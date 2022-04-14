@@ -1,6 +1,8 @@
 ###  Summary
 
-Describe the goal of this PR. Mention any related Issue numbers.
+Describe the goal of this PR. Mention any related Issue numbers. Please note that we do not normally
+accept new externally-contributed PRs to this repo unless it's something Slack-relevant and came 
+up in prior discussion
 
 ### Requirements (place an `x` in each `[ ]`)
 
