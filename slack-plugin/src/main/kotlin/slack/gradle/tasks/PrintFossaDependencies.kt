@@ -1,0 +1,59 @@
+/*
+ * Copyright (C) 2022 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package slack.gradle.tasks
+
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.OutputFile
+
+/**
+ * A task that writes runtime dependency info found in [configuration].
+ *
+ * This is used by the Fossa tool to parse and look up our dependencies. The output file is in the
+ * form of a newline-delimited list of `<module identifier>:<version>`.
+ *
+ * Example:
+ *
+ * ```
+ * mvn+com.google.gson:gson:2.8.6
+ * mvn+com.google.guava:guava:29-jre
+ * ```
+ *
+ * More details:
+ * https://slack-pde.slack.com/archives/C012A55CZNH/p1607469397011200?thread_ts=1607384582.004300&cid=C012A55CZNH
+ *
+ * This task is not cacheable as it has no inputs and is run on demand.
+ */
+public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
+
+  @get:OutputFile public abstract val outputFile: RegularFileProperty
+
+  init {
+    group = "slack"
+  }
+
+  override fun handleDependencies(dependencies: Map<String, String>) {
+    val file = outputFile.asFile.get()
+    file.bufferedWriter().use { writer ->
+      dependencies
+        .entries
+        .map { (moduleIdentifier, version) -> "mvn+$moduleIdentifier:$version" }
+        .sorted()
+        .joinTo(writer, separator = "\n")
+    }
+
+    logger.lifecycle("Fossa deps written to $file")
+  }
+}
