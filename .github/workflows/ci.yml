@@ -37,7 +37,7 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
 
       - name: Generate cache key
-        run: ./checksum.sh checksum.txt
+        run: ./.github/checksum.sh checksum.txt
 
       - uses: actions/cache@v2
         with:
