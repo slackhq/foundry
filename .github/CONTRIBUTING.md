@@ -11,10 +11,11 @@ conventional to check out.
 
 The primary project is `slack-plugin`.
 
-This project is written in Kotlin.
+Kotlin should be used for more idiomatic use with Gradle/AGP APIs
 
-## Setup
+Code formatting is checked via [Spotless](https://github.com/diffplug/spotless). To run the formatter,
+use the `spotlessApply` command.
 
-Be sure your devel environment has `ANDROID_HOME` defined or you'll have trouble running tests
-that require the Android SDK. If you've added it and still seeing the error about not having it
-defined while running tests, try closing and re-opening Android Studio.
+```bash
+./gradlew spotlessApply
+```
