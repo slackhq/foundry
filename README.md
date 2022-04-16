@@ -142,7 +142,7 @@ generated baselines from each subproject into a single global baseline.
 
 ### Misc tools
 
-There is a _ton_ of miscellaneous tools, utilities, and glue code for Gradle (and various plugins) sprinkled throughout this project.
+There are a _ton_ of miscellaneous tools, utilities, and glue code for Gradle (and various plugins) sprinkled throughout this project.
 
 License
 --------
