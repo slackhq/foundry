@@ -112,7 +112,7 @@ slack {
 
 AGP offers new property-based APIs for computing APK version codes and version names. We use this
 to compute information from different inputs (CI build number, git state, etc) and control this
-logic in `ApkVersioningPLugin.kt`.
+logic in `ApkVersioningPlugin.kt`.
 
 ### Check dependency versions
 
