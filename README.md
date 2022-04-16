@@ -85,7 +85,7 @@ dependency of all `Test` tasks.
 
 We try to simplify and streamline the bootstrap process for both local development and on CI. This
 involves computing optimized JVM arguments for the Gradle and Kotlin daemons (which differ between
-CI and local) as well as toe-holds for future customizations.
+CI and local) as well as toe-holds for future customizations. This logic lives in `BootstrapTask.kt`.
 
 ### Permission Checks
 
