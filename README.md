@@ -39,13 +39,20 @@ controlled via `SlackExtension`.
 slack {
   features {
     dagger()
+    moshi(codegen = true)
+  }
+  android {
+    features {
+      robolectric()
+    }
   }
 }
 ```
 
 A major benefit of this is that we can intelligently configure features and avoid applying costly
 plugins like Kapt unless they're actually needed for a specific feature, such as Java injections in
-projects using Dagger.
+projects using Dagger. Since this is pure code, we can also propagate deprecated behavior by 
+deprecating the corresponding functions in the DSL.
 
 ### Platform plugins
 
@@ -92,7 +99,7 @@ CI and local) as well as toe-holds for future customizations. This logic lives i
 To avoid accidentally checking in any new, unexpected manifest permissions, we have a
 `CheckManifestPermissionsTask` that compares the final merged manifest's permissions to an
 allow list of known permissions. This is allow list is checked in and expected to be guarded by a
-CODEOWNER watch and will fail the build if they differ.
+`CODEOWNERS` watch and will fail the build if they differ.
 
 ```kotlin
 slack {
