@@ -140,6 +140,10 @@ global baseline file for baselined issues (when introducing new checks or update
 doesn't currently support this easily. So, we built `MergeDetektBaselinesTask` to merge all the
 generated baselines from each subproject into a single global baseline.
 
+### Misc tools
+
+There is a _ton_ of miscellaneous tools, utilities, and glue code for Gradle (and various plugins) sprinkled throughout this project.
+
 License
 --------
 
