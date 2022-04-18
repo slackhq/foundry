@@ -706,7 +706,8 @@ internal class StandardProjectConfigurations {
                   when (it) {
                     // Skip dashes and underscores. We could camelcase but it looks weird in a
                     // package name
-                    '-', '_' -> null
+                    '-',
+                    '_' -> null
                     // Use the project path as the real dot namespacing
                     ':' -> '.'
                     else -> it
