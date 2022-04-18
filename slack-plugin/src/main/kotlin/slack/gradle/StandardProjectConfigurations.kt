@@ -694,14 +694,16 @@ internal class StandardProjectConfigurations {
         }
         // We don't set targetSdkVersion in libraries since this is controlled by the app.
 
-        // Configure generated manifest
-        // TODO disabled because it seems that disabling android resources always results in
-        //  AndroidSourceSet.manifest.srcFile to exist for some reason
-        //        AutoManifest.configure(
-        //          project = project,
-        //          libraryExtension = this@configure,
-        //          handler = slackExtension.androidHandler.libraryHandler.manifestHandler
-        //        )
+        // TODO namespace is unfortunately not a property so we can't chain this. Would be nice if
+        //  it was.
+        if (slackProperties.computeAndroidNamespace) {
+          namespace =
+            "slack" +
+              project
+                .path
+                .snakeToCamel() // handles dashes and underscores in names
+                .replace(':', '.')
+        }
       }
 
       slackExtension.androidHandler.configureFeatures(project, slackProperties)
