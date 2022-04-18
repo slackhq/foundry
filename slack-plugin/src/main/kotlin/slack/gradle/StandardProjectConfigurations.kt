@@ -681,6 +681,30 @@ internal class StandardProjectConfigurations {
             }
           }
         }
+
+        // namespace is not a property but we can hook into DSL finalizing to set it at the end
+        // if the build script didn't declare one prior
+        finalizeDsl { libraryExtension ->
+          if (libraryExtension.namespace == null) {
+            libraryExtension.namespace =
+              "slack" +
+                project
+                  .path
+                  .asSequence()
+                  .mapNotNull {
+                    when (it) {
+                      // Skip dashes and underscores. We could camelcase but it looks weird in a
+                      // package name
+                      '-',
+                      '_' -> null
+                      // Use the project path as the real dot namespacing
+                      ':' -> '.'
+                      else -> it
+                    }
+                  }
+                  .joinToString("")
+          }
+        }
       }
       configure<LibraryExtension> {
         commonBaseExtensionConfig()
@@ -693,28 +717,6 @@ internal class StandardProjectConfigurations {
           testBuildType = "release"
         }
         // We don't set targetSdkVersion in libraries since this is controlled by the app.
-
-        // TODO namespace is unfortunately not a property so we can't chain this. Would be nice if
-        //  it was.
-        if (slackProperties.computeAndroidNamespace) {
-          namespace =
-            "slack" +
-              project
-                .path
-                .asSequence()
-                .mapNotNull {
-                  when (it) {
-                    // Skip dashes and underscores. We could camelcase but it looks weird in a
-                    // package name
-                    '-',
-                    '_' -> null
-                    // Use the project path as the real dot namespacing
-                    ':' -> '.'
-                    else -> it
-                  }
-                }
-                .joinToString("")
-        }
       }
 
       slackExtension.androidHandler.configureFeatures(project, slackProperties)
