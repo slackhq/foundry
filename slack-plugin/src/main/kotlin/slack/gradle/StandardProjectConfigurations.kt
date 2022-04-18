@@ -701,8 +701,18 @@ internal class StandardProjectConfigurations {
             "slack" +
               project
                 .path
-                .snakeToCamel() // handles dashes and underscores in names
-                .replace(':', '.')
+                .asSequence()
+                .mapNotNull {
+                  when (it) {
+                    // Skip dashes and underscores. We could camelcase but it looks weird in a
+                    // package name
+                    '-', '_' -> null
+                    // Use the project path as the real dot namespacing
+                    ':' -> '.'
+                    else -> it
+                  }
+                }
+                .joinToString("")
         }
       }
 
