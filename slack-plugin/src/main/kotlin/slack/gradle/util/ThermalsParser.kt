@@ -185,7 +185,7 @@ public data class ThermLog(
   val isThrottled: Boolean = speedLimit != -1 && speedLimit < 100
 }
 
-internal object M1ThermalParser {
+internal object AppleSiliconThermals {
   fun getThermals(): ThermalState? {
     val rawValue = JnaThermalState.INSTANCE.thermal_state()
     // Raw value in this case is 0-4, which we use as the ordinal of our enums for convenience

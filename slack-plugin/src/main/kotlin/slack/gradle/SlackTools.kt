@@ -42,11 +42,11 @@ import slack.cli.AppleSiliconCompat.Arch.X86_64
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
-import slack.gradle.util.M1ThermalParser
-import slack.gradle.util.M1ThermalParser.ThermalState.CRITICAL
-import slack.gradle.util.M1ThermalParser.ThermalState.FAIR
-import slack.gradle.util.M1ThermalParser.ThermalState.NOMINAL
-import slack.gradle.util.M1ThermalParser.ThermalState.SERIOUS
+import slack.gradle.util.AppleSiliconThermals
+import slack.gradle.util.AppleSiliconThermals.ThermalState.CRITICAL
+import slack.gradle.util.AppleSiliconThermals.ThermalState.FAIR
+import slack.gradle.util.AppleSiliconThermals.ThermalState.NOMINAL
+import slack.gradle.util.AppleSiliconThermals.ThermalState.SERIOUS
 import slack.gradle.util.ThermLog
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsData
@@ -118,7 +118,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
             availableCpus = 0,
             // These aren't entirely true numbers but best effort for now
             speedLimit =
-              when (M1ThermalParser.getThermals()) {
+              when (AppleSiliconThermals.getThermals()) {
                 NOMINAL -> 100
                 FAIR -> 75
                 SERIOUS -> 50
