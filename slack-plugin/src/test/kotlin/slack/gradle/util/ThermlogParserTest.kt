@@ -20,11 +20,11 @@ import java.time.LocalDateTime
 import org.junit.Assert.fail
 import org.junit.Test
 
-class ThermalsParserTest {
+class ThermlogParserTest {
 
   @Test
   fun happyPath() {
-    val log = ThermalsParser.parse(UNTHROTTLED_EXAMPLE)
+    val log = ThermlogParser.parse(UNTHROTTLED_EXAMPLE)
     check(log is ThermalsData)
     assertThat(log.wasThrottled).isFalse()
     assertThat(log.logs)
@@ -37,14 +37,14 @@ class ThermalsParserTest {
 
   @Test
   fun emptyLogs() {
-    val log = ThermalsParser.parse("")
+    val log = ThermlogParser.parse("")
     check(log is Thermals.Empty)
     assertThat(log.wasThrottled).isFalse()
   }
 
   @Test
   fun throttled() {
-    val log = ThermalsParser.parse(THROTTLED_EXAMPLE)
+    val log = ThermlogParser.parse(THROTTLED_EXAMPLE)
     check(log is ThermalsData)
     assertThat(log.wasThrottled).isTrue()
     assertThat(log.logs)
@@ -57,7 +57,7 @@ class ThermalsParserTest {
 
   @Test
   fun incompleteDataIsSkipped() {
-    val log = ThermalsParser.parse(INCOMPLETE_EXAMPLE)
+    val log = ThermlogParser.parse(INCOMPLETE_EXAMPLE)
     check(log is ThermalsData)
     assertThat(log.wasThrottled).isFalse()
     assertThat(log.logs)
@@ -103,7 +103,7 @@ class ThermalsParserTest {
 
   @Test
   fun garbageDataIsGracefullySkipped() {
-    val log = checkNotNull(ThermalsParser.parse(GARBAGE_DATA))
+    val log = checkNotNull(ThermlogParser.parse(GARBAGE_DATA))
     check(log is ThermalsData)
     assertThat(log.logs).hasSize(2)
     assertThat(log.logs[0].speedLimit).isEqualTo(90)
@@ -117,7 +117,7 @@ class ThermalsParserTest {
     cpuLimit: Int
   ): ThermLog {
     return ThermLog(
-      LocalDateTime.parse(rawString, ThermalsParser.TIMESTAMP_PATTERN),
+      LocalDateTime.parse(rawString, ThermlogParser.TIMESTAMP_PATTERN),
       schedulerLimit,
       availableCpus,
       cpuLimit
