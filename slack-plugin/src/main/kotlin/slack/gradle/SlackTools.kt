@@ -106,9 +106,9 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     }
 
   // TODO unify this API with the other thermals logging?
-  private val m1Thermals: BehaviorSubject<Thermals> = BehaviorSubject.create()
+  private val appleSiliconThermals: BehaviorSubject<Thermals> = BehaviorSubject.create()
   @Suppress("UNCHECKED_CAST")
-  private val m1ThermalsHeartbeat: Disposable =
+  private val appleSiliconThermalsHeartbeat: Disposable =
     if (logThermals && AppleSiliconCompat.Arch.get() == ARM64) {
       Observable.interval(5, SECONDS)
         .map {
@@ -138,7 +138,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
             is ThermalsData -> ThermalsData(acc.logs + next)
           }
         }
-        .subscribe { m1Thermals.onNext(it) }
+        .subscribe { appleSiliconThermals.onNext(it) }
     } else {
       Disposable.empty()
     }
@@ -155,7 +155,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   private fun readThermalsResult(): Thermals? {
     return if (logThermals) {
       if (AppleSiliconCompat.Arch.get() == ARM64) {
-        m1Thermals.value
+        appleSiliconThermals.value
       } else {
         val file = parameters.thermalsOutputFile.asFile.get()
         // File may no longer exist if they were running `clean`
@@ -172,7 +172,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   }
 
   override fun close() {
-    m1ThermalsHeartbeat.dispose()
+    appleSiliconThermalsHeartbeat.dispose()
     try {
       // Close thermals process and save off its current value
       thermalsAtClose = readThermalsResult()
