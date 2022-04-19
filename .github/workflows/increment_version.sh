@@ -6,11 +6,6 @@ source .github/workflows/scriptUtil.sh
 # Parse the current version, strip leading zeros, increment
 CURRENT_VERSION=$(getProperty 'VERSION_NAME' gradle.properties)
 
-# Export the coordinates while we're at it for later use in publish-*.yml files
-# Group is always in our root dir
-GROUP=$(getProperty 'GROUP' gradle.properties)
-ARTIFACT=$(getProperty 'POM_ARTIFACT_ID' gradle.properties)
-
 STRIPPED_CURRENT=$(echo "$CURRENT_VERSION" | sed 's/^0*//')
 if [[ "$REQUESTED_VERSION" != "" ]]; then
   NEW_VERSION=$REQUESTED_VERSION
