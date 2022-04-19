@@ -15,7 +15,7 @@
  */
 package slack.stats
 
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.google.common.base.CaseFormat
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
@@ -42,6 +42,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
@@ -176,35 +177,36 @@ public object ModuleStatsTasks {
           }
         }
 
-        project.afterEvaluate {
-          val extension = the<LibraryExtension>()
-          val targetVariant =
-            if (multiVariant) {
-              val defaultBuildType = extension.buildTypes.find { it.isDefault }?.name ?: "release"
-              val defaultFlavor = extension.productFlavors.find { it.isDefault }?.name ?: ""
-              "$defaultFlavor${defaultBuildType.safeCapitalize()}"
-            } else {
-              "release"
+        project.configure<LibraryAndroidComponentsExtension> {
+          finalizeDsl { extension ->
+            val targetVariant =
+              if (multiVariant) {
+                val defaultBuildType = extension.buildTypes.find { it.isDefault }?.name ?: "release"
+                val defaultFlavor = extension.productFlavors.find { it.isDefault }?.name ?: ""
+                "$defaultFlavor${defaultBuildType.safeCapitalize()}"
+              } else {
+                "release"
+              }
+
+            if (includeGenerated) {
+              val compileLifecycleTask =
+                project.tasks.named("compile${targetVariant.safeCapitalize()}Sources")
+              collector.value.dependsOn(compileLifecycleTask)
             }
 
-          if (includeGenerated) {
-            val compileLifecycleTask =
-              tasks.named("compile${targetVariant.safeCapitalize()}Sources")
-            collector.value.dependsOn(compileLifecycleTask)
-          }
-
-          // TODO do we need to check the gradle properties too?
-          val androidResources = extension.buildFeatures.androidResources == true
-          val viewBinding = extension.buildFeatures.viewBinding == true
-          if (viewBinding) {
-            addGeneratedSources()
-          }
-          collector.value.configure {
-            if (androidResources) {
-              tags.add(ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED)
-            }
+            // TODO do we need to check the gradle properties too?
+            val androidResources = extension.buildFeatures.androidResources == true
+            val viewBinding = extension.buildFeatures.viewBinding == true
             if (viewBinding) {
-              tags.add(ModuleStatsCollectorTask.TAG_VIEW_BINDING)
+              addGeneratedSources()
+            }
+            collector.value.configure {
+              if (androidResources) {
+                tags.add(ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED)
+              }
+              if (viewBinding) {
+                tags.add(ModuleStatsCollectorTask.TAG_VIEW_BINDING)
+              }
             }
           }
         }
