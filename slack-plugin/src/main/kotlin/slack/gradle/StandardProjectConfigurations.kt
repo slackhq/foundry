@@ -681,6 +681,30 @@ internal class StandardProjectConfigurations {
             }
           }
         }
+
+        // namespace is not a property but we can hook into DSL finalizing to set it at the end
+        // if the build script didn't declare one prior
+        finalizeDsl { libraryExtension ->
+          if (libraryExtension.namespace == null) {
+            libraryExtension.namespace =
+              "slack" +
+                project
+                  .path
+                  .asSequence()
+                  .mapNotNull {
+                    when (it) {
+                      // Skip dashes and underscores. We could camelcase but it looks weird in a
+                      // package name
+                      '-',
+                      '_' -> null
+                      // Use the project path as the real dot namespacing
+                      ':' -> '.'
+                      else -> it
+                    }
+                  }
+                  .joinToString("")
+          }
+        }
       }
       configure<LibraryExtension> {
         commonBaseExtensionConfig()
@@ -693,15 +717,6 @@ internal class StandardProjectConfigurations {
           testBuildType = "release"
         }
         // We don't set targetSdkVersion in libraries since this is controlled by the app.
-
-        // Configure generated manifest
-        // TODO disabled because it seems that disabling android resources always results in
-        //  AndroidSourceSet.manifest.srcFile to exist for some reason
-        //        AutoManifest.configure(
-        //          project = project,
-        //          libraryExtension = this@configure,
-        //          handler = slackExtension.androidHandler.libraryHandler.manifestHandler
-        //        )
       }
 
       slackExtension.androidHandler.configureFeatures(project, slackProperties)

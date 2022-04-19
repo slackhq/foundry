@@ -242,13 +242,13 @@ internal fun VersionCatalog.identifierMap(): Map<String, String> {
  * nesting.
  */
 internal fun tomlKey(key: String): String =
-  key.replace("-", "%").replace(".", "-").replace("%", ".").replace("_", ".").toCamel()
+  key.replace("-", "%").replace(".", "-").replace("%", ".").replace("_", ".").snakeToCamel()
 
-private fun String.toCamel(): String {
+internal fun String.snakeToCamel(upper: Boolean = false): String {
   return buildString {
-    var capNext = false
-    for (c in this@toCamel) {
-      if (c == '.' || c == '_') {
+    var capNext = upper
+    for (c in this@snakeToCamel) {
+      if (c == '_' || c == '-' || c == '.') {
         capNext = true
         continue
       } else {

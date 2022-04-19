@@ -87,10 +87,6 @@ public class SlackProperties private constructor(private val project: Project) {
   public val rakeNoApi: Boolean
     get() = booleanProperty("slack.gradle.config.rake.noapi")
 
-  /** Flag to indicate a generated manifest package name. */
-  public val generatedManifestPackageName: String?
-    get() = optionalStringProperty("slack.gradle.config.manifest.packageName")
-
   /**
    * Flag to enable the Gradle Dependency Analysis Plugin, which is disabled by default due to
    * https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/204

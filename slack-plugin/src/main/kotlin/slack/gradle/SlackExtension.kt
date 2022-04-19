@@ -689,42 +689,8 @@ public abstract class AndroidFeaturesHandler {
 }
 
 @SlackExtensionMarker
-public abstract class SlackAndroidLibraryExtension @Inject constructor(objects: ObjectFactory) {
-
-  internal val manifestHandler = objects.newInstance<ManifestHandler>()
-
-  public fun manifest(action: Action<ManifestHandler>) {
-    action.execute(manifestHandler)
-  }
-
-  /**
-   * Configures a generated manifest for a library project.
-   *
-   * Example:
-   * ```
-   * slack {
-   *   manifest {
-   *     packageName.set("slack.foo.blah")
-   *   }
-   * }
-   * ```
-   */
-  public abstract class ManifestHandler @Inject constructor(objects: ObjectFactory) {
-
-    internal val packageName = objects.property<String>()
-
-    /**
-     * Manifest package names are generated as an interpolation of the project path, but you can set
-     * this to hardcode one if need be.
-     *
-     * This can also be set via [SlackProperties.generatedManifestPackageName] in gradle.properties.
-     *
-     * Names will be normalized as needed to avoid keywords like "default", etc.
-     */
-    public fun packageName(name: String) {
-      packageName.set(name)
-    }
-  }
+public abstract class SlackAndroidLibraryExtension {
+  // Left as a toe-hold for the future
 }
 
 @SlackExtensionMarker

@@ -51,7 +51,7 @@ slack {
 
 A major benefit of this is that we can intelligently configure features and avoid applying costly
 plugins like Kapt unless they're actually needed for a specific feature, such as Java injections in
-projects using Dagger. Since this is pure code, we can also propagate deprecated behavior by 
+projects using Dagger. Since this is pure code, we can also propagate deprecated behavior by
 deprecating the corresponding functions in the DSL.
 
 ### Platform plugins
