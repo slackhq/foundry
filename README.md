@@ -68,6 +68,12 @@ their impact. We support both Intel and Apple Silicon macs now and contain this 
 `ThermalsParser.kt`. This also includes helpful charting APIs for visualizing the data (courtesy
 of our friends at Square).
 
+### Better Properties
+
+Gradle's built-in property support is limited and has surprising behavior, so we have our own 
+system on top of it that has consistent precedence, `local.properties` support, local project 
+properties, and configuration caching support. Check out `safeProperty()` in `PropertyUtil.kt`.
+
 ### Dependency Rake
 
 `DependencyRake.kt` contains an extension to the `gradle-dependency-analysis-plugin` that applies
