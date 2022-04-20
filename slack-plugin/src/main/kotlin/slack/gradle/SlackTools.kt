@@ -98,11 +98,12 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   override fun close() {
     // Close thermals process and save off its current value
     thermalsAtClose = thermalsWatcher?.stop()
-    if (!parameters.offline.get()) {
-      thermalsAtClose?.let { thermalsReporter?.reportThermals(it) }
-    }
-    try {} catch (t: Throwable) {
-      logger.error("Failed to parse thermals", t)
+    try {
+      if (!parameters.offline.get()) {
+        thermalsAtClose?.let { thermalsReporter?.reportThermals(it) }
+      }
+    } catch (t: Throwable) {
+      logger.error("Failed to report thermals", t)
     } finally {
       if (okHttpClient.isInitialized()) {
         with(okHttpClient.value) {
