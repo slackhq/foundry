@@ -68,6 +68,10 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       return thermalsAtClose ?: peekThermals()
     }
 
+  init {
+    thermalsWatcher?.start()
+  }
+
   public fun registerExtension(extension: SlackToolsExtension) {
     val dependencies =
       object : SlackToolsDependencies {
