@@ -15,13 +15,8 @@
  */
 package slack.gradle
 
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.File
-import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
@@ -36,21 +31,11 @@ import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.registerIfAbsent
-import slack.cli.AppleSiliconCompat
-import slack.cli.AppleSiliconCompat.Arch.ARM64
-import slack.cli.AppleSiliconCompat.Arch.X86_64
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
-import slack.gradle.util.M1ThermalParser
-import slack.gradle.util.M1ThermalParser.ThermalState.CRITICAL
-import slack.gradle.util.M1ThermalParser.ThermalState.FAIR
-import slack.gradle.util.M1ThermalParser.ThermalState.NOMINAL
-import slack.gradle.util.M1ThermalParser.ThermalState.SERIOUS
-import slack.gradle.util.ThermLog
 import slack.gradle.util.Thermals
-import slack.gradle.util.ThermalsData
-import slack.gradle.util.ThermalsParser
+import slack.gradle.util.ThermalsWatcher
 import slack.gradle.util.mapToBoolean
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
@@ -64,16 +49,28 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   // work for BuildService parameters
   public lateinit var globalConfig: GlobalConfig
 
-  public var thermalsReporter: ThermalsReporter? = null
-
   private val logger = Logging.getLogger("SlackTools")
   private val extensions = ConcurrentHashMap<KClass<out SlackToolsExtension>, SlackToolsExtension>()
 
   public lateinit var okHttpClient: Lazy<OkHttpClient>
 
+  private var thermalsReporter: ThermalsReporter? = null
   private val logThermals =
     OperatingSystem.current().isMacOsX &&
       providers.gradleProperty(SlackProperties.LOG_THERMALS).mapToBoolean().getOrElse(false)
+
+  private val thermalsWatcher = if (logThermals) ThermalsWatcher(::thermalsFile) else null
+  private var thermalsAtClose: Thermals? = null
+
+  /** Returns the current or latest captured thermals log. */
+  public val thermals: Thermals?
+    get() {
+      return thermalsAtClose ?: peekThermals()
+    }
+
+  init {
+    thermalsWatcher?.start()
+  }
 
   public fun registerExtension(extension: SlackToolsExtension) {
     val dependencies =
@@ -98,91 +95,20 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     }
   }
 
-  private val thermalsLogProcess: Process? =
-    if (logThermals && AppleSiliconCompat.Arch.get() == X86_64) {
-      ProcessBuilder("pmset", "-g", "thermlog").redirectOutput(thermalsFile()).start()
-    } else {
-      null
-    }
-
-  // TODO unify this API with the other thermals logging?
-  private val m1Thermals: BehaviorSubject<Thermals> = BehaviorSubject.create()
-  @Suppress("UNCHECKED_CAST")
-  private val m1ThermalsHeartbeat: Disposable =
-    if (logThermals && AppleSiliconCompat.Arch.get() == ARM64) {
-      Observable.interval(5, SECONDS)
-        .map {
-          ThermLog(
-            timestamp = LocalDateTime.now(),
-            schedulerLimit = 0,
-            availableCpus = 0,
-            // These aren't entirely true numbers but best effort for now
-            speedLimit =
-              when (M1ThermalParser.getThermals()) {
-                NOMINAL -> 100
-                FAIR -> 75
-                SERIOUS -> 50
-                CRITICAL -> 25
-                null -> -1
-              },
-          )
-        }
-        .filter { it.speedLimit != -1 }
-        .map {
-          thermalsFile().appendText("\n${it.timestamp} - ${it.speedLimit}")
-          it
-        }
-        .scanWith<Thermals>({ Thermals.Empty }) { acc, next ->
-          when (acc) {
-            is Thermals.Empty -> ThermalsData(listOf(next))
-            is ThermalsData -> ThermalsData(acc.logs + next)
-          }
-        }
-        .subscribe { m1Thermals.onNext(it) }
-    } else {
-      Disposable.empty()
-    }
-
-  private var thermalsAtClose: Thermals? = null
-
-  /** Returns the current or latest captured thermals log. */
-  public val thermals: Thermals?
-    get() {
-      return thermalsAtClose ?: readThermalsResult()
-    }
-
-  @Synchronized
-  private fun readThermalsResult(): Thermals? {
-    return if (logThermals) {
-      if (AppleSiliconCompat.Arch.get() == ARM64) {
-        m1Thermals.value
-      } else {
-        val file = parameters.thermalsOutputFile.asFile.get()
-        // File may no longer exist if they were running `clean`
-        if (file.exists()) {
-          val thermalsLog = file.readText()
-          ThermalsParser.parse(thermalsLog)
-        } else {
-          Thermals.Empty
-        }
-      }
-    } else {
-      null
-    }
+  private fun peekThermals(): Thermals? {
+    return thermalsWatcher?.peek()
   }
 
   override fun close() {
-    m1ThermalsHeartbeat.dispose()
+    // Close thermals process and save off its current value
+    thermalsAtClose = thermalsWatcher?.stop()
     try {
-      // Close thermals process and save off its current value
-      thermalsAtClose = readThermalsResult()
       if (!parameters.offline.get()) {
         thermalsAtClose?.let { thermalsReporter?.reportThermals(it) }
       }
     } catch (t: Throwable) {
-      logger.error("Failed to parse thermals", t)
+      logger.error("Failed to report thermals", t)
     } finally {
-      thermalsLogProcess?.destroyForcibly()?.waitFor()
       if (okHttpClient.isInitialized()) {
         with(okHttpClient.value) {
           dispatcher.executorService.shutdown()

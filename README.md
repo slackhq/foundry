@@ -62,17 +62,18 @@ it to all projects in the consuming repo and reduce dependency version stratific
 
 ### Thermal throttling capture
 
-Macbooks can suffer thermal throttling and result in poor build performance. We built
+MacBooks can suffer thermal throttling and result in poor build performance. We built
 instrumentation for this to capture these and include them in our build scans to better understand
 their impact. We support both Intel and Apple Silicon macs now and contain this implementation in
-`ThermalsParser.kt`. This also includes helpful charting APIs for visualizing the data (courtesy
+`ThermalsWatcher.kt`. This also includes helpful charting APIs for visualizing the data (courtesy
 of our friends at Square).
 
 ### Better Properties
 
-Gradle's built-in property support is limited and has surprising behavior, so we have our own 
-system on top of it that has consistent precedence, `local.properties` support, local project 
-properties, and configuration caching support. Check out `safeProperty()` in `PropertyUtil.kt`.
+Gradle's built-in property support is limited and has surprising behavior, so we have our own
+system on top of it that has consistent precedence, `local.properties` support, project-local
+`gradle.properties`, and configuration caching support. Check out `safeProperty()` in
+`PropertyUtil.kt`.
 
 ### Dependency Rake
 

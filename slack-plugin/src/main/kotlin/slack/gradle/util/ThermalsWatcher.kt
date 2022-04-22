@@ -17,15 +17,90 @@ package slack.gradle.util
 
 import com.sun.jna.Library
 import com.sun.jna.Native
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.Throws
+import slack.cli.AppleSiliconCompat.Arch
+import slack.cli.AppleSiliconCompat.Arch.ARM64
+import slack.cli.AppleSiliconCompat.Arch.X86_64
+import slack.gradle.util.AppleSiliconThermals.ThermalState.CRITICAL
+import slack.gradle.util.AppleSiliconThermals.ThermalState.FAIR
+import slack.gradle.util.AppleSiliconThermals.ThermalState.NOMINAL
+import slack.gradle.util.AppleSiliconThermals.ThermalState.SERIOUS
 import slack.gradle.util.charting.ChartCreator
 
+/**
+ * Simple interface for recording thermals data during the course of a build. The watcher should be
+ * [started][start] when the build is started and [stopped][stop] when the build is complete.
+ *
+ * Current thermals data can be [peeked][peek] at at any time.
+ */
+// Can't be a sealed interface because Gradle hasn't figured out Kotlin 1.5 yet.
+internal interface ThermalsWatcher {
+  fun start()
+
+  fun peek(): Thermals
+
+  fun stop(): Thermals
+
+  companion object {
+    operator fun invoke(thermalsFileProvider: () -> File): ThermalsWatcher {
+      return when (val arch = Arch.get()) {
+        ARM64 -> AppleSiliconThermals(thermalsFileProvider)
+        X86_64 -> IntelThermalsParser(thermalsFileProvider)
+        else -> throw IllegalStateException("Unsupported architecture: $arch")
+      }
+    }
+  }
+}
+
+internal class IntelThermalsParser(val thermalsFileProvider: () -> File) : ThermalsWatcher {
+
+  private var process: Process? = null
+  private var thermalsFile: File? = null
+  private val started = AtomicBoolean(false)
+  override fun start() {
+    check(!started.getAndSet(true)) { "Already started" }
+    thermalsFile = thermalsFileProvider()
+    process = ProcessBuilder("pmset", "-g", "thermlog").redirectOutput(thermalsFile).start()
+  }
+
+  override fun peek(): Thermals {
+    check(started.get()) { "Not started" }
+    val file = thermalsFile ?: return Thermals.Empty
+    // File may no longer exist if they were running `clean`
+    return if (file.exists()) {
+      val thermalsLog = file.readText()
+      ThermlogParser.parse(thermalsLog)
+    } else {
+      Thermals.Empty
+    }
+  }
+
+  override fun stop(): Thermals {
+    check(started.getAndSet(false)) { "Not started" }
+    val thermals =
+      try {
+        peek()
+      } finally {
+        process?.destroyForcibly()?.waitFor()
+      }
+    process = null
+    thermalsFile = null
+    return thermals
+  }
+}
+
 /** Utility for parsing thermals as reported by `pmset -g thermlog`. */
-internal object ThermalsParser {
+internal object ThermlogParser {
   internal val TIMESTAMP_PATTERN = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z")
 
   internal fun parse(log: String): Thermals {
@@ -185,8 +260,63 @@ public data class ThermLog(
   val isThrottled: Boolean = speedLimit != -1 && speedLimit < 100
 }
 
-internal object M1ThermalParser {
-  fun getThermals(): ThermalState? {
+internal class AppleSiliconThermals(
+  private val thermalsFileProvider: () -> File,
+) : ThermalsWatcher {
+
+  private var emissions: BehaviorSubject<Thermals> = BehaviorSubject.create()
+  private var heartbeat: Disposable? = null
+  private var thermalsFile: File? = null
+  private val started = AtomicBoolean(false)
+
+  override fun start() {
+    check(!started.getAndSet(true)) { "Already started." }
+    thermalsFile = thermalsFileProvider()
+    heartbeat =
+      Observable.interval(5, SECONDS)
+        .map {
+          ThermLog(
+            timestamp = LocalDateTime.now(),
+            schedulerLimit = 0,
+            availableCpus = 0,
+            // These aren't entirely true numbers but best effort for now
+            speedLimit =
+              when (getThermalState()) {
+                NOMINAL -> 100
+                FAIR -> 75
+                SERIOUS -> 50
+                CRITICAL -> 25
+                null -> -1
+              },
+          )
+        }
+        .filter { it.speedLimit != -1 }
+        .doOnNext { thermalsFile?.appendText("\n${it.timestamp} - ${it.speedLimit}") }
+        .scanWith<Thermals>({ Thermals.Empty }) { acc, next ->
+          when (acc) {
+            is Thermals.Empty -> ThermalsData(listOf(next))
+            is ThermalsData -> ThermalsData(acc.logs + next)
+          }
+        }
+        .subscribe { emissions.onNext(it) }
+  }
+
+  override fun peek(): Thermals {
+    check(started.get()) { "Not started." }
+    return emissions.value ?: Thermals.Empty
+  }
+
+  override fun stop(): Thermals {
+    check(started.getAndSet(false)) { "Not started." }
+    heartbeat?.dispose()
+    heartbeat = null
+    thermalsFile = null
+    val thermals = emissions.value ?: Thermals.Empty
+    emissions = BehaviorSubject.create()
+    return thermals
+  }
+
+  private fun getThermalState(): ThermalState? {
     val rawValue = JnaThermalState.INSTANCE.thermal_state()
     // Raw value in this case is 0-4, which we use as the ordinal of our enums for convenience
     return if (rawValue in 0..ThermalState.values().size) {
