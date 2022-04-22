@@ -535,7 +535,6 @@ internal object BootstrapUtils {
           // - https://github.com/gradle/gradle/issues/19750
           // - Gradle's default is really low
           "-XX:MaxMetaspaceSize=1g",
-          "-XX:+HeapDumpOnOutOfMemoryError"
         ) + extraArgs,
         maxWorkers
       )
