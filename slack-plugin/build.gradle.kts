@@ -68,7 +68,6 @@ dependencies {
   compileOnly(libs.gradlePlugins.errorProne)
   compileOnly(libs.gradlePlugins.nullaway)
   compileOnly(libs.gradlePlugins.dependencyAnalysis)
-  compileOnly(libs.gradlePlugins.canIDropJetifier)
   compileOnly(libs.gradlePlugins.retry)
   compileOnly(libs.gradlePlugins.anvil)
   compileOnly(libs.gradlePlugins.spotless)

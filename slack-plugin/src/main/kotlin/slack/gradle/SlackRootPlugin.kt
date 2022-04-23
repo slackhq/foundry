@@ -17,7 +17,6 @@ package slack.gradle
 
 import com.autonomousapps.DependencyAnalysisExtension
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import com.github.plnice.canidropjetifier.CanIDropJetifierPluginExtension
 import com.osacky.doctor.DoctorExtension
 import java.util.Locale
 import okhttp3.OkHttpClient
@@ -137,18 +136,6 @@ internal class SlackRootPlugin : Plugin<Project> {
     project.tasks.register<GjfDownloadTask>("updateGjf") {
       version.set(slackProperties.versions.gjf)
       outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
-    }
-
-    // Plugin to check for dependencies that impose a Jetifier requirement
-    // Usage: ./gradlew -Pandroid.enableJetifier=false canIDropJetifier
-    project.pluginManager.withPlugin("com.github.plnice.canidropjetifier") {
-      project.configure<CanIDropJetifierPluginExtension> {
-        // To print out the dependency chain that's incurring it!
-        verbose = true
-        // We disable it because some JVM projects may depend on androidx.annotation (which is just
-        // a jar).
-        analyzeOnlyAndroidModules = false
-      }
     }
 
     // Dependency analysis plugin for build health
