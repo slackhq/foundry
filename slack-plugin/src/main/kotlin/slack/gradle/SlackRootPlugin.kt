@@ -158,11 +158,7 @@ internal class SlackRootPlugin : Plugin<Project> {
         issues {
           all {
             onAny {
-              severity("warn")
-              exclude(
-                // This is a resources-only project.
-                ":libraries:l10n-strings"
-              )
+              ignoreKtx(true)
             }
           }
         }
@@ -171,6 +167,23 @@ internal class SlackRootPlugin : Plugin<Project> {
             ignoreGeneratedCode()
             ignoreInternalPackages()
           }
+        }
+        dependencies {
+          bundle("androidx-paging") { includeGroup("androidx.paging") }
+          bundle("androidx-lifecycle") {
+            includeGroup("androidx.lifecycle")
+            includeGroup("androidx.arch.core")
+          }
+          bundle("bugsnag") { includeGroup("com.bugsnag") }
+          bundle("dagger") {
+            includeGroup("com.google.dagger")
+            includeDependency("javax.inject:javax.inject")
+          }
+          bundle("exoplayer") { includeGroup("com.google.android.exoplayer") }
+          bundle("kotlin-stdlib") { includeGroup("org.jetbrains.kotlin") }
+          bundle("lint-tools") { includeGroup("com.android.tools.lint") }
+          bundle("rxjava") { includeGroup("io.reactivex.rxjava3") }
+          bundle("sqldelight") { includeGroup("com.squareup.sqldelight") }
         }
       }
     }
