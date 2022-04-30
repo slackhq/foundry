@@ -287,7 +287,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
    */
   private fun Coordinates.mapIdentifier(error: Boolean = false): Coordinates {
     return when (this) {
-      is ProjectCoordinates -> this
+      is ProjectCoordinates ->
+        ProjectCoordinates("projects.${convertProjectPathToAccessor(identifier)}")
       is ModuleCoordinates -> {
         val newIdentifier =
           identifierMap.get()[identifier]
@@ -312,8 +313,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
   private fun Coordinates.toDependencyNotation(): String {
     return when (this) {
-      is ProjectCoordinates -> "projects.${convertProjectPathToAccessor(identifier)}"
-      is ModuleCoordinates -> identifier // already mapped
+      is ProjectCoordinates, is ModuleCoordinates ->
+        mapIdentifier(error = true).toDependencyNotation()
       is FlatCoordinates -> gav()
       is IncludedBuildCoordinates -> gav()
     }
