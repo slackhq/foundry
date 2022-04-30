@@ -155,13 +155,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     // Usage: ./gradlew clean buildHealth
     project.pluginManager.withPlugin("com.autonomousapps.dependency-analysis") {
       project.configure<DependencyAnalysisExtension> {
-        issues {
-          all {
-            onAny {
-              ignoreKtx(true)
-            }
-          }
-        }
+        issues { all { onAny { ignoreKtx(true) } } }
         abi {
           exclusions {
             ignoreGeneratedCode()
