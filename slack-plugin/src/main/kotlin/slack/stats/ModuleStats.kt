@@ -27,6 +27,7 @@ import okio.sink
 import okio.source
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
@@ -52,6 +53,7 @@ import org.jgrapht.graph.DirectedAcyclicGraph
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 import slack.gradle.dependsOn
+import slack.gradle.namedLazy
 import slack.gradle.safeCapitalize
 import slack.gradle.util.mapToBoolean
 
@@ -189,9 +191,9 @@ public object ModuleStatsTasks {
               }
 
             if (includeGenerated) {
-              val compileLifecycleTask =
-                project.tasks.named("compile${targetVariant.safeCapitalize()}Sources")
-              collector.value.dependsOn(compileLifecycleTask)
+              project.namedLazy<Task>("compile${targetVariant.safeCapitalize()}Sources") {
+                locTask.dependsOn(it)
+              }
             }
 
             // TODO do we need to check the gradle properties too?

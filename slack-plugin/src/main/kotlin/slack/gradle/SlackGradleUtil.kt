@@ -17,10 +17,17 @@ package slack.gradle
 
 import java.io.File
 import java.util.Locale
+import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.UnknownTaskException
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
 import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
@@ -259,6 +266,36 @@ internal fun String.snakeToCamel(upper: Boolean = false): String {
           append(c)
         }
       }
+    }
+  }
+}
+
+/**
+ * Similar to [TaskContainer.named], but waits until the task is registered if it doesn't exist,
+ * yet. If the task is never registered, then this method will throw an error after the
+ * configuration phase.
+ */
+internal inline fun <reified T : Task> Project.namedLazy(
+  targetName: String,
+  crossinline action: (TaskProvider<T>) -> Unit
+) {
+  try {
+    action(tasks.named<T>(targetName))
+    return
+  } catch (ignored: UnknownTaskException) {}
+
+  var didRun = false
+
+  tasks.withType<T> {
+    if (name == targetName) {
+      action(tasks.named<T>(name))
+      didRun = true
+    }
+  }
+
+  afterEvaluate {
+    if (!didRun) {
+      throw GradleException("Didn't find task $name with type ${T::class}.")
     }
   }
 }
