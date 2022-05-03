@@ -181,7 +181,7 @@ public object ModuleStatsTasks {
           finalizeDsl { extension ->
             val targetVariant =
               if (multiVariant) {
-                val defaultBuildType = extension.buildTypes.find { it.isDefault }?.name ?: "release"
+                val defaultBuildType = extension.buildTypes.find { it.isDefault }?.name ?: "debug"
                 val defaultFlavor = extension.productFlavors.find { it.isDefault }?.name ?: ""
                 "$defaultFlavor${defaultBuildType.safeCapitalize()}"
               } else {
