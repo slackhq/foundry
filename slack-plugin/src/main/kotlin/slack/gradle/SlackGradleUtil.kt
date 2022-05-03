@@ -65,25 +65,24 @@ internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
  */
 internal val Project.isShadowJob: Boolean
   get() =
-      isActionsCi &&
-          providers.environmentVariable("SLACK_SHADOW_JOB").mapToBoolean().getOrElse(false)
+    isActionsCi && providers.environmentVariable("SLACK_SHADOW_JOB").mapToBoolean().getOrElse(false)
 
 /** Returns the git branch this is running on. */
 public fun Project.gitBranch(): Provider<String> {
   return when {
     isJenkins ->
-        providers
-            .environmentVariable("CHANGE_BRANCH")
-            .orElse(providers.environmentVariable("BRANCH_NAME"))
+      providers
+        .environmentVariable("CHANGE_BRANCH")
+        .orElse(providers.environmentVariable("BRANCH_NAME"))
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
-        provider {
-          "git rev-parse --abbrev-ref HEAD"
-              .executeBlockingWithResult(rootProject.rootDir)
-              ?.lines()
-              ?.get(0)
-              ?.trim()
-        }
+      provider {
+        "git rev-parse --abbrev-ref HEAD"
+          .executeBlockingWithResult(rootProject.rootDir)
+          ?.lines()
+          ?.get(0)
+          ?.trim()
+      }
   }
 }
 
@@ -109,11 +108,11 @@ internal fun parseGitVersion(gitVersion: String?): VersionNumber {
     val trimmed = gitVersion.trim()
     val split = trimmed.split("\n").map { it.trim() }
     val versionLine =
-        if (split.size > 1) {
-          split.first { it.startsWith(GIT_VERSION_PREFIX) }
-        } else {
-          split[0]
-        }
+      if (split.size > 1) {
+        split.first { it.startsWith(GIT_VERSION_PREFIX) }
+      } else {
+        split[0]
+      }
     val version = versionLine.removePrefix("git version ")
     return VersionNumber.parse(version)
   }
@@ -123,13 +122,13 @@ internal fun parseGitVersion(gitVersion: String?): VersionNumber {
 
 internal fun robolectricJars(gradleUserHomeDir: File, createDirsIfMissing: Boolean = true): File {
   val slackHome =
-      File(gradleUserHomeDir, "slack").apply {
-        if (createDirsIfMissing) {
-          if (!exists()) {
-            mkdir()
-          }
+    File(gradleUserHomeDir, "slack").apply {
+      if (createDirsIfMissing) {
+        if (!exists()) {
+          mkdir()
         }
       }
+    }
   return File(slackHome, "robolectric-jars").apply {
     if (createDirsIfMissing) {
       if (!exists()) {
@@ -150,9 +149,9 @@ public fun Project.supportedLanguages(supportedLanguages: SupportedLanguagesEnum
   return when (supportedLanguages) {
     SupportedLanguagesEnum.GA -> gaLanguages.toList().filter { it.isNotBlank() }
     SupportedLanguagesEnum.INTERNAL ->
-        internalLanguages.union(gaLanguages).toList().filter { it.isNotBlank() }
+      internalLanguages.union(gaLanguages).toList().filter { it.isNotBlank() }
     SupportedLanguagesEnum.BETA ->
-        betaLanguages.union(gaLanguages).toList().filter { it.isNotBlank() }
+      betaLanguages.union(gaLanguages).toList().filter { it.isNotBlank() }
   }
 }
 
@@ -170,20 +169,20 @@ public enum class SupportedLanguagesEnum {
 public val Project.fullGitSha: String
   get() {
     return "git rev-parse HEAD".executeBlockingWithResult(rootDir)
-        ?: error("No full git sha found!")
+      ?: error("No full git sha found!")
   }
 
 public val Project.gitSha: String
   get() {
     return "git rev-parse --short HEAD".executeBlockingWithResult(rootDir)
-        ?: error("No git sha found!")
+      ?: error("No git sha found!")
   }
 
 public val Project.ciBuildNumber: Provider<String>
   get() {
     return providers
-        .environmentVariable("BUILD_NUMBER")
-        .orElse(providers.environmentVariable("BUILDKITE_BUILD_NUMBER"))
+      .environmentVariable("BUILD_NUMBER")
+      .orElse(providers.environmentVariable("BUILDKITE_BUILD_NUMBER"))
   }
 
 public val Project.jenkinsHome: Provider<String>
@@ -218,13 +217,13 @@ internal fun Project.jvmTargetVersion(): Int {
 }
 
 internal fun Project.getVersionsCatalog(
-    properties: SlackProperties = SlackProperties(this)
+  properties: SlackProperties = SlackProperties(this)
 ): VersionCatalog {
   return getVersionsCatalogOrNull(properties) ?: error("No versions catalog found!")
 }
 
 internal fun Project.getVersionsCatalogOrNull(
-    properties: SlackProperties = SlackProperties(this)
+  properties: SlackProperties = SlackProperties(this)
 ): VersionCatalog? {
   val name = properties.versionCatalogName
   return try {
@@ -251,7 +250,7 @@ internal fun VersionCatalog.identifierMap(): Map<String, String> {
  * nesting.
  */
 internal fun tomlKey(key: String): String =
-    key.replace("-", "%").replace(".", "-").replace("%", ".").replace("_", ".").snakeToCamel()
+  key.replace("-", "%").replace(".", "-").replace("%", ".").replace("_", ".").snakeToCamel()
 
 internal fun String.snakeToCamel(upper: Boolean = false): String {
   return buildString {
@@ -293,8 +292,8 @@ internal fun convertProjectPathToAccessor(projectPath: String): String {
  * configuration phase.
  */
 internal inline fun <reified T : Task> Project.namedLazy(
-    targetName: String,
-    crossinline action: (TaskProvider<T>) -> Unit
+  targetName: String,
+  crossinline action: (TaskProvider<T>) -> Unit
 ) {
   try {
     action(tasks.named<T>(targetName))
