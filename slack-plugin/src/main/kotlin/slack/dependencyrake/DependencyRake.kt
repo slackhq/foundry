@@ -30,6 +30,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.PathSensitive
@@ -60,7 +61,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   // We don't do ABI dependency cleanup yet, see
   // https://github.com/tinyspeck/slack-android-ng/issues/20315
   @get:Input
-  val modes =
+  val modes: SetProperty<AnalysisMode> =
     objects
       .setProperty(AnalysisMode::class.java)
       .convention(
@@ -88,15 +89,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     val noApi = noApi.get()
     val projectAdvice = projectAdvice()
     val redundantPlugins = projectAdvice.pluginAdvice
-    val advices: Set<Advice> =
-      projectAdvice.dependencyAdvice.mapTo(LinkedHashSet()) { advice ->
-        // Remap identifiers to their equivalent `libs.*` reference names.
-        advice.copy(
-          coordinates = advice.coordinates.mapIdentifier(),
-        )
-      }
+    val advices: Set<Advice> = projectAdvice.dependencyAdvice
     val buildFile = buildFileProperty.asFile.get()
-    logger.lifecycle("🌲 Raking $buildFile")
+    logger.lifecycle("🌲 Raking $buildFile ")
     rakeProject(buildFile, advices, redundantPlugins, noApi)
   }
 
@@ -112,14 +107,14 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val unusedDepsToRemove =
       if (AnalysisMode.UNUSED in resolvedModes) {
-        advices.filter { it.isRemove() }.associateBy { it.toDependencyString() }
+        advices.filter { it.isRemove() }.associateBy { it.toDependencyString("UNUSED") }
       } else {
         emptyMap()
       }
 
     val misusedDepsToRemove =
       if (AnalysisMode.MISUSED in resolvedModes) {
-        advices.filter { it.isRemove() }.associateBy { it.toDependencyString() }
+        advices.filter { it.isRemove() }.associateBy { it.toDependencyString("MISUSED") }
       } else {
         emptyMap()
       }
@@ -128,7 +123,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val depsToChange =
       if (AnalysisMode.ABI in resolvedModes) {
-        advices.filter { it.isChange() }.associateBy { it.toDependencyString() }
+        advices.filter { it.isChange() }.associateBy { it.toDependencyString("CHANGE") }
       } else {
         emptyMap()
       }
@@ -146,7 +141,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val compileOnlyDeps =
       if (AnalysisMode.COMPILE_ONLY in resolvedModes) {
-        advices.filter { it.isCompileOnly() }.associateBy { it.toDependencyString() }
+        advices.filter { it.isCompileOnly() }.associateBy {
+          it.toDependencyString("ADD-COMPILE-ONLY")
+        }
       } else {
         emptyMap()
       }
@@ -179,10 +176,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
                   var newConfiguration = advice.toConfiguration!!
                   if (noApi && newConfiguration == "api") {
                     newConfiguration = "implementation"
-                  } else if (!abiModeEnabled) {
-                    newConfiguration = "implementation"
                   }
-                  "  $newConfiguration(${advice.coordinates.toDependencyNotation()})"
+                  "  $newConfiguration(${advice.coordinates.toDependencyNotation("ADD-NEW")})"
                 }
                 .sorted()
                 .forEach {
@@ -217,14 +212,16 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               advices
                 .filter { it.isAdd() }
                 .mapNotNull { depsToAdd.remove(it.coordinates.identifier) }
-                .map { advice ->
-                  val newConfiguration =
-                    if (!abiModeEnabled) {
-                      "implementation"
-                    } else {
-                      advice.toConfiguration
-                    }
-                  "  $newConfiguration(${advice.coordinates.toDependencyNotation()})"
+                .mapNotNull { advice ->
+                  advice.coordinates.toDependencyNotation("ADD")?.let { newNotation ->
+                    val newConfiguration =
+                      if (!abiModeEnabled) {
+                        "implementation"
+                      } else {
+                        advice.toConfiguration
+                      }
+                    "  $newConfiguration($newNotation)"
+                  }
                 }
                 .sorted()
                 .forEach { newLines += it }
@@ -239,7 +236,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               val which =
                 if (depsToChange.keys.any { it in line }) depsToChange else compileOnlyDeps
               val (_, abiDep) =
-                which.entries.first { it.value.coordinates.toDependencyNotation() in line }
+                which.entries.first { (_, v) ->
+                  v.coordinates.toDependencyNotation("ABI")?.let { it in line } ?: false
+                }
               val oldConfiguration = abiDep.fromConfiguration!!
               var newConfiguration = abiDep.toConfiguration!!
               if (noApi && newConfiguration == "api") {
@@ -280,41 +279,30 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     buildFile.writeText(newLines.cleanLineFormatting().joinToString("\n"))
   }
 
-  /**
-   * Remaps a given [Coordinates] to a known toml lib reference or error if [error] is true.
-   *
-   * @param error if true, will throw an exception if the identifier is not found
-   */
-  private fun Coordinates.mapIdentifier(error: Boolean = false): Coordinates {
+  /** Remaps a given [Coordinates] to a known toml lib reference or error if [error] is true. */
+  private fun Coordinates.mapIdentifier(context: String): Coordinates? {
     return when (this) {
-      is ProjectCoordinates ->
-        ProjectCoordinates("projects.${convertProjectPathToAccessor(identifier)}")
       is ModuleCoordinates -> {
         val newIdentifier =
           identifierMap.get()[identifier]
             ?: run {
-              if (error) {
-                error("Unknown identifier: $identifier")
-              } else {
-                logger.lifecycle("Unknown identifier: $identifier")
-              }
-              return this@mapIdentifier
+              logger.lifecycle("($context) Unknown identifier: $identifier")
+              return null
             }
         ModuleCoordinates(newIdentifier, resolvedVersion)
       }
-      is FlatCoordinates -> this
-      is IncludedBuildCoordinates -> this
+      is FlatCoordinates, is IncludedBuildCoordinates, is ProjectCoordinates -> this
     }
   }
 
-  private fun Advice.toDependencyString(): String {
-    return "${fromConfiguration ?: error("Transitive dep $this")}(${coordinates.toDependencyNotation()})"
+  private fun Advice.toDependencyString(context: String): String {
+    return "${fromConfiguration ?: error("Transitive dep $this")}(${coordinates.toDependencyNotation(context)})"
   }
 
-  private fun Coordinates.toDependencyNotation(): String {
+  private fun Coordinates.toDependencyNotation(context: String): String? {
     return when (this) {
-      is ProjectCoordinates, is ModuleCoordinates ->
-        mapIdentifier(error = true).toDependencyNotation()
+      is ProjectCoordinates -> "projects.${convertProjectPathToAccessor(identifier)}"
+      is ModuleCoordinates -> mapIdentifier(context)?.identifier
       is FlatCoordinates -> gav()
       is IncludedBuildCoordinates -> gav()
     }
