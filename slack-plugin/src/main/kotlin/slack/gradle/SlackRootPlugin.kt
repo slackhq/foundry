@@ -168,6 +168,9 @@ internal class SlackRootPlugin : Plugin<Project> {
             includeGroup("androidx.lifecycle")
             includeGroup("androidx.arch.core")
           }
+          bundle("okio") {
+            includeGroup("com.squareup.okio")
+          }
           bundle("bugsnag") { includeGroup("com.bugsnag") }
           bundle("dagger") {
             includeGroup("com.google.dagger")
