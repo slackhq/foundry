@@ -168,10 +168,8 @@ internal class SlackRootPlugin : Plugin<Project> {
             includeGroup("androidx.lifecycle")
             includeGroup("androidx.arch.core")
           }
-          bundle("okio") {
-            includeGroup("com.squareup.okio")
-          }
           bundle("bugsnag") { includeGroup("com.bugsnag") }
+          bundle("coroutines") { include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines.*") }
           bundle("dagger") {
             includeGroup("com.google.dagger")
             includeDependency("javax.inject:javax.inject")
@@ -179,6 +177,7 @@ internal class SlackRootPlugin : Plugin<Project> {
           bundle("exoplayer") { includeGroup("com.google.android.exoplayer") }
           bundle("kotlin-stdlib") { includeGroup("org.jetbrains.kotlin") }
           bundle("lint-tools") { includeGroup("com.android.tools.lint") }
+          bundle("okio") { includeGroup("com.squareup.okio") }
           bundle("rxjava") { includeGroup("io.reactivex.rxjava3") }
           bundle("sqldelight") { includeGroup("com.squareup.sqldelight") }
         }
