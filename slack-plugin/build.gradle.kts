@@ -103,10 +103,6 @@ dependencies {
   implementation(libs.kotlinCliUtil)
   implementation(libs.jna)
 
-  // Serializing build traces
-  implementation(libs.retrofit)
-  implementation(libs.retrofit.converters.wire)
-  implementation(libs.retrofit.adapters.rxjava3)
   implementation(libs.rxjava)
 
   api(platform(libs.okhttp.bom))

@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "reviewers": [
+    "ZacSweers",
+    "ywu96",
+    "seankim-android"
+  ],
+  "branchPrefix": "test-renovate/",
+  "gitAuthor": "OSS-Bot <svc-oss-bot@slack-corp.com>",
+  "repositories": "slackhq/slack-gradle-plugin",
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "com.google.guava:guava"
+      ],
+      "allowedVersions": "!/\\-android$/"
+    }
+  ]
+}
