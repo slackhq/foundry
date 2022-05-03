@@ -40,7 +40,6 @@ commonsText = "org.apache.commons:commons-text:1.9"
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
 gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
-gradlePlugins-canIDropJetifier = "com.github.plnice:canidropjetifier:0.5"
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.8.0"

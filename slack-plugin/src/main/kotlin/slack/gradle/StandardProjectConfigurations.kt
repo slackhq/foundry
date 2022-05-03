@@ -220,8 +220,7 @@ internal class StandardProjectConfigurations {
               throw IllegalArgumentException(
                 "Legacy support library dependencies are no longer " +
                   "supported. To trace this dependency, run './gradlew " +
-                  "-Pandroid.enableJetifier=false -Pslack.gradle.skipAndroidXCheck=true " +
-                  "canIDropJetifier'"
+                  "checkJetifier -Pandroid.enableJetifier=true --no-configuration-cache"
               )
             }
           }
