@@ -145,7 +145,8 @@ internal class StandardProjectConfigurations {
                 noApi.set(isNoApi)
                 identifierMap.set(
                   project.provider {
-                    project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v) ->
+                    project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v)
+                      ->
                       "libs.$v"
                     }
                   }
