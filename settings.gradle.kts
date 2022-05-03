@@ -77,7 +77,6 @@ dependencyResolutionManagement {
     exclusiveContent {
       forRepository(::gradlePluginPortal)
       filter {
-        includeModule("com.github.plnice", "canidropjetifier")
         includeModule("com.github.ben-manes", "gradle-versions-plugin")
         includeModule("com.gradle", "gradle-enterprise-gradle-plugin")
         includeModule("org.gradle", "test-retry-gradle-plugin")
