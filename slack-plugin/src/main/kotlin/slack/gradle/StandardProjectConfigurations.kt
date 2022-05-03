@@ -710,7 +710,22 @@ internal class StandardProjectConfigurations {
         if (slackProperties.enableCompose) {
           configureCompose(project, isApp = false, composeCompilerVersion = composeCompilerVersion)
         }
-        if (!isLibraryWithVariants) {
+        if (isLibraryWithVariants) {
+          buildTypes {
+            getByName("debug") {
+              // For upstream android libraries that just have a single release variant, use that.
+              matchingFallbacks += "release"
+              // Debug should be the default build type. This helps inform studio.
+              isDefault = true
+            }
+          }
+        } else {
+          buildTypes {
+            getByName("release") {
+              // Release should be the default build type. This helps inform studio.
+              isDefault = true
+            }
+          }
           // Default testBuildType is "debug", but AGP doesn't relocate the testBuildType to
           // "release" automatically even if there's only one.
           testBuildType = "release"
