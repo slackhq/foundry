@@ -761,7 +761,27 @@ internal class StandardProjectConfigurations {
       } else {
         jvmTargetVersion.toString()
       }
-    val onKotlinPluginApplied = {
+
+    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
+      // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
+      configure<DetektExtension> {
+        toolVersion = slackProperties.versions.detekt
+        config.from("$rootDir/config/detekt/detekt.yml")
+        config.from("$rootDir/config/detekt/detekt-all.yml")
+
+        baseline =
+          if (globalConfig.mergeDetektBaselinesTask != null) {
+            tasks.withType<DetektCreateBaselineTask>().configureEach {
+              globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
+            }
+            file("$buildDir/intermediates/detekt/baseline.xml")
+          } else {
+            file("$rootDir/config/detekt/baseline.xml")
+          }
+      }
+    }
+
+    pluginManager.withPlugin("org.jetbrains.kotlin.base") {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
       @Suppress("SuspiciousCollectionReassignment")
       tasks.configureEach<KotlinCompile> {
@@ -825,10 +845,10 @@ internal class StandardProjectConfigurations {
              */
             @Suppress("UnusedPrivateClass")
             private abstract class ${
-            CaseFormat.LOWER_HYPHEN.to(
-              CaseFormat.UPPER_CAMEL,
-              project.name
-            )
+              CaseFormat.LOWER_HYPHEN.to(
+                CaseFormat.UPPER_CAMEL,
+                project.name
+              )
             }CompilationMarker
             ```
             """.trimIndent()
@@ -837,27 +857,7 @@ internal class StandardProjectConfigurations {
       }
     }
 
-    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-      // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
-      configure<DetektExtension> {
-        toolVersion = slackProperties.versions.detekt
-        config.from("$rootDir/config/detekt/detekt.yml")
-        config.from("$rootDir/config/detekt/detekt-all.yml")
-
-        baseline =
-          if (globalConfig.mergeDetektBaselinesTask != null) {
-            tasks.withType<DetektCreateBaselineTask>().configureEach {
-              globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
-            }
-            file("$buildDir/intermediates/detekt/baseline.xml")
-          } else {
-            file("$rootDir/config/detekt/baseline.xml")
-          }
-      }
-    }
-
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      onKotlinPluginApplied()
       // Enable linting on pure JVM projects
       apply(plugin = "com.android.lint")
       // Add slack-lint as lint checks source
@@ -865,8 +865,6 @@ internal class StandardProjectConfigurations {
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {
-      onKotlinPluginApplied()
-
       // Configure kotlin sources in Android projects
       configure<BaseExtension> {
         sourceSets.configureEach {
