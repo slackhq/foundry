@@ -67,6 +67,7 @@ internal class IntelThermalsParser(val thermalsFileProvider: () -> File) : Therm
   private var process: Process? = null
   private var thermalsFile: File? = null
   private val started = AtomicBoolean(false)
+
   override fun start() {
     check(!started.getAndSet(true)) { "Already started" }
     thermalsFile = thermalsFileProvider()
@@ -86,13 +87,14 @@ internal class IntelThermalsParser(val thermalsFileProvider: () -> File) : Therm
   }
 
   override fun stop(): Thermals {
-    check(started.getAndSet(false)) { "Not started" }
+    check(started.get()) { "Not started" }
     val thermals =
       try {
         peek()
       } finally {
         process?.destroyForcibly()?.waitFor()
       }
+    started.set(false)
     process = null
     thermalsFile = null
     return thermals
