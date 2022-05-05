@@ -791,7 +791,7 @@ internal class StandardProjectConfigurations {
       if (jdkVersion != null) {
         configure<KotlinProjectExtension> {
           jvmToolchain {
-            (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(jdkVersion))
+            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
           }
         }
       }
