@@ -54,7 +54,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
