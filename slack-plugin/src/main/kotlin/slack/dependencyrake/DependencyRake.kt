@@ -169,7 +169,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val depsToChange =
       if (AnalysisMode.ABI in resolvedModes) {
-        advices.filter { it.isChange() }
+        advices
+          .filter { it.isChange() }
           .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
           .associateBy { it.toDependencyString("CHANGE") }
       } else {
