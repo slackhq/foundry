@@ -172,12 +172,14 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               // Emit any remaining new dependencies to add
               depsToAdd
                 .entries
-                .map { (_, advice) ->
-                  var newConfiguration = advice.toConfiguration!!
-                  if (noApi && newConfiguration == "api") {
-                    newConfiguration = "implementation"
+                .mapNotNull { (_, advice) ->
+                  advice.coordinates.toDependencyNotation("ADD-NEW")?.let { newNotation ->
+                    var newConfiguration = advice.toConfiguration!!
+                    if (noApi && newConfiguration == "api") {
+                      newConfiguration = "implementation"
+                    }
+                    "  $newConfiguration($newNotation)"
                   }
-                  "  $newConfiguration(${advice.coordinates.toDependencyNotation("ADD-NEW")})"
                 }
                 .sorted()
                 .forEach {
