@@ -16,9 +16,13 @@
 package slack.dependencyrake
 
 import com.autonomousapps.AbstractPostProcessingTask
-import com.autonomousapps.advice.Advice
-import com.autonomousapps.advice.Dependency
 import com.autonomousapps.advice.PluginAdvice
+import com.autonomousapps.model.Advice
+import com.autonomousapps.model.Coordinates
+import com.autonomousapps.model.FlatCoordinates
+import com.autonomousapps.model.IncludedBuildCoordinates
+import com.autonomousapps.model.ModuleCoordinates
+import com.autonomousapps.model.ProjectCoordinates
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.file.RegularFileProperty
@@ -26,57 +30,57 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import slack.gradle.convertProjectPathToAccessor
 
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
 
-// Dependencies that act as a facade for multiple transitives that aren't usually intended to be
-// directly depended on.
-private val FACADE_DEPENDENCIES =
-  setOf(
-    "androidx.paging:paging-runtime",
-    "androidx.lifecycle:lifecycle-runtime",
-    "com.android.tools.lint:lint",
-    "com.android.tools.lint:lint-api",
-    "com.android.tools.lint:lint-checks",
-    "com.android.tools.lint:lint-tests",
-    "com.birbit:android-priority-jobqueue",
-    "com.bugsnag:bugsnag-android",
-    "com.google.android.exoplayer:exoplayer",
-    "io.reactivex.rxjava3:rxjava",
-    "javax.inject:javax.inject",
-    "com.squareup.sqldelight:android-driver",
-    "com.github.bumptech.glide:glide"
-  )
-
-// These are sort of inverse-facade dependencies. These may be seen as transitively-used
-// dependencies that should be
-// used via higher level facade dependency.
-private val UP_CONVERT =
+// TODO temporary in the hopes of
+// https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/662
+private val PREFERRED_BUNDLE_IDENTIFIERS =
   mapOf(
-    "androidx.arch.core:core-common" to "androidx.arch.core:core-runtime",
-    "androidx.lifecycle:lifecycle-common" to "androidx.lifecycle:lifecycle-runtime"
+    "androidx.arch.core:core-common" to "androidx.lifecycle:lifecycle-runtime",
+    "androidx.camera:camera-core" to "androidx.camera:camera-camera2",
+    "androidx.compose.animation:animation-core" to "androidx.compose.animation:animation",
+    "androidx.compose.foundation:foundation-layout" to "androidx.compose.foundation:foundation",
+    "androidx.compose.runtime:runtime-saveable" to "androidx.compose.runtime:runtime",
+    "androidx.lifecycle:lifecycle-common" to "androidx.lifecycle:lifecycle-runtime",
+    "androidx.lifecycle:lifecycle-livedata-core" to "androidx.lifecycle:lifecycle-livedata",
+    "androidx.paging:paging-common" to "androidx.paging:paging-runtime",
+    "androidx.paging:paging-common-ktx" to "androidx.paging:paging-runtime-ktx",
+    "com.google.android.play:core" to "com.google.android.play:core-ktx",
+    "com.squareup.leakcanary:leakcanary-android-core" to
+      "com.squareup.leakcanary:leakcanary-android",
+
+    // KMP deps
+    // https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/659
+    "app.cash.turbine:turbine-jvm" to "app.cash.turbine:turbine",
+    "com.github.ajalt.clikt:clikt-jvm" to "com.github.ajalt.clikt:clikt",
+    "com.squareup.okhttp3:okhttp-jvm" to "com.squareup.okhttp3:okhttp",
+    "com.squareup.okio:okio-jvm" to "com.squareup.okio:okio",
+    "com.squareup.wire:wire-runtime-jvm" to "com.squareup.wire:wire-runtime",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm" to
+      "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm" to
+      "org.jetbrains.kotlinx:kotlinx-coroutines-test",
   )
 
-// These are dependencies we manage directly in SlackExtension
-private val MANAGED_DEPENDENCIES = setOf<String>()
-
-// These are projects that _only_ contain resources, which we can't properly handle yet until
-// namespaced resources is
-// available.
-private val RESOURCE_ONLY_PROJECTS = setOf(":l10n-strings", ":slack-kit:slack-kit-resources")
-
-private val String.group: String
-  get() = substringBefore(":")
-
-/** Returns if this is a facade dependency (only if it shares the same group). */
-private fun String.isFacade(original: String = this): Boolean {
-  return removeSuffix("-ktx") in FACADE_DEPENDENCIES && group == original.group
-}
+// These are dependencies we manage directly in SlackExtension or other plugins
+private val MANAGED_DEPENDENCIES =
+  setOf(
+    // Managed by AGP
+    "androidx.databinding:viewbinding",
+    // Managed by KGP
+    "org.jetbrains.kotlin:kotlin-stdlib",
+    // Managed by the SGP robolectric DSL feature
+    "org.robolectric:shadowapi",
+    "org.robolectric:shadows-framework",
+  )
 
 /**
  * Task that consumes the generated advice report json generated by `AdviceTask` and applies its
@@ -96,7 +100,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   // We don't do ABI dependency cleanup yet, see
   // https://github.com/tinyspeck/slack-android-ng/issues/20315
   @get:Input
-  val modes =
+  val modes: SetProperty<AnalysisMode> =
     objects
       .setProperty(AnalysisMode::class.java)
       .convention(
@@ -108,7 +112,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               AnalysisMode.COMPILE_ONLY,
               AnalysisMode.UNUSED,
               AnalysisMode.MISUSED,
-              AnalysisMode.PLUGINS
+              AnalysisMode.PLUGINS,
+              AnalysisMode.ABI
             )
           )
       )
@@ -122,43 +127,11 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   @TaskAction
   fun rake() {
     val noApi = noApi.get()
-    val comprehensiveAdvice = comprehensiveAdvice()
-    val redundantPlugins = comprehensiveAdvice.pluginAdvice
-    val advices =
-      comprehensiveAdvice
-        .dependencyAdvice
-        .filterNot { advice ->
-          // Don't add transitive dependencies of facade parents
-          val isFacade =
-            advice.isAdd() &&
-              advice.parents.orEmpty().any { it.identifier.isFacade(advice.dependency.identifier) }
-          if (isFacade) {
-            logger.lifecycle("Not adding facaded dependency ${advice.dependency.identifier}")
-          }
-          isFacade
-        }
-        .filterNot { advice ->
-          // Don't remove facade dependencies
-          val isFacade = advice.isRemove() && advice.dependency.identifier.isFacade()
-          if (isFacade) {
-            logger.lifecycle("Not removing facade dependency ${advice.dependency.identifier}")
-          }
-          isFacade
-        }
-        .mapTo(LinkedHashSet()) { advice ->
-          // Remap identifiers to their equivalent `libs.*` reference names.
-          advice.copy(
-            dependency = advice.dependency.copy(mapIdentifier(advice.dependency.identifier)),
-            parents =
-              advice.parents?.mapTo(mutableSetOf()) { it.copy(mapIdentifier(it.identifier)) },
-            usedTransitiveDependencies =
-              advice.usedTransitiveDependencies.mapTo(mutableSetOf()) {
-                it.copy(mapIdentifier(it.identifier))
-              }
-          )
-        }
+    val projectAdvice = projectAdvice()
+    val redundantPlugins = projectAdvice.pluginAdvice
+    val advices: Set<Advice> = projectAdvice.dependencyAdvice
     val buildFile = buildFileProperty.asFile.get()
-    logger.lifecycle("🌲 Raking $buildFile")
+    logger.lifecycle("🌲 Raking $buildFile ")
     rakeProject(buildFile, advices, redundantPlugins, noApi)
   }
 
@@ -174,27 +147,32 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val unusedDepsToRemove =
       if (AnalysisMode.UNUSED in resolvedModes) {
-        advices.filter { it.isRemove() && it.usedTransitiveDependencies.isEmpty() }.associateBy {
-          it.dependency.toDependencyString()
-        }
+        advices
+          .filter { it.isRemove() }
+          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+          .associateBy { it.toDependencyString("UNUSED") }
       } else {
         emptyMap()
       }
 
     val misusedDepsToRemove =
       if (AnalysisMode.MISUSED in resolvedModes) {
-        advices.filter { it.isRemove() && it.usedTransitiveDependencies.isNotEmpty() }.associateBy {
-          it.dependency.toDependencyString()
-        }
+        advices
+          .filter { it.isRemove() }
+          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+          .associateBy { it.toDependencyString("MISUSED") }
       } else {
         emptyMap()
       }
 
-    val depsToRemove = unusedDepsToRemove + misusedDepsToRemove
+    val depsToRemove = (unusedDepsToRemove + misusedDepsToRemove)
 
     val depsToChange =
       if (AnalysisMode.ABI in resolvedModes) {
-        advices.filter { it.isChange() }.associateBy { it.dependency.toDependencyString() }
+        advices
+          .filter { it.isChange() }
+          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+          .associateBy { it.toDependencyString("CHANGE") }
       } else {
         emptyMap()
       }
@@ -203,8 +181,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
       if (AnalysisMode.MISUSED in resolvedModes) {
         advices
           .filter { it.isAdd() }
-          .filterNot { it.dependency.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.dependency.identifier }
+          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+          .associateBy { it.coordinates.identifier }
           .toMutableMap()
       } else {
         mutableMapOf()
@@ -212,7 +190,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val compileOnlyDeps =
       if (AnalysisMode.COMPILE_ONLY in resolvedModes) {
-        advices.filter { it.isCompileOnly() }.associateBy { it.dependency.toDependencyString() }
+        advices.filter { it.isCompileOnly() }.associateBy {
+          it.toDependencyString("ADD-COMPILE-ONLY")
+        }
       } else {
         emptyMap()
       }
@@ -241,14 +221,14 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               // Emit any remaining new dependencies to add
               depsToAdd
                 .entries
-                .map { (_, advice) ->
-                  var newConfiguration = advice.toConfiguration!!
-                  if (noApi && newConfiguration == "api") {
-                    newConfiguration = "implementation"
-                  } else if (!abiModeEnabled) {
-                    newConfiguration = "implementation"
+                .mapNotNull { (_, advice) ->
+                  advice.coordinates.toDependencyNotation("ADD-NEW")?.let { newNotation ->
+                    var newConfiguration = advice.toConfiguration!!
+                    if (noApi && newConfiguration == "api") {
+                      newConfiguration = "implementation"
+                    }
+                    "  $newConfiguration($newNotation)"
                   }
-                  "  $newConfiguration(${advice.dependency.toDependencyNotation()})"
                 }
                 .sorted()
                 .forEach {
@@ -276,26 +256,23 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
                 return@forEach
               }
               logger.lifecycle("  ⛔ Removing '${line.trimStart()}'")
-              val (_, removed) = depsToRemove.entries.find { it.key in line }!!
-
-              if (removed.dependency.identifier in RESOURCE_ONLY_PROJECTS) {
-                newLines += line
-              }
 
               // If this is being swapped with used transitives, inline them here
-              // Note we remove from the depsToAdd list on a first come first serve bases (in case
+              // Note we remove from the depsToAdd list on a first-come-first-serve bases (in case
               // multiple deps pull the same transitives).
-              removed
-                .usedTransitiveDependencies
-                .mapNotNull { depsToAdd.remove(it.identifier) }
-                .map { advice ->
-                  val newConfiguration =
-                    if (!abiModeEnabled) {
-                      "implementation"
-                    } else {
-                      advice.toConfiguration
-                    }
-                  "  $newConfiguration(${advice.dependency.toDependencyNotation()})"
+              advices
+                .filter { it.isAdd() }
+                .mapNotNull { depsToAdd.remove(it.coordinates.identifier) }
+                .mapNotNull { advice ->
+                  advice.coordinates.toDependencyNotation("ADD")?.let { newNotation ->
+                    val newConfiguration =
+                      if (!abiModeEnabled) {
+                        "implementation"
+                      } else {
+                        advice.toConfiguration
+                      }
+                    "  $newConfiguration($newNotation)"
+                  }
                 }
                 .sorted()
                 .forEach { newLines += it }
@@ -310,7 +287,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               val which =
                 if (depsToChange.keys.any { it in line }) depsToChange else compileOnlyDeps
               val (_, abiDep) =
-                which.entries.first { it.value.dependency.toDependencyNotation() in line }
+                which.entries.first { (_, v) ->
+                  v.coordinates.toDependencyNotation("ABI")?.let { it in line } ?: false
+                }
               val oldConfiguration = abiDep.fromConfiguration!!
               var newConfiguration = abiDep.toConfiguration!!
               if (noApi && newConfiguration == "api") {
@@ -351,59 +330,33 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     buildFile.writeText(newLines.cleanLineFormatting().joinToString("\n"))
   }
 
-  /**
-   * Maps a given [identifier] to a known toml lib reference or error if [error] is true.
-   *
-   * @param identifier the identifier to map, such as "com.squareup:kotlinpoet"
-   * @param error if true, will throw an exception if the identifier is not found
-   */
-  private fun mapIdentifier(identifier: String, error: Boolean = false): String {
-    return when {
-      identifier.startsWith(":") -> {
-        // Project dep
-        identifier
-      }
-      else -> {
-        UP_CONVERT[identifier]?.let {
-          return mapIdentifier(it, error)
-        }
-        identifierMap.get()[identifier]
-          ?: run {
-            if (error) {
-              error("Unknown identifier: $identifier")
-            } else {
-              logger.lifecycle("Unknown identifier: $identifier")
+  /** Remaps a given [Coordinates] to a known toml lib reference or error if [error] is true. */
+  private fun Coordinates.mapIdentifier(context: String): Coordinates? {
+    return when (this) {
+      is ModuleCoordinates -> {
+        val preferredIdentifier = PREFERRED_BUNDLE_IDENTIFIERS.getOrDefault(identifier, identifier)
+        val newIdentifier =
+          identifierMap.get()[preferredIdentifier]
+            ?: run {
+              logger.lifecycle("($context) Unknown identifier: $identifier")
+              return null
             }
-            identifier
-          }
+        ModuleCoordinates(newIdentifier, resolvedVersion)
       }
+      is FlatCoordinates, is IncludedBuildCoordinates, is ProjectCoordinates -> this
     }
   }
 
-  private fun Dependency.toDependencyString(includeVersion: Boolean = true): String {
-    return "$configurationName(${toDependencyNotation(includeVersion = includeVersion)})"
+  private fun Advice.toDependencyString(context: String): String {
+    return "${fromConfiguration ?: error("Transitive dep $this")}(${coordinates.toDependencyNotation(context)})"
   }
 
-  private fun Dependency.toDependencyNotation(includeVersion: Boolean = true): String {
-    return when {
-      "libs" in identifier -> {
-        // Already mapped
-        identifier
-      }
-      resolvedVersion == null -> {
-        // Project dep
-        "project(\"$identifier\")"
-      }
-      else -> {
-        identifierMap.get()[identifier]
-          ?: run {
-            if (includeVersion) {
-              "\"$identifier\""
-            } else {
-              "\"$identifier:$resolvedVersion\""
-            }
-          }
-      }
+  private fun Coordinates.toDependencyNotation(context: String): String? {
+    return when (this) {
+      is ProjectCoordinates -> "projects.${convertProjectPathToAccessor(identifier)}"
+      is ModuleCoordinates -> mapIdentifier(context)?.identifier
+      is FlatCoordinates -> gav()
+      is IncludedBuildCoordinates -> gav()
     }
   }
 

@@ -238,3 +238,21 @@ subprojects {
     }
   }
 }
+
+dependencyAnalysis {
+  abi {
+    exclusions {
+      ignoreInternalPackages()
+      ignoreGeneratedCode()
+    }
+  }
+  dependencies {
+    bundle("agp") {
+      includeGroup("com.android.tools.build")
+      includeDependency("com.google.code.findbugs:jsr305")
+    }
+    bundle("okio") {
+      includeGroup("com.squareup.okio")
+    }
+  }
+}

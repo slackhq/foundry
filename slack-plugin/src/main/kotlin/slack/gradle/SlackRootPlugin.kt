@@ -142,22 +142,40 @@ internal class SlackRootPlugin : Plugin<Project> {
     // Usage: ./gradlew clean buildHealth
     project.pluginManager.withPlugin("com.autonomousapps.dependency-analysis") {
       project.configure<DependencyAnalysisExtension> {
-        issues {
-          all {
-            onAny {
-              severity("warn")
-              exclude(
-                // This is a resources-only project.
-                ":libraries:l10n-strings"
-              )
-            }
-          }
-        }
+        issues { all { onAny { ignoreKtx(true) } } }
         abi {
           exclusions {
             ignoreGeneratedCode()
             ignoreInternalPackages()
           }
+        }
+        dependencies {
+          bundle("androidx-camera") { includeGroup("androidx.camera") }
+          bundle("androidx-paging") { includeGroup("androidx.paging") }
+          bundle("androidx-lifecycle") {
+            includeGroup("androidx.lifecycle")
+            includeGroup("androidx.arch.core")
+          }
+          bundle("bugsnag") { includeGroup("com.bugsnag") }
+          bundle("clikt") { includeGroup("com.github.ajalt.clikt") }
+          bundle("compose-animation") { includeGroup("androidx.compose.animation") }
+          bundle("compose-foundation") { includeGroup("androidx.compose.foundation") }
+          bundle("compose-runtime") { includeGroup("androidx.compose.runtime") }
+          bundle("coroutines") { include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines.*") }
+          bundle("dagger") {
+            includeGroup("com.google.dagger")
+            includeDependency("javax.inject:javax.inject")
+          }
+          bundle("exoplayer") { includeGroup("com.google.android.exoplayer") }
+          bundle("kotlin-stdlib") { includeGroup("org.jetbrains.kotlin") }
+          bundle("leakcanary") { includeGroup("com.squareup.leakcanary") }
+          bundle("lint-tools") { includeGroup("com.android.tools.lint") }
+          bundle("okhttp") { includeGroup("com.squareup.okhttp3") }
+          bundle("okio") { includeGroup("com.squareup.okio") }
+          bundle("paging") { includeGroup("androidx.paging") }
+          bundle("robolectric") { includeGroup("org.robolectric") }
+          bundle("rxjava") { includeGroup("io.reactivex.rxjava3") }
+          bundle("sqldelight") { includeGroup("com.squareup.sqldelight") }
         }
       }
     }

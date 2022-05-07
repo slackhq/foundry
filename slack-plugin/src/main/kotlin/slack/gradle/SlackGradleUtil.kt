@@ -15,6 +15,7 @@
  */
 package slack.gradle
 
+import com.google.common.base.CaseFormat
 import java.io.File
 import java.util.Locale
 import org.gradle.api.GradleException
@@ -267,6 +268,21 @@ internal fun String.snakeToCamel(upper: Boolean = false): String {
         }
       }
     }
+  }
+}
+
+private fun kebabCaseToCamelCase(s: String): String {
+  return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, s)
+}
+
+/**
+ * Returns a project accessor representation of the given [projectPath].
+ *
+ * Example: `:libraries:foundation` -> `libraries.foundation`.
+ */
+internal fun convertProjectPathToAccessor(projectPath: String): String {
+  return projectPath.removePrefix(":").split(":").joinToString(separator = ".") { segment ->
+    kebabCaseToCamelCase(segment)
   }
 }
 
