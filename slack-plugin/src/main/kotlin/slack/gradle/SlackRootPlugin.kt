@@ -150,32 +150,78 @@ internal class SlackRootPlugin : Plugin<Project> {
           }
         }
         dependencies {
-          bundle("androidx-camera") { includeGroup("androidx.camera") }
-          bundle("androidx-paging") { includeGroup("androidx.paging") }
+          bundle("androidx-camera") {
+            primary("androidx.camera:camera-camera2")
+            includeGroup("androidx.camera")
+          }
+          bundle("androidx-paging") {
+            primary("androidx.paging:paging-runtime")
+            includeGroup("androidx.paging")
+          }
           bundle("androidx-lifecycle") {
+            primary("androidx.lifecycle:lifecycle-runtime")
             includeGroup("androidx.lifecycle")
             includeGroup("androidx.arch.core")
           }
           bundle("bugsnag") { includeGroup("com.bugsnag") }
-          bundle("clikt") { includeGroup("com.github.ajalt.clikt") }
-          bundle("compose-animation") { includeGroup("androidx.compose.animation") }
-          bundle("compose-foundation") { includeGroup("androidx.compose.foundation") }
-          bundle("compose-runtime") { includeGroup("androidx.compose.runtime") }
-          bundle("coroutines") { include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines.*") }
+          bundle("clikt") {
+            primary("com.github.ajalt.clikt:clikt")
+            includeGroup("com.github.ajalt.clikt")
+          }
+          bundle("compose-animation") {
+            primary("androidx.compose.animation:animation")
+            includeGroup("androidx.compose.animation")
+          }
+          bundle("compose-foundation") {
+            primary("androidx.compose.foundation:foundation")
+            includeGroup("androidx.compose.foundation")
+          }
+          bundle("compose-runtime") {
+            primary("androidx.compose.runtime:runtime")
+            includeGroup("androidx.compose.runtime")
+          }
+          bundle("coroutines-core") {
+            primary("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+            include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines-core.*")
+          }
+          bundle("coroutines-test") {
+            primary("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+            include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines-test.*")
+          }
           bundle("dagger") {
             includeGroup("com.google.dagger")
             includeDependency("javax.inject:javax.inject")
           }
           bundle("exoplayer") { includeGroup("com.google.android.exoplayer") }
           bundle("kotlin-stdlib") { includeGroup("org.jetbrains.kotlin") }
-          bundle("leakcanary") { includeGroup("com.squareup.leakcanary") }
+          bundle("leakcanary") {
+            primary("com.squareup.leakcanary:leakcanary-android")
+            includeGroup("com.squareup.leakcanary")
+          }
           bundle("lint-tools") { includeGroup("com.android.tools.lint") }
-          bundle("okhttp") { includeGroup("com.squareup.okhttp3") }
-          bundle("okio") { includeGroup("com.squareup.okio") }
+          bundle("okhttp") {
+            primary("com.squareup.okhttp3:okhttp")
+            includeGroup("com.squareup.okhttp3")
+          }
+          bundle("okio") {
+            primary("com.squareup.okio:okio")
+            includeGroup("com.squareup.okio")
+          }
           bundle("paging") { includeGroup("androidx.paging") }
           bundle("robolectric") { includeGroup("org.robolectric") }
           bundle("rxjava") { includeGroup("io.reactivex.rxjava3") }
-          bundle("sqldelight") { includeGroup("com.squareup.sqldelight") }
+          bundle("sqldelight") {
+            primary("com.squareup.sqldelight:runtime")
+            includeGroup("com.squareup.sqldelight")
+          }
+          bundle("turbine") {
+            primary("app.cash.turbine:turbine")
+            includeGroup("app.cash.turbine")
+          }
+          bundle("wire") {
+            primary("com.squareup.wire:wire-runtime")
+            includeGroup("com.squareup.wire")
+          }
         }
       }
     }
