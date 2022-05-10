@@ -40,34 +40,9 @@ import slack.gradle.convertProjectPathToAccessor
 
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
 
-// TODO temporary in the hopes of
-// https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/662
 private val PREFERRED_BUNDLE_IDENTIFIERS =
   mapOf(
-    "androidx.arch.core:core-common" to "androidx.lifecycle:lifecycle-runtime",
-    "androidx.camera:camera-core" to "androidx.camera:camera-camera2",
-    "androidx.compose.animation:animation-core" to "androidx.compose.animation:animation",
-    "androidx.compose.foundation:foundation-layout" to "androidx.compose.foundation:foundation",
-    "androidx.compose.runtime:runtime-saveable" to "androidx.compose.runtime:runtime",
-    "androidx.lifecycle:lifecycle-common" to "androidx.lifecycle:lifecycle-runtime",
-    "androidx.lifecycle:lifecycle-livedata-core" to "androidx.lifecycle:lifecycle-livedata",
-    "androidx.paging:paging-common" to "androidx.paging:paging-runtime",
-    "androidx.paging:paging-common-ktx" to "androidx.paging:paging-runtime-ktx",
     "com.google.android.play:core" to "com.google.android.play:core-ktx",
-    "com.squareup.leakcanary:leakcanary-android-core" to
-      "com.squareup.leakcanary:leakcanary-android",
-
-    // KMP deps
-    // https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/659
-    "app.cash.turbine:turbine-jvm" to "app.cash.turbine:turbine",
-    "com.github.ajalt.clikt:clikt-jvm" to "com.github.ajalt.clikt:clikt",
-    "com.squareup.okhttp3:okhttp-jvm" to "com.squareup.okhttp3:okhttp",
-    "com.squareup.okio:okio-jvm" to "com.squareup.okio:okio",
-    "com.squareup.wire:wire-runtime-jvm" to "com.squareup.wire:wire-runtime",
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm" to
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core",
-    "org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm" to
-      "org.jetbrains.kotlinx:kotlinx-coroutines-test",
   )
 
 // These are dependencies we manage directly in SlackExtension or other plugins

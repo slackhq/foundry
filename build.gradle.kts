@@ -248,10 +248,12 @@ dependencyAnalysis {
   }
   dependencies {
     bundle("agp") {
+      primary("com.android.tools.build:gradle")
       includeGroup("com.android.tools.build")
       includeDependency("com.google.code.findbugs:jsr305")
     }
     bundle("okio") {
+      primary("com.squareup.okio:okio")
       includeGroup("com.squareup.okio")
     }
   }
