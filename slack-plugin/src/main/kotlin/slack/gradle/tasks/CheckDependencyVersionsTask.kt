@@ -28,7 +28,7 @@ import slack.gradle.safeCapitalize
 
 /**
  * A task that checks expected versions (from [mappedIdentifiersToVersions]) against runtime
- * versions found in [configuration].
+ * versions found in [resolvedArtifacts].
  *
  * This is important to check for some dependencies pulling newer versions unexpectedly.
  */
@@ -81,7 +81,7 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
       return project.tasks.register<CheckDependencyVersionsTask>(
         "check${name.safeCapitalize()}Versions"
       ) {
-        this.configuration = configuration
+        this.resolvedArtifacts.set(configuration.incoming.artifacts.resolvedArtifacts)
         val catalog = project.getVersionsCatalog()
         this.mappedIdentifiersToVersions.putAll(
           project.provider {

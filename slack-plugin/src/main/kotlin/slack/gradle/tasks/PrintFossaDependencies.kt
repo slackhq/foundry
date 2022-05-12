@@ -15,11 +15,16 @@
  */
 package slack.gradle.tasks
 
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.register
+import slack.gradle.safeCapitalize
 
 /**
- * A task that writes runtime dependency info found in [configuration].
+ * A task that writes runtime dependency info found in [resolvedArtifacts].
  *
  * This is used by the Fossa tool to parse and look up our dependencies. The output file is in the
  * form of a newline-delimited list of `<module identifier>:<version>`.
@@ -55,5 +60,20 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
     }
 
     logger.lifecycle("Fossa deps written to $file")
+  }
+
+  public companion object {
+    public fun register(
+      project: Project,
+      name: String,
+      configuration: Configuration
+    ): TaskProvider<PrintFossaDependencies> {
+      return project.tasks.register<PrintFossaDependencies>(
+        "print${name.safeCapitalize()}FossaDependencies"
+      ) {
+        outputFile.set(project.layout.buildDirectory.file("reports/slack/fossa/$name.txt"))
+        resolvedArtifacts.set(configuration.incoming.artifacts.resolvedArtifacts)
+      }
+    }
   }
 }

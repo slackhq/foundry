@@ -16,33 +16,29 @@
 package slack.gradle.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.tasks.Internal
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.maven.MavenModule
 
 public abstract class BaseDependencyCheckTask : DefaultTask() {
-  @get:Internal public lateinit var configuration: Configuration
+  @get:InputFiles internal abstract val resolvedArtifacts: SetProperty<ResolvedArtifactResult>
 
   internal abstract fun handleDependencies(dependencies: Map<String, String>)
 
   init {
     @Suppress("LeakingThis")
     notCompatibleWithConfigurationCache(
-      "Pending Gradle 7.5 and https://github.com/gradle/gradle/pull/18729"
+      "This performs an artifact resolution query at action-time"
     )
   }
 
   @TaskAction
   internal fun check() {
     val componentIds =
-      configuration
-        .incoming
-        .resolutionResult
-        .allDependencies
-        .map { it.from.id }
-        .filterIsInstance<ModuleComponentIdentifier>()
+      resolvedArtifacts.get().map { it.id }.filterIsInstance<ModuleComponentIdentifier>()
 
     val components = fetchComponents(componentIds)
     check(components.isNotEmpty()) { "No runtime versions were found" }
