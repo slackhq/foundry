@@ -104,9 +104,7 @@ internal class StandardProjectConfigurations {
   private val kotlinCompilerArgs =
     mutableListOf<String>()
       .apply {
-        // -Xopt-in is deprecated in Kotlin 1.6.20, but Gradle doesn't use that yet. So we keep it
-        // in the shared configs but remap-them here for consumers to the new one
-        addAll(KotlinBuildConfig.kotlinCompilerArgs.map { it.replace("-Xopt-in", "-opt-in") })
+        addAll(KotlinBuildConfig.kotlinCompilerArgs)
         // Left as a toe-hold for any future dynamic arguments
       }
       .distinct()
