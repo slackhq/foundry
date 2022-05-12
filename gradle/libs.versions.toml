@@ -4,7 +4,7 @@ anvil = "2.4.0"
 bugsnagGradle = "7.2.0"
 dependencyAnalysisPlugin = "1.2.0"
 detekt = "1.20.0"
-dokka = "1.6.20"
+dokka = "1.6.21"
 errorproneGradle = "2.0.2"
 java = "17"
 javapoet = "1.13.0"
@@ -16,7 +16,7 @@ moshi = "1.13.0"
 moshix = "0.17.1"
 nullawayGradle = "1.3.0"
 okhttp = "4.9.3"
-spotless = "6.5.0"
+spotless = "6.6.0"
 sqldelight = "1.5.1"
 versionsPlugin = "0.42.0"
 
@@ -49,7 +49,7 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
 gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.0.1"
-gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.3.2"
+gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 guava = "com.google.guava:guava:31.1-jre"
