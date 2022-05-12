@@ -56,6 +56,7 @@ dependencies {
 
   compileOnly(platform(kotlin("bom", version = libs.versions.kotlin.get())))
   compileOnly(kotlin("gradle-plugin", version = libs.versions.kotlin.get()))
+  implementation(kotlin("reflect", version = libs.versions.kotlin.get()))
 
   // compileOnly because we want to leave versioning to the consumers
   // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can de-dupe version
@@ -84,17 +85,6 @@ dependencies {
   implementation(projects.agpHandlers.agpHandler71)
   testImplementation(libs.agp)
 
-  // Force a newer version of batik-ext
-  // https://issues.apache.org/jira/browse/BATIK-1120
-  // https://stackoverflow.com/questions/30483255/batik-transitive-libraries-dependencies
-  // https://github.com/cashapp/sqldelight/issues/1343
-  // https://github.com/cashapp/sqldelight/issues/2058
-  implementation(libs.batikExt)
-  implementation(libs.xmlApis)
-
-  implementation(libs.javapoet) {
-    because("For access to its NameAllocator utility")
-  }
   implementation(libs.commonsText) {
     because("For access to its StringEscapeUtils")
   }
@@ -105,8 +95,7 @@ dependencies {
   implementation(libs.rxjava)
 
   api(platform(libs.okhttp.bom))
-  implementation(libs.okhttp)
-  implementation(libs.okhttp.loggingInterceptor)
+  api(libs.okhttp)
 
   implementation(libs.moshi)
   implementation(libs.moshi.kotlin)
