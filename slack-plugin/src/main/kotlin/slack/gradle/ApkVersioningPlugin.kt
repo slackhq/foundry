@@ -57,14 +57,10 @@ internal class ApkVersioningPlugin : Plugin<Project> {
   @Suppress("LongMethod")
   override fun apply(project: Project) {
     project.plugins.withType<AppPlugin> {
-      // TODO eventually make these computed again, eagerly resolving to avoid
-      //  https://github.com/gradle/gradle/issues/19649
-      val versionMajor = project.localGradleProperty("versionMajor").get()
-      val versionMinor = project.localGradleProperty("versionMinor").get()
-      val versionPatch = project.localGradleProperty("versionPatch").get()
+      val versionMajor = project.localGradleProperty("versionMajor")
+      val versionMinor = project.localGradleProperty("versionMinor")
+      val versionPatch = project.localGradleProperty("versionPatch")
 
-      // TODO eventually make this computed again, eagerly resolving to avoid
-      //  https://github.com/gradle/gradle/issues/19658
       val user =
         project
           .ciBuildNumber
@@ -72,12 +68,12 @@ internal class ApkVersioningPlugin : Plugin<Project> {
           // Only provider the user if this is _not_ running on jenkins. Composition of properties
           // is still a little weird in Gradle.
           .orElse(project.providers.environmentVariable("USER"))
-          .get()
 
       val versionNameProvider =
         project.providers.provider {
           val prev = "$versionMajor.$versionMinor.$versionPatch"
-          val addOn = user.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: ""
+          val addOn =
+            user.map { it.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: "" }
           "$prev$addOn"
         }
 
