@@ -28,6 +28,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
 import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
@@ -78,7 +79,7 @@ public fun Project.gitBranch(): Provider<String> {
     else ->
       provider {
         "git rev-parse --abbrev-ref HEAD"
-          .executeBlockingWithResult(rootProject.rootDir)
+          .executeBlockingWithResult(project.serviceOf(), rootProject.rootDir)
           ?.lines()
           ?.get(0)
           ?.trim()
@@ -168,13 +169,13 @@ public enum class SupportedLanguagesEnum {
 
 public val Project.fullGitSha: String
   get() {
-    return "git rev-parse HEAD".executeBlockingWithResult(rootDir)
+    return "git rev-parse HEAD".executeBlockingWithResult(project.serviceOf(), rootDir)
       ?: error("No full git sha found!")
   }
 
 public val Project.gitSha: String
   get() {
-    return "git rev-parse --short HEAD".executeBlockingWithResult(rootDir)
+    return "git rev-parse --short HEAD".executeBlockingWithResult(project.serviceOf(), rootDir)
       ?: error("No git sha found!")
   }
 

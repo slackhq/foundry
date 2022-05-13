@@ -16,47 +16,46 @@
 package slack
 
 import java.io.File
-import java.util.concurrent.TimeUnit
+import okio.Buffer
+import org.gradle.process.ExecOperations
 
-internal fun String.execute(workingDir: File) {
-  executeBlocking(workingDir)
+internal fun String.executeBlocking(execOps: ExecOperations, workingDir: File) {
+  execOps
+    .exec {
+      commandLine(this@executeBlocking)
+      workingDir(workingDir)
+    }
+    .rethrowFailure()
 }
 
-internal fun String.executeBlocking(workingDir: File) {
-  Runtime.getRuntime().exec(this, null, workingDir).waitFor()
-}
+internal fun String.executeBlockingWithResult(execOps: ExecOperations, workingDir: File): String? =
+  split(" ").executeBlockingWithResult(execOps, workingDir)
 
-internal fun String.executeWithResult(workingDir: File): String? {
-  return executeBlockingWithResult(workingDir)
-}
+internal fun List<String>.executeBlockingWithResult(
+  execOps: ExecOperations,
+  workingDir: File
+): String? = executeBlockingWithResult(execOps, workingDir, *toTypedArray())
 
-internal fun String.executeBlockingWithResult(workingDir: File): String? {
-  return split(" ").executeBlockingWithResult(workingDir)
-}
-
-internal fun List<String>.executeBlockingWithResult(workingDir: File): String? {
-  return executeBlockingWithResult(workingDir, *toTypedArray())
-}
-
-internal fun executeBlockingWithResult(workingDir: File? = null, vararg args: String): String? {
-  val process = args.toList().executeProcess(workingDir)
+internal fun executeBlockingWithResult(
+  execOps: ExecOperations,
+  workingDir: File? = null,
+  vararg args: String
+): String? {
   return try {
-    val standardText = process.inputStream.bufferedReader().readText()
-    process.errorStream.bufferedReader().readText()
-
-    val finished = process.waitFor(10, TimeUnit.SECONDS)
-    if (finished && process.exitValue() == 0) standardText.trimAtEnd() else null
-  } finally {
-    process.destroyForcibly()
+    val stdIn = Buffer()
+    val stdOut = Buffer()
+    val result =
+      execOps.exec {
+        args(*args)
+        workingDir?.let { workingDir(it) }
+        this.standardInput = stdIn.inputStream()
+        this.standardOutput = stdOut.outputStream()
+      }
+    result.rethrowFailure()
+    stdIn.readUtf8().trimAtEnd()
+  } catch (ignored: Throwable) {
+    null
   }
-}
-
-internal fun String.executeProcess(workingDir: File? = null): Process {
-  return Runtime.getRuntime().exec(this, null, workingDir)
-}
-
-internal fun List<String>.executeProcess(workingDir: File? = null): Process {
-  return Runtime.getRuntime().exec(toTypedArray(), null, workingDir)
 }
 
 private fun String.trimAtEnd(): String {

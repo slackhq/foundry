@@ -19,13 +19,14 @@ import java.io.File
 import java.io.IOException
 import java.net.URLEncoder
 import java.security.MessageDigest
-import java.util.concurrent.TimeUnit
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
+import org.gradle.process.ExecOperations
+import slack.executeBlocking
 import slack.executeBlockingWithResult
-import slack.executeProcess
 
 private val GITHUB_ORIGIN_REGEX = Regex("(.*)github\\.com[/|:](.*)")
 
@@ -121,16 +122,25 @@ private fun ScanApi.addCiMetadata(project: Project) {
 
 private fun ScanApi.addGitMetadata(project: Project) {
   val projectDir = project.projectDir
+  val execOps = project.serviceOf<ExecOperations>()
   background {
-    if (!isGitInstalled(projectDir)) {
+    if (!isGitInstalled(execOps, projectDir)) {
       return@background
     }
 
     val gitCommitId =
-      executeBlockingWithResult(projectDir, "git", "rev-parse", "--short=8", "--verify", "HEAD")
+      executeBlockingWithResult(
+        execOps,
+        projectDir,
+        "git",
+        "rev-parse",
+        "--short=8",
+        "--verify",
+        "HEAD"
+      )
     val gitBranchName =
-      executeBlockingWithResult(projectDir, "git", "rev-parse", "--abbrev-ref", "HEAD")
-    val gitStatus = executeBlockingWithResult(projectDir, "git", "status", "--porcelain")
+      executeBlockingWithResult(execOps, projectDir, "git", "rev-parse", "--abbrev-ref", "HEAD")
+    val gitStatus = executeBlockingWithResult(execOps, projectDir, "git", "status", "--porcelain")
 
     if (gitCommitId != null) {
       val gitCommitIdLabel = "Git commit id"
@@ -141,7 +151,14 @@ private fun ScanApi.addGitMetadata(project: Project) {
       )
 
       val originUrl =
-        executeBlockingWithResult(projectDir, "git", "config", "--get", "remote.origin.url")
+        executeBlockingWithResult(
+          execOps,
+          projectDir,
+          "git",
+          "config",
+          "--get",
+          "remote.origin.url"
+        )
       if (originUrl != null) {
         if ("github.com/" in originUrl || "github.com:" in originUrl) {
           GITHUB_ORIGIN_REGEX.find(originUrl)?.groups?.get(2)?.value?.removeSuffix(".git")?.let {
@@ -201,16 +218,12 @@ private fun urlEncode(url: String): String {
   return URLEncoder.encode(url, Charsets.UTF_8.name())
 }
 
-private fun isGitInstalled(workingDir: File): Boolean {
-  var process: Process? = null
+private fun isGitInstalled(execOperations: ExecOperations, workingDir: File): Boolean {
   return try {
-    process = "git --version".executeProcess(workingDir)
-    val finished = process.waitFor(10, TimeUnit.SECONDS)
-    finished && process.exitValue() == 0
+    "git --version".executeBlocking(execOperations, workingDir)
+    true
   } catch (ignored: IOException) {
     false
-  } finally {
-    process?.destroyForcibly()
   }
 }
 

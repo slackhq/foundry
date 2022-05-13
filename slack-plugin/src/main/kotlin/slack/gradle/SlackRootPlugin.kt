@@ -26,6 +26,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
 import slack.cli.AppleSiliconCompat
 import slack.executeBlocking
@@ -317,12 +318,12 @@ internal class SlackRootPlugin : Plugin<Project> {
     if (!isCi) {
       slackProperties.gitHooksFile?.let { hooksPath ->
         // Configure hooks
-        "git config core.hooksPath $hooksPath".executeBlocking(rootDir)
+        "git config core.hooksPath $hooksPath".executeBlocking(project.serviceOf(), rootDir)
       }
 
       val revsFile = slackProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
-      val gitVersion = "git --version".executeBlockingWithResult(rootDir)
+      val gitVersion = "git --version".executeBlockingWithResult(project.serviceOf(), rootDir)
       val versionNumber = parseGitVersion(gitVersion)
       @Suppress(
         "ReplaceCallWithBinaryOperator"
@@ -342,7 +343,10 @@ internal class SlackRootPlugin : Plugin<Project> {
         }
         else -> {
           logger.debug("Configuring blame.ignoreRevsFile")
-          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(rootDir)
+          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(
+            project.serviceOf(),
+            rootDir
+          )
         }
       }
     }
