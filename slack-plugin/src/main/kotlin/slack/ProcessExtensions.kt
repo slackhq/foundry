@@ -17,6 +17,8 @@ package slack
 
 import java.io.File
 import okio.Buffer
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.process.ExecOperations
 
 internal fun String.executeBlocking(execOps: ExecOperations, workingDir: File) {
@@ -56,6 +58,20 @@ internal fun executeBlockingWithResult(
   } catch (ignored: Throwable) {
     null
   }
+}
+
+internal fun executeWithResult(
+  providers: ProviderFactory,
+  workingDir: File? = null,
+  vararg args: String
+): Provider<String> {
+  return providers
+    .exec {
+      args(*args)
+      workingDir?.let { workingDir(it) }
+    }
+    .standardOutput
+    .asText
 }
 
 private fun String.trimAtEnd(): String {

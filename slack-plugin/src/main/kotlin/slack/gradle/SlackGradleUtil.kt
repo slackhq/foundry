@@ -28,9 +28,8 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
-import slack.executeBlockingWithResult
+import slack.executeWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.DependencyGroup
@@ -77,13 +76,15 @@ public fun Project.gitBranch(): Provider<String> {
         .orElse(providers.environmentVariable("BRANCH_NAME"))
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
-      provider {
-        "git rev-parse --abbrev-ref HEAD"
-          .executeBlockingWithResult(project.serviceOf(), rootProject.rootDir)
-          ?.lines()
-          ?.get(0)
-          ?.trim()
-      }
+      executeWithResult(
+          project.providers,
+          rootProject.rootDir,
+          "git",
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        )
+        .map { it.lines()[0].trim() }
   }
 }
 
@@ -167,16 +168,16 @@ public enum class SupportedLanguagesEnum {
   BETA
 }
 
-public val Project.fullGitSha: String
+public val Project.fullGitSha: Provider<String>
   get() {
-    return "git rev-parse HEAD".executeBlockingWithResult(project.serviceOf(), rootDir)
-      ?: error("No full git sha found!")
+    return executeWithResult(providers, rootDir, "git", "rev-parse", "HEAD")
+      .orElse(provider { error("No full git sha found!") })
   }
 
-public val Project.gitSha: String
+public val Project.gitSha: Provider<String>
   get() {
-    return "git rev-parse --short HEAD".executeBlockingWithResult(project.serviceOf(), rootDir)
-      ?: error("No git sha found!")
+    return executeWithResult(providers, rootDir, "git", "rev-parse", "--short", "HEAD")
+      .orElse(provider { error("No git sha found!") })
   }
 
 public val Project.ciBuildNumber: Provider<String>

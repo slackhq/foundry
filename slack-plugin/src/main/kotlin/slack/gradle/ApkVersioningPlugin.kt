@@ -93,8 +93,8 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       configureVariants(project, versionNameProvider, versionCodeProvider)
 
       // Register a version properties task. This is run on ci via android_preflight.sh
-      val shortGitShaProvider = project.provider { project.gitSha }
-      val longGitShaProvider = project.provider { project.fullGitSha }
+      val shortGitShaProvider = project.gitSha
+      val longGitShaProvider = project.fullGitSha
       project.tasks.register<VersionPropertiesTask>("generateVersionProperties") {
         outputFile.set(
           project.layout.buildDirectory.file("intermediates/versioning/version.properties")
