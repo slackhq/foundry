@@ -167,8 +167,8 @@ subprojects {
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
       kotlinOptions {
-        languageVersion = "1.5"
-        apiVersion = "1.5"
+        languageVersion = "1.6"
+        apiVersion = "1.6"
         // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
         // this sometimes. https://github.com/gradle/gradle/issues/16345
         allWarningsAsErrors = false
