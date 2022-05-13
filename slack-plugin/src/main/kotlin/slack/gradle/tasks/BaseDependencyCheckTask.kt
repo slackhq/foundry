@@ -15,49 +15,53 @@
  */
 package slack.gradle.tasks
 
+import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.ArtifactCollection
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.Usage.USAGE_ATTRIBUTE
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
-import org.gradle.maven.MavenModule
+import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
 
 public abstract class BaseDependencyCheckTask : DefaultTask() {
-  @get:InputFiles internal abstract val resolvedArtifacts: SetProperty<ResolvedArtifactResult>
+  @get:Classpath
+  @get:InputFiles
+  public abstract val resolvedArtifacts: SetProperty<ResolvedArtifactResult>
 
   internal abstract fun handleDependencies(dependencies: Map<String, String>)
 
-  init {
-    @Suppress("LeakingThis")
-    notCompatibleWithConfigurationCache(
-      "This performs an artifact resolution query at action-time"
-    )
-  }
-
   @TaskAction
   internal fun check() {
-    val componentIds =
-      resolvedArtifacts.get().map { it.id }.filterIsInstance<ModuleComponentIdentifier>()
-
-    val components = fetchComponents(componentIds)
-    check(components.isNotEmpty()) { "No runtime versions were found" }
+    val components =
+      resolvedArtifacts
+        .get()
+        .map { it.id }
+        .filterIsInstance<ModuleComponentArtifactIdentifier>()
+        .associate { component ->
+          val componentId = component.componentIdentifier
+          val identifier = "${componentId.group}:${componentId.module}"
+          identifier to componentId.version
+        }
 
     handleDependencies(components)
   }
 
-  private fun fetchComponents(componentIds: List<ModuleComponentIdentifier>): Map<String, String> {
-    return project
-      .dependencies
-      .createArtifactResolutionQuery()
-      .forComponents(componentIds)
-      .withArtifacts(MavenModule::class.java)
-      .execute()
-      .resolvedComponents
-      .associate { component ->
-        val componentId = component.id as ModuleComponentIdentifier
-        val identifier = "${componentId.group}:${componentId.module}"
-        identifier to componentId.version
-      }
+  protected companion object {
+    internal fun Configuration.classesArtifacts(objects: ObjectFactory): ArtifactCollection {
+      return incoming
+        .artifactView {
+          attributes {
+            attribute(USAGE_ATTRIBUTE, objects.named(Usage::class.java, ArtifactType.CLASSES.type))
+          }
+          lenient(true)
+        }
+        .artifacts
+    }
   }
 }

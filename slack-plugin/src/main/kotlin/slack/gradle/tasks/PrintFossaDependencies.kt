@@ -72,7 +72,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
         "print${name.safeCapitalize()}FossaDependencies"
       ) {
         outputFile.set(project.layout.buildDirectory.file("reports/slack/fossa/$name.txt"))
-        resolvedArtifacts.set(configuration.incoming.artifacts.resolvedArtifacts)
+        resolvedArtifacts.set(configuration.classesArtifacts(project.objects).resolvedArtifacts)
       }
     }
   }

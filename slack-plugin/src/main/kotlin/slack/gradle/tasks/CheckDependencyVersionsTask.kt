@@ -81,7 +81,9 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
       return project.tasks.register<CheckDependencyVersionsTask>(
         "check${name.safeCapitalize()}Versions"
       ) {
-        this.resolvedArtifacts.set(configuration.incoming.artifacts.resolvedArtifacts)
+        this.resolvedArtifacts.set(
+          configuration.classesArtifacts(project.objects).resolvedArtifacts
+        )
         val catalog = project.getVersionsCatalog()
         this.mappedIdentifiersToVersions.putAll(
           project.provider {
