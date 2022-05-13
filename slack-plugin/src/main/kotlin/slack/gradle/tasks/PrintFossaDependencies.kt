@@ -18,6 +18,7 @@ package slack.gradle.tasks
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.register
@@ -41,6 +42,7 @@ import slack.gradle.safeCapitalize
  *
  * This task is not cacheable as it has no inputs and is run on demand.
  */
+@CacheableTask
 public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
