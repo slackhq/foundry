@@ -24,7 +24,7 @@ import org.gradle.kotlin.dsl.register
 import slack.gradle.safeCapitalize
 
 /**
- * A task that writes runtime dependency info found in [resolvedArtifacts].
+ * A task that writes runtime dependency info found in [identifiersToVersions].
  *
  * This is used by the Fossa tool to parse and look up our dependencies. The output file is in the
  * form of a newline-delimited list of `<module identifier>:<version>`.
@@ -49,13 +49,13 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
     group = "slack"
   }
 
-  override fun handleDependencies(dependencies: Map<String, String>) {
+  override fun handleDependencies(identifiersToVersions: Map<String, String>) {
     val file = outputFile.asFile.get()
     file.bufferedWriter().use { writer ->
-      dependencies
+      identifiersToVersions
         .entries
         .map { (moduleIdentifier, version) -> "mvn+$moduleIdentifier:$version" }
-        .sorted()
+        .sorted() // Important for deterministic ouputs
         .joinTo(writer, separator = "\n")
     }
 
@@ -72,7 +72,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
         "print${name.safeCapitalize()}FossaDependencies"
       ) {
         outputFile.set(project.layout.buildDirectory.file("reports/slack/fossa/$name.txt"))
-        resolvedArtifacts.set(configuration.classesArtifacts(project.objects).resolvedArtifacts)
+        configureIdentifiersToVersions(configuration)
       }
     }
   }
