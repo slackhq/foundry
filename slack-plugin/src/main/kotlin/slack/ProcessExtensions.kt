@@ -42,17 +42,17 @@ internal fun executeBlockingWithResult(
   vararg args: String
 ): String? {
   return try {
-    val stdIn = Buffer()
     val stdOut = Buffer()
-    val result =
-      execOps.exec {
-        args(*args)
-        workingDir?.let { workingDir(it) }
-        this.standardInput = stdIn.inputStream()
-        this.standardOutput = stdOut.outputStream()
-      }
-    result.rethrowFailure()
-    stdIn.readUtf8().trimAtEnd()
+    stdOut.outputStream().use { os ->
+      execOps
+        .exec {
+          args(*args)
+          workingDir?.let { workingDir(it) }
+          this.standardOutput = os
+        }
+        .rethrowFailure()
+    }
+    stdOut.readUtf8().trimAtEnd()
   } catch (ignored: Throwable) {
     null
   }
