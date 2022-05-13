@@ -21,10 +21,9 @@ import java.net.URLEncoder
 import java.security.MessageDigest
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
-import org.gradle.process.ExecOperations
 import slack.executeBlocking
 import slack.executeBlockingWithResult
 
@@ -122,25 +121,26 @@ private fun ScanApi.addCiMetadata(project: Project) {
 
 private fun ScanApi.addGitMetadata(project: Project) {
   val projectDir = project.projectDir
-  val execOps = project.serviceOf<ExecOperations>()
+  val providers = project.providers
   background {
-    if (!isGitInstalled(execOps, projectDir)) {
+    if (!isGitInstalled(providers, projectDir)) {
       return@background
     }
 
     val gitCommitId =
       executeBlockingWithResult(
-        execOps,
+        providers,
         projectDir,
-        "git",
-        "rev-parse",
-        "--short=8",
-        "--verify",
-        "HEAD"
+        listOf("git", "rev-parse", "--short=8", "--verify", "HEAD")
       )
     val gitBranchName =
-      executeBlockingWithResult(execOps, projectDir, "git", "rev-parse", "--abbrev-ref", "HEAD")
-    val gitStatus = executeBlockingWithResult(execOps, projectDir, "git", "status", "--porcelain")
+      executeBlockingWithResult(
+        providers,
+        projectDir,
+        listOf("git", "rev-parse", "--abbrev-ref", "HEAD")
+      )
+    val gitStatus =
+      executeBlockingWithResult(providers, projectDir, listOf("git", "status", "--porcelain"))
 
     if (gitCommitId != null) {
       val gitCommitIdLabel = "Git commit id"
@@ -152,12 +152,9 @@ private fun ScanApi.addGitMetadata(project: Project) {
 
       val originUrl =
         executeBlockingWithResult(
-          execOps,
+          providers,
           projectDir,
-          "git",
-          "config",
-          "--get",
-          "remote.origin.url"
+          listOf("git", "config", "--get", "remote.origin.url")
         )
       if (originUrl != null) {
         if ("github.com/" in originUrl || "github.com:" in originUrl) {
@@ -218,9 +215,9 @@ private fun urlEncode(url: String): String {
   return URLEncoder.encode(url, Charsets.UTF_8.name())
 }
 
-private fun isGitInstalled(execOperations: ExecOperations, workingDir: File): Boolean {
+private fun isGitInstalled(providers: ProviderFactory, workingDir: File): Boolean {
   return try {
-    "git --version".executeBlocking(execOperations, workingDir)
+    "git --version".executeBlocking(providers, workingDir)
     true
   } catch (ignored: IOException) {
     false

@@ -57,16 +57,6 @@ internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
   return DependencyDef(group, bomArtifact, gradleProperty = groupGradleProperty)
 }
 
-/**
- * If true, this is currently running on the Github Actions shadow job (see
- * .github/workflows/shadowBuild.yml).
- *
- * This is useful to gate changes that are incubating.
- */
-internal val Project.isShadowJob: Boolean
-  get() =
-    isActionsCi && providers.environmentVariable("SLACK_SHADOW_JOB").mapToBoolean().getOrElse(false)
-
 /** Returns the git branch this is running on. */
 public fun Project.gitBranch(): Provider<String> {
   return when {
@@ -79,10 +69,7 @@ public fun Project.gitBranch(): Provider<String> {
       executeWithResult(
           project.providers,
           rootProject.rootDir,
-          "git",
-          "rev-parse",
-          "--abbrev-ref",
-          "HEAD"
+          listOf("git", "rev-parse", "--abbrev-ref", "HEAD")
         )
         .map { it.lines()[0].trim() }
   }
@@ -170,13 +157,13 @@ public enum class SupportedLanguagesEnum {
 
 public val Project.fullGitSha: Provider<String>
   get() {
-    return executeWithResult(providers, rootDir, "git", "rev-parse", "HEAD")
+    return executeWithResult(providers, rootDir, listOf("git", "rev-parse", "HEAD"))
       .orElse(provider { error("No full git sha found!") })
   }
 
 public val Project.gitSha: Provider<String>
   get() {
-    return executeWithResult(providers, rootDir, "git", "rev-parse", "--short", "HEAD")
+    return executeWithResult(providers, rootDir, listOf("git", "rev-parse", "--short", "HEAD"))
       .orElse(provider { error("No git sha found!") })
   }
 

@@ -16,62 +16,46 @@
 package slack
 
 import java.io.File
-import okio.Buffer
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.process.ExecOperations
+import slack.gradle.util.sneakyNull
 
-internal fun String.executeBlocking(execOps: ExecOperations, workingDir: File) {
-  execOps
-    .exec {
-      commandLine(this@executeBlocking)
-      workingDir(workingDir)
-    }
-    .rethrowFailure()
+internal fun String.executeBlocking(providers: ProviderFactory, workingDir: File) {
+  executeBlockingWithResult(providers, workingDir)
 }
 
-internal fun String.executeBlockingWithResult(execOps: ExecOperations, workingDir: File): String? =
-  split(" ").executeBlockingWithResult(execOps, workingDir)
+internal fun String.executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File
+): String? = split(" ").executeBlockingWithResult(providers, workingDir)
 
 internal fun List<String>.executeBlockingWithResult(
-  execOps: ExecOperations,
+  providers: ProviderFactory,
   workingDir: File
-): String? = executeBlockingWithResult(execOps, workingDir, *toTypedArray())
+): String? = executeBlockingWithResult(providers, workingDir, this)
 
 internal fun executeBlockingWithResult(
-  execOps: ExecOperations,
+  providers: ProviderFactory,
   workingDir: File? = null,
-  vararg args: String
+  arguments: List<String>
 ): String? {
-  return try {
-    val stdOut = Buffer()
-    stdOut.outputStream().use { os ->
-      execOps
-        .exec {
-          args(*args)
-          workingDir?.let { workingDir(it) }
-          this.standardOutput = os
-        }
-        .rethrowFailure()
-    }
-    stdOut.readUtf8().trimAtEnd()
-  } catch (ignored: Throwable) {
-    null
-  }
+  return executeWithResult(providers, workingDir, arguments).orNull
 }
 
 internal fun executeWithResult(
   providers: ProviderFactory,
   workingDir: File? = null,
-  vararg args: String
+  arguments: List<String>
 ): Provider<String> {
   return providers
     .exec {
-      args(*args)
+      args = arguments
       workingDir?.let { workingDir(it) }
     }
     .standardOutput
     .asText
+    .map { it.trimAtEnd() }
+    .map { it.ifBlank { sneakyNull() } }
 }
 
 private fun String.trimAtEnd(): String {
