@@ -70,12 +70,14 @@ internal class ApkVersioningPlugin : Plugin<Project> {
           .orElse(project.providers.environmentVariable("USER"))
 
       val versionNameProvider =
-        project.providers.provider {
-          val prev = "$versionMajor.$versionMinor.$versionPatch"
-          val addOn =
-            user.map { it.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: "" }
-          "$prev$addOn"
-        }
+        versionMajor
+          .zip(versionMinor) { major, minor -> "$major.$minor" }
+          .zip(versionPatch) { prev, patch -> "$prev.$patch" }
+          .zip(user) { prev, possibleUser ->
+            val addOn =
+              possibleUser.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: ""
+            "$prev$addOn"
+          }
 
       val ciVersionFileProvider =
         project.rootProject.layout.projectDirectory.file("ci/release.version")

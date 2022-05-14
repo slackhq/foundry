@@ -44,13 +44,16 @@ internal fun executeBlockingWithResult(
 
 internal fun executeWithResult(
   providers: ProviderFactory,
-  workingDir: File? = null,
+  inputWorkingDir: File? = null,
   arguments: List<String>
 ): Provider<String> {
   return providers
     .exec {
-      args = arguments
-      workingDir?.let { workingDir(it) }
+      // Apparently Gradle wants us to distinguish between the executable and its arguments, so...
+      // we try to futz that here. But also this is silly.
+      commandLine(arguments[0])
+      args = arguments.drop(1)
+      inputWorkingDir?.let { workingDir(it) }
     }
     .standardOutput
     .asText

@@ -157,14 +157,16 @@ public enum class SupportedLanguagesEnum {
 
 public val Project.fullGitSha: Provider<String>
   get() {
-    return executeWithResult(providers, rootDir, listOf("git", "rev-parse", "HEAD"))
-      .orElse(provider { error("No full git sha found!") })
+    return executeWithResult(providers, rootProject.rootDir, listOf("git", "rev-parse", "HEAD"))
   }
 
 public val Project.gitSha: Provider<String>
   get() {
-    return executeWithResult(providers, rootDir, listOf("git", "rev-parse", "--short", "HEAD"))
-      .orElse(provider { error("No git sha found!") })
+    return executeWithResult(
+      providers,
+      rootProject.rootDir,
+      listOf("git", "rev-parse", "--short", "HEAD")
+    )
   }
 
 public val Project.ciBuildNumber: Provider<String>
