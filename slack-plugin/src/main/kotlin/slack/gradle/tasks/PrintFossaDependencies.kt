@@ -39,8 +39,6 @@ import slack.gradle.safeCapitalize
  *
  * More details:
  * https://slack-pde.slack.com/archives/C012A55CZNH/p1607469397011200?thread_ts=1607384582.004300&cid=C012A55CZNH
- *
- * This task is not cacheable as it has no inputs and is run on demand.
  */
 @CacheableTask
 public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
