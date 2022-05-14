@@ -19,6 +19,7 @@ import com.android.build.gradle.internal.publishing.AndroidArtifacts
 import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -35,6 +36,9 @@ public abstract class BaseDependencyCheckTask : DefaultTask() {
         .artifactView {
           attributes { attribute(AndroidArtifacts.ARTIFACT_TYPE, ArtifactType.AAR_OR_JAR.type) }
           lenient(true)
+          // Only resolve external dependencies! Without this, all project dependencies will get
+          // _compiled_.
+          componentFilter { id -> id is ModuleComponentIdentifier }
         }
         .artifacts
         .resolvedArtifacts
