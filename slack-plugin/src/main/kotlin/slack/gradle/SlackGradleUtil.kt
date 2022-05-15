@@ -29,7 +29,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
-import slack.executeBlockingWithResult
+import slack.executeWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.DependencyGroup
@@ -57,16 +57,6 @@ internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
   return DependencyDef(group, bomArtifact, gradleProperty = groupGradleProperty)
 }
 
-/**
- * If true, this is currently running on the Github Actions shadow job (see
- * .github/workflows/shadowBuild.yml).
- *
- * This is useful to gate changes that are incubating.
- */
-internal val Project.isShadowJob: Boolean
-  get() =
-    isActionsCi && providers.environmentVariable("SLACK_SHADOW_JOB").mapToBoolean().getOrElse(false)
-
 /** Returns the git branch this is running on. */
 public fun Project.gitBranch(): Provider<String> {
   return when {
@@ -76,13 +66,12 @@ public fun Project.gitBranch(): Provider<String> {
         .orElse(providers.environmentVariable("BRANCH_NAME"))
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
-      provider {
-        "git rev-parse --abbrev-ref HEAD"
-          .executeBlockingWithResult(rootProject.rootDir)
-          ?.lines()
-          ?.get(0)
-          ?.trim()
-      }
+      executeWithResult(
+          project.providers,
+          rootProject.rootDir,
+          listOf("git", "rev-parse", "--abbrev-ref", "HEAD")
+        )
+        .map { it.lines()[0].trim() }
   }
 }
 
@@ -166,16 +155,18 @@ public enum class SupportedLanguagesEnum {
   BETA
 }
 
-public val Project.fullGitSha: String
+public val Project.fullGitSha: Provider<String>
   get() {
-    return "git rev-parse HEAD".executeBlockingWithResult(rootDir)
-      ?: error("No full git sha found!")
+    return executeWithResult(providers, rootProject.rootDir, listOf("git", "rev-parse", "HEAD"))
   }
 
-public val Project.gitSha: String
+public val Project.gitSha: Provider<String>
   get() {
-    return "git rev-parse --short HEAD".executeBlockingWithResult(rootDir)
-      ?: error("No git sha found!")
+    return executeWithResult(
+      providers,
+      rootProject.rootDir,
+      listOf("git", "rev-parse", "--short", "HEAD")
+    )
   }
 
 public val Project.ciBuildNumber: Provider<String>

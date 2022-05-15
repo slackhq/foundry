@@ -57,14 +57,10 @@ internal class ApkVersioningPlugin : Plugin<Project> {
   @Suppress("LongMethod")
   override fun apply(project: Project) {
     project.plugins.withType<AppPlugin> {
-      // TODO eventually make these computed again, eagerly resolving to avoid
-      //  https://github.com/gradle/gradle/issues/19649
-      val versionMajor = project.localGradleProperty("versionMajor").get()
-      val versionMinor = project.localGradleProperty("versionMinor").get()
-      val versionPatch = project.localGradleProperty("versionPatch").get()
+      val versionMajor = project.localGradleProperty("versionMajor")
+      val versionMinor = project.localGradleProperty("versionMinor")
+      val versionPatch = project.localGradleProperty("versionPatch")
 
-      // TODO eventually make this computed again, eagerly resolving to avoid
-      //  https://github.com/gradle/gradle/issues/19658
       val user =
         project
           .ciBuildNumber
@@ -72,14 +68,16 @@ internal class ApkVersioningPlugin : Plugin<Project> {
           // Only provider the user if this is _not_ running on jenkins. Composition of properties
           // is still a little weird in Gradle.
           .orElse(project.providers.environmentVariable("USER"))
-          .get()
 
       val versionNameProvider =
-        project.providers.provider {
-          val prev = "$versionMajor.$versionMinor.$versionPatch"
-          val addOn = user.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: ""
-          "$prev$addOn"
-        }
+        versionMajor
+          .zip(versionMinor) { major, minor -> "$major.$minor" }
+          .zip(versionPatch) { prev, patch -> "$prev.$patch" }
+          .zip(user) { prev, possibleUser ->
+            val addOn =
+              possibleUser.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: ""
+            "$prev$addOn"
+          }
 
       val ciVersionFileProvider =
         project.rootProject.layout.projectDirectory.file("ci/release.version")
@@ -93,8 +91,8 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       configureVariants(project, versionNameProvider, versionCodeProvider)
 
       // Register a version properties task. This is run on ci via android_preflight.sh
-      val shortGitShaProvider = project.provider { project.gitSha }
-      val longGitShaProvider = project.provider { project.fullGitSha }
+      val shortGitShaProvider = project.gitSha
+      val longGitShaProvider = project.fullGitSha
       project.tasks.register<VersionPropertiesTask>("generateVersionProperties") {
         outputFile.set(
           project.layout.buildDirectory.file("intermediates/versioning/version.properties")

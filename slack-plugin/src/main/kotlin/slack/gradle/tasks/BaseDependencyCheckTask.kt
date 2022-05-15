@@ -15,53 +15,51 @@
  */
 package slack.gradle.tasks
 
+import com.android.build.gradle.internal.publishing.AndroidArtifacts
+import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.tasks.Internal
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import org.gradle.maven.MavenModule
+import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
 
 public abstract class BaseDependencyCheckTask : DefaultTask() {
-  @get:Internal public lateinit var configuration: Configuration
+  @get:Input public abstract val identifiersToVersions: MapProperty<String, String>
 
-  internal abstract fun handleDependencies(dependencies: Map<String, String>)
+  protected abstract fun handleDependencies(identifiersToVersions: Map<String, String>)
 
-  init {
-    @Suppress("LeakingThis")
-    notCompatibleWithConfigurationCache(
-      "Pending Gradle 7.5 and https://github.com/gradle/gradle/pull/18729"
+  protected fun configureIdentifiersToVersions(configuration: Configuration) {
+    identifiersToVersions.putAll(
+      configuration.incoming
+        .artifactView {
+          attributes { attribute(AndroidArtifacts.ARTIFACT_TYPE, ArtifactType.AAR_OR_JAR.type) }
+          lenient(true)
+          // Only resolve external dependencies! Without this, all project dependencies will get
+          // _compiled_.
+          componentFilter { id -> id is ModuleComponentIdentifier }
+        }
+        .artifacts
+        .resolvedArtifacts
+        // We _must_ map this here, can't defer to the task action because of
+        // https://github.com/gradle/gradle/issues/20785
+        .map { result ->
+          result
+            .asSequence()
+            .map { it.id }
+            .filterIsInstance<ModuleComponentArtifactIdentifier>()
+            .associate { component ->
+              val componentId = component.componentIdentifier
+              val identifier = "${componentId.group}:${componentId.module}"
+              identifier to componentId.version
+            }
+        }
     )
   }
 
   @TaskAction
   internal fun check() {
-    val componentIds =
-      configuration
-        .incoming
-        .resolutionResult
-        .allDependencies
-        .map { it.from.id }
-        .filterIsInstance<ModuleComponentIdentifier>()
-
-    val components = fetchComponents(componentIds)
-    check(components.isNotEmpty()) { "No runtime versions were found" }
-
-    handleDependencies(components)
-  }
-
-  private fun fetchComponents(componentIds: List<ModuleComponentIdentifier>): Map<String, String> {
-    return project
-      .dependencies
-      .createArtifactResolutionQuery()
-      .forComponents(componentIds)
-      .withArtifacts(MavenModule::class.java)
-      .execute()
-      .resolvedComponents
-      .associate { component ->
-        val componentId = component.id as ModuleComponentIdentifier
-        val identifier = "${componentId.group}:${componentId.module}"
-        identifier to componentId.version
-      }
+    handleDependencies(identifiersToVersions.get())
   }
 }
