@@ -90,6 +90,11 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
         "check${name.safeCapitalize()}Versions"
       ) {
         configureIdentifiersToVersions(configuration)
+        outputFile.set(
+          project.layout.buildDirectory.file(
+            "reports/slack/dependencyVersionsIssues/$name/issues.txt"
+          )
+        )
         val catalog = project.getVersionsCatalog()
         this.mappedIdentifiersToVersions.putAll(
           project.provider {
