@@ -152,6 +152,10 @@ public object ModuleStatsTasks {
         addGeneratedSources()
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
       }
+      withPlugin("app.cash.sqldelight") {
+        addGeneratedSources()
+        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
+      }
       withPlugin("com.android.application") {
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_ANDROID) }
         //          val multiVariant =

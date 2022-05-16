@@ -214,6 +214,10 @@ internal class SlackRootPlugin : Plugin<Project> {
             primary("com.squareup.sqldelight:runtime")
             includeGroup("com.squareup.sqldelight")
           }
+          bundle("sqldelight2") {
+            primary("app.cash.sqldelight:runtime")
+            includeGroup("app.cash.sqldelight")
+          }
           bundle("turbine") {
             primary("app.cash.turbine:turbine")
             includeGroup("app.cash.turbine")
