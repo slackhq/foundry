@@ -15,11 +15,17 @@
  */
 package slack.gradle.tasks
 
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.register
+import slack.gradle.safeCapitalize
 
 /**
- * A task that writes runtime dependency info found in [configuration].
+ * A task that writes runtime dependency info found in [identifiersToVersions].
  *
  * This is used by the Fossa tool to parse and look up our dependencies. The output file is in the
  * form of a newline-delimited list of `<module identifier>:<version>`.
@@ -33,9 +39,8 @@ import org.gradle.api.tasks.OutputFile
  *
  * More details:
  * https://slack-pde.slack.com/archives/C012A55CZNH/p1607469397011200?thread_ts=1607384582.004300&cid=C012A55CZNH
- *
- * This task is not cacheable as it has no inputs and is run on demand.
  */
+@CacheableTask
 public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
@@ -44,16 +49,31 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
     group = "slack"
   }
 
-  override fun handleDependencies(dependencies: Map<String, String>) {
+  override fun handleDependencies(identifiersToVersions: Map<String, String>) {
     val file = outputFile.asFile.get()
     file.bufferedWriter().use { writer ->
-      dependencies
+      identifiersToVersions
         .entries
         .map { (moduleIdentifier, version) -> "mvn+$moduleIdentifier:$version" }
-        .sorted()
+        .sorted() // Important for deterministic ouputs
         .joinTo(writer, separator = "\n")
     }
 
     logger.lifecycle("Fossa deps written to $file")
+  }
+
+  public companion object {
+    public fun register(
+      project: Project,
+      name: String,
+      configuration: Configuration
+    ): TaskProvider<PrintFossaDependencies> {
+      return project.tasks.register<PrintFossaDependencies>(
+        "print${name.safeCapitalize()}FossaDependencies"
+      ) {
+        outputFile.set(project.layout.buildDirectory.file("reports/slack/fossa/$name.txt"))
+        configureIdentifiersToVersions(configuration)
+      }
+    }
   }
 }

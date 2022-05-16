@@ -16,47 +16,49 @@
 package slack
 
 import java.io.File
-import java.util.concurrent.TimeUnit
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import slack.gradle.util.sneakyNull
 
-internal fun String.execute(workingDir: File) {
-  executeBlocking(workingDir)
+internal fun String.executeBlocking(providers: ProviderFactory, workingDir: File) {
+  executeBlockingWithResult(providers, workingDir)
 }
 
-internal fun String.executeBlocking(workingDir: File) {
-  Runtime.getRuntime().exec(this, null, workingDir).waitFor()
+internal fun String.executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File
+): String? = split(" ").executeBlockingWithResult(providers, workingDir)
+
+internal fun List<String>.executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File
+): String? = executeBlockingWithResult(providers, workingDir, this)
+
+internal fun executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File? = null,
+  arguments: List<String>
+): String? {
+  return executeWithResult(providers, workingDir, arguments).orNull
 }
 
-internal fun String.executeWithResult(workingDir: File): String? {
-  return executeBlockingWithResult(workingDir)
-}
-
-internal fun String.executeBlockingWithResult(workingDir: File): String? {
-  return split(" ").executeBlockingWithResult(workingDir)
-}
-
-internal fun List<String>.executeBlockingWithResult(workingDir: File): String? {
-  return executeBlockingWithResult(workingDir, *toTypedArray())
-}
-
-internal fun executeBlockingWithResult(workingDir: File? = null, vararg args: String): String? {
-  val process = args.toList().executeProcess(workingDir)
-  return try {
-    val standardText = process.inputStream.bufferedReader().readText()
-    process.errorStream.bufferedReader().readText()
-
-    val finished = process.waitFor(10, TimeUnit.SECONDS)
-    if (finished && process.exitValue() == 0) standardText.trimAtEnd() else null
-  } finally {
-    process.destroyForcibly()
-  }
-}
-
-internal fun String.executeProcess(workingDir: File? = null): Process {
-  return Runtime.getRuntime().exec(this, null, workingDir)
-}
-
-internal fun List<String>.executeProcess(workingDir: File? = null): Process {
-  return Runtime.getRuntime().exec(toTypedArray(), null, workingDir)
+internal fun executeWithResult(
+  providers: ProviderFactory,
+  inputWorkingDir: File? = null,
+  arguments: List<String>
+): Provider<String> {
+  return providers
+    .exec {
+      // Apparently Gradle wants us to distinguish between the executable and its arguments, so...
+      // we try to futz that here. But also this is silly.
+      commandLine(arguments[0])
+      args = arguments.drop(1)
+      inputWorkingDir?.let { workingDir(it) }
+    }
+    .standardOutput
+    .asText
+    .map { it.trimAtEnd() }
+    .map { it.ifBlank { sneakyNull() } }
 }
 
 private fun String.trimAtEnd(): String {

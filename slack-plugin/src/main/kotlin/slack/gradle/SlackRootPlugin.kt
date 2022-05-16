@@ -214,6 +214,10 @@ internal class SlackRootPlugin : Plugin<Project> {
             primary("com.squareup.sqldelight:runtime")
             includeGroup("com.squareup.sqldelight")
           }
+          bundle("sqldelight2") {
+            primary("app.cash.sqldelight:runtime")
+            includeGroup("app.cash.sqldelight")
+          }
           bundle("turbine") {
             primary("app.cash.turbine:turbine")
             includeGroup("app.cash.turbine")
@@ -317,12 +321,12 @@ internal class SlackRootPlugin : Plugin<Project> {
     if (!isCi) {
       slackProperties.gitHooksFile?.let { hooksPath ->
         // Configure hooks
-        "git config core.hooksPath $hooksPath".executeBlocking(rootDir)
+        "git config core.hooksPath $hooksPath".executeBlocking(project.providers, rootDir)
       }
 
       val revsFile = slackProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
-      val gitVersion = "git --version".executeBlockingWithResult(rootDir)
+      val gitVersion = "git --version".executeBlockingWithResult(project.providers, rootDir)
       val versionNumber = parseGitVersion(gitVersion)
       @Suppress(
         "ReplaceCallWithBinaryOperator"
@@ -342,7 +346,10 @@ internal class SlackRootPlugin : Plugin<Project> {
         }
         else -> {
           logger.debug("Configuring blame.ignoreRevsFile")
-          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(rootDir)
+          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(
+            project.providers,
+            rootDir
+          )
         }
       }
     }

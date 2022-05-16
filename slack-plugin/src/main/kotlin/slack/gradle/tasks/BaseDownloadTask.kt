@@ -35,7 +35,7 @@ import slack.gradle.agp.VersionNumber
 private const val ONE_MEGABYTE_IN_BYTES: Long = 1L * 1024L * 1024L
 
 /**
- * Downloads the a binary from its GitHub releases.
+ * Downloads a binary from its GitHub releases.
  *
  * Usage:
  * ```
@@ -105,10 +105,10 @@ internal abstract class BaseDownloadTask(
       OkHttpClient.Builder()
         .addInterceptor { chain ->
           val originalResponse = chain.proceed(chain.request())
-          originalResponse.body?.let {
-            originalResponse.newBuilder().body(ProgressResponseBody(it, progressListener)).build()
-          }
-            ?: originalResponse
+          originalResponse
+            .newBuilder()
+            .body(ProgressResponseBody(originalResponse.body, progressListener))
+            .build()
         }
         .build()
 
@@ -123,7 +123,7 @@ internal abstract class BaseDownloadTask(
             delete()
           }
         }
-      response.body?.source()?.use { source ->
+      response.body.source().use { source ->
         destinationFile.sink().buffer().use { sink ->
           if (addExecPrefix) {
             sink.writeUtf8(EXEC_PREFIX)
