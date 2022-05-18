@@ -34,21 +34,15 @@ import org.gradle.api.logging.Logger
  */
 internal object AndroidSourcesConfigurer {
 
-  private const val LATEST = 31
   internal const val MARKER_FILE_NAME = "slack_patched_marker"
 
-  fun patchSdkSources(requestedSdkVersion: Int, rootProject: Project, latest: Int = LATEST) {
+  fun patchSdkSources(requestedSdkVersion: Int, rootProject: Project, latest: Int) {
     val sdkDir = inferAndroidHome(rootProject.projectDir)
     patchSdkSources(requestedSdkVersion, sdkDir, rootProject.logger, latest)
   }
 
   @Suppress("LongMethod")
-  fun patchSdkSources(
-    requestedSdkVersion: Int,
-    sdkDir: File,
-    logger: Logger,
-    latest: Int = LATEST
-  ) {
+  fun patchSdkSources(requestedSdkVersion: Int, sdkDir: File, logger: Logger, latest: Int) {
     if (requestedSdkVersion == latest) {
       // Check for our patched marker. If it exists, delete the directory and let AGP download it
       // again.
@@ -87,7 +81,7 @@ internal object AndroidSourcesConfigurer {
         )
       } else {
         logger.lifecycle(
-          "Patching Android sources from $latest as requested SDK version" + " $requestedSdkVersion"
+          "Patching Android sources from $latest as requested SDK version $requestedSdkVersion"
         )
         measureTimeMillis {
           requestedSources.mkdirs()

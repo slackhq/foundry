@@ -351,6 +351,8 @@ public class SlackProperties private constructor(private val project: Project) {
 
   public val compileSdkVersion: String
     get() = stringProperty("slack.compileSdkVersion")
+  public fun latestCompileSdkWithSources(defaultValue: Int): Int =
+    intProperty("slack.latestCompileSdkWithSources", defaultValue = defaultValue)
   public val minSdkVersion: String
     get() = stringProperty("slack.minSdkVersion")
   public val targetSdkVersion: String
