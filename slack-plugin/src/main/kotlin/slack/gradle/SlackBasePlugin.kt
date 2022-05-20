@@ -15,6 +15,8 @@
  */
 package slack.gradle
 
+import com.diffplug.gradle.spotless.SpotlessExtension
+import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import java.util.Locale
 import java.util.Optional
 import kotlin.math.max
@@ -26,6 +28,7 @@ import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.retry
 import org.gradle.kotlin.dsl.withType
 import slack.gradle.util.synchronousEnvProperty
@@ -102,11 +105,56 @@ internal class SlackBasePlugin : Plugin<Project> {
     }
 
     // Everything in here applies to all projects
+    target.configureSpotless(slackProperties)
     target.configureClasspath(slackProperties)
     val scanApi = ScanApi(target)
     if (scanApi.isAvailable) {
       scanApi.addTestParallelization(target)
       scanApi.addTestSystemProperties(target)
+    }
+  }
+
+  /** Configures Spotless for formatting. Note we do this per-project for improved performance. */
+  private fun Project.configureSpotless(slackProperties: SlackProperties) {
+    val isRootProject = this.isRootProject
+    pluginManager.withPlugin("com.diffplug.spotless") {
+      if (isRootProject) {
+        // Pre-declare in root project for better performance and also to work around
+        // https://github.com/diffplug/spotless/issues/1213
+        configure<SpotlessExtension> { predeclareDeps() }
+        configure<SpotlessExtensionPredeclare> {
+          format("misc") {
+            target("*.md", ".gitignore")
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+          val ktlintVersion = slackProperties.versions.ktlint
+          val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
+          kotlin {
+            target("src/**/*.kt")
+            ktlint(ktlintVersion).userData(ktlintUserData)
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+          kotlinGradle {
+            target("src/**/*.kts")
+            ktlint(ktlintVersion).userData(ktlintUserData)
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+          java {
+            target("src/**/*.java")
+            googleJavaFormat(slackProperties.versions.gjf).reflowLongStrings()
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+          json {
+            target("src/**/*.json", "*.json")
+            target("*.json")
+            gson().indentWithSpaces(2).version(slackProperties.versions.gson)
+          }
+        }
+      }
     }
   }
 
