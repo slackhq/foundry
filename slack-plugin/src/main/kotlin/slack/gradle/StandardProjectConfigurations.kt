@@ -29,7 +29,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
-import com.diffplug.gradle.spotless.SpotlessExtension
 import com.google.common.base.CaseFormat
 import com.google.devtools.ksp.gradle.KspExtension
 import io.gitlab.arturbosch.detekt.Detekt
@@ -159,7 +158,6 @@ internal class StandardProjectConfigurations {
     }
 
     val slackExtension = extensions.create<SlackExtension>("slack")
-    configureSpotless(slackProperties)
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
     val jdkVersion = jdkVersion()
@@ -223,44 +221,6 @@ internal class StandardProjectConfigurations {
               )
             }
           }
-        }
-      }
-    }
-  }
-
-  /** Configures Spotless for formatting. Note we do this per-project for improved performance. */
-  private fun Project.configureSpotless(slackProperties: SlackProperties) {
-    pluginManager.withPlugin("com.diffplug.spotless") {
-      configure<SpotlessExtension> {
-        format("misc") {
-          target("*.md", ".gitignore")
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        val ktlintVersion = slackProperties.versions.ktlint
-        val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-        kotlin {
-          target("src/**/*.kt")
-          ktlint(ktlintVersion).userData(ktlintUserData)
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        kotlinGradle {
-          target("src/**/*.kts")
-          ktlint(ktlintVersion).userData(ktlintUserData)
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        java {
-          target("src/**/*.java")
-          googleJavaFormat(slackProperties.versions.gjf).reflowLongStrings()
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        json {
-          target("src/**/*.json", "*.json")
-          target("*.json")
-          gson().indentWithSpaces(2).version(slackProperties.versions.gson)
         }
       }
     }
