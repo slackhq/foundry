@@ -49,6 +49,14 @@ internal fun Project.configureBuildScanMetadata(scanApi: ScanApi) {
   scanApi.addGitMetadata(project)
   scanApi.addTestParallelization(project)
   scanApi.addTestSystemProperties(project)
+
+  // Add the gradle enterprise plugin version if present
+  ScanApi::class
+    .java
+    .classLoader
+    .getResource("com.gradle.scan.plugin.internal.meta.buildAgentVersion.txt")
+    ?.readText()
+    ?.let { buildAgentVersion -> scanApi.value("GE Gradle plugin version", buildAgentVersion) }
 }
 
 private fun ScanApi.tagOs() {
