@@ -57,6 +57,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   private var thermalsReporter: ThermalsReporter? = null
   private val logThermals =
     OperatingSystem.current().isMacOsX &&
+      !parameters.isCleaning.get() &&
       providers.gradleProperty(SlackProperties.LOG_THERMALS).mapToBoolean().getOrElse(false)
 
   private val thermalsWatcher = if (logThermals) ThermalsWatcher(::thermalsFile) else null
@@ -132,6 +133,9 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
           parameters.offline.set(project.gradle.startParameter.isOffline)
+          parameters.isCleaning.set(
+            project.gradle.startParameter.taskNames.any { it.equals("clean", ignoreCase = true) }
+          )
         }
         .apply {
           get().apply {
@@ -146,6 +150,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     /** An output file that the thermals process (continuously) writes to during the build. */
     public val thermalsOutputFile: RegularFileProperty
     public val offline: Property<Boolean>
+    public val isCleaning: Property<Boolean>
   }
 }
 
