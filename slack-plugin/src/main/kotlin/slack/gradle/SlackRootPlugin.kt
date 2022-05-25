@@ -322,12 +322,21 @@ internal class SlackRootPlugin : Plugin<Project> {
     if (!isCi) {
       slackProperties.gitHooksFile?.let { hooksPath ->
         // Configure hooks
-        "git config core.hooksPath $hooksPath".executeBlocking(project.providers, rootDir)
+        "git config core.hooksPath $hooksPath".executeBlocking(
+          project.providers,
+          rootDir,
+          isRelevantToConfigurationCache = false
+        )
       }
 
       val revsFile = slackProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
-      val gitVersion = "git --version".executeBlockingWithResult(project.providers, rootDir)
+      val gitVersion =
+        "git --version".executeBlockingWithResult(
+          project.providers,
+          rootDir,
+          isRelevantToConfigurationCache = false
+        )
       val versionNumber = parseGitVersion(gitVersion)
       @Suppress(
         "ReplaceCallWithBinaryOperator"
@@ -349,7 +358,8 @@ internal class SlackRootPlugin : Plugin<Project> {
           logger.debug("Configuring blame.ignoreRevsFile")
           "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(
             project.providers,
-            rootDir
+            rootDir,
+            isRelevantToConfigurationCache = false
           )
         }
       }
