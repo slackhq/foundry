@@ -17,6 +17,7 @@ package slack
 
 import java.io.File
 import javax.inject.Inject
+import okio.Buffer
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
@@ -24,6 +25,9 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
 import org.gradle.api.tasks.Optional
+import org.gradle.process.ExecOperations
+import org.gradle.process.ExecSpec
+import org.gradle.process.internal.ExecException
 import slack.ExecSource.Parameters
 import slack.gradle.util.sneakyNull
 
@@ -71,31 +75,30 @@ internal fun executeWithResult(
       }
       .map { it.value }
   }
-  return providers.executeWithResult(inputWorkingDir, arguments)
-}
-
-private fun ProviderFactory.executeWithResult(
-  inputWorkingDir: File? = null,
-  arguments: List<String>,
-): Provider<String> {
-  return exec {
-    // Apparently Gradle wants us to distinguish between the executable and its arguments, so...
-    // we try to futz that here. But also this is silly.
-    commandLine(arguments[0])
-    args = arguments.drop(1)
-    inputWorkingDir?.let { workingDir(it) }
-  }
+  return providers
+    .exec { configureExec(inputWorkingDir, arguments) }
     .standardOutput
     .asText
     .map { it.trimAtEnd() }
     .map { it.ifBlank { sneakyNull() } }
 }
 
+private fun ExecSpec.configureExec(
+  inputWorkingDir: File? = null,
+  arguments: List<String>,
+) {
+  // Apparently Gradle wants us to distinguish between the executable and its arguments, so...
+  // we try to futz that here. But also this is silly.
+  commandLine(arguments[0])
+  args = arguments.drop(1)
+  inputWorkingDir?.let { workingDir(it) }
+}
+
 private fun String.trimAtEnd(): String {
   return ("x$this").trim().substring(1)
 }
 
-internal abstract class ExecSource @Inject constructor(private val providers: ProviderFactory) :
+internal abstract class ExecSource @Inject constructor(private val execOperations: ExecOperations) :
   ValueSource<ExecSourceResult, Parameters> {
   interface Parameters : ValueSourceParameters {
     val args: ListProperty<String>
@@ -103,9 +106,22 @@ internal abstract class ExecSource @Inject constructor(private val providers: Pr
   }
 
   override fun obtain(): ExecSourceResult? {
-    val value =
-      providers.executeWithResult(parameters.workingDir.asFile.orNull, parameters.args.get())
-    return value.orNull?.let(::ExecSourceResult)
+    val arguments = parameters.args.get()
+    val inputWorkingDir = parameters.workingDir.asFile.orNull
+    val buffer = Buffer()
+    buffer.outputStream().use { os ->
+      try {
+        execOperations.exec {
+          configureExec(inputWorkingDir, arguments)
+          standardOutput = os
+          errorOutput = os
+        }
+      } catch (ignored: ExecException) {
+        return null
+      }
+    }
+    val value = buffer.readUtf8().trim { it <= ' ' }
+    return ExecSourceResult(value)
   }
 }
 
