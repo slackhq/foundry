@@ -791,6 +791,7 @@ internal class StandardProjectConfigurations {
           }
           jvmTarget = actualJvmTarget
           freeCompilerArgs += kotlinCompilerArgs
+          useK2 = slackProperties.useK2
 
           if (slackProperties.enableCompose && isAndroid) {
             freeCompilerArgs += "-Xskip-prerelease-check"
@@ -809,9 +810,7 @@ internal class StandardProjectConfigurations {
 
       if (jdkVersion != null) {
         configure<KotlinProjectExtension> {
-          jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
-          }
+          jvmToolchain { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
         }
       }
 
