@@ -63,7 +63,7 @@ internal fun executeWithResult(
   arguments: List<String>,
   isRelevantToConfigurationCache: Boolean
 ): Provider<String> {
-  if (isRelevantToConfigurationCache) {
+  if (!isRelevantToConfigurationCache) {
     return providers
       .of(ExecSource::class.java) {
         parameters.workingDir.set(inputWorkingDir)
