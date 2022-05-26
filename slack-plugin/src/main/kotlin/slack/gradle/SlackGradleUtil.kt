@@ -69,7 +69,8 @@ public fun Project.gitBranch(): Provider<String> {
       executeWithResult(
           project.providers,
           rootProject.rootDir,
-          listOf("git", "rev-parse", "--abbrev-ref", "HEAD")
+          listOf("git", "rev-parse", "--abbrev-ref", "HEAD"),
+          isRelevantToConfigurationCache = false
         )
         .map { it.lines()[0].trim() }
   }
@@ -157,7 +158,12 @@ public enum class SupportedLanguagesEnum {
 
 public val Project.fullGitSha: Provider<String>
   get() {
-    return executeWithResult(providers, rootProject.rootDir, listOf("git", "rev-parse", "HEAD"))
+    return executeWithResult(
+      providers,
+      rootProject.rootDir,
+      listOf("git", "rev-parse", "HEAD"),
+      isRelevantToConfigurationCache = true
+    )
   }
 
 public val Project.gitSha: Provider<String>
@@ -165,7 +171,8 @@ public val Project.gitSha: Provider<String>
     return executeWithResult(
       providers,
       rootProject.rootDir,
-      listOf("git", "rev-parse", "--short", "HEAD")
+      listOf("git", "rev-parse", "--short", "HEAD"),
+      isRelevantToConfigurationCache = true
     )
   }
 

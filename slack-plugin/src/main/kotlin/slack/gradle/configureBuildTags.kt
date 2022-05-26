@@ -132,16 +132,24 @@ private fun ScanApi.addGitMetadata(project: Project) {
       executeBlockingWithResult(
         providers,
         projectDir,
-        listOf("git", "rev-parse", "--short=8", "--verify", "HEAD")
+        listOf("git", "rev-parse", "--short=8", "--verify", "HEAD"),
+        isRelevantToConfigurationCache = false
       )
     val gitBranchName =
       executeBlockingWithResult(
         providers,
         projectDir,
-        listOf("git", "rev-parse", "--abbrev-ref", "HEAD")
+        listOf("git", "rev-parse", "--abbrev-ref", "HEAD"),
+        isRelevantToConfigurationCache = false
       )
+
     val gitStatus =
-      executeBlockingWithResult(providers, projectDir, listOf("git", "status", "--porcelain"))
+      executeBlockingWithResult(
+        providers,
+        projectDir,
+        listOf("git", "status", "--porcelain"),
+        isRelevantToConfigurationCache = false
+      )
 
     if (gitCommitId != null) {
       val gitCommitIdLabel = "Git commit id"
@@ -155,7 +163,8 @@ private fun ScanApi.addGitMetadata(project: Project) {
         executeBlockingWithResult(
           providers,
           projectDir,
-          listOf("git", "config", "--get", "remote.origin.url")
+          listOf("git", "config", "--get", "remote.origin.url"),
+          isRelevantToConfigurationCache = false
         )
       if (originUrl != null) {
         if ("github.com/" in originUrl || "github.com:" in originUrl) {
@@ -226,7 +235,7 @@ private fun urlEncode(url: String): String {
 
 private fun isGitInstalled(providers: ProviderFactory, workingDir: File): Boolean {
   return try {
-    "git --version".executeBlocking(providers, workingDir)
+    "git --version".executeBlocking(providers, workingDir, isRelevantToConfigurationCache = false)
     true
   } catch (ignored: IOException) {
     false
