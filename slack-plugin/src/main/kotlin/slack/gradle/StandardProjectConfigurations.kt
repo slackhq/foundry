@@ -193,12 +193,14 @@ internal class StandardProjectConfigurations {
    * [Configurations.Groups.PLATFORM].
    */
   private fun Project.applyPlatforms(slackProperties: SlackProperties) {
-    configurations.matching { isPlatformConfigurationName(it.name) }.configureEach {
-      dependencies {
-        for (bom in slackProperties.versions.boms) {
-          add(name, platform(bom))
+    configurations.configureEach {
+      if (isPlatformConfigurationName(name)) {
+        dependencies {
+          for (bom in slackProperties.versions.boms) {
+            add(name, platform(bom))
+          }
+          add(name, platform(slackProperties.slackPlatformProject))
         }
-        add(name, platform(slackProperties.slackPlatformProject))
       }
     }
   }
@@ -448,12 +450,14 @@ internal class StandardProjectConfigurations {
 
     val objenesis2Version = slackProperties.versions.objenesis
     val prepareAndroidTestConfigurations = {
-      configurations.matching { it.name.contains("androidTest", ignoreCase = true) }.configureEach {
-        // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
-        // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
-        // compatible with Android SDK <26
-        resolutionStrategy.force("org.objenesis:objenesis:$objenesis2Version")
+      configurations.configureEach {
+        if (name.contains("androidTest", ignoreCase = true)) {
+          // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+          exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
+          // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
+          // compatible with Android SDK <26
+          resolutionStrategy.force("org.objenesis:objenesis:$objenesis2Version")
+        }
       }
     }
 
@@ -864,11 +868,11 @@ internal class StandardProjectConfigurations {
 
       // See doc on the property for details
       if (!slackProperties.enableKaptInTests) {
-        tasks
-          .matching { task ->
-            task.name.startsWith("kapt") && task.name.endsWith("TestKotlin", ignoreCase = true)
+        tasks.configureEach {
+          if (name.startsWith("kapt") && name.endsWith("TestKotlin", ignoreCase = true)) {
+            enabled = false
           }
-          .configureEach { enabled = false }
+        }
       }
     }
 
@@ -887,19 +891,19 @@ internal class StandardProjectConfigurations {
       APT_OPTION_CONFIGS.mapValues { (_, value) ->
         value.newConfigurer(this@configureAnnotationProcessors)
       }
-    configurations
-      .matching { configuration ->
-        // Try common case first
-        configuration.name in Configurations.Groups.APT ||
+    configurations.configureEach {
+      // Try common case first
+      val isApt =
+        name in Configurations.Groups.APT ||
           // Try custom configs like testKapt, debugAnnotationProcessor, etc.
-          Configurations.Groups.APT.any { configuration.name.endsWith(it, ignoreCase = true) }
-      }
-      .configureEach {
+          Configurations.Groups.APT.any { name.endsWith(it, ignoreCase = true) }
+      if (isApt) {
         val context = ConfigurationContext(project, this@configureEach)
         incoming.afterResolve {
           dependencies.forEach { dependency -> configs[dependency.name]?.configure(context) }
         }
       }
+    }
   }
 
   /**
@@ -909,9 +913,8 @@ internal class StandardProjectConfigurations {
   private fun Project.configureFreeKotlinCompilerArgs() {
     logger.debug("Configuring specific Kotlin compiler args on $path")
     val once = AtomicBoolean()
-    configurations
-      .matching { isKnownConfiguration(it.name, Configurations.Groups.RUNTIME) }
-      .configureEach {
+    configurations.configureEach {
+      if (isKnownConfiguration(name, Configurations.Groups.RUNTIME)) {
         incoming.afterResolve {
           dependencies.forEach { dependency ->
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
@@ -927,6 +930,7 @@ internal class StandardProjectConfigurations {
           }
         }
       }
+    }
   }
 
   companion object {
