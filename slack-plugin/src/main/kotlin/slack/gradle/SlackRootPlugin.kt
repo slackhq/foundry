@@ -181,14 +181,6 @@ internal class SlackRootPlugin : Plugin<Project> {
             primary("androidx.compose.runtime:runtime")
             includeGroup("androidx.compose.runtime")
           }
-          bundle("coroutines-core") {
-            primary("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-            include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines-core.*")
-          }
-          bundle("coroutines-test") {
-            primary("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-            include("org\\.jetbrains\\.kotlinx:kotlinx-coroutines-test.*")
-          }
           bundle("dagger") {
             includeGroup("com.google.dagger")
             includeDependency("javax.inject:javax.inject")
@@ -204,29 +196,9 @@ internal class SlackRootPlugin : Plugin<Project> {
             primary("com.squareup.okhttp3:okhttp")
             includeGroup("com.squareup.okhttp3")
           }
-          bundle("okio") {
-            primary("com.squareup.okio:okio")
-            includeGroup("com.squareup.okio")
-          }
           bundle("paging") { includeGroup("androidx.paging") }
           bundle("robolectric") { includeGroup("org.robolectric") }
           bundle("rxjava") { includeGroup("io.reactivex.rxjava3") }
-          bundle("sqldelight") {
-            primary("com.squareup.sqldelight:runtime")
-            includeGroup("com.squareup.sqldelight")
-          }
-          bundle("sqldelight2") {
-            primary("app.cash.sqldelight:runtime")
-            includeGroup("app.cash.sqldelight")
-          }
-          bundle("turbine") {
-            primary("app.cash.turbine:turbine")
-            includeGroup("app.cash.turbine")
-          }
-          bundle("wire") {
-            primary("com.squareup.wire:wire-runtime")
-            includeGroup("com.squareup.wire")
-          }
         }
       }
     }
