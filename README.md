@@ -158,6 +158,14 @@ generated baselines from each subproject into a single global baseline.
 
 There are a _ton_ of miscellaneous tools, utilities, and glue code for Gradle (and various plugins) sprinkled throughout this project.
 
+## Usage requirements
+
+SGP expects there to be a `libs` version catalog.
+
+The following versions are required to be set the above catalog.
+Their docs can be found in `SlackVersions.kt`.
+- `jdk`
+
 License
 --------
 

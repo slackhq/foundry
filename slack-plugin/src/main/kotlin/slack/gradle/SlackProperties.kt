@@ -311,11 +311,11 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** The JDK version to use for compilations. */
   public val jdkVersion: Int
-    get() = intProperty("slackToolchainsJdk")
+    get() = versions.jdk
 
   /** The JDK runtime to target for compilations. */
   public val jvmTarget: Int
-    get() = intProperty("slackToolchainsJvmTarget", defaultValue = 11)
+    get() = versions.jvmTarget
 
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
