@@ -473,7 +473,8 @@ internal class StandardProjectConfigurations {
     }
 
     val composeCompilerVersion by lazy {
-      slackProperties.versions.composeCompiler ?: error("Missing `compose-compiler` version in catalog")
+      slackProperties.versions.composeCompiler
+        ?: error("Missing `compose-compiler` version in catalog")
     }
 
     pluginManager.withPlugin("com.android.base") {
@@ -817,7 +818,8 @@ internal class StandardProjectConfigurations {
     pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
       // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
       configure<DetektExtension> {
-        toolVersion = slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
+        toolVersion =
+          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
         config.from("$rootDir/config/detekt/detekt.yml")
         config.from("$rootDir/config/detekt/detekt-all.yml")
 

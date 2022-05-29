@@ -132,22 +132,14 @@ internal class SlackBasePlugin : Plugin<Project> {
           val ktlintVersion = slackProperties.versions.ktlint
           if (ktlintVersion != null) {
             val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-            kotlin {
-              ktlint(ktlintVersion).userData(ktlintUserData)
-            }
-            kotlinGradle {
-              ktlint(ktlintVersion).userData(ktlintUserData)
-            }
+            kotlin { ktlint(ktlintVersion).userData(ktlintUserData) }
+            kotlinGradle { ktlint(ktlintVersion).userData(ktlintUserData) }
           }
 
           val ktfmtVersion = slackProperties.versions.ktfmt
           if (ktfmtVersion != null) {
-            kotlin {
-              ktfmt(ktfmtVersion).googleStyle()
-            }
-            kotlinGradle {
-              ktfmt(ktfmtVersion).googleStyle()
-            }
+            kotlin { ktfmt(ktfmtVersion).googleStyle() }
+            kotlinGradle { ktfmt(ktfmtVersion).googleStyle() }
           }
 
           if (ktlintVersion != null || ktfmtVersion != null) {

@@ -19,7 +19,6 @@ import java.util.Optional
 import org.gradle.api.artifacts.ExternalModuleDependencyBundle
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
-import org.gradle.api.artifacts.VersionConstraint
 import org.gradle.api.provider.Provider
 
 // TODO generate something to map these in the future? Or with reflection?
@@ -60,14 +59,14 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   }
 
   internal fun getValue(key: String): String {
-    return getOptionalValue(key)
-      .orElseThrow { IllegalStateException("No catalog version found for ${tomlKey(key)}") }
+    return getOptionalValue(key).orElseThrow {
+      IllegalStateException("No catalog version found for ${tomlKey(key)}")
+    }
   }
 
   internal fun getOptionalValue(key: String): Optional<String> {
     val tomlKey = tomlKey(key)
-    return catalog.findVersion(tomlKey)
-      .map { it.toString() }
+    return catalog.findVersion(tomlKey).map { it.toString() }
   }
 
   internal val boms: Set<Provider<MinimalExternalModuleDependency>> by lazy {
