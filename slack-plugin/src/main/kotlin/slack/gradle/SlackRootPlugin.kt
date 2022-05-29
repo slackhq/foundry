@@ -90,9 +90,10 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     if (!project.isCi) {
-      val compileSdk = slackProperties.compileSdkVersion.substringAfter("-").toInt()
-      val latestCompileSdkWithSources = slackProperties.latestCompileSdkWithSources(compileSdk)
-      AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
+      slackProperties.compileSdkVersion?.substringAfter("-")?.toInt()?.let { compileSdk ->
+        val latestCompileSdkWithSources = slackProperties.latestCompileSdkWithSources(compileSdk)
+        AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
+      }
       project.configureGit(slackProperties)
     }
     project.configureSlackRootBuildscript()

@@ -204,8 +204,8 @@ public class SlackProperties private constructor(private val project: Project) {
    *
    * Latest versions can be found at https://developer.android.com/ndk/downloads
    */
-  public val ndkVersion: String
-    get() = stringProperty("slack.ndkVersion")
+  public val ndkVersion: String?
+    get() = optionalStringProperty("slack.ndkVersion")
 
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
@@ -349,14 +349,26 @@ public class SlackProperties private constructor(private val project: Project) {
   public val versionCatalogName: String
     get() = stringProperty("slack.catalog", defaultValue = "libs")
 
-  public val compileSdkVersion: String
-    get() = stringProperty("slack.compileSdkVersion")
+  internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
+    val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
+    val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")
+    val targetSdk = targetSdkVersion?.toInt() ?: error("slack.targetSdkVersion not set")
+    return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
+  }
+
+  internal data class AndroidSdkProperties(val compileSdk: String, val minSdk: Int, val targetSdk: Int)
+
+  public val compileSdkVersion: String?
+    get() = optionalStringProperty("slack.compileSdkVersion")
+
   public fun latestCompileSdkWithSources(defaultValue: Int): Int =
     intProperty("slack.latestCompileSdkWithSources", defaultValue = defaultValue)
-  public val minSdkVersion: String
-    get() = stringProperty("slack.minSdkVersion")
-  public val targetSdkVersion: String
-    get() = stringProperty("slack.targetSdkVersion")
+
+  private val minSdkVersion: String?
+    get() = optionalStringProperty("slack.minSdkVersion")
+
+  private val targetSdkVersion: String?
+    get() = optionalStringProperty("slack.targetSdkVersion")
 
   public companion object {
     /**

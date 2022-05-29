@@ -382,16 +382,19 @@ internal class StandardProjectConfigurations {
       }
 
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
+    val sdkVersions by lazy {
+      slackProperties.requireAndroidSdkProperties()
+    }
     val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
       if (shouldApplyCacheFixPlugin) {
         apply(plugin = "org.gradle.android.cache-fix")
       }
 
-      compileSdkVersion(slackProperties.compileSdkVersion)
-      ndkVersion = slackProperties.ndkVersion
+      compileSdkVersion(sdkVersions.compileSdk)
+      slackProperties.ndkVersion?.let { ndkVersion = it }
       defaultConfig {
         // TODO this won't work with SDK previews but will fix in a followup
-        minSdk = slackProperties.minSdkVersion.toInt()
+        minSdk = sdkVersions.minSdk
         vectorDrawables.useSupportLibrary = true
         // Default to the standard android runner, but note this is overridden in :app
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -494,7 +497,7 @@ internal class StandardProjectConfigurations {
         }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          targetSdk = slackProperties.targetSdkVersion.toInt()
+          targetSdk = sdkVersions.targetSdk
         }
         lint {
           lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
