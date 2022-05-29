@@ -123,21 +123,27 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     // Add ktlint download task
-    project.tasks.register<KtLintDownloadTask>("updateKtLint") {
-      version.set(slackProperties.versions.ktlint)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+    slackProperties.versions.ktlint?.let { ktlintVersion ->
+      project.tasks.register<KtLintDownloadTask>("updateKtLint") {
+        version.set(ktlintVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+      }
     }
 
     // Add detekt download task
-    project.tasks.register<DetektDownloadTask>("updateDetekt") {
-      version.set(slackProperties.versions.detekt)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+    slackProperties.versions.detekt?.let { detektVersion ->
+      project.tasks.register<DetektDownloadTask>("updateDetekt") {
+        version.set(detektVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+      }
     }
 
     // Add GJF download task
-    project.tasks.register<GjfDownloadTask>("updateGjf") {
-      version.set(slackProperties.versions.gjf)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+    slackProperties.versions.gjf?.let { gjfVersion ->
+      project.tasks.register<GjfDownloadTask>("updateGjf") {
+        version.set(gjfVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+      }
     }
 
     // Dependency analysis plugin for build health

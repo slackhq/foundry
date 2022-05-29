@@ -463,14 +463,18 @@ internal class StandardProjectConfigurations {
         if (name.contains("androidTest", ignoreCase = true)) {
           // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
           exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
-          // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
-          // compatible with Android SDK <26
-          resolutionStrategy.force("org.objenesis:objenesis:$objenesis2Version")
+          objenesis2Version?.let {
+            // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
+            // compatible with Android SDK <26
+            resolutionStrategy.force("org.objenesis:objenesis:$it")
+          }
         }
       }
     }
 
-    val composeCompilerVersion = slackProperties.versions.composeCompiler
+    val composeCompilerVersion by lazy {
+      slackProperties.versions.composeCompiler ?: error("Missing `compose-compiler` version in catalog")
+    }
 
     pluginManager.withPlugin("com.android.base") {
       if (slackProperties.enableCompose) {
@@ -813,7 +817,7 @@ internal class StandardProjectConfigurations {
     pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
       // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
       configure<DetektExtension> {
-        toolVersion = slackProperties.versions.detekt
+        toolVersion = slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
         config.from("$rootDir/config/detekt/detekt.yml")
         config.from("$rootDir/config/detekt/detekt-all.yml")
 

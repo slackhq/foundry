@@ -128,30 +128,58 @@ internal class SlackBasePlugin : Plugin<Project> {
             trimTrailingWhitespace()
             endWithNewline()
           }
+
           val ktlintVersion = slackProperties.versions.ktlint
-          val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-          kotlin {
-            target("src/**/*.kt")
-            ktlint(ktlintVersion).userData(ktlintUserData)
-            trimTrailingWhitespace()
-            endWithNewline()
+          if (ktlintVersion != null) {
+            val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
+            kotlin {
+              ktlint(ktlintVersion).userData(ktlintUserData)
+            }
+            kotlinGradle {
+              ktlint(ktlintVersion).userData(ktlintUserData)
+            }
           }
-          kotlinGradle {
-            target("src/**/*.kts")
-            ktlint(ktlintVersion).userData(ktlintUserData)
-            trimTrailingWhitespace()
-            endWithNewline()
+
+          val ktfmtVersion = slackProperties.versions.ktfmt
+          if (ktfmtVersion != null) {
+            kotlin {
+              ktfmt(ktfmtVersion).googleStyle()
+            }
+            kotlinGradle {
+              ktfmt(ktfmtVersion).googleStyle()
+            }
           }
-          java {
-            target("src/**/*.java")
-            googleJavaFormat(slackProperties.versions.gjf).reflowLongStrings()
-            trimTrailingWhitespace()
-            endWithNewline()
+
+          if (ktlintVersion != null || ktfmtVersion != null) {
+            check(!(ktlintVersion != null && ktfmtVersion != null)) {
+              "Cannot have both ktlint and ktfmt enabled, please pick one and remove the other from the version catalog!"
+            }
+            kotlin {
+              target("src/**/*.kt")
+              trimTrailingWhitespace()
+              endWithNewline()
+            }
+            kotlinGradle {
+              target("src/**/*.kts")
+              trimTrailingWhitespace()
+              endWithNewline()
+            }
           }
-          json {
-            target("src/**/*.json", "*.json")
-            target("*.json")
-            gson().indentWithSpaces(2).version(slackProperties.versions.gson)
+
+          slackProperties.versions.gjf?.let { gjfVersion ->
+            java {
+              target("src/**/*.java")
+              googleJavaFormat(gjfVersion).reflowLongStrings()
+              trimTrailingWhitespace()
+              endWithNewline()
+            }
+          }
+          slackProperties.versions.gson?.let { gsonVersion ->
+            json {
+              target("src/**/*.json", "*.json")
+              target("*.json")
+              gson().indentWithSpaces(2).version(gsonVersion)
+            }
           }
         }
       }
