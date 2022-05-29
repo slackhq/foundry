@@ -190,20 +190,23 @@ internal class SlackBasePlugin : Plugin<Project> {
     // core one with the
     // new one (as cover for transitive users like junit).
     if (hamcrestDepOptional.isPresent && isTestProject || "test" in lowercaseName) {
-      val hamcrestDep = hamcrestDepOptional.get().get().toString()
-      configuration.resolutionStrategy {
-        dependencySubstitution {
-          substitute(module("org.hamcrest:hamcrest-core")).apply {
-            using(module(hamcrestDep))
-            because("hamcrest 2.1 removed the core/integration/library artifacts")
-          }
-          substitute(module("org.hamcrest:hamcrest-integration")).apply {
-            using(module(hamcrestDep))
-            because("hamcrest 2.1 removed the core/integration/library artifacts")
-          }
-          substitute(module("org.hamcrest:hamcrest-library")).apply {
-            using(module(hamcrestDep))
-            because("hamcrest 2.1 removed the core/integration/library artifacts")
+      val hamcrestDepProvider = hamcrestDepOptional.get()
+      if (hamcrestDepProvider.isPresent) {
+        val hamcrestDep = hamcrestDepProvider.get().toString()
+        configuration.resolutionStrategy {
+          dependencySubstitution {
+            substitute(module("org.hamcrest:hamcrest-core")).apply {
+              using(module(hamcrestDep))
+              because("hamcrest 2.1 removed the core/integration/library artifacts")
+            }
+            substitute(module("org.hamcrest:hamcrest-integration")).apply {
+              using(module(hamcrestDep))
+              because("hamcrest 2.1 removed the core/integration/library artifacts")
+            }
+            substitute(module("org.hamcrest:hamcrest-library")).apply {
+              using(module(hamcrestDep))
+              because("hamcrest 2.1 removed the core/integration/library artifacts")
+            }
           }
         }
       }
