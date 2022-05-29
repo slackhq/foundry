@@ -307,7 +307,7 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** Flag to enable strict JDK mode, forcing some things like JAVA_HOME. */
   public val strictJdk: Boolean
-    get() = booleanProperty("slackToolchainsStrict")
+    get() = booleanProperty("slackToolchainsStrict", defaultValue = true)
 
   /** The JDK version to use for compilations. */
   public val jdkVersion: Int
