@@ -276,12 +276,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = project.project(stringProperty("slack.location.robolectric-core"))
 
   /**
-   * Location for slack-platform project to be referenced by projects.
+   * Gradle path to a platform project to be referenced by other projects.
    *
    * Should be `:path:to:slack-platform` format
+   *
+   * @see Platforms
    */
-  public val slackPlatformProject: Project
-    get() = project.project(stringProperty("slack.location.slack-platform"))
+  public val platformProjectPath: String?
+    get() = optionalStringProperty("slack.location.slack-platform")
 
   /**
    * Opt-in path for commit hooks in the consuming repo that should be automatically installed
@@ -356,7 +358,11 @@ public class SlackProperties private constructor(private val project: Project) {
     return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
   }
 
-  internal data class AndroidSdkProperties(val compileSdk: String, val minSdk: Int, val targetSdk: Int)
+  internal data class AndroidSdkProperties(
+    val compileSdk: String,
+    val minSdk: Int,
+    val targetSdk: Int
+  )
 
   public val compileSdkVersion: String?
     get() = optionalStringProperty("slack.compileSdkVersion")

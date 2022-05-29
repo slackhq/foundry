@@ -44,6 +44,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -125,34 +126,38 @@ internal class StandardProjectConfigurations {
     globalConfig: GlobalConfig,
     slackProperties: SlackProperties
   ) {
-    if (!slackProperties.noPlatform) {
-      applyPlatforms(slackProperties)
+    val platformProjectPath = slackProperties.platformProjectPath
+    if (platformProjectPath == null) {
+      if (slackProperties.strictMode) {
+        logger.warn(
+          "slack.location.slack-platform is not set. Consider creating one to ensure consistent dependency versions across projects!"
+        )
+      }
+    } else if (!slackProperties.noPlatform && path != platformProjectPath) {
+      applyPlatforms(slackProperties.versions.boms, platformProjectPath)
+    }
 
-      if (slackProperties.enableAnalysisPlugin) {
-        val buildFile = project.buildFile
-        // This can run on some intermediate middle directories, like `carbonite` in
-        // `carbonite:carbonite`
-        if (buildFile.exists()) {
-          // Configure rake
-          plugins.withId("com.autonomousapps.dependency-analysis") {
-            val isNoApi = slackProperties.rakeNoApi
-            val rakeDependencies =
-              tasks.register<RakeDependencies>("rakeDependencies") {
-                buildFileProperty.set(project.buildFile)
-                noApi.set(isNoApi)
-                identifierMap.set(
-                  project.provider {
-                    project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v)
-                      ->
-                      "libs.$v"
-                    }
+    if (slackProperties.enableAnalysisPlugin) {
+      val buildFile = project.buildFile
+      // This can run on some intermediate middle directories, like `carbonite` in
+      // `carbonite:carbonite`
+      if (buildFile.exists()) {
+        // Configure rake
+        plugins.withId("com.autonomousapps.dependency-analysis") {
+          val isNoApi = slackProperties.rakeNoApi
+          val rakeDependencies =
+            tasks.register<RakeDependencies>("rakeDependencies") {
+              buildFileProperty.set(project.buildFile)
+              noApi.set(isNoApi)
+              identifierMap.set(
+                project.provider {
+                  project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v) ->
+                    "libs.$v"
                   }
-                )
-              }
-            configure<DependencyAnalysisSubExtension> {
-              registerPostProcessingTask(rakeDependencies)
+                }
+              )
             }
-          }
+          configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
         }
       }
     }
@@ -192,14 +197,17 @@ internal class StandardProjectConfigurations {
    * Applies platform()/bom dependencies for projects, right now only on known
    * [Configurations.Groups.PLATFORM].
    */
-  private fun Project.applyPlatforms(slackProperties: SlackProperties) {
+  private fun Project.applyPlatforms(
+    boms: Set<Provider<MinimalExternalModuleDependency>>,
+    platformProject: String
+  ) {
     configurations.configureEach {
       if (isPlatformConfigurationName(name)) {
         dependencies {
-          for (bom in slackProperties.versions.boms) {
+          for (bom in boms) {
             add(name, platform(bom))
           }
-          add(name, platform(slackProperties.slackPlatformProject))
+          add(name, platform(project(platformProject)))
         }
       }
     }
@@ -382,9 +390,7 @@ internal class StandardProjectConfigurations {
       }
 
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
-    val sdkVersions by lazy {
-      slackProperties.requireAndroidSdkProperties()
-    }
+    val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
     val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
       if (shouldApplyCacheFixPlugin) {
         apply(plugin = "org.gradle.android.cache-fix")
