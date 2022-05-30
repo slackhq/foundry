@@ -36,6 +36,7 @@ import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
 import slack.gradle.tasks.KtLintDownloadTask
+import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.util.ThermalsData
 import slack.stats.ModuleStatsTasks
 
@@ -143,6 +144,14 @@ internal class SlackRootPlugin : Plugin<Project> {
       project.tasks.register<GjfDownloadTask>("updateGjf") {
         version.set(gjfVersion)
         outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+      }
+    }
+
+    // Add ktfmt download task
+    slackProperties.versions.ktfmt?.let { ktfmtVersion ->
+      project.tasks.register<KtfmtDownloadTask>("updateKtfmt") {
+        version.set(ktfmtVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/ktfmt"))
       }
     }
 
