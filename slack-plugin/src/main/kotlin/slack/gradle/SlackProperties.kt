@@ -332,6 +332,14 @@ public class SlackProperties private constructor(private val project: Project) {
   public val autoApplyCacheFix: Boolean
     get() = booleanProperty("slack.auto-apply.cache-fix", defaultValue = true)
 
+  /* Detekt configs. */
+  /** Detekt config files, evaluated from rootProject.file(...). */
+  public val detektConfigs: List<String>?
+    get() = optionalStringProperty("slack.detekt.configs")?.split(",")
+  /** Detekt baseline file, evaluated from rootProject.file(...). */
+  public val detektBaseline: String?
+    get() = optionalStringProperty("slack.detekt.baseline")
+
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
    * have at least one `.kt` source file.

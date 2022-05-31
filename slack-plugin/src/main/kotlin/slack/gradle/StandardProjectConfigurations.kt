@@ -820,18 +820,24 @@ internal class StandardProjectConfigurations {
       configure<DetektExtension> {
         toolVersion =
           slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
-        config.from("$rootDir/config/detekt/detekt.yml")
-        config.from("$rootDir/config/detekt/detekt-all.yml")
-
-        baseline =
-          if (globalConfig.mergeDetektBaselinesTask != null) {
-            tasks.withType<DetektCreateBaselineTask>().configureEach {
-              globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
-            }
-            file("$buildDir/intermediates/detekt/baseline.xml")
-          } else {
-            file("$rootDir/config/detekt/baseline.xml")
+        rootProject.file("config/detekt/detekt.yml")
+        slackProperties.detektConfigs?.let { configs ->
+          for (configFile in configs) {
+            config.from(rootProject.file(configFile))
           }
+        }
+
+        slackProperties.detektBaseline?.let { baselineFile ->
+          baseline =
+            if (globalConfig.mergeDetektBaselinesTask != null) {
+              tasks.withType<DetektCreateBaselineTask>().configureEach {
+                globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
+              }
+              file("$buildDir/intermediates/detekt/baseline.xml")
+            } else {
+              file(rootProject.file(baselineFile))
+            }
+        }
       }
     }
 
