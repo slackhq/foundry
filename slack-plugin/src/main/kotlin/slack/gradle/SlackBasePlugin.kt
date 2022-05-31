@@ -209,7 +209,7 @@ internal class SlackBasePlugin : Plugin<Project> {
     // Hamcrest switched to a single jar starting in 2.1, so exclude the old ones but replace the
     // core one with the
     // new one (as cover for transitive users like junit).
-    if (hamcrestDepOptional.isPresent && isTestProject || "test" in lowercaseName) {
+    if (hamcrestDepOptional.isPresent && (isTestProject || "test" in lowercaseName)) {
       val hamcrestDepProvider = hamcrestDepOptional.get()
       if (hamcrestDepProvider.isPresent) {
         val hamcrestDep = hamcrestDepProvider.get().toString()
