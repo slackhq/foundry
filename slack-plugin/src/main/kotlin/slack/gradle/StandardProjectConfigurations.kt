@@ -44,6 +44,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -125,34 +126,38 @@ internal class StandardProjectConfigurations {
     globalConfig: GlobalConfig,
     slackProperties: SlackProperties
   ) {
-    if (!slackProperties.noPlatform) {
-      applyPlatforms(slackProperties)
+    val platformProjectPath = slackProperties.platformProjectPath
+    if (platformProjectPath == null) {
+      if (slackProperties.strictMode) {
+        logger.warn(
+          "slack.location.slack-platform is not set. Consider creating one to ensure consistent dependency versions across projects!"
+        )
+      }
+    } else if (!slackProperties.noPlatform && path != platformProjectPath) {
+      applyPlatforms(slackProperties.versions.boms, platformProjectPath)
+    }
 
-      if (slackProperties.enableAnalysisPlugin) {
-        val buildFile = project.buildFile
-        // This can run on some intermediate middle directories, like `carbonite` in
-        // `carbonite:carbonite`
-        if (buildFile.exists()) {
-          // Configure rake
-          plugins.withId("com.autonomousapps.dependency-analysis") {
-            val isNoApi = slackProperties.rakeNoApi
-            val rakeDependencies =
-              tasks.register<RakeDependencies>("rakeDependencies") {
-                buildFileProperty.set(project.buildFile)
-                noApi.set(isNoApi)
-                identifierMap.set(
-                  project.provider {
-                    project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v)
-                      ->
-                      "libs.$v"
-                    }
+    if (slackProperties.enableAnalysisPlugin) {
+      val buildFile = project.buildFile
+      // This can run on some intermediate middle directories, like `carbonite` in
+      // `carbonite:carbonite`
+      if (buildFile.exists()) {
+        // Configure rake
+        plugins.withId("com.autonomousapps.dependency-analysis") {
+          val isNoApi = slackProperties.rakeNoApi
+          val rakeDependencies =
+            tasks.register<RakeDependencies>("rakeDependencies") {
+              buildFileProperty.set(project.buildFile)
+              noApi.set(isNoApi)
+              identifierMap.set(
+                project.provider {
+                  project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v) ->
+                    "libs.$v"
                   }
-                )
-              }
-            configure<DependencyAnalysisSubExtension> {
-              registerPostProcessingTask(rakeDependencies)
+                }
+              )
             }
-          }
+          configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
         }
       }
     }
@@ -192,14 +197,17 @@ internal class StandardProjectConfigurations {
    * Applies platform()/bom dependencies for projects, right now only on known
    * [Configurations.Groups.PLATFORM].
    */
-  private fun Project.applyPlatforms(slackProperties: SlackProperties) {
+  private fun Project.applyPlatforms(
+    boms: Set<Provider<MinimalExternalModuleDependency>>,
+    platformProject: String
+  ) {
     configurations.configureEach {
       if (isPlatformConfigurationName(name)) {
         dependencies {
-          for (bom in slackProperties.versions.boms) {
+          for (bom in boms) {
             add(name, platform(bom))
           }
-          add(name, platform(slackProperties.slackPlatformProject))
+          add(name, platform(project(platformProject)))
         }
       }
     }
@@ -382,16 +390,17 @@ internal class StandardProjectConfigurations {
       }
 
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
+    val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
     val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
       if (shouldApplyCacheFixPlugin) {
         apply(plugin = "org.gradle.android.cache-fix")
       }
 
-      compileSdkVersion(slackProperties.compileSdkVersion)
-      ndkVersion = slackProperties.ndkVersion
+      compileSdkVersion(sdkVersions.compileSdk)
+      slackProperties.ndkVersion?.let { ndkVersion = it }
       defaultConfig {
         // TODO this won't work with SDK previews but will fix in a followup
-        minSdk = slackProperties.minSdkVersion.toInt()
+        minSdk = sdkVersions.minSdk
         vectorDrawables.useSupportLibrary = true
         // Default to the standard android runner, but note this is overridden in :app
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -454,14 +463,19 @@ internal class StandardProjectConfigurations {
         if (name.contains("androidTest", ignoreCase = true)) {
           // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
           exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
-          // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
-          // compatible with Android SDK <26
-          resolutionStrategy.force("org.objenesis:objenesis:$objenesis2Version")
+          objenesis2Version?.let {
+            // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
+            // compatible with Android SDK <26
+            resolutionStrategy.force("org.objenesis:objenesis:$it")
+          }
         }
       }
     }
 
-    val composeCompilerVersion = slackProperties.versions.composeCompiler
+    val composeCompilerVersion by lazy {
+      slackProperties.versions.composeCompiler
+        ?: error("Missing `compose-compiler` version in catalog")
+    }
 
     pluginManager.withPlugin("com.android.base") {
       if (slackProperties.enableCompose) {
@@ -494,7 +508,7 @@ internal class StandardProjectConfigurations {
         }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          targetSdk = slackProperties.targetSdkVersion.toInt()
+          targetSdk = sdkVersions.targetSdk
         }
         lint {
           lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
@@ -804,7 +818,8 @@ internal class StandardProjectConfigurations {
     pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
       // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
       configure<DetektExtension> {
-        toolVersion = slackProperties.versions.detekt
+        toolVersion =
+          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
         config.from("$rootDir/config/detekt/detekt.yml")
         config.from("$rootDir/config/detekt/detekt-all.yml")
 

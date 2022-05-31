@@ -23,20 +23,26 @@ import org.gradle.api.provider.Provider
 
 // TODO generate something to map these in the future? Or with reflection?
 internal class SlackVersions(val catalog: VersionCatalog) {
-  val agp: String
-    get() = getValue("agp")
-  val composeCompiler: String
-    get() = getValue("compose-compiler")
-  val detekt: String
-    get() = getValue("detekt")
-  val gjf: String
-    get() = getValue("google-java-format")
-  val gson: String
-    get() = getValue("gson")
-  val ktlint: String
-    get() = getValue("ktlint")
-  val objenesis: String
-    get() = getValue("objenesis")
+  val agp: String?
+    get() = getOptionalValue("agp").orElse(null)
+  val composeCompiler: String?
+    get() = getOptionalValue("compose-compiler").orElse(null)
+  val detekt: String?
+    get() = getOptionalValue("detekt").orElse(null)
+  val gjf: String?
+    get() = getOptionalValue("google-java-format").orElse(null)
+  val gson: String?
+    get() = getOptionalValue("gson").orElse(null)
+  val ktlint: String?
+    get() = getOptionalValue("ktlint").orElse(null)
+  val ktfmt: String?
+    get() = getOptionalValue("ktfmt").orElse(null)
+  val objenesis: String?
+    get() = getOptionalValue("objenesis").orElse(null)
+  val jdk: Int
+    get() = getValue("jdk").toInt()
+  val jvmTarget: Int
+    get() = getOptionalValue("jvmTarget").map { it.toInt() }.orElse(11)
 
   val bundles = Bundles()
 
@@ -53,11 +59,14 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   }
 
   internal fun getValue(key: String): String {
+    return getOptionalValue(key).orElseThrow {
+      IllegalStateException("No catalog version found for ${tomlKey(key)}")
+    }
+  }
+
+  internal fun getOptionalValue(key: String): Optional<String> {
     val tomlKey = tomlKey(key)
-    return catalog
-      .findVersion(tomlKey)
-      .orElseThrow { IllegalStateException("No catalog version found for $tomlKey") }
-      .toString()
+    return catalog.findVersion(tomlKey).map { it.toString() }
   }
 
   internal val boms: Set<Provider<MinimalExternalModuleDependency>> by lazy {

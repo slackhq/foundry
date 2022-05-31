@@ -36,6 +36,7 @@ import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
 import slack.gradle.tasks.KtLintDownloadTask
+import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.util.ThermalsData
 import slack.stats.ModuleStatsTasks
 
@@ -90,9 +91,10 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     if (!project.isCi) {
-      val compileSdk = slackProperties.compileSdkVersion.substringAfter("-").toInt()
-      val latestCompileSdkWithSources = slackProperties.latestCompileSdkWithSources(compileSdk)
-      AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
+      slackProperties.compileSdkVersion?.substringAfter("-")?.toInt()?.let { compileSdk ->
+        val latestCompileSdkWithSources = slackProperties.latestCompileSdkWithSources(compileSdk)
+        AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
+      }
       project.configureGit(slackProperties)
     }
     project.configureSlackRootBuildscript()
@@ -122,21 +124,35 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     // Add ktlint download task
-    project.tasks.register<KtLintDownloadTask>("updateKtLint") {
-      version.set(slackProperties.versions.ktlint)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+    slackProperties.versions.ktlint?.let { ktlintVersion ->
+      project.tasks.register<KtLintDownloadTask>("updateKtLint") {
+        version.set(ktlintVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+      }
     }
 
     // Add detekt download task
-    project.tasks.register<DetektDownloadTask>("updateDetekt") {
-      version.set(slackProperties.versions.detekt)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+    slackProperties.versions.detekt?.let { detektVersion ->
+      project.tasks.register<DetektDownloadTask>("updateDetekt") {
+        version.set(detektVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+      }
     }
 
     // Add GJF download task
-    project.tasks.register<GjfDownloadTask>("updateGjf") {
-      version.set(slackProperties.versions.gjf)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+    slackProperties.versions.gjf?.let { gjfVersion ->
+      project.tasks.register<GjfDownloadTask>("updateGjf") {
+        version.set(gjfVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+      }
+    }
+
+    // Add ktfmt download task
+    slackProperties.versions.ktfmt?.let { ktfmtVersion ->
+      project.tasks.register<KtfmtDownloadTask>("updateKtfmt") {
+        version.set(ktfmtVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/ktfmt"))
+      }
     }
 
     // Dependency analysis plugin for build health
