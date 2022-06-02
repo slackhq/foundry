@@ -55,10 +55,6 @@ internal class SlackBasePlugin : Plugin<Project> {
         target.apply(plugin = "org.gradle.test-retry")
       }
 
-      if (slackProperties.autoApplySpotless) {
-        target.apply(plugin = "com.diffplug.spotless")
-      }
-
       if (slackProperties.autoApplyCacheFix) {
         target.pluginManager.withPlugin("com.android.base") {
           target.apply(plugin = "org.gradle.android.cache-fix")
@@ -117,63 +113,75 @@ internal class SlackBasePlugin : Plugin<Project> {
   /** Configures Spotless for formatting. Note we do this per-project for improved performance. */
   private fun Project.configureSpotless(slackProperties: SlackProperties) {
     val isRootProject = this.isRootProject
+    if (slackProperties.autoApplySpotless) {
+      apply(plugin = "com.diffplug.spotless")
+    } else {
+      return
+    }
     pluginManager.withPlugin("com.diffplug.spotless") {
-      if (isRootProject) {
-        // Pre-declare in root project for better performance and also to work around
-        // https://github.com/diffplug/spotless/issues/1213
-        configure<SpotlessExtension> { predeclareDeps() }
-        configure<SpotlessExtensionPredeclare> {
-          format("misc") {
-            target("*.md", ".gitignore")
+      val spotlessFormatters: SpotlessExtension.() -> Unit = {
+        format("misc") {
+          target("*.md", ".gitignore")
+          trimTrailingWhitespace()
+          endWithNewline()
+        }
+
+        val ktlintVersion = slackProperties.versions.ktlint
+        if (ktlintVersion != null) {
+          val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
+          kotlin { ktlint(ktlintVersion).userData(ktlintUserData) }
+          kotlinGradle { ktlint(ktlintVersion).userData(ktlintUserData) }
+        }
+
+        val ktfmtVersion = slackProperties.versions.ktfmt
+        if (ktfmtVersion != null) {
+          kotlin { ktfmt(ktfmtVersion).googleStyle() }
+          kotlinGradle { ktfmt(ktfmtVersion).googleStyle() }
+        }
+
+        if (ktlintVersion != null || ktfmtVersion != null) {
+          check(!(ktlintVersion != null && ktfmtVersion != null)) {
+            "Cannot have both ktlint and ktfmt enabled, please pick one and remove the other from the version catalog!"
+          }
+          kotlin {
+            target("src/**/*.kt")
             trimTrailingWhitespace()
             endWithNewline()
           }
-
-          val ktlintVersion = slackProperties.versions.ktlint
-          if (ktlintVersion != null) {
-            val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-            kotlin { ktlint(ktlintVersion).userData(ktlintUserData) }
-            kotlinGradle { ktlint(ktlintVersion).userData(ktlintUserData) }
-          }
-
-          val ktfmtVersion = slackProperties.versions.ktfmt
-          if (ktfmtVersion != null) {
-            kotlin { ktfmt(ktfmtVersion).googleStyle() }
-            kotlinGradle { ktfmt(ktfmtVersion).googleStyle() }
-          }
-
-          if (ktlintVersion != null || ktfmtVersion != null) {
-            check(!(ktlintVersion != null && ktfmtVersion != null)) {
-              "Cannot have both ktlint and ktfmt enabled, please pick one and remove the other from the version catalog!"
-            }
-            kotlin {
-              target("src/**/*.kt")
-              trimTrailingWhitespace()
-              endWithNewline()
-            }
-            kotlinGradle {
-              target("src/**/*.kts")
-              trimTrailingWhitespace()
-              endWithNewline()
-            }
-          }
-
-          slackProperties.versions.gjf?.let { gjfVersion ->
-            java {
-              target("src/**/*.java")
-              googleJavaFormat(gjfVersion).reflowLongStrings()
-              trimTrailingWhitespace()
-              endWithNewline()
-            }
-          }
-          slackProperties.versions.gson?.let { gsonVersion ->
-            json {
-              target("src/**/*.json", "*.json")
-              target("*.json")
-              gson().indentWithSpaces(2).version(gsonVersion)
-            }
+          kotlinGradle {
+            target("src/**/*.kts")
+            trimTrailingWhitespace()
+            endWithNewline()
           }
         }
+
+        slackProperties.versions.gjf?.let { gjfVersion ->
+          java {
+            target("src/**/*.java")
+            googleJavaFormat(gjfVersion).reflowLongStrings()
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+        }
+        slackProperties.versions.gson?.let { gsonVersion ->
+          json {
+            target("src/**/*.json", "*.json")
+            target("*.json")
+            gson().indentWithSpaces(2).version(gsonVersion)
+          }
+        }
+      }
+      logger.lifecycle("Configuring root spotless")
+      // Pre-declare in root project for better performance and also to work around
+      // https://github.com/diffplug/spotless/issues/1213
+      configure<SpotlessExtension> {
+        spotlessFormatters()
+        if (isRootProject) {
+          predeclareDeps()
+        }
+      }
+      if (isRootProject) {
+        configure<SpotlessExtensionPredeclare> { spotlessFormatters() }
       }
     }
   }

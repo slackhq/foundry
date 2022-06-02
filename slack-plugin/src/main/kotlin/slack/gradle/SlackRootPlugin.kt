@@ -376,7 +376,7 @@ private fun Project.configureSlackRootBuildscript() {
 
 @Suppress("UnstableApiUsage")
 private fun Project.configureMisc(slackProperties: SlackProperties) {
-  tasks.register<Delete>("clean") {
+  tasks.withType<Delete>().matching { it.name == "clean" }.configureEach {
     group = "build"
     delete(rootProject.buildDir)
   }
