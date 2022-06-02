@@ -171,7 +171,6 @@ internal class SlackBasePlugin : Plugin<Project> {
           }
         }
       }
-      logger.lifecycle("Configuring root spotless")
       // Pre-declare in root project for better performance and also to work around
       // https://github.com/diffplug/spotless/issues/1213
       configure<SpotlessExtension> {
