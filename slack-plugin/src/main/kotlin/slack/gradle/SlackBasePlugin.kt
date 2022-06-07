@@ -106,7 +106,6 @@ internal class SlackBasePlugin : Plugin<Project> {
     val scanApi = ScanApi(target)
     if (scanApi.isAvailable) {
       scanApi.addTestParallelization(target)
-      scanApi.addTestSystemProperties(target)
     }
   }
 

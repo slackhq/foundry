@@ -18,7 +18,6 @@ package slack.gradle
 import java.io.File
 import java.io.IOException
 import java.net.URLEncoder
-import java.security.MessageDigest
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
@@ -48,7 +47,6 @@ internal fun Project.configureBuildScanMetadata(scanApi: ScanApi) {
   }
   scanApi.addGitMetadata(project)
   scanApi.addTestParallelization(project)
-  scanApi.addTestSystemProperties(project)
   scanApi.addGradleEnterpriseVersion()
 }
 
@@ -192,16 +190,6 @@ internal fun ScanApi.addTestParallelization(project: Project) {
   }
 }
 
-internal fun ScanApi.addTestSystemProperties(project: Project) {
-  project.tasks.withType<Test>().configureEach {
-    doFirst {
-      systemProperties.forEach { (key, entryValue) ->
-        hash(entryValue)?.let { hash -> value("$identityPath#sysProps-$key", hash) }
-      }
-    }
-  }
-}
-
 private fun ScanApi.addGradleEnterpriseVersion() {
   javaClass
     .classLoader
@@ -239,26 +227,5 @@ private fun isGitInstalled(providers: ProviderFactory, workingDir: File): Boolea
     true
   } catch (ignored: IOException) {
     false
-  }
-}
-
-private val MESSAGE_DIGEST = MessageDigest.getInstance("SHA-256")
-
-private fun hash(value: Any?): String? {
-  return if (value == null) {
-    null
-  } else {
-    val string = value.toString()
-    val encodedHash = MESSAGE_DIGEST.digest(string.toByteArray(Charsets.UTF_8))
-    buildString {
-      for (i in 0 until encodedHash.size / 4) {
-        val hex = Integer.toHexString(0xff and encodedHash[i].toInt())
-        if (hex.length == 1) {
-          append("0")
-        }
-        append(hex)
-      }
-      append("...")
-    }
   }
 }
