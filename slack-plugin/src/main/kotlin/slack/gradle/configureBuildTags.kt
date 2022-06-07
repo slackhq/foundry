@@ -18,7 +18,6 @@ package slack.gradle
 import java.io.File
 import java.io.IOException
 import java.net.URLEncoder
-import java.security.MessageDigest
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
