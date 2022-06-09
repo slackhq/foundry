@@ -9,7 +9,6 @@ if (hasProperty("SlackRepositoryUrl")) {
 dependencies {
   compileOnly(gradleApi())
   compileOnly(gradleKotlinDsl())
-  implementation(kotlin("reflect", version = libs.versions.kotlin.get()))
-  implementation(libs.agp)
+  compileOnly(libs.agp)
   implementation(libs.guava)
 }

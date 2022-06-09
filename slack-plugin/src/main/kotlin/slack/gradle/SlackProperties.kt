@@ -204,8 +204,8 @@ public class SlackProperties private constructor(private val project: Project) {
    *
    * Latest versions can be found at https://developer.android.com/ndk/downloads
    */
-  public val ndkVersion: String
-    get() = stringProperty("slack.ndkVersion")
+  public val ndkVersion: String?
+    get() = optionalStringProperty("slack.ndkVersion")
 
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
@@ -283,12 +283,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = project.project(stringProperty("slack.location.robolectric-core"))
 
   /**
-   * Location for slack-platform project to be referenced by projects.
+   * Gradle path to a platform project to be referenced by other projects.
    *
    * Should be `:path:to:slack-platform` format
+   *
+   * @see Platforms
    */
-  public val slackPlatformProject: Project
-    get() = project.project(stringProperty("slack.location.slack-platform"))
+  public val platformProjectPath: String?
+    get() = optionalStringProperty("slack.location.slack-platform")
 
   /**
    * Opt-in path for commit hooks in the consuming repo that should be automatically installed
@@ -312,15 +314,15 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** Flag to enable strict JDK mode, forcing some things like JAVA_HOME. */
   public val strictJdk: Boolean
-    get() = booleanProperty("slackToolchainsStrict")
+    get() = booleanProperty("slackToolchainsStrict", defaultValue = true)
 
   /** The JDK version to use for compilations. */
   public val jdkVersion: Int
-    get() = intProperty("slackToolchainsJdk")
+    get() = versions.jdk
 
   /** The JDK runtime to target for compilations. */
   public val jvmTarget: Int
-    get() = intProperty("slackToolchainsJvmTarget", defaultValue = 8)
+    get() = versions.jvmTarget
 
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
@@ -336,6 +338,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.auto-apply.nullaway", defaultValue = true)
   public val autoApplyCacheFix: Boolean
     get() = booleanProperty("slack.auto-apply.cache-fix", defaultValue = true)
+
+  /* Detekt configs. */
+  /** Detekt config files, evaluated from rootProject.file(...). */
+  public val detektConfigs: List<String>?
+    get() = optionalStringProperty("slack.detekt.configs")?.split(",")
+  /** Detekt baseline file, evaluated from rootProject.file(...). */
+  public val detektBaseline: String?
+    get() = optionalStringProperty("slack.detekt.baseline")
 
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
@@ -356,12 +366,30 @@ public class SlackProperties private constructor(private val project: Project) {
   public val versionCatalogName: String
     get() = stringProperty("slack.catalog", defaultValue = "libs")
 
-  public val compileSdkVersion: String
-    get() = stringProperty("slack.compileSdkVersion")
-  public val minSdkVersion: String
-    get() = stringProperty("slack.minSdkVersion")
-  public val targetSdkVersion: String
-    get() = stringProperty("slack.targetSdkVersion")
+  internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
+    val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
+    val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")
+    val targetSdk = targetSdkVersion?.toInt() ?: error("slack.targetSdkVersion not set")
+    return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
+  }
+
+  internal data class AndroidSdkProperties(
+    val compileSdk: String,
+    val minSdk: Int,
+    val targetSdk: Int
+  )
+
+  public val compileSdkVersion: String?
+    get() = optionalStringProperty("slack.compileSdkVersion")
+
+  public fun latestCompileSdkWithSources(defaultValue: Int): Int =
+    intProperty("slack.latestCompileSdkWithSources", defaultValue = defaultValue)
+
+  private val minSdkVersion: String?
+    get() = optionalStringProperty("slack.minSdkVersion")
+
+  private val targetSdkVersion: String?
+    get() = optionalStringProperty("slack.targetSdkVersion")
 
   public companion object {
     /**

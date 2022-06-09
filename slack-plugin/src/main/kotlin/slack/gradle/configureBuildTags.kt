@@ -18,14 +18,13 @@ package slack.gradle
 import java.io.File
 import java.io.IOException
 import java.net.URLEncoder
-import java.security.MessageDigest
-import java.util.concurrent.TimeUnit
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
+import slack.executeBlocking
 import slack.executeBlockingWithResult
-import slack.executeProcess
 
 private val GITHUB_ORIGIN_REGEX = Regex("(.*)github\\.com[/|:](.*)")
 
@@ -48,7 +47,7 @@ internal fun Project.configureBuildScanMetadata(scanApi: ScanApi) {
   }
   scanApi.addGitMetadata(project)
   scanApi.addTestParallelization(project)
-  scanApi.addTestSystemProperties(project)
+  scanApi.addGradleEnterpriseVersion()
 }
 
 private fun ScanApi.tagOs() {
@@ -121,16 +120,34 @@ private fun ScanApi.addCiMetadata(project: Project) {
 
 private fun ScanApi.addGitMetadata(project: Project) {
   val projectDir = project.projectDir
+  val providers = project.providers
   background {
-    if (!isGitInstalled(projectDir)) {
+    if (!isGitInstalled(providers, projectDir)) {
       return@background
     }
 
     val gitCommitId =
-      executeBlockingWithResult(projectDir, "git", "rev-parse", "--short=8", "--verify", "HEAD")
+      executeBlockingWithResult(
+        providers,
+        projectDir,
+        listOf("git", "rev-parse", "--short=8", "--verify", "HEAD"),
+        isRelevantToConfigurationCache = false
+      )
     val gitBranchName =
-      executeBlockingWithResult(projectDir, "git", "rev-parse", "--abbrev-ref", "HEAD")
-    val gitStatus = executeBlockingWithResult(projectDir, "git", "status", "--porcelain")
+      executeBlockingWithResult(
+        providers,
+        projectDir,
+        listOf("git", "rev-parse", "--abbrev-ref", "HEAD"),
+        isRelevantToConfigurationCache = false
+      )
+
+    val gitStatus =
+      executeBlockingWithResult(
+        providers,
+        projectDir,
+        listOf("git", "status", "--porcelain"),
+        isRelevantToConfigurationCache = false
+      )
 
     if (gitCommitId != null) {
       val gitCommitIdLabel = "Git commit id"
@@ -141,7 +158,12 @@ private fun ScanApi.addGitMetadata(project: Project) {
       )
 
       val originUrl =
-        executeBlockingWithResult(projectDir, "git", "config", "--get", "remote.origin.url")
+        executeBlockingWithResult(
+          providers,
+          projectDir,
+          listOf("git", "config", "--get", "remote.origin.url"),
+          isRelevantToConfigurationCache = false
+        )
       if (originUrl != null) {
         if ("github.com/" in originUrl || "github.com:" in originUrl) {
           GITHUB_ORIGIN_REGEX.find(originUrl)?.groups?.get(2)?.value?.removeSuffix(".git")?.let {
@@ -168,14 +190,12 @@ internal fun ScanApi.addTestParallelization(project: Project) {
   }
 }
 
-internal fun ScanApi.addTestSystemProperties(project: Project) {
-  project.tasks.withType<Test>().configureEach {
-    doFirst {
-      systemProperties.forEach { (key, entryValue) ->
-        hash(entryValue)?.let { hash -> value("$identityPath#sysProps-$key", hash) }
-      }
-    }
-  }
+private fun ScanApi.addGradleEnterpriseVersion() {
+  javaClass
+    .classLoader
+    .getResource("com.gradle.scan.plugin.internal.meta.buildAgentVersion.txt")
+    ?.readText()
+    ?.let { buildAgentVersion -> value("GE Gradle plugin version", buildAgentVersion) }
 }
 
 private fun ScanApi.addCustomLinkWithSearchTerms(title: String, search: Map<String, String>) {
@@ -201,36 +221,11 @@ private fun urlEncode(url: String): String {
   return URLEncoder.encode(url, Charsets.UTF_8.name())
 }
 
-private fun isGitInstalled(workingDir: File): Boolean {
-  var process: Process? = null
+private fun isGitInstalled(providers: ProviderFactory, workingDir: File): Boolean {
   return try {
-    process = "git --version".executeProcess(workingDir)
-    val finished = process.waitFor(10, TimeUnit.SECONDS)
-    finished && process.exitValue() == 0
+    "git --version".executeBlocking(providers, workingDir, isRelevantToConfigurationCache = false)
+    true
   } catch (ignored: IOException) {
     false
-  } finally {
-    process?.destroyForcibly()
-  }
-}
-
-private val MESSAGE_DIGEST = MessageDigest.getInstance("SHA-256")
-
-private fun hash(value: Any?): String? {
-  return if (value == null) {
-    null
-  } else {
-    val string = value.toString()
-    val encodedHash = MESSAGE_DIGEST.digest(string.toByteArray(Charsets.UTF_8))
-    buildString {
-      for (i in 0 until encodedHash.size / 4) {
-        val hex = Integer.toHexString(0xff and encodedHash[i].toInt())
-        if (hex.length == 1) {
-          append("0")
-        }
-        append(hex)
-      }
-      append("...")
-    }
   }
 }

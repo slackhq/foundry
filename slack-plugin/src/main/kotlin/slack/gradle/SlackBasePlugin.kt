@@ -15,6 +15,8 @@
  */
 package slack.gradle
 
+import com.diffplug.gradle.spotless.SpotlessExtension
+import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import java.util.Locale
 import java.util.Optional
 import kotlin.math.max
@@ -26,6 +28,7 @@ import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.retry
 import org.gradle.kotlin.dsl.withType
 import slack.gradle.util.synchronousEnvProperty
@@ -50,10 +53,6 @@ internal class SlackBasePlugin : Plugin<Project> {
       // there is somewhat expected.
       if (slackProperties.autoApplyTestRetry && target.isCi) {
         target.apply(plugin = "org.gradle.test-retry")
-      }
-
-      if (slackProperties.autoApplySpotless) {
-        target.apply(plugin = "com.diffplug.spotless")
       }
 
       if (slackProperties.autoApplyCacheFix) {
@@ -102,11 +101,86 @@ internal class SlackBasePlugin : Plugin<Project> {
     }
 
     // Everything in here applies to all projects
+    target.configureSpotless(slackProperties)
     target.configureClasspath(slackProperties)
     val scanApi = ScanApi(target)
     if (scanApi.isAvailable) {
       scanApi.addTestParallelization(target)
-      scanApi.addTestSystemProperties(target)
+    }
+  }
+
+  /** Configures Spotless for formatting. Note we do this per-project for improved performance. */
+  private fun Project.configureSpotless(slackProperties: SlackProperties) {
+    val isRootProject = this.isRootProject
+    if (slackProperties.autoApplySpotless) {
+      apply(plugin = "com.diffplug.spotless")
+    } else {
+      return
+    }
+    pluginManager.withPlugin("com.diffplug.spotless") {
+      val spotlessFormatters: SpotlessExtension.() -> Unit = {
+        format("misc") {
+          target("*.md", ".gitignore")
+          trimTrailingWhitespace()
+          endWithNewline()
+        }
+
+        val ktlintVersion = slackProperties.versions.ktlint
+        if (ktlintVersion != null) {
+          val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
+          kotlin { ktlint(ktlintVersion).userData(ktlintUserData) }
+          kotlinGradle { ktlint(ktlintVersion).userData(ktlintUserData) }
+        }
+
+        val ktfmtVersion = slackProperties.versions.ktfmt
+        if (ktfmtVersion != null) {
+          kotlin { ktfmt(ktfmtVersion).googleStyle() }
+          kotlinGradle { ktfmt(ktfmtVersion).googleStyle() }
+        }
+
+        if (ktlintVersion != null || ktfmtVersion != null) {
+          check(!(ktlintVersion != null && ktfmtVersion != null)) {
+            "Cannot have both ktlint and ktfmt enabled, please pick one and remove the other from the version catalog!"
+          }
+          kotlin {
+            target("src/**/*.kt")
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+          kotlinGradle {
+            target("src/**/*.kts")
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+        }
+
+        slackProperties.versions.gjf?.let { gjfVersion ->
+          java {
+            target("src/**/*.java")
+            googleJavaFormat(gjfVersion).reflowLongStrings()
+            trimTrailingWhitespace()
+            endWithNewline()
+          }
+        }
+        slackProperties.versions.gson?.let { gsonVersion ->
+          json {
+            target("src/**/*.json", "*.json")
+            target("*.json")
+            gson().indentWithSpaces(2).version(gsonVersion)
+          }
+        }
+      }
+      // Pre-declare in root project for better performance and also to work around
+      // https://github.com/diffplug/spotless/issues/1213
+      configure<SpotlessExtension> {
+        spotlessFormatters()
+        if (isRootProject) {
+          predeclareDeps()
+        }
+      }
+      if (isRootProject) {
+        configure<SpotlessExtensionPredeclare> { spotlessFormatters() }
+      }
     }
   }
 
@@ -141,21 +215,24 @@ internal class SlackBasePlugin : Plugin<Project> {
     // Hamcrest switched to a single jar starting in 2.1, so exclude the old ones but replace the
     // core one with the
     // new one (as cover for transitive users like junit).
-    if (hamcrestDepOptional.isPresent && isTestProject || "test" in lowercaseName) {
-      val hamcrestDep = hamcrestDepOptional.get().get().toString()
-      configuration.resolutionStrategy {
-        dependencySubstitution {
-          substitute(module("org.hamcrest:hamcrest-core")).apply {
-            using(module(hamcrestDep))
-            because("hamcrest 2.1 removed the core/integration/library artifacts")
-          }
-          substitute(module("org.hamcrest:hamcrest-integration")).apply {
-            using(module(hamcrestDep))
-            because("hamcrest 2.1 removed the core/integration/library artifacts")
-          }
-          substitute(module("org.hamcrest:hamcrest-library")).apply {
-            using(module(hamcrestDep))
-            because("hamcrest 2.1 removed the core/integration/library artifacts")
+    if (hamcrestDepOptional.isPresent && (isTestProject || "test" in lowercaseName)) {
+      val hamcrestDepProvider = hamcrestDepOptional.get()
+      if (hamcrestDepProvider.isPresent) {
+        val hamcrestDep = hamcrestDepProvider.get().toString()
+        configuration.resolutionStrategy {
+          dependencySubstitution {
+            substitute(module("org.hamcrest:hamcrest-core")).apply {
+              using(module(hamcrestDep))
+              because("hamcrest 2.1 removed the core/integration/library artifacts")
+            }
+            substitute(module("org.hamcrest:hamcrest-integration")).apply {
+              using(module(hamcrestDep))
+              because("hamcrest 2.1 removed the core/integration/library artifacts")
+            }
+            substitute(module("org.hamcrest:hamcrest-library")).apply {
+              using(module(hamcrestDep))
+              because("hamcrest 2.1 removed the core/integration/library artifacts")
+            }
           }
         }
       }

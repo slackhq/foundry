@@ -29,7 +29,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
-import com.diffplug.gradle.spotless.SpotlessExtension
 import com.google.common.base.CaseFormat
 import com.google.devtools.ksp.gradle.KspExtension
 import io.gitlab.arturbosch.detekt.Detekt
@@ -45,6 +44,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -103,9 +103,7 @@ internal class StandardProjectConfigurations {
   private val kotlinCompilerArgs =
     mutableListOf<String>()
       .apply {
-        // -Xopt-in is deprecated in Kotlin 1.6.20, but Gradle doesn't use that yet. So we keep it
-        // in the shared configs but remap-them here for consumers to the new one
-        addAll(KotlinBuildConfig.kotlinCompilerArgs.map { it.replace("-Xopt-in", "-opt-in") })
+        addAll(KotlinBuildConfig.kotlinCompilerArgs)
         // Left as a toe-hold for any future dynamic arguments
       }
       .distinct()
@@ -127,39 +125,43 @@ internal class StandardProjectConfigurations {
     globalConfig: GlobalConfig,
     slackProperties: SlackProperties
   ) {
-    if (!slackProperties.noPlatform) {
-      applyPlatforms(slackProperties)
+    val platformProjectPath = slackProperties.platformProjectPath
+    if (platformProjectPath == null) {
+      if (slackProperties.strictMode) {
+        logger.warn(
+          "slack.location.slack-platform is not set. Consider creating one to ensure consistent dependency versions across projects!"
+        )
+      }
+    } else if (!slackProperties.noPlatform && path != platformProjectPath) {
+      applyPlatforms(slackProperties.versions.boms, platformProjectPath)
+    }
 
-      if (slackProperties.enableAnalysisPlugin) {
-        val buildFile = project.buildFile
-        // This can run on some intermediate middle directories, like `carbonite` in
-        // `carbonite:carbonite`
-        if (buildFile.exists()) {
-          // Configure rake
-          plugins.withId("com.autonomousapps.dependency-analysis") {
-            val isNoApi = slackProperties.rakeNoApi
-            val rakeDependencies =
-              tasks.register<RakeDependencies>("rakeDependencies") {
-                buildFileProperty.set(project.buildFile)
-                noApi.set(isNoApi)
-                identifierMap.set(
-                  project.provider {
-                    project.getVersionsCatalog(slackProperties).identifierMap().mapValues {
-                      "libs.$it"
-                    }
+    if (slackProperties.enableAnalysisPlugin) {
+      val buildFile = project.buildFile
+      // This can run on some intermediate middle directories, like `carbonite` in
+      // `carbonite:carbonite`
+      if (buildFile.exists()) {
+        // Configure rake
+        plugins.withId("com.autonomousapps.dependency-analysis") {
+          val isNoApi = slackProperties.rakeNoApi
+          val rakeDependencies =
+            tasks.register<RakeDependencies>("rakeDependencies") {
+              buildFileProperty.set(project.buildFile)
+              noApi.set(isNoApi)
+              identifierMap.set(
+                project.provider {
+                  project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v) ->
+                    "libs.$v"
                   }
-                )
-              }
-            configure<DependencyAnalysisSubExtension> {
-              registerPostProcessingTask(rakeDependencies)
+                }
+              )
             }
-          }
+          configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
         }
       }
     }
 
     val slackExtension = extensions.create<SlackExtension>("slack")
-    configureSpotless(slackProperties)
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
     val jdkVersion = jdkVersion()
@@ -194,13 +196,18 @@ internal class StandardProjectConfigurations {
    * Applies platform()/bom dependencies for projects, right now only on known
    * [Configurations.Groups.PLATFORM].
    */
-  private fun Project.applyPlatforms(slackProperties: SlackProperties) {
-    configurations.matching { isPlatformConfigurationName(it.name) }.configureEach {
-      dependencies {
-        for (bom in slackProperties.versions.boms) {
-          add(name, platform(bom))
+  private fun Project.applyPlatforms(
+    boms: Set<Provider<MinimalExternalModuleDependency>>,
+    platformProject: String
+  ) {
+    configurations.configureEach {
+      if (isPlatformConfigurationName(name)) {
+        dependencies {
+          for (bom in boms) {
+            add(name, platform(bom))
+          }
+          add(name, platform(project(platformProject)))
         }
-        add(name, platform(slackProperties.slackPlatformProject))
       }
     }
   }
@@ -223,44 +230,6 @@ internal class StandardProjectConfigurations {
               )
             }
           }
-        }
-      }
-    }
-  }
-
-  /** Configures Spotless for formatting. Note we do this per-project for improved performance. */
-  private fun Project.configureSpotless(slackProperties: SlackProperties) {
-    pluginManager.withPlugin("com.diffplug.spotless") {
-      configure<SpotlessExtension> {
-        format("misc") {
-          target("*.md", ".gitignore")
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        val ktlintVersion = slackProperties.versions.ktlint
-        val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-        kotlin {
-          target("src/**/*.kt")
-          ktlint(ktlintVersion).userData(ktlintUserData)
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        kotlinGradle {
-          target("src/**/*.kts")
-          ktlint(ktlintVersion).userData(ktlintUserData)
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        java {
-          target("src/**/*.java")
-          googleJavaFormat(slackProperties.versions.gjf).reflowLongStrings()
-          trimTrailingWhitespace()
-          endWithNewline()
-        }
-        json {
-          target("src/**/*.json", "*.json")
-          target("*.json")
-          gson().indentWithSpaces(2).version(slackProperties.versions.gson)
         }
       }
     }
@@ -420,16 +389,17 @@ internal class StandardProjectConfigurations {
       }
 
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
+    val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
     val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
       if (shouldApplyCacheFixPlugin) {
         apply(plugin = "org.gradle.android.cache-fix")
       }
 
-      compileSdkVersion(slackProperties.compileSdkVersion)
-      ndkVersion = slackProperties.ndkVersion
+      compileSdkVersion(sdkVersions.compileSdk)
+      slackProperties.ndkVersion?.let { ndkVersion = it }
       defaultConfig {
         // TODO this won't work with SDK previews but will fix in a followup
-        minSdk = slackProperties.minSdkVersion.toInt()
+        minSdk = sdkVersions.minSdk
         vectorDrawables.useSupportLibrary = true
         // Default to the standard android runner, but note this is overridden in :app
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -488,16 +458,23 @@ internal class StandardProjectConfigurations {
 
     val objenesis2Version = slackProperties.versions.objenesis
     val prepareAndroidTestConfigurations = {
-      configurations.matching { it.name.contains("androidTest", ignoreCase = true) }.configureEach {
-        // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
-        // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
-        // compatible with Android SDK <26
-        resolutionStrategy.force("org.objenesis:objenesis:$objenesis2Version")
+      configurations.configureEach {
+        if (name.contains("androidTest", ignoreCase = true)) {
+          // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+          exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
+          objenesis2Version?.let {
+            // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
+            // compatible with Android SDK <26
+            resolutionStrategy.force("org.objenesis:objenesis:$it")
+          }
+        }
       }
     }
 
-    val composeCompilerVersion = slackProperties.versions.composeCompiler
+    val composeCompilerVersion by lazy {
+      slackProperties.versions.composeCompiler
+        ?: error("Missing `compose-compiler` version in catalog")
+    }
 
     pluginManager.withPlugin("com.android.base") {
       if (slackProperties.enableCompose) {
@@ -530,7 +507,7 @@ internal class StandardProjectConfigurations {
         }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          targetSdk = slackProperties.targetSdkVersion.toInt()
+          targetSdk = sdkVersions.targetSdk
         }
         lint {
           lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
@@ -765,19 +742,26 @@ internal class StandardProjectConfigurations {
     pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
       // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
       configure<DetektExtension> {
-        toolVersion = slackProperties.versions.detekt
-        config.from("$rootDir/config/detekt/detekt.yml")
-        config.from("$rootDir/config/detekt/detekt-all.yml")
-
-        baseline =
-          if (globalConfig.mergeDetektBaselinesTask != null) {
-            tasks.withType<DetektCreateBaselineTask>().configureEach {
-              globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
-            }
-            file("$buildDir/intermediates/detekt/baseline.xml")
-          } else {
-            file("$rootDir/config/detekt/baseline.xml")
+        toolVersion =
+          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
+        rootProject.file("config/detekt/detekt.yml")
+        slackProperties.detektConfigs?.let { configs ->
+          for (configFile in configs) {
+            config.from(rootProject.file(configFile))
           }
+        }
+
+        slackProperties.detektBaseline?.let { baselineFile ->
+          baseline =
+            if (globalConfig.mergeDetektBaselinesTask != null) {
+              tasks.withType<DetektCreateBaselineTask>().configureEach {
+                globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
+              }
+              file("$buildDir/intermediates/detekt/baseline.xml")
+            } else {
+              file(rootProject.file(baselineFile))
+            }
+        }
       }
     }
 
@@ -901,11 +885,11 @@ internal class StandardProjectConfigurations {
 
       // See doc on the property for details
       if (!slackProperties.enableKaptInTests) {
-        tasks
-          .matching { task ->
-            task.name.startsWith("kapt") && task.name.endsWith("TestKotlin", ignoreCase = true)
+        tasks.configureEach {
+          if (name.startsWith("kapt") && name.endsWith("TestKotlin", ignoreCase = true)) {
+            enabled = false
           }
-          .configureEach { enabled = false }
+        }
       }
     }
 
@@ -924,19 +908,19 @@ internal class StandardProjectConfigurations {
       APT_OPTION_CONFIGS.mapValues { (_, value) ->
         value.newConfigurer(this@configureAnnotationProcessors)
       }
-    configurations
-      .matching { configuration ->
-        // Try common case first
-        configuration.name in Configurations.Groups.APT ||
+    configurations.configureEach {
+      // Try common case first
+      val isApt =
+        name in Configurations.Groups.APT ||
           // Try custom configs like testKapt, debugAnnotationProcessor, etc.
-          Configurations.Groups.APT.any { configuration.name.endsWith(it, ignoreCase = true) }
-      }
-      .configureEach {
+          Configurations.Groups.APT.any { name.endsWith(it, ignoreCase = true) }
+      if (isApt) {
         val context = ConfigurationContext(project, this@configureEach)
         incoming.afterResolve {
           dependencies.forEach { dependency -> configs[dependency.name]?.configure(context) }
         }
       }
+    }
   }
 
   /**
@@ -946,9 +930,8 @@ internal class StandardProjectConfigurations {
   private fun Project.configureFreeKotlinCompilerArgs() {
     logger.debug("Configuring specific Kotlin compiler args on $path")
     val once = AtomicBoolean()
-    configurations
-      .matching { isKnownConfiguration(it.name, Configurations.Groups.RUNTIME) }
-      .configureEach {
+    configurations.configureEach {
+      if (isKnownConfiguration(name, Configurations.Groups.RUNTIME)) {
         incoming.afterResolve {
           dependencies.forEach { dependency ->
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
@@ -964,6 +947,7 @@ internal class StandardProjectConfigurations {
           }
         }
       }
+    }
   }
 
   companion object {

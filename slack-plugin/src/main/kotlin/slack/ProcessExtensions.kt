@@ -16,49 +16,123 @@
 package slack
 
 import java.io.File
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import okio.Buffer
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.provider.ValueSource
+import org.gradle.api.provider.ValueSourceParameters
+import org.gradle.api.tasks.Optional
+import org.gradle.process.ExecOperations
+import org.gradle.process.ExecSpec
+import org.gradle.process.internal.ExecException
+import slack.ExecSource.Parameters
+import slack.gradle.util.sneakyNull
 
-internal fun String.execute(workingDir: File) {
-  executeBlocking(workingDir)
+internal fun String.executeBlocking(
+  providers: ProviderFactory,
+  workingDir: File,
+  isRelevantToConfigurationCache: Boolean
+) {
+  executeBlockingWithResult(providers, workingDir, isRelevantToConfigurationCache)
 }
 
-internal fun String.executeBlocking(workingDir: File) {
-  Runtime.getRuntime().exec(this, null, workingDir).waitFor()
+internal fun String.executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File,
+  isRelevantToConfigurationCache: Boolean
+): String? =
+  split(" ").executeBlockingWithResult(providers, workingDir, isRelevantToConfigurationCache)
+
+internal fun List<String>.executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File,
+  isRelevantToConfigurationCache: Boolean
+): String? = executeBlockingWithResult(providers, workingDir, this, isRelevantToConfigurationCache)
+
+internal fun executeBlockingWithResult(
+  providers: ProviderFactory,
+  workingDir: File? = null,
+  arguments: List<String>,
+  isRelevantToConfigurationCache: Boolean
+): String? {
+  return executeWithResult(providers, workingDir, arguments, isRelevantToConfigurationCache).orNull
 }
 
-internal fun String.executeWithResult(workingDir: File): String? {
-  return executeBlockingWithResult(workingDir)
-}
-
-internal fun String.executeBlockingWithResult(workingDir: File): String? {
-  return split(" ").executeBlockingWithResult(workingDir)
-}
-
-internal fun List<String>.executeBlockingWithResult(workingDir: File): String? {
-  return executeBlockingWithResult(workingDir, *toTypedArray())
-}
-
-internal fun executeBlockingWithResult(workingDir: File? = null, vararg args: String): String? {
-  val process = args.toList().executeProcess(workingDir)
-  return try {
-    val standardText = process.inputStream.bufferedReader().readText()
-    process.errorStream.bufferedReader().readText()
-
-    val finished = process.waitFor(10, TimeUnit.SECONDS)
-    if (finished && process.exitValue() == 0) standardText.trimAtEnd() else null
-  } finally {
-    process.destroyForcibly()
+internal fun executeWithResult(
+  providers: ProviderFactory,
+  inputWorkingDir: File? = null,
+  arguments: List<String>,
+  isRelevantToConfigurationCache: Boolean
+): Provider<String> {
+  if (!isRelevantToConfigurationCache) {
+    return providers
+      .of(ExecSource::class.java) {
+        parameters.workingDir.set(inputWorkingDir)
+        parameters.args.set(arguments)
+      }
+      .map { it.value }
   }
+  return providers
+    .exec { configureExec(inputWorkingDir, arguments) }
+    .standardOutput
+    .asText
+    .map { it.trimAtEnd() }
+    .map { it.ifBlank { sneakyNull() } }
 }
 
-internal fun String.executeProcess(workingDir: File? = null): Process {
-  return Runtime.getRuntime().exec(this, null, workingDir)
-}
-
-internal fun List<String>.executeProcess(workingDir: File? = null): Process {
-  return Runtime.getRuntime().exec(toTypedArray(), null, workingDir)
+private fun ExecSpec.configureExec(
+  inputWorkingDir: File? = null,
+  arguments: List<String>,
+) {
+  // Apparently Gradle wants us to distinguish between the executable and its arguments, so...
+  // we try to futz that here. But also this is silly.
+  commandLine(arguments[0])
+  args = arguments.drop(1)
+  inputWorkingDir?.let { workingDir(it) }
 }
 
 private fun String.trimAtEnd(): String {
   return ("x$this").trim().substring(1)
+}
+
+internal abstract class ExecSource @Inject constructor(private val execOperations: ExecOperations) :
+  ValueSource<ExecSourceResult, Parameters> {
+  interface Parameters : ValueSourceParameters {
+    val args: ListProperty<String>
+    @get:Optional val workingDir: RegularFileProperty
+  }
+
+  override fun obtain(): ExecSourceResult? {
+    val arguments = parameters.args.get()
+    val inputWorkingDir = parameters.workingDir.asFile.orNull
+    val buffer = Buffer()
+    buffer.outputStream().use { os ->
+      try {
+        execOperations.exec {
+          configureExec(inputWorkingDir, arguments)
+          standardOutput = os
+          errorOutput = os
+        }
+      } catch (ignored: ExecException) {
+        return null
+      }
+    }
+    val value = buffer.readUtf8().trim { it <= ' ' }
+    return ExecSourceResult(value)
+  }
+}
+
+/**
+ * A holder class for use with [ExecSource] that explicitly does not implement [equals] or
+ * [hashCode] so that it does not invalidate the configuration cache.
+ */
+internal class ExecSourceResult(val value: String) {
+  override fun equals(other: Any?): Boolean = true
+
+  override fun hashCode(): Int = 0
+
+  override fun toString(): String = "ExecSourceResult(value=$value)"
 }

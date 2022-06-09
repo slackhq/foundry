@@ -188,10 +188,10 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
         .newBuilder()
         .addInterceptor { chain ->
           val originalResponse = chain.proceed(chain.request())
-          originalResponse.body?.let {
-            originalResponse.newBuilder().body(ProgressResponseBody(it, progressListener)).build()
-          }
-            ?: originalResponse
+          originalResponse
+            .newBuilder()
+            .body(ProgressResponseBody(originalResponse.body, progressListener))
+            .build()
         }
         .build()
         .newCall(request)
@@ -199,7 +199,7 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
         .use { response ->
           if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-          response.body?.source()?.use { source ->
+          response.body.source().use { source ->
             destinationFile.sink().buffer().use { sink -> sink.writeAll(source) }
           }
         }

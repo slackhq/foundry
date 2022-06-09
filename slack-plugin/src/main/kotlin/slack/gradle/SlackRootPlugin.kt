@@ -36,6 +36,7 @@ import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
 import slack.gradle.tasks.KtLintDownloadTask
+import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.util.ThermalsData
 import slack.stats.ModuleStatsTasks
 
@@ -90,8 +91,10 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     if (!project.isCi) {
-      val compileSdk = slackProperties.compileSdkVersion.substringAfter("-").toInt()
-      AndroidSourcesConfigurer.patchSdkSources(compileSdk, project)
+      slackProperties.compileSdkVersion?.substringAfter("-")?.toInt()?.let { compileSdk ->
+        val latestCompileSdkWithSources = slackProperties.latestCompileSdkWithSources(compileSdk)
+        AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
+      }
       project.configureGit(slackProperties)
     }
     project.configureSlackRootBuildscript()
@@ -121,43 +124,97 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     // Add ktlint download task
-    project.tasks.register<KtLintDownloadTask>("updateKtLint") {
-      version.set(slackProperties.versions.ktlint)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+    slackProperties.versions.ktlint?.let { ktlintVersion ->
+      project.tasks.register<KtLintDownloadTask>("updateKtLint") {
+        version.set(ktlintVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+      }
     }
 
     // Add detekt download task
-    project.tasks.register<DetektDownloadTask>("updateDetekt") {
-      version.set(slackProperties.versions.detekt)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+    slackProperties.versions.detekt?.let { detektVersion ->
+      project.tasks.register<DetektDownloadTask>("updateDetekt") {
+        version.set(detektVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+      }
     }
 
     // Add GJF download task
-    project.tasks.register<GjfDownloadTask>("updateGjf") {
-      version.set(slackProperties.versions.gjf)
-      outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+    slackProperties.versions.gjf?.let { gjfVersion ->
+      project.tasks.register<GjfDownloadTask>("updateGjf") {
+        version.set(gjfVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+      }
+    }
+
+    // Add ktfmt download task
+    slackProperties.versions.ktfmt?.let { ktfmtVersion ->
+      project.tasks.register<KtfmtDownloadTask>("updateKtfmt") {
+        version.set(ktfmtVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/ktfmt"))
+      }
     }
 
     // Dependency analysis plugin for build health
     // Usage: ./gradlew clean buildHealth
     project.pluginManager.withPlugin("com.autonomousapps.dependency-analysis") {
       project.configure<DependencyAnalysisExtension> {
-        issues {
-          all {
-            onAny {
-              severity("warn")
-              exclude(
-                // This is a resources-only project.
-                ":libraries:l10n-strings"
-              )
-            }
-          }
-        }
+        issues { all { onAny { ignoreKtx(true) } } }
         abi {
           exclusions {
             ignoreGeneratedCode()
             ignoreInternalPackages()
           }
+        }
+        dependencies {
+          bundle("androidx-camera") {
+            primary("androidx.camera:camera-camera2")
+            includeGroup("androidx.camera")
+          }
+          bundle("androidx-paging") {
+            primary("androidx.paging:paging-runtime")
+            includeGroup("androidx.paging")
+          }
+          bundle("androidx-lifecycle") {
+            primary("androidx.lifecycle:lifecycle-runtime")
+            includeGroup("androidx.lifecycle")
+            includeGroup("androidx.arch.core")
+          }
+          bundle("bugsnag") { includeGroup("com.bugsnag") }
+          bundle("clikt") {
+            primary("com.github.ajalt.clikt:clikt")
+            includeGroup("com.github.ajalt.clikt")
+          }
+          bundle("compose-animation") {
+            primary("androidx.compose.animation:animation")
+            includeGroup("androidx.compose.animation")
+          }
+          bundle("compose-foundation") {
+            primary("androidx.compose.foundation:foundation")
+            includeGroup("androidx.compose.foundation")
+          }
+          bundle("compose-runtime") {
+            primary("androidx.compose.runtime:runtime")
+            includeGroup("androidx.compose.runtime")
+          }
+          bundle("dagger") {
+            includeGroup("com.google.dagger")
+            includeDependency("javax.inject:javax.inject")
+          }
+          bundle("exoplayer") { includeGroup("com.google.android.exoplayer") }
+          bundle("kotlin-stdlib") { includeGroup("org.jetbrains.kotlin") }
+          bundle("leakcanary") {
+            primary("com.squareup.leakcanary:leakcanary-android")
+            includeGroup("com.squareup.leakcanary")
+          }
+          bundle("lint-tools") { includeGroup("com.android.tools.lint") }
+          bundle("okhttp") {
+            primary("com.squareup.okhttp3:okhttp")
+            includeGroup("com.squareup.okhttp3")
+          }
+          bundle("paging") { includeGroup("androidx.paging") }
+          bundle("robolectric") { includeGroup("org.robolectric") }
+          bundle("rxjava") { includeGroup("io.reactivex.rxjava3") }
         }
       }
     }
@@ -253,12 +310,21 @@ internal class SlackRootPlugin : Plugin<Project> {
     if (!isCi) {
       slackProperties.gitHooksFile?.let { hooksPath ->
         // Configure hooks
-        "git config core.hooksPath $hooksPath".executeBlocking(rootDir)
+        "git config core.hooksPath $hooksPath".executeBlocking(
+          project.providers,
+          rootDir,
+          isRelevantToConfigurationCache = false
+        )
       }
 
       val revsFile = slackProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
-      val gitVersion = "git --version".executeBlockingWithResult(rootDir)
+      val gitVersion =
+        "git --version".executeBlockingWithResult(
+          project.providers,
+          rootDir,
+          isRelevantToConfigurationCache = false
+        )
       val versionNumber = parseGitVersion(gitVersion)
       @Suppress(
         "ReplaceCallWithBinaryOperator"
@@ -278,7 +344,11 @@ internal class SlackRootPlugin : Plugin<Project> {
         }
         else -> {
           logger.debug("Configuring blame.ignoreRevsFile")
-          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(rootDir)
+          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(
+            project.providers,
+            rootDir,
+            isRelevantToConfigurationCache = false
+          )
         }
       }
     }
@@ -306,7 +376,7 @@ private fun Project.configureSlackRootBuildscript() {
 
 @Suppress("UnstableApiUsage")
 private fun Project.configureMisc(slackProperties: SlackProperties) {
-  tasks.register<Delete>("clean") {
+  tasks.withType<Delete>().matching { it.name == "clean" }.configureEach {
     group = "build"
     delete(rootProject.buildDir)
   }

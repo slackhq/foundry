@@ -109,11 +109,11 @@ data class KotlinBuildConfig(val kotlin: String) {
     "-progressive",
     "-Xinline-classes",
     "-Xjsr305=strict",
-    "-Xopt-in=kotlin.contracts.ExperimentalContracts",
-    "-Xopt-in=kotlin.experimental.ExperimentalTypeInference",
-    "-Xopt-in=kotlin.ExperimentalStdlibApi",
-    "-Xopt-in=kotlin.RequiresOptIn",
-    "-Xopt-in=kotlin.time.ExperimentalTime",
+    "-opt-in=kotlin.contracts.ExperimentalContracts",
+    "-opt-in=kotlin.experimental.ExperimentalTypeInference",
+    "-opt-in=kotlin.ExperimentalStdlibApi",
+    "-opt-in=kotlin.RequiresOptIn",
+    "-opt-in=kotlin.time.ExperimentalTime",
     // Match JVM assertion behavior: https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
     "-Xassertions=jvm",
     // Potentially useful for static analysis tools or annotation processors.
@@ -167,8 +167,8 @@ subprojects {
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
       kotlinOptions {
-        languageVersion = "1.5"
-        apiVersion = "1.5"
+        languageVersion = "1.6"
+        apiVersion = "1.6"
         // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
         // this sometimes. https://github.com/gradle/gradle/issues/16345
         allWarningsAsErrors = false
@@ -235,6 +235,22 @@ subprojects {
           credentials(PasswordCredentials::class.java)
         }
       }
+    }
+  }
+}
+
+dependencyAnalysis {
+  abi {
+    exclusions {
+      ignoreInternalPackages()
+      ignoreGeneratedCode()
+    }
+  }
+  dependencies {
+    bundle("agp") {
+      primary("com.android.tools.build:gradle")
+      includeGroup("com.android.tools.build")
+      includeDependency("com.google.code.findbugs:jsr305")
     }
   }
 }

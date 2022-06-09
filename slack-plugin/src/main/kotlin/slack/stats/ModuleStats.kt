@@ -16,7 +16,6 @@
 package slack.stats
 
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.google.common.base.CaseFormat
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -52,6 +51,7 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.convertProjectPathToAccessor
 import slack.gradle.dependsOn
 import slack.gradle.namedLazy
 import slack.gradle.safeCapitalize
@@ -59,10 +59,6 @@ import slack.gradle.util.mapToBoolean
 
 public object ModuleStatsTasks {
   public const val AGGREGATOR_NAME: String = "aggregateModuleStats"
-
-  private fun kebabCaseToCamelCase(s: String): String {
-    return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, s)
-  }
 
   // Option to disable inclusion of generated code, which is helpful for testing
   private fun Project.includeGenerated() =
@@ -75,10 +71,7 @@ public object ModuleStatsTasks {
       rootProject.provider {
         rootProject.subprojects.associate {
           val regularPath = it.path
-          val projectAccessor =
-            regularPath.removePrefix(":").split(":").joinToString(separator = ".") { segment ->
-              kebabCaseToCamelCase(segment)
-            }
+          val projectAccessor = convertProjectPathToAccessor(regularPath)
           projectAccessor to regularPath
         }
       }
@@ -156,6 +149,10 @@ public object ModuleStatsTasks {
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_WIRE) }
       }
       withPlugin("com.squareup.sqldelight") {
+        addGeneratedSources()
+        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
+      }
+      withPlugin("app.cash.sqldelight") {
         addGeneratedSources()
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
       }
