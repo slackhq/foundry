@@ -112,7 +112,6 @@ data class KotlinBuildConfig(val kotlin: String) {
     "-opt-in=kotlin.contracts.ExperimentalContracts",
     "-opt-in=kotlin.experimental.ExperimentalTypeInference",
     "-opt-in=kotlin.ExperimentalStdlibApi",
-    "-opt-in=kotlin.RequiresOptIn",
     "-opt-in=kotlin.time.ExperimentalTime",
     // Match JVM assertion behavior: https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
     "-Xassertions=jvm",
