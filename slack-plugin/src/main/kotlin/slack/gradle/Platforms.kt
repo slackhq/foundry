@@ -92,9 +92,10 @@ public object Platforms {
 
     targetFile.bufferedWriter().use { writer ->
       val versionsToLibs =
-        dependencyCollection.flattenedPlatformCoordinates().groupBy { it.gradleProperty }.mapKeys {
-          it.key.removePrefix("slack.dependencies.")
-        }
+        dependencyCollection
+          .flattenedPlatformCoordinates()
+          .groupBy { it.gradleProperty }
+          .mapKeys { it.key.removePrefix("slack.dependencies.") }
 
       writer.append("[versions]")
       writer.appendLine()

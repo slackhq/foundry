@@ -85,14 +85,15 @@ internal abstract class LocTask : DefaultTask() {
   }
 
   private fun processDir(dir: File, logger: (String) -> Unit): Map<String, LanguageStats> {
-    return dir.walkTopDown().filter { it.extension in EXTENSION_TO_PROCESSOR }.fold(emptyMap()) {
-      stats,
-      file ->
-      val languageName = EXTENSION_TO_LANGUAGE.getValue(file.extension)
-      val newValues =
-        mapOf(languageName to EXTENSION_TO_PROCESSOR.getValue(file.extension)(file, logger))
-      stats.mergeWith(newValues)
-    }
+    return dir
+      .walkTopDown()
+      .filter { it.extension in EXTENSION_TO_PROCESSOR }
+      .fold(emptyMap()) { stats, file ->
+        val languageName = EXTENSION_TO_LANGUAGE.getValue(file.extension)
+        val newValues =
+          mapOf(languageName to EXTENSION_TO_PROCESSOR.getValue(file.extension)(file, logger))
+        stats.mergeWith(newValues)
+      }
   }
 
   companion object {

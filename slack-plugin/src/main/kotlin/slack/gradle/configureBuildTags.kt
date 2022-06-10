@@ -191,8 +191,7 @@ internal fun ScanApi.addTestParallelization(project: Project) {
 }
 
 private fun ScanApi.addGradleEnterpriseVersion() {
-  javaClass
-    .classLoader
+  javaClass.classLoader
     .getResource("com.gradle.scan.plugin.internal.meta.buildAgentVersion.txt")
     ?.readText()
     ?.let { buildAgentVersion -> value("GE Gradle plugin version", buildAgentVersion) }

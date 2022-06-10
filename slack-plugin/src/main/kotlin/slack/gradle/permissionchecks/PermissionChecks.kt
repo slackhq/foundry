@@ -80,8 +80,7 @@ internal object PermissionChecks {
             val taskName = "check${capitalizedName}PermissionsAllowlist"
             @Suppress("UnstableApiUsage")
             val checkPermissionsAllowlist = createTask(taskName, file, allowlist)
-            variant
-              .artifacts
+            variant.artifacts
               .use(checkPermissionsAllowlist)
               .wiredWithFiles(
                 taskInput = CheckManifestPermissionsTask::inputFile,

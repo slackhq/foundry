@@ -62,14 +62,16 @@ internal abstract class MergeDetektBaselinesTask : DefaultTask() {
   @TaskAction
   fun merge() {
     val merged =
-      baselineFiles.filter { it.exists() }.map { Baseline.load(it.toPath()) }.reduce { acc, baseline
-        ->
-        acc.copy(
-          currentIssues = acc.currentIssues + baseline.currentIssues,
-          manuallySuppressedIssues =
-            acc.manuallySuppressedIssues + baseline.manuallySuppressedIssues
-        )
-      }
+      baselineFiles
+        .filter { it.exists() }
+        .map { Baseline.load(it.toPath()) }
+        .reduce { acc, baseline ->
+          acc.copy(
+            currentIssues = acc.currentIssues + baseline.currentIssues,
+            manuallySuppressedIssues =
+              acc.manuallySuppressedIssues + baseline.manuallySuppressedIssues
+          )
+        }
     val sorted =
       merged.copy(
         currentIssues = merged.currentIssues.toSortedSet(),

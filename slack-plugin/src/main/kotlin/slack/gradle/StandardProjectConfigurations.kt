@@ -527,9 +527,7 @@ internal class StandardProjectConfigurations {
           // Lint is weird in that it will generate a new baseline file and fail the build if a new
           // one was generated, even if empty.
           // If we're updating baselines, always take the baseline so that we populate it if absent.
-          project
-            .layout
-            .projectDirectory
+          project.layout.projectDirectory
             .file("config/lint/baseline.xml")
             .asFile
             .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
@@ -663,8 +661,7 @@ internal class StandardProjectConfigurations {
           if (libraryExtension.namespace == null) {
             libraryExtension.namespace =
               "slack" +
-                project
-                  .path
+                project.path
                   .asSequence()
                   .mapNotNull {
                     when (it) {

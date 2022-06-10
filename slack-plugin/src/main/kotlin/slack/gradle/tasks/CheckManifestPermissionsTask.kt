@@ -55,38 +55,38 @@ internal abstract class CheckManifestPermissionsTask : DefaultTask() {
   @TaskAction
   fun check() {
     measureTimeMillis {
-      val manifestFile = inputFile.asFile.get()
-      logger.debug("$LOG Using manifest at $manifestFile")
+        val manifestFile = inputFile.asFile.get()
+        logger.debug("$LOG Using manifest at $manifestFile")
 
-      val allowlistFile = permissionAllowlistFile.asFile.get()
-      logger.debug("$LOG Using allowlist permissions at $manifestFile")
+        val allowlistFile = permissionAllowlistFile.asFile.get()
+        logger.debug("$LOG Using allowlist permissions at $manifestFile")
 
-      val allowlist = permissionAllowlist.get()
-      logger.debug("$LOG ${allowlist.size} allowlisted permissions: $allowlist")
+        val allowlist = permissionAllowlist.get()
+        logger.debug("$LOG ${allowlist.size} allowlisted permissions: $allowlist")
 
-      val permissions = parseXmlPermissions(manifestFile)
-      logger.debug("$LOG ${permissions.size} parsed permissions: $permissions")
+        val permissions = parseXmlPermissions(manifestFile)
+        logger.debug("$LOG ${permissions.size} parsed permissions: $permissions")
 
-      val added = permissions - allowlist
-      if (added.isNotEmpty()) {
-        throw PermissionAllowlistException(
-          "New permission(s) detected! If this is intentional, " +
-            "please add them to $allowlistFile and update your PR (a code owners group will be " +
-            "added for review). Added permissions: $added"
-        )
+        val added = permissions - allowlist
+        if (added.isNotEmpty()) {
+          throw PermissionAllowlistException(
+            "New permission(s) detected! If this is intentional, " +
+              "please add them to $allowlistFile and update your PR (a code owners group will be " +
+              "added for review). Added permissions: $added"
+          )
+        }
+
+        val removed = allowlist - permissions
+        if (removed.isNotEmpty()) {
+          throw PermissionAllowlistException(
+            "Removed permission(s) detected! If this is " +
+              "intentional, please remove them to $allowlistFile and update your PR (a code owners " +
+              "group will be added for review). Removed permissions: $removed"
+          )
+        }
+
+        manifestFile.copyTo(outputFile.asFile.get(), overwrite = true)
       }
-
-      val removed = allowlist - permissions
-      if (removed.isNotEmpty()) {
-        throw PermissionAllowlistException(
-          "Removed permission(s) detected! If this is " +
-            "intentional, please remove them to $allowlistFile and update your PR (a code owners " +
-            "group will be added for review). Removed permissions: $removed"
-        )
-      }
-
-      manifestFile.copyTo(outputFile.asFile.get(), overwrite = true)
-    }
       .let { logger.debug("$LOG Manifest perm checks took $it ms") }
   }
 

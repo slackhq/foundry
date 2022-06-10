@@ -39,7 +39,8 @@ private constructor(
       val robolectricJarsDownloadTask =
         project.createRobolectricJarsDownloadTask(globalSlackProperties)
       val mergeDetektBaselinesTask =
-        if (project.gradle.startParameter.taskNames.any { it == MergeDetektBaselinesTask.TASK_NAME }
+        if (
+          project.gradle.startParameter.taskNames.any { it == MergeDetektBaselinesTask.TASK_NAME }
         ) {
           project.tasks.register<MergeDetektBaselinesTask>(MergeDetektBaselinesTask.TASK_NAME) {
             outputFile.set(project.layout.projectDirectory.file("config/detekt/baseline.xml"))
