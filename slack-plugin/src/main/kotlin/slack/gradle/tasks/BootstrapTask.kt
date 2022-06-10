@@ -218,8 +218,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
         """.trimIndent()
       )
-      javaInstallationPath
-        .asFile
+      javaInstallationPath.asFile
         .get()
         .writeText(launcher.get().metadata.installationPath.asFile.absolutePath)
     }
@@ -347,8 +346,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
           // TODO for profiler, we want to set these to the local properties + append
           val propertiesFileProvider: () -> File = {
-            project
-              .providers
+            project.providers
               .gradleProperty(Properties.PROPERTIES_FILE)
               .map { File(it) }
               .orElse(File(gradleHome, "gradle.properties"))
@@ -356,8 +354,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           }
           gradlePropertiesFile.set(propertiesFileProvider)
           propertiesMode.set(
-            project
-              .providers
+            project.providers
               .gradleProperty(Properties.PROPERTIES_MODE)
               .map { BootstrapPropertiesMode.valueOf(it.toUpperCase(Locale.US)) }
               .orElse(APPEND)

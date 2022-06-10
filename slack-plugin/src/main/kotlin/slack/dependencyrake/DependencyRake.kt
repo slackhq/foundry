@@ -165,9 +165,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
     val compileOnlyDeps =
       if (AnalysisMode.COMPILE_ONLY in resolvedModes) {
-        advices.filter { it.isCompileOnly() }.associateBy {
-          it.toDependencyString("ADD-COMPILE-ONLY")
-        }
+        advices
+          .filter { it.isCompileOnly() }
+          .associateBy { it.toDependencyString("ADD-COMPILE-ONLY") }
       } else {
         emptyMap()
       }
@@ -194,8 +194,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
             line.trimEnd() == "}" -> {
               done = true
               // Emit any remaining new dependencies to add
-              depsToAdd
-                .entries
+              depsToAdd.entries
                 .mapNotNull { (_, advice) ->
                   advice.coordinates.toDependencyNotation("ADD-NEW")?.let { newNotation ->
                     var newConfiguration = advice.toConfiguration!!
@@ -318,7 +317,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
             }
         ModuleCoordinates(newIdentifier, resolvedVersion)
       }
-      is FlatCoordinates, is IncludedBuildCoordinates, is ProjectCoordinates -> this
+      is FlatCoordinates,
+      is IncludedBuildCoordinates,
+      is ProjectCoordinates -> this
     }
   }
 

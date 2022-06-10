@@ -121,7 +121,8 @@ internal object ThermlogParser {
       val prevCurrentScheduler = currentScheduler
       val prevAvailableCpus = availableCpus
       val prevSpeedLimit = speedLimit
-      if (prevCurrentTime != null &&
+      if (
+        prevCurrentTime != null &&
           prevCurrentScheduler != null &&
           prevAvailableCpus != null &&
           prevSpeedLimit != null

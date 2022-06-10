@@ -85,7 +85,8 @@ internal class SlackBasePlugin : Plugin<Project> {
         incoming.afterResolve {
           dependencies.forEach { dependency ->
             if (dependency.name == "eithernet") {
-              target.tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>()
+              target.tasks
+                .withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>()
                 .configureEach {
                   kotlinOptions {
                     @Suppress("SuspiciousCollectionReassignment")

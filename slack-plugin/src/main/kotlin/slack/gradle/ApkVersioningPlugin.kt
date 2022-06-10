@@ -62,8 +62,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val versionPatch = project.localGradleProperty("versionPatch")
 
       val user =
-        project
-          .ciBuildNumber
+        project.ciBuildNumber
           .map { "" }
           // Only provider the user if this is _not_ running on jenkins. Composition of properties
           // is still a little weird in Gradle.
@@ -83,8 +82,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         project.rootProject.layout.projectDirectory.file("ci/release.version")
       val ciContent = project.providers.fileContents(ciVersionFileProvider)
       val versionCodeProvider: Provider<Int> =
-        project
-          .ciBuildNumber
+        project.ciBuildNumber
           .flatMap { ciContent.asText.map { it.toInt() } }
           .orElse(project.providers.provider { ApkVersioning.DEFAULT_VERSION_CODE })
 

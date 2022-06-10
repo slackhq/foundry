@@ -84,24 +84,25 @@ internal object AndroidSourcesConfigurer {
           "Patching Android sources from $latest as requested SDK version $requestedSdkVersion"
         )
         measureTimeMillis {
-          requestedSources.mkdirs()
-          latestSources.copyRecursively(requestedSources, overwrite = true)
+            requestedSources.mkdirs()
+            latestSources.copyRecursively(requestedSources, overwrite = true)
 
-          // Now create our marker
-          File(requestedSources, MARKER_FILE_NAME).apply {
-            createNewFile()
-            // Write some explanatory text. This isn't used anywhere, just here for curious readers.
-            writeText(
-              """
+            // Now create our marker
+            File(requestedSources, MARKER_FILE_NAME).apply {
+              createNewFile()
+              // Write some explanatory text. This isn't used anywhere, just here for curious
+              // readers.
+              writeText(
+                """
             Hello curious reader! This file exists solely as a marker for the
             AndroidSourcesConfigurer util to know if these are patched sdk sources. This sources
             directory is a copy of API $latest sources.
 
             Did you know if you drive from Houston to LA, El Paso is halfway?
               """.trimIndent()
-            )
+              )
+            }
           }
-        }
           .also {
             logger.lifecycle(
               "Successfully patched Android sources for SDK $requestedSdkVersion " +

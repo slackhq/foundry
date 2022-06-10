@@ -53,8 +53,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
 
   @TaskAction
   public fun writeFiles() {
-    outputFile
-      .asFile
+    outputFile.asFile
       .get()
       .writeText(
         androidTestApkDirs

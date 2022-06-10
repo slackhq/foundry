@@ -162,8 +162,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
           val generatorProjects =
             buildSet<Any> {
               addAll(
-                slackProperties
-                  .anvilGeneratorProjects
+                slackProperties.anvilGeneratorProjects
                   ?.splitToSequence(";")
                   ?.map(::project)
                   .orEmpty()
@@ -291,7 +290,8 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
 
       // At the very end we check if kapt is enabled and disable anvil component merging if needed
       // https://github.com/square/anvil#incremental-kotlin-compilation-breaks-compiler-plugins
-      if (kaptRequired &&
+      if (
+        kaptRequired &&
           daggerConfig?.enableAnvil == true &&
           !daggerConfig.alwaysEnableAnvilComponentMerging
       ) {

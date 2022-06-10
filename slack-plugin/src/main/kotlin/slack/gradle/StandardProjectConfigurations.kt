@@ -54,7 +54,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
@@ -69,6 +68,7 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
@@ -528,9 +528,7 @@ internal class StandardProjectConfigurations {
           // Lint is weird in that it will generate a new baseline file and fail the build if a new
           // one was generated, even if empty.
           // If we're updating baselines, always take the baseline so that we populate it if absent.
-          project
-            .layout
-            .projectDirectory
+          project.layout.projectDirectory
             .file("config/lint/baseline.xml")
             .asFile
             .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
@@ -664,8 +662,7 @@ internal class StandardProjectConfigurations {
           if (libraryExtension.namespace == null) {
             libraryExtension.namespace =
               "slack" +
-                project
-                  .path
+                project.path
                   .asSequence()
                   .mapNotNull {
                     when (it) {
@@ -739,7 +736,34 @@ internal class StandardProjectConfigurations {
       } else {
         jvmTargetVersion.toString()
       }
-    val onKotlinPluginApplied = {
+
+    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
+      // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
+      configure<DetektExtension> {
+        toolVersion =
+          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
+        rootProject.file("config/detekt/detekt.yml")
+        slackProperties.detektConfigs?.let { configs ->
+          for (configFile in configs) {
+            config.from(rootProject.file(configFile))
+          }
+        }
+
+        slackProperties.detektBaseline?.let { baselineFile ->
+          baseline =
+            if (globalConfig.mergeDetektBaselinesTask != null) {
+              tasks.withType<DetektCreateBaselineTask>().configureEach {
+                globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
+              }
+              file("$buildDir/intermediates/detekt/baseline.xml")
+            } else {
+              file(rootProject.file(baselineFile))
+            }
+        }
+      }
+    }
+
+    plugins.withType<KotlinBasePlugin> {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
       @Suppress("SuspiciousCollectionReassignment")
       tasks.configureEach<KotlinCompile> {
@@ -749,6 +773,7 @@ internal class StandardProjectConfigurations {
           }
           jvmTarget = actualJvmTarget
           freeCompilerArgs += kotlinCompilerArgs
+          useK2 = slackProperties.useK2
 
           if (slackProperties.enableCompose && isAndroid) {
             freeCompilerArgs += "-Xskip-prerelease-check"
@@ -767,9 +792,7 @@ internal class StandardProjectConfigurations {
 
       if (jdkVersion != null) {
         configure<KotlinProjectExtension> {
-          jvmToolchain {
-            (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(jdkVersion))
-          }
+          jvmToolchain { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
         }
       }
 
@@ -803,10 +826,10 @@ internal class StandardProjectConfigurations {
              */
             @Suppress("UnusedPrivateClass")
             private abstract class ${
-            CaseFormat.LOWER_HYPHEN.to(
-              CaseFormat.UPPER_CAMEL,
-              project.name
-            )
+              CaseFormat.LOWER_HYPHEN.to(
+                CaseFormat.UPPER_CAMEL,
+                project.name
+              )
             }CompilationMarker
             ```
             """.trimIndent()
@@ -815,34 +838,7 @@ internal class StandardProjectConfigurations {
       }
     }
 
-    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-      // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
-      configure<DetektExtension> {
-        toolVersion =
-          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
-        rootProject.file("config/detekt/detekt.yml")
-        slackProperties.detektConfigs?.let { configs ->
-          for (configFile in configs) {
-            config.from(rootProject.file(configFile))
-          }
-        }
-
-        slackProperties.detektBaseline?.let { baselineFile ->
-          baseline =
-            if (globalConfig.mergeDetektBaselinesTask != null) {
-              tasks.withType<DetektCreateBaselineTask>().configureEach {
-                globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
-              }
-              file("$buildDir/intermediates/detekt/baseline.xml")
-            } else {
-              file(rootProject.file(baselineFile))
-            }
-        }
-      }
-    }
-
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      onKotlinPluginApplied()
       // Enable linting on pure JVM projects
       apply(plugin = "com.android.lint")
       // Add slack-lint as lint checks source
@@ -850,8 +846,6 @@ internal class StandardProjectConfigurations {
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {
-      onKotlinPluginApplied()
-
       // Configure kotlin sources in Android projects
       configure<BaseExtension> {
         sourceSets.configureEach {

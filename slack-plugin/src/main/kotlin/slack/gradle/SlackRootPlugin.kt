@@ -376,10 +376,13 @@ private fun Project.configureSlackRootBuildscript() {
 
 @Suppress("UnstableApiUsage")
 private fun Project.configureMisc(slackProperties: SlackProperties) {
-  tasks.withType<Delete>().matching { it.name == "clean" }.configureEach {
-    group = "build"
-    delete(rootProject.buildDir)
-  }
+  tasks
+    .withType<Delete>()
+    .matching { it.name == "clean" }
+    .configureEach {
+      group = "build"
+      delete(rootProject.buildDir)
+    }
 
   // Configure gradle doctor
   pluginManager.withPlugin("com.osacky.doctor") {

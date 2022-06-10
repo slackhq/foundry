@@ -52,8 +52,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
   override fun handleDependencies(identifiersToVersions: Map<String, String>) {
     val file = outputFile.asFile.get()
     file.bufferedWriter().use { writer ->
-      identifiersToVersions
-        .entries
+      identifiersToVersions.entries
         .map { (moduleIdentifier, version) -> "mvn+$moduleIdentifier:$version" }
         .sorted() // Important for deterministic ouputs
         .joinTo(writer, separator = "\n")

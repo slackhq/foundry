@@ -174,7 +174,7 @@ public fun Project.slackTools(): SlackTools {
 
 @Suppress("UNCHECKED_CAST")
 public fun Project.slackToolsProvider(): Provider<SlackTools> {
-  return (project.gradle.sharedServices.registrations.getByName(SERVICE_NAME) as
-      BuildServiceRegistration<SlackTools, Parameters>)
+  return (project.gradle.sharedServices.registrations.getByName(SERVICE_NAME)
+      as BuildServiceRegistration<SlackTools, Parameters>)
     .service
 }
