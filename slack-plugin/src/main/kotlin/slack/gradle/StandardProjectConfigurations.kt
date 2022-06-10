@@ -771,7 +771,7 @@ internal class StandardProjectConfigurations {
             allWarningsAsErrors = true
           }
           jvmTarget = actualJvmTarget
-          freeCompilerArgs += kotlinCompilerArgs
+          freeCompilerArgs += kotlinCompilerArgs + "-Xjdk-release=$actualJvmTarget"
           useK2 = slackProperties.useK2
 
           if (slackProperties.enableCompose && isAndroid) {
