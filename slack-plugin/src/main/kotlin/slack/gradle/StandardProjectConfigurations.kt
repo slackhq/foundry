@@ -740,6 +740,7 @@ internal class StandardProjectConfigurations {
     pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
       // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
       configure<DetektExtension> {
+        buildUponDefaultConfig = true
         toolVersion =
           slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
         rootProject.file("config/detekt/detekt.yml")
