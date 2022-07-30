@@ -47,7 +47,7 @@ jobs:
             ${{ runner.os }}-gradle-${{ matrix.job }}-
 
       - name: Install JDK ${{ matrix.ci_java_version }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.ci_java_version }}
