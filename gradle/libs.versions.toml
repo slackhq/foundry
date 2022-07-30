@@ -53,7 +53,7 @@ gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin
 guava = "com.google.guava:guava:31.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
 jgrapht = "org.jgrapht:jgrapht-core:1.5.1"
-jna = "net.java.dev.jna:jna:5.11.0"
+jna = "net.java.dev.jna:jna:5.12.1"
 junit = "junit:junit:4.13.2"
 markdown = "org.jetbrains:markdown:0.1.46"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
