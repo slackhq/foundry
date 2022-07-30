@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import com.diffplug.gradle.spotless.SpotlessExtension
-import com.vanniktech.maven.publish.MavenPublishPluginExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.util.internal.VersionNumber
@@ -219,11 +218,6 @@ subprojects {
           url.set(URL("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes"))
         }
       }
-    }
-
-    configure<MavenPublishPluginExtension> {
-      // Prevent publishing to MavenCentral
-      sonatypeHost = null
     }
 
     // Add our maven repository repo
