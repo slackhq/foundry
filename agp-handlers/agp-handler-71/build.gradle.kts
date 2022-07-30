@@ -10,7 +10,7 @@ if (hasProperty("SlackRepositoryUrl")) {
 dependencies {
   compileOnly(gradleApi())
   compileOnly(gradleKotlinDsl())
-  compileOnly("com.android.tools.build:gradle:7.1.2")
+  compileOnly("com.android.tools.build:gradle:7.2.1")
   // Android tools versioning is wild
   compileOnly("com.android.tools:common:30.1.2")
 
