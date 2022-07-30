@@ -9,7 +9,9 @@
   ],
   "branchPrefix": "test-renovate/",
   "gitAuthor": "OSS-Bot <svc-oss-bot@slack-corp.com>",
-  "repositories": "slackhq/slack-gradle-plugin",
+  "repositories": [
+    "slackhq/slack-gradle-plugin"  
+  ],
   "packageRules": [
     {
       "matchPackageNames": [
