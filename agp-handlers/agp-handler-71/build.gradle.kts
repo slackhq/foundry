@@ -12,7 +12,7 @@ dependencies {
   compileOnly(gradleKotlinDsl())
   compileOnly("com.android.tools.build:gradle:7.1.2")
   // Android tools versioning is wild
-  compileOnly("com.android.tools:common:30.1.2")
+  compileOnly("com.android.tools:common:30.2.1")
 
   compileOnly(libs.autoService.annotations)
   ksp(libs.autoService.ksp)
