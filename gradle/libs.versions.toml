@@ -7,7 +7,7 @@ detekt = "1.21.0"
 dokka = "1.7.10"
 errorproneGradle = "2.0.2"
 java = "17"
-kotlin = "1.7.0"
+kotlin = "1.7.10"
 ksp = "1.7.10-1.0.6"
 ktfmt = "0.38"
 mavenPublish = "0.21.0"
@@ -24,6 +24,8 @@ dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.re
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+# Here to trigger Renovate updates
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
