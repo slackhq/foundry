@@ -25,7 +25,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 # Here to trigger Renovate updates
-kotlin.jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
