@@ -1,5 +1,5 @@
 [versions]
-agp = "7.2.1"
+agp = "7.2.2"
 anvil = "2.4.1"
 bugsnagGradle = "7.3.0"
 dependencyAnalysisPlugin = "1.12.0"
