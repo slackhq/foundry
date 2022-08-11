@@ -56,27 +56,33 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       var kaptRequired = false
+      var naptRequired = false
       val avMoshiEnabled = featuresHandler.avExtensionMoshi.getOrElse(false)
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
       val allowKsp = slackProperties.allowKsp
       val allowMoshiIr = slackProperties.allowMoshiIr
+      val allowNapt = slackProperties.allowMoshiIr
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
-        kaptRequired = true
+        if (allowNapt) {
+          naptRequired = true
+          // Apply kapt for them
+          pluginManager.apply("com.sergei-lapin.napt")
+        } else {
+          kaptRequired = true
+          // Apply kapt for them
+          pluginManager.apply("org.jetbrains.kotlin.kapt")
+        }
         if (logVerbose) {
           logger.lifecycle(
             """
-            [Kapt Config]
+            [kapt/napt Config]
             project = $path
-            kapt source = $source
+            source = $source
             """.trimIndent()
           )
-        }
-        if (!isUsingKapt) {
-          // Apply kapt for them
-          pluginManager.apply("org.jetbrains.kotlin.kapt")
         }
       }
 
@@ -117,12 +123,13 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
         }
       }
 
-      val aptConfiguration =
-        if (isKotlin) {
+      fun aptConfiguration(): String {
+        return if (isKotlin && !naptRequired) {
           "kapt"
         } else {
           "annotationProcessor"
         }
+      }
 
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
@@ -176,7 +183,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
           markKaptNeeded("Dagger compiler")
-          dependencies.add(aptConfiguration, SlackDependencies.Dagger.compiler)
+          dependencies.add(aptConfiguration(), SlackDependencies.Dagger.compiler)
         }
 
         if (featuresHandler.daggerHandler.android.enabled.get()) {
@@ -186,7 +193,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
             dependencies.add("implementation", SlackDependencies.Dagger.android)
             if (!daggerConfig.runtimeOnly && daggerConfig.contributesAndroidInjector) {
               markKaptNeeded("Dagger Android Processor")
-              dependencies.add(aptConfiguration, SlackDependencies.Dagger.androidProcessor)
+              dependencies.add(aptConfiguration(), SlackDependencies.Dagger.androidProcessor)
             }
           }
         }
@@ -195,20 +202,20 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
       if (featuresHandler.autoValue.getOrElse(false)) {
         markKaptNeeded("AutoValue")
         dependencies.add("compileOnly", SlackDependencies.Auto.Value.annotations)
-        dependencies.add(aptConfiguration, SlackDependencies.Auto.Value.autovalue)
+        dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.autovalue)
         if (avMoshiEnabled) {
           dependencies.add("implementation", SlackDependencies.Auto.Value.Moshi.runtime)
-          dependencies.add(aptConfiguration, SlackDependencies.Auto.Value.Moshi.extension)
+          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.Moshi.extension)
         }
         if (featuresHandler.avExtensionParcel.getOrElse(false)) {
           dependencies.add("implementation", SlackDependencies.Auto.Value.Parcel.adapter)
-          dependencies.add(aptConfiguration, SlackDependencies.Auto.Value.Parcel.extension)
+          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.Parcel.extension)
         }
         if (featuresHandler.avExtensionWith.getOrElse(false)) {
-          dependencies.add(aptConfiguration, SlackDependencies.Auto.Value.with)
+          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.with)
         }
         if (featuresHandler.avExtensionKotlin.getOrElse(false)) {
-          dependencies.add(aptConfiguration, SlackDependencies.Auto.Value.kotlin)
+          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.kotlin)
           configure<KaptExtension> { arguments { arg("avkSrc", project.file("src/main/java")) } }
         }
       }
@@ -221,14 +228,14 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
         } else {
           markKaptNeeded("AutoService")
           dependencies.add("compileOnly", SlackDependencies.Auto.Service.annotations)
-          dependencies.add(aptConfiguration, SlackDependencies.Auto.Service.autoservice)
+          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Service.autoservice)
         }
       }
 
       if (featuresHandler.incap.getOrElse(false)) {
         markKaptNeeded("Incap")
         dependencies.add("compileOnly", SlackDependencies.Incap.incap)
-        dependencies.add(aptConfiguration, SlackDependencies.Incap.processor)
+        dependencies.add(aptConfiguration(), SlackDependencies.Incap.processor)
       }
 
       if (featuresHandler.redacted.getOrElse(false)) {
@@ -245,7 +252,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
             dependencies.add("ksp", SlackDependencies.Moshi.codeGen)
           } else {
             markKaptNeeded("Moshi code gen")
-            dependencies.add(aptConfiguration, SlackDependencies.Moshi.codeGen)
+            dependencies.add(aptConfiguration(), SlackDependencies.Moshi.codeGen)
           }
         }
         if (featuresHandler.moshiHandler.moshiAdapters.getOrElse(false)) {
@@ -273,7 +280,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
               dependencies.add("ksp", SlackDependencies.Moshi.MoshiX.Sealed.codegen)
             } else {
               markKaptNeeded("Moshi sealed codegen")
-              dependencies.add(aptConfiguration, SlackDependencies.Moshi.MoshiX.Sealed.codegen)
+              dependencies.add(aptConfiguration(), SlackDependencies.Moshi.MoshiX.Sealed.codegen)
             }
           }
           if (featuresHandler.moshiHandler.sealedReflect.getOrElse(false)) {

@@ -240,6 +240,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val allowMoshiIr: Boolean
     get() = booleanProperty("slack.allow-moshi-ir")
 
+  /** Flag to enable/disable Napt. */
+  public val allowNapt: Boolean
+    get() = booleanProperty("slack.allow-napt")
+
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
     get() = optionalStringProperty("slack.disabledVariants")
