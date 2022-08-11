@@ -62,7 +62,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
       val allowKsp = slackProperties.allowKsp
       val allowMoshiIr = slackProperties.allowMoshiIr
-      val allowNapt = slackProperties.allowMoshiIr
+      val allowNapt = slackProperties.allowNapt
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
