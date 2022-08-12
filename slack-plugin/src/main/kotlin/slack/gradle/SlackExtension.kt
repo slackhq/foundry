@@ -68,7 +68,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
       fun markKaptNeeded(source: String) {
         if (allowNapt) {
           naptRequired = true
-          // Apply kapt for them
+          // Apply napt for them
           pluginManager.apply("com.sergei-lapin.napt")
         } else {
           kaptRequired = true
