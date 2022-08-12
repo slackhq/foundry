@@ -44,9 +44,10 @@ import slack.stats.LocTask.LocData
  */
 @CacheableTask
 internal abstract class LocTask : DefaultTask() {
+  // Always run this! Not every module has source files but in those cases we want to just write
+  // an empty JSON object for tasks that depend on this task's outputs.
   @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:InputDirectory
-  @get:SkipWhenEmpty
   abstract val srcsDir: DirectoryProperty
 
   @get:PathSensitive(PathSensitivity.RELATIVE)
