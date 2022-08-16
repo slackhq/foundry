@@ -73,7 +73,7 @@ dependencyResolutionManagement {
       }
     }
 
-    // ExclusiveConent is used here because this proxies jcenter under the hood!
+    // ExclusiveContent is used here because this proxies jcenter under the hood!
     exclusiveContent {
       forRepository(::gradlePluginPortal)
       filter {
@@ -83,6 +83,7 @@ dependencyResolutionManagement {
         includeModule("gradle.plugin.org.gradle.android", "android-cache-fix-gradle-plugin")
         includeModule("net.ltgt.gradle", "gradle-errorprone-plugin")
         includeModule("net.ltgt.gradle", "gradle-nullaway-plugin")
+        includeModule("com.sergei-lapin.napt", "gradle")
       }
     }
   }

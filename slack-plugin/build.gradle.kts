@@ -67,6 +67,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.detekt)
   compileOnly(libs.detekt)
   compileOnly(libs.gradlePlugins.errorProne)
+  compileOnly(libs.gradlePlugins.napt)
   compileOnly(libs.gradlePlugins.nullaway)
   compileOnly(libs.gradlePlugins.dependencyAnalysis)
   compileOnly(libs.gradlePlugins.retry)
