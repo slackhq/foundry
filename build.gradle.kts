@@ -112,9 +112,6 @@ data class KotlinBuildConfig(val kotlin: String) {
     "-opt-in=kotlin.experimental.ExperimentalTypeInference",
     "-opt-in=kotlin.ExperimentalStdlibApi",
     "-opt-in=kotlin.time.ExperimentalTime",
-    // We should be able to remove this in Kotlin 1.7, yet for some reason it still warns about its use
-    // https://youtrack.jetbrains.com/issue/KT-52720
-    "-opt-in=kotlin.RequiresOptIn",
     // Match JVM assertion behavior: https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
     "-Xassertions=jvm",
     // Potentially useful for static analysis tools or annotation processors.
@@ -181,6 +178,8 @@ subprojects {
         freeCompilerArgs += (kotlinBuildConfig.kotlinCompilerArgs + "-Xsam-conversions=class")
           // -progressive is useless when running on an older language version but new compiler version
           .filter { it != "-progressive" }
+          // We should be able to remove this in Gradle 8 when it upgrades to Kotlin 1.7
+          .plus("-opt-in=kotlin.RequiresOptIn")
       }
     }
 
