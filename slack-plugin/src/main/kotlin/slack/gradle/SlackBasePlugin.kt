@@ -31,6 +31,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.retry
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.gradle.util.synchronousEnvProperty
 import slack.stats.ModuleStatsTasks
 
@@ -62,12 +63,7 @@ internal class SlackBasePlugin : Plugin<Project> {
       }
 
       if (slackProperties.autoApplyDetekt) {
-        // Would be nice to have a single Kotlin hook
-        // https://youtrack.jetbrains.com/issue/KT-48008
-        target.pluginManager.withPlugin("org.jetbrains.kotlin.android") {
-          target.apply(plugin = "io.gitlab.arturbosch.detekt")
-        }
-        target.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        target.plugins.withType<KotlinBasePlugin> {
           target.apply(plugin = "io.gitlab.arturbosch.detekt")
         }
       }
