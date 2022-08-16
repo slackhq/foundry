@@ -31,6 +31,8 @@ import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.google.common.base.CaseFormat
 import com.google.devtools.ksp.gradle.KspExtension
+import com.slapin.napt.JvmArgsStrongEncapsulation
+import com.slapin.napt.NaptGradleExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
@@ -190,6 +192,26 @@ internal class StandardProjectConfigurations {
       // Required for Google compile-testing to work.
       // https://github.com/google/compile-testing/issues/222
       jvmArgs("--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
+    }
+
+    pluginManager.withPlugin("com.sergei-lapin.napt") {
+      configure<NaptGradleExtension> {
+        // Don't generate triggers, we'll handle ensuring Java files ourselves.
+        generateNaptTrigger.set(false)
+
+        // We need to add extra args due to dagger-android running GJF.
+        // Can remove once this is fixed or dagger-android's removed.
+        // https://github.com/google/dagger/pull/3532
+        forkJvmArgs.set(
+          listOf(
+            "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+          ) + JvmArgsStrongEncapsulation
+        )
+      }
     }
   }
 
