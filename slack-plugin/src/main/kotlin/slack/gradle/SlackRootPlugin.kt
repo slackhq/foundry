@@ -421,9 +421,7 @@ private fun Project.configureMisc(slackProperties: SlackProperties) {
        * By default, Gradle treats empty directories as inputs to compilation tasks. This can cause
        * cache misses.
        */
-      // TODO Disabled for now due to kapt leaving empty packages
-      // https://youtrack.jetbrains.com/issue/KT-41353
-      failOnEmptyDirectories.set(false)
+      failOnEmptyDirectories.set(true)
       /**
        * Do not allow building all apps simultaneously. This is likely not what the user intended.
        */
