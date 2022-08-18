@@ -32,6 +32,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import slack.stats.LocTask.LocData
 
@@ -43,8 +44,7 @@ import slack.stats.LocTask.LocData
  */
 @CacheableTask
 internal abstract class LocTask : DefaultTask() {
-  // Always run this! Not every module has source files but in those cases we want to just write
-  // an empty JSON object for tasks that depend on this task's outputs.
+  @get:SkipWhenEmpty
   @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:InputDirectory
   abstract val srcsDir: DirectoryProperty
@@ -216,5 +216,9 @@ internal abstract class LocTask : DefaultTask() {
   data class LocData(
     val srcs: Map<String, LanguageStats>,
     val generatedSrcs: Map<String, LanguageStats>
-  )
+  ) {
+    companion object {
+      val EMPTY = LocData(emptyMap(), emptyMap())
+    }
+  }
 }
