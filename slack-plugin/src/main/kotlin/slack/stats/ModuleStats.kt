@@ -36,6 +36,7 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -349,7 +350,10 @@ internal abstract class ModuleStatsCollectorTask : DefaultTask() {
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
-  @get:PathSensitive(PathSensitivity.NONE) @get:InputFile abstract val locData: RegularFileProperty
+  @get:Optional
+  @get:PathSensitive(PathSensitivity.NONE)
+  @get:InputFile
+  abstract val locData: RegularFileProperty
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -362,8 +366,12 @@ internal abstract class ModuleStatsCollectorTask : DefaultTask() {
   @TaskAction
   fun dumpStats() {
     val (sources, generatedSources) =
-      locData.asFile.get().source().buffer().use { source ->
-        moshi.adapter<LocTask.LocData>().fromJson(source)!!
+      if (locData.isPresent) {
+        locData.asFile.get().source().buffer().use { source ->
+          moshi.adapter<LocTask.LocData>().fromJson(source)!!
+        }
+      } else {
+        LocTask.LocData.EMPTY
       }
 
     val dependencies = StatsUtils.parseProjectDeps(buildFileProperty.asFile.get())
