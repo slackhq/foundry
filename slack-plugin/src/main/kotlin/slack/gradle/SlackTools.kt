@@ -15,6 +15,7 @@
  */
 package slack.gradle
 
+import com.squareup.moshi.Moshi
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -34,6 +35,7 @@ import org.gradle.kotlin.dsl.registerIfAbsent
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
+import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
 import slack.gradle.util.mapToBoolean
@@ -43,6 +45,8 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   BuildService<Parameters>, AutoCloseable {
 
   public val agpHandler: AgpHandler by lazy { AgpHandlers.createHandler() }
+  public val moshi: Moshi
+    get() = JsonTools.MOSHI
 
   // I really really wish we could do this the "correct" way but Gradle is problematic with its
   // inconsistent expectations of Serializability. Specifically - it seems that `@Nested` does not

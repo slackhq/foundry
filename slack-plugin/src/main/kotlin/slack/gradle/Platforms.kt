@@ -15,8 +15,6 @@
  */
 package slack.gradle
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 import java.util.Locale
 import okio.buffer
@@ -34,6 +32,7 @@ import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.boms
 import slack.gradle.dependencies.flattenedPlatformCoordinates
 import slack.gradle.dependencies.identifierMap
+import slack.gradle.util.JsonTools
 import slack.gradle.util.sneakyNull
 
 public object Platforms {
@@ -259,8 +258,9 @@ public object Platforms {
       project.providers.provider {
         val path = slackProperties.versionsJson ?: return@provider sneakyNull()
         println("Parsing versions json at $path")
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        path.source().buffer().use { moshi.adapter(VersionsOutput::class.java).fromJson(it)!! }
+        path.source().buffer().use {
+          JsonTools.MOSHI.adapter(VersionsOutput::class.java).fromJson(it)!!
+        }
       }
 
     val providers = project.providers

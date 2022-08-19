@@ -21,6 +21,7 @@ import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 import okio.buffer
 import okio.sink
 import okio.source
@@ -29,6 +30,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
@@ -45,6 +47,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.jgrapht.alg.scoring.BetweennessCentrality
@@ -56,6 +59,7 @@ import slack.gradle.convertProjectPathToAccessor
 import slack.gradle.dependsOn
 import slack.gradle.namedLazy
 import slack.gradle.safeCapitalize
+import slack.gradle.util.JsonTools
 import slack.gradle.util.mapToBoolean
 
 public object ModuleStatsTasks {
@@ -107,7 +111,18 @@ public object ModuleStatsTasks {
         project.tasks.register<ModuleStatsCollectorTask>("moduleStats") {
           modulePath.set(project.path)
           buildFileProperty.set(project.buildFile)
-          locData.set(locTask.flatMap { it.outputFile })
+          locData.set(
+            locTask
+              .flatMap { it.outputFile }
+              .map {
+                val file = it.asFile
+                if (file.exists()) {
+                  file.readText()
+                } else {
+                  LocTask.LocData.EMPTY_JSON
+                }
+              }
+          )
           this.includeGenerated.set(includeGenerated)
           outputFile.set(project.layout.buildDirectory.file("reports/slack/moduleStats.json"))
         }
@@ -261,15 +276,13 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
-  private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-
   init {
     group = "slack"
   }
 
   @TaskAction
   internal fun dumpStats() {
-    val adapter = moshi.adapter<ModuleStats>()
+    val adapter = JsonTools.MOSHI.adapter<ModuleStats>()
     val allStats =
       statsFiles.map { it.source().buffer().use(adapter::fromJson)!! }.sortedBy { it.modulePath }
 
@@ -318,13 +331,14 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
 
     logger.debug("Scores are ${scores.joinToString("\n")}")
     outputFile.asFile.get().sink().buffer().use { sink ->
-      moshi.adapter<AggregateModuleScore>().toJson(sink, AggregateModuleScore(scores))
+      JsonTools.MOSHI.adapter<AggregateModuleScore>().toJson(sink, AggregateModuleScore(scores))
     }
   }
 }
 
 @CacheableTask
-internal abstract class ModuleStatsCollectorTask : DefaultTask() {
+internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: ObjectFactory) :
+  DefaultTask() {
 
   companion object {
     const val TAG_KAPT = "kapt"
@@ -350,10 +364,12 @@ internal abstract class ModuleStatsCollectorTask : DefaultTask() {
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
+  // Not pointing at a JSON file since it's optional and Gradle doesn't handle optional files well
+  // when chained from outputs of other (possibly-skipped) tasks.
+  // https://github.com/gradle/gradle/issues/2016
   @get:Optional
-  @get:PathSensitive(PathSensitivity.NONE)
-  @get:InputFile
-  abstract val locData: RegularFileProperty
+  @get:Input
+  val locData: Property<String> = objects.property<String>().convention(LocTask.LocData.EMPTY_JSON)
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -365,14 +381,7 @@ internal abstract class ModuleStatsCollectorTask : DefaultTask() {
 
   @TaskAction
   fun dumpStats() {
-    val (sources, generatedSources) =
-      if (locData.isPresent) {
-        locData.asFile.get().source().buffer().use { source ->
-          moshi.adapter<LocTask.LocData>().fromJson(source)!!
-        }
-      } else {
-        LocTask.LocData.EMPTY
-      }
+    val (sources, generatedSources) = moshi.adapter<LocTask.LocData>().fromJson(locData.get())!!
 
     val dependencies = StatsUtils.parseProjectDeps(buildFileProperty.asFile.get())
 
