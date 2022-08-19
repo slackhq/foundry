@@ -15,9 +15,7 @@
  */
 package slack.stats
 
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 import okio.buffer
 import okio.sink
@@ -34,6 +32,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+import slack.gradle.util.JsonTools
 import slack.stats.LocTask.LocData
 
 /**
@@ -76,11 +75,7 @@ internal abstract class LocTask : DefaultTask() {
         emptyMap()
       }
     outputFile.asFile.get().sink().buffer().use { sink ->
-      Moshi.Builder()
-        .addLast(KotlinJsonAdapterFactory())
-        .build()
-        .adapter<LocData>()
-        .toJson(sink, LocData(srcs, generatedSrcs))
+      JsonTools.MOSHI.adapter<LocData>().toJson(sink, LocData(srcs, generatedSrcs))
     }
   }
 
@@ -219,6 +214,7 @@ internal abstract class LocTask : DefaultTask() {
   ) {
     companion object {
       val EMPTY = LocData(emptyMap(), emptyMap())
+      val EMPTY_JSON by lazy { JsonTools.MOSHI.adapter<LocData>().toJson(EMPTY) }
     }
   }
 }
