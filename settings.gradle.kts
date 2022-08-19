@@ -149,7 +149,6 @@ rootProject.name = "slack-gradle-plugin"
 // Please keep these in alphabetical order!
 include(":slack-plugin")
 include(":agp-handlers:agp-handler-api")
-include(":agp-handlers:agp-handler-71")
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance
 enableFeaturePreview("GROOVY_COMPILATION_AVOIDANCE")
