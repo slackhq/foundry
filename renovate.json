@@ -18,6 +18,10 @@
         "com.google.guava:guava"
       ],
       "allowedVersions": "!/\\-android$/"
+    },
+    {
+      "matchPackageNames": ["renovatebot/github-action"],
+      "extends": ["schedule:monthly"]
     }
   ]
 }
