@@ -72,3 +72,7 @@ jobs:
         with:
           name: error-report
           path: build-reports.zip
+
+      - name: Publish snapshot (main branch only)
+        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main'
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
