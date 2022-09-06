@@ -52,7 +52,7 @@ public class SlackProperties private constructor(private val project: Project) {
 
   internal val versions: SlackVersions by lazy {
     project.rootProject.getOrCreateExtra("slack-versions") {
-      SlackVersions(project.rootProject.getVersionsCatalog(this))
+      SlackVersions(project.rootProject.getVersionsCatalog())
     }
   }
 
@@ -120,12 +120,12 @@ public class SlackProperties private constructor(private val project: Project) {
   public val versionsJson: File?
     get() = fileProperty("slack.versionsJson")
 
-  /** Toggle for enabling Jetpack Compose in Android subprojects. */
-  public val enableCompose: Boolean
-    get() =
-      booleanProperty(
-        "slack.enableCompose",
-      )
+  /**
+   * An alias name to a libs.versions.toml bundle for common Android Compose dependencies that
+   * should be added to android projects with compose enabled
+   */
+  public val defaultComposeAndroidBundleAlias: String?
+    get() = optionalStringProperty("slack.compose.android.defaultBundleAlias")
 
   /**
    * When this property is present, the "internalRelease" build variant will have an application id
@@ -365,10 +365,6 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Specific toggle for validating the presence of `.kt` files in Kotlin projects. */
   public val strictValidateKtFilePresence: Boolean
     get() = booleanProperty("slack.strict.validateKtFiles", defaultValue = true)
-
-  /** Specified the name of the versions catalog to use for bom management. */
-  public val versionCatalogName: String
-    get() = stringProperty("slack.catalog", defaultValue = "libs")
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")

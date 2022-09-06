@@ -18,7 +18,6 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTestBuilder
@@ -47,6 +46,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
+import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -101,7 +101,10 @@ private fun Logger.logWithTag(message: String) {
  * - Use debug logging.
  */
 @Suppress("TooManyFunctions")
-internal class StandardProjectConfigurations {
+internal class StandardProjectConfigurations(
+  private val globalProperties: SlackProperties,
+  private val versionCatalog: VersionCatalog,
+) {
 
   private val kotlinCompilerArgs =
     mutableListOf<String>()
@@ -153,9 +156,7 @@ internal class StandardProjectConfigurations {
               noApi.set(isNoApi)
               identifierMap.set(
                 project.provider {
-                  project.getVersionsCatalog(slackProperties).identifierMap().mapValues { (_, v) ->
-                    "libs.$v"
-                  }
+                  project.getVersionsCatalog().identifierMap().mapValues { (_, v) -> "libs.$v" }
                 }
               )
             }
@@ -164,7 +165,8 @@ internal class StandardProjectConfigurations {
       }
     }
 
-    val slackExtension = extensions.create<SlackExtension>("slack")
+    val slackExtension =
+      extensions.create<SlackExtension>("slack", globalProperties, slackProperties, versionCatalog)
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
     val jdkVersion = jdkVersion()
@@ -183,9 +185,15 @@ internal class StandardProjectConfigurations {
     // TODO always configure compileOptions here
     configureAndroidProjects(globalConfig, slackExtension, jvmTargetVersion, slackProperties)
 
-    configureKotlinProjects(globalConfig, jdkVersion, jvmTargetVersion, slackProperties)
+    configureKotlinProjects(
+      globalConfig,
+      jdkVersion,
+      jvmTargetVersion,
+      slackProperties,
+      slackExtension
+    )
     configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
-    slackExtension.configureFeatures(this, slackProperties)
+    slackExtension.applyTo(this)
 
     // TODO would be nice if we could apply this _only_ if compile-testing is on the test classpath
     tasks.withType<Test>().configureEach {
@@ -494,17 +502,6 @@ internal class StandardProjectConfigurations {
       }
     }
 
-    val composeCompilerVersion by lazy {
-      slackProperties.versions.composeCompiler
-        ?: error("Missing `compose-compiler` version in catalog")
-    }
-
-    pluginManager.withPlugin("com.android.base") {
-      if (slackProperties.enableCompose) {
-        dependencies.add("implementation", SlackDependencies.Androidx.Compose.runtime)
-      }
-    }
-
     pluginManager.withPlugin("com.android.application") {
       // Add slack-lint as lint checks source
       slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
@@ -524,10 +521,8 @@ internal class StandardProjectConfigurations {
         }
       }
       configure<BaseAppModuleExtension> {
+        slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
         commonBaseExtensionConfig()
-        if (slackProperties.enableCompose) {
-          configureCompose(project, isApp = true, composeCompilerVersion = composeCompilerVersion)
-        }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.targetSdk
@@ -633,7 +628,7 @@ internal class StandardProjectConfigurations {
         }
       }
 
-      slackExtension.androidHandler.configureFeatures(project, slackProperties)
+      slackExtension.androidHandler.applyTo(project)
     }
 
     pluginManager.withPlugin("com.android.library") {
@@ -702,10 +697,8 @@ internal class StandardProjectConfigurations {
         }
       }
       configure<LibraryExtension> {
+        slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
         commonBaseExtensionConfig()
-        if (slackProperties.enableCompose) {
-          configureCompose(project, isApp = false, composeCompilerVersion = composeCompilerVersion)
-        }
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -729,19 +722,7 @@ internal class StandardProjectConfigurations {
         // We don't set targetSdkVersion in libraries since this is controlled by the app.
       }
 
-      slackExtension.androidHandler.configureFeatures(project, slackProperties)
-    }
-  }
-
-  private fun configureCompose(project: Project, isApp: Boolean, composeCompilerVersion: String) {
-    val commonExtensionConfig: CommonExtension<*, *, *, *>.() -> Unit = {
-      buildFeatures { compose = true }
-      composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
-    }
-    if (isApp) {
-      project.configure<BaseAppModuleExtension> { commonExtensionConfig() }
-    } else {
-      project.configure<LibraryExtension> { commonExtensionConfig() }
+      slackExtension.androidHandler.applyTo(project)
     }
   }
 
@@ -750,7 +731,8 @@ internal class StandardProjectConfigurations {
     globalConfig: GlobalConfig,
     jdkVersion: Int?,
     jvmTargetVersion: Int,
-    slackProperties: SlackProperties
+    slackProperties: SlackProperties,
+    slackExtension: SlackExtension
   ) {
     val actualJvmTarget =
       if (jvmTargetVersion == 8) {
@@ -798,7 +780,12 @@ internal class StandardProjectConfigurations {
           freeCompilerArgs += kotlinCompilerArgs
           useK2 = slackProperties.useK2
 
-          if (slackProperties.enableCompose && isAndroid) {
+          if (
+            slackExtension.androidHandler.featuresHandler.composeHandler.enabled.get() && isAndroid
+          ) {
+            logger.debug(
+              "Configuring compose compiler args in ${project.path}:${this@configureEach.name}"
+            )
             freeCompilerArgs += "-Xskip-prerelease-check"
             // Flag to disable Compose's kotlin version check because they're often behind
             freeCompilerArgs +=

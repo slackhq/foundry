@@ -15,7 +15,6 @@
  */
 package slack.gradle.dependencies
 
-import slack.gradle.SlackProperties
 import slack.gradle.dependencies.SlackDependencies.artifact
 
 /**
@@ -78,16 +77,7 @@ import slack.gradle.dependencies.SlackDependencies.artifact
 @Suppress("MemberNameEqualsClassName") // Detekt is being silly here
 internal object SlackDependencies : DependencySet() {
 
-  val clikt: Any by artifact("com.github.ajalt.clikt")
   internal val javaxInject: Any by artifact("javax.inject", "javax.inject")
-  object Androidx : DependencySet() {
-    /** NOTE: You must enable the [SlackProperties.enableCompose] property to use these. */
-    object Compose : DependencyGroup("androidx.compose", "compose") {
-      val compiler: Any by
-        artifact(groupOverride = "androidx.compose.compiler", gradleProperty = "compose-compiler")
-      val runtime: Any by artifact(groupOverride = "androidx.compose.runtime")
-    }
-  }
 
   object Anvil : DependencyGroup("com.squareup.anvil", "anvil") {
     internal val annotations by artifact()
