@@ -679,6 +679,7 @@ constructor(
         "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
       }
     enabled.set(true)
+    enabled.disallowChanges()
     extension.apply {
       buildFeatures { compose = true }
       composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
