@@ -295,7 +295,7 @@ internal inline fun <reified T : Task> Project.namedLazy(
 
   var didRun = false
 
-  tasks.withType<T>().configureEach {
+  tasks.withType<T> {
     if (name == targetName) {
       action(tasks.named<T>(name))
       didRun = true
@@ -304,9 +304,7 @@ internal inline fun <reified T : Task> Project.namedLazy(
 
   afterEvaluate {
     if (!didRun) {
-      throw GradleException(
-        "Didn't find task '$targetName' with type '${T::class}' in project '${project.path}'."
-      )
+      throw GradleException("Didn't find task $name with type ${T::class}.")
     }
   }
 }
