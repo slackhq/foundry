@@ -17,12 +17,14 @@
 
 package slack.gradle
 
+import com.android.build.api.dsl.CommonExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.apply
@@ -38,9 +40,16 @@ import slack.gradle.dependencies.SlackDependencies
 @DslMarker public annotation class SlackExtensionMarker
 
 @SlackExtensionMarker
-public abstract class SlackExtension @Inject constructor(objects: ObjectFactory) {
-
-  internal val androidHandler = objects.newInstance<AndroidHandler>()
+public abstract class SlackExtension
+@Inject
+constructor(
+  objects: ObjectFactory,
+  globalSlackProperties: SlackProperties,
+  private val slackProperties: SlackProperties,
+  versionCatalog: VersionCatalog
+) {
+  internal val androidHandler =
+    objects.newInstance<AndroidHandler>(globalSlackProperties, slackProperties, versionCatalog)
   internal val featuresHandler = objects.newInstance<FeaturesHandler>()
 
   public fun android(action: Action<AndroidHandler>) {
@@ -51,7 +60,7 @@ public abstract class SlackExtension @Inject constructor(objects: ObjectFactory)
     action.execute(featuresHandler)
   }
 
-  internal fun configureFeatures(project: Project, slackProperties: SlackProperties) {
+  internal fun applyTo(project: Project) {
     val logVerbose = slackProperties.slackExtensionVerbose
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
@@ -636,12 +645,73 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
 
 @SlackExtensionMarker
 @Suppress("UnnecessaryAbstractClass")
-public abstract class AndroidHandler @Inject constructor(objects: ObjectFactory) {
+public abstract class ComposeHandler
+@Inject
+constructor(
+  objects: ObjectFactory,
+  globalSlackProperties: SlackProperties,
+  slackProperties: SlackProperties,
+  versionCatalog: VersionCatalog
+) {
+
+  private val composeBundleAlias =
+    globalSlackProperties.defaultComposeAndroidBundleAlias?.let { alias ->
+      versionCatalog.findBundle(alias).orElse(null)
+    }
+  private val composeCompilerVersion by lazy {
+    slackProperties.versions.composeCompiler
+      ?: error("Missing `compose-compiler` version in catalog")
+  }
+  internal val enabled = objects.property<Boolean>().convention(false)
+
+  /**
+   * This is weird! Due to the non-property nature of the AGP buildFeatures and composeOptions DSLs,
+   * we can't lazily chain their values to our own extension's properties. Because of this, we
+   * lazily set this instance from [StandardProjectConfigurations] during Android extension
+   * evaluation and then make calls to [enable] directly set the values on this instance. Ideally we
+   * could eventually remove this if/when AGP finally makes these properties lazy.
+   */
+  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+
+  internal fun enable() {
+    val extension =
+      checkNotNull(androidExtension) {
+        "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
+      }
+    enabled.set(true)
+    extension.apply {
+      buildFeatures { compose = true }
+      composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+    }
+  }
+
+  internal fun applyTo(project: Project) {
+    if (enabled.getOrElse(false)) {
+      composeBundleAlias?.let { project.dependencies.add("implementation", it) }
+    }
+  }
+}
+
+@SlackExtensionMarker
+@Suppress("UnnecessaryAbstractClass")
+public abstract class AndroidHandler
+@Inject
+constructor(
+  objects: ObjectFactory,
+  globalSlackProperties: SlackProperties,
+  private val slackProperties: SlackProperties,
+  versionCatalog: VersionCatalog
+) {
   internal val libraryHandler = objects.newInstance<SlackAndroidLibraryExtension>()
   internal val appHandler = objects.newInstance<SlackAndroidAppExtension>()
 
   @Suppress("MemberVisibilityCanBePrivate")
-  internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
+  internal val featuresHandler =
+    objects.newInstance<AndroidFeaturesHandler>(
+      globalSlackProperties,
+      slackProperties,
+      versionCatalog
+    )
 
   public fun features(action: Action<AndroidFeaturesHandler>) {
     action.execute(featuresHandler)
@@ -655,7 +725,7 @@ public abstract class AndroidHandler @Inject constructor(objects: ObjectFactory)
     action.execute(appHandler)
   }
 
-  internal fun configureFeatures(project: Project, slackProperties: SlackProperties) {
+  internal fun applyTo(project: Project) {
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       if (featuresHandler.robolectric.getOrElse(false)) {
@@ -668,15 +738,28 @@ public abstract class AndroidHandler @Inject constructor(objects: ObjectFactory)
           add("testImplementation", slackProperties.robolectricCoreProject)
         }
       }
+
+      featuresHandler.composeHandler.applyTo(project)
     }
   }
 }
 
 @SlackExtensionMarker
-public abstract class AndroidFeaturesHandler {
+public abstract class AndroidFeaturesHandler
+@Inject
+constructor(
+  objects: ObjectFactory,
+  globalSlackProperties: SlackProperties,
+  slackProperties: SlackProperties,
+  versionCatalog: VersionCatalog
+) {
   internal abstract val androidTest: Property<Boolean>
   internal abstract val androidTestExcludeFromFladle: Property<Boolean>
   internal abstract val robolectric: Property<Boolean>
+
+  // Compose features
+  internal val composeHandler =
+    objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
   /**
    * Enables android instrumentation tests for this project.
@@ -692,6 +775,21 @@ public abstract class AndroidFeaturesHandler {
   // In the future, we may want to add an enum for picking which shadows/artifacts
   public fun robolectric() {
     robolectric.set(true)
+  }
+
+  /**
+   * Enables Compose for this project and applies any version catalog bundle dependencies defined by
+   * [SlackProperties.defaultComposeAndroidBundleAlias].
+   */
+  public fun compose() {
+    compose {
+      // No further configuration right now
+    }
+  }
+
+  private fun compose(action: Action<ComposeHandler>) {
+    composeHandler.enable()
+    action.execute(composeHandler)
   }
 }
 
