@@ -530,14 +530,19 @@ internal class StandardProjectConfigurations(
         lint {
           lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
           sarifReport = true
-        }
-        lint {
           // This check is _never_ up to date and makes network requests!
           disable += "NewerVersionAvailable"
           // These store qualified gradle caches in their paths and always change in baselines
           disable += "ObsoleteLintCustomCheck"
           // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
           error += "ImplicitSamInstance"
+
+          if (sdkVersions.minSdk >= 28) {
+            // Lint doesn't understand AppComponentFactory
+            // https://issuetracker.google.com/issues/243267012
+            disable += "Instantiatable"
+          }
+
           ignoreWarnings = lintErrorsOnly
           checkDependencies = true
           absolutePaths = false
