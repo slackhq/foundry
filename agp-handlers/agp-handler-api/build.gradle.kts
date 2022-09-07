@@ -1,9 +1,6 @@
 plugins {
   kotlin("jvm")
-}
-
-if (hasProperty("SlackRepositoryUrl")) {
-  apply(plugin = "com.vanniktech.maven.publish")
+  alias(libs.plugins.mavenPublish)
 }
 
 dependencies {

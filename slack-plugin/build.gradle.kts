@@ -1,10 +1,7 @@
 plugins {
   `kotlin-dsl`
   kotlin("jvm")
-}
-
-if (hasProperty("SlackRepositoryUrl")) {
-  apply(plugin = "com.vanniktech.maven.publish")
+  alias(libs.plugins.mavenPublish)
 }
 
 gradlePlugin {
