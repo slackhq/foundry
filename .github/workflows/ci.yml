@@ -74,5 +74,5 @@ jobs:
           path: build-reports.zip
 
       - name: Publish snapshot (main branch only)
-        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main'
+        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main' && matrix.ci_agp_version == '7.2.0' && matrix.ci_kotlin_version == '1.7.0' && matrix.ci_java_version == '17'
         run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
