@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import com.diffplug.gradle.spotless.SpotlessExtension
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.util.internal.VersionNumber
@@ -219,17 +220,8 @@ subprojects {
       }
     }
 
-    // Add our maven repository repo
-    configure<PublishingExtension> {
-      val url = providers.gradleProperty("SlackRepositoryUrl")
-        .get()
-      repositories {
-        maven {
-          name = "SlackRepository"
-          setUrl(url)
-          credentials(PasswordCredentials::class.java)
-        }
-      }
+    configure<MavenPublishBaseExtension> {
+      publishToMavenCentral()
     }
   }
 }
