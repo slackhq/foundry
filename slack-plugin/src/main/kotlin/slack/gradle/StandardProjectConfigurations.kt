@@ -798,7 +798,7 @@ internal class StandardProjectConfigurations(
             // It's basically just very noisy.
             val composeCompilerKotlinVersion =
               slackProperties.versions.composeCompilerKotlinVersion
-                ?: error("missing 'compose-compiler-kotlin-version' version in version catalog")
+                ?: error("Missing 'composeCompilerKotlinVersion' version in version catalog")
             val kotlinVersion = slackProperties.versions.kotlin
             if (kotlinVersion != composeCompilerKotlinVersion) {
               freeCompilerArgs +=
