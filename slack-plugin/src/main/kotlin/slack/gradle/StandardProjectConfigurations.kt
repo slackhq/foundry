@@ -793,11 +793,20 @@ internal class StandardProjectConfigurations(
             )
             freeCompilerArgs += "-Xskip-prerelease-check"
             // Flag to disable Compose's kotlin version check because they're often behind
-            freeCompilerArgs +=
-              listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-              )
+            // Or ahead
+            // Or if they're the same, do nothing
+            // It's basically just very noisy.
+            val composeCompilerKotlinVersion =
+              slackProperties.versions.composeCompilerKotlinVersion
+                ?: error("missing 'compose-compiler-kotlin-version' version in version catalog")
+            val kotlinVersion = slackProperties.versions.kotlin
+            if (kotlinVersion != composeCompilerKotlinVersion) {
+              freeCompilerArgs +=
+                listOf(
+                  "-P",
+                  "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
+                )
+            }
           }
 
           // Potentially useful for static analysis or annotation processors
