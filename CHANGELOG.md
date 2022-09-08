@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.1.1
+-----
+
+_2022-09-08_
+
+- Fix wrong `slack.unit-test` plugin application.
+
 0.1.0
 -----
 
