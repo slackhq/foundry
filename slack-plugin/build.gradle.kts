@@ -6,19 +6,19 @@ plugins {
 
 gradlePlugin {
   plugins.create("unitTest") {
-    id = "slack.unit-test"
+    id = "com.slack.gradle.unit-test"
     implementationClass = "slack.unittest.UnitTestPlugin"
   }
   plugins.create("slack-root") {
-    id = "slack.root"
+    id = "com.slack.gradle.root"
     implementationClass = "slack.gradle.SlackRootPlugin"
   }
   plugins.create("slack-base") {
-    id = "slack.base"
+    id = "com.slack.gradle.base"
     implementationClass = "slack.gradle.SlackBasePlugin"
   }
   plugins.create("apkVersioning") {
-    id = "slack.apk-versioning"
+    id = "com.slack.gradle.apk-versioning"
     implementationClass = "slack.gradle.ApkVersioningPlugin"
   }
 }
