@@ -267,7 +267,7 @@ internal class SlackBasePlugin : Plugin<Project> {
   private fun Project.configureTests(slackProperties: SlackProperties) {
     val maxParallel = max(Runtime.getRuntime().availableProcessors() / 2, 1)
     // Create "ciUnitTest" tasks in all subprojects
-    apply(plugin = "slack.unit-test")
+    apply(plugin = "com.slack.gradle.unit-test")
 
     // Unit test task configuration
     tasks.withType<Test>().configureEach {
