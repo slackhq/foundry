@@ -139,8 +139,6 @@ internal object SlackDependencies : DependencySet() {
   }
 
   internal object Dagger : DependencyGroup("com.google.dagger") {
-    val android: Any by artifact("dagger-android")
-    val androidProcessor: Any by artifact("dagger-android-processor")
     val compiler: Any by artifact("dagger-compiler")
     val dagger: Any by artifact()
   }

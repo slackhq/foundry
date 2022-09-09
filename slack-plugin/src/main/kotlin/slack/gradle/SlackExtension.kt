@@ -194,18 +194,6 @@ constructor(
           markKaptNeeded("Dagger compiler")
           dependencies.add(aptConfiguration(), SlackDependencies.Dagger.compiler)
         }
-
-        if (featuresHandler.daggerHandler.android.enabled.get()) {
-          if (!isAndroid) {
-            error("Dagger android can only be enabled on android projects!")
-          } else {
-            dependencies.add("implementation", SlackDependencies.Dagger.android)
-            if (!daggerConfig.runtimeOnly && daggerConfig.contributesAndroidInjector) {
-              markKaptNeeded("Dagger Android Processor")
-              dependencies.add(aptConfiguration(), SlackDependencies.Dagger.androidProcessor)
-            }
-          }
-        }
       }
 
       if (featuresHandler.autoValue.getOrElse(false)) {
@@ -389,22 +377,6 @@ public abstract class FeaturesHandler @Inject constructor(objects: ObjectFactory
   }
 
   /**
-   * Adds dagger's runtime as dependencies to this but runs no code generation.
-   *
-   * @param includeDaggerAndroidRuntime includes the dagger-android runtime too. Be wary that this
-   * ```
-   *                                    is deprecated!
-   * ```
-   */
-  @DelicateSlackPluginApi
-  public fun daggerRuntimeOnly(includeDaggerAndroidRuntime: Boolean = false) {
-    daggerRuntimeOnly()
-    if (includeDaggerAndroidRuntime) {
-      daggerHandler.android.runtimeOnly.set(true)
-    }
-  }
-
-  /**
    * Enables AutoValue for this project.
    *
    * @param moshi Enables auto-value-moshi
@@ -549,7 +521,6 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
   internal val alwaysEnableAnvilComponentMerging: Property<Boolean> =
     objects.property<Boolean>().convention(false)
   internal val anvilGenerators = objects.domainObjectSet(Any::class)
-  internal val android = objects.newInstance(DaggerAndroidHandler::class)
 
   /**
    * Dependencies for Anvil generators that should be added. These should be in the same form as
@@ -579,31 +550,13 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     alwaysEnableAnvilComponentMerging.set(true)
   }
 
-  @Deprecated("dagger-android is deprecated, please use Anvil!")
-  public fun android(runtimeOnly: Boolean = false) {
-    android.enabled.set(runtimeOnly)
-    android.runtimeOnly.set(runtimeOnly)
-  }
-
-  @Deprecated("dagger-android is deprecated, please use Anvil!")
-  public fun android(
-    runtimeOnly: Boolean = false,
-    enableContributesAndroidInjector: Boolean = false
-  ) {
-    android.enabled.set(runtimeOnly || enableContributesAndroidInjector)
-    android.enableContributesAndroidInjector.set(enableContributesAndroidInjector)
-  }
-
   internal fun computeConfig(): DaggerConfig? {
     if (!enabled.get()) return null
-    val androidRuntimeOnly = android.runtimeOnly.get()
     val runtimeOnly = runtimeOnly.get()
     val enableAnvil = !runtimeOnly
     var anvilFactories = true
     var anvilFactoriesOnly = false
-    val contributesAndroidInjector = android.enableContributesAndroidInjector.getOrElse(false)
-    // ContributesAndroidInjector results in subcomponents, so we need regular component gen too
-    val useDaggerCompiler = contributesAndroidInjector || useDaggerCompiler.get()
+    val useDaggerCompiler = useDaggerCompiler.get()
     val alwaysEnableAnvilComponentMerging = !runtimeOnly && alwaysEnableAnvilComponentMerging.get()
 
     if (useDaggerCompiler) {
@@ -612,35 +565,23 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     }
 
     return DaggerConfig(
-      androidRuntimeOnly,
       runtimeOnly,
       enableAnvil,
       anvilFactories,
       anvilFactoriesOnly,
       useDaggerCompiler,
-      contributesAndroidInjector,
       alwaysEnableAnvilComponentMerging
     )
   }
 
   internal data class DaggerConfig(
-    val androidRuntimeOnly: Boolean,
     val runtimeOnly: Boolean,
     val enableAnvil: Boolean,
     var anvilFactories: Boolean,
     var anvilFactoriesOnly: Boolean,
     val useDaggerCompiler: Boolean,
-    val contributesAndroidInjector: Boolean,
     val alwaysEnableAnvilComponentMerging: Boolean
   )
-
-  @SlackExtensionMarker
-  public abstract class DaggerAndroidHandler @Inject constructor(objects: ObjectFactory) {
-    internal val enabled: Property<Boolean> = objects.property<Boolean>().convention(false)
-    internal val runtimeOnly: Property<Boolean> = objects.property<Boolean>().convention(false)
-    internal val enableContributesAndroidInjector: Property<Boolean> =
-      objects.property<Boolean>().convention(false)
-  }
 }
 
 @SlackExtensionMarker

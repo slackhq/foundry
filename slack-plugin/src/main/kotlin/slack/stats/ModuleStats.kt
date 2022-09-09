@@ -245,9 +245,6 @@ public object ModuleStatsTasks {
             if (daggerConfig.useDaggerCompiler) {
               tags.add(ModuleStatsCollectorTask.TAG_DAGGER_COMPILER)
             }
-            if (daggerConfig.contributesAndroidInjector) {
-              tags.add(ModuleStatsCollectorTask.TAG_DAGGER_ANDROID)
-            }
           }
         }
       }
@@ -344,7 +341,6 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
     const val TAG_KAPT = "kapt"
     const val TAG_KOTLIN = "kotlin"
     const val TAG_DAGGER_COMPILER = "dagger-compiler"
-    const val TAG_DAGGER_ANDROID = "dagger-android"
     const val TAG_VIEW_BINDING = "viewbinding"
     const val TAG_ANDROID = "android"
     const val TAG_WIRE = "wire"
@@ -500,16 +496,12 @@ public data class Weights(
     val resourcesHavePublicXml = true // TODO
     val androidVariants = ModuleStatsCollectorTask.TAG_VARIANTS in tags
     val daggerCompiler = ModuleStatsCollectorTask.TAG_DAGGER_COMPILER in tags
-    val daggerAndroid = ModuleStatsCollectorTask.TAG_DAGGER_ANDROID in tags
 
     // Kapt slows down projects. We want KSP/Anvil longer term, for now we just add a fixed hit.
     if (kapt) {
       // Dagger is a necessary evil on build times
       if (daggerCompiler) {
         score += 5
-        if (daggerAndroid) {
-          score += 5
-        }
       } else {
         // Non-dagger stuff gets an extra bite because it's likely autovalue
         score += 10
