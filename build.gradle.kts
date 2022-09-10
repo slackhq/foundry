@@ -221,7 +221,8 @@ subprojects {
     }
 
     configure<MavenPublishBaseExtension> {
-      publishToMavenCentral()
+      publishToMavenCentral(automaticRelease = true)
+      signAllPublications()
     }
   }
 }
