@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.1.2
+-----
+
+_2022-09-20_
+
+- Support Robolectric jars for Android API 30.
+
 0.1.1
 -----
 
