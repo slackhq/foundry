@@ -59,6 +59,8 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
   @get:Internal
   internal val allSdks by lazy {
     val iVersion = instrumentedVersion.get()
+    // Sourced from
+    // https://github.com/robolectric/robolectric/blob/master/robolectric/src/main/java/org/robolectric/plugins/DefaultSdkProvider.java
     listOf(
         DefaultSdk(21, "5.0.2_r3", "r0", "REL", 8, iVersion),
         DefaultSdk(22, "5.1.1_r9", "r2", "REL", 8, iVersion),
@@ -72,6 +74,7 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
         DefaultSdk(30, "11", "6757853", "REL", 9, iVersion),
         DefaultSdk(31, "12", "7732740", "REL", 9, iVersion),
         DefaultSdk(32, "12.1", "8229987", "REL", 9, iVersion),
+        DefaultSdk(33, "13", "9030017", "Tiramisu", 9, iVersion),
       )
       .associateBy { it.apiLevel }
   }
