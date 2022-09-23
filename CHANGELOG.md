@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.2.0
+-----
+
+_2022-09-23_
+
+- Add option to enable only certain variants' android tests.
+
+```kotlin
+slack {
+  android {
+    features {
+      androidTest(allowedVariants = setOf("internalDebug"))
+    }
+  }
+}
+```
+
 0.1.2
 -----
 
