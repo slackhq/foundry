@@ -27,6 +27,7 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
@@ -697,6 +698,7 @@ constructor(
 ) {
   internal abstract val androidTest: Property<Boolean>
   internal abstract val androidTestExcludeFromFladle: Property<Boolean>
+  internal abstract val androidTestAllowedVariants: SetProperty<String>
   internal abstract val robolectric: Property<Boolean>
 
   // Compose features
@@ -707,10 +709,18 @@ constructor(
    * Enables android instrumentation tests for this project.
    *
    * @param excludeFromFladle If true, the test will be excluded from Flank/Fladle tests.
+   * @param allowedVariants If set, the allowed variants to enable android tests for.
    */
-  public fun androidTest(excludeFromFladle: Boolean = false) {
+  public fun androidTest(
+    excludeFromFladle: Boolean = false,
+    allowedVariants: List<String>? = null
+  ) {
     androidTest.set(true)
     androidTestExcludeFromFladle.set(excludeFromFladle)
+    androidTestAllowedVariants.set(allowedVariants)
+    androidTest.disallowChanges()
+    androidTestExcludeFromFladle.disallowChanges()
+    androidTestAllowedVariants.disallowChanges()
   }
 
   /** Enables robolectric for this project. */

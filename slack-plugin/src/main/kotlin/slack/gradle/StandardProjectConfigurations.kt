@@ -408,8 +408,7 @@ internal class StandardProjectConfigurations(
               builder.enable = false
               builder.enableUnitTest = false
               if (builder is HasAndroidTestBuilder) {
-                builder.enableAndroidTest =
-                  slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+                builder.enableAndroidTest = false
               }
             }
           }
@@ -658,8 +657,14 @@ internal class StandardProjectConfigurations(
 
         // Disable androidTest tasks in libraries unless they opt-in
         beforeVariants { builder ->
-          builder.enableAndroidTest =
+          val androidTestEnabled =
             slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+          val variantEnabled =
+            androidTestEnabled &&
+              (slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                ?.contains(builder.flavorName)
+                ?: true)
+          builder.enableAndroidTest = variantEnabled
         }
 
         // Contribute these libraries to Fladle if they opt into it
