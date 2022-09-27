@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2.1
+-----
+
+_2022-09-27_
+
+- **Fix:** New `androidTest(allowedVariants = ...)` wasn't running on `com.android.application` projects.
+- **Fix:** Configure `Lint` DSL block for `com.android.library` and `org.jetbrains.kotlin.jvm` projects too.
+
 0.2.0
 -----
 
