@@ -711,10 +711,7 @@ constructor(
    * @param excludeFromFladle If true, the test will be excluded from Flank/Fladle tests.
    * @param allowedVariants If set, the allowed variants to enable android tests for.
    */
-  public fun androidTest(
-    excludeFromFladle: Boolean = false,
-    allowedVariants: Set<String>? = null
-  ) {
+  public fun androidTest(excludeFromFladle: Boolean = false, allowedVariants: Set<String>? = null) {
     androidTest.set(true)
     androidTestExcludeFromFladle.set(excludeFromFladle)
     androidTestAllowedVariants.set(allowedVariants)
