@@ -18,6 +18,7 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.Lint
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTestBuilder
@@ -389,7 +390,6 @@ internal class StandardProjectConfigurations(
     slackProperties: SlackProperties
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
-    val lintErrorsOnly = slackProperties.lintErrorsOnly
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -418,8 +418,8 @@ internal class StandardProjectConfigurations(
         }
       }
 
-    val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
     val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
+    val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
     val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
       if (shouldApplyCacheFixPlugin) {
         apply(plugin = "org.gradle.android.cache-fix")
@@ -536,33 +536,8 @@ internal class StandardProjectConfigurations(
           targetSdk = sdkVersions.targetSdk
         }
         lint {
-          lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
-          sarifReport = true
-          // This check is _never_ up to date and makes network requests!
-          disable += "NewerVersionAvailable"
-          // These store qualified gradle caches in their paths and always change in baselines
-          disable += "ObsoleteLintCustomCheck"
-          // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
-          error += "ImplicitSamInstance"
-
-          if (sdkVersions.minSdk >= 28) {
-            // Lint doesn't understand AppComponentFactory
-            // https://issuetracker.google.com/issues/243267012
-            disable += "Instantiatable"
-          }
-
-          ignoreWarnings = lintErrorsOnly
+          configureLint(project, slackProperties, sdkVersions, true)
           checkDependencies = true
-          absolutePaths = false
-
-          // Lint is weird in that it will generate a new baseline file and fail the build if a new
-          // one was generated, even if empty.
-          // If we're updating baselines, always take the baseline so that we populate it if absent.
-          project.layout.projectDirectory
-            .file("config/lint/baseline.xml")
-            .asFile
-            .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
-            ?.let { baseline = it }
         }
         packagingOptions {
           resources.excludes +=
@@ -718,6 +693,7 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
         commonBaseExtensionConfig()
+        lint { configureLint(project, slackProperties, sdkVersions, false) }
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -879,6 +855,7 @@ internal class StandardProjectConfigurations(
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
       // Enable linting on pure JVM projects
       apply(plugin = "com.android.lint")
+      configure<Lint> { configureLint(project, slackProperties, null, false) }
       // Add slack-lint as lint checks source
       slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
     }
@@ -1024,6 +1001,43 @@ internal class StandardProjectConfigurations(
       return isKnownConfiguration(name, Configurations.Groups.PLATFORM)
     }
   }
+}
+
+private fun Lint.configureLint(
+  project: Project,
+  slackProperties: SlackProperties,
+  androidSdkVersions: SlackProperties.AndroidSdkProperties?,
+  checkDependencies: Boolean,
+) {
+  lintConfig = project.rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
+  sarifReport = true
+  // This check is _never_ up to date and makes network requests!
+  disable += "NewerVersionAvailable"
+  // These store qualified gradle caches in their paths and always change in baselines
+  disable += "ObsoleteLintCustomCheck"
+  // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
+  error += "ImplicitSamInstance"
+
+  androidSdkVersions?.let { sdkVersions ->
+    if (sdkVersions.minSdk >= 28) {
+      // Lint doesn't understand AppComponentFactory
+      // https://issuetracker.google.com/issues/243267012
+      disable += "Instantiatable"
+    }
+  }
+
+  ignoreWarnings = slackProperties.lintErrorsOnly
+  absolutePaths = false
+  this.checkDependencies = checkDependencies
+
+  // Lint is weird in that it will generate a new baseline file and fail the build if a new
+  // one was generated, even if empty.
+  // If we're updating baselines, always take the baseline so that we populate it if absent.
+  project.layout.projectDirectory
+    .file("config/lint/baseline.xml")
+    .asFile
+    .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
+    ?.let { baseline = it }
 }
 
 internal interface KotlinArgConfig {
