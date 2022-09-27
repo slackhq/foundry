@@ -713,7 +713,7 @@ constructor(
    */
   public fun androidTest(
     excludeFromFladle: Boolean = false,
-    allowedVariants: Set<String>? = null
+    allowedVariants: Iterable<String>? = null
   ) {
     androidTest.set(true)
     androidTestExcludeFromFladle.set(excludeFromFladle)
