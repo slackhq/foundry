@@ -516,6 +516,15 @@ internal class StandardProjectConfigurations(
             if (builder.buildType == "release") {
               builder.enableUnitTest = false
             }
+            // Disable androidTest tasks in libraries unless they opt-in
+            val androidTestEnabled =
+              slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+            val variantEnabled =
+              androidTestEnabled &&
+                builder.name in
+                  slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                    .orEmpty()
+            builder.enableAndroidTest = variantEnabled
           }
         }
       }
@@ -636,9 +645,9 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           val variantEnabled =
             androidTestEnabled &&
-              (slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.flavorName)
-                ?: true)
+              builder.name in
+                slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                  .orEmpty()
           builder.enableAndroidTest = variantEnabled
         }
 
