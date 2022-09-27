@@ -527,7 +527,7 @@ internal class StandardProjectConfigurations(
           targetSdk = sdkVersions.targetSdk
         }
         lint {
-          configureLint(project, slackProperties, sdkVersions, checkDependencies)
+          configureLint(project, slackProperties, sdkVersions, true)
           checkDependencies = true
         }
         packagingOptions {
@@ -684,7 +684,7 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
         commonBaseExtensionConfig()
-        lint { configureLint(project, slackProperties, sdkVersions, checkDependencies) }
+        lint { configureLint(project, slackProperties, sdkVersions, false) }
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -846,7 +846,7 @@ internal class StandardProjectConfigurations(
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
       // Enable linting on pure JVM projects
       apply(plugin = "com.android.lint")
-      configure<Lint> { configureLint(project, slackProperties, null, checkDependencies) }
+      configure<Lint> { configureLint(project, slackProperties, null, false) }
       // Add slack-lint as lint checks source
       slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
     }
@@ -1019,6 +1019,7 @@ private fun Lint.configureLint(
 
   ignoreWarnings = slackProperties.lintErrorsOnly
   absolutePaths = false
+  this.checkDependencies = checkDependencies
 
   // Lint is weird in that it will generate a new baseline file and fail the build if a new
   // one was generated, even if empty.
