@@ -317,7 +317,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     public const val VERSION: Int = 2
 
     internal fun isBootstrapEnabled(project: Project): Boolean {
-      return project.gradle.startParameter.taskNames.any { it == "bootstrap" }
+      return project.gradle.startParameter.taskNames.any { it == NAME }
     }
 
     internal fun configureSubprojectBootstrapTasks(project: Project) {
@@ -327,7 +327,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       // this, so bootstrap always runs first.
       project.tasks.configureEach {
         val task = this
-        if (name == "bootstrap") return@configureEach
+        if (name == NAME) return@configureEach
         if (name == "clean") return@configureEach
         if (this is BootstrapTask) {
           rootTask.configure { finalizedBy(task) }
