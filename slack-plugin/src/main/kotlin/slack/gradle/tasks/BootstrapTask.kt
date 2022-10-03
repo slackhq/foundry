@@ -308,6 +308,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
   }
 
   public companion object {
+    public const val NAME: String = "bootstrap"
+
     /**
      * Current bootstrap version. Other bootstrap tasks can check against this as a minimum version.
      */
@@ -316,7 +318,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     public fun register(project: Project): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
-        project.tasks.register<CoreBootstrapTask>("bootstrap") {
+        project.tasks.register<CoreBootstrapTask>(NAME) {
           val jdkVersion = project.jdkVersion()
           val service = project.serviceOf<JavaToolchainService>()
           val defaultLauncher =
@@ -360,23 +362,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
               .orElse(APPEND)
           )
         }
-
-      // Clever trick to make this finalized by all bootstrap tasks and all other tasks depend on
-      // this,
-      // so this always runs first.
-      // Safe to use allprojects because we only run this conditionally
-      project.allprojects {
-        tasks.configureEach {
-          val task = this
-          if (name == "bootstrap") return@configureEach
-          if (name == "clean") return@configureEach
-          if (this is BootstrapTask) {
-            bootstrap.configure { finalizedBy(task) }
-          } else {
-            dependsOn(bootstrap)
-          }
-        }
-      }
 
       return bootstrap
     }
