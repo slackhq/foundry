@@ -48,6 +48,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.kotlin.dsl.listProperty
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.support.serviceOf
@@ -308,12 +309,33 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
   }
 
   public companion object {
-    public const val NAME: String = "bootstrap"
+    private const val NAME: String = "bootstrap"
 
     /**
      * Current bootstrap version. Other bootstrap tasks can check against this as a minimum version.
      */
     public const val VERSION: Int = 2
+
+    internal fun isBootstrapEnabled(project: Project): Boolean {
+      return project.gradle.startParameter.taskNames.any { it == "bootstrap" }
+    }
+
+    internal fun configureSubprojectBootstrapTasks(project: Project) {
+      if (!isBootstrapEnabled(project)) return
+      val rootTask = project.rootProject.tasks.named<CoreBootstrapTask>(NAME)
+      // Clever trick to make this finalized by all bootstrap tasks and all other tasks depend on
+      // this, so bootstrap always runs first.
+      project.tasks.configureEach {
+        val task = this
+        if (name == "bootstrap") return@configureEach
+        if (name == "clean") return@configureEach
+        if (this is BootstrapTask) {
+          rootTask.configure { finalizedBy(task) }
+        } else {
+          dependsOn(rootTask)
+        }
+      }
+    }
 
     public fun register(project: Project): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
@@ -323,7 +345,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           val service = project.serviceOf<JavaToolchainService>()
           val defaultLauncher =
             service.launcherFor { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
-          @Suppress("LeakingThis") launcher.convention(defaultLauncher)
+          this.launcher.convention(defaultLauncher)
           this.jdkVersion.set(jdkVersion)
 
           val cacheDirProvider = project.layout.projectDirectory.dir(".cache")
