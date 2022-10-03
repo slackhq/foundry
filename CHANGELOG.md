@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.2.3
+-----
+
+_2022-10-03_
+
+- **Fix:** Only configure bootstrap conditionally.
+
 0.2.2
 -----
 
