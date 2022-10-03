@@ -52,6 +52,7 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.support.serviceOf
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import oshi.SystemInfo
 import slack.cli.AppleSiliconCompat
 import slack.cli.AppleSiliconCompat.isMacOS
@@ -328,7 +329,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       project.tasks.configureEach {
         val task = this
         if (name == NAME) return@configureEach
-        if (name == "clean") return@configureEach
+        if (name == LifecycleBasePlugin.CLEAN_TASK_NAME) return@configureEach
         if (this is BootstrapTask) {
           rootTask.configure { finalizedBy(task) }
         } else {
