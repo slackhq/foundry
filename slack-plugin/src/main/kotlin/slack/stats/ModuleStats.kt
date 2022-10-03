@@ -72,19 +72,9 @@ public object ModuleStatsTasks {
   internal fun configureRoot(rootProject: Project) {
     val includeGenerated = rootProject.includeGenerated()
 
-    val projectAccessorMapping =
-      rootProject.provider {
-        rootProject.subprojects.associate {
-          val regularPath = it.path
-          val projectAccessor = convertProjectPathToAccessor(regularPath)
-          projectAccessor to regularPath
-        }
-      }
-
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
       outputFile.set(rootProject.layout.buildDirectory.file("reports/slack/moduleStats.json"))
       this.includeGenerated.set(includeGenerated)
-      projectPathsToAccessors.set(projectAccessorMapping)
     }
   }
 
@@ -127,7 +117,12 @@ public object ModuleStatsTasks {
           outputFile.set(project.layout.buildDirectory.file("reports/slack/moduleStats.json"))
         }
 
-      project.rootProject.tasks.named<ModuleStatsAggregatorTask>(AGGREGATOR_NAME).configure {
+      val aggregatorTask =
+        project.rootProject.tasks.named<ModuleStatsAggregatorTask>(AGGREGATOR_NAME)
+      val regularPath = project.path
+      val projectAccessor = convertProjectPathToAccessor(regularPath)
+      aggregatorTask.configure {
+        projectPathsToAccessors.put(projectAccessor, regularPath)
         statsFiles.from(task.map { it.outputFile })
       }
       task
