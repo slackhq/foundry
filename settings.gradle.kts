@@ -139,6 +139,8 @@ pluginManagement {
         includeModule("io.gitlab.arturbosch.detekt", "io.gitlab.arturbosch.detekt.gradle.plugin")
         includeModule("org.gradle.kotlin.kotlin-dsl", "org.gradle.kotlin.kotlin-dsl.gradle.plugin")
         includeModule("org.gradle.kotlin", "gradle-kotlin-dsl-plugins")
+        includeModule("com.autonomousapps", "plugin-best-practices-plugin")
+        includeModule("com.autonomousapps.plugin-best-practices-plugin", "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin")
       }
     }
   }
