@@ -29,9 +29,12 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.retry
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import slack.gradle.tasks.BootstrapTask
+import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.util.synchronousEnvProperty
 import slack.stats.ModuleStatsTasks
 
@@ -50,6 +53,7 @@ internal class SlackBasePlugin : Plugin<Project> {
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       StandardProjectConfigurations(slackProperties, versionCatalog).applyTo(target)
       target.configureTests(slackProperties)
+      target.configureBootstrapTasks()
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
@@ -344,6 +348,22 @@ internal class SlackBasePlugin : Plugin<Project> {
             maxRetries.set(1)
           }
         }
+      }
+    }
+  }
+
+  private fun Project.configureBootstrapTasks() {
+    val rootTask = rootProject.tasks.named<CoreBootstrapTask>(CoreBootstrapTask.NAME)
+    // Clever trick to make this finalized by all bootstrap tasks and all other tasks depend on
+    // this, so bootstrap always runs first.
+    tasks.configureEach {
+      val task = this
+      if (name == "bootstrap") return@configureEach
+      if (name == "clean") return@configureEach
+      if (this is BootstrapTask) {
+        rootTask.configure { finalizedBy(task) }
+      } else {
+        dependsOn(rootTask)
       }
     }
   }

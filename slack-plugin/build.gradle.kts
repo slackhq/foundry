@@ -2,6 +2,7 @@ plugins {
   `kotlin-dsl`
   kotlin("jvm")
   alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.bestPracticesPlugin)
 }
 
 gradlePlugin {
