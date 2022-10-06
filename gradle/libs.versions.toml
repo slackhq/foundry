@@ -1,18 +1,18 @@
 [versions]
 agp = "7.3.0"
 anvil = "2.4.2"
-bugsnagGradle = "7.3.0"
+bugsnagGradle = "7.3.1"
 dependencyAnalysisPlugin = "1.13.1"
 detekt = "1.21.0"
 dokka = "1.7.10"
 errorproneGradle = "2.0.2"
 java = "17"
-kotlin = "1.7.10"
+kotlin = "1.7.20"
 ksp = "1.7.10-1.0.6"
 ktfmt = "0.38"
 mavenPublish = "0.22.0"
 moshi = "1.14.0"
-moshix = "0.18.3"
+moshix = "0.19.0"
 nullawayGradle = "1.3.0"
 okhttp = "5.0.0-alpha.10"
 spotless = "6.11.0"
@@ -50,7 +50,7 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
-gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.1.0"
+gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.2.0"
 gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
