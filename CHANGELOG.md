@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.2.3
+-----
+
+_2022-10-03_
+
+- **Fix:** Only configure bootstrap conditionally.
+
+0.2.2
+-----
+
+_2022-10-03_
+
+- Add necessary `--add-opens` to `Test` tasks for Robolectric 4.9+ when it's enabled.
+- Avoid `subprojects` module stats and `allprojects` in bootstrap for better project isolation support.
+
 0.2.1
 -----
 

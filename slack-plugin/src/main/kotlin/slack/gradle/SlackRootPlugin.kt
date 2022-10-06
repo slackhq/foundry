@@ -369,7 +369,7 @@ internal class SlackRootPlugin : Plugin<Project> {
 
 private fun Project.configureSlackRootBuildscript() {
   // Only register bootstrap if explicitly requested for now
-  if (gradle.startParameter.taskNames.any { it == "bootstrap" }) {
+  if (CoreBootstrapTask.isBootstrapEnabled(this)) {
     CoreBootstrapTask.register(this)
   }
 }
