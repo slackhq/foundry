@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.2.4
+-----
+
+_2022-10-06_
+
+* **Fix**: Only check allowed androidTest variants if any are defined.
+
 0.2.3
 -----
 
