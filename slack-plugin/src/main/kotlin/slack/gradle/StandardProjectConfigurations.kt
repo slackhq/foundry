@@ -521,9 +521,9 @@ internal class StandardProjectConfigurations(
               slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
             val variantEnabled =
               androidTestEnabled &&
-                builder.name in
-                  slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                    .orEmpty()
+                slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                  ?.contains(builder.name)
+                  ?: true
             builder.enableAndroidTest = variantEnabled
           }
         }
@@ -645,9 +645,9 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           val variantEnabled =
             androidTestEnabled &&
-              builder.name in
-                slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                  .orEmpty()
+              slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                ?.contains(builder.name)
+                ?: true
           builder.enableAndroidTest = variantEnabled
         }
 
