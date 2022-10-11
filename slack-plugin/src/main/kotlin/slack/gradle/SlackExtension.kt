@@ -634,7 +634,7 @@ constructor(
   internal fun applyTo(project: Project) {
     if (enabled.getOrElse(false)) {
       composeBundleAlias?.let { project.dependencies.add("implementation", it) }
-      project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+      project.pluginManager.withPlugin("org.jetbrains.compose") {
         project.dependencies {
           add(
             PLUGIN_CLASSPATH_CONFIGURATION_NAME,
