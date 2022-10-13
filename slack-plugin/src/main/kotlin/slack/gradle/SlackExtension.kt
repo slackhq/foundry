@@ -37,6 +37,7 @@ import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.dependencies.SlackDependencies
 
@@ -633,6 +634,14 @@ constructor(
   internal fun applyTo(project: Project) {
     if (enabled.getOrElse(false)) {
       composeBundleAlias?.let { project.dependencies.add("implementation", it) }
+      project.pluginManager.withPlugin("org.jetbrains.compose") {
+        project.dependencies {
+          add(
+            PLUGIN_CLASSPATH_CONFIGURATION_NAME,
+            "androidx.compose.compiler:compiler:$composeCompilerVersion"
+          )
+        }
+      }
     }
   }
 }
