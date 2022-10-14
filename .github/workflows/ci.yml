@@ -23,7 +23,7 @@ jobs:
       matrix:
         ci_java_version: ['17']
         ci_kotlin_version: ['1.7.20']
-        ci_agp_version: ['7.3.1', '7.4.0-beta02']
+        ci_agp_version: ['7.3.1', '7.4.0-beta02', '8.0.0-alpha03']
     env:
       DEP_OVERRIDES: 'true'
       DEP_OVERRIDE_KOTLIN: '${{ matrix.ci_kotlin_version }}'

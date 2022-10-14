@@ -80,6 +80,8 @@ dependencies {
 
   compileOnly(libs.agp)
   api(projects.agpHandlers.agpHandlerApi)
+  api(projects.agpHandlers.agpHandler73)
+  api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
 
   implementation(libs.commonsText) {
