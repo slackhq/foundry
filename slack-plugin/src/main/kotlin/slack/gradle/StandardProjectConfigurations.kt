@@ -19,7 +19,10 @@ package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.dsl.Lint
-import com.android.build.api.variant.*
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTestBuilder
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
