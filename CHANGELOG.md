@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.3.0
+-----
+
+_2022-10-14_
+
+* **New**: Support `com.android.test` projects.
+* **New**: Preliminary support for AGP 8.x.
+* Support Error Prone Gradle Plugin 3.x.
+* Update `me.tongfei:progressbar` to `0.9.5`.
+
 0.2.4
 -----
 
