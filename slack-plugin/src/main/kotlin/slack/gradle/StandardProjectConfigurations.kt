@@ -30,7 +30,6 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.google.common.base.CaseFormat
-import com.google.devtools.ksp.gradle.KspExtension
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
 import io.gitlab.arturbosch.detekt.Detekt
@@ -903,13 +902,6 @@ internal class StandardProjectConfigurations(
             enabled = false
           }
         }
-      }
-    }
-
-    pluginManager.withPlugin("com.google.devtools.ksp") {
-      configure<KspExtension> {
-        // Don't run other plugins like Anvil in KSP's task
-        blockOtherCompilerPlugins = true
       }
     }
   }
