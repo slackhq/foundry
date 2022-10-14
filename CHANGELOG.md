@@ -8,6 +8,7 @@ _2022-10-14_
 
 * **New**: Support `com.android.test` projects.
 * **New**: Preliminary support for AGP 8.x.
+* Automatically add compose compiler dep in Compose multiplatform (i.e. `org.jetbrains.compose`) projects.
 * Support Error Prone Gradle Plugin 3.x.
 * Update `me.tongfei:progressbar` to `0.9.5`.
 
