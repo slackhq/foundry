@@ -420,6 +420,7 @@ internal class StandardProjectConfigurations(
 
     val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
+    val agpHandler = slackTools().agpHandler
     val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
       if (shouldApplyCacheFixPlugin) {
         apply(plugin = "org.gradle.android.cache-fix")
@@ -468,21 +469,19 @@ internal class StandardProjectConfigurations(
         unitTests.isIncludeAndroidResources = true
 
         // Configure individual Tests tasks.
-        unitTests.all(
-          typedClosureOf {
-            //
-            // Note that we can't configure this to _just_ be enabled for robolectric projects
-            // based on dependencies unfortunately, as the task graph is already wired by the time
-            // dependencies start getting resolved.
-            //
-            logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-            dependsOn(globalConfig.updateRobolectricJarsTask)
+        agpHandler.allUnitTestOptions(unitTests) { test ->
+          //
+          // Note that we can't configure this to _just_ be enabled for robolectric projects
+          // based on dependencies unfortunately, as the task graph is already wired by the time
+          // dependencies start getting resolved.
+          //
+          logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
+          test.dependsOn(globalConfig.updateRobolectricJarsTask)
 
-            // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
-            // https://github.com/robolectric/robolectric/issues/5115
-            systemProperty("javax.net.ssl.trustStoreType", "JKS")
-          }
-        )
+          // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
+          // https://github.com/robolectric/robolectric/issues/5115
+          test.systemProperty("javax.net.ssl.trustStoreType", "JKS")
+        }
       }
     }
 

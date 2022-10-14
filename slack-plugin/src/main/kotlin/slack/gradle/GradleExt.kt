@@ -21,7 +21,6 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.internal.dsl.BuildType
 import com.android.builder.model.AndroidProject
-import groovy.lang.Closure
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -42,7 +41,6 @@ import org.gradle.api.plugins.PluginManager
 import org.gradle.api.reflect.TypeOf
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.closureOf
 import org.gradle.kotlin.dsl.hasPlugin
 import org.gradle.kotlin.dsl.named
 
@@ -224,11 +222,6 @@ internal fun Configuration.androidArtifactView(): ArtifactView {
   return incoming.artifactView {
     attributes { attribute(Attribute.of("artifactType", String::class.java), "android-classes") }
   }
-}
-
-/** Typed alternative to Gradle Kotlin-DSL's [closureOf], which only returns `Closure<Any?>`. */
-internal fun <T> Any.typedClosureOf(action: T.() -> Unit): Closure<T> {
-  @Suppress("UNCHECKED_CAST") return closureOf(action) as Closure<T>
 }
 
 internal operator fun ExtensionContainer.set(key: String, value: Any) {
