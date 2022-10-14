@@ -71,7 +71,6 @@ dependencies {
   compileOnly(libs.gradlePlugins.retry)
   compileOnly(libs.gradlePlugins.anvil)
   compileOnly(libs.gradlePlugins.spotless)
-  compileOnly(libs.gradlePlugins.ksp)
   compileOnly(libs.gradlePlugins.redacted)
   compileOnly(libs.gradlePlugins.moshix)
 
