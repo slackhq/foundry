@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.1
+-----
+
+_2022-10-20_
+
+* Exclude `**/build/**` from `Detekt` tasks.
+
 0.3.0
 -----
 
