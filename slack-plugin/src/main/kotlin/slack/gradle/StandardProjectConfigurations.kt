@@ -772,6 +772,11 @@ internal class StandardProjectConfigurations(
             }
         }
       }
+
+      tasks.configureEach<Detekt> {
+        jvmTarget = actualJvmTarget
+        exclude("**/build/**")
+      }
     }
 
     plugins.withType<KotlinBasePlugin> {
@@ -820,9 +825,6 @@ internal class StandardProjectConfigurations(
           jvmToolchain { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
         }
       }
-
-      // Set Detekt's jvmTarget
-      tasks.configureEach<Detekt> { jvmTarget = actualJvmTarget }
 
       configureFreeKotlinCompilerArgs()
       if (slackProperties.strictMode && slackProperties.strictValidateKtFilePresence) {
