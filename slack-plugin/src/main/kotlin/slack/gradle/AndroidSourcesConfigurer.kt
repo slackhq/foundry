@@ -99,7 +99,8 @@ internal object AndroidSourcesConfigurer {
             directory is a copy of API $latest sources.
 
             Did you know if you drive from Houston to LA, El Paso is halfway?
-              """.trimIndent()
+              """
+                  .trimIndent()
               )
             }
           }

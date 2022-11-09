@@ -48,7 +48,8 @@ class ModuleStatsTest {
         testImplementation(projects.libraries.foundation.testCommons)
       }
 
-      """.trimIndent()
+      """
+        .trimIndent()
 
     val deps = StatsUtils.parseProjectDeps(buildFileText)
     assertThat(deps)

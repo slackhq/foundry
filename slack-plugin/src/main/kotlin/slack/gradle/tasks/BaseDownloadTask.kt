@@ -158,4 +158,5 @@ private val EXEC_PREFIX =
        -jar ${'$'}0 "${'$'}@"
 
 
-  """.trimIndent()
+  """
+    .trimIndent()

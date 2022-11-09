@@ -57,7 +57,8 @@ internal object PermissionChecks {
     allowListActionGetter: () -> Action<PermissionAllowlistConfigurer>?,
     createTask:
       (taskName: String, file: File, allowListProvider: Provider<Set<String>>) -> TaskProvider<
-          out CheckManifestPermissionsTask>
+          out CheckManifestPermissionsTask
+        >
   ) {
     project.extensions.configure<ApplicationAndroidComponentsExtension> {
       onVariants { variant ->

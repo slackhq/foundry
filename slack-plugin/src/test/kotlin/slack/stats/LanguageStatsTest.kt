@@ -49,7 +49,8 @@ class LanguageStatsTest {
 
         }
       }
-      """.trimIndent()
+      """
+        .trimIndent()
     )
 
     val languageStats = LocTask.processJvmFile(source) { println(it) }
@@ -82,7 +83,8 @@ class LanguageStatsTest {
 
         }
       }
-      """.trimIndent()
+      """
+        .trimIndent()
     )
 
     val languageStats = LocTask.processJvmFile(source) { println(it) }
@@ -126,7 +128,8 @@ class LanguageStatsTest {
               tools:background="@drawable/unread_border_1"/>
 
       </FrameLayout>
-      """.trimIndent()
+      """
+        .trimIndent()
     )
 
     val languageStats = LocTask.processXmlFile(source) { println(it) }
