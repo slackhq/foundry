@@ -859,7 +859,8 @@ internal class StandardProjectConfigurations(
               )
             }CompilationMarker
             ```
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
       }

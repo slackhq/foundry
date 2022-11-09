@@ -101,4 +101,5 @@ private val MANIFEST_CONTENT =
       <!-- Used to start foreground service for Slack call -->
       <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
   </manifest>
-  """.trimIndent()
+  """
+    .trimIndent()

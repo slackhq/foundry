@@ -218,7 +218,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
         For advanced configuration see https://github.com/tinyspeck/slack-android-ng/wiki/JDK-Installation-&-JAVA_HOME
 
-        """.trimIndent()
+        """
+          .trimIndent()
       )
       javaInstallationPath.asFile
         .get()
@@ -266,7 +267,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       # Note that these properties will prevent you from using other projects on JDK 8
       # These are appended to the end of the file to override any previous declarations of the same
       # keys, but you should consider removing those keys if you have any.
-    """.trimIndent()
+    """
+        .trimIndent()
     val suffix = "\n$regionMarkerSuffix"
     val propsString =
       properties.entries.joinToString("\n", prefix = "\n$prefix\n", postfix = suffix) { (key, value)
