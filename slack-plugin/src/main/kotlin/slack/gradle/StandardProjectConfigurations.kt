@@ -662,8 +662,14 @@ internal class StandardProjectConfigurations(
           builder.enableAndroidTest = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly
-            check(project.file("src/androidTest/AndroidManifest.xml").exists()) {
-              "AndroidManifest.xml is missing from src/androidTest. Ensure it exists and also is set to debuggable!"
+            if (slackProperties.strictMode && slackProperties.strictValidateAndroidTestManifest) {
+              val manifest = project.file("src/androidTest/AndroidManifest.xml")
+              check(manifest.exists()) {
+                "AndroidManifest.xml is missing from src/androidTest. Ensure it exists and also is set to debuggable!"
+              }
+              check(manifest.readText().contains("android:debuggable=\"true\"")) {
+                "AndroidManifest.xml in src/androidTest is missing the debuggable flag! Ensure it is set to 'android:debuggable=\"true\"'"
+              }
             }
           }
         }
