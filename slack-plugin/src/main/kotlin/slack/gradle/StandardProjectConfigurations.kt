@@ -660,6 +660,12 @@ internal class StandardProjectConfigurations(
                 ?.contains(builder.name)
                 ?: true
           builder.enableAndroidTest = variantEnabled
+          if (variantEnabled) {
+            // Ensure there's a manifest file present and has its debuggable flag set correctly
+            check(project.file("src/androidTest/AndroidManifest.xml").exists()) {
+              "AndroidManifest.xml is missing from src/androidTest. Ensure it exists and also is set to debuggable!"
+            }
+          }
         }
 
         // Contribute these libraries to Fladle if they opt into it
@@ -859,7 +865,8 @@ internal class StandardProjectConfigurations(
               )
             }CompilationMarker
             ```
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
       }
