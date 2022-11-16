@@ -2,7 +2,7 @@
 agp = "7.3.1"
 anvil = "2.4.2"
 bugsnagGradle = "7.3.1"
-dependencyAnalysisPlugin = "1.13.1"
+dependencyAnalysisPlugin = "1.14.1"
 detekt = "1.21.0"
 dokka = "1.7.20"
 errorproneGradle = "3.0.1"
