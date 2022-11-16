@@ -17,7 +17,7 @@ nullawayGradle = "1.3.0"
 okhttp = "5.0.0-alpha.10"
 spotless = "6.11.0"
 sqldelight = "1.5.1"
-versionsPlugin = "0.43.0"
+versionsPlugin = "0.44.0"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.3" }
