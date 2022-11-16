@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.3
+-----
+
+_2022-11-11_
+
+* Add some more Kotlin compiler arguments to compilations. See [#160](https://github.com/slackhq/slack-gradle-plugin/pull/160)
+
 0.3.2
 -----
 
