@@ -19,7 +19,9 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 import java.net.URL
@@ -173,22 +175,25 @@ subprojects {
 
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
-      kotlinOptions {
-        languageVersion = "1.6"
-        apiVersion = "1.6"
+      compilerOptions {
+        languageVersion.set(KOTLIN_1_6)
+        apiVersion.set(KOTLIN_1_6)
         // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
         // this sometimes. https://github.com/gradle/gradle/issues/16345
-        allWarningsAsErrors = false
-        jvmTarget = kotlinBuildConfig.kotlinJvmTarget
+        allWarningsAsErrors.set(false)
+        jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
         // We use class SAM conversions because lambdas compiled into invokedynamic are not
         // Serializable, which causes accidental headaches with Gradle configuration caching. It's
         // easier for us to just use the previous anonymous classes behavior
-        @Suppress("SuspiciousCollectionReassignment")
-        freeCompilerArgs += (kotlinBuildConfig.kotlinCompilerArgs + "-Xsam-conversions=class")
-          // -progressive is useless when running on an older language version but new compiler version
-          .filter { it != "-progressive" }
-          // We should be able to remove this in Gradle 8 when it upgrades to Kotlin 1.7
-          .plus("-opt-in=kotlin.RequiresOptIn")
+        freeCompilerArgs.add("-Xsam-conversions=class")
+        // We should be able to remove this in Gradle 8 when it upgrades to Kotlin 1.7
+        freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+        freeCompilerArgs.addAll(
+          kotlinBuildConfig.kotlinCompilerArgs
+            // -progressive is useless when running on an older language version but new compiler version
+            .filter { it != "-progressive" }
+            .plus("-opt-in=kotlin.RequiresOptIn")
+        )
       }
     }
 
