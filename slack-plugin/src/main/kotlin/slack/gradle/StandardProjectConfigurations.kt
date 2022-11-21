@@ -26,11 +26,11 @@ import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.google.common.base.CaseFormat
-import com.google.devtools.ksp.gradle.KspExtension
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
 import io.gitlab.arturbosch.detekt.Detekt
@@ -420,71 +420,73 @@ internal class StandardProjectConfigurations(
 
     val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
-    val commonBaseExtensionConfig: BaseExtension.() -> Unit = {
-      if (shouldApplyCacheFixPlugin) {
-        apply(plugin = "org.gradle.android.cache-fix")
-      }
-
-      compileSdkVersion(sdkVersions.compileSdk)
-      slackProperties.ndkVersion?.let { ndkVersion = it }
-      defaultConfig {
-        // TODO this won't work with SDK previews but will fix in a followup
-        minSdk = sdkVersions.minSdk
-        vectorDrawables.useSupportLibrary = true
-        // Default to the standard android runner, but note this is overridden in :app
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-      }
-
-      compileOptions {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        isCoreLibraryDesugaringEnabled = true
-      }
-
-      dependencies.add(
-        Configurations.CORE_LIBRARY_DESUGARING,
-        SlackDependencies.Google.coreLibraryDesugaring
-      )
-
-      testOptions {
-        animationsDisabled = true
-
-        if (booleanProperty("orchestrator")) {
-          logger.info(
-            "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
-          )
-          execution = "ANDROIDX_TEST_ORCHESTRATOR"
-        } else {
-          logger.debug(
-            "[android.testOptions]: Configured to run tests without Android Test Orchestrator"
-          )
+    val agpHandler = slackTools().agpHandler
+    val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
+      { applyTestOptions ->
+        if (shouldApplyCacheFixPlugin) {
+          apply(plugin = "org.gradle.android.cache-fix")
         }
 
-        // Added to avoid unimplemented exceptions in some of the unit tests that have simple
-        // android dependencies like checking whether code is running on main thread.
-        // See https://developer.android.com/training/testing/unit-testing/local-unit-tests
-        // #error-not-mocked for more details
-        unitTests.isReturnDefaultValues = true
-        unitTests.isIncludeAndroidResources = true
+        compileSdkVersion(sdkVersions.compileSdk)
+        slackProperties.ndkVersion?.let { ndkVersion = it }
+        defaultConfig {
+          // TODO this won't work with SDK previews but will fix in a followup
+          minSdk = sdkVersions.minSdk
+          vectorDrawables.useSupportLibrary = true
+          // Default to the standard android runner, but note this is overridden in :app
+          testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
 
-        // Configure individual Tests tasks.
-        unitTests.all(
-          typedClosureOf {
-            //
-            // Note that we can't configure this to _just_ be enabled for robolectric projects
-            // based on dependencies unfortunately, as the task graph is already wired by the time
-            // dependencies start getting resolved.
-            //
-            logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-            dependsOn(globalConfig.updateRobolectricJarsTask)
+        compileOptions {
+          sourceCompatibility = javaVersion
+          targetCompatibility = javaVersion
+          isCoreLibraryDesugaringEnabled = true
+        }
 
-            // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
-            // https://github.com/robolectric/robolectric/issues/5115
-            systemProperty("javax.net.ssl.trustStoreType", "JKS")
-          }
+        dependencies.add(
+          Configurations.CORE_LIBRARY_DESUGARING,
+          SlackDependencies.Google.coreLibraryDesugaring
         )
+
+        if (applyTestOptions) {
+          testOptions {
+            animationsDisabled = true
+
+            if (booleanProperty("orchestrator")) {
+              logger.info(
+                "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
+              )
+              execution = "ANDROIDX_TEST_ORCHESTRATOR"
+            } else {
+              logger.debug(
+                "[android.testOptions]: Configured to run tests without Android Test Orchestrator"
+              )
+            }
+
+            // Added to avoid unimplemented exceptions in some of the unit tests that have simple
+            // android dependencies like checking whether code is running on main thread.
+            // See https://developer.android.com/training/testing/unit-testing/local-unit-tests
+            // #error-not-mocked for more details
+            unitTests.isReturnDefaultValues = true
+            unitTests.isIncludeAndroidResources = true
+
+            // Configure individual Tests tasks.
+            agpHandler.allUnitTestOptions(unitTests) { test ->
+              //
+              // Note that we can't configure this to _just_ be enabled for robolectric projects
+              // based on dependencies unfortunately, as the task graph is already wired by the time
+              // dependencies start getting resolved.
+              //
+              logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
+              test.dependsOn(globalConfig.updateRobolectricJarsTask)
+
+              // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
+              // https://github.com/robolectric/robolectric/issues/5115
+              test.systemProperty("javax.net.ssl.trustStoreType", "JKS")
+            }
+          }
+        }
       }
-    }
 
     val objenesis2Version = slackProperties.versions.objenesis
     val prepareAndroidTestConfigurations = {
@@ -498,6 +500,15 @@ internal class StandardProjectConfigurations(
             resolutionStrategy.force("org.objenesis:objenesis:$it")
           }
         }
+      }
+    }
+
+    pluginManager.withPlugin("com.android.test") {
+      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
+      configure<TestExtension> {
+        slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
+        commonBaseExtensionConfig(false)
+        defaultConfig { targetSdk = sdkVersions.targetSdk }
       }
     }
 
@@ -521,16 +532,16 @@ internal class StandardProjectConfigurations(
               slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
             val variantEnabled =
               androidTestEnabled &&
-                builder.name in
-                  slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                    .orEmpty()
+                slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                  ?.contains(builder.name)
+                  ?: true
             builder.enableAndroidTest = variantEnabled
           }
         }
       }
       configure<BaseAppModuleExtension> {
         slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
-        commonBaseExtensionConfig()
+        commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.targetSdk
@@ -645,10 +656,22 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           val variantEnabled =
             androidTestEnabled &&
-              builder.name in
-                slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                  .orEmpty()
+              slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                ?.contains(builder.name)
+                ?: true
           builder.enableAndroidTest = variantEnabled
+          if (variantEnabled) {
+            // Ensure there's a manifest file present and has its debuggable flag set correctly
+            if (slackProperties.strictMode && slackProperties.strictValidateAndroidTestManifest) {
+              val manifest = project.file("src/androidTest/AndroidManifest.xml")
+              check(manifest.exists()) {
+                "AndroidManifest.xml is missing from src/androidTest. Ensure it exists and also is set to debuggable!"
+              }
+              check(manifest.readText().contains("android:debuggable=\"true\"")) {
+                "AndroidManifest.xml in src/androidTest is missing the debuggable flag! Ensure it is set to 'android:debuggable=\"true\"'"
+              }
+            }
+          }
         }
 
         // Contribute these libraries to Fladle if they opt into it
@@ -692,7 +715,7 @@ internal class StandardProjectConfigurations(
       }
       configure<LibraryExtension> {
         slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
-        commonBaseExtensionConfig()
+        commonBaseExtensionConfig(true)
         lint { configureLint(project, slackProperties, sdkVersions, false) }
         if (isLibraryWithVariants) {
           buildTypes {
@@ -761,6 +784,11 @@ internal class StandardProjectConfigurations(
             }
         }
       }
+
+      tasks.configureEach<Detekt> {
+        jvmTarget = actualJvmTarget
+        exclude("**/build/**")
+      }
     }
 
     plugins.withType<KotlinBasePlugin> {
@@ -810,9 +838,6 @@ internal class StandardProjectConfigurations(
         }
       }
 
-      // Set Detekt's jvmTarget
-      tasks.configureEach<Detekt> { jvmTarget = actualJvmTarget }
-
       configureFreeKotlinCompilerArgs()
       if (slackProperties.strictMode && slackProperties.strictValidateKtFilePresence) {
         // Verify that at least one `.kt` file is present in the project's `main` source set. This
@@ -846,7 +871,8 @@ internal class StandardProjectConfigurations(
               )
             }CompilationMarker
             ```
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
       }
@@ -903,13 +929,6 @@ internal class StandardProjectConfigurations(
             enabled = false
           }
         }
-      }
-    }
-
-    pluginManager.withPlugin("com.google.devtools.ksp") {
-      configure<KspExtension> {
-        // Don't run other plugins like Anvil in KSP's task
-        blockOtherCompilerPlugins = true
       }
     }
   }

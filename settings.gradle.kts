@@ -144,6 +144,22 @@ pluginManagement {
       }
     }
   }
+  plugins { id("com.gradle.enterprise") version "3.11.2" }
+}
+
+plugins { id("com.gradle.enterprise") }
+
+val VERSION_NAME: String by extra.properties
+
+gradleEnterprise {
+  buildScan {
+    publishAlways()
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+
+    tag(if (System.getenv("CI").isNullOrBlank()) "Local" else "CI")
+    tag(VERSION_NAME)
+  }
 }
 
 rootProject.name = "slack-gradle-plugin"
@@ -151,6 +167,8 @@ rootProject.name = "slack-gradle-plugin"
 // Please keep these in alphabetical order!
 include(":slack-plugin")
 include(":agp-handlers:agp-handler-api")
+include(":agp-handlers:agp-handler-73")
+include(":agp-handlers:agp-handler-80")
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance
 enableFeaturePreview("GROOVY_COMPILATION_AVOIDANCE")

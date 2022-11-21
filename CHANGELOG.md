@@ -1,6 +1,45 @@
 Changelog
 =========
 
+0.3.3
+-----
+
+_2022-11-11_
+
+* Add some more Kotlin compiler arguments to compilations. See [#160](https://github.com/slackhq/slack-gradle-plugin/pull/160)
+
+0.3.2
+-----
+
+_2022-11-10_
+
+* (Strict mode only) Check for `AndroidManifest.xml` files in androidTest sources + ensure they're debuggable.
+
+0.3.1
+-----
+
+_2022-10-20_
+
+* Exclude `**/build/**` from `Detekt` tasks.
+
+0.3.0
+-----
+
+_2022-10-14_
+
+* **New**: Support `com.android.test` projects.
+* **New**: Preliminary support for AGP 8.x.
+* Automatically add compose compiler dep in Compose multiplatform (i.e. `org.jetbrains.compose`) projects.
+* Support Error Prone Gradle Plugin 3.x.
+* Update `me.tongfei:progressbar` to `0.9.5`.
+
+0.2.4
+-----
+
+_2022-10-06_
+
+* **Fix**: Only check allowed androidTest variants if any are defined.
+
 0.2.3
 -----
 

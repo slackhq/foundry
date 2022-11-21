@@ -71,7 +71,6 @@ dependencies {
   compileOnly(libs.gradlePlugins.retry)
   compileOnly(libs.gradlePlugins.anvil)
   compileOnly(libs.gradlePlugins.spotless)
-  compileOnly(libs.gradlePlugins.ksp)
   compileOnly(libs.gradlePlugins.redacted)
   compileOnly(libs.gradlePlugins.moshix)
 
@@ -81,6 +80,8 @@ dependencies {
 
   compileOnly(libs.agp)
   api(projects.agpHandlers.agpHandlerApi)
+  api(projects.agpHandlers.agpHandler73)
+  api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
 
   implementation(libs.commonsText) {

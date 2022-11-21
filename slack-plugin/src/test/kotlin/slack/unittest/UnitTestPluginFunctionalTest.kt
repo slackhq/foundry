@@ -58,7 +58,8 @@ class UnitTestPluginFunctionalTest {
           repositories {
             jcenter()
           }
-      """.trimIndent()
+      """
+        .trimIndent()
     )
 
     val runner = GradleRunner.create().withProjectDir(testProjectDir.root).withPluginClasspath()
@@ -146,7 +147,8 @@ class UnitTestPluginFunctionalTest {
                 dimension "environment"
             }
         }
-      """.trimIndent()
+      """
+          .trimIndent()
       } else {
         ""
       }
@@ -174,7 +176,8 @@ class UnitTestPluginFunctionalTest {
               }
               $flavorBlock
           }
-      """.trimIndent()
+      """
+        .trimIndent()
     )
     // language=xml
     androidManifest.writeText(
@@ -184,7 +187,8 @@ class UnitTestPluginFunctionalTest {
               xmlns:tools="http://schemas.android.com/tools">
               <application android:name=".TestApp"/>
             </manifest>
-      """.trimIndent()
+      """
+        .trimIndent()
     )
   }
 }

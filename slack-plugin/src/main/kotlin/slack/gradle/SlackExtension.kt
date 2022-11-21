@@ -37,6 +37,7 @@ import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.dependencies.SlackDependencies
 
@@ -93,7 +94,8 @@ constructor(
             [kapt/napt Config]
             project = $path
             source = $source
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
       }
@@ -106,7 +108,8 @@ constructor(
             [KSP Config]
             project = $path
             KSP source = $source
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
         if (!isUsingKsp) {
@@ -123,7 +126,8 @@ constructor(
             [Moshi Gradle Config]
             project = $path
             source = $source
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
         if (!isUsingMoshiGradle) {
@@ -160,7 +164,8 @@ constructor(
             [Dagger Config]
             project = $path
             daggerConfig = $daggerConfig
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
 
@@ -633,6 +638,14 @@ constructor(
   internal fun applyTo(project: Project) {
     if (enabled.getOrElse(false)) {
       composeBundleAlias?.let { project.dependencies.add("implementation", it) }
+      project.pluginManager.withPlugin("org.jetbrains.compose") {
+        project.dependencies {
+          add(
+            PLUGIN_CLASSPATH_CONFIGURATION_NAME,
+            "androidx.compose.compiler:compiler:$composeCompilerVersion"
+          )
+        }
+      }
     }
   }
 }

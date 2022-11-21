@@ -140,7 +140,8 @@ private val THROTTLED_EXAMPLE =
 	CPU_Scheduler_Limit 	= 100
 	CPU_Available_CPUs 	= 8
 	CPU_Speed_Limit 	= 100
-""".trimIndent()
+"""
+    .trimIndent()
 
 /** Weird but actual phenomenon we've seen. */
 private val GARBAGE_DATA =
@@ -158,7 +159,8 @@ private val GARBAGE_DATA =
 	CPU_Scheduler_Limit 	= 100
 	CPU_Available_CPUs 	= 8
 	CPU_Speed_Limit 	= 100
-""".trimIndent()
+"""
+    .trimIndent()
 
 private val UNTHROTTLED_EXAMPLE =
   """
@@ -174,7 +176,8 @@ private val UNTHROTTLED_EXAMPLE =
 	CPU_Scheduler_Limit 	= 100
 	CPU_Available_CPUs 	= 8
 	CPU_Speed_Limit 	= 100
-""".trimIndent()
+"""
+    .trimIndent()
 
 private val INCOMPLETE_EXAMPLE =
   """
@@ -188,4 +191,5 @@ private val INCOMPLETE_EXAMPLE =
 2021-07-07 12:32:50 -0400 CPU Power notify
 	CPU_Available_CPUs 	= 8
 	CPU_Speed_Limit 	= 100
-""".trimIndent()
+"""
+    .trimIndent()

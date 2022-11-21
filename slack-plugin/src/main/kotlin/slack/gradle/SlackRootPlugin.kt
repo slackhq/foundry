@@ -60,7 +60,8 @@ internal class SlackRootPlugin : Plugin<Project> {
         Please download a native arm64 JDK and remove your existing x86 JDK.
 
         See: https://github.com/tinyspeck/slack-android-ng/wiki/JDK-Installation-&-JAVA_HOME
-      """.trimIndent()
+      """
+        .trimIndent()
     }
 
     val okHttpClient = lazy { OkHttpClient.Builder().build() }
@@ -86,7 +87,8 @@ internal class SlackRootPlugin : Plugin<Project> {
 
           If you're seeing this error from Studio, ensure Studio is using JDK $jdk in
           Preferences > Build, Execution, Deployment > Build tools > Gradle > Gradle JVM
-        """.trimIndent()
+        """
+          .trimIndent()
       }
     }
 
