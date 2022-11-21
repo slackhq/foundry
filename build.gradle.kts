@@ -123,7 +123,15 @@ data class KotlinBuildConfig(val kotlin: String) {
     "-Xjvm-default=all",
     // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
     "-Xtype-enhancement-improvements-strict-mode",
-    "-Xjspecify-annotations=strict"
+    "-Xjspecify-annotations=strict",
+    // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T => T & Any)
+    "-Xenhance-type-parameter-types-to-def-not-null",
+    // Use fast implementation on Jar FS. This may speed up compilation time, but currently it's an experimental mode
+    // TODO toe-hold but we can't use it yet because it emits a warning that fails with -Werror
+    //  https://youtrack.jetbrains.com/issue/KT-54928
+//    "-Xuse-fast-jar-file-system",
+    // Support inferring type arguments based on only self upper bounds of the corresponding type parameters
+    "-Xself-upper-bound-inference",
   ) + extraArgs
   val kotlinJvmTarget: String = "11"
 

@@ -366,6 +366,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val strictValidateKtFilePresence: Boolean
     get() = booleanProperty("slack.strict.validateKtFiles", defaultValue = true)
 
+  /** Specific toggle for validating manifests in androidTest sources. */
+  public val strictValidateAndroidTestManifest: Boolean
+    get() = booleanProperty("slack.strict.validateAndroidTestManifests", defaultValue = true)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")

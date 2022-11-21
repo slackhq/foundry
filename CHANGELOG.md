@@ -1,6 +1,20 @@
 Changelog
 =========
 
+0.3.3
+-----
+
+_2022-11-11_
+
+* Add some more Kotlin compiler arguments to compilations. See [#160](https://github.com/slackhq/slack-gradle-plugin/pull/160)
+
+0.3.2
+-----
+
+_2022-11-10_
+
+* (Strict mode only) Check for `AndroidManifest.xml` files in androidTest sources + ensure they're debuggable.
+
 0.3.1
 -----
 

@@ -42,16 +42,19 @@ class SlackGradleUtilTest {
       """
       git version 2.24.0
       hub version 2.13.0
-      """.trimIndent()
+      """
+        .trimIndent()
     val parsed = parseGitVersion(gitVersionOutput)
     assertThat(parsed.toString()).isEqualTo("2.24.0")
   }
 
   @Test
   fun unrecognizedFallsBackToUnknown() {
-    val gitVersionOutput = """
+    val gitVersionOutput =
+      """
       garbage
-      """.trimIndent()
+      """
+        .trimIndent()
     val parsed = parseGitVersion(gitVersionOutput)
     assertThat(parsed).isEqualTo(VersionNumber.UNKNOWN)
   }

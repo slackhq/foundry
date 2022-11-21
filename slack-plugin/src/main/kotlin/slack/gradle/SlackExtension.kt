@@ -94,7 +94,8 @@ constructor(
             [kapt/napt Config]
             project = $path
             source = $source
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
       }
@@ -107,7 +108,8 @@ constructor(
             [KSP Config]
             project = $path
             KSP source = $source
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
         if (!isUsingKsp) {
@@ -124,7 +126,8 @@ constructor(
             [Moshi Gradle Config]
             project = $path
             source = $source
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
         if (!isUsingMoshiGradle) {
@@ -161,7 +164,8 @@ constructor(
             [Dagger Config]
             project = $path
             daggerConfig = $daggerConfig
-            """.trimIndent()
+            """
+              .trimIndent()
           )
         }
 

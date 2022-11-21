@@ -1,10 +1,9 @@
-###  Summary
+<!--
+  ⬆ Put your description above this! ⬆
 
-Describe the goal of this PR. Mention any related Issue numbers. Please note that we do not normally
-accept new externally-contributed PRs to this repo unless it's something Slack-relevant and came 
-up in prior discussion
+  Please be descriptive and detailed.
+  
+  Please read our [Contributing Guidelines](https://github.com/tinyspeck/slack-gradle-plugin/blob/main/.github/CONTRIBUTING.md) and [Code of Conduct](https://slackhq.github.io/code-of-conduct).
 
-### Requirements (place an `x` in each `[ ]`)
-
-* [ ] I've read and understood the [Contributing Guidelines](https://github.com/{project_slug}/blob/main/.github/CONTRIBUTING.md) and have done my best effort to follow them.
-* [ ] I've read and agree to the [Code of Conduct](https://slackhq.github.io/code-of-conduct).
+Don't worry about deleting this, it's not visible in the PR!
+-->
