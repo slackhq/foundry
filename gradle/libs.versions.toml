@@ -20,7 +20,7 @@ sqldelight = "1.5.1"
 versionsPlugin = "0.44.0"
 
 [plugins]
-bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.8" }
+bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.9" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
