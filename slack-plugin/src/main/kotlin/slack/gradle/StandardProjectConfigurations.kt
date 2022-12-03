@@ -468,7 +468,6 @@ internal class StandardProjectConfigurations(
             // See https://developer.android.com/training/testing/unit-testing/local-unit-tests
             // #error-not-mocked for more details
             unitTests.isReturnDefaultValues = true
-            unitTests.isIncludeAndroidResources = true
 
             // Configure individual Tests tasks.
             agpHandler.allUnitTestOptions(unitTests) { test ->
@@ -506,7 +505,7 @@ internal class StandardProjectConfigurations(
     pluginManager.withPlugin("com.android.test") {
       slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       configure<TestExtension> {
-        slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
+        slackExtension.androidHandler.androidExtension = this
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.targetSdk }
       }
@@ -540,7 +539,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<BaseAppModuleExtension> {
-        slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
+        slackExtension.androidHandler.androidExtension = this
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
@@ -714,7 +713,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
-        slackExtension.androidHandler.featuresHandler.composeHandler.androidExtension = this
+        slackExtension.androidHandler.androidExtension = this
         commonBaseExtensionConfig(true)
         lint { configureLint(project, slackProperties, sdkVersions, false) }
         if (isLibraryWithVariants) {

@@ -613,13 +613,7 @@ constructor(
   }
   internal val enabled = objects.property<Boolean>().convention(false)
 
-  /**
-   * This is weird! Due to the non-property nature of the AGP buildFeatures and composeOptions DSLs,
-   * we can't lazily chain their values to our own extension's properties. Because of this, we
-   * lazily set this instance from [StandardProjectConfigurations] during Android extension
-   * evaluation and then make calls to [enable] directly set the values on this instance. Ideally we
-   * could eventually remove this if/when AGP finally makes these properties lazy.
-   */
+  /** @see [AndroidHandler.androidExtension] */
   internal var androidExtension: CommonExtension<*, *, *, *>? = null
 
   internal fun enable() {
@@ -671,6 +665,19 @@ constructor(
       versionCatalog
     )
 
+  /**
+   * This is weird! Due to the non-property nature of the AGP buildFeatures and composeOptions DSLs,
+   * we can't lazily chain their values to our own extension's properties. Because of this, we
+   * lazily set this instance from [StandardProjectConfigurations] during Android extension
+   * evaluation and then make calls to [enable] directly set the values on this instance. Ideally we
+   * could eventually remove this if/when AGP finally makes these properties lazy.
+   */
+  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+    set(value) {
+      field = value
+      featuresHandler.composeHandler.androidExtension = value
+    }
+
   public fun features(action: Action<AndroidFeaturesHandler>) {
     action.execute(featuresHandler)
   }
@@ -703,6 +710,9 @@ constructor(
             "--add-opens=java.base/java.util=ALL-UNNAMED",
           )
         }
+
+        // Required for Robolectric to work.
+        androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
       }
 
       featuresHandler.composeHandler.applyTo(project)
