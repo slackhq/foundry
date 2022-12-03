@@ -675,6 +675,7 @@ constructor(
   internal var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
+      featuresHandler.androidExtension = value
       featuresHandler.composeHandler.androidExtension = value
     }
 
@@ -710,9 +711,6 @@ constructor(
             "--add-opens=java.base/java.util=ALL-UNNAMED",
           )
         }
-
-        // Required for Robolectric to work.
-        androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
       }
 
       featuresHandler.composeHandler.applyTo(project)
@@ -738,6 +736,14 @@ constructor(
   internal val composeHandler =
     objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
+  /** @see [AndroidHandler.androidExtension] */
+  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+    set(value) {
+      field = value
+      composeHandler.androidExtension = value
+    }
+
+
   /**
    * Enables android instrumentation tests for this project.
    *
@@ -759,6 +765,8 @@ constructor(
   /** Enables robolectric for this project. */
   // In the future, we may want to add an enum for picking which shadows/artifacts
   public fun robolectric() {
+    // Required for Robolectric to work.
+    androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
     robolectric.set(true)
   }
 
