@@ -371,7 +371,8 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.strict.validateAndroidTestManifests", defaultValue = true)
 
   /**
-   * Always enables resources in android unit tests. Only present for benchmarking purposes and should otherwise be off.
+   * Always enables resources in android unit tests. Only present for benchmarking purposes and
+   * should otherwise be off.
    */
   public val alwaysEnableResourcesInTests: Boolean
     get() = booleanProperty("slack.gradle.config.test.alwaysEnableResources", defaultValue = false)

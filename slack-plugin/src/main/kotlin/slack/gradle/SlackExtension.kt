@@ -743,7 +743,6 @@ constructor(
       composeHandler.androidExtension = value
     }
 
-
   /**
    * Enables android instrumentation tests for this project.
    *
