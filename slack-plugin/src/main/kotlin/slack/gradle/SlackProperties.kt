@@ -370,6 +370,12 @@ public class SlackProperties private constructor(private val project: Project) {
   public val strictValidateAndroidTestManifest: Boolean
     get() = booleanProperty("slack.strict.validateAndroidTestManifests", defaultValue = true)
 
+  /**
+   * Always enables resources in android unit tests. Only present for benchmarking purposes and should otherwise be off.
+   */
+  public val alwaysEnableResourcesInTests: Boolean
+    get() = booleanProperty("slack.gradle.config.test.alwaysEnableResources", defaultValue = false)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")

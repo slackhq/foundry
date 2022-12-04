@@ -468,6 +468,9 @@ internal class StandardProjectConfigurations(
             // See https://developer.android.com/training/testing/unit-testing/local-unit-tests
             // #error-not-mocked for more details
             unitTests.isReturnDefaultValues = true
+            if (slackProperties.alwaysEnableResourcesInTests) {
+              unitTests.isIncludeAndroidResources = true
+            }
 
             // Configure individual Tests tasks.
             agpHandler.allUnitTestOptions(unitTests) { test ->
