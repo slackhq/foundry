@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.4
+-----
+
+_2022-12-04_
+
+* Only enable `isIncludeAndroidResources` in Android unit tests automatically when `robolectric()` is used.
+
 0.3.3
 -----
 
