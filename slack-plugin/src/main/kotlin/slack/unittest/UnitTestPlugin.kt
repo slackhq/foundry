@@ -23,7 +23,8 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.ciUnitTestAndroidVariant
 
-private const val TASK_NAME = "ciUnitTest"
+private const val CI_UNIT_TEST_TASK_NAME = "ciUnitTest"
+private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
 private const val LOG = "SlackUnitTestPlugin:"
 
 /**
@@ -36,6 +37,9 @@ private const val LOG = "SlackUnitTestPlugin:"
  * For an Android application or library, "ciUnitTest" will depend on "testInternalDebugUnitTest"
  * (if the "internal"/"external" product flavors exist), or "testDebugUnitTest". For a Java or
  * Kotlin library, it will depend on "test".
+ *
+ * For convenience, this also creates a task named `compileCiUnitTest` for just _building_ the
+ * tests.
  */
 internal class UnitTestPlugin : Plugin<Project> {
 
@@ -43,32 +47,30 @@ internal class UnitTestPlugin : Plugin<Project> {
     // Projects can opt out of creating the task with this property.
     val enabled = SlackProperties(project).ciUnitTestEnabled
     if (!enabled) {
-      project.logger.debug("$LOG Skipping creation of \"$TASK_NAME\" task")
+      project.logger.debug("$LOG Skipping creation of \"$CI_UNIT_TEST_TASK_NAME\" task")
       return
     }
 
     // We only want to create tasks once, but a project might apply multiple plugins.
     val applied = AtomicBoolean(false)
 
-    project.pluginManager.withPlugin("com.android.application") {
+    project.pluginManager.withPlugin("com.android.base") {
       if (applied.compareAndSet(false, true)) {
-        project.logger.debug("$LOG Applying UnitTestPlugin to android application")
-        createAndroidCiUnitTestTask(project)
-      }
-    }
-    project.pluginManager.withPlugin("com.android.library") {
-      if (applied.compareAndSet(false, true)) {
-        project.logger.debug("$LOG Applying UnitTestPlugin to android library")
+        project.logger.debug("$LOG Applying UnitTestPlugin to Android project")
         createAndroidCiUnitTestTask(project)
       }
     }
     val javaKotlinLibraryHandler = { plugin: AppliedPlugin ->
       if (applied.compareAndSet(false, true)) {
         project.logger.debug("$LOG Applying UnitTestPlugin to ${plugin.name}")
-        project.logger.debug("$LOG Creating $TASK_NAME that depends on test")
-        project.tasks.register(TASK_NAME) {
+        project.logger.debug("$LOG Creating CI unit test tasks")
+        project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
           group = LifecycleBasePlugin.VERIFICATION_GROUP
           dependsOn("test")
+        }
+        project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
+          group = LifecycleBasePlugin.VERIFICATION_GROUP
+          dependsOn("testClasses")
         }
       }
     }
@@ -77,13 +79,21 @@ internal class UnitTestPlugin : Plugin<Project> {
   }
 
   private fun createAndroidCiUnitTestTask(project: Project) {
-    val variantUnitTestTaskName = "test${project.ciUnitTestAndroidVariant()}UnitTest"
-    project.logger.debug("$LOG Creating $TASK_NAME that depends on $variantUnitTestTaskName")
-    project.tasks.register(TASK_NAME) {
+    val variant = project.ciUnitTestAndroidVariant()
+    val variantUnitTestTaskName = "test${variant}UnitTest"
+    val variantCompileUnitTestTaskName = "compile${variant}UnitTestSources"
+    project.logger.debug("$LOG Creating CI unit test tasks for variant '$variant'")
+    project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
       group = LifecycleBasePlugin.VERIFICATION_GROUP
       // Even if the task isn't created yet, we can do this by name alone and it will resolve at
       // task configuration time.
       dependsOn(variantUnitTestTaskName)
+    }
+    project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
+      group = LifecycleBasePlugin.VERIFICATION_GROUP
+      // Even if the task isn't created yet, we can do this by name alone and it will resolve at
+      // task configuration time.
+      dependsOn(variantCompileUnitTestTaskName)
     }
   }
 }
