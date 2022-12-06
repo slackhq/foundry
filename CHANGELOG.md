@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.5
+-----
+
+_2022-12-06_
+
+* Introduce `compileCiUnitTest` lifecycle task to just compile (but not run!) unit tests that are run by `ciUnitTest`.
+
 0.3.4
 -----
 
