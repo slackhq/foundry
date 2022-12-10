@@ -573,6 +573,14 @@ internal class StandardProjectConfigurations(
               // https://slack-pde.slack.com/archives/C8EER3C04/p1621353426001500
               "annotated-jdk/**"
             )
+          agpHandler.jniLibsPickFirst(
+            this,
+            setOf(
+              // Some libs like Flipper bring their own copy of common native libs (like C++) and we
+              // need to de-dupe
+              "**/*.so"
+            )
+          )
           jniLibs.pickFirsts +=
             setOf(
               // Some libs like Flipper bring their own copy of common native libs (like C++) and we
