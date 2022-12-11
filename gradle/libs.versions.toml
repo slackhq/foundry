@@ -55,7 +55,9 @@ gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 guava = "com.google.guava:guava:31.1-jre"
+javapoet = "com.squareup:javapoet:1.13.0"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
+kotlinpoet = "com.squareup:kotlinpoet:1.12.0"
 kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kgp-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.1"

@@ -131,6 +131,8 @@ dependencies {
 
   addTestPlugin(libs.agp)
   addTestPlugin(libs.kgp)
+  testImplementation(libs.javapoet)
+  testImplementation(libs.kotlinpoet)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
