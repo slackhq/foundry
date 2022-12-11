@@ -20,12 +20,12 @@ import java.io.File
 import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import slack.fakes.NoOpLogger
+import slack.gradle.util.newTemporaryFolder
 
 class AndroidSourcesConfigurerTest {
 
-  @JvmField @Rule val tmpFolder = TemporaryFolder()
+  @JvmField @Rule val tmpFolder = newTemporaryFolder()
 
   @Test
   fun happyPath() {

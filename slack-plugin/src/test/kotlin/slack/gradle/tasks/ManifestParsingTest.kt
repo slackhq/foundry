@@ -18,11 +18,11 @@ package slack.gradle.tasks
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import slack.gradle.util.newTemporaryFolder
 
 class ManifestParsingTest {
 
-  @JvmField @Rule val temporaryFolder = TemporaryFolder()
+  @JvmField @Rule val temporaryFolder = newTemporaryFolder()
 
   @Test
   fun basicTest() {
