@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   `kotlin-dsl`
   kotlin("jvm")
@@ -44,8 +46,28 @@ val copyVersionTemplatesProvider = tasks.register<Copy>("copyVersionTemplates") 
   }
 }
 
-tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileKotlin") {
+tasks.named<KotlinCompile>("compileKotlin") {
   dependsOn(copyVersionTemplatesProvider)
+}
+
+tasks.withType<Test>().configureEach {
+  beforeTest(closureOf<TestDescriptor> { logger.lifecycle("Running test: $this") })
+}
+
+sourceSets {
+  getByName("test").resources.srcDirs(project.layout.buildDirectory.dir("pluginUnderTestMetadata"))
+}
+
+// Fix missing implicit task dependency in Gradle's test kit
+tasks.named("processTestResources") { dependsOn("pluginUnderTestMetadata") }
+
+val addTestPlugin: Configuration = configurations.create("addTestPlugin")
+
+configurations { testImplementation.get().extendsFrom(addTestPlugin) }
+
+tasks.pluginUnderTestMetadata {
+  // make sure the test can access plugins for coordination.
+  pluginClasspath.from(addTestPlugin)
 }
 
 dependencies {
@@ -82,7 +104,6 @@ dependencies {
   api(projects.agpHandlers.agpHandlerApi)
   api(projects.agpHandlers.agpHandler73)
   api(projects.agpHandlers.agpHandler80)
-  testImplementation(libs.agp)
 
   implementation(libs.commonsText) {
     because("For access to its StringEscapeUtils")
@@ -108,6 +129,8 @@ dependencies {
   // Better I/O
   api(libs.okio)
 
+  addTestPlugin(libs.agp)
+  addTestPlugin(libs.kgp)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }

@@ -56,6 +56,8 @@ gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradl
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 guava = "com.google.guava:guava:31.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
+kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kgp-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.1"
 jna = "net.java.dev.jna:jna:5.12.1"
 junit = "junit:junit:4.13.2"
