@@ -175,3 +175,6 @@ enableFeaturePreview("GROOVY_COMPILATION_AVOIDANCE")
 
 // https://docs.gradle.org/current/userguide/declaring_dependencies.html#sec:type-safe-project-accessors
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+// Even more configuration cache checks
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
