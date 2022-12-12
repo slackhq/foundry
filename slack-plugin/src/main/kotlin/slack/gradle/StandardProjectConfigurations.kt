@@ -581,12 +581,6 @@ internal class StandardProjectConfigurations(
               "**/*.so"
             )
           )
-          jniLibs.pickFirsts +=
-            setOf(
-              // Some libs like Flipper bring their own copy of common native libs (like C++) and we
-              // need to de-dupe
-              "**/*.so"
-            )
         }
         buildTypes {
           getByName("debug") {
