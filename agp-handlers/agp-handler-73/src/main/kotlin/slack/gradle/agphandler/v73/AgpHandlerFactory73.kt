@@ -15,6 +15,7 @@
  */
 package slack.gradle.agphandler.v73
 
+import com.android.build.api.dsl.PackagingOptions
 import com.android.build.gradle.internal.dsl.TestOptions
 import com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.google.auto.service.AutoService
@@ -42,6 +43,13 @@ private class AgpHandler73 : AgpHandler {
 
   override fun allUnitTestOptions(options: TestOptions.UnitTestOptions, body: (Test) -> Unit) {
     options.all(typedClosureOf(body))
+  }
+
+  override fun jniLibsPickFirst(
+    packagingOptions: PackagingOptions,
+    pickFirsts: Collection<String>
+  ) {
+    packagingOptions.jniLibs.pickFirsts += pickFirsts
   }
 }
 
