@@ -31,7 +31,6 @@ import slack.gradle.safeCapitalize
  * form of a newline-delimited list of `<module identifier>:<version>`.
  *
  * Example:
- *
  * ```
  * mvn+com.google.gson:gson:2.8.6
  * mvn+com.google.guava:guava:29-jre

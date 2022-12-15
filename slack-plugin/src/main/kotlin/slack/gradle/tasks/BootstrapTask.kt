@@ -109,7 +109,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
   /**
    * Environments can have different constraints, namely CI vs local.
-   *
    * - In CI, we want to use near-100% of resources.
    * - In local, we want to maybe just use 50% (leaves room for studio, emulator, chrome etc)
    */

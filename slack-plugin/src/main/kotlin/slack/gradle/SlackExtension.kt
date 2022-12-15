@@ -351,17 +351,21 @@ public abstract class FeaturesHandler @Inject constructor(objects: ObjectFactory
    * Enables dagger for this project.
    *
    * @param enableComponents enables dagger components in this project, which in turn imposes use
+   *
    * ```
    *                         of the dagger compiler (slower!)
    * @param projectHasJavaInjections
    * ```
+   *
    * indicates if this project has injected _Java_ files. This means
+   *
    * ```
    *                                 any Java file with `@Inject` or `@AssistedInject`. This imposes
    *                                 use of the dagger compiler (slower!) because Anvil only
    *                                 processes Kotlin files.
    * @param action
    * ```
+   *
    * optional block for extra configuration, such as anvil generators or android.
    */
   @DelicateSlackPluginApi
@@ -428,7 +432,7 @@ public abstract class FeaturesHandler @Inject constructor(objects: ObjectFactory
    * @param codegen Enables codegen.
    * @param adapters Enables moshi-adapters.
    * @param kotlinReflect Enables kotlin-reflect-based support. Should only be used in unit tests or
-   * CLIs!
+   *   CLIs!
    * @param action Optional extra configuration for other Moshi libraries, such as MoshiX.
    */
   public fun moshi(
@@ -498,9 +502,9 @@ public abstract class MoshiHandler {
    *
    * @param codegen Enables codegen.
    * @param kotlinReflect Enables kotlin-reflect-based support. Should only be used in unit tests or
-   * CLIs!
+   *   CLIs!
    * @param metadataReflect Enables metadata-based reflection support. Should only be used in unit
-   * tests or CLIs!
+   *   tests or CLIs!
    */
   public fun sealed(
     codegen: Boolean,
