@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.6
+-----
+
+_2022-12-15_
+
+* Backport `android.packagingOptions.jniLibs.pickFirst` for AGP 8.x compatibility, as the returned type by `jniLibs` changed from `JniLibsPackagingOptions` to `JniLibsPackaging`.
+
 0.3.5
 -----
 
