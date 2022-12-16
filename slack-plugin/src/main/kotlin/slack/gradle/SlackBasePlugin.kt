@@ -88,9 +88,8 @@ internal class SlackBasePlugin : Plugin<Project> {
               target.tasks
                 .withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>()
                 .configureEach {
-                  kotlinOptions {
-                    @Suppress("SuspiciousCollectionReassignment")
-                    freeCompilerArgs += "-opt-in=com.slack.eithernet.ExperimentalEitherNetApi"
+                  compilerOptions {
+                    freeCompilerArgs.add("-opt-in=com.slack.eithernet.ExperimentalEitherNetApi")
                   }
                 }
             }
