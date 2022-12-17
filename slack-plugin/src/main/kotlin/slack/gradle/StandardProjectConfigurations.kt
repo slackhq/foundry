@@ -72,7 +72,6 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
@@ -82,6 +81,7 @@ import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
+import slack.gradle.util.configureKotlinCompile
 
 private const val LOG = "SlackPlugin:"
 
@@ -798,7 +798,7 @@ internal class StandardProjectConfigurations(
     plugins.withType<KotlinBasePlugin> {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
       @Suppress("SuspiciousCollectionReassignment")
-      tasks.configureEach<KotlinCompile> {
+      tasks.configureKotlinCompile {
         kotlinOptions {
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
             allWarningsAsErrors = true
@@ -811,7 +811,7 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.composeHandler.enabled.get() && isAndroid
           ) {
             logger.debug(
-              "Configuring compose compiler args in ${project.path}:${this@configureEach.name}"
+              "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompile.name}"
             )
             freeCompilerArgs += "-Xskip-prerelease-check"
             // Flag to disable Compose's kotlin version check because they're often behind
@@ -972,7 +972,7 @@ internal class StandardProjectConfigurations(
           dependencies.forEach { dependency ->
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
               if (once.compareAndSet(false, true)) {
-                tasks.withType<KotlinCompile>().configureEach {
+                tasks.configureKotlinCompile {
                   kotlinOptions {
                     @Suppress("SuspiciousCollectionReassignment") // This isn't suspicious
                     freeCompilerArgs += config.args
