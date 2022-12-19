@@ -71,9 +71,9 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
@@ -83,6 +83,7 @@ import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
+import slack.gradle.util.configureKotlinCompile
 
 private const val LOG = "SlackPlugin:"
 
@@ -96,7 +97,7 @@ private fun Logger.logWithTag(message: String) {
  *
  * Principles:
  * - Avoid duplicating work and allocations. This runs at configuration time and should be as low
- * overhead as possible.
+ *   overhead as possible.
  * - Do not resolve dependencies at configuration-time. Use appropriate callback APIs!
  * - Support Kotlin, Android, and Java projects.
  * - One-off configuration should be left to individual projects to declare.
@@ -798,22 +799,31 @@ internal class StandardProjectConfigurations(
 
     plugins.withType<KotlinBasePlugin> {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
-      tasks.configureEach<KotlinCompile> {
+
+      tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
+        // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
+        // target compilation
+        val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
+
         compilerOptions {
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
             allWarningsAsErrors.set(true)
           }
           jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
-          freeCompilerArgs.addAll(kotlinCompilerArgs)
+          if (!isKaptGenerateStubsTask) {
+            freeCompilerArgs.addAll(kotlinCompilerArgs)
+          }
           useK2.set(slackProperties.useK2)
 
           if (
             slackExtension.androidHandler.featuresHandler.composeHandler.enabled.get() && isAndroid
           ) {
             logger.debug(
-              "Configuring compose compiler args in ${project.path}:${this@configureEach.name}"
+              "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompile.name}"
             )
-            freeCompilerArgs.add("-Xskip-prerelease-check")
+            if (!isKaptGenerateStubsTask) {
+              freeCompilerArgs.add("-Xskip-prerelease-check")
+            }
             // Flag to disable Compose's kotlin version check because they're often behind
             // Or ahead
             // Or if they're the same, do nothing
@@ -822,11 +832,11 @@ internal class StandardProjectConfigurations(
               slackProperties.versions.composeCompilerKotlinVersion
                 ?: error("Missing 'composeCompilerKotlinVersion' version in version catalog")
             val kotlinVersion = slackProperties.versions.kotlin
-            if (kotlinVersion != composeCompilerKotlinVersion) {
+            if (!isKaptGenerateStubsTask && kotlinVersion != composeCompilerKotlinVersion) {
               freeCompilerArgs.addAll(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
-              )
+                  "-P",
+                  "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
+                )
             }
           }
 
@@ -971,7 +981,7 @@ internal class StandardProjectConfigurations(
           dependencies.forEach { dependency ->
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
               if (once.compareAndSet(false, true)) {
-                tasks.withType<KotlinCompile>().configureEach {
+                tasks.configureKotlinCompile {
                   compilerOptions { freeCompilerArgs.addAll(config.args) }
                 }
               }

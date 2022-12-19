@@ -33,6 +33,7 @@ import org.gradle.kotlin.dsl.retry
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.gradle.tasks.CoreBootstrapTask
+import slack.gradle.util.configureKotlinCompile
 import slack.gradle.util.synchronousEnvProperty
 import slack.stats.ModuleStatsTasks
 
@@ -85,13 +86,11 @@ internal class SlackBasePlugin : Plugin<Project> {
         incoming.afterResolve {
           dependencies.forEach { dependency ->
             if (dependency.name == "eithernet") {
-              target.tasks
-                .withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>()
-                .configureEach {
-                  compilerOptions {
-                    freeCompilerArgs.add("-opt-in=com.slack.eithernet.ExperimentalEitherNetApi")
-                  }
+              target.tasks.configureKotlinCompile {
+                compilerOptions {
+                  freeCompilerArgs.add("-opt-in=com.slack.eithernet.ExperimentalEitherNetApi")
                 }
+              }
             }
           }
         }
