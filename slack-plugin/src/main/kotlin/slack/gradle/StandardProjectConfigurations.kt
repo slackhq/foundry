@@ -834,9 +834,9 @@ internal class StandardProjectConfigurations(
             val kotlinVersion = slackProperties.versions.kotlin
             if (!isKaptGenerateStubsTask && kotlinVersion != composeCompilerKotlinVersion) {
               freeCompilerArgs.addAll(
-                  "-P",
-                  "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
-                )
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
+              )
             }
           }
 
