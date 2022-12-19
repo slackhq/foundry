@@ -70,6 +70,7 @@ import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.dependencyrake.RakeDependencies
@@ -798,13 +799,19 @@ internal class StandardProjectConfigurations(
     plugins.withType<KotlinBasePlugin> {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
       @Suppress("SuspiciousCollectionReassignment")
-      tasks.configureKotlinCompile {
+      tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
+        // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
+        // target compilation
+        val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
+
         kotlinOptions {
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
             allWarningsAsErrors = true
           }
           jvmTarget = actualJvmTarget
-          freeCompilerArgs += kotlinCompilerArgs
+          if (!isKaptGenerateStubsTask) {
+            freeCompilerArgs += kotlinCompilerArgs
+          }
           useK2 = slackProperties.useK2
 
           if (
@@ -813,7 +820,9 @@ internal class StandardProjectConfigurations(
             logger.debug(
               "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompile.name}"
             )
-            freeCompilerArgs += "-Xskip-prerelease-check"
+            if (!isKaptGenerateStubsTask) {
+              freeCompilerArgs += "-Xskip-prerelease-check"
+            }
             // Flag to disable Compose's kotlin version check because they're often behind
             // Or ahead
             // Or if they're the same, do nothing
@@ -822,7 +831,7 @@ internal class StandardProjectConfigurations(
               slackProperties.versions.composeCompilerKotlinVersion
                 ?: error("Missing 'composeCompilerKotlinVersion' version in version catalog")
             val kotlinVersion = slackProperties.versions.kotlin
-            if (kotlinVersion != composeCompilerKotlinVersion) {
+            if (!isKaptGenerateStubsTask && kotlinVersion != composeCompilerKotlinVersion) {
               freeCompilerArgs +=
                 listOf(
                   "-P",

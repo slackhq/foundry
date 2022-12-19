@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.3.7
+-----
+
+_2022-12-18_
+
+* **Fix:** Don't apply freeCompilerArguments.
+* **Fix:** Add missing license information to POM packaging.
+
 0.3.6
 -----
 
