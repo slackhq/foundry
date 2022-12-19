@@ -95,7 +95,7 @@ private fun Logger.logWithTag(message: String) {
  *
  * Principles:
  * - Avoid duplicating work and allocations. This runs at configuration time and should be as low
- * overhead as possible.
+ *   overhead as possible.
  * - Do not resolve dependencies at configuration-time. Use appropriate callback APIs!
  * - Support Kotlin, Android, and Java projects.
  * - One-off configuration should be left to individual projects to declare.
