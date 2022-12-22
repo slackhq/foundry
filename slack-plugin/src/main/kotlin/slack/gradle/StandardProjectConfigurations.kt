@@ -554,8 +554,9 @@ internal class StandardProjectConfigurations(
           configureLint(project, slackProperties, sdkVersions, true)
           checkDependencies = true
         }
-        packagingOptions {
-          resources.excludes +=
+        agpHandler.packagingOptions(
+          this,
+          resourceExclusions =
             setOf(
               "META-INF/LICENSE.txt",
               "META-INF/LICENSE",
@@ -574,16 +575,14 @@ internal class StandardProjectConfigurations(
               // We don't know where this comes from but it's 5MB
               // https://slack-pde.slack.com/archives/C8EER3C04/p1621353426001500
               "annotated-jdk/**"
-            )
-          agpHandler.jniLibsPickFirst(
-            this,
+            ),
+          jniPickFirsts =
             setOf(
               // Some libs like Flipper bring their own copy of common native libs (like C++) and we
               // need to de-dupe
               "**/*.so"
             )
-          )
-        }
+        )
         buildTypes {
           getByName("debug") {
             // For upstream android libraries that just have a single release variant, use that.

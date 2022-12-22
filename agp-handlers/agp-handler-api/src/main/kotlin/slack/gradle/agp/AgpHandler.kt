@@ -15,7 +15,7 @@
  */
 package slack.gradle.agp
 
-import com.android.build.api.dsl.PackagingOptions
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.internal.dsl.TestOptions
 import org.gradle.api.tasks.testing.Test
 
@@ -29,10 +29,14 @@ public interface AgpHandler {
   public fun allUnitTestOptions(options: TestOptions.UnitTestOptions, body: (Test) -> Unit)
 
   /**
-   * Shim for packagingOptions.jniLibs.pickFirst, which had a signature change in AGP 8.x from
-   * `JniLibsPackagingOptions` to `JniLibsPackaging`.
+   * Shim for packagingOptions, which had a signature change in AGP 8.x from `PackagingOptions` to
+   * `Packaging`.
    */
-  public fun jniLibsPickFirst(packagingOptions: PackagingOptions, pickFirsts: Collection<String>)
+  public fun packagingOptions(
+    commonExtension: CommonExtension<*, *, *, *>,
+    resourceExclusions: Collection<String>,
+    jniPickFirsts: Collection<String>,
+  )
 }
 
 /**
