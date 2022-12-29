@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.4.0
+-----
+
+_2022-12-29_
+
+* Update to Kotlin 1.8.0. This plugin now requires Kotlin 1.8.0 or later as it only configures KGP's new `compilerOptions` API now.
+
 0.3.8
 -----
 
