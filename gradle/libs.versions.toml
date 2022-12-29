@@ -7,8 +7,8 @@ detekt = "1.22.0"
 dokka = "1.7.20"
 errorproneGradle = "3.0.1"
 java = "17"
-kotlin = "1.7.22"
-ksp = "1.7.22-1.0.8"
+kotlin = "1.8.0"
+ksp = "1.8.0-1.0.8"
 ktfmt = "0.42"
 mavenPublish = "0.22.0"
 moshi = "1.14.0"
@@ -56,6 +56,7 @@ gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradl
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 guava = "com.google.guava:guava:31.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
+ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.1"
 jna = "net.java.dev.jna:jna:5.12.1"
 junit = "junit:junit:4.13.2"

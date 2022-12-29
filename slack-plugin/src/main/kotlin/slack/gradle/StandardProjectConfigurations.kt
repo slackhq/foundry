@@ -69,6 +69,7 @@ import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
@@ -797,21 +798,21 @@ internal class StandardProjectConfigurations(
 
     plugins.withType<KotlinBasePlugin> {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
-      @Suppress("SuspiciousCollectionReassignment")
+
       tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
         // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
         // target compilation
         val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
 
-        kotlinOptions {
+        compilerOptions {
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
-            allWarningsAsErrors = true
+            allWarningsAsErrors.set(true)
           }
-          jvmTarget = actualJvmTarget
+          jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
           if (!isKaptGenerateStubsTask) {
-            freeCompilerArgs += kotlinCompilerArgs
+            freeCompilerArgs.addAll(kotlinCompilerArgs)
           }
-          useK2 = slackProperties.useK2
+          useK2.set(slackProperties.useK2)
 
           if (
             slackExtension.androidHandler.featuresHandler.composeHandler.enabled.get() && isAndroid
@@ -820,7 +821,7 @@ internal class StandardProjectConfigurations(
               "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompile.name}"
             )
             if (!isKaptGenerateStubsTask) {
-              freeCompilerArgs += "-Xskip-prerelease-check"
+              freeCompilerArgs.add("-Xskip-prerelease-check")
             }
             // Flag to disable Compose's kotlin version check because they're often behind
             // Or ahead
@@ -831,16 +832,15 @@ internal class StandardProjectConfigurations(
                 ?: error("Missing 'composeCompilerKotlinVersion' version in version catalog")
             val kotlinVersion = slackProperties.versions.kotlin
             if (!isKaptGenerateStubsTask && kotlinVersion != composeCompilerKotlinVersion) {
-              freeCompilerArgs +=
-                listOf(
-                  "-P",
-                  "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
-                )
+              freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
+              )
             }
           }
 
           // Potentially useful for static analysis or annotation processors
-          javaParameters = true
+          javaParameters.set(true)
         }
       }
 
@@ -981,10 +981,7 @@ internal class StandardProjectConfigurations(
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
               if (once.compareAndSet(false, true)) {
                 tasks.configureKotlinCompile {
-                  kotlinOptions {
-                    @Suppress("SuspiciousCollectionReassignment") // This isn't suspicious
-                    freeCompilerArgs += config.args
-                  }
+                  compilerOptions { freeCompilerArgs.addAll(config.args) }
                 }
               }
             }
