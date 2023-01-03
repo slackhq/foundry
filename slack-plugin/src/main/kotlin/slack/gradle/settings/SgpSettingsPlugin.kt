@@ -15,8 +15,8 @@
  */
 package slack.gradle.settings
 
-import org.gradle.api.Action
 import javax.inject.Inject
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.initialization.Settings
