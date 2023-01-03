@@ -26,6 +26,10 @@ gradlePlugin {
     id = "com.slack.gradle.apk-versioning"
     implementationClass = "slack.gradle.ApkVersioningPlugin"
   }
+  plugins.create("settings") {
+    id = "com.slack.gradle.settings"
+    implementationClass = "slack.gradle.settings.SgpSettingsPlugin"
+  }
 }
 
 sourceSets {

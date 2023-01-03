@@ -24,7 +24,16 @@ package slack.gradle.agp
  */
 public interface AgpHandlerFactory {
   public val minVersion: VersionNumber
-  /** Attempts to get the current AGP version or throws and exception if it cannot. */
+  /** Attempts to ascertain the current AGP version or throws and exception if it cannot. */
   public fun currentVersion(): String
+  /**
+   * Creates a new [AgpHandler] instance for the current AGP version if [currentVersion] was deemed
+   * to match.
+   */
   public fun create(): AgpHandler
+  /**
+   * Creates a new [AgpSettingsHandler] instance for the current AGP version if [currentVersion] was
+   * deemed to match.
+   */
+  public fun createSettingsHandler(): AgpSettingsHandler = AgpSettingsHandler.NoOp
 }
