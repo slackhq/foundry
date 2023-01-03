@@ -34,7 +34,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.registerIfAbsent
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
-import slack.gradle.agp.AgpHandler
 import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
@@ -44,7 +43,6 @@ import slack.gradle.util.mapToBoolean
 public abstract class SlackTools @Inject constructor(providers: ProviderFactory) :
   BuildService<Parameters>, AutoCloseable {
 
-  public val agpHandler: AgpHandler by lazy { AgpHandlers.createHandler() }
   public val moshi: Moshi
     get() = JsonTools.MOSHI
 

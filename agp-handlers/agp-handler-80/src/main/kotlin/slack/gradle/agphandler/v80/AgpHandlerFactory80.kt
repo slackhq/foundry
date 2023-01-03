@@ -31,13 +31,9 @@ public class AgpHandlerFactory80 : AgpHandlerFactory {
 
   override fun currentVersion(): String = ANDROID_GRADLE_PLUGIN_VERSION
 
-  override fun create(): AgpHandler {
-    return AgpHandler80()
-  }
+  override fun createHandler(): AgpHandler = AgpHandler80()
 
-  override fun createSettingsHandler(): AgpSettingsHandler {
-    return AgpSettingsHandler80()
-  }
+  override fun createSettingsHandler(): AgpSettingsHandler = AgpSettingsHandler80()
 }
 
 private class AgpHandler80 : AgpHandler {

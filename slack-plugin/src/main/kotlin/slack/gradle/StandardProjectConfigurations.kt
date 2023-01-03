@@ -81,6 +81,7 @@ import slack.gradle.agp.getVersionsCatalog
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.permissionchecks.PermissionChecks
+import slack.gradle.settings.agpHandler
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
@@ -423,7 +424,7 @@ internal class StandardProjectConfigurations(
 
     val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
-    val agpHandler = slackTools().agpHandler
+    val agpHandler = project.agpHandler()
     val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {

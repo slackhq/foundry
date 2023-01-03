@@ -15,6 +15,8 @@
  */
 package slack.gradle.agp
 
+import java.util.ServiceLoader
+
 /**
  * A basic factory interface for creating [AgpHandler] instances. These should be implemented and
  * contributed as a service loader via something like `@AutoService`.
@@ -30,10 +32,36 @@ public interface AgpHandlerFactory {
    * Creates a new [AgpHandler] instance for the current AGP version if [currentVersion] was deemed
    * to match.
    */
-  public fun create(): AgpHandler
+  public fun createHandler(): AgpHandler
   /**
    * Creates a new [AgpSettingsHandler] instance for the current AGP version if [currentVersion] was
    * deemed to match.
    */
   public fun createSettingsHandler(): AgpSettingsHandler = AgpSettingsHandler.NoOp
+
+  public companion object {
+    public fun load(): AgpHandlerFactory {
+      /**
+       * Load handlers and pick the highest compatible version (by [AgpHandlerFactory.minVersion])
+       */
+      return ServiceLoader.load(AgpHandlerFactory::class.java)
+        .iterator()
+        .asSequence()
+        .mapNotNull { factory ->
+          // Filter out any factories that can't compute the AGP version, as
+          // they're _definitely_ not compatible
+          try {
+            FactoryData(VersionNumber.parse(factory.currentVersion()), factory)
+          } catch (t: Throwable) {
+            null
+          }
+        }
+        .filter { (agpVersion, factory) -> agpVersion.baseVersion >= factory.minVersion }
+        .maxByOrNull { (_, factory) -> factory.minVersion }
+        ?.factory
+        ?: error("Unrecognized AGP version!")
+    }
+  }
 }
+
+private data class FactoryData(val agpVersion: VersionNumber, val factory: AgpHandlerFactory)

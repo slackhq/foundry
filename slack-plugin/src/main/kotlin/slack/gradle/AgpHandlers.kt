@@ -15,40 +15,7 @@
  */
 package slack.gradle
 
-import java.util.ServiceLoader
-import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.AgpHandlerFactory
-import slack.gradle.agp.AgpSettingsHandler
 import slack.gradle.agp.VersionNumber
-
-internal object AgpHandlers {
-  private fun factory(): AgpHandlerFactory {
-    /** Load handlers and pick the highest compatible version (by [AgpHandlerFactory.minVersion]) */
-    return ServiceLoader.load(AgpHandlerFactory::class.java)
-      .iterator()
-      .asSequence()
-      .mapNotNull { factory ->
-        // Filter out any factories that can't compute the AGP version, as
-        // they're _definitely_ not compatible
-        try {
-          FactoryData(VersionNumber.parse(factory.currentVersion()), factory)
-        } catch (t: Throwable) {
-          null
-        }
-      }
-      .filter { (agpVersion, factory) -> agpVersion.baseVersion >= factory.minVersion }
-      .maxByOrNull { (_, factory) -> factory.minVersion }
-      ?.factory
-      ?: error("Unrecognized AGP version!")
-  }
-
-  fun createHandler(): AgpHandler {
-    return factory().create()
-  }
-
-  fun createSettingsHandler(): AgpSettingsHandler {
-    return factory().createSettingsHandler()
-  }
-}
 
 private data class FactoryData(val agpVersion: VersionNumber, val factory: AgpHandlerFactory)
