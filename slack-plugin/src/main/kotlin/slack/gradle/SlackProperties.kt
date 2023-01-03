@@ -17,7 +17,7 @@ package slack.gradle
 
 import java.io.File
 import org.gradle.api.Project
-import slack.gradle.agp.getVersionsCatalog
+import slack.gradle.settings.slackVersions
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.getOrCreateExtra
 import slack.gradle.util.intProperty
@@ -51,11 +51,8 @@ public class SlackProperties private constructor(private val project: Project) {
   private fun optionalStringProperty(key: String, defaultValue: String? = null): String? =
     project.optionalStringProperty(key, defaultValue = defaultValue)
 
-  internal val versions: SlackVersions by lazy {
-    project.rootProject.getOrCreateExtra("slack-versions") {
-      SlackVersions(project.rootProject.getVersionsCatalog())
-    }
-  }
+  // TODO eventually define this somewhere separate from SlackProperties?
+  internal val versions: SlackVersions = project.slackVersions()
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
