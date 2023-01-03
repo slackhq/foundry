@@ -23,7 +23,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.UnknownTaskException
 import org.gradle.api.artifacts.VersionCatalog
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -212,18 +211,6 @@ internal fun Project.jdkVersion(): Int {
 
 internal fun Project.jvmTargetVersion(): Int {
   return SlackProperties(this).jvmTarget
-}
-
-internal fun Project.getVersionsCatalog(): VersionCatalog {
-  return getVersionsCatalogOrNull() ?: error("No versions catalog found!")
-}
-
-internal fun Project.getVersionsCatalogOrNull(): VersionCatalog? {
-  return try {
-    project.extensions.getByType<VersionCatalogsExtension>().named("libs")
-  } catch (ignored: Exception) {
-    null
-  }
 }
 
 /** Returns a map of module identifiers to toml library reference aliases */

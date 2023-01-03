@@ -32,6 +32,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.retry
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import slack.gradle.agp.getVersionsCatalogOrNull
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.util.configureKotlinCompile
 import slack.gradle.util.synchronousEnvProperty

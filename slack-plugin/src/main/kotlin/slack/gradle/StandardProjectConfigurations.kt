@@ -77,6 +77,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
+import slack.gradle.agp.getVersionsCatalog
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.permissionchecks.PermissionChecks

@@ -27,6 +27,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.dependencies
+import slack.gradle.agp.getVersionsCatalog
 import slack.gradle.dependencies.DependencyCollection
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.boms

@@ -17,6 +17,7 @@ package slack.gradle
 
 import java.io.File
 import org.gradle.api.Project
+import slack.gradle.agp.getVersionsCatalog
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.getOrCreateExtra
 import slack.gradle.util.intProperty
