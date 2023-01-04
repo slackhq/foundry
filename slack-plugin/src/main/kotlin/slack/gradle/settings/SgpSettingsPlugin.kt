@@ -54,6 +54,10 @@ public class SgpSettingsPlugin : Plugin<Settings> {
     // as Project objects cannot query for the Settings object (and its extensions), we
     // deposit the handler instance into each project using the extra Properties.
     settings.gradle.beforeProject {
+      // Gradle does this immensely weird thing where it considers all intermediary folders in
+      // between projects to _also_ be projects. We skip those in configuration.
+      if (!file("build.gradle.kts").exists()) return@beforeProject
+
       extensions.extraProperties[SGP_VERSIONS_EXTENSION_KEY] = versions
       extensions.extraProperties[AGP_HANDLER_EXTENSION_KEY] = handler
 
