@@ -12,6 +12,41 @@ questions in the discussions section of the project!
 We may later publish some of these components. If you're interested in this, feel free to raise in
 a discussions post or vote for existing suggestions.
 
+
+## Usage requirements
+
+SGP is more or less set up via its `Settings` plugin. Apply this in the `settings.gradle.kts` file
+and it will automatically configure all subprojects and the root project.
+
+```kotlin
+// In settings.gradle.kts
+plugins {
+  id("com.slack.gradle.settings")
+}
+
+slack {
+  // Optionally configure versions. This will default to sourcing from `libs.versions.toml`.
+  versions {
+    jvmTarget.set(11)
+  }
+}
+```
+
+SGP expects a `libs` version catalog to be present.
+
+The following versions are required to be set the above catalog or via the `slack.versions` DSL in the settings plugin.
+Their docs can be found in `SlackVersions.kt`.
+- `kotlin` - The Kotlin version to use.
+- `jdk` - The JDK version to use.
+- `jvmTarget` - The JVM target to use in Kotlin and Java (as `--release`) compilations.
+
+The following plugins are applied by default but can be disabled via Gradle properties if you don't need them.
+- Gradle's test retry – `slack.auto-apply.test-retry`
+- Spotless – `slack.auto-apply.spotless`
+- Detekt – `slack.auto-apply.detekt`
+- NullAway – `slack.auto-apply.nullaway`
+- Android Cache Fix – `slack.auto-apply.cache-fix`
+
 ## Highlights
 
 ### Common project configuration
@@ -24,8 +59,12 @@ This includes a whole host of things!
 - Common Kotlin configuration (freeCompilerArgs, JVM target, etc).
 - Common Java configuration (toolchains, release versions, etc).
 - Common annotation processors.
-- SlackExtension (see next section).
+- `SlackExtension` (see next section).
 - Formatting (via Spotless).
+  - Kotlin
+  - Java
+  - JSON
+  - Some standard files like newline endings
 - Platforms and BOM dependencies (see "Platform plugins" section below).
 - Common lint checks (both on Android and plain JVM projects).
 
@@ -157,21 +196,6 @@ generated baselines from each subproject into a single global baseline.
 ### Misc tools
 
 There are a _ton_ of miscellaneous tools, utilities, and glue code for Gradle (and various plugins) sprinkled throughout this project.
-
-## Usage requirements
-
-SGP expects there to be a `libs` version catalog.
-
-The following versions are required to be set the above catalog.
-Their docs can be found in `SlackVersions.kt`.
-- `jdk`
-
-The following plugins are applied by default but can be disabled if you don't need them.
-- Gradle's test retry – `slack.auto-apply.test-retry`
-- Spotless – `slack.auto-apply.spotless`
-- Detekt – `slack.auto-apply.detekt`
-- NullAway – `slack.auto-apply.nullaway`
-- Android Cache Fix – `slack.auto-apply.cache-fix`
 
 License
 --------

@@ -27,6 +27,12 @@ internal class SlackVersions(
   val catalog: VersionCatalog,
   settingsVersions: SgpSettingsVersions,
 ) {
+  // Required
+  val kotlin: String = settingsVersions.kotlin.get()
+  val jdk: Int = settingsVersions.jdk.get()
+  val jvmTarget: Int = settingsVersions.jvmTarget.get()
+
+  // Optional
   val agp: String? = settingsVersions.agp.orNull
   val composeCompiler: String? = settingsVersions.composeCompiler.orNull
   val composeCompilerKotlinVersion: String? = settingsVersions.composeCompilerKotlinVersion.orNull
@@ -36,9 +42,6 @@ internal class SlackVersions(
   val ktlint: String? = settingsVersions.ktlint.orNull
   val ktfmt: String? = settingsVersions.ktfmt.orNull
   val objenesis: String? = settingsVersions.objenesis.orNull
-  val kotlin: String = settingsVersions.kotlin.get()
-  val jdk: Int = settingsVersions.jdk.get()
-  val jvmTarget: Int = settingsVersions.jvmTarget.get()
 
   val bundles = Bundles()
 
