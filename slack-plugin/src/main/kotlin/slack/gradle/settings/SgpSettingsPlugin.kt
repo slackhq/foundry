@@ -56,7 +56,7 @@ public class SgpSettingsPlugin : Plugin<Settings> {
     settings.gradle.beforeProject {
       // Gradle does this immensely weird thing where it considers all intermediary folders in
       // between projects to _also_ be projects. We skip those in configuration.
-      if (!file("build.gradle.kts").exists()) return@beforeProject
+      if (!buildFile.exists()) return@beforeProject
 
       extensions.extraProperties[SGP_VERSIONS_EXTENSION_KEY] = versions
       extensions.extraProperties[AGP_HANDLER_EXTENSION_KEY] = handler
