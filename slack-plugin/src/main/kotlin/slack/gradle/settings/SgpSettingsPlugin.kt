@@ -25,6 +25,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.property
@@ -33,6 +34,7 @@ import slack.gradle.SlackVersions
 import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.AgpHandlerFactory
 import slack.gradle.agp.getVersionsCatalog
+import slack.gradle.isRootProject
 import slack.gradle.settings.SgpSettingsPlugin.Companion.AGP_HANDLER_EXTENSION_KEY
 import slack.gradle.settings.SgpSettingsPlugin.Companion.SGP_VERSIONS_EXTENSION_KEY
 import slack.gradle.tomlKey
@@ -54,6 +56,12 @@ public class SgpSettingsPlugin : Plugin<Settings> {
     settings.gradle.beforeProject {
       extensions.extraProperties[SGP_VERSIONS_EXTENSION_KEY] = versions
       extensions.extraProperties[AGP_HANDLER_EXTENSION_KEY] = handler
+
+      // Apply base plugin to all subprojects
+      if (project.isRootProject) {
+        apply(plugin = "com.slack.gradle.root")
+      }
+      apply(plugin = "com.slack.gradle.base")
     }
   }
 
