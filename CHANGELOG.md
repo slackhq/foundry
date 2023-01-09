@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.4.1
+-----
+
+_2023-01-09_
+
+Happy new year!
+
+- **Fix**: Remove EitherNet compiler option opt-ins.
+- Update Okio to `3.3.0`.
+
 0.4.0
 -----
 
