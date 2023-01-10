@@ -168,6 +168,7 @@ Their docs can be found in `SlackVersions.kt`.
 
 The following plugins are applied by default but can be disabled if you don't need them.
 - Gradle's test retry – `slack.auto-apply.test-retry`
+  - By default, this uses the [Gradle test-retry plugin](https://github.com/gradle/test-retry-gradle-plugin), but can be configured to use the Gradle Enterprise plugin's implementation instead by setting the `slack.test.retry.pluginType` property to `GE`.
 - Spotless – `slack.auto-apply.spotless`
 - Detekt – `slack.auto-apply.detekt`
 - NullAway – `slack.auto-apply.nullaway`

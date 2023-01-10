@@ -17,9 +17,12 @@ package slack.gradle
 
 import java.io.File
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import slack.gradle.util.booleanProperty
+import slack.gradle.util.booleanProvider
 import slack.gradle.util.getOrCreateExtra
 import slack.gradle.util.intProperty
+import slack.gradle.util.intProvider
 import slack.gradle.util.optionalStringProperty
 import slack.gradle.util.safeProperty
 
@@ -342,6 +345,26 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.auto-apply.nullaway", defaultValue = true)
   public val autoApplyCacheFix: Boolean
     get() = booleanProperty("slack.auto-apply.cache-fix", defaultValue = true)
+
+  /* Test retry controls. */
+  public enum class TestRetryPluginType {
+    RETRY_PLUGIN,
+    GE
+  }
+
+  public val testRetryPluginType: TestRetryPluginType
+    get() =
+      stringProperty("slack.test.retry.pluginType", TestRetryPluginType.RETRY_PLUGIN.name)
+        .let(TestRetryPluginType::valueOf)
+
+  public val testRetryFailOnPassedAfterRetry: Provider<Boolean>
+    get() = project.booleanProvider("slack.test.retry.failOnPassedAfterRetry", defaultValue = false)
+
+  public val testRetryMaxFailures: Provider<Int>
+    get() = project.intProvider("slack.test.retry.maxFailures", defaultValue = 20)
+
+  public val testRetryMaxRetries: Provider<Int>
+    get() = project.intProvider("slack.test.retry.maxRetries", defaultValue = 1)
 
   /* Detekt configs. */
   /** Detekt config files, evaluated from rootProject.file(...). */
