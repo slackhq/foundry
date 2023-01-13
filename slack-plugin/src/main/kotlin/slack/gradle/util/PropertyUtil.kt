@@ -171,20 +171,43 @@ internal fun Project.synchronousEnvProperty(env: String, default: String? = null
   return providers.environmentVariable(env).getOrElse(sneakyNull(default))
 }
 
+// TODO rename these scalar types to <type>Value
 internal fun Project.booleanProperty(key: String, defaultValue: Boolean = false): Boolean {
-  return booleanProperty(key, provider { defaultValue })
+  return booleanProvider(key, defaultValue).get()
 }
 
 internal fun Project.booleanProperty(key: String, defaultValue: Provider<Boolean>): Boolean {
-  return safeProperty(key).mapToBoolean().orElse(defaultValue).get()
+  return booleanProvider(key, defaultValue).get()
+}
+
+internal fun Project.booleanProvider(
+  key: String,
+  defaultValue: Boolean = false
+): Provider<Boolean> {
+  return booleanProvider(key, provider { defaultValue })
+}
+
+internal fun Project.booleanProvider(
+  key: String,
+  defaultValue: Provider<Boolean>
+): Provider<Boolean> {
+  return safeProperty(key).mapToBoolean().orElse(defaultValue)
 }
 
 internal fun Project.intProperty(key: String, defaultValue: Int = -1): Int {
-  return intProperty(key, provider { defaultValue })
+  return intProvider(key, defaultValue).get()
 }
 
 internal fun Project.intProperty(key: String, defaultValue: Provider<Int>): Int {
-  return safeProperty(key).mapToInt().orElse(defaultValue).get()
+  return intProvider(key, defaultValue).get()
+}
+
+internal fun Project.intProvider(key: String, defaultValue: Int = -1): Provider<Int> {
+  return intProvider(key, provider { defaultValue })
+}
+
+internal fun Project.intProvider(key: String, defaultValue: Provider<Int>): Provider<Int> {
+  return safeProperty(key).mapToInt().orElse(defaultValue)
 }
 
 internal fun Project.stringProperty(key: String): String {
