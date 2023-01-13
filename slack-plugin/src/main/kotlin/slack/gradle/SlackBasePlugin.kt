@@ -17,6 +17,7 @@ package slack.gradle
 
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
+import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import java.util.Locale
 import java.util.Optional
 import kotlin.math.max
@@ -56,7 +57,11 @@ internal class SlackBasePlugin : Plugin<Project> {
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
       // there is somewhat expected.
-      if (slackProperties.autoApplyTestRetry && target.isCi) {
+      if (
+        slackProperties.autoApplyTestRetry &&
+          target.isCi &&
+          slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN
+      ) {
         target.apply(plugin = "org.gradle.test-retry")
       }
 
@@ -318,13 +323,25 @@ internal class SlackBasePlugin : Plugin<Project> {
     }
 
     if (isCi) {
-      pluginManager.withPlugin("org.gradle.test-retry") {
+      if (slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN) {
+        pluginManager.withPlugin("org.gradle.test-retry") {
+          tasks.withType<Test>().configureEach {
+            @Suppress("MagicNumber")
+            retry {
+              failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
+              maxFailures.set(slackProperties.testRetryMaxFailures)
+              maxRetries.set(slackProperties.testRetryMaxRetries)
+            }
+          }
+        }
+      } else {
+        // TODO eventually expose if GE was enabled in settings via our own settings plugin?
         tasks.withType<Test>().configureEach {
           @Suppress("MagicNumber")
-          retry {
-            failOnPassedAfterRetry.set(false)
-            maxFailures.set(20)
-            maxRetries.set(1)
+          geRetry {
+            failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
+            maxFailures.set(slackProperties.testRetryMaxFailures)
+            maxRetries.set(slackProperties.testRetryMaxRetries)
           }
         }
       }
