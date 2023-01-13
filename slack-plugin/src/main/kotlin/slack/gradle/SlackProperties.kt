@@ -15,6 +15,7 @@
  */
 package slack.gradle
 
+import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import slack.gradle.settings.slackVersions
@@ -25,7 +26,6 @@ import slack.gradle.util.intProperty
 import slack.gradle.util.intProvider
 import slack.gradle.util.optionalStringProperty
 import slack.gradle.util.safeProperty
-import java.io.File
 
 /**
  * (Mostly Gradle) properties for configuration of SlackPlugin.
