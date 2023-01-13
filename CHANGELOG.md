@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.4.2
+-----
+
+_2023-01-13_
+
+* **Enhancement:** Change default gradle memory percent in bootstrap from 25% to 50%.
+* **Fix:** Support the gradle enterprise plugin retry implementation when using Gradle enterprise 3.12+.
+
 0.4.1
 -----
 
