@@ -91,7 +91,7 @@ private val BYTES_PER_GB = 1024.0.pow(3)
 private const val NEW_SIZE_PERCENT = 0.67
 
 /** The ratio of Gradle jvm args memory to kotlin daemon memory. */
-private const val DEFAULT_GRADLE_MEMORY_PERCENT = 0.25f
+private const val DEFAULT_GRADLE_MEMORY_PERCENT = 0.50f
 
 /**
  * The core Bootstrap task that all bootstrap-applicable tasks can depend on. This task configures
