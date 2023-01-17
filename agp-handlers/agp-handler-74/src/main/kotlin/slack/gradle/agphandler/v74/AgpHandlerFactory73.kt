@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.agphandler.v73
+package slack.gradle.agphandler.v74
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.internal.dsl.TestOptions
@@ -27,17 +27,17 @@ import slack.gradle.agp.AgpHandlerFactory
 import slack.gradle.agp.VersionNumber
 
 @AutoService(AgpHandlerFactory::class)
-public class AgpHandlerFactory73 : AgpHandlerFactory {
-  override val minVersion: VersionNumber = VersionNumber.parse("7.3.0")
+public class AgpHandlerFactory74 : AgpHandlerFactory {
+  override val minVersion: VersionNumber = VersionNumber.parse("7.4.0")
 
   override fun currentVersion(): String = ANDROID_GRADLE_PLUGIN_VERSION
 
   override fun create(): AgpHandler {
-    return AgpHandler73()
+    return AgpHandler74()
   }
 }
 
-private class AgpHandler73 : AgpHandler {
+private class AgpHandler74 : AgpHandler {
   override val agpVersion: String
     get() = ANDROID_GRADLE_PLUGIN_VERSION
 
