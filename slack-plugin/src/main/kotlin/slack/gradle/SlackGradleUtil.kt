@@ -76,17 +76,6 @@ public fun Project.gitBranch(): Provider<String> {
   }
 }
 
-/**
- * We only enable bugsnag on CI branches starting with "release" (the prefix release team uses) or
- * main and disable the bugsnag gradle plugin in everywhere else to speed up build times. Note that
- * this includes a few things: preventing manifest modifications per-build, uploading mapping files
- * to their slow endpoints, etc.
- */
-public val Project.shouldEnableBugsnagPlugin: Boolean
-  get() {
-    return (isCi) && gitBranch().map { it == "main" || it.startsWith("release") }.getOrElse(false)
-  }
-
 private const val GIT_VERSION_PREFIX = "git version "
 
 /**
