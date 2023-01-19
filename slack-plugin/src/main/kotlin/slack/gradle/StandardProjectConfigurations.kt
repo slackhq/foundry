@@ -447,7 +447,7 @@ internal class StandardProjectConfigurations(
 
         dependencies.add(
           Configurations.CORE_LIBRARY_DESUGARING,
-          SlackDependencies.Google.coreLibraryDesugaring
+          versionCatalog.findLibrary("google-coreLibraryDesugaring"),
         )
 
         if (applyTestOptions) {
