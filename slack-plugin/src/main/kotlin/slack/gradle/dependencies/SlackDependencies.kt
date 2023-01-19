@@ -148,11 +148,6 @@ internal object SlackDependencies : DependencySet() {
     internal val core: Any by artifact("error_prone_core")
   }
 
-  object Google : DependencySet() {
-    val coreLibraryDesugaring: Any by artifact("com.android.tools", "desugar_jdk_libs")
-    val r8: Any by artifact("com.android.tools", "r8")
-  }
-
   object Incap : DependencyGroup("net.ltgt.gradle.incap") {
     val incap: Any by artifact()
     val processor: Any by artifact("incap-processor")
