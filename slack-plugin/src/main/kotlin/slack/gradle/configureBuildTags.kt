@@ -72,33 +72,6 @@ private fun ScanApi.tagCiOrLocal(isCi: Boolean) {
 }
 
 private fun ScanApi.addCiMetadata(project: Project) {
-  if (project.isJenkins) {
-    if (System.getenv("BUILD_URL") != null) {
-      link("Jenkins build", System.getenv("BUILD_URL"))
-    }
-    if (System.getenv("BUILD_NUMBER") != null) {
-      value("CI build number", System.getenv("BUILD_NUMBER"))
-    }
-    if (System.getenv("NODE_NAME") != null) {
-      val nodeNameLabel = "CI node"
-      val nodeName = System.getenv("NODE_NAME")
-      value(nodeNameLabel, nodeName)
-      addCustomLinkWithSearchTerms("CI node build scans", mapOf(nodeNameLabel to nodeName))
-    }
-    if (System.getenv("JOB_NAME") != null) {
-      val jobNameLabel = "CI job"
-      val jobName = System.getenv("JOB_NAME")
-      value(jobNameLabel, jobName)
-      addCustomLinkWithSearchTerms("CI job build scans", mapOf(jobNameLabel to jobName))
-    }
-    if (System.getenv("STAGE_NAME") != null) {
-      val stageNameLabel = "CI stage"
-      val stageName = System.getenv("STAGE_NAME")
-      value(stageNameLabel, stageName)
-      addCustomLinkWithSearchTerms("CI stage build scans", mapOf(stageNameLabel to stageName))
-    }
-  }
-
   if (project.isActionsCi) {
     if (System.getenv("GITHUB_REPOSITORY") != null && System.getenv("GITHUB_RUN_ID") != null) {
       link(

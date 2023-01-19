@@ -298,7 +298,6 @@ internal class SlackBasePlugin : Plugin<Project> {
 
         val workspaceDir =
           when {
-            isJenkins -> synchronousEnvProperty("WORKSPACE")
             isActionsCi -> synchronousEnvProperty("GITHUB_WORKSPACE")
             else -> rootProject.projectDir.absolutePath
           }

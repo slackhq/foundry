@@ -43,13 +43,9 @@ public val Project.isActionsCi: Boolean
 public val Project.isBuildkite: Boolean
   get() = providers.environmentVariable("BUILDKITE").mapToBoolean().getOrElse(false)
 
-/** If true, this is currently running on Jenkins CI. */
-public val Project.isJenkins: Boolean
-  get() = jenkinsHome.isPresent
-
 /** If true, this is currently running on any CI. */
 public val Project.isCi: Boolean
-  get() = isJenkins || isActionsCi || isBuildkite
+  get() = isActionsCi || isBuildkite
 
 /** Useful helper for resolving a `group:name:version` bom notation for a [DependencyGroup]. */
 internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
@@ -60,10 +56,6 @@ internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
 /** Returns the git branch this is running on. */
 public fun Project.gitBranch(): Provider<String> {
   return when {
-    isJenkins ->
-      providers
-        .environmentVariable("CHANGE_BRANCH")
-        .orElse(providers.environmentVariable("BRANCH_NAME"))
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
       executeWithResult(

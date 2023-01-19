@@ -617,6 +617,22 @@ internal class StandardProjectConfigurations(
         }
 
         pluginManager.withPlugin("com.bugsnag.android.gradle") {
+          val branchMatchesPatternProvider =
+            slackProperties.bugsnagEnabledBranchPattern.zip(gitBranch()) { pattern, branch ->
+              if (pattern == null || branch == null) {
+                return@zip false
+              }
+              pattern.toRegex().matches(branch)
+            }
+
+          val enabledProvider =
+            slackProperties.bugsnagEnabled.orElse(branchMatchesPatternProvider).orElse(false).zip(
+              provider { isCi }
+            ) { enabled, isRunningOnCi ->
+              // Only enable if we're also on CI
+              enabled && isRunningOnCi
+            }
+
           configure<BugsnagPluginExtension> {
             variantFilter {
               // disables plugin for all debug variants
@@ -628,17 +644,6 @@ internal class StandardProjectConfigurations(
 
             // 5 minute timeout because let's be real, if it's taking this long something is wrong
             requestTimeoutMs.set(FIVE_MINUTES_MS)
-
-            val branchMatchesPatternProvider =
-              slackProperties.bugsnagEnabledBranchPattern.zip(gitBranch()) { pattern, branch ->
-                if (pattern == null || branch == null) {
-                  return@zip false
-                }
-                pattern.toRegex().matches(branch)
-              }
-
-            val enabledProvider =
-              slackProperties.bugsnagEnabled.orElse(branchMatchesPatternProvider).orElse(false)
 
             // Enable uploads if the enable prop is enabled or the branch matches a provided pattern
             // Note we _don't_ use the BugsnagPluginExtension.enabled property itself because we do
