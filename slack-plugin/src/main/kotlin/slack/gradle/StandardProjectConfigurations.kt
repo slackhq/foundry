@@ -649,10 +649,12 @@ internal class StandardProjectConfigurations(
             // Note we _don't_ use the BugsnagPluginExtension.enabled property itself because we do
             // want bugsnag to do most of its regular process, just skipping uploads unless enabled.
             uploadJvmMappings.set(enabledProvider)
-            uploadNdkMappings.set(enabledProvider)
-            uploadNdkUnityLibraryMappings.set(enabledProvider)
-            uploadReactNativeMappings.set(enabledProvider)
             reportBuilds.set(enabledProvider)
+
+            // We don't use these
+            uploadNdkMappings.set(false)
+            uploadNdkUnityLibraryMappings.set(false)
+            uploadReactNativeMappings.set(false)
           }
         }
       }
