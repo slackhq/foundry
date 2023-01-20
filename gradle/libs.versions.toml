@@ -43,6 +43,7 @@ gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+gradlePlugins-detektCompilerPlugin = "io.github.detekt:detekt-compiler-plugin:0.3.3"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.8.1"
 gradlePlugins-enterprise = "com.gradle:gradle-enterprise-gradle-plugin:3.12.2"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }

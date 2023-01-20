@@ -434,6 +434,18 @@ public class SlackProperties private constructor(private val project: Project) {
   private val targetSdkVersion: String?
     get() = optionalStringProperty("slack.targetSdkVersion")
 
+  /**
+   * The type of detekt plugin to use. Default is [DetektPluginType.STANDALONE_PLUGIN] as the compiler plugin is quite experimental.
+   */
+  internal val detektPluginType: DetektPluginType
+    get() = optionalStringProperty("slack.detekt.pluginType")?.let(DetektPluginType::valueOf)
+      ?: DetektPluginType.STANDALONE_PLUGIN
+
+  public enum class DetektPluginType(public val pluginId: String) {
+    STANDALONE_PLUGIN("io.gitlab.arturbosch.detekt"),
+    COMPILER_PLUGIN("io.github.detekt.gradle.compiler-plugin")
+  }
+
   public companion object {
     /**
      * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.

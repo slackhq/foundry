@@ -791,7 +791,14 @@ internal class StandardProjectConfigurations(
         jvmTargetVersion.toString()
       }
 
-    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
+    pluginManager.withPlugin(SlackProperties.DetektPluginType.COMPILER_PLUGIN.pluginId) {
+      // TODO uhhh what's in the current release and why doesn't this match the repo
+      configure<ProjectDetektExtension> {
+
+      }
+    }
+
+    pluginManager.withPlugin(SlackProperties.DetektPluginType.STANDALONE_PLUGIN.pluginId) {
       // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
       configure<DetektExtension> {
         buildUponDefaultConfig = true

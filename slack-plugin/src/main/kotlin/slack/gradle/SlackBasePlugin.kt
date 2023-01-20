@@ -73,7 +73,7 @@ internal class SlackBasePlugin : Plugin<Project> {
 
       if (slackProperties.autoApplyDetekt) {
         target.plugins.withType<KotlinBasePlugin> {
-          target.apply(plugin = "io.gitlab.arturbosch.detekt")
+          target.apply(plugin = slackProperties.detektPluginType.pluginId)
         }
       }
 

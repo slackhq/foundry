@@ -67,6 +67,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.doctor)
   compileOnly(libs.gradlePlugins.versions)
   compileOnly(libs.gradlePlugins.detekt)
+  compileOnly(libs.gradlePlugins.detektCompilerPlugin)
   compileOnly(libs.detekt)
   compileOnly(libs.gradlePlugins.errorProne)
   compileOnly(libs.gradlePlugins.napt)
