@@ -19,6 +19,7 @@ import com.sun.jna.Library
 import com.sun.jna.Native
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.File
 import java.time.Duration
@@ -301,7 +302,21 @@ internal class AppleSiliconThermals(
             is ThermalsData -> ThermalsData(acc.logs + next)
           }
         }
-        .subscribe { emissions.onNext(it) }
+        .subscribeWith(
+          object : DisposableObserver<Thermals>() {
+            override fun onNext(thermals: Thermals) {
+              emissions.onNext(thermals)
+            }
+
+            override fun onError(e: Throwable) {
+              System.err.println("Error in thermals watcher:\n${e.stackTraceToString()}")
+            }
+
+            override fun onComplete() {
+              // Nothing to do
+            }
+          }
+        )
   }
 
   override fun peek(): Thermals {
