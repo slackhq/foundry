@@ -27,7 +27,6 @@ public class GlobalConfig
 private constructor(
   internal val updateRobolectricJarsTask: TaskProvider<UpdateRobolectricJarsTask>,
   internal val mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
-  internal val shouldEnableBugsnagOnRelease: Boolean,
   internal val kotlinDaemonArgs: List<String>,
   internal val errorProneCheckNamesAsErrors: List<String>
 ) {
@@ -51,8 +50,6 @@ private constructor(
       return GlobalConfig(
         updateRobolectricJarsTask = robolectricJarsDownloadTask,
         mergeDetektBaselinesTask = mergeDetektBaselinesTask,
-        // Release builds are cut from a combination of main and branches starting with "release"
-        shouldEnableBugsnagOnRelease = project.shouldEnableBugsnagPlugin,
         kotlinDaemonArgs = globalSlackProperties.kotlinDaemonArgs.split(" "),
         errorProneCheckNamesAsErrors =
           globalSlackProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty()

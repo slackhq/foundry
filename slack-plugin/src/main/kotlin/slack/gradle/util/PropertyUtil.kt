@@ -191,7 +191,13 @@ internal fun Project.booleanProvider(
   key: String,
   defaultValue: Provider<Boolean>
 ): Provider<Boolean> {
-  return safeProperty(key).mapToBoolean().orElse(defaultValue)
+  return booleanProvider(key).orElse(defaultValue)
+}
+
+internal fun Project.booleanProvider(
+  key: String,
+): Provider<Boolean> {
+  return safeProperty(key).mapToBoolean()
 }
 
 internal fun Project.intProperty(key: String, defaultValue: Int = -1): Int {
@@ -222,4 +228,15 @@ internal fun Project.stringProperty(key: String, defaultValue: String): String {
 
 internal fun Project.optionalStringProperty(key: String, defaultValue: String? = null): String? {
   return safeProperty(key).orNull ?: defaultValue
+}
+
+internal fun Project.optionalStringProvider(key: String): Provider<String> {
+  return optionalStringProvider(key, null)
+}
+
+internal fun Project.optionalStringProvider(
+  key: String,
+  defaultValue: String? = null
+): Provider<String> {
+  return safeProperty(key).let { defaultValue?.let { provider { defaultValue } } ?: it }
 }

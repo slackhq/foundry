@@ -49,7 +49,7 @@ public object Platforms {
       // Paging v3 is a complete Kotlin rewrite and not API compatible
       "androidx.paging",
 
-      // Bugsnag's 5.x snapshot contains breaking changes
+      // Timber's 5.x snapshot contains breaking changes
       "com.jakewharton.timber",
 
       // Junit will actually see JUnit 5, which is basically a different library.
