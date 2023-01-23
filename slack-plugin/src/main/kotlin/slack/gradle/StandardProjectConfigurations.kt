@@ -448,7 +448,7 @@ internal class StandardProjectConfigurations(
 
         dependencies.add(
           Configurations.CORE_LIBRARY_DESUGARING,
-          versionCatalog.findLibrary("google-coreLibraryDesugaring"),
+          versionCatalog.findLibrary("google-coreLibraryDesugaring").get(),
         )
 
         if (applyTestOptions) {

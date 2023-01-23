@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.1
+-----
+
+_2023-01-23_
+
+* **Fix**: Unwrap `Optional` for `google-coreLibraryDesugaring` dependency before adding it. The Gradle API's lack of type safety strikes again.
+
 0.5.0
 -----
 
