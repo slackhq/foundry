@@ -38,13 +38,10 @@ import org.gradle.work.DisableCachingByDefault
  *
  * MONKEY PATCH NOTES: This task is monkey patched to sort files before merging in order to make
  * this task deterministic. This is controlled by the `com.slack.sgp.sort-merge-files` system
- * property.
+ * property. Also removed `@BuildAnalyzer` from the task because its API changed in later AGP
+ * versions.
  */
 @DisableCachingByDefault
-@BuildAnalyzer(
-  primaryTaskCategory = TaskCategory.MISC,
-  secondaryTaskCategories = [TaskCategory.MERGING]
-)
 public abstract class MergeFileTask : NonIncrementalTask() {
 
   @get:InputFiles
