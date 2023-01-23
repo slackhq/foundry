@@ -38,7 +38,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -47,7 +46,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.jgrapht.alg.scoring.BetweennessCentrality
@@ -101,18 +99,7 @@ public object ModuleStatsTasks {
         project.tasks.register<ModuleStatsCollectorTask>("moduleStats") {
           modulePath.set(project.path)
           buildFileProperty.set(project.buildFile)
-          locData.set(
-            locTask
-              .flatMap { it.outputFile }
-              .map {
-                val file = it.asFile
-                if (file.exists()) {
-                  file.readText()
-                } else {
-                  LocTask.LocData.EMPTY_JSON
-                }
-              }
-          )
+          locDataFiles.from(locTask.flatMap { it.outputFile })
           this.includeGenerated.set(includeGenerated)
           outputFile.set(project.layout.buildDirectory.file("reports/slack/moduleStats.json"))
         }
@@ -355,12 +342,12 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
-  // Not pointing at a JSON file since it's optional and Gradle doesn't handle optional files well
+  // Collection since it's optional and Gradle doesn't handle optional files well
   // when chained from outputs of other (possibly-skipped) tasks.
   // https://github.com/gradle/gradle/issues/2016
-  @get:Optional
-  @get:Input
-  val locData: Property<String> = objects.property<String>().convention(LocTask.LocData.EMPTY_JSON)
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  @get:InputFiles
+  val locDataFiles: ConfigurableFileCollection = objects.fileCollection()
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -372,7 +359,10 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
   @TaskAction
   fun dumpStats() {
-    val (sources, generatedSources) = moshi.adapter<LocTask.LocData>().fromJson(locData.get())!!
+    val (sources, generatedSources) =
+      locDataFiles.singleFile.source().buffer().use {
+        moshi.adapter<LocTask.LocData>().fromJson(it)!!
+      }
 
     val dependencies = StatsUtils.parseProjectDeps(buildFileProperty.asFile.get())
 
