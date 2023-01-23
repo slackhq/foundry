@@ -166,6 +166,7 @@ rootProject.name = "slack-gradle-plugin"
 
 // Please keep these in alphabetical order!
 include(":slack-plugin")
+include(":sgp-monkeypatch-agp")
 include(":agp-handlers:agp-handler-api")
 include(":agp-handlers:agp-handler-74")
 include(":agp-handlers:agp-handler-80")
