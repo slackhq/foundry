@@ -63,7 +63,10 @@ public abstract class MergeFileTask : NonIncrementalTask() {
 
       val filesToUse =
         if (System.getenv("com.slack.sgp.sort-merge-files").toBoolean()) {
-          existingFiles.sortedBy { it.name.lowercase(Locale.US) }
+          if (System.getenv("com.slack.sgp.sort-merge-files.log").toBoolean()) {
+            println("Sorting ${existingFiles.size} files in merge task. Files are $existingFiles")
+          }
+          existingFiles.sortedBy { it.absolutePath.lowercase(Locale.US) }
         } else {
           existingFiles
         }
