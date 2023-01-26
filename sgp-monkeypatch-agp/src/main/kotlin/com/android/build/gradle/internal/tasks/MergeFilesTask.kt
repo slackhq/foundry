@@ -66,7 +66,7 @@ public abstract class MergeFileTask : NonIncrementalTask() {
           if (System.getenv("com.slack.sgp.sort-merge-files.log").toBoolean()) {
             println("Sorting ${existingFiles.size} files in merge task. Files are $existingFiles")
           }
-          existingFiles.sortedBy { it.absolutePath.lowercase(Locale.US) }
+          existingFiles.sortedBy { it.invariantSeparatorsPath.lowercase(Locale.US) }
         } else {
           existingFiles
         }
