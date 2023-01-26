@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.2
+-----
+
+_2023-01-26_
+
+* Try another fix for the `MergeFilesTask` monkeypatch plus extra logging. Feel free to skip this update if you're unaffected.
+
 0.5.1
 -----
 
