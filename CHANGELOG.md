@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.3
+-----
+
+_2023-01-27_
+
+* Fix the `MergeFilesTask` monkeypatch using env vars instead of system props.
+
 0.5.2
 -----
 
