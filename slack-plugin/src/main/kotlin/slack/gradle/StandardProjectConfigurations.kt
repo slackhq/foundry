@@ -69,11 +69,13 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
@@ -968,6 +970,23 @@ internal class StandardProjectConfigurations(
             enabled = false
           }
         }
+      }
+    }
+
+    pluginManager.withPlugin("org.jetbrains.compose") {
+      configure<ComposeExtension> {
+        kotlinCompilerPlugin.set(
+          dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
+        )
+      }
+      dependencies {
+        val composeCompilerVersion =
+          slackProperties.versions.composeCompiler
+            ?: error("Missing `compose-compiler` version in catalog")
+        add(
+          PLUGIN_CLASSPATH_CONFIGURATION_NAME,
+          "androidx.compose.compiler:compiler:$composeCompilerVersion"
+        )
       }
     }
   }
