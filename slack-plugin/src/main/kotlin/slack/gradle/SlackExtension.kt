@@ -36,7 +36,9 @@ import org.gradle.kotlin.dsl.domainObjectSet
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.dependencies.SlackDependencies
 
@@ -615,26 +617,49 @@ constructor(
       ?: error("Missing `compose-compiler` version in catalog")
   }
   internal val enabled = objects.property<Boolean>().convention(false)
+  internal val multiplatform = objects.property<Boolean>().convention(false)
 
   /** @see [AndroidHandler.androidExtension] */
   internal var androidExtension: CommonExtension<*, *, *, *>? = null
 
-  internal fun enable() {
-    val extension =
-      checkNotNull(androidExtension) {
-        "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
-      }
+  internal fun enable(multiplatform: Boolean) {
     enabled.set(true)
     enabled.disallowChanges()
-    extension.apply {
-      buildFeatures { compose = true }
-      composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+    this.multiplatform.set(multiplatform)
+    this.multiplatform.disallowChanges()
+    if (!multiplatform) {
+      val extension =
+        checkNotNull(androidExtension) {
+          "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
+        }
+      extension.apply {
+        buildFeatures { compose = true }
+        composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+      }
     }
   }
 
-  internal fun applyTo(project: Project) {
-    if (enabled.getOrElse(false)) {
-      composeBundleAlias?.let { project.dependencies.add("implementation", it) }
+  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+    if (enabled.get()) {
+      if (!multiplatform.get()) {
+        composeBundleAlias?.let { project.dependencies.add("implementation", it) }
+      } else {
+        project.apply(plugin = "org.jetbrains.compose")
+        project.configure<ComposeExtension> {
+          kotlinCompilerPlugin.set(
+            dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
+          )
+        }
+        project.dependencies {
+          val composeCompilerVersion =
+            slackProperties.versions.composeCompiler
+              ?: error("Missing `compose-compiler` version in catalog")
+          add(
+            PLUGIN_CLASSPATH_CONFIGURATION_NAME,
+            "androidx.compose.compiler:compiler:$composeCompilerVersion"
+          )
+        }
+      }
     }
   }
 }
@@ -708,7 +733,7 @@ constructor(
         }
       }
 
-      featuresHandler.composeHandler.applyTo(project)
+      featuresHandler.composeHandler.applyTo(project, slackProperties)
     }
   }
 }
@@ -768,14 +793,14 @@ constructor(
    * Enables Compose for this project and applies any version catalog bundle dependencies defined by
    * [SlackProperties.defaultComposeAndroidBundleAlias].
    */
-  public fun compose() {
-    compose {
+  public fun compose(multiplatform: Boolean = false) {
+    compose(multiplatform) {
       // No further configuration right now
     }
   }
 
-  private fun compose(action: Action<ComposeHandler>) {
-    composeHandler.enable()
+  private fun compose(multiplatform: Boolean, action: Action<ComposeHandler>) {
+    composeHandler.enable(multiplatform = multiplatform)
     action.execute(composeHandler)
   }
 }
