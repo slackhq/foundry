@@ -48,7 +48,7 @@ private class AgpHandler80 : AgpHandler {
     resourceExclusions: Collection<String>,
     jniPickFirsts: Collection<String>
   ) {
-    commonExtension.packagingOptions {
+    commonExtension.packaging {
       resources.excludes += resourceExclusions
       jniLibs.pickFirsts += jniPickFirsts
     }
