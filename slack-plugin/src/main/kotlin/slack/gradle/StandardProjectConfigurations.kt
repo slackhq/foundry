@@ -49,6 +49,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -165,15 +166,23 @@ internal class StandardProjectConfigurations(
         // Configure rake
         plugins.withId("com.autonomousapps.dependency-analysis") {
           val isNoApi = slackProperties.rakeNoApi
+          val catalogExtension =
+            extensions.findByType<VersionCatalogsExtension>()
+              ?: error("Could not find any version catalogs!")
+          val catalogNames = catalogExtension.catalogNames
           val rakeDependencies =
             tasks.register<RakeDependencies>("rakeDependencies") {
               buildFileProperty.set(project.buildFile)
               noApi.set(isNoApi)
-              identifierMap.set(
-                project.provider {
-                  project.getVersionsCatalog().identifierMap().mapValues { (_, v) -> "libs.$v" }
-                }
-              )
+              for (name in catalogNames) {
+                identifierMap.putAll(
+                  provider {
+                    project.getVersionsCatalog(name).identifierMap().mapValues { (_, v) ->
+                      "$name.$v"
+                    }
+                  }
+                )
+              }
             }
           configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
         }

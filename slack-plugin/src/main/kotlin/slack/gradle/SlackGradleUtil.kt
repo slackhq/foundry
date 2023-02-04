@@ -195,13 +195,13 @@ internal fun Project.jvmTargetVersion(): Int {
   return SlackProperties(this).jvmTarget
 }
 
-internal fun Project.getVersionsCatalog(): VersionCatalog {
-  return getVersionsCatalogOrNull() ?: error("No versions catalog found!")
+internal fun Project.getVersionsCatalog(name: String = "libs"): VersionCatalog {
+  return getVersionsCatalogOrNull(name) ?: error("Versions catalog '$name' not found!")
 }
 
-internal fun Project.getVersionsCatalogOrNull(): VersionCatalog? {
+internal fun Project.getVersionsCatalogOrNull(name: String = "libs"): VersionCatalog? {
   return try {
-    project.extensions.getByType<VersionCatalogsExtension>().named("libs")
+    project.extensions.getByType<VersionCatalogsExtension>().named(name)
   } catch (ignored: Exception) {
     null
   }
