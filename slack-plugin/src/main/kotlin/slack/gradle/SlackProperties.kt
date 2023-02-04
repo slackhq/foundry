@@ -99,6 +99,15 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.gradle.config.enableAnalysisPlugin")
 
   /**
+   * Path prefix to include only matching projects in dependency rake. This is useful for running dependency rake on
+   * only a subset of projects.
+   *
+   * Multiple paths can be specified by separating them with a comma.
+   */
+  public val dependencyRakeInclude: String?
+    get() = optionalStringProperty("slack.gradle.config.dependencyRakeInclude")
+
+  /**
    * Flag to indicate this project should be exempted from platforms, usually platform projects
    * themselves.
    */

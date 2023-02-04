@@ -158,34 +158,16 @@ internal class StandardProjectConfigurations(
       applyPlatforms(slackProperties.versions.boms, platformProjectPath)
     }
 
-    if (slackProperties.enableAnalysisPlugin) {
-      val buildFile = project.buildFile
-      // This can run on some intermediate middle directories, like `carbonite` in
-      // `carbonite:carbonite`
-      if (buildFile.exists()) {
-        // Configure rake
-        plugins.withId("com.autonomousapps.dependency-analysis") {
-          val isNoApi = slackProperties.rakeNoApi
-          val catalogExtension =
-            extensions.findByType<VersionCatalogsExtension>()
-              ?: error("Could not find any version catalogs!")
-          val catalogNames = catalogExtension.catalogNames
-          val rakeDependencies =
-            tasks.register<RakeDependencies>("rakeDependencies") {
-              buildFileProperty.set(project.buildFile)
-              noApi.set(isNoApi)
-              for (name in catalogNames) {
-                identifierMap.putAll(
-                  provider {
-                    project.getVersionsCatalog(name).identifierMap().mapValues { (_, v) ->
-                      "$name.$v"
-                    }
-                  }
-                )
-              }
-            }
-          configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
-        }
+    if (slackProperties.enableAnalysisPlugin && project.path != slackProperties.platformProjectPath) {
+      val includes = slackProperties.dependencyRakeInclude
+        ?.split(',')
+        ?.toSet()
+        ?: setOf(":")
+      logger.lifecycle("Dependency Rake includes: $includes")
+      val projectPath = project.path
+
+      if (includes.any { projectPath.startsWith(it) }) {
+        maybeRegisterDependencyRake(slackProperties)
       }
     }
 
@@ -243,6 +225,37 @@ internal class StandardProjectConfigurations(
             "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
           ) + JvmArgsStrongEncapsulation
         )
+      }
+    }
+  }
+
+  private fun Project.maybeRegisterDependencyRake(slackProperties: SlackProperties) {
+    val buildFile = project.buildFile
+    // This can run on some intermediate middle directories, like `carbonite` in
+    // `carbonite:carbonite`
+    if (buildFile.exists()) {
+      // Configure rake
+      plugins.withId("com.autonomousapps.dependency-analysis") {
+        val isNoApi = slackProperties.rakeNoApi
+        val catalogExtension =
+          extensions.findByType<VersionCatalogsExtension>()
+            ?: error("Could not find any version catalogs!")
+        val catalogNames = catalogExtension.catalogNames
+        val rakeDependencies =
+          tasks.register<RakeDependencies>("rakeDependencies") {
+            buildFileProperty.set(project.buildFile)
+            noApi.set(isNoApi)
+            for (name in catalogNames) {
+              identifierMap.putAll(
+                provider {
+                  project.getVersionsCatalog(name).identifierMap().mapValues { (_, v) ->
+                    "$name.$v"
+                  }
+                }
+              )
+            }
+          }
+        configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
       }
     }
   }
