@@ -37,6 +37,7 @@ import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
+import slack.gradle.tasks.SortDependenciesDownloadTask
 import slack.gradle.util.ThermalsData
 import slack.stats.ModuleStatsTasks
 
@@ -154,6 +155,14 @@ internal class SlackRootPlugin : Plugin<Project> {
       project.tasks.register<KtfmtDownloadTask>("updateKtfmt") {
         version.set(ktfmtVersion)
         outputFile.set(project.layout.projectDirectory.file("config/bin/ktfmt"))
+      }
+    }
+
+    // Add sortDependencies download task
+    slackProperties.versions.sortDependencies?.let { sortDependenciesVersion ->
+      project.tasks.register<SortDependenciesDownloadTask>("updateSortDependencies") {
+        version.set(sortDependenciesVersion)
+        outputFile.set(project.layout.projectDirectory.file("config/bin/sort-dependencies"))
       }
     }
 

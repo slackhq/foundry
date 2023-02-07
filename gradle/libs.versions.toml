@@ -16,6 +16,7 @@ moshix = "0.21.0"
 nullawayGradle = "1.3.0"
 okhttp = "5.0.0-alpha.10"
 spotless = "6.14.1"
+sortDependencies = "0.1"
 sqldelight = "1.5.1"
 versionsPlugin = "0.45.0"
 
@@ -31,6 +32,7 @@ lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+sortDependencies = { id = "com.squareup.sort-dependencies", version.ref = "sortDependencies" }
 versionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
 
 [libraries]
@@ -52,6 +54,7 @@ gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
 gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.3.0"
 gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
+gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 guava = "com.google.guava:guava:31.1-jre"

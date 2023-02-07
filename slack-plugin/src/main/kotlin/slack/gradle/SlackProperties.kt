@@ -375,6 +375,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val detektBaseline: String?
     get() = optionalStringProperty("slack.detekt.baseline")
 
+  /** Comma-separated set of projects to ignore in sorting dependencies. */
+  public val sortDependenciesIgnore: String?
+    get() = optionalStringProperty("slack.sortDependencies.ignore")
+
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
    * have at least one `.kt` source file.
