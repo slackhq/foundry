@@ -1,6 +1,22 @@
 Changelog
 =========
 
+0.5.4
+-----
+
+_2023-02-07_
+
+* **New**: Integrate [gradle-dependency-sorter](https://github.com/square/gradle-dependencies-sorter) as another formatter. This automatically apply if the `sortDependencies` toml version is present, and you can have it download+create executable binaries via `./gradlew downloadDependenciesSorter`.
+* **Enhancement**: Improve compose multiplatform support. Now the `compose()` DSL is moved to `slack.features` and offers an optional `multiplatform` parameter to enable the compose multiplatform plugin.
+  ```kotlin
+  slack {
+    features {
+      compose(multiplatform = <true|false>
+    }
+  }
+  ```
+* Build against Kotlin `1.8.10` and AGP `7.4.1`.
+
 0.5.3
 -----
 
