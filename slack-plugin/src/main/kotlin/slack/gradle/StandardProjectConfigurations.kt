@@ -30,6 +30,7 @@ import com.android.build.gradle.TestExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
+import com.bugsnag.android.gradle.BugsnagPluginExtension
 import com.google.common.base.CaseFormat
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
@@ -66,7 +67,6 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.support.serviceOf
-import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -88,6 +88,7 @@ import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompile
 
 private const val LOG = "SlackPlugin:"
+private const val FIVE_MINUTES_MS = 300_000L
 
 private fun Logger.logWithTag(message: String) {
   debug("$LOG $message")
@@ -449,7 +450,7 @@ internal class StandardProjectConfigurations(
 
         dependencies.add(
           Configurations.CORE_LIBRARY_DESUGARING,
-          SlackDependencies.Google.coreLibraryDesugaring
+          versionCatalog.findLibrary("google-coreLibraryDesugaring").get(),
         )
 
         if (applyTestOptions) {
@@ -618,18 +619,44 @@ internal class StandardProjectConfigurations(
         }
 
         pluginManager.withPlugin("com.bugsnag.android.gradle") {
-          // See SlackGradleUtil.shouldEnableBugsnagPlugin for more details on this logic
-          buildTypes.configureEach {
-            // We use withGroovyBuilder here because for the life of me I can't understand where to
-            // set this in a strongly typed language.
-            withGroovyBuilder {
-              getProperty("ext").withGroovyBuilder {
-                setProperty(
-                  "enableBugsnag",
-                  !isDebuggable && globalConfig.shouldEnableBugsnagOnRelease
-                )
+          val branchMatchesPatternProvider =
+            slackProperties.bugsnagEnabledBranchPattern.zip(gitBranch()) { pattern, branch ->
+              if (pattern == null || branch == null) {
+                return@zip false
+              }
+              pattern.toRegex().matches(branch)
+            }
+
+          val enabledProvider =
+            slackProperties.bugsnagEnabled.orElse(branchMatchesPatternProvider).orElse(false).zip(
+              provider { isCi }
+            ) { enabled, isRunningOnCi ->
+              // Only enable if we're also on CI
+              enabled && isRunningOnCi
+            }
+
+          configure<BugsnagPluginExtension> {
+            variantFilter {
+              // disables plugin for all debug variants
+              // This is technically the default behavior, buuuuut let's be super sure eh?
+              if (name.contains("debug", ignoreCase = true)) {
+                setEnabled(false)
               }
             }
+
+            // 5 minute timeout because let's be real, if it's taking this long something is wrong
+            requestTimeoutMs.set(FIVE_MINUTES_MS)
+
+            // Enable uploads if the enable prop is enabled or the branch matches a provided pattern
+            // Note we _don't_ use the BugsnagPluginExtension.enabled property itself because we do
+            // want bugsnag to do most of its regular process, just skipping uploads unless enabled.
+            uploadJvmMappings.set(enabledProvider)
+            reportBuilds.set(enabledProvider)
+
+            // We don't use these
+            uploadNdkMappings.set(false)
+            uploadNdkUnityLibraryMappings.set(false)
+            uploadReactNativeMappings.set(false)
           }
         }
       }

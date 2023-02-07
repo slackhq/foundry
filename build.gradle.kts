@@ -164,7 +164,7 @@ subprojects {
   pluginManager.withPlugin("java") {
     configure<JavaPluginExtension> {
       toolchain {
-        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().removeSuffix("-ea").toInt()))
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.jdk.get().removeSuffix("-ea").toInt()))
       }
     }
 
@@ -176,8 +176,8 @@ subprojects {
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
-        languageVersion.set(KOTLIN_1_6)
-        apiVersion.set(KOTLIN_1_6)
+        languageVersion.set(KOTLIN_1_7)
+        apiVersion.set(KOTLIN_1_7)
         // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
         // this sometimes. https://github.com/gradle/gradle/issues/16345
         allWarningsAsErrors.set(false)

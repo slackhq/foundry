@@ -25,6 +25,7 @@ import slack.gradle.util.getOrCreateExtra
 import slack.gradle.util.intProperty
 import slack.gradle.util.intProvider
 import slack.gradle.util.optionalStringProperty
+import slack.gradle.util.optionalStringProvider
 import slack.gradle.util.safeProperty
 
 /**
@@ -397,6 +398,14 @@ public class SlackProperties private constructor(private val project: Project) {
    */
   public val alwaysEnableResourcesInTests: Boolean
     get() = booleanProperty("slack.gradle.config.test.alwaysEnableResources", defaultValue = false)
+
+  /** Global toggle to enable bugsnag. Note this still respects variant filters. */
+  public val bugsnagEnabled: Provider<Boolean>
+    get() = project.booleanProvider("slack.gradle.config.bugsnag.enabled")
+
+  /** Branch pattern for git branches Bugsnag should be enabled on. */
+  public val bugsnagEnabledBranchPattern: Provider<String>
+    get() = project.optionalStringProvider("slack.gradle.config.bugsnag.enabledBranchPattern")
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")

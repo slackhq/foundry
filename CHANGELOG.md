@@ -1,6 +1,48 @@
 Changelog
 =========
 
+0.5.3
+-----
+
+_2023-01-27_
+
+* Fix the `MergeFilesTask` monkeypatch using env vars instead of system props.
+
+0.5.2
+-----
+
+_2023-01-26_
+
+* Try another fix for the `MergeFilesTask` monkeypatch plus extra logging. Feel free to skip this update if you're unaffected.
+
+0.5.1
+-----
+
+_2023-01-23_
+
+* **Fix**: Unwrap `Optional` for `google-coreLibraryDesugaring` dependency before adding it. The Gradle API's lack of type safety strikes again.
+
+0.5.0
+-----
+
+_2023-01-23_
+
+* **New**: Introduce a new `sgp-monkeypatch-agp` artifact. This contains monkeypatches for AGP where we try to fix bugs. This initial version contains a patched `MergeFilesTask` that sorts files before merging them to ensure deterministic outputs, as we believe this is causing our lint tasks to be non-cacheable across machines. This can be enabled via setting the `com.slack.sgp.sort-merge-files` system property to `true`.
+* **New**: Rework how bugsnag is enabled. Instead of only applying the plugin in release/main builds, we now always apply the plugin and only enable uploads on release/main builds. This allows us to catch issues with the plugin in updates sooner, as before we would not see them on PRs.
+  * Uploads can be force-enabled via setting the `slack.gradle.config.bugsnag.enabled` gradle property to true.
+  * Branches that allow uploads can be configured via regexp value on the `slack.gradle.config.bugsnag.enabledBranchPattern` gradle property. For example: `slack.gradle.config.bugsnag.enabledBranchPattern=main|release_.*`.
+* **New**: Source desugar libraries from `libs.versions.toml` instead of assuming the artifact name. Starting with 1.2.0, desugar JDK libs offers multiple artifacts. Point `google-coreLibraryDesugaring` in [libraries] to whichever artifact should be used.
+* **Fix**: Catch and print errors with thermal closes.
+* **Misc**: Update to JDK 19 and latest AGPs. The plugin itself still targets JVM 11 bytecode. AGP 7.4.0 is now required.
+
+0.4.2
+-----
+
+_2023-01-13_
+
+* **Enhancement:** Change default gradle memory percent in bootstrap from 25% to 50%.
+* **Fix:** Support the gradle enterprise plugin retry implementation when using Gradle enterprise 3.12+.
+
 0.4.1
 -----
 

@@ -40,6 +40,14 @@ Their docs can be found in `SlackVersions.kt`.
 - `jdk` - The JDK version to use.
 - `jvmTarget` - The JVM target to use in Kotlin and Java (as `--release`) compilations.
 
+For Android projects, some extra definitions need to be defined
+- `libs.versions.toml` libraries
+  - `google-coreLibraryDesugaring` - the core library desugaring libraries to use with L8.
+- `gradle.properties` properties
+  - `slack.compileSdkVersion`
+  - `slack.targetSdkVersion`
+  - `slack.minSdkVersion`
+
 The following plugins are applied by default but can be disabled via Gradle properties if you don't need them.
 - Gradle's test retry – `slack.auto-apply.test-retry`
   - By default, this uses the [Gradle test-retry plugin](https://github.com/gradle/test-retry-gradle-plugin), but can be configured to use the Gradle Enterprise plugin's implementation instead by setting the `slack.test.retry.pluginType` property to `GE`.

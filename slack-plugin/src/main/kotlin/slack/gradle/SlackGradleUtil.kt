@@ -42,13 +42,9 @@ public val Project.isActionsCi: Boolean
 public val Project.isBuildkite: Boolean
   get() = providers.environmentVariable("BUILDKITE").mapToBoolean().getOrElse(false)
 
-/** If true, this is currently running on Jenkins CI. */
-public val Project.isJenkins: Boolean
-  get() = jenkinsHome.isPresent
-
 /** If true, this is currently running on any CI. */
 public val Project.isCi: Boolean
-  get() = isJenkins || isActionsCi || isBuildkite
+  get() = isActionsCi || isBuildkite
 
 /** Useful helper for resolving a `group:name:version` bom notation for a [DependencyGroup]. */
 internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
@@ -59,10 +55,6 @@ internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
 /** Returns the git branch this is running on. */
 public fun Project.gitBranch(): Provider<String> {
   return when {
-    isJenkins ->
-      providers
-        .environmentVariable("CHANGE_BRANCH")
-        .orElse(providers.environmentVariable("BRANCH_NAME"))
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
       executeWithResult(
@@ -74,17 +66,6 @@ public fun Project.gitBranch(): Provider<String> {
         .map { it.lines()[0].trim() }
   }
 }
-
-/**
- * We only enable bugsnag on CI branches starting with "release" (the prefix release team uses) or
- * main and disable the bugsnag gradle plugin in everywhere else to speed up build times. Note that
- * this includes a few things: preventing manifest modifications per-build, uploading mapping files
- * to their slow endpoints, etc.
- */
-public val Project.shouldEnableBugsnagPlugin: Boolean
-  get() {
-    return (isCi) && gitBranch().map { it == "main" || it.startsWith("release") }.getOrElse(false)
-  }
 
 private const val GIT_VERSION_PREFIX = "git version "
 
