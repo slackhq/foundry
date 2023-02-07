@@ -11,7 +11,7 @@ _2023-02-07_
   ```kotlin
   slack {
     features {
-      compose(multiplatform = <true|false>
+      compose(multiplatform = <true|false>)
     }
   }
   ```
