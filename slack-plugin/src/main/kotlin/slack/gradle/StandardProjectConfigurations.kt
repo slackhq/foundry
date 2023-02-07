@@ -121,7 +121,18 @@ internal class StandardProjectConfigurations(
   fun applyTo(project: Project) {
     val slackProperties = SlackProperties(project)
     val globalConfig = project.slackTools().globalConfig
+    project.applyCommonConfigurations()
     project.applyJvmConfigurations(globalConfig, slackProperties)
+  }
+
+  private fun Project.applyCommonConfigurations() {
+    if (project.buildFile.exists()) {
+      val sortDependenciesIgnoreSet =
+        globalProperties.sortDependenciesIgnore?.splitToSequence(',')?.toSet().orEmpty()
+      if (project.path !in sortDependenciesIgnoreSet) {
+        apply(plugin = "com.squareup.sort-dependencies")
+      }
+    }
   }
 
   @Suppress("unused")

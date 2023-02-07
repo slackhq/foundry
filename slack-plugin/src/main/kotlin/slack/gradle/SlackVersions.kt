@@ -41,6 +41,8 @@ internal class SlackVersions(val catalog: VersionCatalog) {
     get() = getOptionalValue("ktlint").orElse(null)
   val ktfmt: String?
     get() = getOptionalValue("ktfmt").orElse(null)
+  val sortDependencies: String?
+    get() = getOptionalValue("sortDependencies").orElse(null)
   val objenesis: String?
     get() = getOptionalValue("objenesis").orElse(null)
   val jdk: Int

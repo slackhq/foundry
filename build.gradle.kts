@@ -44,6 +44,7 @@ plugins {
   alias(libs.plugins.ksp) apply false
   alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
+  alias(libs.plugins.sortDependencies) apply false
 }
 
 configure<DetektExtension> {
@@ -206,6 +207,9 @@ subprojects {
     configure<SamWithReceiverExtension> {
       annotation("org.gradle.api.HasImplicitReceiver")
     }
+
+    // TODO toe-hold for https://github.com/square/gradle-dependencies-sorter/issues/18
+//    apply(plugin = "com.squareup.sort-dependencies")
   }
 
   tasks.withType<Detekt>().configureEach {
