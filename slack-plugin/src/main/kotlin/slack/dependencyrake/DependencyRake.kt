@@ -82,15 +82,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
         providers
           .gradleProperty("slack.dependencyrake.modes")
           .map { it.splitToSequence(",").map(AnalysisMode::valueOf).toSet() }
-          .orElse(
-            setOf(
-              AnalysisMode.COMPILE_ONLY,
-              AnalysisMode.UNUSED,
-              AnalysisMode.MISUSED,
-              AnalysisMode.PLUGINS,
-              AnalysisMode.ABI
-            )
-          )
+          .orElse(AnalysisMode.values().toSet())
       )
 
   @get:Input abstract val noApi: Property<Boolean>
