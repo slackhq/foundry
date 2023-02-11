@@ -80,6 +80,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.moshix)
   compileOnly(libs.gradlePlugins.wire)
   compileOnly(libs.gradlePlugins.sqldelight)
+  compileOnly(libs.gradlePlugins.ksp)
 
   implementation(libs.oshi) {
     because("To read hardware information")

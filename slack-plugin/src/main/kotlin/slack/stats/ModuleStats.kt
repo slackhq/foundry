@@ -18,6 +18,7 @@ package slack.stats
 import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -53,6 +54,7 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
@@ -137,10 +139,26 @@ public object ModuleStatsTasks {
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.jvm") {
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KOTLIN) }
+        if (includeGenerated) {
+          collector.value.configure {
+            dependsOn(project.tasks.withType<JavaCompile>())
+            dependsOn(project.tasks.withType<KotlinCompile>())
+          }
+        }
       }
       withPlugin("org.jetbrains.kotlin.kapt") {
         addGeneratedSources()
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KAPT) }
+        if (includeGenerated) {
+          collector.value.configure { mustRunAfter(project.tasks.withType<KaptTask>()) }
+        }
+      }
+      withPlugin("com.google.devtools.ksp") {
+        addGeneratedSources()
+        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KSP) }
+        if (includeGenerated) {
+          collector.value.configure { mustRunAfter(project.tasks.withType<KspTask>()) }
+        }
       }
       withPlugin("org.jetbrains.kotlin.android") {
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KOTLIN) }
@@ -161,8 +179,8 @@ public object ModuleStatsTasks {
         if (includeGenerated) {
           collector.value.configure {
             mustRunAfter(
-              project.tasks.withType<GenerateSchemaTask>(),
-              project.tasks.withType<SqlDelightTask>()
+              project.tasks.withType(GenerateSchemaTask::class.java),
+              project.tasks.withType(SqlDelightTask::class.java),
             )
           }
         }
@@ -333,6 +351,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
   companion object {
     const val TAG_KAPT = "kapt"
+    const val TAG_KSP = "ksp"
     const val TAG_KOTLIN = "kotlin"
     const val TAG_DAGGER_COMPILER = "dagger-compiler"
     const val TAG_VIEW_BINDING = "viewbinding"
@@ -488,6 +507,7 @@ public data class Weights(
     score += javaKotlinRatio.div(10).toInt()
 
     val kapt = ModuleStatsCollectorTask.TAG_KAPT in tags
+    val ksp = ModuleStatsCollectorTask.TAG_KSP in tags
     val android = ModuleStatsCollectorTask.TAG_ANDROID in tags
     val resourcesEnabled = ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED in tags
     val resourcesHavePublicXml = true // TODO
@@ -503,6 +523,15 @@ public data class Weights(
         // Non-dagger stuff gets an extra bite because it's likely autovalue
         score += 10
       }
+    }
+
+    if (ksp) {
+      score += 2
+    }
+
+    // Enabling both kapt and KSP is a bad idea and we want to discourage it
+    if (ksp && kapt) {
+      score += 10
     }
 
     // Android slows down projects. We just add a fixed hit.
