@@ -121,7 +121,18 @@ internal class StandardProjectConfigurations(
   fun applyTo(project: Project) {
     val slackProperties = SlackProperties(project)
     val globalConfig = project.slackTools().globalConfig
+    project.applyCommonConfigurations()
     project.applyJvmConfigurations(globalConfig, slackProperties)
+  }
+
+  private fun Project.applyCommonConfigurations() {
+    if (project.buildFile.exists()) {
+      val sortDependenciesIgnoreSet =
+        globalProperties.sortDependenciesIgnore?.splitToSequence(',')?.toSet().orEmpty()
+      if (project.path !in sortDependenciesIgnoreSet) {
+        apply(plugin = "com.squareup.sort-dependencies")
+      }
+    }
   }
 
   @Suppress("unused")
@@ -511,7 +522,7 @@ internal class StandardProjectConfigurations(
     pluginManager.withPlugin("com.android.test") {
       slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       configure<TestExtension> {
-        slackExtension.androidHandler.androidExtension = this
+        slackExtension.androidExtension = this
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.targetSdk }
       }
@@ -545,7 +556,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<BaseAppModuleExtension> {
-        slackExtension.androidHandler.androidExtension = this
+        slackExtension.androidExtension = this
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
@@ -746,7 +757,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
-        slackExtension.androidHandler.androidExtension = this
+        slackExtension.androidExtension = this
         commonBaseExtensionConfig(true)
         lint { configureLint(project, slackProperties, sdkVersions, false) }
         if (isLibraryWithVariants) {
@@ -841,9 +852,7 @@ internal class StandardProjectConfigurations(
           }
           useK2.set(slackProperties.useK2)
 
-          if (
-            slackExtension.androidHandler.featuresHandler.composeHandler.enabled.get() && isAndroid
-          ) {
+          if (slackExtension.featuresHandler.composeHandler.enabled.get()) {
             logger.debug(
               "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompile.name}"
             )

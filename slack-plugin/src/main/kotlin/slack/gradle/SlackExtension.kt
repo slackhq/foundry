@@ -36,6 +36,7 @@ import org.gradle.kotlin.dsl.domainObjectSet
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
@@ -52,9 +53,24 @@ constructor(
   private val slackProperties: SlackProperties,
   versionCatalog: VersionCatalog
 ) {
-  internal val androidHandler =
-    objects.newInstance<AndroidHandler>(globalSlackProperties, slackProperties, versionCatalog)
-  internal val featuresHandler = objects.newInstance<FeaturesHandler>()
+  internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
+  internal val featuresHandler =
+    objects.newInstance<FeaturesHandler>(globalSlackProperties, slackProperties, versionCatalog)
+
+  /**
+   * This is weird! Due to the non-property nature of some AGP DSL features (e.g. buildFeatures and
+   * composeOptions DSLs), we can't lazily chain their values to our own extension's properties.
+   * Because of this, we lazily set this instance from [StandardProjectConfigurations] during
+   * Android extension evaluation and then make calls to enable them _directly_ set the values on
+   * this instance. Ideally we could eventually remove this if/when AGP finally makes these
+   * properties lazy.
+   */
+  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+    set(value) {
+      field = value
+      androidHandler.androidExtension = value
+      featuresHandler.androidExtension = value
+    }
 
   public fun android(action: Action<AndroidHandler>) {
     action.execute(androidHandler)
@@ -68,6 +84,8 @@ constructor(
     val logVerbose = slackProperties.slackExtensionVerbose
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
+      featuresHandler.applyTo(project)
+
       var kaptRequired = false
       var naptRequired = false
       val avMoshiEnabled = featuresHandler.avExtensionMoshi.getOrElse(false)
@@ -314,7 +332,14 @@ constructor(
 }
 
 @SlackExtensionMarker
-public abstract class FeaturesHandler @Inject constructor(objects: ObjectFactory) {
+public abstract class FeaturesHandler
+@Inject
+constructor(
+  objects: ObjectFactory,
+  globalSlackProperties: SlackProperties,
+  private val slackProperties: SlackProperties,
+  versionCatalog: VersionCatalog
+) {
   // Dagger features
   internal val daggerHandler = objects.newInstance<DaggerHandler>()
 
@@ -336,6 +361,17 @@ public abstract class FeaturesHandler @Inject constructor(objects: ObjectFactory
 
   // Moshi
   internal val moshiHandler = objects.newInstance<MoshiHandler>()
+
+  // Compose features
+  internal val composeHandler =
+    objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
+
+  /** @see [SlackExtension.androidExtension] */
+  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+    set(value) {
+      field = value
+      composeHandler.androidExtension = value
+    }
 
   /**
    * Enables dagger for this project.
@@ -461,6 +497,25 @@ public abstract class FeaturesHandler @Inject constructor(objects: ObjectFactory
   /** Enables redacted-compiler-plugin on this project. */
   public fun redacted() {
     redacted.set(true)
+  }
+
+  /**
+   * Enables Compose for this project and applies any version catalog bundle dependencies defined by
+   * [SlackProperties.defaultComposeAndroidBundleAlias].
+   */
+  public fun compose(multiplatform: Boolean = false) {
+    compose(multiplatform) {
+      // No further configuration right now
+    }
+  }
+
+  private fun compose(multiplatform: Boolean, action: Action<ComposeHandler>) {
+    composeHandler.enable(multiplatform = multiplatform)
+    action.execute(composeHandler)
+  }
+
+  internal fun applyTo(project: Project) {
+    composeHandler.applyTo(project, slackProperties)
   }
 }
 
@@ -616,28 +671,43 @@ constructor(
       ?: error("Missing `compose-compiler` version in catalog")
   }
   internal val enabled = objects.property<Boolean>().convention(false)
+  internal val multiplatform = objects.property<Boolean>().convention(false)
 
   /** @see [AndroidHandler.androidExtension] */
   internal var androidExtension: CommonExtension<*, *, *, *>? = null
 
-  internal fun enable() {
-    val extension =
-      checkNotNull(androidExtension) {
-        "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
-      }
+  internal fun enable(multiplatform: Boolean) {
     enabled.set(true)
     enabled.disallowChanges()
-    extension.apply {
-      buildFeatures { compose = true }
-      composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+    this.multiplatform.set(multiplatform)
+    this.multiplatform.disallowChanges()
+    if (!multiplatform) {
+      val extension =
+        checkNotNull(androidExtension) {
+          "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
+        }
+      extension.apply {
+        buildFeatures { compose = true }
+        composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+      }
     }
   }
 
-  internal fun applyTo(project: Project) {
-    if (enabled.getOrElse(false)) {
-      composeBundleAlias?.let { project.dependencies.add("implementation", it) }
-      project.pluginManager.withPlugin("org.jetbrains.compose") {
+  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+    if (enabled.get()) {
+      if (!multiplatform.get()) {
+        composeBundleAlias?.let { project.dependencies.add("implementation", it) }
+      } else {
+        project.apply(plugin = "org.jetbrains.compose")
+        project.configure<ComposeExtension> {
+          kotlinCompilerPlugin.set(
+            dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
+          )
+        }
         project.dependencies {
+          val composeCompilerVersion =
+            slackProperties.versions.composeCompiler
+              ?: error("Missing `compose-compiler` version in catalog")
           add(
             PLUGIN_CLASSPATH_CONFIGURATION_NAME,
             "androidx.compose.compiler:compiler:$composeCompilerVersion"
@@ -654,33 +724,19 @@ public abstract class AndroidHandler
 @Inject
 constructor(
   objects: ObjectFactory,
-  globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
 ) {
   internal val libraryHandler = objects.newInstance<SlackAndroidLibraryExtension>()
   internal val appHandler = objects.newInstance<SlackAndroidAppExtension>()
 
   @Suppress("MemberVisibilityCanBePrivate")
-  internal val featuresHandler =
-    objects.newInstance<AndroidFeaturesHandler>(
-      globalSlackProperties,
-      slackProperties,
-      versionCatalog
-    )
+  internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
-  /**
-   * This is weird! Due to the non-property nature of the AGP buildFeatures and composeOptions DSLs,
-   * we can't lazily chain their values to our own extension's properties. Because of this, we
-   * lazily set this instance from [StandardProjectConfigurations] during Android extension
-   * evaluation and then make calls to [enable] directly set the values on this instance. Ideally we
-   * could eventually remove this if/when AGP finally makes these properties lazy.
-   */
+  /** @see [SlackExtension.androidExtension] */
   internal var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
       featuresHandler.androidExtension = value
-      featuresHandler.composeHandler.androidExtension = value
     }
 
   public fun features(action: Action<AndroidFeaturesHandler>) {
@@ -716,36 +772,19 @@ constructor(
           )
         }
       }
-
-      featuresHandler.composeHandler.applyTo(project)
     }
   }
 }
 
 @SlackExtensionMarker
-public abstract class AndroidFeaturesHandler
-@Inject
-constructor(
-  objects: ObjectFactory,
-  globalSlackProperties: SlackProperties,
-  slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
-) {
+public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val androidTest: Property<Boolean>
   internal abstract val androidTestExcludeFromFladle: Property<Boolean>
   internal abstract val androidTestAllowedVariants: SetProperty<String>
   internal abstract val robolectric: Property<Boolean>
 
-  // Compose features
-  internal val composeHandler =
-    objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
-
   /** @see [AndroidHandler.androidExtension] */
   internal var androidExtension: CommonExtension<*, *, *, *>? = null
-    set(value) {
-      field = value
-      composeHandler.androidExtension = value
-    }
 
   /**
    * Enables android instrumentation tests for this project.
@@ -771,21 +810,6 @@ constructor(
     // Required for Robolectric to work.
     androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
     robolectric.set(true)
-  }
-
-  /**
-   * Enables Compose for this project and applies any version catalog bundle dependencies defined by
-   * [SlackProperties.defaultComposeAndroidBundleAlias].
-   */
-  public fun compose() {
-    compose {
-      // No further configuration right now
-    }
-  }
-
-  private fun compose(action: Action<ComposeHandler>) {
-    composeHandler.enable()
-    action.execute(composeHandler)
   }
 }
 

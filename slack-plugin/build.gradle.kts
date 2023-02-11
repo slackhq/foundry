@@ -64,6 +64,7 @@ dependencies {
   // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can de-dupe version
   // management between this plugin and the root build.gradle.kts file.
   compileOnly(libs.gradlePlugins.bugsnag)
+  compileOnly(libs.gradlePlugins.compose)
   compileOnly(libs.gradlePlugins.doctor)
   compileOnly(libs.gradlePlugins.versions)
   compileOnly(libs.gradlePlugins.detekt)

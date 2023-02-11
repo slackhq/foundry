@@ -1,6 +1,36 @@
 Changelog
 =========
 
+0.5.4
+-----
+
+_2023-02-07_
+
+* **New**: Integrate [gradle-dependency-sorter](https://github.com/square/gradle-dependencies-sorter) as another formatter. This automatically apply if the `sortDependencies` toml version is present, and you can have it download+create executable binaries via `./gradlew downloadDependenciesSorter`.
+* **Enhancement**: Improve compose multiplatform support. Now the `compose()` DSL is moved to `slack.features` and offers an optional `multiplatform` parameter to enable the compose multiplatform plugin.
+  ```kotlin
+  slack {
+    features {
+      compose(multiplatform = <true|false>)
+    }
+  }
+  ```
+* Build against Kotlin `1.8.10` and AGP `7.4.1`.
+
+0.5.3
+-----
+
+_2023-01-27_
+
+* Fix the `MergeFilesTask` monkeypatch using env vars instead of system props.
+
+0.5.2
+-----
+
+_2023-01-26_
+
+* Try another fix for the `MergeFilesTask` monkeypatch plus extra logging. Feel free to skip this update if you're unaffected.
+
 0.5.1
 -----
 

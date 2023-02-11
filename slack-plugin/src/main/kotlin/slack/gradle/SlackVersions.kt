@@ -41,12 +41,18 @@ internal class SlackVersions(val catalog: VersionCatalog) {
     get() = getOptionalValue("ktlint").orElse(null)
   val ktfmt: String?
     get() = getOptionalValue("ktfmt").orElse(null)
+  val sortDependencies: String?
+    get() = getOptionalValue("sortDependencies").orElse(null)
   val objenesis: String?
     get() = getOptionalValue("objenesis").orElse(null)
   val jdk: Int
     get() = getValue("jdk").toInt()
   val jvmTarget: Int
     get() = getOptionalValue("jvmTarget").map { it.toInt() }.orElse(11)
+  val composeJb: String?
+    get() = getOptionalValue("compose-jb").orElse(null)
+  val composeJbKotlinVersion: String?
+    get() = getOptionalValue("compose-compiler-kotlin-version").orElse(null)
 
   val bundles = Bundles()
 
