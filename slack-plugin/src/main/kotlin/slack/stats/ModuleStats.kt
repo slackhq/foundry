@@ -15,10 +15,13 @@
  */
 package slack.stats
 
+import app.cash.sqldelight.gradle.GenerateSchemaTask
+import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.squareup.wire.gradle.WireTask
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -44,10 +47,13 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
@@ -122,16 +128,15 @@ public object ModuleStatsTasks {
       }
     }
 
+    if (includeGenerated) {
+      collector.value.configure {
+        mustRunAfter(project.tasks.withType<JavaCompile>())
+        mustRunAfter(project.tasks.withType<KotlinCompile>())
+      }
+    }
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.jvm") {
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KOTLIN) }
-
-        if (includeGenerated) {
-          val compileKotlinTask = project.tasks.named("compileKotlin")
-          val compileJavaTask = project.tasks.named("compileJava")
-          collector.value.dependsOn(compileKotlinTask)
-          collector.value.dependsOn(compileJavaTask)
-        }
       }
       withPlugin("org.jetbrains.kotlin.kapt") {
         addGeneratedSources()
@@ -146,14 +151,21 @@ public object ModuleStatsTasks {
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_WIRE) }
-      }
-      withPlugin("com.squareup.sqldelight") {
-        addGeneratedSources()
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
+        if (includeGenerated) {
+          collector.value.configure { mustRunAfter(project.tasks.withType<WireTask>()) }
+        }
       }
       withPlugin("app.cash.sqldelight") {
         addGeneratedSources()
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
+        if (includeGenerated) {
+          collector.value.configure {
+            mustRunAfter(
+              project.tasks.withType<GenerateSchemaTask>(),
+              project.tasks.withType<SqlDelightTask>()
+            )
+          }
+        }
       }
       withPlugin("com.android.application") {
         collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_ANDROID) }
