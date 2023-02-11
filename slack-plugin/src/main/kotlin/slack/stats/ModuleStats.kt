@@ -87,6 +87,8 @@ public object ModuleStatsTasks {
   internal fun configureSubproject(project: Project) {
     if (
       !project.buildFile.exists() ||
+        // Some projects don't have src/main. Right now we don't handle them
+        !File(project.projectDir, "src/main").exists() ||
         project.path == ":app" || // TODO need to handle application and androidTest better
         "slack-platform" in project.path
     ) {
