@@ -84,7 +84,8 @@ public object ModuleStatsTasks {
   private fun Project.includeGenerated() =
     providers.environmentVariable("MODULE_SCORE_INCLUDE_GENERATED").mapToBoolean().orElse(true)
 
-  internal fun configureRoot(rootProject: Project) {
+  internal fun configureRoot(rootProject: Project, slackProperties: SlackProperties) {
+    if (!slackProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
@@ -97,10 +98,8 @@ public object ModuleStatsTasks {
     return MAIN_SRC_DIRS.firstOrNull { File(this@findMainSourceDir, it).exists() }
   }
 
-  internal fun configureSubproject(
-    project: Project,
-    slackProperties: SlackProperties = SlackProperties(project)
-  ) {
+  internal fun configureSubproject(project: Project, slackProperties: SlackProperties) {
+    if (!slackProperties.modScoreGlobalEnabled) return
     if (!project.buildFile.exists()) return
 
     if (slackProperties.modScoreIgnore) return
