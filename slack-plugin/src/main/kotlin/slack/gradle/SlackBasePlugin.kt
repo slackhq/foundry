@@ -84,7 +84,7 @@ internal class SlackBasePlugin : Plugin<Project> {
         }
       }
 
-      ModuleStatsTasks.configureSubproject(target)
+      ModuleStatsTasks.configureSubproject(target, slackProperties)
     }
 
     // Everything in here applies to all projects
