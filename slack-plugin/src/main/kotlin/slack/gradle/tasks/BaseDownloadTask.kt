@@ -16,10 +16,7 @@
 package slack.gradle.tasks
 
 import java.io.IOException
-import me.tongfei.progressbar.DelegatingProgressBarConsumer
-import me.tongfei.progressbar.ProgressBar
-import me.tongfei.progressbar.ProgressBarBuilder
-import me.tongfei.progressbar.ProgressBarStyle
+import javax.inject.Inject
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.buffer
@@ -30,9 +27,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.logging.progress.ProgressLoggerFactory
 import slack.gradle.agp.VersionNumber
-
-private const val ONE_MEGABYTE_IN_BYTES: Long = 1L * 1024L * 1024L
 
 /**
  * Downloads a binary from its GitHub releases.
@@ -42,12 +38,13 @@ private const val ONE_MEGABYTE_IN_BYTES: Long = 1L * 1024L * 1024L
  *     ./gradlew <updateThing>
  * ```
  */
-@Suppress("UnstableApiUsage")
 internal abstract class BaseDownloadTask(
   private val targetName: String,
   private val addExecPrefix: Boolean = false,
   private val urlTemplate: (version: String) -> String
 ) : DefaultTask(), BootstrapTask {
+  @get:Inject abstract val progressLoggerFactory: ProgressLoggerFactory
+
   @get:Input abstract val version: Property<String>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
@@ -56,50 +53,20 @@ internal abstract class BaseDownloadTask(
   @TaskAction
   fun download() {
     val version = version.get()
+    val progressLogger = progressLoggerFactory.newOperation(javaClass)
 
     @Suppress("ReplaceCallWithBinaryOperator") // Groovy interop falls over here
     check(!VersionNumber.parse(version).equals(VersionNumber.UNKNOWN)) {
       "Not a valid $targetName version number! $version"
     }
 
-    val request = Request.Builder().url(urlTemplate(version)).build()
+    val url = urlTemplate(version)
+    logger.debug("Downloading $url")
+    val request = Request.Builder().url(url).build()
+    val fileName = url.substringAfterLast('/')
+    progressLogger.start("Download $fileName", "Starting download")
 
-    val progressListener =
-      object : ProgressListener {
-        private var firstUpdate = true
-        private lateinit var progressBar: ProgressBar
-
-        override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
-          if (done) {
-            progressBar.close()
-            System.out.flush()
-          } else {
-            if (firstUpdate) {
-              firstUpdate = false
-              if (contentLength == -1L) {
-                error("content-length: unknown")
-              } else {
-                progressBar =
-                  ProgressBarBuilder()
-                    .setTaskName("Downloading $targetName")
-                    .setInitialMax(contentLength)
-                    .setStyle(ProgressBarStyle.COLORFUL_UNICODE_BLOCK)
-                    .setConsumer(
-                      DelegatingProgressBarConsumer {
-                        print("\r$it")
-                        System.out.flush()
-                      }
-                    )
-                    .setUnit("MB", ONE_MEGABYTE_IN_BYTES)
-                    .build()
-              }
-            }
-            if (contentLength != -1L) {
-              progressBar.stepTo(bytesRead)
-            }
-          }
-        }
-      }
+    val progressListener = ProgressLoggerProgressListener(fileName, progressLogger)
 
     val client =
       OkHttpClient.Builder()
@@ -123,6 +90,8 @@ internal abstract class BaseDownloadTask(
             delete()
           }
         }
+
+      progressLogger.progress("Writing to $destinationFile")
       response.body.source().use { source ->
         destinationFile.sink().buffer().use { sink ->
           if (addExecPrefix) {
@@ -132,9 +101,9 @@ internal abstract class BaseDownloadTask(
         }
       }
 
-      logger.lifecycle("Download finished, setting permissions")
+      progressLogger.progress("Setting permissions")
       destinationFile.setExecutable(true)
-      logger.lifecycle("Finished!")
+      progressLogger.completed("Finished!", false)
     }
   }
 }
