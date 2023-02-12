@@ -312,7 +312,7 @@ internal class SlackRootPlugin : Plugin<Project> {
 
   private fun isStable(version: String): Boolean {
     val stableKeyword =
-      listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase(Locale.US).contains(it) }
+      listOf("RELEASE", "FINAL", "GA").any { version.uppercase(Locale.US).contains(it) }
     return stableKeyword || STABLE_REGEX.matches(version)
   }
 

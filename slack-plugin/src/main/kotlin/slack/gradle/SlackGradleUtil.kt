@@ -174,17 +174,18 @@ public val Project.usePrototypeAppId: Boolean
     return SlackProperties(this).usePrototypeAppId
   }
 
-// Exposed for use in projects since this uses an experimental API that's understood to be allowed
-// here but not in
-// downstream projects.
+public fun String.decapitalizeUS(): String {
+  return replaceFirstChar { it.lowercase(Locale.US) }
+}
+
 public fun String.safeCapitalize(): String {
-  return capitalize(Locale.US)
+  return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
 }
 
 /** Returns the variant used for `ciUnitTest` tasks on this (presumably) Android project. */
 internal fun Project.ciUnitTestAndroidVariant(): String {
   val ciUnitTestVariant = SlackProperties(this).ciUnitTestVariant
-  return ciUnitTestVariant.capitalize(Locale.US)
+  return ciUnitTestVariant.safeCapitalize()
 }
 
 internal fun Project.jdkVersion(): Int {

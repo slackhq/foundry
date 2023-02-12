@@ -198,7 +198,7 @@ internal class SlackBasePlugin : Plugin<Project> {
     checkerDepOptional: Optional<Provider<MinimalExternalModuleDependency>>
   ) {
     val configurationName = configuration.name
-    val lowercaseName = configurationName.toLowerCase(Locale.US)
+    val lowercaseName = configurationName.lowercase(Locale.US)
     // Hamcrest switched to a single jar starting in 2.1, so exclude the old ones but replace the
     // core one with the
     // new one (as cover for transitive users like junit).
