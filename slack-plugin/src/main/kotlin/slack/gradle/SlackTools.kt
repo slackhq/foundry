@@ -39,6 +39,7 @@ import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
 import slack.gradle.util.mapToBoolean
+import slack.gradle.util.shutdown
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
 public abstract class SlackTools @Inject constructor(providers: ProviderFactory) :
@@ -115,11 +116,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       logger.error("Failed to report thermals", t)
     } finally {
       if (okHttpClient.isInitialized()) {
-        with(okHttpClient.value) {
-          dispatcher.executorService.shutdown()
-          connectionPool.evictAll()
-          cache?.close()
-        }
+        okHttpClient.value.shutdown()
       }
     }
   }
