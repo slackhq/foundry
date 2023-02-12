@@ -15,6 +15,8 @@
  */
 package slack.gradle.tasks
 
+import org.gradle.api.tasks.UntrackedTask
+
 /**
  * Downloads the GJF binary from its GitHub releases.
  *
@@ -23,6 +25,7 @@ package slack.gradle.tasks
  *     ./gradlew updateGjf
  * ```
  */
+@UntrackedTask(because = "These are one-off, on-demand download tasks")
 internal abstract class GjfDownloadTask :
   BaseDownloadTask(
     targetName = "GoogleJavaFormat",
