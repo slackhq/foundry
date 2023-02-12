@@ -5,10 +5,6 @@ plugins {
   alias(libs.plugins.bestPracticesPlugin)
 }
 
-kotlinDslPluginOptions {
-  jvmTarget.set("11")
-}
-
 gradlePlugin {
   plugins.create("unitTest") {
     id = "com.slack.gradle.unit-test"
