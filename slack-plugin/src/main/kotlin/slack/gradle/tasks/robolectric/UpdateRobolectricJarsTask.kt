@@ -17,26 +17,30 @@ package slack.gradle.tasks.robolectric
 
 import java.io.File
 import java.io.IOException
-import me.tongfei.progressbar.DelegatingProgressBarConsumer
-import me.tongfei.progressbar.ProgressBar
-import me.tongfei.progressbar.ProgressBarBuilder
-import me.tongfei.progressbar.ProgressBarStyle
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.buffer
 import okio.sink
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
+import org.gradle.kotlin.dsl.property
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import slack.gradle.tasks.BootstrapTask
-import slack.gradle.tasks.ProgressListener
-import slack.gradle.tasks.ProgressResponseBody
-
-private const val ONE_MEGABYTE_IN_BYTES: Long = 1L * 1024L * 1024L
+import slack.gradle.util.mapToBoolean
+import slack.gradle.util.shutdown
 
 /**
  * Updates the Robolectric android-all jars. Is declared as a task dependency of all
@@ -46,7 +50,24 @@ private const val ONE_MEGABYTE_IN_BYTES: Long = 1L * 1024L * 1024L
  * existing ones.
  */
 @UntrackedTask(because = "State for this is handled elsewhere.")
-internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask {
+internal abstract class UpdateRobolectricJarsTask
+@Inject
+constructor(
+  private val workerExecutor: WorkerExecutor,
+  objects: ObjectFactory,
+  providers: ProviderFactory,
+) : DefaultTask(), BootstrapTask {
+
+  @get:Internal
+  val forceReDownload =
+    objects
+      .property<Boolean>()
+      .convention(
+        providers
+          .environmentVariable("SLACK_FORCE_REDOWNLOAD_ROBOLECTRIC_JARS")
+          .mapToBoolean()
+          .orElse(false)
+      )
 
   @get:Internal abstract val sdkVersions: ListProperty<Int>
 
@@ -79,12 +100,18 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
       .associateBy { it.apiLevel }
   }
 
+  init {
+    group = "slack"
+    description = "Downloads the Robolectric android-all jars."
+  }
+
   internal fun sdkFor(version: Int): Sdk {
     return allSdks[version] ?: error("No robolectric jar coordinates found for $version.")
   }
 
   @TaskAction
   fun download() {
+    val workQueue = workerExecutor.noIsolation()
     val destinationDir = outputDir.asFile.get()
     val versions = sdkVersions.get()
 
@@ -98,19 +125,24 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
     // Track jars we currently have to which ones we try to download. At the end, we'll delete any
     // we don't want.
     val existingJars = jarsIn(destinationDir).associateByTo(LinkedHashMap(), File::getName)
+    val forceReDownload = forceReDownload.get()
 
-    val client = OkHttpClient.Builder().build()
     for (version in versions) {
       val sdk = sdkFor(version)
       val dependencyJar = sdk.dependencyJar()
       val jarName = dependencyJar.name
       existingJars.remove(jarName)
       val destinationFile = File(destinationDir, jarName)
-      if (destinationFile.exists()) {
-        logger.debug("$TAG Skipping $jarName, already downloaded 👍.")
+      val exists = destinationFile.exists()
+      if (exists && !forceReDownload) {
+        logger.lifecycle("$TAG Skipping $jarName, already downloaded 👍.")
         continue
       } else {
-        logger.debug("$TAG Downloading $jarName from Maven Central.")
+        if (exists) {
+          logger.lifecycle("$TAG Re-downloading $jarName from Maven Central.")
+        } else {
+          logger.lifecycle("$TAG Downloading $jarName from Maven Central.")
+        }
         if (offline.get()) {
           throw IllegalStateException(
             "Missing robolectric jar ${destinationFile.name} but can't" +
@@ -118,11 +150,14 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
           )
         }
         destinationFile.createNewFile()
-        downloadVersion(client, dependencyJar, destinationFile)
-        System.out.flush()
+        workQueue.submit(DownloadJarAction::class.java) {
+          this.dependencyJar.set(dependencyJar)
+          this.destinationFile.set(destinationFile)
+        }
       }
     }
 
+    workQueue.await()
     existingJars.forEach { (name, file) ->
       logger.lifecycle("Deleting unused Robolectric jar '$name'")
       file.delete()
@@ -135,77 +170,42 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
     fun jarsIn(dir: File): Set<File> {
       return dir.listFiles().orEmpty().filterTo(LinkedHashSet()) { it.extension == "jar" }
     }
+  }
+}
 
-    private fun downloadVersion(
-      client: OkHttpClient,
-      dependencyJar: DependencyJar,
-      destinationFile: File
-    ) {
-      val request =
-        with(dependencyJar) {
-          Request.Builder()
-            .url(
-              "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/$version/$name"
-            )
-            .build()
-        }
+internal interface DownloadJarParameters : WorkParameters {
+  val dependencyJar: Property<DependencyJar>
+  val destinationFile: RegularFileProperty
+}
 
-      val progressListener =
-        object : ProgressListener {
-          private var firstUpdate = true
-          private lateinit var progressBar: ProgressBar
+internal abstract class DownloadJarAction : WorkAction<DownloadJarParameters> {
+  override fun execute() {
+    // Can't share this from SlackTools because there's a cyclical dependency between GlobalConfig
+    // (which creates this task) and SlackTools' availability
+    val client =
+      OkHttpClient.Builder().connectionPool(ConnectionPool(1, 5, TimeUnit.MINUTES)).build()
+    val dependencyJar = parameters.dependencyJar.get()
+    val destinationFile = parameters.destinationFile.asFile.get()
+    val url =
+      with(dependencyJar) {
+        "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/$version/$name"
+      }
 
-          override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
-            if (done) {
-              progressBar.close()
-              System.out.flush()
-            } else {
-              if (firstUpdate) {
-                firstUpdate = false
-                if (contentLength == -1L) {
-                  error("content-length: unknown")
-                } else {
-                  progressBar =
-                    ProgressBarBuilder()
-                      .setTaskName(dependencyJar.version)
-                      .setInitialMax(contentLength)
-                      .setStyle(ProgressBarStyle.ASCII)
-                      .setConsumer(
-                        DelegatingProgressBarConsumer {
-                          print("\r$it")
-                          System.out.flush()
-                        }
-                      )
-                      .setUnit("MB", ONE_MEGABYTE_IN_BYTES)
-                      .build()
-                }
-              }
-              if (contentLength != -1L) {
-                progressBar.stepTo(bytesRead)
-              }
-            }
-          }
-        }
+    val request = Request.Builder().url(url).build()
 
-      client
-        .newBuilder()
-        .addInterceptor { chain ->
-          val originalResponse = chain.proceed(chain.request())
-          originalResponse
-            .newBuilder()
-            .body(ProgressResponseBody(originalResponse.body, progressListener))
-            .build()
-        }
-        .build()
-        .newCall(request)
-        .execute()
-        .use { response ->
-          if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-          response.body.source().use { source ->
-            destinationFile.sink().buffer().use { sink -> sink.writeAll(source) }
-          }
-        }
+    // TODO not possible to show progress here because Gradle:
+    //  https://github.com/gradle/gradle/issues/3654
+    //  Best we could do would be to create a separate task for each jar and show progress for each
+    client.newBuilder().build().newCall(request).execute().use { response ->
+      if (!response.isSuccessful) {
+        throw IOException("Unexpected code $response")
+      }
+      response.body.source().use { source ->
+        destinationFile.sink().buffer().use { sink -> sink.writeAll(source) }
+      }
     }
+
+    // TODO is this... necessary?
+    client.shutdown()
   }
 }

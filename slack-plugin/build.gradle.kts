@@ -108,9 +108,6 @@ dependencies {
   // Graphing library with Betweenness Centrality algo for modularization score
   implementation(libs.jgrapht)
 
-  // Progress bar for downloads
-  implementation(libs.progressBar)
-
   // Better I/O
   api(libs.okio)
 
