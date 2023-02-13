@@ -78,6 +78,9 @@ dependencies {
   compileOnly(libs.gradlePlugins.spotless)
   compileOnly(libs.gradlePlugins.redacted)
   compileOnly(libs.gradlePlugins.moshix)
+  compileOnly(libs.gradlePlugins.wire)
+  compileOnly(libs.gradlePlugins.sqldelight)
+  compileOnly(libs.gradlePlugins.ksp)
 
   implementation(libs.oshi) {
     because("To read hardware information")
@@ -87,7 +90,6 @@ dependencies {
   api(projects.agpHandlers.agpHandlerApi)
   api(projects.agpHandlers.agpHandler74)
   api(projects.agpHandlers.agpHandler80)
-  api(projects.sgpMonkeypatchAgp)
   testImplementation(libs.agp)
 
   implementation(libs.commonsText) {

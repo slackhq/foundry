@@ -102,7 +102,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
     project.configureSlackRootBuildscript()
     project.configureMisc(slackProperties)
-    ModuleStatsTasks.configureRoot(project)
+    ModuleStatsTasks.configureRoot(project, slackProperties)
     val scanApi = ScanApi(project)
     project.configureBuildScanMetadata(scanApi)
     if (scanApi.isAvailable) {
