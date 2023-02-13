@@ -15,6 +15,7 @@
  */
 package slack.gradle.tasks
 
+import okhttp3.Interceptor
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.BufferedSource
@@ -58,6 +59,17 @@ internal constructor(
 
 internal interface ProgressListener {
   fun update(bytesRead: Long, contentLength: Long, done: Boolean)
+}
+
+internal class ProgressReportingInterceptor(private val progressListener: ProgressListener) :
+  Interceptor {
+  override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+    val originalResponse = chain.proceed(chain.request())
+    return originalResponse
+      .newBuilder()
+      .body(ProgressResponseBody(originalResponse.body, progressListener))
+      .build()
+  }
 }
 
 /** A [ProgressListener] that logs progress to a [ProgressLogger]. */

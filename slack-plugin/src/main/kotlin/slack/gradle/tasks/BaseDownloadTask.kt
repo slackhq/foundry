@@ -69,15 +69,7 @@ internal abstract class BaseDownloadTask(
     val progressListener = ProgressLoggerProgressListener(fileName, progressLogger)
 
     val client =
-      OkHttpClient.Builder()
-        .addInterceptor { chain ->
-          val originalResponse = chain.proceed(chain.request())
-          originalResponse
-            .newBuilder()
-            .body(ProgressResponseBody(originalResponse.body, progressListener))
-            .build()
-        }
-        .build()
+      OkHttpClient.Builder().addInterceptor(ProgressReportingInterceptor(progressListener)).build()
 
     client.newCall(request).execute().use { response ->
       if (!response.isSuccessful) throw IOException("Unexpected code $response")
