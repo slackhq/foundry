@@ -12,6 +12,8 @@ _2023-02-13_
 - **Enhancement**: Binary download tasks (`KtfmtDownloadTask`, `DetektDownloadTask`, etc) now have prettier and more reliable download progress indications.
 - **Enhancement**: `UpdateRobolectricJarsTask` now uses Gradle workers to parallelize downloads. On gigabit wifi, this takes the task runtime down from ~21sec to ~13sec.
 - **Enhancement**: The boolean `SLACK_FORCE_REDOWNLOAD_ROBOLECTRIC_JARS` env variable can be used to force `UpdateRobolectricJarsTask` to redownload jars even if already downloaded.
+**Behavior change**: Mod score must now be opted in to via the `slack.gradle.config.modscore.enabled=true` gradle property.
+- **Enhancement**: Mod score can be disabled per-project via the `slack.gradle.config.modscore.ignore=true` gradle property.
 
 0.5.4
 -----
