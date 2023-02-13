@@ -15,12 +15,19 @@
  */
 package slack.gradle.tasks
 
+import okhttp3.Interceptor
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.BufferedSource
 import okio.ForwardingSource
 import okio.Source
 import okio.buffer
+import org.gradle.internal.logging.progress.ProgressLogger
+
+private const val ONE_MEGABYTE_IN_BYTES: Double = (1L * 1024L * 1024L).toDouble()
+
+private val Long.mb: String
+  get() = String.format("%.2f", this / ONE_MEGABYTE_IN_BYTES)
 
 internal class ProgressResponseBody
 internal constructor(
@@ -52,4 +59,40 @@ internal constructor(
 
 internal interface ProgressListener {
   fun update(bytesRead: Long, contentLength: Long, done: Boolean)
+}
+
+internal class ProgressReportingInterceptor(private val progressListener: ProgressListener) :
+  Interceptor {
+  override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+    val originalResponse = chain.proceed(chain.request())
+    return originalResponse
+      .newBuilder()
+      .body(ProgressResponseBody(originalResponse.body, progressListener))
+      .build()
+  }
+}
+
+/** A [ProgressListener] that logs progress to a [ProgressLogger]. */
+internal class ProgressLoggerProgressListener(
+  private val name: String,
+  private val progressLogger: ProgressLogger
+) : ProgressListener {
+  private var firstUpdate = true
+
+  override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
+    if (done) {
+      progressLogger.progress("Download completed")
+    } else {
+      if (firstUpdate) {
+        firstUpdate = false
+        if (contentLength == -1L) {
+          progressLogger.completed("content-length: unknown", /* failed */ true)
+          error("content-length: unknown")
+        }
+      }
+      if (contentLength != -1L) {
+        progressLogger.progress("$name > ${bytesRead.mb} MB/${contentLength.mb} MB")
+      }
+    }
+  }
 }

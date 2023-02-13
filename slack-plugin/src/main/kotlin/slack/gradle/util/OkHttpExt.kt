@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2023 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.tasks
+package slack.gradle.util
 
-import org.gradle.api.tasks.UntrackedTask
+import okhttp3.OkHttpClient
 
-/**
- * Downloads the KtLint binary from its GitHub releases.
- *
- * Usage:
- * ```
- *     ./gradlew updateKtLint
- * ```
- */
-@UntrackedTask(because = "These are one-off, on-demand download tasks")
-internal abstract class KtLintDownloadTask :
-  BaseDownloadTask(
-    targetName = "KtLint",
-    addExecPrefix = false,
-    urlTemplate = { version ->
-      "https://github.com/pinterest/ktlint/releases/download/$version/ktlint"
-    }
-  )
+/** Shuts down this [OkHttpClient] and all of its resources. */
+internal fun OkHttpClient.shutdown() {
+  dispatcher.executorService.shutdown()
+  connectionPool.evictAll()
+  cache?.close()
+}
