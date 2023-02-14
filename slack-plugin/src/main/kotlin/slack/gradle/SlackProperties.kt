@@ -413,6 +413,18 @@ public class SlackProperties private constructor(private val project: Project) {
   public val bugsnagEnabledBranchPattern: Provider<String>
     get() = project.optionalStringProvider("slack.gradle.config.bugsnag.enabledBranchPattern")
 
+  /** Global boolean that controls whether mod score is enabled on this project. */
+  public val modScoreGlobalEnabled: Boolean
+    get() = project.booleanProperty("slack.gradle.config.modscore.enabled")
+
+  /**
+   * Per-project boolean that allows for excluding this project from mod score.
+   *
+   * Note this should only be applied to projects that cannot be depended on.
+   */
+  public val modScoreIgnore: Boolean
+    get() = project.booleanProperty("slack.gradle.config.modscore.ignore")
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")

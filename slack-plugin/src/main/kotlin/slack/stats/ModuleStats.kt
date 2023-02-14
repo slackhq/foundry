@@ -15,10 +15,14 @@
  */
 package slack.stats
 
+import app.cash.sqldelight.gradle.GenerateSchemaTask
+import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.squareup.wire.gradle.WireTask
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -38,18 +42,20 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.internal.KaptTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
@@ -65,11 +71,21 @@ import slack.gradle.util.mapToBoolean
 public object ModuleStatsTasks {
   public const val AGGREGATOR_NAME: String = "aggregateModuleStats"
 
+  private val MAIN_SRC_DIRS =
+    listOf(
+      "main",
+      "commonMain",
+      "internal",
+      "debug",
+      "internalDebug",
+    )
+
   // Option to disable inclusion of generated code, which is helpful for testing
   private fun Project.includeGenerated() =
     providers.environmentVariable("MODULE_SCORE_INCLUDE_GENERATED").mapToBoolean().orElse(true)
 
-  internal fun configureRoot(rootProject: Project) {
+  internal fun configureRoot(rootProject: Project, slackProperties: SlackProperties) {
+    if (!slackProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
@@ -78,41 +94,46 @@ public object ModuleStatsTasks {
     }
   }
 
-  internal fun configureSubproject(project: Project) {
-    if (
-      !project.buildFile.exists() ||
-        project.path == ":app" || // TODO need to handle application and androidTest better
-        "slack-platform" in project.path
-    ) {
-      return
-    }
+  private fun File.findMainSourceDir(): String? {
+    return MAIN_SRC_DIRS.firstOrNull { File(this@findMainSourceDir, it).exists() }
+  }
 
-    val slackProperties = SlackProperties(project)
+  internal fun configureSubproject(project: Project, slackProperties: SlackProperties) {
+    if (!slackProperties.modScoreGlobalEnabled) return
+    if (!project.buildFile.exists()) return
+
+    if (slackProperties.modScoreIgnore) return
+
+    // Don't run on the platform project, it's a special case
+    if (project.path == slackProperties.platformProjectPath) return
+
+    val mainSrcDir = File(project.projectDir, "src").findMainSourceDir()
+
     val includeGenerated = project.includeGenerated().get()
 
     val locTask =
-      project.tasks.register<LocTask>("loc") {
-        srcsDir.set(project.layout.projectDirectory.dir("src/main"))
-        outputFile.set(project.layout.buildDirectory.file("reports/slack/loc.json"))
+      if (mainSrcDir == null) {
+        null
+      } else {
+        project.tasks.register<LocTask>("loc") {
+          srcsDir.set(project.layout.projectDirectory.dir("src/$mainSrcDir"))
+          outputFile.set(project.layout.buildDirectory.file("reports/slack/loc.json"))
+        }
       }
 
-    val collector: Lazy<TaskProvider<ModuleStatsCollectorTask>> = lazy {
+    /** Link task dependencies for both the loc and stats collector tasks. */
+    fun linkToLocTask(body: (Task) -> Unit) {
+      locTask?.configure { body(this) }
+    }
+
+    val moduleStatsCollector: Lazy<TaskProvider<ModuleStatsCollectorTask>> = lazy {
       val task =
         project.tasks.register<ModuleStatsCollectorTask>("moduleStats") {
           modulePath.set(project.path)
           buildFileProperty.set(project.buildFile)
-          locData.set(
-            locTask
-              .flatMap { it.outputFile }
-              .map {
-                val file = it.asFile
-                if (file.exists()) {
-                  file.readText()
-                } else {
-                  LocTask.LocData.EMPTY_JSON
-                }
-              }
-          )
+          if (locTask != null) {
+            locDataFiles.from(locTask.flatMap { it.outputFile })
+          }
           this.includeGenerated.set(includeGenerated)
           outputFile.set(project.layout.buildDirectory.file("reports/slack/moduleStats.json"))
         }
@@ -128,64 +149,78 @@ public object ModuleStatsTasks {
       task
     }
 
+    fun addCollectorTag(tag: String) {
+      moduleStatsCollector.value.configure { tags.add(tag) }
+    }
+
     val generatedSourcesAdded = AtomicBoolean()
     val addGeneratedSources = {
-      if (includeGenerated && generatedSourcesAdded.compareAndSet(false, true)) {
+      if (locTask != null && generatedSourcesAdded.compareAndSet(false, true)) {
         locTask.configure { generatedSrcsDir.set(project.layout.buildDirectory.dir("generated")) }
       }
     }
 
+    linkToLocTask {
+      it.mustRunAfter(project.tasks.withType<JavaCompile>())
+      it.mustRunAfter(project.tasks.withType<KotlinCompile>())
+    }
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.jvm") {
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KOTLIN) }
-
+        addCollectorTag(ModuleStatsCollectorTask.TAG_KOTLIN)
         if (includeGenerated) {
-          val compileKotlinTask = project.tasks.named("compileKotlin")
-          val compileJavaTask = project.tasks.named("compileJava")
-          collector.value.dependsOn(compileKotlinTask)
-          collector.value.dependsOn(compileJavaTask)
+          linkToLocTask {
+            it.dependsOn(project.tasks.withType<JavaCompile>())
+            it.dependsOn(project.tasks.withType<KotlinCompile>())
+          }
         }
       }
       withPlugin("org.jetbrains.kotlin.kapt") {
         addGeneratedSources()
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KAPT) }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_KAPT)
+        linkToLocTask { it.mustRunAfter(project.tasks.withType<KaptTask>()) }
+      }
+      withPlugin("com.google.devtools.ksp") {
+        addGeneratedSources()
+        addCollectorTag(ModuleStatsCollectorTask.TAG_KSP)
+        linkToLocTask { it.mustRunAfter(project.tasks.withType<KspTask>()) }
       }
       withPlugin("org.jetbrains.kotlin.android") {
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_KOTLIN) }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_KOTLIN)
       }
       withPlugin("org.jetbrains.kotlin.plugin.parcelize") {
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_PARCELIZE) }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_PARCELIZE)
       }
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_WIRE) }
-      }
-      withPlugin("com.squareup.sqldelight") {
-        addGeneratedSources()
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_WIRE)
+        linkToLocTask { it.mustRunAfter(project.tasks.withType<WireTask>()) }
       }
       withPlugin("app.cash.sqldelight") {
         addGeneratedSources()
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_SQLDELIGHT) }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_SQLDELIGHT)
+        linkToLocTask {
+          it.mustRunAfter(
+            project.tasks.withType(GenerateSchemaTask::class.java),
+            project.tasks.withType(SqlDelightTask::class.java),
+          )
+        }
       }
       withPlugin("com.android.application") {
-        collector.value.configure { tags.add(ModuleStatsCollectorTask.TAG_ANDROID) }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_ANDROID)
         //          val multiVariant =
         // project.booleanProperty(SlackPluginConfigs.LIBRARY_WITH_VARIANTS, false, local = true)
         //          afterEvaluate {
         //            val targetVariant = if (multiVariant) "internalDebug" else "release"
         //            val compileLifecycleTask =
         // tasks.named("compile${targetVariant.safeCapitalize()}Sources")
-        //            collector.value.dependsOn(compileLifecycleTask)
+        //            moduleStatsCollector.dependsOn(compileLifecycleTask)
         //          }
       }
       withPlugin("com.android.library") {
         val multiVariant = slackProperties.libraryWithVariants
-        collector.value.configure {
-          tags.add(ModuleStatsCollectorTask.TAG_ANDROID)
-          if (multiVariant) {
-            tags.add(ModuleStatsCollectorTask.TAG_VARIANTS)
-          }
+        addCollectorTag(ModuleStatsCollectorTask.TAG_ANDROID)
+        if (multiVariant) {
+          addCollectorTag(ModuleStatsCollectorTask.TAG_VARIANTS)
         }
 
         project.configure<LibraryAndroidComponentsExtension> {
@@ -199,7 +234,7 @@ public object ModuleStatsTasks {
                 "release"
               }
 
-            if (includeGenerated) {
+            if (includeGenerated && locTask != null) {
               project.namedLazy<Task>("compile${targetVariant.safeCapitalize()}Sources") {
                 locTask.dependsOn(it)
               }
@@ -211,35 +246,23 @@ public object ModuleStatsTasks {
             if (viewBinding) {
               addGeneratedSources()
             }
-            collector.value.configure {
-              if (androidResources) {
-                tags.add(ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED)
-              }
-              if (viewBinding) {
-                tags.add(ModuleStatsCollectorTask.TAG_VIEW_BINDING)
-              }
+            if (androidResources) {
+              addCollectorTag(ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED)
+            }
+            if (viewBinding) {
+              addCollectorTag(ModuleStatsCollectorTask.TAG_VIEW_BINDING)
             }
           }
         }
       }
-      withPlugin("java-library") {
-        // Trigger init
-        collector.value
-      }
-      withPlugin("java") {
-        // Trigger init
-        collector.value
-      }
 
-      // TODO would be nice if we could drop autovalue or glide into this
+      // TODO would be nice if we could drop autovalue into this
       project.afterEvaluate {
         val extension = the<SlackExtension>()
         val daggerConfig = extension.featuresHandler.daggerHandler.computeConfig()
         if (daggerConfig != null) {
-          collector.value.configure {
-            if (daggerConfig.useDaggerCompiler) {
-              tags.add(ModuleStatsCollectorTask.TAG_DAGGER_COMPILER)
-            }
+          if (daggerConfig.useDaggerCompiler) {
+            addCollectorTag(ModuleStatsCollectorTask.TAG_DAGGER_COMPILER)
           }
         }
       }
@@ -295,11 +318,9 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
           graph.addEdge(subproject, dependency)
         } catch (e: IllegalArgumentException) {
           // Surprisingly, not unexpected. This can happen when project A has a compileOnly
-          // dependency
-          // on project B and project B has a testImplementation dependency on project A.
+          // dependency on project B and project B has a testImplementation dependency on project A.
           // This _only_ happens with model and test-model, which we should just modularize out to a
-          // third
-          // "model-tests" module
+          // third "model-tests" module
           if ("model" !in subproject || "model" !in dependency) {
             throw RuntimeException(
               "Cycle from $subproject to $dependency. Please modularize this better!",
@@ -334,6 +355,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
   companion object {
     const val TAG_KAPT = "kapt"
+    const val TAG_KSP = "ksp"
     const val TAG_KOTLIN = "kotlin"
     const val TAG_DAGGER_COMPILER = "dagger-compiler"
     const val TAG_VIEW_BINDING = "viewbinding"
@@ -355,12 +377,12 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
-  // Not pointing at a JSON file since it's optional and Gradle doesn't handle optional files well
+  // Collection since it's optional and Gradle doesn't handle optional files well
   // when chained from outputs of other (possibly-skipped) tasks.
   // https://github.com/gradle/gradle/issues/2016
-  @get:Optional
-  @get:Input
-  val locData: Property<String> = objects.property<String>().convention(LocTask.LocData.EMPTY_JSON)
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  @get:InputFiles
+  val locDataFiles: ConfigurableFileCollection = objects.fileCollection()
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -372,7 +394,15 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
   @TaskAction
   fun dumpStats() {
-    val (sources, generatedSources) = moshi.adapter<LocTask.LocData>().fromJson(locData.get())!!
+    val locSrcFiles = locDataFiles.files
+    val (sources, generatedSources) =
+      if (locSrcFiles.isNotEmpty()) {
+        locDataFiles.singleFile.source().buffer().use {
+          moshi.adapter<LocTask.LocData>().fromJson(it)!!
+        }
+      } else {
+        LocTask.LocData.EMPTY
+      }
 
     val dependencies = StatsUtils.parseProjectDeps(buildFileProperty.asFile.get())
 
@@ -486,6 +516,7 @@ public data class Weights(
     score += javaKotlinRatio.div(10).toInt()
 
     val kapt = ModuleStatsCollectorTask.TAG_KAPT in tags
+    val ksp = ModuleStatsCollectorTask.TAG_KSP in tags
     val android = ModuleStatsCollectorTask.TAG_ANDROID in tags
     val resourcesEnabled = ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED in tags
     val resourcesHavePublicXml = true // TODO
@@ -501,6 +532,15 @@ public data class Weights(
         // Non-dagger stuff gets an extra bite because it's likely autovalue
         score += 10
       }
+    }
+
+    if (ksp) {
+      score += 2
+    }
+
+    // Enabling both kapt and KSP is a bad idea and we want to discourage it
+    if (ksp && kapt) {
+      score += 10
     }
 
     // Android slows down projects. We just add a fixed hit.

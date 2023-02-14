@@ -15,6 +15,8 @@
  */
 package slack.gradle.tasks
 
+import org.gradle.api.tasks.UntrackedTask
+
 /**
  * Downloads the ktfmt binary from maven central.
  *
@@ -23,6 +25,7 @@ package slack.gradle.tasks
  *     ./gradlew updateKtfmt
  * ```
  */
+@UntrackedTask(because = "These are one-off, on-demand download tasks")
 internal abstract class KtfmtDownloadTask :
   BaseDownloadTask(
     targetName = "ktfmt",
