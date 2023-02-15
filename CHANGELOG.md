@@ -1,13 +1,20 @@
 Changelog
 =========
 
-0.5.6
+0.5.7
 -----
 
 _2023-02-15_
 
 - **Fix**: `MergeFileTask.kt` was accidentally removed during a previous release.
 - **Fix**: Add `jna-platform` dependency to align with the `jna` dependency version.
+
+0.5.6
+-----
+
+_2023-02-15_
+
+Do not use! Release was accidentally messed up.
 
 0.5.5
 -----
