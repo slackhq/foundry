@@ -98,6 +98,7 @@ dependencies {
   implementation(libs.guava)
   implementation(libs.kotlinCliUtil)
   implementation(libs.jna)
+  implementation(libs.jna.platform)
 
   implementation(libs.rxjava)
 
