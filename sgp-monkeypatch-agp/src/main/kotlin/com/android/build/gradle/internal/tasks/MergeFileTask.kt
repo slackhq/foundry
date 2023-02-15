@@ -20,6 +20,7 @@ import com.google.common.base.Charsets
 import com.google.common.io.Files
 import java.io.File
 import java.io.IOException
+import java.lang.Boolean as JavaBoolean
 import java.util.Locale
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -62,8 +63,8 @@ public abstract class MergeFileTask : NonIncrementalTask() {
       val existingFiles = inputFiles.filter { it.isFile() }
 
       val filesToUse =
-        if (System.getenv("com.slack.sgp.sort-merge-files").toBoolean()) {
-          if (System.getenv("com.slack.sgp.sort-merge-files.log").toBoolean()) {
+        if (JavaBoolean.getBoolean("com.slack.sgp.sort-merge-files")) {
+          if (JavaBoolean.getBoolean("com.slack.sgp.sort-merge-files.log")) {
             println("Sorting ${existingFiles.size} files in merge task. Files are $existingFiles")
           }
           existingFiles.sortedBy { it.invariantSeparatorsPath.lowercase(Locale.US) }
