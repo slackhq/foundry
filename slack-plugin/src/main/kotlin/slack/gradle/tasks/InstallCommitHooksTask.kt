@@ -80,7 +80,7 @@ constructor(
     logger.lifecycle(
       """
       Finished! Be sure to point git at the hooks location
-      
+
       $ git config core.hooksPath $outputHooksDir
       """
         .trimIndent()
