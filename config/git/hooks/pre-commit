@@ -63,7 +63,8 @@ function partially_staged_chksum() {
 original_partially_staged_chksum=$(partially_staged_chksum)
 original_partially_staged_filenames=$(echo "$original_partially_staged_chksum" | grep -oE '[^ ]+$')
 
-#### ktfmt && Detekt section
+# TODO eventually support detekt here too once we can wire baseline and config fils
+#### ktfmt
 # Get a list of staged files, parsing .kt or .kts files
 kotlin_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*"  | grep -Ei "\.kt(s)?$")"
 if [[ ! -z ${kotlin_files_list} ]]; then
@@ -75,16 +76,6 @@ if [[ ! -z ${kotlin_files_list} ]]; then
         echo -e "${RED}Formatting failed, re-running verbosely. Alternatively, you can run the format command locally" >&2
         echo -e "Running format command: './config/bin/ktfmt --google-style ${kotlin_files_args}'${NC}" >&2
         "${REPO_ROOT_DIR}/config/bin/ktfmt" --google-style ${kotlin_files_args} >&2
-        exit $?
-    fi
-
-    kotlin_files_detekt_args="$(echo $kotlin_files_list | tr " " ",")"
-    "${REPO_ROOT_DIR}/config/bin/detekt" --build-upon-default-config --auto-correct --baseline "${REPO_ROOT_DIR}/config/detekt/baseline.xml" --config "${REPO_ROOT_DIR}/config/detekt/detekt.yml" --input ${kotlin_files_detekt_args} &> /dev/null
-    if [[ $? != 0 ]]; then
-        # Something it couldn't handle came up. Show the command and run verbosely for local debugging.
-        echo -e "${RED}Detekt failed, re-running verbosely. Alternatively, you can run the format command locally" >&2
-        echo -e "Running format command: './config/bin/detekt --build-upon-default-config --auto-correct --baseline "${REPO_ROOT_DIR}/config/detekt/baseline.xml" --config "${REPO_ROOT_DIR}/config/detekt/detekt.yml" --input ${kotlin_files_detekt_args}'${NC}" >&2
-        "${REPO_ROOT_DIR}/config/bin/detekt" --build-upon-default-config --auto-correct --baseline "${REPO_ROOT_DIR}/config/detekt/baseline.xml" --config "${REPO_ROOT_DIR}/config/detekt/detekt.yml" --input ${kotlin_files_detekt_args} >&2
         exit $?
     fi
 fi
