@@ -135,7 +135,7 @@ constructor(
       val destinationFile = File(destinationDir, jarName)
       val exists = destinationFile.exists()
       if (exists && !forceReDownload) {
-        logger.lifecycle("$TAG Skipping $jarName, already downloaded 👍.")
+        logger.debug("$TAG Skipping $jarName, already downloaded 👍.")
         continue
       } else {
         if (exists) {
