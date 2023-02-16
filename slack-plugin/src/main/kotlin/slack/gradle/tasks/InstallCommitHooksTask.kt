@@ -77,6 +77,14 @@ constructor(
       logger.lifecycle("Writing $name")
       File(outputDir, name).writeText(text)
     }
+    logger.lifecycle(
+      """
+      Finished! Be sure to point git at the hooks location
+      
+      $ git config core.hooksPath $outputHooksDir
+      """
+        .trimIndent()
+    )
   }
 
   internal companion object {
