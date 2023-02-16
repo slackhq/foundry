@@ -182,6 +182,10 @@ The following plugins are applied by default but can be disabled if you don't ne
 - NullAway – `slack.auto-apply.nullaway`
 - Android Cache Fix – `slack.auto-apply.cache-fix`
 
+## Commit hooks
+
+The `installCommitHooks` task can install commit hooks for formatting kotlin and java files. They expect binaries to be in `<root>/config/git/hooks` and it's highly recommended to enable git-lfs for these objects. These binaries can be downloaded via the `updateKtfmt`, `updateGjf`, etc tasks.
+
 License
 --------
 
