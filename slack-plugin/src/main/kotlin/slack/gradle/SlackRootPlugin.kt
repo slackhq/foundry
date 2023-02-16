@@ -35,7 +35,7 @@ import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
-import slack.gradle.tasks.InstallCommitHooks
+import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
@@ -384,7 +384,7 @@ private fun Project.configureSlackRootBuildscript() {
   if (CoreBootstrapTask.isBootstrapEnabled(this)) {
     CoreBootstrapTask.register(this)
   }
-  InstallCommitHooks.register(this)
+  InstallCommitHooksTask.register(this)
 }
 
 @Suppress("UnstableApiUsage")

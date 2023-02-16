@@ -18,7 +18,7 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.setProperty
 
 @UntrackedTask(because = "This is run on-demand")
-public abstract class InstallCommitHooks
+public abstract class InstallCommitHooksTask
 @Inject
 constructor(
   layout: ProjectLayout,
@@ -67,8 +67,8 @@ constructor(
   internal companion object {
     private const val NAME = "installCommitHooks"
 
-    fun register(rootProject: Project): TaskProvider<InstallCommitHooks> {
-      return rootProject.tasks.register<InstallCommitHooks>(NAME)
+    fun register(rootProject: Project): TaskProvider<InstallCommitHooksTask> {
+      return rootProject.tasks.register<InstallCommitHooksTask>(NAME)
     }
   }
 }
