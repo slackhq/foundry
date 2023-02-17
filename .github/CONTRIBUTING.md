@@ -19,3 +19,8 @@ use the `spotlessApply` command.
 ```bash
 ./gradlew spotlessApply
 ```
+
+Optionally, there are commit hooks in the repo you can enable by running the below
+```bash
+git config core.hooksPath config/git/hooks
+```
