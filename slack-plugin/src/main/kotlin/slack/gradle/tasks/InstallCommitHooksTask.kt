@@ -65,10 +65,7 @@ constructor(
   @TaskAction
   public fun install() {
     val hookFiles =
-      names.get().associate { name ->
-        val fixedName = name.removePrefix("githook-")
-        fixedName to Resources.getResource(fixedName).readText()
-      }
+      names.get().associateWith { name -> Resources.getResource("githook-$name").readText() }
 
     val outputDir = outputHooksDir.asFile.get()
     logger.lifecycle("Writing git hooks to $outputDir")
@@ -78,12 +75,7 @@ constructor(
       File(outputDir, name).writeText(text)
     }
     logger.lifecycle(
-      """
-      Finished! Be sure to point git at the hooks location
-
-      $ git config core.hooksPath $outputHooksDir
-      """
-        .trimIndent()
+      "Finished! Be sure to point git at the hooks location: \"git config core.hooksPath $outputDir\""
     )
   }
 
