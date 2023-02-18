@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   `kotlin-dsl`
   kotlin("jvm")
@@ -5,9 +7,7 @@ plugins {
   alias(libs.plugins.bestPracticesPlugin)
 }
 
-kotlinDslPluginOptions {
-  jvmTarget.set("11")
-}
+kotlinDslPluginOptions { jvmTarget.set("11") }
 
 gradlePlugin {
   plugins.create("unitTest") {
@@ -30,27 +30,39 @@ gradlePlugin {
 
 sourceSets {
   main.configure {
-    java.srcDir(project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main"))
+    java.srcDir(
+      project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main")
+    )
   }
 }
 
 // NOTE: DON'T CHANGE THIS TASK NAME WITHOUT CHANGING IT IN THE ROOT BUILD FILE TOO!
-val copyVersionTemplatesProvider = tasks.register<Copy>("copyVersionTemplates") {
-  from(project.layout.projectDirectory.dir("version-templates"))
-  into(project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main"))
-  filteringCharset = "UTF-8"
+val copyVersionTemplatesProvider =
+  tasks.register<Copy>("copyVersionTemplates") {
+    from(project.layout.projectDirectory.dir("version-templates"))
+    into(project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main"))
+    filteringCharset = "UTF-8"
 
-  doFirst {
-    if (destinationDir.exists()) {
-      // Clear output dir first if anything is present
-      destinationDir.listFiles()?.forEach { it.delete() }
+    doFirst {
+      if (destinationDir.exists()) {
+        // Clear output dir first if anything is present
+        destinationDir.listFiles()?.forEach { it.delete() }
+      }
     }
+  }
+
+tasks.named<KotlinCompile>("compileKotlin") { dependsOn(copyVersionTemplatesProvider) }
+
+// Copy our hooks into resources for InstallCommitHooks
+tasks.named<ProcessResources>("processResources") {
+  from(rootProject.layout.projectDirectory.dir("config/git/hooks")) {
+    // Give it a common prefix for us to look for
+    rename { name -> "githook-$name" }
   }
 }
 
-tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileKotlin") {
-  dependsOn(copyVersionTemplatesProvider)
-}
+// Necessary for gradle exec optimizations in gradle 8
+tasks.matching { it.name == "sourcesJar" }.configureEach { dependsOn(copyVersionTemplatesProvider) }
 
 dependencies {
   compileOnly(gradleApi())
@@ -61,7 +73,8 @@ dependencies {
   implementation(kotlin("reflect", version = libs.versions.kotlin.get()))
 
   // compileOnly because we want to leave versioning to the consumers
-  // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can de-dupe version
+  // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can
+  // de-dupe version
   // management between this plugin and the root build.gradle.kts file.
   compileOnly(libs.gradlePlugins.bugsnag)
   compileOnly(libs.gradlePlugins.compose)
@@ -82,9 +95,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.sqldelight)
   compileOnly(libs.gradlePlugins.ksp)
 
-  implementation(libs.oshi) {
-    because("To read hardware information")
-  }
+  implementation(libs.oshi) { because("To read hardware information") }
 
   compileOnly(libs.agp)
   api(projects.agpHandlers.agpHandlerApi)
@@ -92,12 +103,11 @@ dependencies {
   api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
 
-  implementation(libs.commonsText) {
-    because("For access to its StringEscapeUtils")
-  }
+  implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
   implementation(libs.guava)
   implementation(libs.kotlinCliUtil)
   implementation(libs.jna)
+  implementation(libs.jna.platform)
 
   implementation(libs.rxjava)
 

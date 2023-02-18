@@ -8,6 +8,7 @@ detekt = "1.22.0"
 dokka = "1.7.20"
 errorproneGradle = "3.0.1"
 jdk = "19"
+jna = "5.13.0"
 kotlin = "1.8.10"
 ksp = "1.8.10-1.0.9"
 ktfmt = "0.43"
@@ -20,7 +21,7 @@ sortDependencies = "0.1"
 spotless = "6.15.0"
 sqldelight = "2.0.0-alpha05"
 versionsPlugin = "0.45.0"
-wire = "4.5.0"
+wire = "4.5.1"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.9" }
@@ -66,7 +67,8 @@ guava = "com.google.guava:guava:31.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.1"
-jna = "net.java.dev.jna:jna:5.13.0"
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 junit = "junit:junit:4.13.2"
 markdown = "org.jetbrains:markdown:0.4.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }

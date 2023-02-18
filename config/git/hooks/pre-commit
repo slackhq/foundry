@@ -1,0 +1,127 @@
+#!/bin/bash
+
+######## FORMAT HOOK START ########
+
+if [[ "$SLACK_COMMIT_HOOK_OPT_OUT" == "true" ]]; then
+    echo 'Warning: Skipping pre-commit hook because SLACK_COMMIT_HOOK_OPT_OUT is true'
+    exit
+fi
+
+# Opt-out for cases where --no-verify isn't available
+# Usage: `git -c hook.pre-commit.enabled=false commit`
+#
+# Or you can add a git alias:
+# git config --global alias.noprecommit \
+#   '!git -c hook.pre-commit.enabled=false'
+# Usage: `git noprecommit commit`
+#
+# Or you can add a shell alias: `alias gitnoprecommit='git -c hook.pre-commit.enabled=false'`
+# Then usage is: `gitnoprecommit commit`
+enabled="$(git config --bool hooks.pre-commit.enabled)"
+
+if [[ "$enabled" == "false" ]]; then
+    echo 'Warning: Skipping pre-commit hook...'
+    exit
+fi
+
+# Turn off any custom GREP_OPTIONS that the user may have set up
+# shellcheck disable=2034 # (appears unused)
+GREP_OPTIONS=
+
+# Don't run formatting hooks during rebase
+# If rebase in progress, this will have a 0 exit code. If there isn't one, it will return a non-zero code
+# shellcheck disable=2010 # We are grepping ls with a known string.
+ls "$(git rev-parse --git-dir)" | grep -q rebase
+if [[ $? == 0 ]]; then
+    exit
+fi
+
+# Don't run formatting hooks during merge commits
+# If merge in progress, this will have a 0 exit code. If there isn't one, it will return a non-zero code
+git rev-parse -q --verify MERGE_HEAD
+if [[ $? == 0 ]]; then
+    exit
+fi
+
+# Note: to see colors in a bash script use "echo -e" or "printf".
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+REPO_ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+#### Store Original State section
+# Outputs "checksum size filename" for each file that is both staged and unstaged.
+# Used to figure out what files were modified.
+function partially_staged_chksum() {
+    # Use -G.* to only include files that have code changes. To support IntelliJ's separation of
+    # commits for rename and code changes for Java -> Kotlin conversions.
+    staged_files=$(git diff --cached --name-only --diff-filter=ACMR "-G.*" | grep -Ei "(\.kt(s)?)|(.*java)$" | sort)
+    unstaged_files=$(git diff --name-only --diff-filter=ACM | grep -Ei "(\.kt(s)?)|(.*java)$" | sort)
+    # Note: -12 means only include lines that are in both files.
+    comm -12 <(echo "$staged_files") <(echo "$unstaged_files") | xargs cksum
+}
+
+original_partially_staged_chksum=$(partially_staged_chksum)
+original_partially_staged_filenames=$(echo "$original_partially_staged_chksum" | grep -oE '[^ ]+$')
+
+# TODO eventually support detekt here too once we can wire baseline and config fils
+#### ktfmt
+# Get a list of staged files, parsing .kt or .kts files
+kotlin_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*"  | grep -Ei "\.kt(s)?$")"
+if [[ ! -z ${kotlin_files_list} ]]; then
+    # We have some Kotlin files! Join them to a string delimited on space. We'll pass these to ktfmt
+    kotlin_files_args="$(echo ${kotlin_files_list} | paste -sd " " -)"
+    "${REPO_ROOT_DIR}/config/bin/ktfmt" --google-style ${kotlin_files_args} &> /dev/null
+    if [[ $? != 0 ]]; then
+        # Something it couldn't handle came up. Show the command and run verbosely for local debugging.
+        echo -e "${RED}Formatting failed, re-running verbosely. Alternatively, you can run the format command locally" >&2
+        echo -e "Running format command: './config/bin/ktfmt --google-style ${kotlin_files_args}'${NC}" >&2
+        "${REPO_ROOT_DIR}/config/bin/ktfmt" --google-style ${kotlin_files_args} >&2
+        exit $?
+    fi
+fi
+
+#### GJF section
+java_files_list=$(git diff --cached --name-only --diff-filter=ACMR "-G.*" | grep ".*java$" )
+if [ ! -z "${java_files_list}" ]; then
+    # We have some Java files! Join them to a string delimited on space. We'll pass these to GJF
+    "${REPO_ROOT_DIR}/config/bin/gjf" --replace $java_files_list &> /dev/null
+    if [[ $? != 0 ]]; then
+        # Something it couldn't handle came up. Show the command and run verbosely for local debugging.
+        echo -e "${RED}Formatting failed, re-running verbosely. Alternatively, you can run the format command locally" >&2
+        echo -e "Running format command: './config/bin/gjf --replace ${java_files_list}'${NC}" >&2
+        "${REPO_ROOT_DIR}/config/bin/gjf" --replace $java_files_list >&2
+        exit $?
+    fi
+fi
+
+#### Add changed files section
+# Re-stage any modified files that were fully staged.
+all_files="${kotlin_files_list} ${java_files_list}"
+for file in ${all_files}; do
+    if [[ -f ${file} && ! "${original_partially_staged_filenames}" == *"${file}"* ]]; then
+        git add "${file}"
+    fi
+done
+
+#### Check that all fixes were staged section
+# Check if there were any partially staged files that were modified.
+# Note: -13 means only include lines that are in 2nd file (originally partially staged)
+# Check if there is still a file that is partially staged
+modified_partially_staged_filenames=$(comm -13 \
+  <(partially_staged_chksum) \
+  <(echo "$original_partially_staged_chksum") |
+  grep -oE '[^ ]+$')
+
+# Remove files from modified_partially_staged_filenames that no longer have changes.
+modified_partially_staged_filenames=$(comm -12 \
+  <(partially_staged_chksum | grep -oE '[^ ]+$') \
+  <(echo "$modified_partially_staged_filenames"))
+
+if [ -n "$modified_partially_staged_filenames" ]; then
+  printf "%bCould not automatically add all fixed files to commit: some files had unstaged changes:%b\n" "$RED" "$NC"
+  echo "$modified_partially_staged_filenames"
+  echo "Manually stage the fixes that were just made and try again."
+  exit 2
+fi
+
+######## FORMAT HOOK END ########
