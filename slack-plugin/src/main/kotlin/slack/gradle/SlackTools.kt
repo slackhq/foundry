@@ -31,7 +31,6 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.registerIfAbsent
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
@@ -129,7 +128,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       okHttpClient: Lazy<OkHttpClient>,
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
-        .registerIfAbsent(SERVICE_NAME, SlackTools::class) {
+        .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
           parameters.thermalsOutputFile.set(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )

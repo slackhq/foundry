@@ -34,10 +34,10 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
-import org.gradle.kotlin.dsl.property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
+import slack.gradle.property
 import slack.gradle.tasks.BootstrapTask
 import slack.gradle.util.mapToBoolean
 import slack.gradle.util.shutdown

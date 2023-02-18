@@ -28,10 +28,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.retry
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.util.synchronousEnvProperty
@@ -62,25 +59,25 @@ internal class SlackBasePlugin : Plugin<Project> {
           target.isCi &&
           slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN
       ) {
-        target.apply(plugin = "org.gradle.test-retry")
+        target.pluginManager.apply("org.gradle.test-retry")
       }
 
       if (slackProperties.autoApplyCacheFix) {
         target.pluginManager.withPlugin("com.android.base") {
-          target.apply(plugin = "org.gradle.android.cache-fix")
+          target.pluginManager.apply("org.gradle.android.cache-fix")
         }
       }
 
       if (slackProperties.autoApplyDetekt) {
-        target.plugins.withType<KotlinBasePlugin> {
-          target.apply(plugin = "io.gitlab.arturbosch.detekt")
+        target.plugins.withType(KotlinBasePlugin::class.java) {
+          target.pluginManager.apply("io.gitlab.arturbosch.detekt")
         }
       }
 
       if (slackProperties.autoApplyNullaway) {
         // Always apply the NullAway plugin with errorprone
         target.pluginManager.withPlugin("net.ltgt.errorprone") {
-          target.apply(plugin = "net.ltgt.nullaway")
+          target.pluginManager.apply("net.ltgt.nullaway")
         }
       }
 
@@ -100,7 +97,7 @@ internal class SlackBasePlugin : Plugin<Project> {
   private fun Project.configureSpotless(slackProperties: SlackProperties) {
     val isRootProject = this.isRootProject
     if (slackProperties.autoApplySpotless) {
-      apply(plugin = "com.diffplug.spotless")
+      pluginManager.apply("com.diffplug.spotless")
     } else {
       return
     }
@@ -255,10 +252,10 @@ internal class SlackBasePlugin : Plugin<Project> {
   private fun Project.configureTests(slackProperties: SlackProperties) {
     val maxParallel = max(Runtime.getRuntime().availableProcessors() / 2, 1)
     // Create "ciUnitTest" tasks in all subprojects
-    apply(plugin = "com.slack.gradle.unit-test")
+    pluginManager.apply("com.slack.gradle.unit-test")
 
     // Unit test task configuration
-    tasks.withType<Test>().configureEach {
+    tasks.withType(Test::class.java).configureEach {
       // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
       // CPUs.
       maxParallelForks = maxParallel
@@ -324,7 +321,7 @@ internal class SlackBasePlugin : Plugin<Project> {
     if (isCi) {
       if (slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN) {
         pluginManager.withPlugin("org.gradle.test-retry") {
-          tasks.withType<Test>().configureEach {
+          tasks.withType(Test::class.java).configureEach {
             @Suppress("MagicNumber")
             retry {
               failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
@@ -335,7 +332,7 @@ internal class SlackBasePlugin : Plugin<Project> {
         }
       } else {
         // TODO eventually expose if GE was enabled in settings via our own settings plugin?
-        tasks.withType<Test>().configureEach {
+        tasks.withType(Test::class.java).configureEach {
           @Suppress("MagicNumber")
           geRetry {
             failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)

@@ -15,11 +15,11 @@
  */
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.findByType
 import slack.gradle.AndroidHandler
 import slack.gradle.SlackAndroidAppExtension
 import slack.gradle.SlackAndroidLibraryExtension
 import slack.gradle.SlackExtension
+import slack.gradle.findByType
 
 /*
  * This file exists because of a strange behavior in Gradle. If you want to access buildSrc code from the root project's

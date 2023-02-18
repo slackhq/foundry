@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
   compileOnly(gradleApi())
-  compileOnly(gradleKotlinDsl())
   compileOnly(libs.agp)
   implementation(libs.guava)
 }

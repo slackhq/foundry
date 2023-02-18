@@ -49,11 +49,6 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.the
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jgrapht.alg.scoring.BetweennessCentrality
@@ -61,9 +56,12 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.configure
 import slack.gradle.convertProjectPathToAccessor
 import slack.gradle.dependsOn
+import slack.gradle.getByType
 import slack.gradle.namedLazy
+import slack.gradle.register
 import slack.gradle.safeCapitalize
 import slack.gradle.util.JsonTools
 import slack.gradle.util.mapToBoolean
@@ -139,7 +137,7 @@ public object ModuleStatsTasks {
         }
 
       val aggregatorTask =
-        project.rootProject.tasks.named<ModuleStatsAggregatorTask>(AGGREGATOR_NAME)
+        project.rootProject.tasks.named(AGGREGATOR_NAME, ModuleStatsAggregatorTask::class.java)
       val regularPath = project.path
       val projectAccessor = convertProjectPathToAccessor(regularPath)
       aggregatorTask.configure {
@@ -161,28 +159,28 @@ public object ModuleStatsTasks {
     }
 
     linkToLocTask {
-      it.mustRunAfter(project.tasks.withType<JavaCompile>())
-      it.mustRunAfter(project.tasks.withType<KotlinCompile>())
+      it.mustRunAfter(project.tasks.withType(JavaCompile::class.java))
+      it.mustRunAfter(project.tasks.withType(KotlinCompile::class.java))
     }
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.jvm") {
         addCollectorTag(ModuleStatsCollectorTask.TAG_KOTLIN)
         if (includeGenerated) {
           linkToLocTask {
-            it.dependsOn(project.tasks.withType<JavaCompile>())
-            it.dependsOn(project.tasks.withType<KotlinCompile>())
+            it.dependsOn(project.tasks.withType(JavaCompile::class.java))
+            it.dependsOn(project.tasks.withType(KotlinCompile::class.java))
           }
         }
       }
       withPlugin("org.jetbrains.kotlin.kapt") {
         addGeneratedSources()
         addCollectorTag(ModuleStatsCollectorTask.TAG_KAPT)
-        linkToLocTask { it.mustRunAfter(project.tasks.withType<KaptTask>()) }
+        linkToLocTask { it.mustRunAfter(project.tasks.withType(KaptTask::class.java)) }
       }
       withPlugin("com.google.devtools.ksp") {
         addGeneratedSources()
         addCollectorTag(ModuleStatsCollectorTask.TAG_KSP)
-        linkToLocTask { it.mustRunAfter(project.tasks.withType<KspTask>()) }
+        linkToLocTask { it.mustRunAfter(project.tasks.withType(KspTask::class.java)) }
       }
       withPlugin("org.jetbrains.kotlin.android") {
         addCollectorTag(ModuleStatsCollectorTask.TAG_KOTLIN)
@@ -193,7 +191,7 @@ public object ModuleStatsTasks {
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
         addCollectorTag(ModuleStatsCollectorTask.TAG_WIRE)
-        linkToLocTask { it.mustRunAfter(project.tasks.withType<WireTask>()) }
+        linkToLocTask { it.mustRunAfter(project.tasks.withType(WireTask::class.java)) }
       }
       withPlugin("app.cash.sqldelight") {
         addGeneratedSources()
@@ -258,7 +256,7 @@ public object ModuleStatsTasks {
 
       // TODO would be nice if we could drop autovalue into this
       project.afterEvaluate {
-        val extension = the<SlackExtension>()
+        val extension = project.extensions.getByType<SlackExtension>()
         val daggerConfig = extension.featuresHandler.daggerHandler.computeConfig()
         if (daggerConfig != null) {
           if (daggerConfig.useDaggerCompiler) {

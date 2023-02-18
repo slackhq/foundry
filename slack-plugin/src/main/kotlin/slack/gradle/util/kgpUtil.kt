@@ -16,7 +16,6 @@
 package slack.gradle.util
 
 import org.gradle.api.tasks.TaskContainer
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -33,7 +32,7 @@ internal fun TaskContainer.configureKotlinCompile(
   includeKaptGenerateStubsTask: Boolean = false,
   action: KotlinCompile.() -> Unit
 ) {
-  withType<KotlinCompile>()
+  withType(KotlinCompile::class.java)
     // Kapt stub gen is a special case because KGP sets it up to copy compiler args from the
     // standard kotlin compilation, which can lead to duplicates. SOOOO we skip configuration of
     // it here. Callers to this _can_ opt in to including it, but they must be explicit.

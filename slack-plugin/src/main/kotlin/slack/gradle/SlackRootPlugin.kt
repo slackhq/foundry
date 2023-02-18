@@ -24,9 +24,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
 import slack.cli.AppleSiliconCompat
 import slack.executeBlocking
 import slack.executeBlockingWithResult
@@ -232,7 +229,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     project.pluginManager.withPlugin("com.github.ben-manes.versions") {
-      project.tasks.withType<DependencyUpdatesTask>().configureEach {
+      project.tasks.withType(DependencyUpdatesTask::class.java).configureEach {
         // Disallow updating to unstable candidates from stable versions, but do allow suggesting
         // newer unstable
         // candidates if we're already on an unstable version. Note that we won't suggest a newer
@@ -390,7 +387,7 @@ private fun Project.configureSlackRootBuildscript() {
 @Suppress("UnstableApiUsage")
 private fun Project.configureMisc(slackProperties: SlackProperties) {
   tasks
-    .withType<Delete>()
+    .withType(Delete::class.java)
     .matching { it.name == "clean" }
     .configureEach {
       group = "build"

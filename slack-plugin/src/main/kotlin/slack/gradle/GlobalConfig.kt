@@ -18,7 +18,6 @@ package slack.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
 import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 
