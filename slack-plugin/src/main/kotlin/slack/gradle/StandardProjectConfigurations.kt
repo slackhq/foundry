@@ -562,9 +562,7 @@ internal class StandardProjectConfigurations(
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.targetSdk
         }
-        lint {
-          configureLint(project, slackProperties, sdkVersions, checkDependencies = true)
-        }
+        lint { configureLint(project, slackProperties, sdkVersions, checkDependencies = true) }
         agpHandler.packagingOptions(
           this,
           resourceExclusions =
