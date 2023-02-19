@@ -27,8 +27,6 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.withType
 import slack.executeWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
@@ -270,15 +268,15 @@ internal inline fun <reified T : Task> Project.namedLazy(
   crossinline action: (TaskProvider<T>) -> Unit
 ) {
   try {
-    action(tasks.named<T>(targetName))
+    action(tasks.named(targetName, T::class.java))
     return
   } catch (ignored: UnknownTaskException) {}
 
   var didRun = false
 
-  tasks.withType<T> {
+  tasks.withType(T::class.java).configureEach {
     if (name == targetName) {
-      action(tasks.named<T>(name))
+      action(tasks.named(name, T::class.java))
       didRun = true
     }
   }

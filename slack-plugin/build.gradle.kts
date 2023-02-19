@@ -1,13 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  `kotlin-dsl`
   kotlin("jvm")
+  `java-gradle-plugin`
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.bestPracticesPlugin)
 }
-
-kotlinDslPluginOptions { jvmTarget.set("11") }
 
 gradlePlugin {
   plugins.create("unitTest") {

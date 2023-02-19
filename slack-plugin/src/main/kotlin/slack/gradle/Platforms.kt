@@ -26,7 +26,6 @@ import org.gradle.api.internal.provider.MissingValueException
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.kotlin.dsl.dependencies
 import slack.gradle.dependencies.DependencyCollection
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.boms
@@ -224,7 +223,7 @@ public object Platforms {
     //  - Support overriding values from a VERSIONS_JSON env property
     //    - snapshots should use strict versions
 
-    project.dependencies {
+    project.dependencies.apply {
       constraints {
         for (alias in catalog.libraryAliases) {
           add("api", catalog.findLibrary(alias).get())
@@ -266,7 +265,7 @@ public object Platforms {
     val providers = project.providers
 
     val flattened = dependencies.flattenedPlatformCoordinates()
-    project.dependencies {
+    project.dependencies.apply {
       constraints {
         for (def in flattened) {
           if (def.isBomManaged) continue

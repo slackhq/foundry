@@ -58,16 +58,6 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.exclude
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.support.serviceOf
-import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -130,7 +120,7 @@ internal class StandardProjectConfigurations(
       val sortDependenciesIgnoreSet =
         globalProperties.sortDependenciesIgnore?.splitToSequence(',')?.toSet().orEmpty()
       if (project.path !in sortDependenciesIgnoreSet) {
-        apply(plugin = "com.squareup.sort-dependencies")
+        pluginManager.apply("com.squareup.sort-dependencies")
       }
     }
   }
@@ -181,7 +171,13 @@ internal class StandardProjectConfigurations(
     }
 
     val slackExtension =
-      extensions.create<SlackExtension>("slack", globalProperties, slackProperties, versionCatalog)
+      extensions.create(
+        "slack",
+        SlackExtension::class.java,
+        globalProperties,
+        slackProperties,
+        versionCatalog
+      )
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
     val jdkVersion = jdkVersion()
@@ -211,7 +207,7 @@ internal class StandardProjectConfigurations(
     slackExtension.applyTo(this)
 
     // TODO would be nice if we could apply this _only_ if compile-testing is on the test classpath
-    tasks.withType<Test>().configureEach {
+    tasks.withType(Test::class.java).configureEach {
       // Required for Google compile-testing to work.
       // https://github.com/google/compile-testing/issues/222
       jvmArgs("--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
@@ -248,7 +244,7 @@ internal class StandardProjectConfigurations(
   ) {
     configurations.configureEach {
       if (isPlatformConfigurationName(name)) {
-        dependencies {
+        project.dependencies.apply {
           for (bom in boms) {
             add(name, platform(bom))
           }
@@ -287,8 +283,8 @@ internal class StandardProjectConfigurations(
     jvmTargetVersion: Int,
     slackProperties: SlackProperties
   ) {
-    plugins.withType<JavaBasePlugin>().configureEach {
-      extensions.configure<JavaPluginExtension> {
+    plugins.withType(JavaBasePlugin::class.java).configureEach {
+      project.configure<JavaPluginExtension> {
         val version = JavaVersion.toVersion(jvmTargetVersion)
         sourceCompatibility = version
         targetCompatibility = version
@@ -305,7 +301,7 @@ internal class StandardProjectConfigurations(
 
     val javaToolchains by lazy { project.serviceOf<JavaToolchainService>() }
 
-    tasks.withType<JavaCompile>().configureEach {
+    tasks.withType(JavaCompile::class.java).configureEach {
       // Keep parameter names, this is useful for annotation processors and static analysis tools
       options.compilerArgs.addAll(listOf("-parameters"))
 
@@ -340,9 +336,9 @@ internal class StandardProjectConfigurations(
         slackProperties.versions.catalog.findLibrary("errorProne-nullaway").orElseThrow {
           IllegalStateException("Could not find errorProne-nullaway in the catalog")
         }
-      dependencies { add("errorprone", nullawayDep) }
+      dependencies.apply { add("errorprone", nullawayDep) }
 
-      tasks.withType<JavaCompile>().configureEach {
+      tasks.withType(JavaCompile::class.java).configureEach {
         val nullAwaySeverity =
           if (name.contains("test", ignoreCase = true)) {
             CheckSeverity.OFF
@@ -366,7 +362,7 @@ internal class StandardProjectConfigurations(
 
       val isAndroidProject = isAndroid
 
-      tasks.withType<JavaCompile>().configureEach {
+      tasks.withType(JavaCompile::class.java).configureEach {
         options.errorprone {
           disableWarningsInGeneratedCode.set(true)
           excludedPaths.set(".*/build/generated/.*") // The EP flag alone isn't enough
@@ -438,7 +434,7 @@ internal class StandardProjectConfigurations(
     val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {
-          apply(plugin = "org.gradle.android.cache-fix")
+          pluginManager.apply("org.gradle.android.cache-fix")
         }
 
         compileSdkVersion(sdkVersions.compileSdk)
@@ -509,7 +505,7 @@ internal class StandardProjectConfigurations(
       configurations.configureEach {
         if (name.contains("androidTest", ignoreCase = true)) {
           // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-          exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
+          exclude(mapOf("group" to "org.jetbrains.kotlinx", "module" to "kotlinx-coroutines-debug"))
           objenesis2Version?.let {
             // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
             // compatible with Android SDK <26
@@ -719,7 +715,7 @@ internal class StandardProjectConfigurations(
 
         // Contribute these libraries to Fladle if they opt into it
         val androidTestApksAggregator =
-          project.rootProject.tasks.named<AndroidTestApksTask>(AndroidTestApksTask.NAME)
+          project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
         onVariants { variant ->
           val excluded =
             slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
@@ -818,7 +814,7 @@ internal class StandardProjectConfigurations(
         slackProperties.detektBaseline?.let { baselineFile ->
           baseline =
             if (globalConfig.mergeDetektBaselinesTask != null) {
-              tasks.withType<DetektCreateBaselineTask>().configureEach {
+              tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
                 globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
               }
               file("$buildDir/intermediates/detekt/baseline.xml")
@@ -834,7 +830,7 @@ internal class StandardProjectConfigurations(
       }
     }
 
-    plugins.withType<KotlinBasePlugin> {
+    plugins.withType(KotlinBasePlugin::class.java).configureEach {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
 
       tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
@@ -928,7 +924,7 @@ internal class StandardProjectConfigurations(
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
       // Enable linting on pure JVM projects
-      apply(plugin = "com.android.lint")
+      pluginManager.apply("com.android.lint")
       configure<Lint> { configureLint(project, slackProperties, null, false) }
       // Add slack-lint as lint checks source
       slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
