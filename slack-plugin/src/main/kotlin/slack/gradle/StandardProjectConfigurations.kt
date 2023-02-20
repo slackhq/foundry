@@ -558,10 +558,7 @@ internal class StandardProjectConfigurations(
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.targetSdk
         }
-        lint {
-          configureLint(project, slackProperties, sdkVersions, true)
-          checkDependencies = true
-        }
+        lint { configureLint(project, slackProperties, sdkVersions, checkDependencies = true) }
         agpHandler.packagingOptions(
           this,
           resourceExclusions =
@@ -1076,6 +1073,7 @@ private fun Lint.configureLint(
   // These store qualified gradle caches in their paths and always change in baselines
   disable += "ObsoleteLintCustomCheck"
   // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
+  enable += "ImplicitSamInstance"
   error += "ImplicitSamInstance"
 
   androidSdkVersions?.let { sdkVersions ->
@@ -1090,11 +1088,13 @@ private fun Lint.configureLint(
   absolutePaths = false
   this.checkDependencies = checkDependencies
 
+  val lintBaselineFile = slackProperties.lintBaselineFileName
+
   // Lint is weird in that it will generate a new baseline file and fail the build if a new
   // one was generated, even if empty.
   // If we're updating baselines, always take the baseline so that we populate it if absent.
   project.layout.projectDirectory
-    .file("config/lint/baseline.xml")
+    .file(lintBaselineFile)
     .asFile
     .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
     ?.let { baseline = it }
