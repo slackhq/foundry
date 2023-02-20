@@ -29,8 +29,8 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.setProperty
+import slack.gradle.register
+import slack.gradle.setProperty
 
 @UntrackedTask(because = "This is run on-demand")
 public abstract class InstallCommitHooksTask
@@ -83,7 +83,8 @@ constructor(
     private const val NAME = "installCommitHooks"
 
     fun register(rootProject: Project): TaskProvider<InstallCommitHooksTask> {
-      return rootProject.tasks.register<InstallCommitHooksTask>(NAME)
+      // No idea why the reified register we have doesn't work here
+      return rootProject.tasks.register(NAME, InstallCommitHooksTask::class.java)
     }
   }
 }

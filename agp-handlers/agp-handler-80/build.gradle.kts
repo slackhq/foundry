@@ -6,7 +6,6 @@ plugins {
 
 dependencies {
   compileOnly(gradleApi())
-  compileOnly(gradleKotlinDsl())
   compileOnly("com.android.tools.build:gradle:8.0.0-beta03")
   api(projects.agpHandlers.agpHandlerApi)
   implementation(libs.autoService.annotations)

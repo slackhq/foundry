@@ -21,7 +21,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
+import slack.gradle.register
 import slack.gradle.safeCapitalize
 
 /**

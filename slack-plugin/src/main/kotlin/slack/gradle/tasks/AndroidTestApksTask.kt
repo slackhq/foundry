@@ -25,7 +25,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
+import slack.gradle.register
 
 /**
  * A task that aggregates all the androidTest apk paths and writes them (newline-delimited) to an
