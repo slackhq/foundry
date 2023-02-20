@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.5.8
+-----
+
+_2023-02-20_
+
+- **Enhancement**: Remove kotlin-dsl from the plugin. If you were indirectly relying on its APIs from this plugin, you'll need to add that dependency separately.
+- **Enhancement**: Better support fully modularized lints
+  - `checkDependencies` is no longer enabled by default.
+  - Make the baseline file name configurable via `slack.lint.baseline-file-name` property. Defaults to `lint-baseline.xml`.
+- **Fix**: `ImplicitSamInstance` lint not being enabled.
+
 0.5.7
 -----
 
