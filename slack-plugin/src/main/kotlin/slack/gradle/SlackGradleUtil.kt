@@ -274,7 +274,7 @@ internal inline fun <reified T : Task> Project.namedLazy(
 
   var didRun = false
 
-  tasks.withType(T::class.java).configureEach {
+  tasks.withType(T::class.java) {
     if (name == targetName) {
       action(tasks.named(name, T::class.java))
       didRun = true
