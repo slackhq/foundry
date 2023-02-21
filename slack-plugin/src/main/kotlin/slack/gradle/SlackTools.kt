@@ -64,7 +64,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       !parameters.cleanRequested.get() &&
       providers.gradleProperty(SlackProperties.LOG_THERMALS).mapToBoolean().getOrElse(false)
 
-  private val thermalsWatcher = if (logThermals) ThermalsWatcher(::thermalsFile) else null
+  private val thermalsWatcher = if (logThermals) ThermalsWatcher(logger, ::thermalsFile) else null
   private var thermalsAtClose: Thermals? = null
 
   /** Returns the current or latest captured thermals log. */
