@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.9
+-----
+
+_2023-02-27_
+
+- Gracefully handle JNA load failures in thermals logging.
+
 0.5.8
 -----
 
