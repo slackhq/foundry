@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.5.10
+------
+
+_2023-03-07_
+
+- Reduce noisy JNA load failures logging. Still have not gotten to the root cause, but at least this will reduce the log noise.
+- Add a new `slack.lint.severity.errorRuleIds` Gradle property to specify lint rule IDs that should always be error severity.
+
 0.5.9
 -----
 
