@@ -240,10 +240,6 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintBaselineFileName: String
     get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
 
-  /** Comma-separated list of lint rule IDs that should be set to `error` severity. */
-  public val lintErrorRuleIds: String?
-    get() = project.optionalStringProperty("slack.lint.severity.errorRuleIds")
-
   /** Flag to enable/disable KSP. */
   public val allowKsp: Boolean
     get() = booleanProperty("slack.allow-ksp")
