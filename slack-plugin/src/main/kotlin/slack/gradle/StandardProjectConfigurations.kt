@@ -1076,6 +1076,10 @@ private fun Lint.configureLint(
   enable += "ImplicitSamInstance"
   error += "ImplicitSamInstance"
 
+  for (ruleId in slackProperties.lintErrorRuleIds?.splitToSequence(',').orEmpty()) {
+    error += ruleId
+  }
+
   androidSdkVersions?.let { sdkVersions ->
     if (sdkVersions.minSdk >= 28) {
       // Lint doesn't understand AppComponentFactory
