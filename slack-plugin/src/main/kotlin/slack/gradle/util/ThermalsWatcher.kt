@@ -296,7 +296,9 @@ internal class AppleSiliconThermals(
               },
           )
         }
-        .filter { it.speedLimit != -1 }
+        // TODO we should try to better understand this issue, but for now let's stop trying to
+        //  track if it fails.
+        .takeUntil { it.speedLimit == -1 }
         .doOnNext { thermalsFile?.appendText("\n${it.timestamp} - ${it.speedLimit}") }
         .scanWith<Thermals>({ Thermals.Empty }) { acc, next ->
           when (acc) {
@@ -311,11 +313,12 @@ internal class AppleSiliconThermals(
             }
 
             override fun onError(e: Throwable) {
-              System.err.println("Error in thermals watcher:\n${e.stackTraceToString()}")
+              logger.error("Error in thermals watcher:\n${e.stackTraceToString()}")
             }
 
             override fun onComplete() {
-              // Nothing to do
+              // If we completed then we received an unknown state.
+              logger.error("Could not read thermals for this build.")
             }
           }
         )
@@ -342,9 +345,8 @@ internal class AppleSiliconThermals(
         JnaThermalState.INSTANCE.thermal_state()
       } catch (t: Throwable) {
         // If Gradle is misconfigured, this will fail to load and result in a massive cascading
-        // stacktrace to RxJava
-        // that's more or less incomprehensible to read. Instead, we'll just swallow the exception
-        // and log an error.
+        // stacktrace to RxJava that's more or less incomprehensible to read. Instead, we'll
+        // just swallow the exception and log an error.
         logger.error("Could not read thermals state: ${t.message}")
         return null
       }
