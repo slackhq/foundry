@@ -8,10 +8,6 @@ plugins {
 }
 
 gradlePlugin {
-  plugins.create("unitTest") {
-    id = "com.slack.gradle.unit-test"
-    implementationClass = "slack.unittest.UnitTestPlugin"
-  }
   plugins.create("slack-root") {
     id = "com.slack.gradle.root"
     implementationClass = "slack.gradle.SlackRootPlugin"

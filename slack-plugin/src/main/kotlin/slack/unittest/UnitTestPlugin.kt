@@ -16,23 +16,17 @@
 package slack.unittest
 
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.ciUnitTestAndroidVariant
-import slack.gradle.isRootProject
-
-private const val GLOBAL_CI_UNIT_TEST_TASK_NAME = "globalCiUnitTest"
-private const val CI_UNIT_TEST_TASK_NAME = "ciUnitTest"
-private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
-private const val LOG = "SlackUnitTestPlugin:"
 
 /**
- * This plugin creates a task named "ciUnitTest" in the project it is applied to, which depends on
- * the specific unit test task that we want to run on CI for the project.
+ * This code creates a task named "ciUnitTest" in the project it is applied to, which depends on the
+ * specific unit test task that we want to run on CI for the project.
  *
  * Instead of running "./gradlew test" on CI (which would run tests on every build variant on every
  * project), we prefer to run unit tests on only one build variant to save time.
@@ -48,18 +42,20 @@ private const val LOG = "SlackUnitTestPlugin:"
  * which depends on all the "ciUnitTest" tasks in the subprojects. This is the task that should be
  * run on CI.
  */
-internal class UnitTestPlugin : Plugin<Project> {
+internal object UnitTests {
+  private const val GLOBAL_CI_UNIT_TEST_TASK_NAME = "globalCiUnitTest"
+  private const val CI_UNIT_TEST_TASK_NAME = "ciUnitTest"
+  private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
+  private const val LOG = "SlackUnitTests:"
 
-  override fun apply(project: Project) {
-    val globalTask =
-      if (project.isRootProject) {
-        project.rootProject.tasks.register(GLOBAL_CI_UNIT_TEST_TASK_NAME) {
-          group = LifecycleBasePlugin.VERIFICATION_GROUP
-          description = "Global lifecycle task to run all ciUnitTest tasks."
-        }
-      } else {
-        project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
-      }
+  fun configureRootProject(project: Project): TaskProvider<Task> =
+    project.tasks.register(GLOBAL_CI_UNIT_TEST_TASK_NAME) {
+      group = LifecycleBasePlugin.VERIFICATION_GROUP
+      description = "Global lifecycle task to run all ciUnitTest tasks."
+    }
+
+  fun configureSubproject(project: Project) {
+    val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
 
     // Projects can opt out of creating the task with this property.
     val enabled = SlackProperties(project).ciUnitTestEnabled

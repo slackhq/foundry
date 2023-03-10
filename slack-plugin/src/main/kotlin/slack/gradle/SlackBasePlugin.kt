@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.util.synchronousEnvProperty
 import slack.stats.ModuleStatsTasks
+import slack.unittest.UnitTests
 
 /**
  * Simple base plugin over [StandardProjectConfigurations]. Eventually functionality from this will
@@ -252,7 +253,7 @@ internal class SlackBasePlugin : Plugin<Project> {
   private fun Project.configureTests(slackProperties: SlackProperties) {
     val maxParallel = max(Runtime.getRuntime().availableProcessors() / 2, 1)
     // Create "ciUnitTest" tasks in all subprojects
-    pluginManager.apply("com.slack.gradle.unit-test")
+    UnitTests.configureSubproject(this)
 
     // Unit test task configuration
     tasks.withType(Test::class.java).configureEach {
