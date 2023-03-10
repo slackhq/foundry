@@ -136,6 +136,24 @@ internal object UnitTests {
       // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
       reports.junitXml.mergeReruns.set(true)
 
+      /*
+       *
+       * Much of the below is to improve memory management on CI
+       * https://github.com/tinyspeck/slack-android-ng/issues/22005
+       *
+       */
+
+      // Improve JVM memory behavior in tests to avoid OOMs
+      // https://www.royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/
+      jvmArgs("-XX:+UseContainerSupport")
+
+      // helps when tests leak memory
+      @Suppress("MagicNumber") setForkEvery(1000L)
+
+      // Cap JVM args per test
+      minHeapSize = "128m"
+      maxHeapSize = "1g"
+
       jvmArgs(
         // region compile-testing args
         // TODO would be nice if we could apply this _only_ if compile-testing is on the test
@@ -151,6 +169,8 @@ internal object UnitTests {
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/java.util=ALL-UNNAMED",
         // endregion
+
+        "-Xss1m", // Stack size
       )
 
       if (slackProperties.testVerboseLogging) {
@@ -167,30 +187,12 @@ internal object UnitTests {
           // running on.
           displayGranularity = 0
         }
-      }
-
-      if (isCi) {
-        //
-        // Trying to improve memory management on CI
-        // https://github.com/tinyspeck/slack-android-ng/issues/22005
-        //
-
-        // Improve JVM memory behavior in tests to avoid OOMs
-        // https://www.royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/
-        jvmArgs("-XX:+UseContainerSupport")
 
         val workspaceDir =
           when {
             project.isActionsCi -> project.synchronousEnvProperty("GITHUB_WORKSPACE")
             else -> project.rootProject.projectDir.absolutePath
           }
-
-        // helps when tests leak memory
-        @Suppress("MagicNumber") setForkEvery(1000L)
-
-        // Cap JVM args per test
-        minHeapSize = "128m"
-        maxHeapSize = "1g"
         jvmArgs(
           "-XX:+HeapDumpOnOutOfMemoryError",
           "-XX:+UseGCOverheadLimit",
@@ -199,7 +201,6 @@ internal object UnitTests {
           "-XX:HeapDumpPath=$workspaceDir/fs_oom_err_pid<pid>.hprof",
           "-XX:OnError=cat $workspaceDir/fs_oom.log",
           "-XX:OnOutOfMemoryError=cat $workspaceDir/fs_oom_err_pid<pid>.hprof",
-          "-Xss1m" // Stack size
         )
       }
     }
