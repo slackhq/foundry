@@ -178,11 +178,21 @@ internal object UnitTests {
         minHeapSize = "128m"
         maxHeapSize = "1g"
         jvmArgs(
+          // region compile-testing args
           // TODO would be nice if we could apply this _only_ if compile-testing is on the test
           //  classpath
           // Required for Google compile-testing to work.
           // https://github.com/google/compile-testing/issues/222
           "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+          // endregion
+
+          // region Robolectric args
+          // Robolectric 4.9+ requires these --add-opens options.
+          // https://github.com/robolectric/robolectric/issues/7456
+          "--add-opens=java.base/java.lang=ALL-UNNAMED",
+          "--add-opens=java.base/java.util=ALL-UNNAMED",
+          // endregion
+
           "-XX:+HeapDumpOnOutOfMemoryError",
           "-XX:+UseGCOverheadLimit",
           "-XX:GCHeapFreeLimit=10",
