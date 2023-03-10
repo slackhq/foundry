@@ -15,14 +15,22 @@
  */
 package slack.unittest
 
+import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.max
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.retry
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.ciUnitTestAndroidVariant
+import slack.gradle.isActionsCi
+import slack.gradle.isCi
+import slack.gradle.util.synchronousEnvProperty
 
 /**
  * This code creates a task named "ciUnitTest" in the project it is applied to, which depends on the
@@ -43,6 +51,7 @@ import slack.gradle.ciUnitTestAndroidVariant
  * run on CI.
  */
 internal object UnitTests {
+  private val MAX_PARALLEL = max(Runtime.getRuntime().availableProcessors() / 2, 1)
   private const val GLOBAL_CI_UNIT_TEST_TASK_NAME = "globalCiUnitTest"
   private const val CI_UNIT_TEST_TASK_NAME = "ciUnitTest"
   private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
@@ -54,11 +63,11 @@ internal object UnitTests {
       description = "Global lifecycle task to run all ciUnitTest tasks."
     }
 
-  fun configureSubproject(project: Project) {
+  fun configureSubproject(project: Project, slackProperties: SlackProperties) {
     val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
 
     // Projects can opt out of creating the task with this property.
-    val enabled = SlackProperties(project).ciUnitTestEnabled
+    val enabled = slackProperties.ciUnitTestEnabled
     if (!enabled) {
       project.logger.debug("$LOG Skipping creation of \"$CI_UNIT_TEST_TASK_NAME\" task")
       return
@@ -91,6 +100,8 @@ internal object UnitTests {
     }
     project.pluginManager.withPlugin("java-library", javaKotlinLibraryHandler)
     project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm", javaKotlinLibraryHandler)
+
+    configureTestTasks(project, slackProperties)
   }
 
   private fun createAndroidCiUnitTestTask(project: Project, globalTask: TaskProvider<*>) {
@@ -111,6 +122,95 @@ internal object UnitTests {
       // Even if the task isn't created yet, we can do this by name alone and it will resolve at
       // task configuration time.
       dependsOn(variantCompileUnitTestTaskName)
+    }
+  }
+
+  private fun configureTestTasks(project: Project, slackProperties: SlackProperties) {
+    // Unit test task configuration
+    project.tasks.withType(Test::class.java).configureEach {
+      // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
+      // CPUs.
+      maxParallelForks = MAX_PARALLEL
+
+      // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
+      reports.junitXml.mergeReruns.set(true)
+
+      if (slackProperties.testVerboseLogging) {
+        // Add additional logging on Jenkins to help debug hanging or OOM-ing unit tests.
+        testLogging {
+          showStandardStreams = true
+          showStackTraces = true
+
+          // Set options for log level LIFECYCLE
+          events("started", "passed", "failed", "skipped")
+          setExceptionFormat("short")
+
+          // Setting this to 0 (the default is 2) will display the test executor that each test is
+          // running on.
+          displayGranularity = 0
+        }
+      }
+
+      if (project.isCi) {
+        //
+        // Trying to improve memory management on CI
+        // https://github.com/tinyspeck/slack-android-ng/issues/22005
+        //
+
+        // Improve JVM memory behavior in tests to avoid OOMs
+        // https://www.royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/
+        if (JavaVersion.current().isJava10Compatible) {
+          jvmArgs("-XX:+UseContainerSupport")
+        } else {
+          jvmArgs("-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap")
+        }
+
+        val workspaceDir =
+          when {
+            project.isActionsCi -> project.synchronousEnvProperty("GITHUB_WORKSPACE")
+            else -> project.rootProject.projectDir.absolutePath
+          }
+
+        // helps when tests leak memory
+        @Suppress("MagicNumber") setForkEvery(1000L)
+
+        // Cap JVM args per test
+        minHeapSize = "128m"
+        maxHeapSize = "1g"
+        jvmArgs(
+          "-XX:+HeapDumpOnOutOfMemoryError",
+          "-XX:+UseGCOverheadLimit",
+          "-XX:GCHeapFreeLimit=10",
+          "-XX:GCTimeLimit=20",
+          "-XX:HeapDumpPath=$workspaceDir/fs_oom_err_pid<pid>.hprof",
+          "-XX:OnError=cat $workspaceDir/fs_oom.log",
+          "-XX:OnOutOfMemoryError=cat $workspaceDir/fs_oom_err_pid<pid>.hprof",
+          "-Xss1m" // Stack size
+        )
+      }
+    }
+
+    if (project.isCi) {
+      if (slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN) {
+        project.pluginManager.withPlugin("org.gradle.test-retry") {
+          project.tasks.withType(Test::class.java).configureEach {
+            retry {
+              failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
+              maxFailures.set(slackProperties.testRetryMaxFailures)
+              maxRetries.set(slackProperties.testRetryMaxRetries)
+            }
+          }
+        }
+      } else {
+        // TODO eventually expose if GE was enabled in settings via our own settings plugin?
+        project.tasks.withType(Test::class.java).configureEach {
+          geRetry {
+            failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
+            maxFailures.set(slackProperties.testRetryMaxFailures)
+            maxRetries.set(slackProperties.testRetryMaxRetries)
+          }
+        }
+      }
     }
   }
 }
