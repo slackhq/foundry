@@ -178,6 +178,11 @@ internal object UnitTests {
         minHeapSize = "128m"
         maxHeapSize = "1g"
         jvmArgs(
+          // TODO would be nice if we could apply this _only_ if compile-testing is on the test
+          //  classpath
+          // Required for Google compile-testing to work.
+          // https://github.com/google/compile-testing/issues/222
+          "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
           "-XX:+HeapDumpOnOutOfMemoryError",
           "-XX:+UseGCOverheadLimit",
           "-XX:GCHeapFreeLimit=10",

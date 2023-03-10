@@ -54,7 +54,6 @@ import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
@@ -205,13 +204,6 @@ internal class StandardProjectConfigurations(
     )
     configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
     slackExtension.applyTo(this)
-
-    // TODO would be nice if we could apply this _only_ if compile-testing is on the test classpath
-    tasks.withType(Test::class.java).configureEach {
-      // Required for Google compile-testing to work.
-      // https://github.com/google/compile-testing/issues/222
-      jvmArgs("--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
-    }
 
     pluginManager.withPlugin("com.sergei-lapin.napt") {
       configure<NaptGradleExtension> {
