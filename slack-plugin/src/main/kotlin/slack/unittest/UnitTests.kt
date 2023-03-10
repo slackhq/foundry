@@ -126,6 +126,8 @@ internal object UnitTests {
   }
 
   private fun configureTestTasks(project: Project, slackProperties: SlackProperties) {
+    val isCi = project.isCi
+
     // Unit test task configuration
     project.tasks.withType(Test::class.java).configureEach {
       // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
@@ -134,6 +136,23 @@ internal object UnitTests {
 
       // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
       reports.junitXml.mergeReruns.set(true)
+
+      jvmArgs(
+        // region compile-testing args
+        // TODO would be nice if we could apply this _only_ if compile-testing is on the test
+        //  classpath
+        // Required for Google compile-testing to work.
+        // https://github.com/google/compile-testing/issues/222
+        "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+        // endregion
+
+        // region Robolectric args
+        // Robolectric 4.9+ requires these --add-opens options.
+        // https://github.com/robolectric/robolectric/issues/7456
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.base/java.util=ALL-UNNAMED",
+        // endregion
+      )
 
       if (slackProperties.testVerboseLogging) {
         // Add additional logging on Jenkins to help debug hanging or OOM-ing unit tests.
@@ -151,7 +170,7 @@ internal object UnitTests {
         }
       }
 
-      if (project.isCi) {
+      if (isCi) {
         //
         // Trying to improve memory management on CI
         // https://github.com/tinyspeck/slack-android-ng/issues/22005
@@ -178,21 +197,6 @@ internal object UnitTests {
         minHeapSize = "128m"
         maxHeapSize = "1g"
         jvmArgs(
-          // region compile-testing args
-          // TODO would be nice if we could apply this _only_ if compile-testing is on the test
-          //  classpath
-          // Required for Google compile-testing to work.
-          // https://github.com/google/compile-testing/issues/222
-          "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-          // endregion
-
-          // region Robolectric args
-          // Robolectric 4.9+ requires these --add-opens options.
-          // https://github.com/robolectric/robolectric/issues/7456
-          "--add-opens=java.base/java.lang=ALL-UNNAMED",
-          "--add-opens=java.base/java.util=ALL-UNNAMED",
-          // endregion
-
           "-XX:+HeapDumpOnOutOfMemoryError",
           "-XX:+UseGCOverheadLimit",
           "-XX:GCHeapFreeLimit=10",
@@ -205,7 +209,7 @@ internal object UnitTests {
       }
     }
 
-    if (project.isCi) {
+    if (isCi) {
       if (slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN) {
         project.pluginManager.withPlugin("org.gradle.test-retry") {
           project.tasks.withType(Test::class.java).configureEach {
