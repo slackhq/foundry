@@ -18,7 +18,6 @@ package slack.unittest
 import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.AppliedPlugin
@@ -178,11 +177,7 @@ internal object UnitTests {
 
         // Improve JVM memory behavior in tests to avoid OOMs
         // https://www.royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/
-        if (JavaVersion.current().isJava10Compatible) {
-          jvmArgs("-XX:+UseContainerSupport")
-        } else {
-          jvmArgs("-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap")
-        }
+        jvmArgs("-XX:+UseContainerSupport")
 
         val workspaceDir =
           when {
