@@ -63,14 +63,14 @@ internal object UnitTests {
     }
 
   fun configureSubproject(project: Project, slackProperties: SlackProperties) {
-    val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
-
     // Projects can opt out of creating the task with this property.
     val enabled = slackProperties.ciUnitTestEnabled
     if (!enabled) {
       project.logger.debug("$LOG Skipping creation of \"$CI_UNIT_TEST_TASK_NAME\" task")
       return
     }
+
+    val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
 
     // We only want to create tasks once, but a project might apply multiple plugins.
     val applied = AtomicBoolean(false)
