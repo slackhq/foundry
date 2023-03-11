@@ -77,13 +77,11 @@ internal object UnitTests {
 
     project.pluginManager.withPlugin("com.android.base") {
       if (applied.compareAndSet(false, true)) {
-        project.logger.debug("$LOG Applying UnitTestPlugin to Android project")
         createAndroidCiUnitTestTask(project, globalTask)
       }
     }
     val javaKotlinLibraryHandler = { plugin: AppliedPlugin ->
       if (applied.compareAndSet(false, true)) {
-        project.logger.debug("$LOG Applying UnitTestPlugin to ${plugin.name}")
         project.logger.debug("$LOG Creating CI unit test tasks")
         val ciUnitTest =
           project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
