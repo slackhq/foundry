@@ -108,6 +108,7 @@ internal object LintTasks {
       )
     }
 
+    // TODO should we change this default to depend on _all_ "lintReport*" AndroidLintTasks?
     val variant = slackProperties.ciLintVariant
     val lintTaskName =
       if (variant == null) {
