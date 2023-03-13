@@ -118,14 +118,14 @@ internal object LintTasks {
       }
 
     project.logger.debug("$LOG Creating CI lint task for variant '$variant'")
-    val ciUnitTest =
+    val ciLintTask =
       project.tasks.register(CI_LINT_TASK_NAME) {
         group = LifecycleBasePlugin.VERIFICATION_GROUP
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
         // task configuration time.
         dependsOn(lintTaskName)
       }
-    globalTask.configure { dependsOn(ciUnitTest) }
+    globalTask.configure { dependsOn(ciLintTask) }
   }
 
   private fun Lint.configureLint(
