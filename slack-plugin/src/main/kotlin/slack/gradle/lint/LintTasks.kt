@@ -73,7 +73,7 @@ internal object LintTasks {
         sdkVersions!!.invoke()
       )
     } else {
-      val javaKotlinLibraryHandler = { plugin: AppliedPlugin ->
+      val javaKotlinLibraryHandler = { _: AppliedPlugin ->
         if (applied.compareAndSet(false, true)) {
           // Enable linting on pure JVM projects
           project.pluginManager.apply("com.android.lint")
