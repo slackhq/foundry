@@ -17,7 +17,12 @@ package slack.gradle.lint
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.Lint
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -26,6 +31,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.configure
+import slack.gradle.getByType
 import slack.gradle.safeCapitalize
 
 internal object LintTasks {
@@ -46,16 +52,18 @@ internal object LintTasks {
     commonExtension: CommonExtension<*, *, *, *>?,
     sdkVersions: (() -> SlackProperties.AndroidSdkProperties)?,
   ) {
+    project.logger.debug("$LOG Configuring lint tasks for project ${project.path}...")
     // Projects can opt out of creating the task with this property.
-    val enabled = slackProperties.ciUnitTestEnabled
+    val enabled = slackProperties.ciLintEnabled
     if (!enabled) {
       project.logger.debug("$LOG Skipping creation of \"$CI_LINT_TASK_NAME\" task")
       return
     }
 
-    // Apply common lints
-    slackProperties.versions.bundles.commonLint.ifPresent {
-      project.dependencies.add("lintChecks", it)
+    fun applyCommonLints() {
+      slackProperties.versions.bundles.commonLint.ifPresent {
+        project.dependencies.add("lintChecks", it)
+      }
     }
 
     val globalTask = project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
@@ -64,7 +72,8 @@ internal object LintTasks {
     val applied = AtomicBoolean(false)
 
     if (commonExtension != null) {
-      project.logger.debug("$LOG Applying UnitTestPlugin to Android project")
+      project.logger.debug("$LOG Applying ciLint to Android project")
+      applyCommonLints()
       createAndroidCiLintTask(
         project,
         globalTask,
@@ -78,7 +87,8 @@ internal object LintTasks {
           // Enable linting on pure JVM projects
           project.pluginManager.apply("com.android.lint")
           project.configure<Lint> { configureLint(project, slackProperties, null, false) }
-          project.logger.debug("$LOG Creating CI lint task")
+          applyCommonLints()
+          project.logger.debug("$LOG Creating ciLint task")
           val ciLint =
             project.tasks.register(COMPILE_CI_LINT_NAME) {
               group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -99,6 +109,7 @@ internal object LintTasks {
     extension: CommonExtension<*, *, *, *>,
     sdkVersions: SlackProperties.AndroidSdkProperties,
   ) {
+    project.logger.debug("$LOG Configuring android lint tasks. isApp=${extension is AppExtension}")
     extension.lint {
       configureLint(
         project,
@@ -108,24 +119,46 @@ internal object LintTasks {
       )
     }
 
-    // TODO should we change this default to depend on _all_ "lintReport*" AndroidLintTasks?
-    val variant = slackProperties.ciLintVariant
-    val lintTaskName =
-      if (variant == null) {
-        "lint"
-      } else {
-        "lint${variant.safeCapitalize()}"
-      }
-
-    project.logger.debug("$LOG Creating CI lint task for variant '$variant'")
+    project.logger.debug("$LOG Creating ciLint task")
     val ciLintTask =
-      project.tasks.register(CI_LINT_TASK_NAME) {
-        group = LifecycleBasePlugin.VERIFICATION_GROUP
+      project.tasks.register(CI_LINT_TASK_NAME) { group = LifecycleBasePlugin.VERIFICATION_GROUP }
+    globalTask.configure { dependsOn(ciLintTask) }
+
+    slackProperties.ciLintVariants?.let { variants ->
+      ciLintTask.configure {
+        // Even if the task isn't created yet, we can do this by name alone and it will resolve at
+        // task configuration time.
+        variants.splitToSequence(',').forEach { variant ->
+          logger.debug("$LOG Using variant $variant for ciLint task")
+          val lintTaskName = "lint${variant.safeCapitalize()}"
+          dependsOn(lintTaskName)
+        }
+      }
+      return // nothing else to do!
+    }
+
+    val componentsExtension =
+      when (extension) {
+        is AppExtension -> {
+          project.extensions.getByType<ApplicationAndroidComponentsExtension>()
+        }
+        is LibraryExtension -> {
+          project.extensions.getByType<LibraryAndroidComponentsExtension>()
+        }
+        is TestExtension -> {
+          project.extensions.getByType<TestAndroidComponentsExtension>()
+        }
+        else -> error("No AndroidComponentsExtension found for project ${project.path}")
+      }
+    componentsExtension.onVariants { variant ->
+      val lintTaskName = "lint${variant.name.safeCapitalize()}"
+      project.logger.debug("$LOG Adding $lintTaskName to ciLint task")
+      ciLintTask.configure {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
         // task configuration time.
         dependsOn(lintTaskName)
       }
-    globalTask.configure { dependsOn(ciLintTask) }
+    }
   }
 
   private fun Lint.configureLint(
