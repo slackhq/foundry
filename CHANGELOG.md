@@ -1,6 +1,24 @@
 Changelog
 =========
 
+0.6.0
+-----
+
+_2023-03-14_
+
+Happy Pi day!
+
+- Refactor how unit tests are configured.
+  - `Test` tasks are now configured more consistently across CI and local, so there should be more cache hits.
+  - Add a new `globalCiUnitTest` task to the root project to ease running `ciUnitTest` tasks across all subprojects.
+  - Add new properties to `SlackProperties` for controlling max parallelism and `forkEvery` options in `Test` tasks.
+- Refactor how lint tasks are configured.
+  - Add a new `ciLint` task to every project that depends on all lint tasks in that project. This is intended to be the inverse
+    behavior of the built-in `lint` task in Android projects, which only runs the default variant's lint task.
+  - Add a new `globalCiLint` task to the root project to ease running `ciLint` tasks across all subprojects.
+  - Add new properties to `SlackProperties` for controlling which variants should be linted.
+- Revert "Add lintErrorRuleIds property". `lint.xml` is the right place for this kind of logic.
+
 0.5.10
 ------
 
