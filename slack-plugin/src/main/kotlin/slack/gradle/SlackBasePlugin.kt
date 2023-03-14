@@ -17,22 +17,17 @@ package slack.gradle
 
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
-import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import java.util.Locale
 import java.util.Optional
-import kotlin.math.max
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.retry
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.gradle.tasks.CoreBootstrapTask
-import slack.gradle.util.synchronousEnvProperty
 import slack.stats.ModuleStatsTasks
+import slack.unittest.UnitTests
 
 /**
  * Simple base plugin over [StandardProjectConfigurations]. Eventually functionality from this will
@@ -48,7 +43,7 @@ internal class SlackBasePlugin : Plugin<Project> {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       StandardProjectConfigurations(slackProperties, versionCatalog).applyTo(target)
-      target.configureTests(slackProperties)
+      UnitTests.configureSubproject(target, slackProperties)
       CoreBootstrapTask.configureSubprojectBootstrapTasks(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
@@ -242,102 +237,6 @@ internal class SlackBasePlugin : Plugin<Project> {
               "Checker Framework dependencies are all over the place, so we force their version to a " +
                 "single latest one"
             )
-          }
-        }
-      }
-    }
-  }
-
-  @Suppress("LongMethod")
-  private fun Project.configureTests(slackProperties: SlackProperties) {
-    val maxParallel = max(Runtime.getRuntime().availableProcessors() / 2, 1)
-    // Create "ciUnitTest" tasks in all subprojects
-    pluginManager.apply("com.slack.gradle.unit-test")
-
-    // Unit test task configuration
-    tasks.withType(Test::class.java).configureEach {
-      // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
-      // CPUs.
-      maxParallelForks = maxParallel
-
-      // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
-      reports.junitXml.mergeReruns.set(true)
-
-      if (slackProperties.testVerboseLogging) {
-        // Add additional logging on Jenkins to help debug hanging or OOM-ing unit tests.
-        testLogging {
-          showStandardStreams = true
-          showStackTraces = true
-
-          // Set options for log level LIFECYCLE
-          events("started", "passed", "failed", "skipped")
-          setExceptionFormat("short")
-
-          // Setting this to 0 (the default is 2) will display the test executor that each test is
-          // running on.
-          displayGranularity = 0
-        }
-      }
-
-      if (isCi) {
-        //
-        // Trying to improve memory management on CI
-        // https://github.com/tinyspeck/slack-android-ng/issues/22005
-        //
-
-        // Improve JVM memory behavior in tests to avoid OOMs
-        // https://www.royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/
-        if (JavaVersion.current().isJava10Compatible) {
-          jvmArgs("-XX:+UseContainerSupport")
-        } else {
-          jvmArgs("-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap")
-        }
-
-        val workspaceDir =
-          when {
-            isActionsCi -> synchronousEnvProperty("GITHUB_WORKSPACE")
-            else -> rootProject.projectDir.absolutePath
-          }
-
-        // helps when tests leak memory
-        @Suppress("MagicNumber") setForkEvery(1000L)
-
-        // Cap JVM args per test
-        minHeapSize = "128m"
-        maxHeapSize = "1g"
-        jvmArgs(
-          "-XX:+HeapDumpOnOutOfMemoryError",
-          "-XX:+UseGCOverheadLimit",
-          "-XX:GCHeapFreeLimit=10",
-          "-XX:GCTimeLimit=20",
-          "-XX:HeapDumpPath=$workspaceDir/fs_oom_err_pid<pid>.hprof",
-          "-XX:OnError=cat $workspaceDir/fs_oom.log",
-          "-XX:OnOutOfMemoryError=cat $workspaceDir/fs_oom_err_pid<pid>.hprof",
-          "-Xss1m" // Stack size
-        )
-      }
-    }
-
-    if (isCi) {
-      if (slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN) {
-        pluginManager.withPlugin("org.gradle.test-retry") {
-          tasks.withType(Test::class.java).configureEach {
-            @Suppress("MagicNumber")
-            retry {
-              failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
-              maxFailures.set(slackProperties.testRetryMaxFailures)
-              maxRetries.set(slackProperties.testRetryMaxRetries)
-            }
-          }
-        }
-      } else {
-        // TODO eventually expose if GE was enabled in settings via our own settings plugin?
-        tasks.withType(Test::class.java).configureEach {
-          @Suppress("MagicNumber")
-          geRetry {
-            failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
-            maxFailures.set(slackProperties.testRetryMaxFailures)
-            maxRetries.set(slackProperties.testRetryMaxRetries)
           }
         }
       }

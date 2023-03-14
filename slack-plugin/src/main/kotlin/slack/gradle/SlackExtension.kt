@@ -28,7 +28,6 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.testing.Test
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
@@ -755,14 +754,6 @@ constructor(
           add("testImplementation", SlackDependencies.Testing.Robolectric.annotations)
           add("testImplementation", SlackDependencies.Testing.Robolectric.robolectric)
           add("testImplementation", slackProperties.robolectricCoreProject)
-        }
-        // Robolectric 4.9+ requires these --add-opens options.
-        // https://github.com/robolectric/robolectric/issues/7456
-        project.tasks.withType(Test::class.java).configureEach {
-          jvmArgs(
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.base/java.util=ALL-UNNAMED",
-          )
         }
       }
     }

@@ -39,6 +39,7 @@ import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
 import slack.gradle.util.ThermalsData
 import slack.stats.ModuleStatsTasks
+import slack.unittest.UnitTests
 
 /**
  * A common entry point for Slack project configuration. This should only be applied once and on the
@@ -102,6 +103,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     project.configureSlackRootBuildscript()
     LintTasks.configureRootProject(project)
     project.configureMisc(slackProperties)
+    UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
     val scanApi = ScanApi(project)
     project.configureBuildScanMetadata(scanApi)

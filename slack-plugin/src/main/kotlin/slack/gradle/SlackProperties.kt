@@ -286,6 +286,24 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = stringProperty("slack.ci-unit-test.variant", "release")
 
   /**
+   * Parallelism multiplier to use for unit tests. This should be a float value that is multiplied
+   * by the number of cores. The value can be a fraction. Default is 0.5.
+   */
+  public val unitTestParallelismMultiplier: Float
+    get() {
+      val rawValue = stringProperty("slack.unit-test.parallelismMultiplier", "0.5")
+      val floatValue = rawValue.toFloatOrNull()
+      require(floatValue != null && floatValue > 0) {
+        "Invalid value for slack.unit-test.parallelismMultiplier: '$rawValue'"
+      }
+      return floatValue
+    }
+
+  /** Controls how often to fork the JVM in unit tests. Default is 1000. */
+  public val unitTestForkEvery: Long
+    get() = intProperty("slack.unit-test.forkEvery", 1000).toLong()
+
+  /**
    * Flag to enable ciLint on a project. Default is true.
    *
    * When enabled, a task named "ciLint" will be created in this project, which will depend on the
