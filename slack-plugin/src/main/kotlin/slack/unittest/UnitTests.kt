@@ -75,6 +75,10 @@ internal object UnitTests {
       return
     }
 
+    if (slackProperties.ciUnitTestEnableKover) {
+      project.pluginManager.apply("org.jetbrains.kotlinx.kover")
+    }
+
     val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
 
     // We only want to create tasks once, but a project might apply multiple plugins.
