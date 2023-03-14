@@ -286,6 +286,22 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = stringProperty("slack.ci-unit-test.variant", "release")
 
   /**
+   * Flag to enable ciLint on a project. Default is true.
+   *
+   * When enabled, a task named "ciLint" will be created in this project, which will depend on the
+   * all the lint tasks in the project.
+   */
+  public val ciLintEnabled: Boolean
+    get() = booleanProperty("slack.ci-lint.enable", defaultValue = true)
+
+  /**
+   * Comma-separated list of CI lint variants to run (Android only). Default when unspecified will
+   * lint all variants.
+   */
+  public val ciLintVariants: String?
+    get() = optionalStringProperty("slack.ci-lint.variants")
+
+  /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
    *
