@@ -285,6 +285,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val ciUnitTestVariant: String
     get() = stringProperty("slack.ci-unit-test.variant", "release")
 
+  /** If enabled, applies the kotlinx-kover plugin to projects using ciUnitTest. */
+  public val ciUnitTestEnableKover: Boolean
+    get() = booleanProperty("slack.ci-unit-test.enableKover", false)
+
   /**
    * Parallelism multiplier to use for unit tests. This should be a float value that is multiplied
    * by the number of cores. The value can be a fraction. Default is 0.5.
