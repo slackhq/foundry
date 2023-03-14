@@ -287,7 +287,7 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /**
    * Parallelism multiplier to use for unit tests. This should be a float value that is multiplied
-   * by the number of cores. The value can be a fraction.
+   * by the number of cores. The value can be a fraction. Default is 0.5.
    */
   public val unitTestParallelismMultiplier: Float
     get() {
@@ -298,6 +298,10 @@ public class SlackProperties private constructor(private val project: Project) {
       }
       return floatValue
     }
+
+  /** Controls how often to fork the JVM in unit tests. Default is 1000. */
+  public val unitTestForkEvery: Long
+    get() = intProperty("slack.unit-test.forkEvery", 1000).toLong()
 
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution

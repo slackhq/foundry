@@ -150,7 +150,7 @@ internal object UnitTests {
       jvmArgs("-XX:+UseContainerSupport")
 
       // helps when tests leak memory
-      @Suppress("MagicNumber") setForkEvery(1000L)
+      setForkEvery(slackProperties.unitTestForkEvery)
 
       // Cap JVM args per test
       minHeapSize = "128m"
