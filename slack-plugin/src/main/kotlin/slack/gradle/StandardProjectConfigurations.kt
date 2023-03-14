@@ -18,7 +18,6 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.dsl.Lint
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTestBuilder
@@ -68,6 +67,7 @@ import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
@@ -420,7 +420,7 @@ internal class StandardProjectConfigurations(
         }
       }
 
-    val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
+    val sdkVersions = lazy { slackProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
     val agpHandler = slackTools().agpHandler
     val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
@@ -429,11 +429,11 @@ internal class StandardProjectConfigurations(
           pluginManager.apply("org.gradle.android.cache-fix")
         }
 
-        compileSdkVersion(sdkVersions.compileSdk)
+        compileSdkVersion(sdkVersions.value.compileSdk)
         slackProperties.ndkVersion?.let { ndkVersion = it }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          minSdk = sdkVersions.minSdk
+          minSdk = sdkVersions.value.minSdk
           vectorDrawables.useSupportLibrary = true
           // Default to the standard android runner, but note this is overridden in :app
           testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -508,17 +508,15 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.test") {
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       configure<TestExtension> {
         slackExtension.androidExtension = this
         commonBaseExtensionConfig(false)
-        defaultConfig { targetSdk = sdkVersions.targetSdk }
+        defaultConfig { targetSdk = sdkVersions.value.targetSdk }
+        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
       }
     }
 
     pluginManager.withPlugin("com.android.application") {
-      // Add slack-lint as lint checks source
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       prepareAndroidTestConfigurations()
       configure<ApplicationAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
@@ -548,9 +546,9 @@ internal class StandardProjectConfigurations(
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          targetSdk = sdkVersions.targetSdk
+          targetSdk = sdkVersions.value.targetSdk
         }
-        lint { configureLint(project, slackProperties, sdkVersions, checkDependencies = true) }
+        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
         agpHandler.packagingOptions(
           this,
           resourceExclusions =
@@ -659,8 +657,6 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.library") {
-      // Add slack-lint as lint checks source
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       prepareAndroidTestConfigurations()
       val isLibraryWithVariants = slackProperties.libraryWithVariants
 
@@ -744,7 +740,7 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.androidExtension = this
         commonBaseExtensionConfig(true)
-        lint { configureLint(project, slackProperties, sdkVersions, false) }
+        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -912,11 +908,7 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      // Enable linting on pure JVM projects
-      pluginManager.apply("com.android.lint")
-      configure<Lint> { configureLint(project, slackProperties, null, false) }
-      // Add slack-lint as lint checks source
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
+      LintTasks.configureSubProject(project, slackProperties, null, null)
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {
@@ -1050,46 +1042,6 @@ internal class StandardProjectConfigurations(
       return isKnownConfiguration(name, Configurations.Groups.PLATFORM)
     }
   }
-}
-
-private fun Lint.configureLint(
-  project: Project,
-  slackProperties: SlackProperties,
-  androidSdkVersions: SlackProperties.AndroidSdkProperties?,
-  checkDependencies: Boolean,
-) {
-  lintConfig = project.rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
-  sarifReport = true
-  // This check is _never_ up to date and makes network requests!
-  disable += "NewerVersionAvailable"
-  // These store qualified gradle caches in their paths and always change in baselines
-  disable += "ObsoleteLintCustomCheck"
-  // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
-  enable += "ImplicitSamInstance"
-  error += "ImplicitSamInstance"
-
-  androidSdkVersions?.let { sdkVersions ->
-    if (sdkVersions.minSdk >= 28) {
-      // Lint doesn't understand AppComponentFactory
-      // https://issuetracker.google.com/issues/243267012
-      disable += "Instantiatable"
-    }
-  }
-
-  ignoreWarnings = slackProperties.lintErrorsOnly
-  absolutePaths = false
-  this.checkDependencies = checkDependencies
-
-  val lintBaselineFile = slackProperties.lintBaselineFileName
-
-  // Lint is weird in that it will generate a new baseline file and fail the build if a new
-  // one was generated, even if empty.
-  // If we're updating baselines, always take the baseline so that we populate it if absent.
-  project.layout.projectDirectory
-    .file(lintBaselineFile)
-    .asFile
-    .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
-    ?.let { baseline = it }
 }
 
 internal interface KotlinArgConfig {

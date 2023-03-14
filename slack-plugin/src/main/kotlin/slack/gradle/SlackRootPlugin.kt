@@ -28,6 +28,7 @@ import slack.cli.AppleSiliconCompat
 import slack.executeBlocking
 import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
+import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.tasks.DetektDownloadTask
@@ -100,6 +101,7 @@ internal class SlackRootPlugin : Plugin<Project> {
       project.configureGit(slackProperties)
     }
     project.configureSlackRootBuildscript()
+    LintTasks.configureRootProject(project)
     project.configureMisc(slackProperties)
     UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
