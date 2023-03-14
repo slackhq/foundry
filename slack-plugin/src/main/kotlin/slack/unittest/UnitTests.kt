@@ -18,6 +18,7 @@ package slack.unittest
 import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
+import kotlin.math.roundToInt
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.AppliedPlugin
@@ -50,11 +51,15 @@ import slack.gradle.util.synchronousEnvProperty
  * run on CI.
  */
 internal object UnitTests {
-  private val MAX_PARALLEL = max(Runtime.getRuntime().availableProcessors() / 2, 1)
   private const val GLOBAL_CI_UNIT_TEST_TASK_NAME = "globalCiUnitTest"
   private const val CI_UNIT_TEST_TASK_NAME = "ciUnitTest"
   private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
   private const val LOG = "SlackUnitTests:"
+
+  private fun maxForks(slackProperties: SlackProperties): Int {
+    val multiplier = slackProperties.unitTestParallelismMultiplier
+    return max((Runtime.getRuntime().availableProcessors() * multiplier).roundToInt(), 1)
+  }
 
   fun configureRootProject(project: Project): TaskProvider<Task> =
     project.tasks.register(GLOBAL_CI_UNIT_TEST_TASK_NAME) {
@@ -129,16 +134,15 @@ internal object UnitTests {
     project.tasks.withType(Test::class.java).configureEach {
       // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
       // CPUs.
-      maxParallelForks = MAX_PARALLEL
+      maxParallelForks =
+        maxForks(slackProperties).also { logger.debug("$LOG Setting maxParallelForks to $it") }
 
       // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
       reports.junitXml.mergeReruns.set(true)
 
       /*
-       *
        * Much of the below is to improve memory management on CI
        * https://github.com/tinyspeck/slack-android-ng/issues/22005
-       *
        */
 
       // Improve JVM memory behavior in tests to avoid OOMs

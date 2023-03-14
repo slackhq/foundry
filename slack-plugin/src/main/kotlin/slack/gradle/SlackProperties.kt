@@ -286,6 +286,20 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = stringProperty("slack.ci-unit-test.variant", "release")
 
   /**
+   * Parallelism multiplier to use for unit tests. This should be a float value that is multiplied
+   * by the number of cores. The value can be a fraction.
+   */
+  public val unitTestParallelismMultiplier: Float
+    get() {
+      val rawValue = stringProperty("slack.unit-test.parallelismMultiplier", "0.5")
+      val floatValue = rawValue.toFloatOrNull()
+      require(floatValue != null && floatValue > 0) {
+        "Invalid value for slack.unit-test.parallelismMultiplier: '$rawValue'"
+      }
+      return floatValue
+    }
+
+  /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
    *
