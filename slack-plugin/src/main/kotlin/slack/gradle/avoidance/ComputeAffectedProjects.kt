@@ -289,10 +289,10 @@ private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, P
       // TODO deleted file. Temporarily make it and try again?
       else -> error("Unsupported file type: $this")
     }
-  return findNearestProjectDir(repoRoot, currentDir, cache)
+  return findNearestProjectDirRecursive(repoRoot, currentDir, cache)
 }
 
-private fun findNearestProjectDir(
+private fun findNearestProjectDirRecursive(
   repoRoot: Path,
   currentDir: Path?,
   cache: MutableMap<Path, Path>
@@ -307,7 +307,7 @@ private fun findNearestProjectDir(
     if (hasBuildFile) {
       return currentDir
     }
-    findNearestProjectDir(repoRoot, currentDir.parent, cache)
+    findNearestProjectDirRecursive(repoRoot, currentDir.parent, cache)
   }
 }
 
