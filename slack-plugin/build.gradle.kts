@@ -97,6 +97,7 @@ dependencies {
   api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
 
+  implementation(libs.gradlePlugins.graphAssert) { because("To use is Gradle graphing APIs.") }
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
   implementation(libs.guava)
   implementation(libs.kotlinCliUtil)
