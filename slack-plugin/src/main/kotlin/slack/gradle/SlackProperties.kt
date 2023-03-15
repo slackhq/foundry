@@ -421,6 +421,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val sortDependenciesIgnore: String?
     get() = optionalStringProperty("slack.sortDependencies.ignore")
 
+  /** Enables verbose debug logging across the plugin. */
+  public val debug: Boolean
+    get() = booleanProperty("slack.debug", defaultValue = false)
+
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
    * have at least one `.kt` source file.
