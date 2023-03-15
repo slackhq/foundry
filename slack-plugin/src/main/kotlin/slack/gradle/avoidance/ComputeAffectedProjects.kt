@@ -23,6 +23,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.nameWithoutExtension
 import kotlin.time.measureTimedValue
 import org.gradle.api.DefaultTask
@@ -278,19 +279,29 @@ private fun Path.resolveProjectPath(rootDir: Path): String {
  * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
  * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
  */
-// TODO move up and do a superficial cache
 private fun Path.findNearestProjectDir(repoRoot: Path): Path {
-  var currentDir = this.parent
-  check(currentDir.isDirectory())
-  while (currentDir != null && currentDir != repoRoot) {
-    val hasBuildFile = resolve("build.gradle.kts").exists() || resolve("build.gradle").exists()
-    if (hasBuildFile) {
-      return currentDir
-    } else {
-      currentDir = currentDir.parent
+  val currentDir =
+    when {
+      isRegularFile() -> parent
+      isDirectory() -> this
+      // TODO deleted file. Temporarily make it and try again?
+      else -> error("Unsupported file type: $this")
     }
+  return findNearestProjectDir(repoRoot, currentDir)
+}
+
+// TODO move up and do a superficial cache
+private tailrec fun findNearestProjectDir(repoRoot: Path, currentDir: Path?): Path {
+  if (currentDir == null || currentDir == repoRoot) {
+    error("Could not find build.gradle(.kts) for $currentDir")
   }
-  error("Could not find build.gradle(.kts) for $this")
+
+  val hasBuildFile =
+    currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
+  if (hasBuildFile) {
+    return currentDir
+  }
+  return findNearestProjectDir(repoRoot, currentDir.parent)
 }
 
 private fun DependencyGraph.Node.allDependencies(): Set<DependencyGraph.Node> {
