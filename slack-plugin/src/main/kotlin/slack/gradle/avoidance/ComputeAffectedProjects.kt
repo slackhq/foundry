@@ -21,10 +21,12 @@ import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.absolute
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.relativeTo
 import kotlin.time.measureTimedValue
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -147,13 +149,16 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
             gradlePath to ChangedProject(projectPath, gradlePath, files.toSet())
           }
       }
+    log("changedProjects: $changedProjects")
 
     val graph = logTimedValue("creating graph") { DependencyGraph.create(dependencyGraph.get()) }
 
     val projectsToDependencies: Map<String, Set<String>> =
       logTimedValue("computing dependencies") {
         graph.nodes().associate { node ->
-          node.key to node.allDependencies().mapTo(mutableSetOf()) { it.key }
+          val dependencies = mutableSetOf<DependencyGraph.Node>()
+          node.visitDependencies(dependencies)
+          node.key to dependencies.mapTo(mutableSetOf()) { it.key }
         }
       }
 
@@ -198,6 +203,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   private fun writeDiagnostic(fileName: String, content: () -> String) {
     if (debug.get()) {
       val file = diagnosticsDir.file(fileName).get().asFile
+      file.createNewFile()
       file.parentFile.mkdirs()
       file.writeText(content())
     }
@@ -273,7 +279,13 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
  * Gradle project path (e.g. `:app`).
  */
 private fun Path.resolveProjectPath(rootDir: Path): String {
-  return rootDir.relativize(this).nameWithoutExtension.replace(File.separatorChar, ':')
+  return try {
+    // TODO need the actual relative path but for some reason the path here is relative to the repo
+    // root
+    absolute().relativeTo(rootDir).nameWithoutExtension.replace(File.separatorChar, ':')
+  } catch (e: IllegalArgumentException) {
+    error("Could not resolve project path for '$this' to '$rootDir'")
+  }
 }
 
 /**
@@ -311,11 +323,11 @@ private fun findNearestProjectDirRecursive(
   }
 }
 
-private fun DependencyGraph.Node.allDependencies(): Set<DependencyGraph.Node> {
-  return buildSet {
-    addAll(dependsOn)
-    for (dependency in dependsOn) {
-      addAll(dependency.allDependencies())
+private fun DependencyGraph.Node.visitDependencies(setToAddTo: MutableSet<DependencyGraph.Node>) {
+  for (dependency in dependsOn) {
+    if (!setToAddTo.add(dependency)) {
+      // Only add transitives if we haven't already seen this dependency.
+      dependency.visitDependencies(setToAddTo)
     }
   }
 }
