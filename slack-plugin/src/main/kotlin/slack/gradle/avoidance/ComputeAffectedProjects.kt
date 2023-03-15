@@ -270,8 +270,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
  * Gradle project path (e.g. `:app`).
  */
 private fun Path.resolveProjectPath(rootDir: Path): String {
-  val projectDir = findNearestProjectDir(rootDir)
-  return rootDir.relativize(projectDir).nameWithoutExtension.replace(File.separatorChar, ':')
+  return rootDir.relativize(this).nameWithoutExtension.replace(File.separatorChar, ':')
 }
 
 /**
@@ -283,9 +282,8 @@ private fun Path.resolveProjectPath(rootDir: Path): String {
 private fun Path.findNearestProjectDir(repoRoot: Path): Path {
   var currentDir = this.parent
   check(currentDir.isDirectory())
-  while (currentDir != null && currentDir != repoRoot && currentDir != currentDir.root) {
-    val hasBuildFile =
-      currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
+  while (currentDir != null && currentDir != repoRoot) {
+    val hasBuildFile = resolve("build.gradle.kts").exists() || resolve("build.gradle").exists()
     if (hasBuildFile) {
       return currentDir
     } else {
