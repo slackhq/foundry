@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.6.1
+-----
+
+_2023-03-15_
+
+Happy Ted Lasso season 3 premier day!
+
+- **Fix**: Remove `UseContainerSupport` jvm arg from unit tests as this appears to only work on Linux.
+
 0.6.0
 -----
 
