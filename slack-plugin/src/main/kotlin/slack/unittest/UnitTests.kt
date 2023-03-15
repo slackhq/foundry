@@ -149,10 +149,6 @@ internal object UnitTests {
        * https://github.com/tinyspeck/slack-android-ng/issues/22005
        */
 
-      // Improve JVM memory behavior in tests to avoid OOMs
-      // https://www.royvanrijn.com/blog/2018/05/java-and-docker-memory-limits/
-      jvmArgs("-XX:+UseContainerSupport")
-
       // helps when tests leak memory
       setForkEvery(slackProperties.unitTestForkEvery)
 
