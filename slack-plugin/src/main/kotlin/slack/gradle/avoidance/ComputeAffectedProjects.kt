@@ -134,11 +134,13 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       return
     }
 
+    val nearestProjectCache = mutableMapOf<Path, Path>()
+
     // Mapping of Gradle project paths (like ":app") to the ChangedProject representation.
     val changedProjects =
       logTimedValue("computing changed projects") {
         filteredChangedFilePaths
-          .groupBy { it.findNearestProjectDir(rootDirPath) }
+          .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache) }
           .entries
           .associate { (projectPath, files) ->
             val gradlePath = projectPath.resolveProjectPath(rootDirPath)
@@ -279,7 +281,7 @@ private fun Path.resolveProjectPath(rootDir: Path): String {
  * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
  * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
  */
-private fun Path.findNearestProjectDir(repoRoot: Path): Path {
+private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path>): Path {
   val currentDir =
     when {
       isRegularFile() -> parent
@@ -287,21 +289,26 @@ private fun Path.findNearestProjectDir(repoRoot: Path): Path {
       // TODO deleted file. Temporarily make it and try again?
       else -> error("Unsupported file type: $this")
     }
-  return findNearestProjectDir(repoRoot, currentDir)
+  return findNearestProjectDir(repoRoot, currentDir, cache)
 }
 
-// TODO move up and do a superficial cache
-private tailrec fun findNearestProjectDir(repoRoot: Path, currentDir: Path?): Path {
+private fun findNearestProjectDir(
+  repoRoot: Path,
+  currentDir: Path?,
+  cache: MutableMap<Path, Path>
+): Path {
   if (currentDir == null || currentDir == repoRoot) {
     error("Could not find build.gradle(.kts) for $currentDir")
   }
 
-  val hasBuildFile =
-    currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
-  if (hasBuildFile) {
-    return currentDir
+  return cache.getOrPut(currentDir) {
+    val hasBuildFile =
+      currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
+    if (hasBuildFile) {
+      return currentDir
+    }
+    findNearestProjectDir(repoRoot, currentDir.parent, cache)
   }
-  return findNearestProjectDir(repoRoot, currentDir.parent)
 }
 
 private fun DependencyGraph.Node.allDependencies(): Set<DependencyGraph.Node> {
