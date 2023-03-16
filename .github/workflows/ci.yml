@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         ci_java_version: ['19']
-        ci_kotlin_version: ['1.8.0']
+        ci_kotlin_version: ['1.8.20-RC']
         ci_agp_version: ['7.4.0', '8.0.0-beta01', '8.1.0-alpha01']
     env:
       DEP_OVERRIDES: 'true'
@@ -74,5 +74,5 @@ jobs:
           path: build-reports.zip
 
       - name: Publish snapshot (main branch only)
-        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main' && matrix.ci_agp_version == '7.2.0' && matrix.ci_kotlin_version == '1.7.0' && matrix.ci_java_version == '17'
+        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main' && matrix.ci_agp_version == '7.2.0' && matrix.ci_kotlin_version == '1.8.20-RC' && matrix.ci_java_version == '17'
         run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
