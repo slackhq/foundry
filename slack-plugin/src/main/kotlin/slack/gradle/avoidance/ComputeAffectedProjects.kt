@@ -41,7 +41,16 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
 
-/** TODO more granular stuff */
+/**
+ * TODO
+ *
+ * Example usage:
+ * ```bash
+ * ./gradlew computeAffectedProjects --changed-files changed_files.txt
+ * ```
+ *
+ * Optionally pass in `-Pslack.debug=true` to enable debug logging.
+ */
 @UntrackedTask(because = "This task modifies build scripts in place.")
 internal abstract class ComputeAffectedProjects : DefaultTask() {
 
@@ -188,7 +197,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       changedProjects.entries
         .sortedBy { it.key }
         .joinToString("\n") { (_, v) ->
-          val testOnlyString = if (v.onlyTestsAreChanged) " (test only)" else ""
+          val testOnlyString = if (v.onlyTestsAreChanged) " (tests only)" else ""
           val lintBaselineOnly = if (v.onlyLintBaselineChanged) " (lint-baseline.xml only)" else ""
           "${v.gradlePath}$testOnlyString$lintBaselineOnly\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
         }
@@ -232,8 +241,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
     val allAffectedProjects = buildSet {
       for ((path, change) in changedProjects) {
         add(path)
-
-        if (!change.affectsDependents) {
+        if (change.affectsDependents) {
           addAll(projectsToDependents[path] ?: emptySet())
         }
       }
@@ -422,16 +430,25 @@ private data class ChangedProject(
    * Returns true if all changed files are in a test directory and therefore do not carry-over to
    * downstream dependents.
    */
-  val onlyTestsAreChanged: Boolean = changedPaths.all(testPathMatcher::matches)
+  val testPaths: Set<Path> = changedPaths.filterTo(mutableSetOf(), testPathMatcher::matches)
+  val onlyTestsAreChanged = testPaths.size == changedPaths.size
+
   /**
    * Returns true if all changed files are just `lint-baseline.xml`. This is useful because it means
    * they don't affect downstream dependants.
    */
-  val onlyLintBaselineChanged: Boolean = changedPaths.all(lintBaselinePathMatcher::matches)
+  val lintBaseline: Set<Path> =
+    changedPaths.filterTo(mutableSetOf(), lintBaselinePathMatcher::matches)
+  val onlyLintBaselineChanged = lintBaseline.size == changedPaths.size
+
   /**
-   * Shorthand to know if both [onlyLintBaselineChanged] and [onlyTestsAreChanged] are both false.
+   * Remaining affected files that aren't test paths or lint baseline, and therefore affect
+   * dependants.
    */
-  val affectsDependents = !onlyLintBaselineChanged && !onlyTestsAreChanged
+  val dependantAffectingFiles = changedPaths - testPaths - lintBaseline
+
+  /** Shorthand for if [dependantAffectingFiles] is not empty. */
+  val affectsDependents = dependantAffectingFiles.isNotEmpty()
 
   companion object {
     // This covers snapshot tests too as they are under src/test/snapshots/**
