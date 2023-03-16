@@ -201,24 +201,34 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
 
     val rootDirPath = rootDir.get().asFile.toPath()
 
-    val pathMatchers =
+    val neverSkipPathMatchers =
       logTimedValue("creating path matchers") {
         neverSkipPatterns.get().map { fs.getPathMatcher("glob:$it") }
       }
     log("neverSkipPatterns: ${neverSkipPatterns.get()}")
 
-    // TODO this is slow as it checks all of them, but in the future we could hide this behind a
-    //  debug flag
-    val pathsWithSkippability =
-      logTimedValue("checking for non-skippable files") {
-        filteredChangedFilePaths.associateWith { path -> pathMatchers.find { it.matches(path) } }
+    if (debug.get()) {
+      // Do a slower, more verbose check in debug
+      val pathsWithSkippability =
+        logTimedValue("checking for non-skippable files") {
+          filteredChangedFilePaths.associateWith { path ->
+            neverSkipPathMatchers.find { it.matches(path) }
+          }
+        }
+      if (pathsWithSkippability.values.any { it != null }) {
+        // Produce no outputs, run everything
+        logger.lifecycle(
+          "$LOG Never-skip pattern(s) matched: ${pathsWithSkippability.filterValues { it != null }}."
+        )
+        return
       }
-    if (pathsWithSkippability.values.any { it != null }) {
-      // No file means we run everything.
-      logger.lifecycle(
-        "$LOG Never-skip pattern(s) matched: ${pathsWithSkippability.filterValues { it != null }}."
-      )
-      return
+    } else {
+      // Do a fast check for never-skip paths when not debugging
+      if (filteredChangedFilePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }) {
+        // Produce no outputs, run everything
+        logger.lifecycle("$LOG Never-skip pattern(s) matched.")
+        return
+      }
     }
 
     val nearestProjectCache = mutableMapOf<Path, Path>()
