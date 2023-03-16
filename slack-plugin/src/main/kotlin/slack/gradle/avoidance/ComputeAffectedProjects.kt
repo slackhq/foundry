@@ -41,32 +41,50 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
 
-/**
- * TODO more granular stuff
- * - not all xml files are equal. baseline.xml is not the same as a resource file
- */
+/** TODO more granular stuff */
 @UntrackedTask(because = "This task modifies build scripts in place.")
 internal abstract class ComputeAffectedProjects : DefaultTask() {
 
+  /** Root repo directory. Used to compute relative paths and not considered an input. */
   @get:Internal abstract val rootDir: DirectoryProperty
 
+  /** Debugging flag. If enabled, extra diagnostics and logging is performed. */
   @get:Input abstract val debug: Property<Boolean>
 
+  /**
+   * A list of glob patterns for files to include in computing affected projects. This should
+   * usually be source files, build files, gradle.properties files, and other projects that affect
+   * builds.
+   */
   @get:Input
   val includePatterns: ListProperty<String> =
     project.objects.listProperty(String::class.java).convention(DEFAULT_INCLUDE_PATTERNS)
 
+  /**
+   * A list of glob patterns that, if matched with a file, indicate that nothing should be skipped
+   * and no [outputFile] or [outputFocusFile] will be generated.
+   *
+   * This is useful for globally-affecting things like root build files, `libs.versions.toml`, etc.
+   */
   @get:Input
   val neverSkipPatterns: ListProperty<String> =
     project.objects.listProperty(String::class.java).convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
+  /** The serialized dependency graph as computed from our known configurations. */
   @get:Input abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
 
+  /**
+   * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
+   * list of changed files. This is usually computed from a GitHub PR's changed files.
+   */
   @get:Option(option = "changed-files", description = "A relative file path to changed_files.txt.")
   @get:Input
   abstract val changedFiles: Property<String>
 
+  /** Output diagnostics directory for use in debugging. */
   @get:OutputDirectory abstract val diagnosticsDir: DirectoryProperty
+
+  /** The output list of affected projects. */
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
   /** An output .focus file that could be used with the Focus plugin. */
