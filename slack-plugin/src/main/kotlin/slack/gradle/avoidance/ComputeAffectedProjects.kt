@@ -21,12 +21,9 @@ import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.absolute
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.nameWithoutExtension
-import kotlin.io.path.relativeTo
 import kotlin.time.measureTimedValue
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -90,11 +87,24 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
 
   @TaskAction
   fun computeTimed() {
+    // Clear outputs as needed
+    outputFile.get().asFile.apply {
+      if (exists()) {
+        delete()
+      }
+    }
+    if (debug.get()) {
+      diagnosticsDir.asFile.get().apply {
+        if (exists()) {
+          deleteRecursively()
+        }
+        mkdirs()
+      }
+    }
     logTimedValue("computation") { compute() }
   }
 
-  @TaskAction
-  fun compute() {
+  private fun compute() {
     val fs = FileSystems.getDefault()
 
     log("reading changed files from: ${changedFiles.get()}")
@@ -128,8 +138,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         filteredChangedFilePaths.associateWith { path -> pathMatchers.find { it.matches(path) } }
       }
     if (pathsWithSkippability.values.any { it != null }) {
-      // TODO write all projects to file? Or denote a blank file as meaning all? Or don't write a
-      //  file?
+      // No file means we run everything.
       logger.lifecycle(
         "$LOG Never-skip pattern(s) matched: ${pathsWithSkippability.filterValues { it != null }}."
       )
@@ -145,7 +154,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
           .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache) }
           .entries
           .associate { (projectPath, files) ->
-            val gradlePath = projectPath.resolveProjectPath(rootDirPath)
+            val gradlePath = ":${projectPath.toString().replace(File.separatorChar, ':')}"
             gradlePath to ChangedProject(projectPath, gradlePath, files.toSet())
           }
       }
@@ -193,7 +202,6 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         if (!change.onlyTestsAreChanged) {
           addAll(projectsToDependents[path] ?: emptySet())
         }
-        //        addAll(graph.subTree(changedProject).findRoot().allDependencies().map { it.key })
       }
     }
 
@@ -203,8 +211,8 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   private fun writeDiagnostic(fileName: String, content: () -> String) {
     if (debug.get()) {
       val file = diagnosticsDir.file(fileName).get().asFile
-      file.createNewFile()
       file.parentFile.mkdirs()
+      file.createNewFile()
       file.writeText(content())
     }
   }
@@ -270,21 +278,6 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
     val (value, duration) = measureTimedValue(body)
     log("$name took $duration")
     return value
-  }
-}
-
-/**
- * Given a file path like
- * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns a
- * Gradle project path (e.g. `:app`).
- */
-private fun Path.resolveProjectPath(rootDir: Path): String {
-  return try {
-    // TODO need the actual relative path but for some reason the path here is relative to the repo
-    // root
-    absolute().relativeTo(rootDir).nameWithoutExtension.replace(File.separatorChar, ':')
-  } catch (e: IllegalArgumentException) {
-    error("Could not resolve project path for '$this' to '$rootDir'")
   }
 }
 
