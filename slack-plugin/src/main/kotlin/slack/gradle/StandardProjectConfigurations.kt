@@ -512,7 +512,13 @@ internal class StandardProjectConfigurations(
         slackExtension.androidExtension = this
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
+        LintTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          this,
+          sdkVersions::value
+        )
       }
     }
 
@@ -548,7 +554,13 @@ internal class StandardProjectConfigurations(
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.value.targetSdk
         }
-        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
+        LintTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          this,
+          sdkVersions::value
+        )
         agpHandler.packagingOptions(
           this,
           resourceExclusions =
@@ -706,7 +718,8 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
               false
             )
-          if (!excluded) {
+          val isAffectedProject = globalConfig.affectedProjects?.contains(project.path) ?: true
+          if (!excluded && isAffectedProject) {
             variant.androidTest?.artifacts?.get(SingleArtifact.APK)?.let { apkArtifactsDir ->
               // Wire this up to the aggregator
               androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
@@ -740,7 +753,13 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.androidExtension = this
         commonBaseExtensionConfig(true)
-        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
+        LintTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          this,
+          sdkVersions::value
+        )
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -908,7 +927,13 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      LintTasks.configureSubProject(project, slackProperties, null, null)
+      LintTasks.configureSubProject(
+        project,
+        slackProperties,
+        globalConfig.affectedProjects,
+        null,
+        null
+      )
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {
