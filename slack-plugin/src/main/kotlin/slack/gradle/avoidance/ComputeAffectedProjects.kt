@@ -163,7 +163,8 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         .sortedBy { it.key }
         .joinToString("\n") { (_, v) ->
           val testOnlyString = if (v.onlyTestsAreChanged) " (test only)" else ""
-          "${v.gradlePath}$testOnlyString\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
+          val lintBaselineOnly = if (v.onlyLintBaselineChanged) " (lint-baseline.xml only)" else ""
+          "${v.gradlePath}$testOnlyString$lintBaselineOnly\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
         }
     }
 
@@ -206,7 +207,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       for ((path, change) in changedProjects) {
         add(path)
 
-        if (!change.onlyTestsAreChanged) {
+        if (!change.affectsDependents) {
           addAll(projectsToDependents[path] ?: emptySet())
         }
       }
@@ -377,11 +378,22 @@ private data class ChangedProject(
    * Returns true if all changed files are in a test directory and therefore do not carry-over to
    * downstream dependents.
    */
-  val onlyTestsAreChanged: Boolean = changedPaths.any(testPathMatcher::matches)
+  val onlyTestsAreChanged: Boolean = changedPaths.all(testPathMatcher::matches)
+  /**
+   * Returns true if all changed files are just `lint-baseline.xml`. This is useful because it means
+   * they don't affect downstream dependants.
+   */
+  val onlyLintBaselineChanged: Boolean = changedPaths.all(lintBaselinePathMatcher::matches)
+  /**
+   * Shorthand to know if both [onlyLintBaselineChanged] and [onlyTestsAreChanged] are both false.
+   */
+  val affectsDependents = !onlyLintBaselineChanged && !onlyTestsAreChanged
 
   companion object {
     // This covers snapshot tests too as they are under src/test/snapshots/**
     private val testPathMatcher =
       FileSystems.getDefault().getPathMatcher("glob:**/src/*{test,androidTest}/**")
+    private val lintBaselinePathMatcher =
+      FileSystems.getDefault().getPathMatcher("glob:**/lint-baseline.xml")
   }
 }
