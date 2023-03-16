@@ -360,6 +360,13 @@ public class SlackProperties private constructor(private val project: Project) {
   public val gitIgnoreRevsFile: File?
     get() = fileProperty("slack.git.ignoreRevsFile")
 
+  /**
+   * Optional file location for an `affected_projects.txt` file that contains a list of projects
+   * affected in this build.
+   */
+  public val affectedProjects: File?
+    get() = fileProperty("slack.avoidance.affectedProjectsFile")
+
   /* Controls for Java/JVM/JDK versions uses in compilations and execution of tests. */
 
   /** Flag to enable strict JDK mode, forcing some things like JAVA_HOME. */
