@@ -43,7 +43,11 @@ internal class SlackBasePlugin : Plugin<Project> {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       StandardProjectConfigurations(slackProperties, versionCatalog).applyTo(target)
-      UnitTests.configureSubproject(target, slackProperties)
+      UnitTests.configureSubproject(
+        target,
+        slackProperties,
+        target.slackTools().globalConfig.affectedProjects
+      )
       CoreBootstrapTask.configureSubprojectBootstrapTasks(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only

@@ -67,7 +67,11 @@ internal object UnitTests {
       description = "Global lifecycle task to run all ciUnitTest tasks."
     }
 
-  fun configureSubproject(project: Project, slackProperties: SlackProperties) {
+  fun configureSubproject(
+    project: Project,
+    slackProperties: SlackProperties,
+    affectedProjects: Set<String>?
+  ) {
     // Projects can opt out of creating the task with this property.
     val enabled = slackProperties.ciUnitTestEnabled
     if (!enabled) {
@@ -79,7 +83,12 @@ internal object UnitTests {
       project.pluginManager.apply("org.jetbrains.kotlinx.kover")
     }
 
-    val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
+    val globalTask =
+      if (affectedProjects == null || project.path in affectedProjects) {
+        project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
+      } else {
+        null
+      }
 
     // We only want to create tasks once, but a project might apply multiple plugins.
     val applied = AtomicBoolean(false)
@@ -97,7 +106,7 @@ internal object UnitTests {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             dependsOn("test")
           }
-        globalTask.configure { dependsOn(ciUnitTest) }
+        globalTask?.configure { dependsOn(ciUnitTest) }
         project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
           group = LifecycleBasePlugin.VERIFICATION_GROUP
           dependsOn("testClasses")
@@ -110,7 +119,7 @@ internal object UnitTests {
     configureTestTasks(project, slackProperties)
   }
 
-  private fun createAndroidCiUnitTestTask(project: Project, globalTask: TaskProvider<*>) {
+  private fun createAndroidCiUnitTestTask(project: Project, globalTask: TaskProvider<*>?) {
     val variant = project.ciUnitTestAndroidVariant()
     val variantUnitTestTaskName = "test${variant}UnitTest"
     val variantCompileUnitTestTaskName = "compile${variant}UnitTestSources"
@@ -122,7 +131,7 @@ internal object UnitTests {
         // task configuration time.
         dependsOn(variantUnitTestTaskName)
       }
-    globalTask.configure { dependsOn(ciUnitTest) }
+    globalTask?.configure { dependsOn(ciUnitTest) }
     project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
       group = LifecycleBasePlugin.VERIFICATION_GROUP
       // Even if the task isn't created yet, we can do this by name alone and it will resolve at
