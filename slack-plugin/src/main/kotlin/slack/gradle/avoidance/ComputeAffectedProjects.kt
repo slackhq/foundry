@@ -42,20 +42,54 @@ import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
 
 /**
- * TODO
+ * This task is a meta task to compute the set of projects that are affected by a set of changed
+ * files ([changedFiles]).
  *
+ * The intention of this task is to run as a preflight step in pull requests to only run a subset of
+ * checks affected by files changed _in_ that PR. This allows CI on PRs to safely complete faster
+ * and reduce CI usage.
+ *
+ * ### Inputs
+ *
+ * The primary input is [changedFiles], which is a newline-delimited list of files that have
+ * changed. Usually the files changed in a pull request. This can be specified via the
+ * `--changed-files` CLI option, and its path is resolved against the root project directory.
+ *
+ * [includePatterns] is a list of glob patterns that are used to filter the list of changed files.
+ * These should usually be source files that are deemed to participate in builds (e.g. `.kt` files).
+ *
+ * [neverSkipPatterns] is a list of glob patterns that, if matched with any changed file, indicate
+ * that nothing should be skipped and the full build should run. This is important for files like
+ * version catalog toml files or root build.gradle file changes.
+ *
+ * ### Outputs
+ *
+ * The primary output [outputFile] is a newline-delimited list of Gradle project paths that are
+ * determined to be affected. This is intended to be used as an input to a subsequent Gradle
+ * invocation to inform which projects can be avoided.
+ *
+ * A secondary output file is [outputFocusFile]. This is a `focus.settings.gradle` file that can be
+ * used with the dropbox/focus plugin, and will be a minimal list of projects needed to build the
+ * affected projects.
+ *
+ * With both outputs, if any "never-skippable" files [neverSkipPatterns] are changed, then no output
+ * file is produced and all projects are considered affected. If a file is produced but has no
+ * content written to it, that simply means that no projects are affected.
+ *
+ * ### Debugging
+ *
+ * To debug this task, pass in `-Pslack.debug=true` to enable debug logging. This will also output
+ * verbose diagnostics to [diagnosticsDir] (usually `build/skippy/diagnostics`). Debug mode will
+ * also output timings.
+ *
+ * ### Usage
  * Example usage:
  * ```bash
  * ./gradlew computeAffectedProjects --changed-files changed_files.txt
  * ```
- *
- * Optionally pass in `-Pslack.debug=true` to enable debug logging.
  */
-@UntrackedTask(because = "This task modifies build scripts in place.")
+@UntrackedTask(because = "This task is a meta task that more or less runs as a utility script.")
 internal abstract class ComputeAffectedProjects : DefaultTask() {
-
-  /** Root repo directory. Used to compute relative paths and not considered an input. */
-  @get:Internal abstract val rootDir: DirectoryProperty
 
   /** Debugging flag. If enabled, extra diagnostics and logging is performed. */
   @get:Input abstract val debug: Property<Boolean>
@@ -79,9 +113,6 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   val neverSkipPatterns: ListProperty<String> =
     project.objects.listProperty(String::class.java).convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
-  /** The serialized dependency graph as computed from our known configurations. */
-  @get:Input abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
-
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
    * list of changed files. This is usually computed from a GitHub PR's changed files.
@@ -98,6 +129,16 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
 
   /** An output .focus file that could be used with the Focus plugin. */
   @get:OutputFile abstract val outputFocusFile: RegularFileProperty
+
+  /*
+   * Internal properties.
+   */
+
+  /** Root repo directory. Used to compute relative paths and not considered an input. */
+  @get:Internal internal abstract val rootDir: DirectoryProperty
+
+  /** The serialized dependency graph as computed from our known configurations. */
+  @get:Input internal abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
 
   init {
     group = "slack"
@@ -116,7 +157,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   }
 
   @TaskAction
-  fun computeTimed() {
+  fun compute() {
     // Clear outputs as needed
     outputFile.get().asFile.apply {
       if (exists()) {
@@ -136,10 +177,10 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         mkdirs()
       }
     }
-    logTimedValue("computation") { compute() }
+    logTimedValue("full computation") { computeImpl() }
   }
 
-  private fun compute() {
+  private fun computeImpl() {
     val fs = FileSystems.getDefault()
 
     log("reading changed files from: ${changedFiles.get()}")
