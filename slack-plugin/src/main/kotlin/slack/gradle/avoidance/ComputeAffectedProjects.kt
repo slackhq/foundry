@@ -69,6 +69,9 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   @get:OutputDirectory abstract val diagnosticsDir: DirectoryProperty
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
+  /** An output .focus file that could be used with the Focus plugin. */
+  @get:OutputFile abstract val outputFocusFile: RegularFileProperty
+
   init {
     group = "slack"
     description = "Computes affected projects and writes them to a file."
@@ -89,6 +92,11 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   fun computeTimed() {
     // Clear outputs as needed
     outputFile.get().asFile.apply {
+      if (exists()) {
+        delete()
+      }
+    }
+    outputFocusFile.get().asFile.apply {
       if (exists()) {
         delete()
       }
@@ -214,7 +222,24 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
     }
 
     logger.lifecycle("$LOG Found ${allAffectedProjects.size} affected projects.")
+
+    // Generate affected_projects.txt
+    log("writing affected projects to: ${outputFile.get()}")
     outputFile.get().asFile.writeText(allAffectedProjects.sorted().joinToString("\n"))
+
+    // Generate .focus settings file
+    val allRequiredProjects =
+      allAffectedProjects
+        .flatMapTo(mutableSetOf()) { project ->
+          val dependencies = projectsToDependencies[project].orEmpty()
+          dependencies + project
+        }
+        .sorted()
+    log("writing focus settings to: ${outputFocusFile.get()}")
+    outputFocusFile
+      .get()
+      .asFile
+      .writeText(allRequiredProjects.joinToString("\n") { "include(\"$it\")" })
   }
 
   private fun writeDiagnostic(fileName: String, content: () -> String) {
@@ -281,6 +306,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         dependencyGraph.set(rootProject.provider { moduleGraph })
         diagnosticsDir.set(project.layout.buildDirectory.dir("skippy/diagnostics"))
         outputFile.set(project.layout.buildDirectory.file("skippy/affected_projects.txt"))
+        outputFocusFile.set(project.layout.buildDirectory.file("skippy/focus.settings.gradle"))
         // TODO neverSkipPatterns
         // TODO includePatterns
       }
