@@ -231,13 +231,14 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       }
     }
 
-    val nearestProjectCache = mutableMapOf<Path, Path>()
+    val nearestProjectCache = mutableMapOf<Path, Path?>()
 
     // Mapping of Gradle project paths (like ":app") to the ChangedProject representation.
     val changedProjects =
       logTimedValue("computing changed projects") {
         filteredChangedFilePaths
           .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache) }
+          .filterNotNullKeys()
           .entries
           .associate { (projectPath, files) ->
             val gradlePath = ":${projectPath.toString().replace(File.separatorChar, ':')}"
@@ -322,6 +323,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   private fun writeDiagnostic(fileName: String, content: () -> String) {
     if (debug.get()) {
       val file = diagnosticsDir.file(fileName).get().asFile
+      log("writing diagnostic file: $file")
       file.parentFile.mkdirs()
       file.createNewFile()
       file.writeText(content())
@@ -331,7 +333,6 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
   companion object {
     private const val LOG = "[Skippy]"
 
-    // TODO what about paparazzi snapshots, lint baselines
     private val DEFAULT_INCLUDE_PATTERNS =
       listOf(
         "**/*.kt",
@@ -384,8 +385,8 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         diagnosticsDir.set(project.layout.buildDirectory.dir("skippy/diagnostics"))
         outputFile.set(project.layout.buildDirectory.file("skippy/affected_projects.txt"))
         outputFocusFile.set(project.layout.buildDirectory.file("skippy/focus.settings.gradle"))
-        // TODO neverSkipPatterns
-        // TODO includePatterns
+        // Overrides of includes/neverSkippable patterns should be done in the consuming project
+        // directly
       }
     }
   }
@@ -402,12 +403,15 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
  * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
  * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
  */
-private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path>): Path {
+private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path?>): Path? {
   val currentDir =
     when {
+      !exists() -> {
+        // Deleted file. These can't affect projects
+        return null
+      }
       isRegularFile() -> parent
       isDirectory() -> this
-      // TODO deleted file. Temporarily make it and try again?
       else -> error("Unsupported file type: $this")
     }
   return findNearestProjectDirRecursive(repoRoot, currentDir, cache)
@@ -416,8 +420,8 @@ private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, P
 private fun findNearestProjectDirRecursive(
   repoRoot: Path,
   currentDir: Path?,
-  cache: MutableMap<Path, Path>
-): Path {
+  cache: MutableMap<Path, Path?>
+): Path? {
   if (currentDir == null || currentDir == repoRoot) {
     error("Could not find build.gradle(.kts) for $currentDir")
   }
@@ -463,6 +467,11 @@ private fun Map<String, Set<String>>.flip(): Map<String, Set<String>> {
     }
   }
   return flipped
+}
+
+/** Return a new map with null keys filtered out. */
+private fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
+  return filterKeys { it != null }.mapKeys { it.key!! }
 }
 
 /**
