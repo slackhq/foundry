@@ -158,7 +158,14 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
             gradlePath to ChangedProject(projectPath, gradlePath, files.toSet())
           }
       }
-    log("changedProjects: $changedProjects")
+    writeDiagnostic("changedProjects.txt") {
+      changedProjects.entries
+        .sortedBy { it.key }
+        .joinToString("\n") { (_, v) ->
+          val testOnlyString = if (v.onlyTestsAreChanged) " (test only)" else ""
+          "${v.gradlePath}$testOnlyString\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
+        }
+    }
 
     val graph = logTimedValue("creating graph") { DependencyGraph.create(dependencyGraph.get()) }
 
@@ -205,6 +212,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       }
     }
 
+    logger.lifecycle("$LOG Found ${allAffectedProjects.size} affected projects.")
     outputFile.get().asFile.writeText(allAffectedProjects.sorted().joinToString("\n"))
   }
 
@@ -233,7 +241,9 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
 
     private val DEFAULT_NEVER_SKIP_PATTERNS =
       listOf(
+        // root build.gradle.kts and settings.gradle.kts files
         "*.gradle.kts",
+        // root gradle.properties file
         "gradle.properties",
         "**/*.versions.toml",
         "ci/**",
@@ -245,6 +255,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjects> {
       // TODO any others?
+      // TODO what about testFixtures?
       val configurationsToLook: Set<String> =
         setOf(
           "api",
@@ -252,7 +263,8 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
           "ksp",
           "testImplementation",
           "androidTestImplementation",
-          "compileOnly"
+          "compileOnly",
+          "annotationProcessor",
         )
 
       val moduleGraph by lazy {
@@ -359,17 +371,17 @@ private fun Map<String, Set<String>>.flip(): Map<String, Set<String>> {
 private data class ChangedProject(
   val path: Path,
   val gradlePath: String,
-  val changedPaths: Set<Path>
+  val changedPaths: Set<Path>,
 ) {
   /**
    * Returns true if all changed files are in a test directory and therefore do not carry-over to
    * downstream dependents.
    */
-  val onlyTestsAreChanged: Boolean
-    get() = changedPaths.any(testPathMatcher::matches)
+  val onlyTestsAreChanged: Boolean = changedPaths.any(testPathMatcher::matches)
 
   companion object {
+    // This covers snapshot tests too as they are under src/test/snapshots/**
     private val testPathMatcher =
-      FileSystems.getDefault().getPathMatcher("glob:**/src/**/*{test,androidTest}/**")
+      FileSystems.getDefault().getPathMatcher("glob:**/src/*{test,androidTest}/**")
   }
 }
