@@ -27,22 +27,29 @@ import kotlin.contracts.contract
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 import org.gradle.api.Action
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.UnknownTaskException
 import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
+import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.PluginManager
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.reflect.TypeOf
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.hasPlugin
-import org.gradle.kotlin.dsl.named
+import org.gradle.configurationcache.extensions.get
+import org.gradle.internal.service.ServiceRegistry
 
 /*
  * A set of utility functions that check and cache project information stored in extensions.
@@ -115,12 +122,12 @@ internal val Project.isUsingMoshiGradle: Boolean
 
 internal val Project.isAndroidApplication: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_APPLICATION) { plugins.hasPlugin(AppPlugin::class) }
+    return getOrComputeExt(IS_ANDROID_APPLICATION) { plugins.hasPlugin(AppPlugin::class.java) }
   }
 
 internal val Project.isAndroidLibrary: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin(LibraryPlugin::class) }
+    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin(LibraryPlugin::class.java) }
   }
 
 internal val Project.isAndroid: Boolean
@@ -148,6 +155,15 @@ internal fun <T, R> Action<T>.liftIntoFunction(into: R.(task: Action<T>) -> Unit
   return { into(this@liftIntoFunction) }
 }
 
+internal inline fun <reified T : Task> TaskContainer.register(
+  name: String,
+  configuration: Action<in T>
+): TaskProvider<T> = register(name, T::class.java, configuration)
+
+internal inline fun <reified T : Any> Project.configure(action: Action<T>) {
+  extensions.getByType<T>().apply(action::execute)
+}
+
 internal inline fun <reified T> ExtensionContainer.findByType(): T? {
   // Gradle, Kotlin, and Java all have different notions of what a "type" is.
   // I'm sorry
@@ -168,7 +184,7 @@ internal inline fun <reified T : Task> TaskContainer.providerWithNameOrNull(
   name: String
 ): TaskProvider<T>? {
   return try {
-    named<T>(name)
+    named(name, T::class.java)
   } catch (e: UnknownTaskException) {
     null
   }
@@ -270,3 +286,33 @@ internal val Project.isSyncing: Boolean
 // Note that we don't reference the AndroidProject property because this constant moved in AGP 7.2
 public val Project.invokedFromIde: Boolean
   get() = hasProperty("android.injected.invoked.from.ide")
+
+internal inline fun <reified T : Any> ObjectFactory.newInstance(vararg parameters: Any): T {
+  return newInstance(T::class.java, *parameters)
+}
+
+internal inline fun <reified T : Any> ObjectFactory.property(): Property<T> {
+  return property(T::class.java)
+}
+
+internal inline fun <reified E : Any> ObjectFactory.setProperty(): SetProperty<E> {
+  return setProperty(E::class.java)
+}
+
+internal inline fun <reified E : Any> ObjectFactory.listProperty(): ListProperty<E> {
+  return listProperty(E::class.java)
+}
+
+internal inline fun <reified K : Any, reified V : Any> ObjectFactory.mapProperty():
+  MapProperty<K, V> {
+  return mapProperty(K::class.java, V::class.java)
+}
+
+internal inline fun <reified E : Any> ObjectFactory.domainObjectSet(): DomainObjectSet<E> {
+  return domainObjectSet(E::class.java)
+}
+
+internal inline fun <reified T : Any> Project.serviceOf(): T =
+  (this as ProjectInternal).services.get()
+
+internal inline fun <reified T : Any> ServiceRegistry.get(): T = this[T::class.java]!!

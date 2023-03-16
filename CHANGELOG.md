@@ -1,6 +1,74 @@
 Changelog
 =========
 
+0.6.1
+-----
+
+_2023-03-15_
+
+Happy Ted Lasso season 3 premier day!
+
+- **Fix**: Remove `UseContainerSupport` jvm arg from unit tests as this appears to only work on Linux.
+
+0.6.0
+-----
+
+_2023-03-14_
+
+Happy Pi day!
+
+- Refactor how unit tests are configured.
+  - `Test` tasks are now configured more consistently across CI and local, so there should be more cache hits.
+  - Add a new `globalCiUnitTest` task to the root project to ease running `ciUnitTest` tasks across all subprojects.
+  - Add new properties to `SlackProperties` for controlling max parallelism and `forkEvery` options in `Test` tasks.
+- Refactor how lint tasks are configured.
+  - Add a new `ciLint` task to every project that depends on all lint tasks in that project. This is intended to be the inverse
+    behavior of the built-in `lint` task in Android projects, which only runs the default variant's lint task.
+  - Add a new `globalCiLint` task to the root project to ease running `ciLint` tasks across all subprojects.
+  - Add new properties to `SlackProperties` for controlling which variants should be linted.
+- Revert "Add lintErrorRuleIds property". `lint.xml` is the right place for this kind of logic.
+
+0.5.10
+------
+
+_2023-03-07_
+
+- Reduce noisy JNA load failures logging. Still have not gotten to the root cause, but at least this will reduce the log noise.
+- Add a new `slack.lint.severity.errorRuleIds` Gradle property to specify lint rule IDs that should always be error severity.
+
+0.5.9
+-----
+
+_2023-02-27_
+
+- Gracefully handle JNA load failures in thermals logging.
+
+0.5.8
+-----
+
+_2023-02-20_
+
+- **Enhancement**: Remove kotlin-dsl from the plugin. If you were indirectly relying on its APIs from this plugin, you'll need to add that dependency separately.
+- **Enhancement**: Better support fully modularized lints
+  - `checkDependencies` is no longer enabled by default.
+  - Make the baseline file name configurable via `slack.lint.baseline-file-name` property. Defaults to `lint-baseline.xml`.
+- **Fix**: `ImplicitSamInstance` lint not being enabled.
+
+0.5.7
+-----
+
+_2023-02-15_
+
+- **Fix**: `MergeFileTask.kt` was accidentally removed during a previous release.
+- **Fix**: Add `jna-platform` dependency to align with the `jna` dependency version.
+
+0.5.6
+-----
+
+_2023-02-15_
+
+Do not use! Release was accidentally messed up.
+
 0.5.5
 -----
 

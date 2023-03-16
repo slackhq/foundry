@@ -24,22 +24,22 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
 import slack.cli.AppleSiliconCompat
 import slack.executeBlocking
 import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
+import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
+import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
 import slack.gradle.util.ThermalsData
 import slack.stats.ModuleStatsTasks
+import slack.unittest.UnitTests
 
 /**
  * A common entry point for Slack project configuration. This should only be applied once and on the
@@ -101,7 +101,9 @@ internal class SlackRootPlugin : Plugin<Project> {
       project.configureGit(slackProperties)
     }
     project.configureSlackRootBuildscript()
+    LintTasks.configureRootProject(project)
     project.configureMisc(slackProperties)
+    UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
     val scanApi = ScanApi(project)
     project.configureBuildScanMetadata(scanApi)
@@ -231,7 +233,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     project.pluginManager.withPlugin("com.github.ben-manes.versions") {
-      project.tasks.withType<DependencyUpdatesTask>().configureEach {
+      project.tasks.withType(DependencyUpdatesTask::class.java).configureEach {
         // Disallow updating to unstable candidates from stable versions, but do allow suggesting
         // newer unstable
         // candidates if we're already on an unstable version. Note that we won't suggest a newer
@@ -383,12 +385,13 @@ private fun Project.configureSlackRootBuildscript() {
   if (CoreBootstrapTask.isBootstrapEnabled(this)) {
     CoreBootstrapTask.register(this)
   }
+  InstallCommitHooksTask.register(this)
 }
 
 @Suppress("UnstableApiUsage")
 private fun Project.configureMisc(slackProperties: SlackProperties) {
   tasks
-    .withType<Delete>()
+    .withType(Delete::class.java)
     .matching { it.name == "clean" }
     .configureEach {
       group = "build"

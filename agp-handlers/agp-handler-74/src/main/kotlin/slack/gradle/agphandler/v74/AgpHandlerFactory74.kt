@@ -21,7 +21,6 @@ import com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.google.auto.service.AutoService
 import groovy.lang.Closure
 import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.closureOf
 import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.AgpHandlerFactory
 import slack.gradle.agp.VersionNumber
@@ -60,4 +59,17 @@ private class AgpHandler74 : AgpHandler {
 /** Typed alternative to Gradle Kotlin-DSL's [closureOf], which only returns `Closure<Any?>`. */
 private fun <T> Any.typedClosureOf(action: T.() -> Unit): Closure<T> {
   @Suppress("UNCHECKED_CAST") return closureOf(action) as Closure<T>
+}
+
+private fun <T> Any.closureOf(action: T.() -> Unit): Closure<Any?> =
+  KotlinClosure1(action, this, this)
+
+private class KotlinClosure1<in T : Any?, V : Any>(
+  val function: T.() -> V?,
+  owner: Any? = null,
+  thisObject: Any? = null
+) : Closure<V?>(owner, thisObject) {
+
+  @Suppress("unused") // to be called dynamically by Groovy
+  fun doCall(it: T): V? = it.function()
 }

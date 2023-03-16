@@ -28,14 +28,6 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.domainObjectSet
-import org.gradle.kotlin.dsl.newInstance
-import org.gradle.kotlin.dsl.property
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
@@ -262,7 +254,7 @@ constructor(
       }
 
       if (featuresHandler.redacted.getOrElse(false)) {
-        apply(plugin = "dev.zacsweers.redacted")
+        pluginManager.apply("dev.zacsweers.redacted")
       }
 
       if (featuresHandler.moshiHandler.moshi.getOrElse(false)) {
@@ -587,7 +579,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
   internal val runtimeOnly: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val alwaysEnableAnvilComponentMerging: Property<Boolean> =
     objects.property<Boolean>().convention(false)
-  internal val anvilGenerators = objects.domainObjectSet(Any::class)
+  internal val anvilGenerators = objects.domainObjectSet<Any>()
 
   /**
    * Dependencies for Anvil generators that should be added. These should be in the same form as
@@ -698,13 +690,13 @@ constructor(
       if (!multiplatform.get()) {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       } else {
-        project.apply(plugin = "org.jetbrains.compose")
+        project.pluginManager.apply("org.jetbrains.compose")
         project.configure<ComposeExtension> {
           kotlinCompilerPlugin.set(
             dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
           )
         }
-        project.dependencies {
+        project.dependencies.apply {
           val composeCompilerVersion =
             slackProperties.versions.composeCompiler
               ?: error("Missing `compose-compiler` version in catalog")
@@ -755,21 +747,13 @@ constructor(
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       if (featuresHandler.robolectric.getOrElse(false)) {
-        project.dependencies {
+        project.dependencies.apply {
           // For projects using robolectric, we want to make sure they include robolectric-core to
           // ensure robolectric uses our custom dependency resolver and config (which just need
           // to be on the classpath).
           add("testImplementation", SlackDependencies.Testing.Robolectric.annotations)
           add("testImplementation", SlackDependencies.Testing.Robolectric.robolectric)
           add("testImplementation", slackProperties.robolectricCoreProject)
-        }
-        // Robolectric 4.9+ requires these --add-opens options.
-        // https://github.com/robolectric/robolectric/issues/7456
-        project.tasks.withType<Test>().configureEach {
-          jvmArgs(
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.base/java.util=ALL-UNNAMED",
-          )
         }
       }
     }

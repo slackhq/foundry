@@ -236,6 +236,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintUpdateBaselines: Boolean
     get() = booleanProperty("slack.lint.update-baselines")
 
+  /** File name to use for a project's lint baseline. */
+  public val lintBaselineFileName: String
+    get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
+
   /** Flag to enable/disable KSP. */
   public val allowKsp: Boolean
     get() = booleanProperty("slack.allow-ksp")
@@ -280,6 +284,44 @@ public class SlackProperties private constructor(private val project: Project) {
   /** CI unit test variant (Android only). Defaults to `release`. */
   public val ciUnitTestVariant: String
     get() = stringProperty("slack.ci-unit-test.variant", "release")
+
+  /** If enabled, applies the kotlinx-kover plugin to projects using ciUnitTest. */
+  public val ciUnitTestEnableKover: Boolean
+    get() = booleanProperty("slack.ci-unit-test.enableKover", false)
+
+  /**
+   * Parallelism multiplier to use for unit tests. This should be a float value that is multiplied
+   * by the number of cores. The value can be a fraction. Default is 0.5.
+   */
+  public val unitTestParallelismMultiplier: Float
+    get() {
+      val rawValue = stringProperty("slack.unit-test.parallelismMultiplier", "0.5")
+      val floatValue = rawValue.toFloatOrNull()
+      require(floatValue != null && floatValue > 0) {
+        "Invalid value for slack.unit-test.parallelismMultiplier: '$rawValue'"
+      }
+      return floatValue
+    }
+
+  /** Controls how often to fork the JVM in unit tests. Default is 1000. */
+  public val unitTestForkEvery: Long
+    get() = intProperty("slack.unit-test.forkEvery", 1000).toLong()
+
+  /**
+   * Flag to enable ciLint on a project. Default is true.
+   *
+   * When enabled, a task named "ciLint" will be created in this project, which will depend on the
+   * all the lint tasks in the project.
+   */
+  public val ciLintEnabled: Boolean
+    get() = booleanProperty("slack.ci-lint.enable", defaultValue = true)
+
+  /**
+   * Comma-separated list of CI lint variants to run (Android only). Default when unspecified will
+   * lint all variants.
+   */
+  public val ciLintVariants: String?
+    get() = optionalStringProperty("slack.ci-lint.variants")
 
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution

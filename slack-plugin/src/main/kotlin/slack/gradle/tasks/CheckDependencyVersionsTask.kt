@@ -24,8 +24,8 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
 import slack.gradle.getVersionsCatalog
+import slack.gradle.register
 import slack.gradle.safeCapitalize
 
 /**

@@ -32,9 +32,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
 import slack.gradle.util.localGradleProperty
 
 /**
@@ -56,7 +53,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
 
   @Suppress("LongMethod")
   override fun apply(project: Project) {
-    project.plugins.withType<AppPlugin> {
+    project.plugins.withType(AppPlugin::class.java) {
       val versionMajor = project.localGradleProperty("versionMajor")
       val versionMinor = project.localGradleProperty("versionMinor")
       val versionPatch = project.localGradleProperty("versionPatch")

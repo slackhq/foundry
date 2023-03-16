@@ -18,7 +18,6 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.dsl.Lint
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTestBuilder
@@ -54,20 +53,9 @@ import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.exclude
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.support.serviceOf
-import org.gradle.kotlin.dsl.withType
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -79,6 +67,7 @@ import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
@@ -130,7 +119,7 @@ internal class StandardProjectConfigurations(
       val sortDependenciesIgnoreSet =
         globalProperties.sortDependenciesIgnore?.splitToSequence(',')?.toSet().orEmpty()
       if (project.path !in sortDependenciesIgnoreSet) {
-        apply(plugin = "com.squareup.sort-dependencies")
+        pluginManager.apply("com.squareup.sort-dependencies")
       }
     }
   }
@@ -181,7 +170,13 @@ internal class StandardProjectConfigurations(
     }
 
     val slackExtension =
-      extensions.create<SlackExtension>("slack", globalProperties, slackProperties, versionCatalog)
+      extensions.create(
+        "slack",
+        SlackExtension::class.java,
+        globalProperties,
+        slackProperties,
+        versionCatalog
+      )
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
     val jdkVersion = jdkVersion()
@@ -209,13 +204,6 @@ internal class StandardProjectConfigurations(
     )
     configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
     slackExtension.applyTo(this)
-
-    // TODO would be nice if we could apply this _only_ if compile-testing is on the test classpath
-    tasks.withType<Test>().configureEach {
-      // Required for Google compile-testing to work.
-      // https://github.com/google/compile-testing/issues/222
-      jvmArgs("--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
-    }
 
     pluginManager.withPlugin("com.sergei-lapin.napt") {
       configure<NaptGradleExtension> {
@@ -248,7 +236,7 @@ internal class StandardProjectConfigurations(
   ) {
     configurations.configureEach {
       if (isPlatformConfigurationName(name)) {
-        dependencies {
+        project.dependencies.apply {
           for (bom in boms) {
             add(name, platform(bom))
           }
@@ -287,8 +275,8 @@ internal class StandardProjectConfigurations(
     jvmTargetVersion: Int,
     slackProperties: SlackProperties
   ) {
-    plugins.withType<JavaBasePlugin>().configureEach {
-      extensions.configure<JavaPluginExtension> {
+    plugins.withType(JavaBasePlugin::class.java).configureEach {
+      project.configure<JavaPluginExtension> {
         val version = JavaVersion.toVersion(jvmTargetVersion)
         sourceCompatibility = version
         targetCompatibility = version
@@ -305,7 +293,7 @@ internal class StandardProjectConfigurations(
 
     val javaToolchains by lazy { project.serviceOf<JavaToolchainService>() }
 
-    tasks.withType<JavaCompile>().configureEach {
+    tasks.withType(JavaCompile::class.java).configureEach {
       // Keep parameter names, this is useful for annotation processors and static analysis tools
       options.compilerArgs.addAll(listOf("-parameters"))
 
@@ -340,9 +328,9 @@ internal class StandardProjectConfigurations(
         slackProperties.versions.catalog.findLibrary("errorProne-nullaway").orElseThrow {
           IllegalStateException("Could not find errorProne-nullaway in the catalog")
         }
-      dependencies { add("errorprone", nullawayDep) }
+      dependencies.apply { add("errorprone", nullawayDep) }
 
-      tasks.withType<JavaCompile>().configureEach {
+      tasks.withType(JavaCompile::class.java).configureEach {
         val nullAwaySeverity =
           if (name.contains("test", ignoreCase = true)) {
             CheckSeverity.OFF
@@ -366,7 +354,7 @@ internal class StandardProjectConfigurations(
 
       val isAndroidProject = isAndroid
 
-      tasks.withType<JavaCompile>().configureEach {
+      tasks.withType(JavaCompile::class.java).configureEach {
         options.errorprone {
           disableWarningsInGeneratedCode.set(true)
           excludedPaths.set(".*/build/generated/.*") // The EP flag alone isn't enough
@@ -432,20 +420,20 @@ internal class StandardProjectConfigurations(
         }
       }
 
-    val sdkVersions by lazy { slackProperties.requireAndroidSdkProperties() }
+    val sdkVersions = lazy { slackProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
     val agpHandler = slackTools().agpHandler
     val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {
-          apply(plugin = "org.gradle.android.cache-fix")
+          pluginManager.apply("org.gradle.android.cache-fix")
         }
 
-        compileSdkVersion(sdkVersions.compileSdk)
+        compileSdkVersion(sdkVersions.value.compileSdk)
         slackProperties.ndkVersion?.let { ndkVersion = it }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          minSdk = sdkVersions.minSdk
+          minSdk = sdkVersions.value.minSdk
           vectorDrawables.useSupportLibrary = true
           // Default to the standard android runner, but note this is overridden in :app
           testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -509,7 +497,7 @@ internal class StandardProjectConfigurations(
       configurations.configureEach {
         if (name.contains("androidTest", ignoreCase = true)) {
           // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-          exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-debug")
+          exclude(mapOf("group" to "org.jetbrains.kotlinx", "module" to "kotlinx-coroutines-debug"))
           objenesis2Version?.let {
             // Cover for https://github.com/mockito/mockito/pull/2024, as objenesis 3.x is not
             // compatible with Android SDK <26
@@ -520,17 +508,15 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.test") {
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       configure<TestExtension> {
         slackExtension.androidExtension = this
         commonBaseExtensionConfig(false)
-        defaultConfig { targetSdk = sdkVersions.targetSdk }
+        defaultConfig { targetSdk = sdkVersions.value.targetSdk }
+        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
       }
     }
 
     pluginManager.withPlugin("com.android.application") {
-      // Add slack-lint as lint checks source
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       prepareAndroidTestConfigurations()
       configure<ApplicationAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
@@ -560,12 +546,9 @@ internal class StandardProjectConfigurations(
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
-          targetSdk = sdkVersions.targetSdk
+          targetSdk = sdkVersions.value.targetSdk
         }
-        lint {
-          configureLint(project, slackProperties, sdkVersions, true)
-          checkDependencies = true
-        }
+        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
         agpHandler.packagingOptions(
           this,
           resourceExclusions =
@@ -674,8 +657,6 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.library") {
-      // Add slack-lint as lint checks source
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
       prepareAndroidTestConfigurations()
       val isLibraryWithVariants = slackProperties.libraryWithVariants
 
@@ -719,7 +700,7 @@ internal class StandardProjectConfigurations(
 
         // Contribute these libraries to Fladle if they opt into it
         val androidTestApksAggregator =
-          project.rootProject.tasks.named<AndroidTestApksTask>(AndroidTestApksTask.NAME)
+          project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
         onVariants { variant ->
           val excluded =
             slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
@@ -759,7 +740,7 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.androidExtension = this
         commonBaseExtensionConfig(true)
-        lint { configureLint(project, slackProperties, sdkVersions, false) }
+        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -818,7 +799,7 @@ internal class StandardProjectConfigurations(
         slackProperties.detektBaseline?.let { baselineFile ->
           baseline =
             if (globalConfig.mergeDetektBaselinesTask != null) {
-              tasks.withType<DetektCreateBaselineTask>().configureEach {
+              tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
                 globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
               }
               file("$buildDir/intermediates/detekt/baseline.xml")
@@ -834,7 +815,7 @@ internal class StandardProjectConfigurations(
       }
     }
 
-    plugins.withType<KotlinBasePlugin> {
+    plugins.withType(KotlinBasePlugin::class.java).configureEach {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
 
       tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
@@ -927,11 +908,7 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      // Enable linting on pure JVM projects
-      apply(plugin = "com.android.lint")
-      configure<Lint> { configureLint(project, slackProperties, null, false) }
-      // Add slack-lint as lint checks source
-      slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
+      LintTasks.configureSubProject(project, slackProperties, null, null)
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {
@@ -1065,43 +1042,6 @@ internal class StandardProjectConfigurations(
       return isKnownConfiguration(name, Configurations.Groups.PLATFORM)
     }
   }
-}
-
-private fun Lint.configureLint(
-  project: Project,
-  slackProperties: SlackProperties,
-  androidSdkVersions: SlackProperties.AndroidSdkProperties?,
-  checkDependencies: Boolean,
-) {
-  lintConfig = project.rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
-  sarifReport = true
-  // This check is _never_ up to date and makes network requests!
-  disable += "NewerVersionAvailable"
-  // These store qualified gradle caches in their paths and always change in baselines
-  disable += "ObsoleteLintCustomCheck"
-  // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
-  error += "ImplicitSamInstance"
-
-  androidSdkVersions?.let { sdkVersions ->
-    if (sdkVersions.minSdk >= 28) {
-      // Lint doesn't understand AppComponentFactory
-      // https://issuetracker.google.com/issues/243267012
-      disable += "Instantiatable"
-    }
-  }
-
-  ignoreWarnings = slackProperties.lintErrorsOnly
-  absolutePaths = false
-  this.checkDependencies = checkDependencies
-
-  // Lint is weird in that it will generate a new baseline file and fail the build if a new
-  // one was generated, even if empty.
-  // If we're updating baselines, always take the baseline so that we populate it if absent.
-  project.layout.projectDirectory
-    .file("config/lint/baseline.xml")
-    .asFile
-    .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
-    ?.let { baseline = it }
 }
 
 internal interface KotlinArgConfig {
