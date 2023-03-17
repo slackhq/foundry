@@ -1,6 +1,57 @@
 Changelog
 =========
 
+0.7.0
+-----
+
+_2023-03-17_
+
+### Project Skippy
+
+This release introduces an experimental new `computeAffectedProjects` task for computing affected projects based on an input of changed files. The goal of this is to statically detect which unit test, lint, and androidTest checks can be safely skipped in CI on pull requests.
+
+Example usage
+```bash
+./gradlew computeAffectedProjects --changed-files changed_files.txt
+```
+
+Where `changed_files.txt` is resolved against the root repo directory and contains a newline-delimited list of changed files (usually inferred from a PR).
+
+A simple example of how to produce such a file with the `gh` CLI:
+
+```bash
+gh pr view ${{ github.event.number }} --json files -q '.files[].path' > changed_files.txt
+```
+
+One would run this task _first_ as a preflight task, then run subsequent builds with the `slack.avoidance.affectedProjectsFile` Gradle property pointing to its output file location (printed at the end of the task).
+
+```bash
+./gradlew ... -Pslack.avoidance.affectedProjectsFile=/Users/zacsweers/dev/slack/slack-android-ng/build/skippy/affected_projects.txt
+```
+
+The `globalCiLint`, `globalCiUnitTest`, and `aggregateAndroidTestApks` tasks all support reading this property and will avoid adding dependencies on tasks in projects that are not present in this set.
+
+The `ComputeAffectedProjectsTask` task has some sensible defaults, but can be configured further in the root projects like so.
+
+```kotlin
+tasks.named<ComputeAffectedProjectsTask>("computeAffectedProjects") {
+  // Glob patterns of files to include in computing
+  includePatterns.addAll(
+    "**/*.kt",
+    "**/*.java",
+  )
+  // Glob patterns of files that, if changed, should result in not skipping anything in the build
+  neverSkipPatterns.addAll(
+    "**/*.versions.toml",
+    "gradle/wrapper/**",
+  )
+}
+```
+
+Debug logging can be enabled via the `slack.debug=true` Gradle property. This will output timings, logs, and diagnostics for the task.
+
+The configurations used to determine the build graph can be customized via comma-separated list to the `slack.avoidance.affected-project-configurations` property.
+
 0.6.1
 -----
 
