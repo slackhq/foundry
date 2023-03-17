@@ -312,7 +312,15 @@ internal class AffectedProjectsComputer(
         "*.gradle.kts",
         // root gradle.properties file
         "gradle.properties",
+        // Version catalogs
         "**/*.versions.toml",
+        // Gradle wrapper files
+        "**/gradle/wrapper/**",
+        "gradle/wrapper/**",
+        "gradlew",
+        "gradle.bat",
+        "**/gradlew",
+        "**/gradle.bat",
       )
   }
 }
