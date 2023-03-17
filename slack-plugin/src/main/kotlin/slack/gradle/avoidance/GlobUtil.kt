@@ -22,13 +22,16 @@ internal fun interface PathMatcher {
   fun matches(path: String): Boolean
 }
 
+private class StringPathMatcher(private val pattern: String) : PathMatcher {
+  // TODO if we ever support windows, there's a separate windows method.
+  private val regex = Globs.toUnixRegexPattern(pattern).toRegex()
+  override fun matches(path: String) = regex.matches(path)
+  override fun toString() = pattern
+}
+
 internal fun PathMatcher.matches(path: Path) = matches(path.toString())
 
-// TODO if we ever support windows, there's a separate windows method.
-internal fun String.toPathMatcher(): PathMatcher {
-  val regex = Globs.toUnixRegexPattern(this).toRegex()
-  return PathMatcher(regex::matches)
-}
+internal fun String.toPathMatcher(): PathMatcher = StringPathMatcher(this)
 
 // Copied from the JDK Globs.java and is used by the JDK's PathMatcher, but it's not exposed as
 // public API for reuse.
