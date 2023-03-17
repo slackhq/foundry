@@ -74,7 +74,8 @@ import slack.gradle.util.SgpLogger
  *   projects that affect builds.
  * @property neverSkipPatterns A list of glob patterns that, if matched with a file, indicate that
  *   nothing should be skipped and [compute] will return null. This is useful for globally-affecting
- *   things like root build files, `libs.versions.toml`, etc.
+ *   things like root build files, `libs.versions.toml`, etc. **NOTE**: This list is always merged
+ *   with [includePatterns] as these are implicitly relevant files.
  * @property debug Debugging flag. If enabled, extra diagnostics and logging is performed.
  * @property logger A logger to use for logging.
  */
@@ -99,8 +100,14 @@ internal class AffectedProjectsComputer(
     log("changedFilePaths: $changedFilePaths")
 
     log("includePatterns: $includePatterns")
+    // Merge include patterns with never-skip patterns. This is because
+    val mergedIncludePatterns = (includePatterns + neverSkipPatterns).toSet()
+    log("mergedIncludePatterns: $mergedIncludePatterns")
+
     val filteredChangedFilePaths =
-      logTimedValue("filtering changed files") { filterIncludes(changedFilePaths, includePatterns) }
+      logTimedValue("filtering changed files") {
+        filterIncludes(changedFilePaths, mergedIncludePatterns)
+      }
     log("filteredChangedFilePaths: $filteredChangedFilePaths")
 
     val neverSkipPathMatchers =
@@ -322,7 +329,7 @@ internal class AffectedProjectsComputer(
       )
 
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
-    fun filterIncludes(filePaths: List<Path>, includePatterns: List<String>) =
+    fun filterIncludes(filePaths: List<Path>, includePatterns: Collection<String>) =
       filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
 
     /** Returns whether any [filePaths] match any [neverSkipPatterns]. */
