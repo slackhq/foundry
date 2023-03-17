@@ -100,24 +100,18 @@ internal class AffectedProjectsComputer(
 
     log("includePatterns: $includePatterns")
     val filteredChangedFilePaths =
-      logTimedValue("filtering changed files") {
-        changedFilePaths.filter {
-          includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) }
-        }
-      }
+      logTimedValue("filtering changed files") { filterIncludes(changedFilePaths, includePatterns) }
     log("filteredChangedFilePaths: $filteredChangedFilePaths")
 
     val neverSkipPathMatchers =
-      logTimedValue("creating path matchers") { neverSkipPatterns.map { it.toPathMatcher() } }
+      logTimedValue("creating path matchers") { neverSkipPatterns.map(String::toPathMatcher) }
     log("neverSkipPatterns: $neverSkipPatterns")
 
     if (debug) {
       // Do a slower, more verbose check in debug
       val pathsWithSkippability =
         logTimedValue("checking for non-skippable files") {
-          filteredChangedFilePaths.associateWith { path ->
-            neverSkipPathMatchers.find { it.matches(path) }
-          }
+          anyNeverSkipDebug(filteredChangedFilePaths, neverSkipPathMatchers)
         }
       if (pathsWithSkippability.values.any { it != null }) {
         // Produce no outputs, run everything
@@ -128,7 +122,7 @@ internal class AffectedProjectsComputer(
       }
     } else {
       // Do a fast check for never-skip paths when not debugging
-      if (filteredChangedFilePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }) {
+      if (anyNeverSkip(filteredChangedFilePaths, neverSkipPathMatchers)) {
         // Produce no outputs, run everything
         logger.lifecycle("Never-skip pattern(s) matched.")
         return null
@@ -322,6 +316,24 @@ internal class AffectedProjectsComputer(
         "**/gradlew",
         "**/gradle.bat",
       )
+
+    /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
+    fun filterIncludes(filePaths: List<Path>, includePatterns: List<String>) =
+      filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
+
+    /** Returns whether any [filePaths] match any [neverSkipPatterns]. */
+    fun anyNeverSkip(filePaths: List<Path>, neverSkipPathMatchers: List<PathMatcher>) =
+      filePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }
+
+    /**
+     * A slower, debug-only alternative to [anyNeverSkip] that returns a map of paths to matched
+     * [PathMatcher]s. This is useful for debugging as we can indicate the matched pattern.
+     */
+    fun anyNeverSkipDebug(
+      filePaths: List<Path>,
+      neverSkipPathMatchers: List<PathMatcher>
+    ): Map<Path, PathMatcher?> =
+      filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
   }
 }
 
