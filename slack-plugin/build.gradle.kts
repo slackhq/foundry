@@ -118,6 +118,7 @@ dependencies {
   // Better I/O
   api(libs.okio)
 
+  testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
