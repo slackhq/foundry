@@ -17,13 +17,7 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
-import java.io.File
-import java.nio.file.FileSystems
-import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
 import kotlin.time.measureTimedValue
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -40,6 +34,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
+import slack.gradle.util.SgpLogger
 
 /**
  * This task is a meta task to compute the set of projects that are affected by a set of changed
@@ -89,10 +84,12 @@ import slack.gradle.SlackProperties
  * ```
  */
 @UntrackedTask(because = "This task is a meta task that more or less runs as a utility script.")
-internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
+public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWriter {
 
   /** Debugging flag. If enabled, extra diagnostics and logging is performed. */
-  @get:Input abstract val debug: Property<Boolean>
+  @get:Input
+  public val debug: Property<Boolean> =
+    project.objects.property(Boolean::class.java).convention(false)
 
   /**
    * A list of glob patterns for files to include in computing affected projects. This should
@@ -100,8 +97,10 @@ internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
    * builds.
    */
   @get:Input
-  val includePatterns: ListProperty<String> =
-    project.objects.listProperty(String::class.java).convention(DEFAULT_INCLUDE_PATTERNS)
+  public val includePatterns: ListProperty<String> =
+    project.objects
+      .listProperty(String::class.java)
+      .convention(AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS)
 
   /**
    * A list of glob patterns that, if matched with a file, indicate that nothing should be skipped
@@ -110,8 +109,10 @@ internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
    * This is useful for globally-affecting things like root build files, `libs.versions.toml`, etc.
    */
   @get:Input
-  val neverSkipPatterns: ListProperty<String> =
-    project.objects.listProperty(String::class.java).convention(DEFAULT_NEVER_SKIP_PATTERNS)
+  public val neverSkipPatterns: ListProperty<String> =
+    project.objects
+      .listProperty(String::class.java)
+      .convention(AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS)
 
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
@@ -119,16 +120,16 @@ internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
    */
   @get:Option(option = "changed-files", description = "A relative file path to changed_files.txt.")
   @get:Input
-  abstract val changedFiles: Property<String>
+  public abstract val changedFiles: Property<String>
 
   /** Output diagnostics directory for use in debugging. */
-  @get:OutputDirectory abstract val diagnosticsDir: DirectoryProperty
+  @get:OutputDirectory public abstract val diagnosticsDir: DirectoryProperty
 
   /** The output list of affected projects. */
-  @get:OutputFile abstract val outputFile: RegularFileProperty
+  @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   /** An output .focus file that could be used with the Focus plugin. */
-  @get:OutputFile abstract val outputFocusFile: RegularFileProperty
+  @get:OutputFile public abstract val outputFocusFile: RegularFileProperty
 
   /*
    * Internal properties.
@@ -140,9 +141,79 @@ internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
   /** The serialized dependency graph as computed from our known configurations. */
   @get:Input internal abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
 
+  private lateinit var prefixLogger: SgpLogger
+
   init {
     group = "slack"
     description = "Computes affected projects and writes them to a file."
+  }
+
+  @TaskAction
+  internal fun compute() {
+    prefixLogger = SgpLogger.prefix(LOG, SgpLogger.gradle(logger))
+    logTimedValue("gradle task computation") {
+      // Clear outputs as needed
+      outputFile.get().asFile.apply {
+        if (exists()) {
+          delete()
+        }
+      }
+      outputFocusFile.get().asFile.apply {
+        if (exists()) {
+          delete()
+        }
+      }
+      if (debug.get()) {
+        diagnosticsDir.get().asFile.also { file ->
+          if (file.exists()) {
+            file.deleteRecursively()
+          }
+          file.mkdirs()
+        }
+      }
+      val (affectedProjects, focusProjects) =
+        AffectedProjectsComputer(
+            rootDirPath = rootDir.asFile.get().toPath(),
+            dependencyGraph = {
+              logTimedValue("creating dependency graph") {
+                DependencyGraph.create(dependencyGraph.get())
+              }
+            },
+            includePatterns = includePatterns.get(),
+            neverSkipPatterns = neverSkipPatterns.get(),
+            debug = debug.get(),
+            diagnostics = this,
+            changedFilePaths =
+              logTimedValue("reading changed files") {
+                val file = changedFiles.get()
+                log("reading changed files from: $file")
+                rootDir.file(file).get().asFile.readLines().map { Paths.get(it.trim()) }
+              },
+            logger = prefixLogger,
+          )
+          .compute()
+          ?: return@logTimedValue
+
+      // Generate affected_projects.txt
+      log("writing affected projects to: $outputFile")
+      outputFile.get().asFile.writeText(affectedProjects.sorted().joinToString("\n"))
+
+      // Generate .focus settings file
+      log("writing focus settings to: $outputFocusFile")
+      outputFocusFile
+        .get()
+        .asFile
+        .writeText(focusProjects.joinToString("\n") { "include(\"$it\")" })
+    }
+  }
+
+  override fun write(name: String, content: () -> String) {
+    if (debug.get()) {
+      val file = diagnosticsDir.get().file("$name.txt").asFile
+      log("writing diagnostic file: $path")
+      file.parentFile.mkdirs()
+      file.writeText(content())
+    }
   }
 
   private fun log(message: String) {
@@ -156,202 +227,14 @@ internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
     }
   }
 
-  @TaskAction
-  fun compute() {
-    // Clear outputs as needed
-    outputFile.get().asFile.apply {
-      if (exists()) {
-        delete()
-      }
-    }
-    outputFocusFile.get().asFile.apply {
-      if (exists()) {
-        delete()
-      }
-    }
-    if (debug.get()) {
-      diagnosticsDir.asFile.get().apply {
-        if (exists()) {
-          deleteRecursively()
-        }
-        mkdirs()
-      }
-    }
-    logTimedValue("full computation") { computeImpl() }
+  private inline fun <T> logTimedValue(name: String, body: () -> T): T {
+    val (value, duration) = measureTimedValue(body)
+    log("$name took $duration")
+    return value
   }
 
-  private fun computeImpl() {
-    val fs = FileSystems.getDefault()
-
-    log("reading changed files from: ${changedFiles.get()}")
-    val changedFilesPaths =
-      logTimedValue("reading changed files") {
-        rootDir.file(changedFiles).get().asFile.readLines().map { Paths.get(it.trim()) }
-      }
-    log("changedFilesPaths: $changedFilesPaths")
-
-    log("includePatterns: ${includePatterns.get()}")
-    val filteredChangedFilePaths =
-      logTimedValue("filtering changed files") {
-        changedFilesPaths.filter {
-          includePatterns.get().any { pattern -> fs.getPathMatcher("glob:$pattern").matches(it) }
-        }
-      }
-    log("filteredChangedFilePaths: $filteredChangedFilePaths")
-
-    val rootDirPath = rootDir.get().asFile.toPath()
-
-    val neverSkipPathMatchers =
-      logTimedValue("creating path matchers") {
-        neverSkipPatterns.get().map { fs.getPathMatcher("glob:$it") }
-      }
-    log("neverSkipPatterns: ${neverSkipPatterns.get()}")
-
-    if (debug.get()) {
-      // Do a slower, more verbose check in debug
-      val pathsWithSkippability =
-        logTimedValue("checking for non-skippable files") {
-          filteredChangedFilePaths.associateWith { path ->
-            neverSkipPathMatchers.find { it.matches(path) }
-          }
-        }
-      if (pathsWithSkippability.values.any { it != null }) {
-        // Produce no outputs, run everything
-        logger.lifecycle(
-          "$LOG Never-skip pattern(s) matched: ${pathsWithSkippability.filterValues { it != null }}."
-        )
-        return
-      }
-    } else {
-      // Do a fast check for never-skip paths when not debugging
-      if (filteredChangedFilePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }) {
-        // Produce no outputs, run everything
-        logger.lifecycle("$LOG Never-skip pattern(s) matched.")
-        return
-      }
-    }
-
-    val nearestProjectCache = mutableMapOf<Path, Path?>()
-
-    // Mapping of Gradle project paths (like ":app") to the ChangedProject representation.
-    val changedProjects =
-      logTimedValue("computing changed projects") {
-        filteredChangedFilePaths
-          .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache) }
-          .filterNotNullKeys()
-          .entries
-          .associate { (projectPath, files) ->
-            val gradlePath = ":${projectPath.toString().replace(File.separatorChar, ':')}"
-            gradlePath to ChangedProject(projectPath, gradlePath, files.toSet())
-          }
-      }
-    writeDiagnostic("changedProjects.txt") {
-      changedProjects.entries
-        .sortedBy { it.key }
-        .joinToString("\n") { (_, v) ->
-          val testOnlyString = if (v.onlyTestsAreChanged) " (tests only)" else ""
-          val lintBaselineOnly = if (v.onlyLintBaselineChanged) " (lint-baseline.xml only)" else ""
-          "${v.gradlePath}$testOnlyString$lintBaselineOnly\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
-        }
-    }
-
-    val graph = logTimedValue("creating graph") { DependencyGraph.create(dependencyGraph.get()) }
-
-    val projectsToDependencies: Map<String, Set<String>> =
-      logTimedValue("computing dependencies") {
-        graph.nodes().associate { node ->
-          val dependencies = mutableSetOf<DependencyGraph.Node>()
-          node.visitDependencies(dependencies)
-          node.key to dependencies.mapTo(mutableSetOf()) { it.key }
-        }
-      }
-
-    writeDiagnostic("projectsToDependencies.txt") {
-      buildString {
-        for ((project, dependencies) in projectsToDependencies.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
-    val projectsToDependents = logTimedValue("computing dependents", projectsToDependencies::flip)
-
-    writeDiagnostic("projectsToDependents.txt") {
-      buildString {
-        for ((project, dependencies) in projectsToDependents.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
-    val allAffectedProjects = buildSet {
-      for ((path, change) in changedProjects) {
-        add(path)
-        if (change.affectsDependents) {
-          addAll(projectsToDependents[path] ?: emptySet())
-        }
-      }
-    }
-
-    logger.lifecycle("$LOG Found ${allAffectedProjects.size} affected projects.")
-
-    // Generate affected_projects.txt
-    log("writing affected projects to: ${outputFile.get()}")
-    outputFile.get().asFile.writeText(allAffectedProjects.sorted().joinToString("\n"))
-
-    // Generate .focus settings file
-    val allRequiredProjects =
-      allAffectedProjects
-        .flatMapTo(mutableSetOf()) { project ->
-          val dependencies = projectsToDependencies[project].orEmpty()
-          dependencies + project
-        }
-        .sorted()
-    log("writing focus settings to: ${outputFocusFile.get()}")
-    outputFocusFile
-      .get()
-      .asFile
-      .writeText(allRequiredProjects.joinToString("\n") { "include(\"$it\")" })
-  }
-
-  private fun writeDiagnostic(fileName: String, content: () -> String) {
-    if (debug.get()) {
-      val file = diagnosticsDir.file(fileName).get().asFile
-      log("writing diagnostic file: $file")
-      file.parentFile.mkdirs()
-      file.createNewFile()
-      file.writeText(content())
-    }
-  }
-
-  companion object {
+  internal companion object {
     private const val LOG = "[Skippy]"
-
-    private val DEFAULT_INCLUDE_PATTERNS =
-      listOf(
-        "**/*.kt",
-        "*.gradle.kts",
-        "**/*.gradle.kts",
-        "**/*.java",
-        "**/AndroidManifest.xml",
-        "**/res/**",
-        "**/gradle.properties",
-      )
-
-    private val DEFAULT_NEVER_SKIP_PATTERNS =
-      listOf(
-        // root build.gradle.kts and settings.gradle.kts files
-        "*.gradle.kts",
-        // root gradle.properties file
-        "gradle.properties",
-        "**/*.versions.toml",
-      )
 
     fun register(
       rootProject: Project,
@@ -387,141 +270,5 @@ internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
         // directly
       }
     }
-  }
-
-  private inline fun <T> logTimedValue(name: String, body: () -> T): T {
-    val (value, duration) = measureTimedValue(body)
-    log("$name took $duration")
-    return value
-  }
-}
-
-/**
- * Given a file path like
- * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
- * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
- */
-private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path?>): Path? {
-  val currentDir =
-    when {
-      !exists() -> {
-        /*
-         * Deleted file. Still check the parent dirs though because if the project itself still
-         * exists, it still affects downstream
-         *
-         * There _is_ an edge case here though: what if the intermediary project was deleted but
-         * nested below another, real project? How do we know when to stop?
-         * Well, we're protected from this scenario by the fact that such a change would incur a change to
-         * `settings.gradle.kts`, and subsequently all projects would be deemed affected.
-         */
-        parent
-      }
-      isRegularFile() -> parent
-      isDirectory() -> this
-      else -> error("Unsupported file type: $this")
-    }
-  return findNearestProjectDirRecursive(repoRoot, currentDir, cache)
-}
-
-private fun findNearestProjectDirRecursive(
-  repoRoot: Path,
-  currentDir: Path?,
-  cache: MutableMap<Path, Path?>
-): Path? {
-  if (currentDir == null || currentDir == repoRoot) {
-    error("Could not find build.gradle(.kts) for $currentDir")
-  }
-
-  return cache.getOrPut(currentDir) {
-    // Note the dir may not exist, but that's ok because we still want to check its parents
-    val hasBuildFile =
-      currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
-    if (hasBuildFile) {
-      return currentDir
-    }
-    findNearestProjectDirRecursive(repoRoot, currentDir.parent, cache)
-  }
-}
-
-private fun DependencyGraph.Node.visitDependencies(setToAddTo: MutableSet<DependencyGraph.Node>) {
-  for (dependency in dependsOn) {
-    if (!setToAddTo.add(dependency)) {
-      // Only add transitives if we haven't already seen this dependency.
-      dependency.visitDependencies(setToAddTo)
-    }
-  }
-}
-
-/**
- * Flips a map. In the context of [ComputeAffectedProjectsTask], we use this to flip a map of
- * projects to their dependencies to a map of projects to the projects that depend on them. We use
- * this to find all affected projects given a seed of changed projects.
- *
- * Example:
- *
- *  ```
- *  Given a map
- *  {a:[b, c], b:[d], c:[d], d:[]}
- *  return
- *  {b:[a], c:[a], d:[b, c]}
- *  ```
- */
-private fun Map<String, Set<String>>.flip(): Map<String, Set<String>> {
-  val flipped = mutableMapOf<String, MutableSet<String>>()
-  for ((project, dependenciesSet) in this) {
-    for (dependency in dependenciesSet) {
-      flipped.getOrPut(dependency, ::mutableSetOf).add(project)
-    }
-  }
-  return flipped
-}
-
-/** Return a new map with null keys filtered out. */
-private fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
-  return filterKeys { it != null }.mapKeys { it.key!! }
-}
-
-/**
- * Represents a changed project as computed by [ComputeAffectedProjectsTask.changedFiles].
- *
- * @property path The [Path] to the project directory.
- * @property gradlePath The Gradle project path (e.g. `:app`).
- * @property changedPaths The set of [Paths][Path] to files that have changed.
- */
-private data class ChangedProject(
-  val path: Path,
-  val gradlePath: String,
-  val changedPaths: Set<Path>,
-) {
-  /**
-   * Returns true if all changed files are in a test directory and therefore do not carry-over to
-   * downstream dependents.
-   */
-  val testPaths: Set<Path> = changedPaths.filterTo(mutableSetOf(), testPathMatcher::matches)
-  val onlyTestsAreChanged = testPaths.size == changedPaths.size
-
-  /**
-   * Returns true if all changed files are just `lint-baseline.xml`. This is useful because it means
-   * they don't affect downstream dependants.
-   */
-  val lintBaseline: Set<Path> =
-    changedPaths.filterTo(mutableSetOf(), lintBaselinePathMatcher::matches)
-  val onlyLintBaselineChanged = lintBaseline.size == changedPaths.size
-
-  /**
-   * Remaining affected files that aren't test paths or lint baseline, and therefore affect
-   * dependants.
-   */
-  val dependantAffectingFiles = changedPaths - testPaths - lintBaseline
-
-  /** Shorthand for if [dependantAffectingFiles] is not empty. */
-  val affectsDependents = dependantAffectingFiles.isNotEmpty()
-
-  companion object {
-    // This covers snapshot tests too as they are under src/test/snapshots/**
-    private val testPathMatcher =
-      FileSystems.getDefault().getPathMatcher("glob:**/src/*{test,androidTest}/**")
-    private val lintBaselinePathMatcher =
-      FileSystems.getDefault().getPathMatcher("glob:**/lint-baseline.xml")
   }
 }
