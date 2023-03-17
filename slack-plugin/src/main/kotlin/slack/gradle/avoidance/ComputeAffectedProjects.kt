@@ -350,8 +350,6 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         // root gradle.properties file
         "gradle.properties",
         "**/*.versions.toml",
-        "ci/**",
-        ".buildkite/**",
       )
 
     fun register(
