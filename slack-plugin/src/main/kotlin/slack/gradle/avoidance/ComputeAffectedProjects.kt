@@ -358,7 +358,6 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjects> {
       // TODO any others?
-      // TODO what about testFixtures?
       val configurationsToLook: Set<String> =
         setOf(
           "api",
@@ -406,8 +405,16 @@ private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, P
   val currentDir =
     when {
       !exists() -> {
-        // Deleted file. These can't affect projects
-        return null
+        /*
+         * Deleted file. Still check the parent dirs though because if the project itself still
+         * exists, it still affects downstream
+         *
+         * There _is_ an edge case here though: what if the intermediary project was deleted but
+         * nested below another, real project? How do we know when to stop?
+         * Well, we're protected from this scenario by the fact that such a change would incur a change to
+         * `settings.gradle.kts`, and subsequently all projects would be deemed affected.
+         */
+        parent
       }
       isRegularFile() -> parent
       isDirectory() -> this
@@ -426,6 +433,7 @@ private fun findNearestProjectDirRecursive(
   }
 
   return cache.getOrPut(currentDir) {
+    // Note the dir may not exist, but that's ok because we still want to check its parents
     val hasBuildFile =
       currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
     if (hasBuildFile) {
