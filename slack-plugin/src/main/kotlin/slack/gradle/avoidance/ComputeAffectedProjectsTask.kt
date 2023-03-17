@@ -182,22 +182,25 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
 
   internal companion object {
     private const val LOG = "[Skippy]"
+    private val DEFAULT_CONFIGURATIONS =
+      setOf(
+        "api",
+        "implementation",
+        "ksp",
+        "testImplementation",
+        "androidTestImplementation",
+        "compileOnly",
+        "annotationProcessor",
+      )
 
     fun register(
       rootProject: Project,
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjectsTask> {
-      // TODO any others?
-      val configurationsToLook: Set<String> =
-        setOf(
-          "api",
-          "implementation",
-          "ksp",
-          "testImplementation",
-          "androidTestImplementation",
-          "compileOnly",
-          "annotationProcessor",
-        )
+      val configurationsToLook by lazy {
+        slackProperties.affectedProjectConfigurations?.splitToSequence(',')?.toSet()
+          ?: DEFAULT_CONFIGURATIONS
+      }
 
       val moduleGraph by lazy {
         GradleDependencyGraphFactory.create(rootProject, configurationsToLook).serializableGraph()

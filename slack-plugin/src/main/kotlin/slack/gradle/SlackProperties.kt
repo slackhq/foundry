@@ -432,6 +432,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val debug: Boolean
     get() = booleanProperty("slack.debug", defaultValue = false)
 
+  /** A comma-separated list of configurations to use in affected project detection. */
+  public val affectedProjectConfigurations: String?
+    get() = optionalStringProperty("slack.avoidance.affected-project-configurations")
+
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
    * have at least one `.kt` source file.
