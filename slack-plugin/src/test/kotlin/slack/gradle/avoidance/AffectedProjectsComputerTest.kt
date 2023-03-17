@@ -27,6 +27,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkip
+import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkipDebug
+import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterIncludes
 import slack.gradle.util.SgpLogger
 
 class AffectedProjectsComputerTest {
@@ -84,6 +87,100 @@ class AffectedProjectsComputerTest {
         expectedAffectedProjects = listOf(":$projectName"),
         expectedFocusProjects = listOf(":$projectName"),
       )
+  }
+
+  @Test
+  fun `smoke test for default include patterns`() {
+    val patterns = AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS
+    val testInputs =
+      mapOf(
+        "foo/bar/baz/Example.kt" to true,
+        "foo/bar/baz/AndroidManifest.xml" to true,
+        // Other language types
+        "foo/bar/baz/Example.java" to true,
+        "foo/bar/baz/Example.groovy" to false,
+        // Top level sources not included because they're not in a src dir.
+        "Example.kt" to false,
+        "AndroidManifest.xml" to false,
+        "strings.xml" to false,
+        "resources/foo.txt" to false,
+        "resources/services/some.service.yay" to false,
+        // Top level and nested gradle.properties
+        "gradle.properties" to true,
+        "nested/gradle.properties" to true,
+        // Top level and nested build.gradle(.kts)
+        "build.gradle.kts" to true,
+        "nested/build.gradle.kts" to true,
+        "build.gradle" to true,
+        "nested/build.gradle" to true,
+        // Top level and nested settings.gradle(.kts)
+        "settings.gradle.kts" to true,
+        "nested/settings.gradle.kts" to true,
+        "settings.gradle" to true,
+        "nested/settings.gradle" to true,
+        // Android Resources
+        "nested/res/values/strings.xml" to true,
+        "nested/res/raw/lottie_thing.json" to true,
+        // Regular resources
+        "nested/src/main/resources/foo.txt" to true,
+        "nested/src/main/resources/services/some.service.yay" to true,
+      )
+    assertThat(filterIncludes(testInputs.keys.map { it.toPath() }, patterns))
+      .containsExactlyElementsIn(testInputs.filterValues { it }.keys.map { it.toPath() })
+  }
+
+  @Test
+  fun `smoke test for default never skip patterns`() {
+    val patterns = AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS.map(String::toPathMatcher)
+    val testInputs =
+      mapOf(
+        "foo/bar/baz/Example.kt" to false,
+        "foo/bar/baz/AndroidManifest.xml" to false,
+        // Other language types
+        "foo/bar/baz/Example.java" to false,
+        // Top level and nested gradle.properties
+        "gradle.properties" to true,
+        "nested/gradle.properties" to false,
+        // Top level and nested build.gradle(.kts)
+        "build.gradle.kts" to true,
+        "nested/build.gradle.kts" to false,
+        "build.gradle" to true,
+        "nested/build.gradle" to false,
+        // Top level and nested settings.gradle(.kts)
+        "settings.gradle.kts" to true,
+        "nested/settings.gradle.kts" to false,
+        "settings.gradle" to true,
+        "nested/settings.gradle" to false,
+        // Android Resources
+        "nested/res/values/strings.xml" to false,
+        "nested/res/raw/lottie_thing.json" to false,
+        // Regular resources
+        "nested/src/main/resources/foo.txt" to false,
+        "nested/src/main/resources/services/some.service.yay" to false,
+        "nested/res/raw/lottie_thing.json" to false,
+        // Gradle files
+        "gradle/wrapper/gradle-wrapper.properties" to true,
+        "nested/gradle/wrapper/gradle-wrapper.properties" to true,
+        "gradle/libs.versions.toml" to true,
+        "nested/gradle/libs.versions.toml" to true,
+        "gradle/otherLibs.versions.toml" to true,
+        "nested/gradle/otherLibs.versions.toml" to true,
+        "gradlew" to true,
+        "nested/gradlew" to true,
+        "gradlew.bat" to true,
+        "nested/gradlew.bat" to true,
+      )
+    for ((path, expectedToBeSkipped) in testInputs) {
+      val okioPath = path.toPath()
+      assertThat(anyNeverSkip(listOf(okioPath), patterns)).isEqualTo(expectedToBeSkipped)
+
+      val result = anyNeverSkipDebug(listOf(path.toPath()), patterns).getValue(okioPath)
+      if (expectedToBeSkipped) {
+        checkNotNull(result) { "Expected $path to not be skipped, but was. Debug info: $result" }
+      } else {
+        check(result == null) { "Expected $path to be skipped, but was not. Debug info: $result" }
+      }
+    }
   }
 
   // TODO
