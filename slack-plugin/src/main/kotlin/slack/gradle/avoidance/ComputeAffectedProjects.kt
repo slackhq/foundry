@@ -339,7 +339,8 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
         "*.gradle.kts",
         "**/*.gradle.kts",
         "**/*.java",
-        "**/*.xml",
+        "**/AndroidManifest.xml",
+        "**/res/**",
         "**/gradle.properties",
       )
 
