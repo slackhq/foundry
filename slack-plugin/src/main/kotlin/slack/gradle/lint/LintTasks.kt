@@ -71,6 +71,12 @@ internal object LintTasks {
       if (affectedProjects == null || project.path in affectedProjects) {
         project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
       } else {
+        val log = "$LOG Skipping ${project.path}:$CI_LINT_TASK_NAME because it is not affected."
+        if (slackProperties.debug) {
+          project.logger.lifecycle(log)
+        } else {
+          project.logger.debug(log)
+        }
         null
       }
 
