@@ -288,7 +288,7 @@ private fun Path.findNearestProjectDir(
       isDirectory(fileSystem) -> this
       else -> error("Unsupported file type: $this")
     }
-  return findNearestProjectDirRecursive(repoRoot, currentDir, cache)
+  return findNearestProjectDirRecursive(repoRoot, this, currentDir, cache)
 }
 
 private fun Path.isRegularFile(fileSystem: FileSystem): Boolean =
@@ -301,11 +301,12 @@ private fun Path.exists(): Boolean = toNioPath().exists()
 
 private fun findNearestProjectDirRecursive(
   repoRoot: Path,
+  originalPath: Path,
   currentDir: Path?,
   cache: MutableMap<Path, Path?>
 ): Path? {
   if (currentDir == null || currentDir == repoRoot) {
-    error("Could not find build.gradle(.kts) for $currentDir")
+    error("Could not find build.gradle(.kts) for $originalPath")
   }
 
   return cache.getOrPut(currentDir) {
@@ -315,7 +316,7 @@ private fun findNearestProjectDirRecursive(
     if (hasBuildFile) {
       return currentDir
     }
-    findNearestProjectDirRecursive(repoRoot, currentDir.parent, cache)
+    findNearestProjectDirRecursive(repoRoot, originalPath, currentDir.parent, cache)
   }
 }
 
