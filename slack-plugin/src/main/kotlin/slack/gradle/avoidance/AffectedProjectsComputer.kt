@@ -23,6 +23,69 @@ import okio.FileSystem
 import okio.Path
 import slack.gradle.util.SgpLogger
 
+/**
+ * This is a program compute the set of Gradle projects that are affected by a set of changed files
+ * ([changedFilePaths]).
+ *
+ * The intention of this program is to run as a preflight step in pull requests to only run a subset
+ * of checks affected by files changed _in_ that PR. This allows CI on PRs to safely complete faster
+ * and reduce CI usage.
+ *
+ * ### Inputs
+ *
+ * The primary input is [changedFilePaths], which is a newline-delimited list of files that have
+ * changed. Usually the files changed in a pull request.
+ *
+ * [includePatterns] is a list of glob patterns that are used to filter the list of changed files.
+ * These should usually be source files that are deemed to participate in builds (e.g. `.kt` files).
+ *
+ * [neverSkipPatterns] is a list of glob patterns that, if matched with any changed file, indicate
+ * that nothing should be skipped and the full build should run. This is important for files like
+ * version catalog toml files or root build.gradle file changes.
+ *
+ * ### Outputs
+ *
+ * The primary output [AffectedProjectsResult.affectedProjects] is a set of Gradle project paths
+ * that are determined to be affected. This is intended to be used as an input to a subsequent
+ * Gradle invocation (usually as a file) to inform which projects can be avoided.
+ *
+ * A secondary output file is [AffectedProjectsResult.focusProjects]. This is a set of Gradle
+ * project paths that can be written to a `focus.settings.gradle` file that can be used with the
+ * dropbox/focus plugin, and will be a minimal list of projects needed to build the affected
+ * projects.
+ *
+ * With both outputs, if any "never-skippable" files [neverSkipPatterns] are changed, then no output
+ * file is produced and all projects are considered affected. If a file is produced but has no
+ * content written to it, that simply means that no projects are affected.
+ *
+ * ### Debugging
+ *
+ * To debug this task, pass in `-Pslack.debug=true` to enable debug logging. This will also output
+ * verbose diagnostics to [diagnostics] (usually `build/skippy/diagnostics`). Debug mode will also
+ * output timings.
+ *
+ * ### Usage
+ * Example usage:
+ * ```bash
+ * ./gradlew computeAffectedProjects --changed-files changed_files.txt
+ * ```
+ *
+ * @property rootDirPath Root repo directory. Used to compute relative paths and not considered an
+ *   input.
+ * @property dependencyGraph The serialized dependency graph as computed from our known
+ *   configurations. Lazily loaded and only invoked onces.
+ * @property changedFilePaths A relative (to the repo root) path to a changed_files.txt that
+ *   contains a newline-delimited list of changed files. This is usually computed from a GitHub PR's
+ *   changed files.
+ * @property includePatterns A list of glob patterns for files to include in computing affected
+ *   projects. This should usually be source files, build files, gradle.properties files, and other
+ *   projects that affect builds.
+ * @property neverSkipPatterns A list of glob patterns that, if matched with a file, indicate that
+ *   nothing should be skipped and [compute] will return null. This is useful for globally-affecting
+ *   things like root build files, `libs.versions.toml`, etc.
+ * @property debug Debugging flag. If enabled, extra diagnostics and logging is performed.
+ * @property logger A logger to use for logging.
+ */
 internal class AffectedProjectsComputer(
   private val rootDirPath: Path,
   private val dependencyGraph: () -> DependencyGraph,

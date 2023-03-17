@@ -38,77 +38,22 @@ import slack.gradle.SlackProperties
 import slack.gradle.util.SgpLogger
 
 /**
- * This task is a meta task to compute the set of projects that are affected by a set of changed
- * files ([changedFiles]).
- *
- * The intention of this task is to run as a preflight step in pull requests to only run a subset of
- * checks affected by files changed _in_ that PR. This allows CI on PRs to safely complete faster
- * and reduce CI usage.
- *
- * ### Inputs
- *
- * The primary input is [changedFiles], which is a newline-delimited list of files that have
- * changed. Usually the files changed in a pull request. This can be specified via the
- * `--changed-files` CLI option, and its path is resolved against the root project directory.
- *
- * [includePatterns] is a list of glob patterns that are used to filter the list of changed files.
- * These should usually be source files that are deemed to participate in builds (e.g. `.kt` files).
- *
- * [neverSkipPatterns] is a list of glob patterns that, if matched with any changed file, indicate
- * that nothing should be skipped and the full build should run. This is important for files like
- * version catalog toml files or root build.gradle file changes.
- *
- * ### Outputs
- *
- * The primary output [outputFile] is a newline-delimited list of Gradle project paths that are
- * determined to be affected. This is intended to be used as an input to a subsequent Gradle
- * invocation to inform which projects can be avoided.
- *
- * A secondary output file is [outputFocusFile]. This is a `focus.settings.gradle` file that can be
- * used with the dropbox/focus plugin, and will be a minimal list of projects needed to build the
- * affected projects.
- *
- * With both outputs, if any "never-skippable" files [neverSkipPatterns] are changed, then no output
- * file is produced and all projects are considered affected. If a file is produced but has no
- * content written to it, that simply means that no projects are affected.
- *
- * ### Debugging
- *
- * To debug this task, pass in `-Pslack.debug=true` to enable debug logging. This will also output
- * verbose diagnostics to [diagnosticsDir] (usually `build/skippy/diagnostics`). Debug mode will
- * also output timings.
- *
- * ### Usage
- * Example usage:
- * ```bash
- * ./gradlew computeAffectedProjects --changed-files changed_files.txt
- * ```
+ * @see AffectedProjectsComputer for most of the salient docs! The inputs in this task more or less
+ *   match 1:1 to the properties of that class.
  */
 @UntrackedTask(because = "This task is a meta task that more or less runs as a utility script.")
 public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWriter {
 
-  /** Debugging flag. If enabled, extra diagnostics and logging is performed. */
   @get:Input
   public val debug: Property<Boolean> =
     project.objects.property(Boolean::class.java).convention(false)
 
-  /**
-   * A list of glob patterns for files to include in computing affected projects. This should
-   * usually be source files, build files, gradle.properties files, and other projects that affect
-   * builds.
-   */
   @get:Input
   public val includePatterns: ListProperty<String> =
     project.objects
       .listProperty(String::class.java)
       .convention(AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS)
 
-  /**
-   * A list of glob patterns that, if matched with a file, indicate that nothing should be skipped
-   * and no [outputFile] or [outputFocusFile] will be generated.
-   *
-   * This is useful for globally-affecting things like root build files, `libs.versions.toml`, etc.
-   */
   @get:Input
   public val neverSkipPatterns: ListProperty<String> =
     project.objects
@@ -139,7 +84,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   /** Root repo directory. Used to compute relative paths and not considered an input. */
   @get:Internal internal abstract val rootDir: DirectoryProperty
 
-  /** The serialized dependency graph as computed from our known configurations. */
   @get:Input internal abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
 
   private lateinit var prefixLogger: SgpLogger
