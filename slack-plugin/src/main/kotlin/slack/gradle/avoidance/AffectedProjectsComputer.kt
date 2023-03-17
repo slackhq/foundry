@@ -146,12 +146,19 @@ internal class AffectedProjectsComputer(
     val changedProjects =
       logTimedValue("computing changed projects") {
         filteredChangedFilePaths
-          .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache, fileSystem) }
+          .groupBy {
+            // We need the full path here in order to resolve file attributes correctly
+            rootDirPath
+              .resolve(it)
+              .findNearestProjectDir(rootDirPath, nearestProjectCache, fileSystem)
+          }
           .filterNotNullKeys()
           .entries
           .associate { (projectPath, files) ->
-            val gradlePath = ":${projectPath.toString().replace(Path.DIRECTORY_SEPARATOR, ":")}"
-            gradlePath to ChangedProject(projectPath, gradlePath, files.toSet())
+            // Get the relative path back now, we don't need the fully qualified path anymore
+            val relativePath = projectPath.relativeTo(rootDirPath)
+            val gradlePath = ":${relativePath.toString().replace(Path.DIRECTORY_SEPARATOR, ":")}"
+            gradlePath to ChangedProject(relativePath, gradlePath, files.toSet())
           }
       }
     diagnostics.write("changedProjects.txt") {
