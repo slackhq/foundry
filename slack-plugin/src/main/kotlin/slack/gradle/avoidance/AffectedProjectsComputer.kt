@@ -29,6 +29,8 @@ import slack.gradle.util.SgpLogger
  * of checks affected by files changed _in_ that PR. This allows CI on PRs to safely complete faster
  * and reduce CI usage.
  *
+ * **NOTE**: Included builds are not supported.
+ *
  * ### Inputs
  *
  * The primary input is [changedFilePaths], which is a newline-delimited list of files that have
@@ -315,6 +317,7 @@ internal class AffectedProjectsComputer(
       listOf(
         // root build.gradle.kts and settings.gradle.kts files
         "*.gradle.kts",
+        "*.gradle",
         // root gradle.properties file
         "gradle.properties",
         // Version catalogs
@@ -323,9 +326,11 @@ internal class AffectedProjectsComputer(
         "**/gradle/wrapper/**",
         "gradle/wrapper/**",
         "gradlew",
-        "gradle.bat",
+        "gradlew.bat",
         "**/gradlew",
-        "**/gradle.bat",
+        "**/gradlew.bat",
+        // buildSrc
+        "buildSrc/**",
       )
 
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
