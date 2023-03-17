@@ -16,7 +16,6 @@
 package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
-import java.io.File
 import kotlin.io.path.exists
 import kotlin.time.measureTimedValue
 import okio.FileSystem
@@ -151,7 +150,7 @@ internal class AffectedProjectsComputer(
           .filterNotNullKeys()
           .entries
           .associate { (projectPath, files) ->
-            val gradlePath = ":${projectPath.toString().replace(File.separatorChar, ':')}"
+            val gradlePath = ":${projectPath.toString().replace(Path.DIRECTORY_SEPARATOR, ":")}"
             gradlePath to ChangedProject(projectPath, gradlePath, files.toSet())
           }
       }
