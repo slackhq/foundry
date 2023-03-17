@@ -16,6 +16,7 @@
 package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
+import java.util.Collections.unmodifiableSet
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
@@ -308,41 +309,45 @@ internal class AffectedProjectsComputer(
   }
 
   companion object {
-    val DEFAULT_INCLUDE_PATTERNS =
-      setOf(
-        "**/*.kt",
-        "*.gradle",
-        "**/*.gradle",
-        "*.gradle.kts",
-        "**/*.gradle.kts",
-        "**/*.java",
-        "**/AndroidManifest.xml",
-        "**/res/**",
-        "**/src/*/resources/**",
-        "gradle.properties",
-        "**/gradle.properties",
+    val DEFAULT_INCLUDE_PATTERNS: Set<String> =
+      unmodifiableSet(
+        setOf(
+          "**/*.kt",
+          "*.gradle",
+          "**/*.gradle",
+          "*.gradle.kts",
+          "**/*.gradle.kts",
+          "**/*.java",
+          "**/AndroidManifest.xml",
+          "**/res/**",
+          "**/src/*/resources/**",
+          "gradle.properties",
+          "**/gradle.properties",
+        )
       )
 
-    val DEFAULT_NEVER_SKIP_PATTERNS =
-      setOf(
-        // root build.gradle.kts and settings.gradle.kts files
-        "*.gradle.kts",
-        "*.gradle",
-        // root gradle.properties file
-        "gradle.properties",
-        // Version catalogs
-        "**/*.versions.toml",
-        // Gradle wrapper files
-        "**/gradle/wrapper/**",
-        "gradle/wrapper/**",
-        "gradlew",
-        "gradlew.bat",
-        "**/gradlew",
-        "**/gradlew.bat",
-        // buildSrc
-        "buildSrc/**",
-        // CI
-        "**/.github/workflows/**",
+    val DEFAULT_NEVER_SKIP_PATTERNS: Set<String> =
+      unmodifiableSet(
+        setOf(
+          // root build.gradle.kts and settings.gradle.kts files
+          "*.gradle.kts",
+          "*.gradle",
+          // root gradle.properties file
+          "gradle.properties",
+          // Version catalogs
+          "**/*.versions.toml",
+          // Gradle wrapper files
+          "**/gradle/wrapper/**",
+          "gradle/wrapper/**",
+          "gradlew",
+          "gradlew.bat",
+          "**/gradlew",
+          "**/gradlew.bat",
+          // buildSrc
+          "buildSrc/**",
+          // CI
+          "**/.github/workflows/**",
+        )
       )
 
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
