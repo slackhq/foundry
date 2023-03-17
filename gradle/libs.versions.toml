@@ -56,7 +56,7 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
-gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.3.0"
+gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.3.1"
 gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
 gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
