@@ -38,6 +38,12 @@ import slack.gradle.SlackProperties
 import slack.gradle.util.SgpLogger
 
 /**
+ * ### Usage
+ * Example usage:
+ * ```bash
+ * ./gradlew computeAffectedProjects --changed-files changed_files.txt
+ * ```
+ *
  * @see AffectedProjectsComputer for most of the salient docs! The inputs in this task more or less
  *   match 1:1 to the properties of that class.
  */

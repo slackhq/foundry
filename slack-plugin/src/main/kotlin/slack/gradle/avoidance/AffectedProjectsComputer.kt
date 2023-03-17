@@ -62,12 +62,6 @@ import slack.gradle.util.SgpLogger
  * verbose diagnostics to [diagnostics] (usually `build/skippy/diagnostics`). Debug mode will also
  * output timings.
  *
- * ### Usage
- * Example usage:
- * ```bash
- * ./gradlew computeAffectedProjects --changed-files changed_files.txt
- * ```
- *
  * @property rootDirPath Root repo directory. Used to compute relative paths and not considered an
  *   input.
  * @property dependencyGraph The serialized dependency graph as computed from our known
