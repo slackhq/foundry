@@ -331,6 +331,8 @@ internal class AffectedProjectsComputer(
         "**/gradlew.bat",
         // buildSrc
         "buildSrc/**",
+        // CI
+        "**/.github/workflows/**",
       )
 
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
