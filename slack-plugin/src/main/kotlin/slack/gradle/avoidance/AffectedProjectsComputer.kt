@@ -292,11 +292,15 @@ internal class AffectedProjectsComputer(
     internal val DEFAULT_INCLUDE_PATTERNS =
       listOf(
         "**/*.kt",
+        "*.gradle",
+        "**/*.gradle",
         "*.gradle.kts",
         "**/*.gradle.kts",
         "**/*.java",
         "**/AndroidManifest.xml",
         "**/res/**",
+        "**/src/*/resources/**",
+        "gradle.properties",
         "**/gradle.properties",
       )
 
