@@ -20,13 +20,11 @@ import com.jraska.module.graph.DependencyGraph
 import okio.BufferedSink
 import okio.FileSystem
 import okio.Path
-import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import okio.buffer
+import okio.fakefilesystem.FakeFileSystem
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkip
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkipDebug
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterIncludes
@@ -34,18 +32,16 @@ import slack.gradle.util.SgpLogger
 
 class AffectedProjectsComputerTest {
 
-  // FakeFileSystem doesn't work because it doesn't support isRegularFile/isDirectory ops.
-  @get:Rule val tmpFolder = TemporaryFolder()
-
   private val diagnostics = mutableMapOf<String, String>()
   private val diagnosticWriter = DiagnosticWriter { name, content -> diagnostics[name] = content() }
-  private val fileSystem = FileSystem.SYSTEM
+  private val fileSystem = FakeFileSystem()
   private lateinit var rootDirPath: Path
   private lateinit var rootTestProject: TestProject
 
   @Before
   fun setup() {
-    rootDirPath = tmpFolder.newFolder("project").toOkioPath()
+    rootDirPath = fileSystem.workingDirectory / "project"
+    fileSystem.createDirectory(rootDirPath)
     rootTestProject =
       TestProject(fileSystem, rootDirPath, ":") {
         buildFile()
@@ -55,6 +51,7 @@ class AffectedProjectsComputerTest {
 
   private fun createComputer(dependencyGraph: DependencyGraph, changedFilePaths: List<String>) =
     AffectedProjectsComputer(
+      fileSystem = fileSystem,
       dependencyGraph = { dependencyGraph },
       changedFilePaths = createChangedFilePaths(changedFilePaths),
       rootDirPath = rootDirPath,
