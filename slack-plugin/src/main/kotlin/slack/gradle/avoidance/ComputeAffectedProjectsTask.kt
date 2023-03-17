@@ -89,7 +89,7 @@ import slack.gradle.SlackProperties
  * ```
  */
 @UntrackedTask(because = "This task is a meta task that more or less runs as a utility script.")
-internal abstract class ComputeAffectedProjects : DefaultTask() {
+internal abstract class ComputeAffectedProjectsTask : DefaultTask() {
 
   /** Debugging flag. If enabled, extra diagnostics and logging is performed. */
   @get:Input abstract val debug: Property<Boolean>
@@ -356,7 +356,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
     fun register(
       rootProject: Project,
       slackProperties: SlackProperties
-    ): TaskProvider<ComputeAffectedProjects> {
+    ): TaskProvider<ComputeAffectedProjectsTask> {
       // TODO any others?
       val configurationsToLook: Set<String> =
         setOf(
@@ -375,7 +375,7 @@ internal abstract class ComputeAffectedProjects : DefaultTask() {
 
       return rootProject.tasks.register(
         "computeAffectedProjects",
-        ComputeAffectedProjects::class.java
+        ComputeAffectedProjectsTask::class.java
       ) {
         debug.set(slackProperties.debug)
         rootDir.set(project.layout.projectDirectory)
@@ -453,9 +453,9 @@ private fun DependencyGraph.Node.visitDependencies(setToAddTo: MutableSet<Depend
 }
 
 /**
- * Flips a map. In the context of [ComputeAffectedProjects], we use this to flip a map of projects
- * to their dependencies to a map of projects to the projects that depend on them. We use this to
- * find all affected projects given a seed of changed projects.
+ * Flips a map. In the context of [ComputeAffectedProjectsTask], we use this to flip a map of
+ * projects to their dependencies to a map of projects to the projects that depend on them. We use
+ * this to find all affected projects given a seed of changed projects.
  *
  * Example:
  *
@@ -482,7 +482,7 @@ private fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
 }
 
 /**
- * Represents a changed project as computed by [ComputeAffectedProjects.changedFiles].
+ * Represents a changed project as computed by [ComputeAffectedProjectsTask.changedFiles].
  *
  * @property path The [Path] to the project directory.
  * @property gradlePath The Gradle project path (e.g. `:app`).

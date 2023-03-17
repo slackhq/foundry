@@ -28,7 +28,7 @@ import slack.cli.AppleSiliconCompat
 import slack.executeBlocking
 import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
-import slack.gradle.avoidance.ComputeAffectedProjects
+import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CoreBootstrapTask
@@ -106,7 +106,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     project.configureMisc(slackProperties)
     UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
-    ComputeAffectedProjects.register(project, slackProperties)
+    ComputeAffectedProjectsTask.register(project, slackProperties)
     val scanApi = ScanApi(project)
     project.configureBuildScanMetadata(scanApi)
     if (scanApi.isAvailable) {
