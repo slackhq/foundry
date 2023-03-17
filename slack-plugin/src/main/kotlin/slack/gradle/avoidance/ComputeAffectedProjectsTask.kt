@@ -24,8 +24,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -35,6 +35,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
+import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 
 /**
@@ -55,15 +56,15 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     project.objects.property(Boolean::class.java).convention(false)
 
   @get:Input
-  public val includePatterns: ListProperty<String> =
+  public val includePatterns: SetProperty<String> =
     project.objects
-      .listProperty(String::class.java)
+      .setProperty<String>()
       .convention(AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS)
 
   @get:Input
-  public val neverSkipPatterns: ListProperty<String> =
+  public val neverSkipPatterns: SetProperty<String> =
     project.objects
-      .listProperty(String::class.java)
+      .setProperty<String>()
       .convention(AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS)
 
   /**

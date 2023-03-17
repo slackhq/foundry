@@ -86,8 +86,8 @@ internal class AffectedProjectsComputer(
   private val dependencyGraph: () -> DependencyGraph,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
-  private val includePatterns: List<String> = DEFAULT_INCLUDE_PATTERNS,
-  private val neverSkipPatterns: List<String> = DEFAULT_NEVER_SKIP_PATTERNS,
+  private val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,
+  private val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
   private val logger: SgpLogger = SgpLogger.noop()
@@ -298,8 +298,8 @@ internal class AffectedProjectsComputer(
   }
 
   companion object {
-    internal val DEFAULT_INCLUDE_PATTERNS =
-      listOf(
+    val DEFAULT_INCLUDE_PATTERNS =
+      setOf(
         "**/*.kt",
         "*.gradle",
         "**/*.gradle",
@@ -313,8 +313,8 @@ internal class AffectedProjectsComputer(
         "**/gradle.properties",
       )
 
-    internal val DEFAULT_NEVER_SKIP_PATTERNS =
-      listOf(
+    val DEFAULT_NEVER_SKIP_PATTERNS =
+      setOf(
         // root build.gradle.kts and settings.gradle.kts files
         "*.gradle.kts",
         "*.gradle",
