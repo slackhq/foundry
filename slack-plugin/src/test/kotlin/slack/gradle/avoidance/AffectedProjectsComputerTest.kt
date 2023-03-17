@@ -29,6 +29,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkip
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkipDebug
+import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterExcludes
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterIncludes
 import slack.gradle.util.SgpLogger
 
@@ -181,6 +182,21 @@ class AffectedProjectsComputerTest {
         check(result == null) { "Expected $path to be skipped, but was not. Debug info: $result" }
       }
     }
+  }
+
+  @Test
+  fun excludeFilters() {
+    val patterns =
+      setOf(
+        "**/baz/**",
+      )
+    val testInputs =
+      mapOf(
+        "foo/bar/baz/Example.kt" to false,
+        "foo/bar/AndroidManifest.xml" to true,
+      )
+    assertThat(filterExcludes(testInputs.keys.map { it.toPath() }, patterns))
+      .containsExactlyElementsIn(testInputs.filterValues { it }.keys.map { it.toPath() })
   }
 
   // TODO

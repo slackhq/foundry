@@ -71,10 +71,13 @@ import slack.gradle.util.SgpLogger
  * @property changedFilePaths A relative (to the repo root) path to a changed_files.txt that
  *   contains a newline-delimited list of changed files. This is usually computed from a GitHub PR's
  *   changed files.
- * @property includePatterns A list of glob patterns for files to include in computing affected
+ * @property includePatterns A set of glob patterns for files to include in computing affected
  *   projects. This should usually be source files, build files, gradle.properties files, and other
  *   projects that affect builds.
- * @property neverSkipPatterns A list of glob patterns that, if matched with a file, indicate that
+ * @property excludePatterns A set of glob patterns for files to exclude from computing affected
+ *   projects. This is run _after_ [includePatterns] and can be useful for excluding files that
+ *   would otherwise be included by an existing inclusion pattern.
+ * @property neverSkipPatterns A set of glob patterns that, if matched with a file, indicate that
  *   nothing should be skipped and [compute] will return null. This is useful for globally-affecting
  *   things like root build files, `libs.versions.toml`, etc. **NOTE**: This list is always merged
  *   with [includePatterns] as these are implicitly relevant files.
@@ -87,6 +90,7 @@ internal class AffectedProjectsComputer(
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
   private val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,
+  private val excludePatterns: Set<String> = emptySet(),
   private val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
@@ -106,9 +110,15 @@ internal class AffectedProjectsComputer(
     val mergedIncludePatterns = (includePatterns + neverSkipPatterns).toSet()
     log("mergedIncludePatterns: $mergedIncludePatterns")
 
-    val filteredChangedFilePaths =
-      logTimedValue("filtering changed files") {
+    val includedChangedFilePaths =
+      logTimedValue("filtering changed files with includes") {
         filterIncludes(changedFilePaths, mergedIncludePatterns)
+      }
+    log("includedChangedFilePaths: $includedChangedFilePaths")
+
+    val filteredChangedFilePaths =
+      logTimedValue("filtering changed files with excludes") {
+        filterExcludes(includedChangedFilePaths, excludePatterns)
       }
     log("filteredChangedFilePaths: $filteredChangedFilePaths")
 
@@ -338,6 +348,10 @@ internal class AffectedProjectsComputer(
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
     fun filterIncludes(filePaths: List<Path>, includePatterns: Collection<String>) =
       filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
+
+    /** Returns a filtered list of [filePaths] that do _not_ match the given [includePatterns]. */
+    fun filterExcludes(filePaths: List<Path>, excludePatterns: Collection<String>) =
+      filePaths.filterNot { excludePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
 
     /** Returns whether any [filePaths] match any [neverSkipPatterns]. */
     fun anyNeverSkip(filePaths: List<Path>, neverSkipPathMatchers: List<PathMatcher>) =

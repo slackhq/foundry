@@ -62,6 +62,10 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       .convention(AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS)
 
   @get:Input
+  public val excludePatterns: SetProperty<String> =
+    project.objects.setProperty<String>().convention(emptySet())
+
+  @get:Input
   public val neverSkipPatterns: SetProperty<String> =
     project.objects
       .setProperty<String>()
@@ -132,6 +136,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
               }
             },
             includePatterns = includePatterns.get(),
+            excludePatterns = excludePatterns.get(),
             neverSkipPatterns = neverSkipPatterns.get(),
             debug = debug.get(),
             diagnostics = this,
