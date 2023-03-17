@@ -16,7 +16,6 @@
 package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
-import kotlin.io.path.exists
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
@@ -101,6 +100,8 @@ internal class AffectedProjectsComputer(
   }
 
   private fun computeImpl(): AffectedProjectsResult? {
+    log("root dir path is: $rootDirPath")
+    check(rootDirPath.exists()) { "Root dir path $rootDirPath does not exist" }
     log("changedFilePaths: $changedFilePaths")
 
     log("includePatterns: $includePatterns")
@@ -148,9 +149,7 @@ internal class AffectedProjectsComputer(
         filteredChangedFilePaths
           .groupBy {
             // We need the full path here in order to resolve file attributes correctly
-            rootDirPath
-              .resolve(it)
-              .findNearestProjectDir(rootDirPath, nearestProjectCache, fileSystem)
+            rootDirPath.resolve(it).findNearestProjectDir(rootDirPath, nearestProjectCache)
           }
           .filterNotNullKeys()
           .entries
@@ -243,6 +242,64 @@ internal class AffectedProjectsComputer(
     return value
   }
 
+  /**
+   * Given a file path like
+   * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
+   * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
+   */
+  private fun Path.findNearestProjectDir(
+    repoRoot: Path,
+    cache: MutableMap<Path, Path?>,
+  ): Path? {
+    val currentDir =
+      when {
+        !exists() -> {
+          /*
+           * Deleted file. Still check the parent dirs though because if the project itself still
+           * exists, it still affects downstream
+           *
+           * There _is_ an edge case here though: what if the intermediary project was deleted but
+           * nested below another, real project? How do we know when to stop?
+           * Well, we're protected from this scenario by the fact that such a change would incur a change to
+           * `settings.gradle.kts`, and subsequently all projects would be deemed affected.
+           */
+          parent
+        }
+        isRegularFile() -> parent
+        isDirectory() -> this
+        else -> error("Unsupported file type: $this")
+      }
+    return findNearestProjectDirRecursive(repoRoot, this, currentDir, cache)
+  }
+
+  private fun Path.isRegularFile(): Boolean = fileSystem.metadataOrNull(this)?.isRegularFile == true
+
+  private fun Path.isDirectory(): Boolean = fileSystem.metadataOrNull(this)?.isDirectory == true
+
+  private fun Path.exists(): Boolean = fileSystem.exists(this)
+
+  private fun findNearestProjectDirRecursive(
+    repoRoot: Path,
+    originalPath: Path,
+    currentDir: Path?,
+    cache: MutableMap<Path, Path?>
+  ): Path? {
+    if (currentDir == null || currentDir == repoRoot) {
+      error("Could not find build.gradle(.kts) for $originalPath")
+    }
+
+    return cache.getOrPut(currentDir) {
+      // Note the dir may not exist, but that's ok because we still want to check its parents
+      val hasBuildFile =
+        currentDir.resolve("build.gradle.kts").exists() ||
+          currentDir.resolve("build.gradle").exists()
+      if (hasBuildFile) {
+        return currentDir
+      }
+      findNearestProjectDirRecursive(repoRoot, originalPath, currentDir.parent, cache)
+    }
+  }
+
   companion object {
     internal val DEFAULT_INCLUDE_PATTERNS =
       listOf(
@@ -263,66 +320,6 @@ internal class AffectedProjectsComputer(
         "gradle.properties",
         "**/*.versions.toml",
       )
-  }
-}
-
-/**
- * Given a file path like
- * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
- * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
- */
-private fun Path.findNearestProjectDir(
-  repoRoot: Path,
-  cache: MutableMap<Path, Path?>,
-  fileSystem: FileSystem,
-): Path? {
-  val currentDir =
-    when {
-      !exists() -> {
-        /*
-         * Deleted file. Still check the parent dirs though because if the project itself still
-         * exists, it still affects downstream
-         *
-         * There _is_ an edge case here though: what if the intermediary project was deleted but
-         * nested below another, real project? How do we know when to stop?
-         * Well, we're protected from this scenario by the fact that such a change would incur a change to
-         * `settings.gradle.kts`, and subsequently all projects would be deemed affected.
-         */
-        parent
-      }
-      isRegularFile(fileSystem) -> parent
-      isDirectory(fileSystem) -> this
-      else -> error("Unsupported file type: $this")
-    }
-  return findNearestProjectDirRecursive(repoRoot, this, currentDir, cache)
-}
-
-private fun Path.isRegularFile(fileSystem: FileSystem): Boolean =
-  fileSystem.metadataOrNull(this)?.isRegularFile == true
-
-private fun Path.isDirectory(fileSystem: FileSystem): Boolean =
-  fileSystem.metadataOrNull(this)?.isDirectory == true
-
-private fun Path.exists(): Boolean = toNioPath().exists()
-
-private fun findNearestProjectDirRecursive(
-  repoRoot: Path,
-  originalPath: Path,
-  currentDir: Path?,
-  cache: MutableMap<Path, Path?>
-): Path? {
-  if (currentDir == null || currentDir == repoRoot) {
-    error("Could not find build.gradle(.kts) for $originalPath")
-  }
-
-  return cache.getOrPut(currentDir) {
-    // Note the dir may not exist, but that's ok because we still want to check its parents
-    val hasBuildFile =
-      currentDir.resolve("build.gradle.kts").exists() || currentDir.resolve("build.gradle").exists()
-    if (hasBuildFile) {
-      return currentDir
-    }
-    findNearestProjectDirRecursive(repoRoot, originalPath, currentDir.parent, cache)
   }
 }
 
