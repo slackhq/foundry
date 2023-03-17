@@ -17,13 +17,10 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import java.io.File
-import java.nio.file.FileSystem
-import java.nio.file.FileSystems
-import java.nio.file.Path
 import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
 import kotlin.time.measureTimedValue
+import okio.FileSystem
+import okio.Path
 import slack.gradle.util.SgpLogger
 
 internal class AffectedProjectsComputer(
@@ -34,7 +31,7 @@ internal class AffectedProjectsComputer(
   private val includePatterns: List<String> = DEFAULT_INCLUDE_PATTERNS,
   private val neverSkipPatterns: List<String> = DEFAULT_NEVER_SKIP_PATTERNS,
   private val debug: Boolean = false,
-  private val fileSystem: FileSystem = FileSystems.getDefault(),
+  private val fileSystem: FileSystem = FileSystem.SYSTEM,
   private val logger: SgpLogger = SgpLogger.noop()
 ) {
   fun compute(): AffectedProjectsResult? {
@@ -48,15 +45,13 @@ internal class AffectedProjectsComputer(
     val filteredChangedFilePaths =
       logTimedValue("filtering changed files") {
         changedFilePaths.filter {
-          includePatterns.any { pattern -> fileSystem.getPathMatcher("glob:$pattern").matches(it) }
+          includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) }
         }
       }
     log("filteredChangedFilePaths: $filteredChangedFilePaths")
 
     val neverSkipPathMatchers =
-      logTimedValue("creating path matchers") {
-        neverSkipPatterns.map { fileSystem.getPathMatcher("glob:$it") }
-      }
+      logTimedValue("creating path matchers") { neverSkipPatterns.map { it.toPathMatcher() } }
     log("neverSkipPatterns: $neverSkipPatterns")
 
     if (debug) {
@@ -89,7 +84,7 @@ internal class AffectedProjectsComputer(
     val changedProjects =
       logTimedValue("computing changed projects") {
         filteredChangedFilePaths
-          .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache) }
+          .groupBy { it.findNearestProjectDir(rootDirPath, nearestProjectCache, fileSystem) }
           .filterNotNullKeys()
           .entries
           .associate { (projectPath, files) ->
@@ -207,7 +202,11 @@ internal class AffectedProjectsComputer(
  * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
  * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
  */
-private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path?>): Path? {
+private fun Path.findNearestProjectDir(
+  repoRoot: Path,
+  cache: MutableMap<Path, Path?>,
+  fileSystem: FileSystem,
+): Path? {
   val currentDir =
     when {
       !exists() -> {
@@ -222,12 +221,20 @@ private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, P
          */
         parent
       }
-      isRegularFile() -> parent
-      isDirectory() -> this
+      isRegularFile(fileSystem) -> parent
+      isDirectory(fileSystem) -> this
       else -> error("Unsupported file type: $this")
     }
   return findNearestProjectDirRecursive(repoRoot, currentDir, cache)
 }
+
+private fun Path.isRegularFile(fileSystem: FileSystem): Boolean =
+  fileSystem.metadataOrNull(this)?.isRegularFile == true
+
+private fun Path.isDirectory(fileSystem: FileSystem): Boolean =
+  fileSystem.metadataOrNull(this)?.isDirectory == true
+
+private fun Path.exists(): Boolean = toNioPath().exists()
 
 private fun findNearestProjectDirRecursive(
   repoRoot: Path,
@@ -325,9 +332,7 @@ private data class ChangedProject(
 
   companion object {
     // This covers snapshot tests too as they are under src/test/snapshots/**
-    private val testPathMatcher =
-      FileSystems.getDefault().getPathMatcher("glob:**/src/*{test,androidTest}/**")
-    private val lintBaselinePathMatcher =
-      FileSystems.getDefault().getPathMatcher("glob:**/lint-baseline.xml")
+    private val testPathMatcher = "**/src/*{test,androidTest}/**".toPathMatcher()
+    private val lintBaselinePathMatcher = "**/lint-baseline.xml".toPathMatcher()
   }
 }

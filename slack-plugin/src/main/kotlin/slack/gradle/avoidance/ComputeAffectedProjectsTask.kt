@@ -17,8 +17,9 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
-import java.nio.file.Paths
 import kotlin.time.measureTimedValue
+import okio.Path.Companion.toOkioPath
+import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
@@ -173,7 +174,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       }
       val (affectedProjects, focusProjects) =
         AffectedProjectsComputer(
-            rootDirPath = rootDir.asFile.get().toPath(),
+            rootDirPath = rootDir.asFile.get().toOkioPath(normalize = true),
             dependencyGraph = {
               logTimedValue("creating dependency graph") {
                 DependencyGraph.create(dependencyGraph.get())
@@ -187,7 +188,9 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
               logTimedValue("reading changed files") {
                 val file = changedFiles.get()
                 log("reading changed files from: $file")
-                rootDir.file(file).get().asFile.readLines().map { Paths.get(it.trim()) }
+                rootDir.file(file).get().asFile.readLines().map {
+                  it.trim().toPath(normalize = true)
+                }
               },
             logger = prefixLogger,
           )
