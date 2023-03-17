@@ -35,6 +35,8 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
+import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
+import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 
@@ -57,9 +59,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
 
   @get:Input
   public val includePatterns: SetProperty<String> =
-    project.objects
-      .setProperty<String>()
-      .convention(AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS)
+    project.objects.setProperty<String>().convention(DEFAULT_INCLUDE_PATTERNS)
 
   @get:Input
   public val excludePatterns: SetProperty<String> =
@@ -67,9 +67,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
 
   @get:Input
   public val neverSkipPatterns: SetProperty<String> =
-    project.objects
-      .setProperty<String>()
-      .convention(AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS)
+    project.objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited

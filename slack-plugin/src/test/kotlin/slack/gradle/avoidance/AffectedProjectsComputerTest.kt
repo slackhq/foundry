@@ -92,7 +92,7 @@ class AffectedProjectsComputerTest {
 
   @Test
   fun `smoke test for default include patterns`() {
-    val patterns = AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS
+    val patterns = AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
     val testInputs =
       mapOf(
         "foo/bar/baz/Example.kt" to true,
@@ -132,7 +132,7 @@ class AffectedProjectsComputerTest {
 
   @Test
   fun `smoke test for default never skip patterns`() {
-    val patterns = AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS.map(String::toPathMatcher)
+    val patterns = AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS.map(String::toPathMatcher)
     val testInputs =
       mapOf(
         "foo/bar/baz/Example.kt" to false,
