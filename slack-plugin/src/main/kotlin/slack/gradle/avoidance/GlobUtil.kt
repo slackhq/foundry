@@ -19,13 +19,15 @@ import java.util.regex.PatternSyntaxException
 import okio.Path
 
 internal fun interface PathMatcher {
-  fun matches(path: Path): Boolean
+  fun matches(path: String): Boolean
 }
+
+internal fun PathMatcher.matches(path: Path) = matches(path.toString())
 
 // TODO if we ever support windows, there's a separate windows method.
 internal fun String.toPathMatcher(): PathMatcher {
   val regex = Globs.toUnixRegexPattern(this).toRegex()
-  return PathMatcher { path -> regex.matches(path.toString()) }
+  return PathMatcher(regex::matches)
 }
 
 // Copied from the JDK Globs.java and is used by the JDK's PathMatcher, but it's not exposed as
