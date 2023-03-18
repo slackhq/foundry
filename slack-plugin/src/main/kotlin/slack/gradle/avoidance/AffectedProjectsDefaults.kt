@@ -55,7 +55,7 @@ public object AffectedProjectsDefaults {
         // buildSrc
         "buildSrc/**",
         // CI
-        "**/.github/workflows/**",
+        ".github/workflows/**",
       )
     )
 }

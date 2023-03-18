@@ -170,6 +170,9 @@ class AffectedProjectsComputerTest {
         "nested/gradlew" to true,
         "gradlew.bat" to true,
         "nested/gradlew.bat" to true,
+        // GH Actions
+        ".github/workflows/ci.yml" to true,
+        ".github/ci.yml" to false,
       )
     for ((path, expectedToBeSkipped) in testInputs) {
       val okioPath = path.toPath()
