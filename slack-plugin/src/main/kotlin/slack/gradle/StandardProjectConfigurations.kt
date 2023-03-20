@@ -724,6 +724,14 @@ internal class StandardProjectConfigurations(
               // Wire this up to the aggregator
               androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
             }
+          } else {
+            val reason = if (excluded) "excluded" else "not affected"
+            val log = "$LOG Skipping ${project.path}:androidTest because it is $reason."
+            if (slackProperties.debug) {
+              project.logger.lifecycle(log)
+            } else {
+              project.logger.debug(log)
+            }
           }
         }
 
