@@ -16,7 +16,7 @@ _2023-03-20_
      may otherwise be captured in an inclusion filter and is difficult to
      describe in a simple glob pattern. GitHub action does similar controls
      for CI matrices.
-- [Skippy] Allow relative project paths to `affected_projects.txt` and allow non-existent files as a value. This makes it easy to gracefully fall back in CI.
+- [Skippy] Allow relative (from the project root) to `affected_projects.txt` and allow non-existent files as a value. This makes it easy to gracefully fall back in CI.
 - [Skippy] Fix logging path matchers missing toString() impls.
 - [SKippy] Log verbosely in debug mode when skipping task deps.
 - Update oshi to `6.4.1`.
