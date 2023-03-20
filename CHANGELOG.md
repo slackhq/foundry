@@ -1,6 +1,26 @@
 Changelog
 =========
 
+0.7.1
+-----
+
+_2023-03-20_
+
+- [Skippy] Improve pattern configuration.
+  1. Make the default patterns public. This allows consumers to more
+     easily reuse them when customizing their own.
+  2. Use sets for the type to better enforce uniqueness requirements.
+  3. Add github actions to never-skip defaults.
+  4. Add excludePatterns to allow finer-grained control. This runs _after_
+     include filtering so that users can manually exclude certain files that
+     may otherwise be captured in an inclusion filter and is difficult to
+     describe in a simple glob pattern. GitHub action does similar controls
+     for CI matrices.
+- [Skippy] Allow relative project paths to `affected_projects.txt` and allow non-existent files as a value. This makes it easy to gracefully fall back in CI.
+- [Skippy] Fix logging path matchers missing toString() impls.
+- [SKippy] Log verbosely in debug mode when skipping task deps.
+- Update oshi to `6.4.1`.
+
 0.7.0
 -----
 
