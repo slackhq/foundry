@@ -27,6 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkip
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkipDebug
+import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterExcludes
 import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterIncludes
 import slack.gradle.util.SgpLogger
 
@@ -88,7 +89,7 @@ class AffectedProjectsComputerTest {
 
   @Test
   fun `smoke test for default include patterns`() {
-    val patterns = AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS
+    val patterns = AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
     val testInputs =
       mapOf(
         "foo/bar/baz/Example.kt" to true,
@@ -128,7 +129,7 @@ class AffectedProjectsComputerTest {
 
   @Test
   fun `smoke test for default never skip patterns`() {
-    val patterns = AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS.map(String::toPathMatcher)
+    val patterns = AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS.map(String::toPathMatcher)
     val testInputs =
       mapOf(
         "foo/bar/baz/Example.kt" to false,
@@ -166,6 +167,9 @@ class AffectedProjectsComputerTest {
         "nested/gradlew" to true,
         "gradlew.bat" to true,
         "nested/gradlew.bat" to true,
+        // GH Actions
+        ".github/workflows/ci.yml" to true,
+        ".github/ci.yml" to false,
       )
     for ((path, expectedToBeSkipped) in testInputs) {
       val okioPath = path.toPath()
@@ -178,6 +182,21 @@ class AffectedProjectsComputerTest {
         check(result == null) { "Expected $path to be skipped, but was not. Debug info: $result" }
       }
     }
+  }
+
+  @Test
+  fun excludeFilters() {
+    val patterns =
+      setOf(
+        "**/baz/**",
+      )
+    val testInputs =
+      mapOf(
+        "foo/bar/baz/Example.kt" to false,
+        "foo/bar/AndroidManifest.xml" to true,
+      )
+    assertThat(filterExcludes(testInputs.keys.map { it.toPath() }, patterns))
+      .containsExactlyElementsIn(testInputs.filterValues { it }.keys.map { it.toPath() })
   }
 
   // TODO

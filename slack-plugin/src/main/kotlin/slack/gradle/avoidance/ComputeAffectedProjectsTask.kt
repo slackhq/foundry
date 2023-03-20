@@ -24,8 +24,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -35,6 +35,9 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
+import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
+import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
+import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 
 /**
@@ -55,16 +58,16 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     project.objects.property(Boolean::class.java).convention(false)
 
   @get:Input
-  public val includePatterns: ListProperty<String> =
-    project.objects
-      .listProperty(String::class.java)
-      .convention(AffectedProjectsComputer.DEFAULT_INCLUDE_PATTERNS)
+  public val includePatterns: SetProperty<String> =
+    project.objects.setProperty<String>().convention(DEFAULT_INCLUDE_PATTERNS)
 
   @get:Input
-  public val neverSkipPatterns: ListProperty<String> =
-    project.objects
-      .listProperty(String::class.java)
-      .convention(AffectedProjectsComputer.DEFAULT_NEVER_SKIP_PATTERNS)
+  public val excludePatterns: SetProperty<String> =
+    project.objects.setProperty<String>().convention(emptySet())
+
+  @get:Input
+  public val neverSkipPatterns: SetProperty<String> =
+    project.objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
@@ -131,6 +134,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
               }
             },
             includePatterns = includePatterns.get(),
+            excludePatterns = excludePatterns.get(),
             neverSkipPatterns = neverSkipPatterns.get(),
             debug = debug.get(),
             diagnostics = this,
