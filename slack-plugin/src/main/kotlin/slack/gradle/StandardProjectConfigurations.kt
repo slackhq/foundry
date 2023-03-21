@@ -73,6 +73,7 @@ import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompile
+import slack.gradle.util.sneakyNull
 
 private const val LOG = "SlackPlugin:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -839,6 +840,7 @@ internal class StandardProjectConfigurations(
       tasks.configureEach<Detekt> {
         jvmTarget = actualJvmTarget
         exclude("**/build/**")
+        jdkHome.set(sneakyNull<File>())
       }
     }
 
