@@ -132,6 +132,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = optionalStringProperty("slack.compose.android.defaultBundleAlias")
 
   /**
+   * Enables live literals. Note that they are disabled by default due to
+   * https://issuetracker.google.com/issues/274207650 and
+   * https://issuetracker.google.com/issues/274231394.
+   */
+  public val composeEnableLiveLiterals: Boolean
+    get() = booleanProperty("slack.compose.android.enableLiveLiterals", false)
+
+  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *

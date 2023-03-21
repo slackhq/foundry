@@ -650,7 +650,7 @@ public abstract class ComposeHandler
 constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
-  slackProperties: SlackProperties,
+  private val slackProperties: SlackProperties,
   versionCatalog: VersionCatalog
 ) {
 
@@ -680,7 +680,11 @@ constructor(
         }
       extension.apply {
         buildFeatures { compose = true }
-        composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+        composeOptions {
+          kotlinCompilerExtensionVersion = composeCompilerVersion
+          // Disable live literals by default
+          useLiveLiterals = slackProperties.composeEnableLiveLiterals
+        }
       }
     }
   }
