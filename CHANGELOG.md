@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.7.2
+-----
+
+_2023-03-21_
+
+- Disable Live Literals in Compose by default due to multiple issues. They can be enabled via `-Pslack.compose.android.enableLiveLiterals=true`.
+  - Poor runtime performance: https://issuetracker.google.com/issues/274207650.
+  - Non-deterministic class files breaking build cache: https://issuetracker.google.com/issues/274231394.
+- [Skippy] Add `.github/actions/**` to default never skip filters.
+
 0.7.1
 -----
 
