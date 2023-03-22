@@ -30,9 +30,9 @@ import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
+import slack.gradle.capitalizeUS
 import slack.gradle.configure
 import slack.gradle.getByType
-import slack.gradle.safeCapitalize
 
 internal object LintTasks {
   private const val GLOBAL_CI_LINT_TASK_NAME = "globalCiLint"
@@ -142,7 +142,7 @@ internal object LintTasks {
         // task configuration time.
         variants.splitToSequence(',').forEach { variant ->
           logger.debug("$LOG Using variant $variant for ciLint task")
-          val lintTaskName = "lint${variant.safeCapitalize()}"
+          val lintTaskName = "lint${variant.capitalizeUS()}"
           dependsOn(lintTaskName)
         }
       }
@@ -163,7 +163,7 @@ internal object LintTasks {
         else -> error("No AndroidComponentsExtension found for project ${project.path}")
       }
     componentsExtension.onVariants { variant ->
-      val lintTaskName = "lint${variant.name.safeCapitalize()}"
+      val lintTaskName = "lint${variant.name.capitalizeUS()}"
       project.logger.debug("$LOG Adding $lintTaskName to ciLint task")
       ciLintTask.configure {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at

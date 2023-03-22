@@ -56,13 +56,13 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.capitalizeUS
 import slack.gradle.configure
 import slack.gradle.convertProjectPathToAccessor
 import slack.gradle.dependsOn
 import slack.gradle.getByType
 import slack.gradle.namedLazy
 import slack.gradle.register
-import slack.gradle.safeCapitalize
 import slack.gradle.util.JsonTools
 import slack.gradle.util.mapToBoolean
 
@@ -227,13 +227,13 @@ public object ModuleStatsTasks {
               if (multiVariant) {
                 val defaultBuildType = extension.buildTypes.find { it.isDefault }?.name ?: "debug"
                 val defaultFlavor = extension.productFlavors.find { it.isDefault }?.name ?: ""
-                "$defaultFlavor${defaultBuildType.safeCapitalize()}"
+                "$defaultFlavor${defaultBuildType.capitalizeUS()}"
               } else {
                 "release"
               }
 
             if (includeGenerated && locTask != null) {
-              project.namedLazy<Task>("compile${targetVariant.safeCapitalize()}Sources") {
+              project.namedLazy<Task>("compile${targetVariant.capitalizeUS()}Sources") {
                 locTask.dependsOn(it)
               }
             }
