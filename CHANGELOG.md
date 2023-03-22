@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.7.3
+-----
+
+_2023-03-22_
+
+- Set `Detekt.jdkHome` to null to avoid https://github.com/detekt/detekt/issues/5925.
+- Rename `String.safeCapitalize()` to `String.capitalizeUS()` to make it more explicit.
+
 0.7.2
 -----
 
