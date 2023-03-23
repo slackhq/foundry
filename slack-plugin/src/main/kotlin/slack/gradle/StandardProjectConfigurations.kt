@@ -510,7 +510,7 @@ internal class StandardProjectConfigurations(
 
     pluginManager.withPlugin("com.android.test") {
       configure<TestExtension> {
-        slackExtension.androidExtension = this
+        slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
         LintTasks.configureSubProject(
@@ -549,7 +549,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<BaseAppModuleExtension> {
-        slackExtension.androidExtension = this
+        slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
@@ -760,7 +760,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
-        slackExtension.androidExtension = this
+        slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         LintTasks.configureSubProject(
           project,
