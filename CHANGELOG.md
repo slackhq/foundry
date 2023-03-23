@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.7.4
+-----
+
+_2023-03-22_
+
+- Don't expose `androidExtension` publicly in `SlackExtension` to avoid Gradle mismatching number of type arguments in AGP 8.1.0-alpha10+.
+
 0.7.3
 -----
 
