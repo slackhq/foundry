@@ -33,9 +33,6 @@ import com.bugsnag.android.gradle.BugsnagPluginExtension
 import com.google.common.base.CaseFormat
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import net.ltgt.gradle.errorprone.CheckSeverity
@@ -67,13 +64,13 @@ import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompile
-import slack.gradle.util.sneakyNull
 
 private const val LOG = "SlackPlugin:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -811,38 +808,13 @@ internal class StandardProjectConfigurations(
         jvmTargetVersion.toString()
       }
 
-    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-      // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
-      configure<DetektExtension> {
-        buildUponDefaultConfig = true
-        toolVersion =
-          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
-        rootProject.file("config/detekt/detekt.yml")
-        slackProperties.detektConfigs?.let { configs ->
-          for (configFile in configs) {
-            config.from(rootProject.file(configFile))
-          }
-        }
-
-        slackProperties.detektBaseline?.let { baselineFile ->
-          baseline =
-            if (globalConfig.mergeDetektBaselinesTask != null) {
-              tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
-                globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
-              }
-              file("$buildDir/intermediates/detekt/baseline.xml")
-            } else {
-              file(rootProject.file(baselineFile))
-            }
-        }
-      }
-
-      tasks.configureEach<Detekt> {
-        jvmTarget = actualJvmTarget
-        exclude("**/build/**")
-        jdkHome.set(sneakyNull<File>())
-      }
-    }
+    DetektTasks.configureSubProject(
+      project,
+      slackProperties,
+      globalConfig.affectedProjects,
+      actualJvmTarget,
+      globalConfig.mergeDetektBaselinesTask,
+    )
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
