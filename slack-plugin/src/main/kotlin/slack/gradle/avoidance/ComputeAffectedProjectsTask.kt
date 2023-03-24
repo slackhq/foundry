@@ -194,13 +194,18 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     private const val LOG = "[Skippy]"
     private val DEFAULT_CONFIGURATIONS =
       setOf(
-        "api",
-        "implementation",
-        "ksp",
-        "testImplementation",
         "androidTestImplementation",
-        "compileOnly",
         "annotationProcessor",
+        "api",
+        "compileOnly",
+        "debugApi",
+        "debugImplementation",
+        "implementation",
+        "kapt",
+        "ksp",
+        "releaseApi",
+        "releaseImplementation",
+        "testImplementation",
       )
 
     fun register(
@@ -208,7 +213,14 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjectsTask> {
       val configurationsToLook by lazy {
-        slackProperties.affectedProjectConfigurations?.splitToSequence(',')?.toSet()
+        val providedConfigs = slackProperties.affectedProjectConfigurations
+        providedConfigs?.splitToSequence(',')?.toSet()?.let { providedConfigSet ->
+          if (slackProperties.buildUponDefaultAffectedProjectConfigurations) {
+            DEFAULT_CONFIGURATIONS + providedConfigSet
+          } else {
+            providedConfigSet
+          }
+        }
           ?: DEFAULT_CONFIGURATIONS
       }
 

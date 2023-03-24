@@ -445,6 +445,13 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = optionalStringProperty("slack.avoidance.affected-project-configurations")
 
   /**
+   * Flag to, when true, makes [affectedProjectConfigurations] build upon the defaults rather than
+   * replace them.
+   */
+  public val buildUponDefaultAffectedProjectConfigurations: Boolean
+    get() = booleanProperty("slack.avoidance.build-upon-default-affected-project-configurations")
+
+  /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
    * have at least one `.kt` source file.
    *
