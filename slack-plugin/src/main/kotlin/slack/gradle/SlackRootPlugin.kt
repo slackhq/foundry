@@ -29,10 +29,10 @@ import slack.executeBlocking
 import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
+import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CoreBootstrapTask
-import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.GjfDownloadTask
 import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
@@ -103,6 +103,7 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
     project.configureSlackRootBuildscript()
     LintTasks.configureRootProject(project)
+    DetektTasks.configureRootProject(project, slackProperties)
     project.configureMisc(slackProperties)
     UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
@@ -135,14 +136,6 @@ internal class SlackRootPlugin : Plugin<Project> {
       project.tasks.register<KtLintDownloadTask>("updateKtLint") {
         version.set(ktlintVersion)
         outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
-      }
-    }
-
-    // Add detekt download task
-    slackProperties.versions.detekt?.let { detektVersion ->
-      project.tasks.register<DetektDownloadTask>("updateDetekt") {
-        version.set(detektVersion)
-        outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
       }
     }
 
