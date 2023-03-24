@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.7.5
+-----
+
+_2023-03-24_
+
+- [Skippy] Add more default configurations.
+- [Skippy] Add `slack.avoidance.build-upon-default-affected-project-configurations` flag to make provided configurations build upon defaults.
+- Add new `globalDetekt` task that runs `detekt` on all subprojects. This is Skippy-compatible and responds to `slack.avoidance.affectedProjectsFile`.
+
 0.7.4
 -----
 
