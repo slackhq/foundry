@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.7.6
+-----
+
+_2023-03-25_
+
+- **Fix**: Apply matching configurations to `DetektCreateBaselineTask` tasks too due to https://github.com/detekt/detekt/issues/5940.
+
 0.7.5
 -----
 

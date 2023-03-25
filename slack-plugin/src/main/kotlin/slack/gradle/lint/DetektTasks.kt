@@ -102,6 +102,7 @@ internal object DetektTasks {
           null
         }
 
+      // Duplicate configs due to https://github.com/detekt/detekt/issues/5940
       project.tasks.configureEach<Detekt> {
         this.jvmTarget = jvmTarget
         exclude("**/build/**")
@@ -109,6 +110,11 @@ internal object DetektTasks {
 
         val detektTask = this
         globalTask?.configure { dependsOn(detektTask) }
+      }
+      project.tasks.configureEach<DetektCreateBaselineTask> {
+        this.jvmTarget = jvmTarget
+        exclude("**/build/**")
+        jdkHome.set(sneakyNull<File>())
       }
     }
   }
