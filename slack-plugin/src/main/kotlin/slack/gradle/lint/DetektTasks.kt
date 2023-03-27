@@ -108,13 +108,18 @@ internal object DetektTasks {
         exclude("**/build/**")
         jdkHome.set(sneakyNull<File>())
 
-        val detektTask = this
-        globalTask?.configure { dependsOn(detektTask) }
+        val taskEnabled = slackProperties.enableFullDetekt || name == "detekt"
+        enabled = taskEnabled
+        if (taskEnabled) {
+          val detektTask = this
+          globalTask?.configure { dependsOn(detektTask) }
+        }
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
         this.jvmTarget = jvmTarget
         exclude("**/build/**")
         jdkHome.set(sneakyNull<File>())
+        enabled = slackProperties.enableFullDetekt || name == "detektBaseline"
       }
     }
   }
