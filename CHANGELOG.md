@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.7.7
+-----
+
+_2023-03-27_
+
+- Add new `slack.detekt.full` property to gate whether or to run full detekt (i.e. with type resolution). If disabled, `detektRelease`/`detektMain` and associated tasks will be disabled and not used in `detektGlobal`.
+
 0.7.6
 -----
 
