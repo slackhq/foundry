@@ -808,13 +808,11 @@ internal class StandardProjectConfigurations(
         jvmTargetVersion.toString()
       }
 
-    DetektTasks.configureSubProject(
-      project,
-      slackProperties,
-      globalConfig.affectedProjects,
-      actualJvmTarget,
-      globalConfig.mergeDetektBaselinesTask,
-    )
+    val detektConfigured = AtomicBoolean()
+    // Must be outside the withType() block below because you can't apply new plugins in that block
+    if (slackProperties.autoApplyDetekt) {
+      project.pluginManager.apply("io.gitlab.arturbosch.detekt")
+    }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
       configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
@@ -905,6 +903,16 @@ internal class StandardProjectConfigurations(
               .trimIndent()
           )
         }
+      }
+
+      if (!detektConfigured.getAndSet(true)) {
+        DetektTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          actualJvmTarget,
+          globalConfig.mergeDetektBaselinesTask,
+        )
       }
     }
 

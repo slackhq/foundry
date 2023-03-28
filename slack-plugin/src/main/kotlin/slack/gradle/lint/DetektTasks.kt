@@ -17,14 +17,17 @@ package slack.gradle.lint
 
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.io.File
 import org.gradle.api.Project
+import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.configure
 import slack.gradle.configureEach
+import slack.gradle.isRootProject
 import slack.gradle.register
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
@@ -59,6 +62,9 @@ internal object DetektTasks {
     jvmTarget: String,
     mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
   ) {
+    check(!project.isRootProject) {
+      "This method should only be called for subprojects, not the root project."
+    }
     if (slackProperties.versions.detekt == null) return
 
     project.pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
@@ -79,7 +85,7 @@ internal object DetektTasks {
         slackProperties.detektBaseline?.let { baselineFile ->
           baseline =
             if (mergeDetektBaselinesTask != null) {
-              project.tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
+              project.tasks.configureEach<DetektCreateBaselineTask> {
                 mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
               }
               project.file("${project.buildDir}/intermediates/detekt/baseline.xml")
@@ -107,19 +113,26 @@ internal object DetektTasks {
         this.jvmTarget = jvmTarget
         exclude("**/build/**")
         jdkHome.set(sneakyNull<File>())
-
-        val taskEnabled = slackProperties.enableFullDetekt || name == "detekt"
-        enabled = taskEnabled
-        if (taskEnabled) {
-          val detektTask = this
-          globalTask?.configure { dependsOn(detektTask) }
-        }
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
         this.jvmTarget = jvmTarget
         exclude("**/build/**")
         jdkHome.set(sneakyNull<File>())
-        enabled = slackProperties.enableFullDetekt || name == "detektBaseline"
+      }
+
+      // Wire up to the global task
+      globalTask?.configure {
+        // We use a filter on Detekt tasks because not every project actually makes one!
+        val taskSpec =
+          if (slackProperties.enableFullDetekt) {
+            // Depend on all Detekt tasks with type resolution
+            // The "detekt" task is excluded because it is a plain, non-type-resolution version
+            Spec<Detekt> { it.name != DetektPlugin.DETEKT_TASK_NAME }
+          } else {
+            // Depend _only_ on the "detekt plain" task, which runs without type resolution
+            Spec<Detekt> { it.name == DetektPlugin.DETEKT_TASK_NAME }
+          }
+        dependsOn(project.tasks.withType(Detekt::class.java).matching(taskSpec))
       }
     }
   }

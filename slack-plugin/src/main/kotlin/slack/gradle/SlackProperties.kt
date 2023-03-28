@@ -431,7 +431,7 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Detekt baseline file, evaluated from rootProject.file(...). */
   public val detektBaseline: String?
     get() = optionalStringProperty("slack.detekt.baseline")
-  /** Enables full detekt mode (with type resolution). Off by default due to performance issues.. */
+  /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
   public val enableFullDetekt: Boolean
     get() = booleanProperty("slack.detekt.full")
 

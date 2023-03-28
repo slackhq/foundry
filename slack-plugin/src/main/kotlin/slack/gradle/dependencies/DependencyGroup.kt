@@ -40,7 +40,7 @@ public abstract class DependencyGroup(
    * ```
    */
   internal val groupGradleProperty by lazy {
-    gradleProperty ?: this::class.simpleName!!.toLowerCase(Locale.US)
+    gradleProperty ?: this::class.simpleName!!.lowercase(Locale.US)
   }
 
   internal constructor(

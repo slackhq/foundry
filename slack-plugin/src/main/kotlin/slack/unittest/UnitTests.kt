@@ -28,6 +28,7 @@ import org.gradle.kotlin.dsl.retry
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.ciUnitTestAndroidVariant
+import slack.gradle.configureEach
 import slack.gradle.isActionsCi
 import slack.gradle.isCi
 import slack.gradle.util.synchronousEnvProperty
@@ -151,7 +152,7 @@ internal object UnitTests {
     val isCi = project.isCi
 
     // Unit test task configuration
-    project.tasks.withType(Test::class.java).configureEach {
+    project.tasks.configureEach<Test> {
       // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
       // CPUs.
       maxParallelForks =
