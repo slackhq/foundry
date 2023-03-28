@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.7.8
+-----
+
+_2023-03-28_
+
+- **Fix**: Add missing `detekt` task dependencies for `globalDetekt`.
+- **Fix**: Only apply detekt config once (even if multiple Kotlin plugins are applied).
+
 0.7.7
 -----
 
