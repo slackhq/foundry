@@ -179,12 +179,32 @@ internal class AffectedProjectsComputer(
         }
     }
 
-    val projectsToDependencies: Map<String, Set<String>> =
-      logTimedValue("computing dependencies") {
-        dependencyGraph().nodes().associate { node ->
+    val resolvedDependencyGraph = logTimedValue("resolving graph") { dependencyGraph() }
+
+    val shallowProjectsToDependencies: Map<String, Set<String>> =
+      logTimedValue("computing shallow dependencies") {
+        resolvedDependencyGraph.nodes().associate { node ->
           val dependencies = mutableSetOf<DependencyGraph.Node>()
           node.visitDependencies(dependencies)
           node.key to dependencies.mapTo(mutableSetOf()) { it.key }
+        }
+      }
+
+    diagnostics.write("shallowProjectsToDependencies.txt") {
+      buildString {
+        for ((project, dependencies) in shallowProjectsToDependencies.toSortedMap()) {
+          appendLine(project)
+          for (dep in dependencies.sorted()) {
+            appendLine("-> $dep")
+          }
+        }
+      }
+    }
+
+    val projectsToDependencies =
+      logTimedValue("computing full dependencies") {
+        shallowProjectsToDependencies.mapValues { (project, _) ->
+          getAllDependencies(project, shallowProjectsToDependencies)
         }
       }
 
@@ -227,7 +247,7 @@ internal class AffectedProjectsComputer(
 
     val allRequiredProjects =
       allAffectedProjects
-        .flatMapTo(mutableSetOf()) { project ->
+        .flatMap { project ->
           val dependencies = projectsToDependencies[project].orEmpty()
           dependencies + project
         }
@@ -331,6 +351,29 @@ internal class AffectedProjectsComputer(
       neverSkipPathMatchers: List<PathMatcher>
     ): Map<Path, PathMatcher?> =
       filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
+
+    /** Returns a deep set of all dependencies for the given [project], including transitive. */
+    // TODO future optimization could be to include previously-computed project dependencies as a
+    //  cache.
+    internal fun getAllDependencies(
+      project: String,
+      projectsToDependencies: Map<String, Set<String>>,
+      includeSelf: Boolean = false,
+    ): Set<String> {
+      val result = mutableSetOf<String>()
+      fun addDependent(project: String) {
+        if (result.add(project)) {
+          projectsToDependencies[project]?.forEach(::addDependent)
+        }
+      }
+
+      addDependent(project)
+
+      if (!includeSelf) {
+        result.remove(project)
+      }
+      return result
+    }
   }
 }
 

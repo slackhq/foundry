@@ -199,6 +199,57 @@ class AffectedProjectsComputerTest {
       .containsExactlyElementsIn(testInputs.filterValues { it }.keys.map { it.toPath() })
   }
 
+  @Test
+  fun getAllDependencies() {
+    val projectsToDependencies =
+      mapOf(
+        ":test" to
+          setOf(
+            ":lib1",
+            ":lib2",
+            ":lib3",
+          ),
+        // Transitive dep on lib4
+        ":lib1" to
+          setOf(
+            ":lib4",
+          ),
+        // Recursive dep on test
+        ":lib2" to
+          setOf(
+            ":test",
+          ),
+        // Recursive dep on lib1
+        ":lib4" to
+          setOf(
+            ":lib1",
+          ),
+        // Unused projects
+        ":lib5" to
+          setOf(
+            ":lib6",
+          ),
+        // Unused project depends on used one.
+        ":lib7" to
+          setOf(
+            ":lib1",
+          ),
+      )
+
+    val allRequiredProjects =
+      AffectedProjectsComputer.getAllDependencies(":test", projectsToDependencies)
+    assertThat(allRequiredProjects).containsExactly(":lib1", ":lib2", ":lib3", ":lib4")
+
+    val allRequiredProjectsWithSelf =
+      AffectedProjectsComputer.getAllDependencies(
+        ":test",
+        projectsToDependencies,
+        includeSelf = true
+      )
+    assertThat(allRequiredProjectsWithSelf)
+      .containsExactly(":test", ":lib1", ":lib2", ":lib3", ":lib4")
+  }
+
   // TODO
   //  - Debug logging
   //  - Include filters
