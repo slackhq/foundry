@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.7.9
+-----
+
+_2023-04-01_
+
+Happy April Fool's Day!
+
+- [Skippy] Recursively resolve project dependencies to avoid missing transitive edges in the graph. Previously we only computed shallow dependencies.
+
 0.7.8
 -----
 
