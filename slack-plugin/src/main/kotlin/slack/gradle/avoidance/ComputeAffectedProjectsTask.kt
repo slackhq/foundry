@@ -202,6 +202,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
         "debugImplementation",
         "implementation",
         "kapt",
+        "kotlinCompilerPluginClasspath",
         "ksp",
         "releaseApi",
         "releaseImplementation",
