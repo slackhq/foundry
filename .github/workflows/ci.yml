@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         ci_java_version: ['19']
-        ci_kotlin_version: ['1.8.20-RC']
+        ci_kotlin_version: ['1.8.20']
         ci_agp_version: ['7.4.0', '8.0.0-beta01', '8.1.0-alpha01']
     env:
       DEP_OVERRIDES: 'true'
