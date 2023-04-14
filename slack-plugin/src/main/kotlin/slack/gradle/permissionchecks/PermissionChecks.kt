@@ -25,9 +25,9 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.configure
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.agp.VariantConfiguration
+import slack.gradle.configure
 import slack.gradle.tasks.CheckManifestPermissionsTask
 
 // TODO simplify this now that it's no longer in AgpHandler
@@ -60,7 +60,7 @@ internal object PermissionChecks {
           out CheckManifestPermissionsTask
         >
   ) {
-    project.extensions.configure<ApplicationAndroidComponentsExtension> {
+    project.configure<ApplicationAndroidComponentsExtension> {
       onVariants { variant ->
         allowListActionGetter()?.let { allowListAction ->
           val configurer = DefaultPermissionAllowlistConfigurer(variant)

@@ -29,6 +29,7 @@ import java.time.format.DateTimeParseException
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.Throws
+import org.gradle.api.logging.Logger
 import slack.cli.AppleSiliconCompat.Arch
 import slack.cli.AppleSiliconCompat.Arch.ARM64
 import slack.cli.AppleSiliconCompat.Arch.X86_64
@@ -53,9 +54,9 @@ internal interface ThermalsWatcher {
   fun stop(): Thermals
 
   companion object {
-    operator fun invoke(thermalsFileProvider: () -> File): ThermalsWatcher {
+    operator fun invoke(logger: Logger, thermalsFileProvider: () -> File): ThermalsWatcher {
       return when (val arch = Arch.get()) {
-        ARM64 -> AppleSiliconThermals(thermalsFileProvider)
+        ARM64 -> AppleSiliconThermals(logger, thermalsFileProvider)
         X86_64 -> IntelThermalsParser(thermalsFileProvider)
         else -> throw IllegalStateException("Unsupported architecture: $arch")
       }
@@ -265,6 +266,7 @@ public data class ThermLog(
 }
 
 internal class AppleSiliconThermals(
+  private val logger: Logger,
   private val thermalsFileProvider: () -> File,
 ) : ThermalsWatcher {
 
@@ -294,7 +296,9 @@ internal class AppleSiliconThermals(
               },
           )
         }
-        .filter { it.speedLimit != -1 }
+        // TODO we should try to better understand this issue, but for now let's stop trying to
+        //  track if it fails.
+        .takeUntil { it.speedLimit == -1 }
         .doOnNext { thermalsFile?.appendText("\n${it.timestamp} - ${it.speedLimit}") }
         .scanWith<Thermals>({ Thermals.Empty }) { acc, next ->
           when (acc) {
@@ -309,11 +313,12 @@ internal class AppleSiliconThermals(
             }
 
             override fun onError(e: Throwable) {
-              System.err.println("Error in thermals watcher:\n${e.stackTraceToString()}")
+              logger.error("Error in thermals watcher:\n${e.stackTraceToString()}")
             }
 
             override fun onComplete() {
-              // Nothing to do
+              // If we completed then we received an unknown state.
+              logger.error("Could not read thermals for this build.")
             }
           }
         )
@@ -335,7 +340,16 @@ internal class AppleSiliconThermals(
   }
 
   private fun getThermalState(): ThermalState? {
-    val rawValue = JnaThermalState.INSTANCE.thermal_state()
+    val rawValue =
+      try {
+        JnaThermalState.INSTANCE.thermal_state()
+      } catch (t: Throwable) {
+        // If Gradle is misconfigured, this will fail to load and result in a massive cascading
+        // stacktrace to RxJava that's more or less incomprehensible to read. Instead, we'll
+        // just swallow the exception and log an error.
+        logger.error("Could not read thermals state: ${t.message}")
+        return null
+      }
     // Raw value in this case is 0-4, which we use as the ordinal of our enums for convenience
     return if (rawValue in 0..ThermalState.values().size) {
       ThermalState.values()[rawValue]

@@ -47,11 +47,6 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.kotlin.dsl.listProperty
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.property
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import oshi.SystemInfo
 import slack.cli.AppleSiliconCompat
@@ -60,6 +55,10 @@ import slack.gradle.SlackProperties
 import slack.gradle.isCi
 import slack.gradle.isRootProject
 import slack.gradle.jdkVersion
+import slack.gradle.listProperty
+import slack.gradle.property
+import slack.gradle.register
+import slack.gradle.serviceOf
 import slack.gradle.tasks.BootstrapPropertiesMode.APPEND
 import slack.gradle.tasks.BootstrapPropertiesMode.LOG
 import slack.gradle.tasks.BootstrapUtils.DaemonArgsProvider
@@ -324,7 +323,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
     internal fun configureSubprojectBootstrapTasks(project: Project) {
       if (!isBootstrapEnabled(project)) return
-      val rootTask = project.rootProject.tasks.named<CoreBootstrapTask>(NAME)
+      val rootTask = project.rootProject.tasks.named(NAME, CoreBootstrapTask::class.java)
       // Clever trick to make this finalized by all bootstrap tasks and all other tasks depend on
       // this, so bootstrap always runs first.
       project.tasks.configureEach {

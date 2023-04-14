@@ -31,7 +31,6 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.registerIfAbsent
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
@@ -39,6 +38,7 @@ import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
 import slack.gradle.util.mapToBoolean
+import slack.gradle.util.shutdown
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
 public abstract class SlackTools @Inject constructor(providers: ProviderFactory) :
@@ -64,7 +64,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       !parameters.cleanRequested.get() &&
       providers.gradleProperty(SlackProperties.LOG_THERMALS).mapToBoolean().getOrElse(false)
 
-  private val thermalsWatcher = if (logThermals) ThermalsWatcher(::thermalsFile) else null
+  private val thermalsWatcher = if (logThermals) ThermalsWatcher(logger, ::thermalsFile) else null
   private var thermalsAtClose: Thermals? = null
 
   /** Returns the current or latest captured thermals log. */
@@ -115,11 +115,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       logger.error("Failed to report thermals", t)
     } finally {
       if (okHttpClient.isInitialized()) {
-        with(okHttpClient.value) {
-          dispatcher.executorService.shutdown()
-          connectionPool.evictAll()
-          cache?.close()
-        }
+        okHttpClient.value.shutdown()
       }
     }
   }
@@ -132,7 +128,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       okHttpClient: Lazy<OkHttpClient>,
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
-        .registerIfAbsent(SERVICE_NAME, SlackTools::class) {
+        .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
           parameters.thermalsOutputFile.set(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )

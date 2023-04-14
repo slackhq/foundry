@@ -132,6 +132,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = optionalStringProperty("slack.compose.android.defaultBundleAlias")
 
   /**
+   * Enables live literals. Note that they are disabled by default due to
+   * https://issuetracker.google.com/issues/274207650 and
+   * https://issuetracker.google.com/issues/274231394.
+   */
+  public val composeEnableLiveLiterals: Boolean
+    get() = booleanProperty("slack.compose.android.enableLiveLiterals", false)
+
+  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *
@@ -236,6 +244,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintUpdateBaselines: Boolean
     get() = booleanProperty("slack.lint.update-baselines")
 
+  /** File name to use for a project's lint baseline. */
+  public val lintBaselineFileName: String
+    get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
+
   /** Flag to enable/disable KSP. */
   public val allowKsp: Boolean
     get() = booleanProperty("slack.allow-ksp")
@@ -281,6 +293,44 @@ public class SlackProperties private constructor(private val project: Project) {
   public val ciUnitTestVariant: String
     get() = stringProperty("slack.ci-unit-test.variant", "release")
 
+  /** If enabled, applies the kotlinx-kover plugin to projects using ciUnitTest. */
+  public val ciUnitTestEnableKover: Boolean
+    get() = booleanProperty("slack.ci-unit-test.enableKover", false)
+
+  /**
+   * Parallelism multiplier to use for unit tests. This should be a float value that is multiplied
+   * by the number of cores. The value can be a fraction. Default is 0.5.
+   */
+  public val unitTestParallelismMultiplier: Float
+    get() {
+      val rawValue = stringProperty("slack.unit-test.parallelismMultiplier", "0.5")
+      val floatValue = rawValue.toFloatOrNull()
+      require(floatValue != null && floatValue > 0) {
+        "Invalid value for slack.unit-test.parallelismMultiplier: '$rawValue'"
+      }
+      return floatValue
+    }
+
+  /** Controls how often to fork the JVM in unit tests. Default is 1000. */
+  public val unitTestForkEvery: Long
+    get() = intProperty("slack.unit-test.forkEvery", 1000).toLong()
+
+  /**
+   * Flag to enable ciLint on a project. Default is true.
+   *
+   * When enabled, a task named "ciLint" will be created in this project, which will depend on the
+   * all the lint tasks in the project.
+   */
+  public val ciLintEnabled: Boolean
+    get() = booleanProperty("slack.ci-lint.enable", defaultValue = true)
+
+  /**
+   * Comma-separated list of CI lint variants to run (Android only). Default when unspecified will
+   * lint all variants.
+   */
+  public val ciLintVariants: String?
+    get() = optionalStringProperty("slack.ci-lint.variants")
+
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
@@ -317,6 +367,13 @@ public class SlackProperties private constructor(private val project: Project) {
    */
   public val gitIgnoreRevsFile: File?
     get() = fileProperty("slack.git.ignoreRevsFile")
+
+  /**
+   * Optional file location for an `affected_projects.txt` file that contains a list of projects
+   * affected in this build.
+   */
+  public val affectedProjects: File?
+    get() = fileProperty("slack.avoidance.affectedProjectsFile")
 
   /* Controls for Java/JVM/JDK versions uses in compilations and execution of tests. */
 
@@ -374,10 +431,28 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Detekt baseline file, evaluated from rootProject.file(...). */
   public val detektBaseline: String?
     get() = optionalStringProperty("slack.detekt.baseline")
+  /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
+  public val enableFullDetekt: Boolean
+    get() = booleanProperty("slack.detekt.full")
 
   /** Comma-separated set of projects to ignore in sorting dependencies. */
   public val sortDependenciesIgnore: String?
     get() = optionalStringProperty("slack.sortDependencies.ignore")
+
+  /** Enables verbose debug logging across the plugin. */
+  public val debug: Boolean
+    get() = booleanProperty("slack.debug", defaultValue = false)
+
+  /** A comma-separated list of configurations to use in affected project detection. */
+  public val affectedProjectConfigurations: String?
+    get() = optionalStringProperty("slack.avoidance.affected-project-configurations")
+
+  /**
+   * Flag to, when true, makes [affectedProjectConfigurations] build upon the defaults rather than
+   * replace them.
+   */
+  public val buildUponDefaultAffectedProjectConfigurations: Boolean
+    get() = booleanProperty("slack.avoidance.build-upon-default-affected-project-configurations")
 
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects
@@ -412,6 +487,18 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Branch pattern for git branches Bugsnag should be enabled on. */
   public val bugsnagEnabledBranchPattern: Provider<String>
     get() = project.optionalStringProvider("slack.gradle.config.bugsnag.enabledBranchPattern")
+
+  /** Global boolean that controls whether mod score is enabled on this project. */
+  public val modScoreGlobalEnabled: Boolean
+    get() = project.booleanProperty("slack.gradle.config.modscore.enabled")
+
+  /**
+   * Per-project boolean that allows for excluding this project from mod score.
+   *
+   * Note this should only be applied to projects that cannot be depended on.
+   */
+  public val modScoreIgnore: Boolean
+    get() = project.booleanProperty("slack.gradle.config.modscore.ignore")
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")

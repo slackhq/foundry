@@ -15,6 +15,8 @@
  */
 package slack.gradle.tasks
 
+import org.gradle.api.tasks.UntrackedTask
+
 /**
  * Downloads the Sort Dependencies binary from maven central.
  *
@@ -23,6 +25,7 @@ package slack.gradle.tasks
  *     ./gradlew updateSortDependencies
  * ```
  */
+@UntrackedTask(because = "These are one-off, on-demand download tasks")
 internal abstract class SortDependenciesDownloadTask :
   BaseDownloadTask(
     targetName = "Sort Dependencies",

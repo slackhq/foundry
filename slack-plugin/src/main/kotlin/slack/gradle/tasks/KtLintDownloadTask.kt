@@ -15,6 +15,8 @@
  */
 package slack.gradle.tasks
 
+import org.gradle.api.tasks.UntrackedTask
+
 /**
  * Downloads the KtLint binary from its GitHub releases.
  *
@@ -23,6 +25,7 @@ package slack.gradle.tasks
  *     ./gradlew updateKtLint
  * ```
  */
+@UntrackedTask(because = "These are one-off, on-demand download tasks")
 internal abstract class KtLintDownloadTask :
   BaseDownloadTask(
     targetName = "KtLint",

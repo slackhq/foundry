@@ -15,11 +15,14 @@
  */
 package slack.gradle.tasks.robolectric
 
+import java.io.Serializable
+
+// Serializable for Gradle use
 internal data class DependencyJar(
   val groupId: String,
   val artifactId: String,
   val version: String,
   val classifier: String? = null
-) {
+) : Serializable {
   val name: String = "$artifactId-$version.jar"
 }

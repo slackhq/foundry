@@ -18,7 +18,6 @@ package slack.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
 import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 
@@ -28,7 +27,8 @@ private constructor(
   internal val updateRobolectricJarsTask: TaskProvider<UpdateRobolectricJarsTask>,
   internal val mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
   internal val kotlinDaemonArgs: List<String>,
-  internal val errorProneCheckNamesAsErrors: List<String>
+  internal val errorProneCheckNamesAsErrors: List<String>,
+  internal val affectedProjects: Set<String>?
 ) {
 
   internal companion object {
@@ -52,7 +52,20 @@ private constructor(
         mergeDetektBaselinesTask = mergeDetektBaselinesTask,
         kotlinDaemonArgs = globalSlackProperties.kotlinDaemonArgs.split(" "),
         errorProneCheckNamesAsErrors =
-          globalSlackProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty()
+          globalSlackProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty(),
+        affectedProjects =
+          globalSlackProperties.affectedProjects?.let {
+            // Resolve from the project. This allows it to either be an absolute path or a relative
+            // one from the root project.
+            val resolved = project.file(it)
+            // Check file existence. This way we can allow specifying the property even if it
+            // doesn't exist, which can be more convenient in CI pipelines.
+            if (resolved.exists()) {
+              resolved.readLines().toSet()
+            } else {
+              null
+            }
+          }
       )
     }
   }

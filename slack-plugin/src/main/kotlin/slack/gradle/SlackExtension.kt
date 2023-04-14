@@ -28,14 +28,6 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.domainObjectSet
-import org.gradle.kotlin.dsl.newInstance
-import org.gradle.kotlin.dsl.property
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
@@ -65,12 +57,16 @@ constructor(
    * this instance. Ideally we could eventually remove this if/when AGP finally makes these
    * properties lazy.
    */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
-      androidHandler.androidExtension = value
-      featuresHandler.androidExtension = value
+      androidHandler.setAndroidExtension(value)
+      featuresHandler.setAndroidExtension(value)
     }
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>) {
+    this.androidExtension = androidExtension
+  }
 
   public fun android(action: Action<AndroidHandler>) {
     action.execute(androidHandler)
@@ -262,7 +258,7 @@ constructor(
       }
 
       if (featuresHandler.redacted.getOrElse(false)) {
-        apply(plugin = "dev.zacsweers.redacted")
+        pluginManager.apply("dev.zacsweers.redacted")
       }
 
       if (featuresHandler.moshiHandler.moshi.getOrElse(false)) {
@@ -367,11 +363,15 @@ constructor(
     objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
   /** @see [SlackExtension.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
-      composeHandler.androidExtension = value
+      composeHandler.setAndroidExtension(value)
     }
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   /**
    * Enables dagger for this project.
@@ -587,7 +587,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
   internal val runtimeOnly: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val alwaysEnableAnvilComponentMerging: Property<Boolean> =
     objects.property<Boolean>().convention(false)
-  internal val anvilGenerators = objects.domainObjectSet(Any::class)
+  internal val anvilGenerators = objects.domainObjectSet<Any>()
 
   /**
    * Dependencies for Anvil generators that should be added. These should be in the same form as
@@ -658,7 +658,7 @@ public abstract class ComposeHandler
 constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
-  slackProperties: SlackProperties,
+  private val slackProperties: SlackProperties,
   versionCatalog: VersionCatalog
 ) {
 
@@ -674,7 +674,11 @@ constructor(
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   /** @see [AndroidHandler.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   internal fun enable(multiplatform: Boolean) {
     enabled.set(true)
@@ -688,7 +692,11 @@ constructor(
         }
       extension.apply {
         buildFeatures { compose = true }
-        composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+        composeOptions {
+          kotlinCompilerExtensionVersion = composeCompilerVersion
+          // Disable live literals by default
+          useLiveLiterals = slackProperties.composeEnableLiveLiterals
+        }
       }
     }
   }
@@ -698,13 +706,13 @@ constructor(
       if (!multiplatform.get()) {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       } else {
-        project.apply(plugin = "org.jetbrains.compose")
+        project.pluginManager.apply("org.jetbrains.compose")
         project.configure<ComposeExtension> {
           kotlinCompilerPlugin.set(
             dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
           )
         }
-        project.dependencies {
+        project.dependencies.apply {
           val composeCompilerVersion =
             slackProperties.versions.composeCompiler
               ?: error("Missing `compose-compiler` version in catalog")
@@ -733,11 +741,15 @@ constructor(
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [SlackExtension.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
-      featuresHandler.androidExtension = value
+      featuresHandler.setAndroidExtension(value)
     }
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   public fun features(action: Action<AndroidFeaturesHandler>) {
     action.execute(featuresHandler)
@@ -755,21 +767,13 @@ constructor(
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       if (featuresHandler.robolectric.getOrElse(false)) {
-        project.dependencies {
+        project.dependencies.apply {
           // For projects using robolectric, we want to make sure they include robolectric-core to
           // ensure robolectric uses our custom dependency resolver and config (which just need
           // to be on the classpath).
           add("testImplementation", SlackDependencies.Testing.Robolectric.annotations)
           add("testImplementation", SlackDependencies.Testing.Robolectric.robolectric)
           add("testImplementation", slackProperties.robolectricCoreProject)
-        }
-        // Robolectric 4.9+ requires these --add-opens options.
-        // https://github.com/robolectric/robolectric/issues/7456
-        project.tasks.withType<Test>().configureEach {
-          jvmArgs(
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.base/java.util=ALL-UNNAMED",
-          )
         }
       }
     }
@@ -784,7 +788,11 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val robolectric: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   /**
    * Enables android instrumentation tests for this project.

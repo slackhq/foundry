@@ -21,8 +21,8 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
-import slack.gradle.safeCapitalize
+import slack.gradle.capitalizeUS
+import slack.gradle.register
 
 /**
  * A task that writes runtime dependency info found in [identifiersToVersions].
@@ -67,7 +67,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
       configuration: Configuration
     ): TaskProvider<PrintFossaDependencies> {
       return project.tasks.register<PrintFossaDependencies>(
-        "print${name.safeCapitalize()}FossaDependencies"
+        "print${name.capitalizeUS()}FossaDependencies"
       ) {
         outputFile.set(project.layout.buildDirectory.file("reports/slack/fossa/$name.txt"))
         configureIdentifiersToVersions(configuration)

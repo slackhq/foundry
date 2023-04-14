@@ -24,9 +24,9 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
+import slack.gradle.capitalizeUS
 import slack.gradle.getVersionsCatalog
-import slack.gradle.safeCapitalize
+import slack.gradle.register
 
 /**
  * A task that checks expected versions (from [mappedIdentifiersToVersions]) against runtime
@@ -87,7 +87,7 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
       configuration: Configuration
     ): TaskProvider<CheckDependencyVersionsTask> {
       return project.tasks.register<CheckDependencyVersionsTask>(
-        "check${name.safeCapitalize()}Versions"
+        "check${name.capitalizeUS()}Versions"
       ) {
         configureIdentifiersToVersions(configuration)
         outputFile.set(

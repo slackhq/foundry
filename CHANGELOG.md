@@ -1,6 +1,224 @@
 Changelog
 =========
 
+0.7.9
+-----
+
+_2023-04-01_
+
+Happy April Fool's Day!
+
+- [Skippy] Recursively resolve project dependencies to avoid missing transitive edges in the graph. Previously we only computed shallow dependencies.
+
+0.7.8
+-----
+
+_2023-03-28_
+
+- **Fix**: Add missing `detekt` task dependencies for `globalDetekt`.
+- **Fix**: Only apply detekt config once (even if multiple Kotlin plugins are applied).
+
+0.7.7
+-----
+
+_2023-03-27_
+
+- Add new `slack.detekt.full` property to gate whether or to run full detekt (i.e. with type resolution). If disabled, `detektRelease`/`detektMain` and associated tasks will be disabled and not used in `detektGlobal`.
+
+0.7.6
+-----
+
+_2023-03-25_
+
+- **Fix**: Apply matching configurations to `DetektCreateBaselineTask` tasks too due to https://github.com/detekt/detekt/issues/5940.
+
+0.7.5
+-----
+
+_2023-03-24_
+
+- [Skippy] Add more default configurations.
+- [Skippy] Add `slack.avoidance.build-upon-default-affected-project-configurations` flag to make provided configurations build upon defaults.
+- Add new `globalDetekt` task that runs `detekt` on all subprojects. This is Skippy-compatible and responds to `slack.avoidance.affectedProjectsFile`.
+
+0.7.4
+-----
+
+_2023-03-22_
+
+- Don't expose `androidExtension` publicly in `SlackExtension` to avoid Gradle mismatching number of type arguments in AGP 8.1.0-alpha10+.
+
+0.7.3
+-----
+
+_2023-03-22_
+
+- Set `Detekt.jdkHome` to null to avoid https://github.com/detekt/detekt/issues/5925.
+- Rename `String.safeCapitalize()` to `String.capitalizeUS()` to make it more explicit.
+
+0.7.2
+-----
+
+_2023-03-21_
+
+- Disable Live Literals in Compose by default due to multiple issues. They can be enabled via `-Pslack.compose.android.enableLiveLiterals=true`.
+  - Poor runtime performance: https://issuetracker.google.com/issues/274207650.
+  - Non-deterministic class files breaking build cache: https://issuetracker.google.com/issues/274231394.
+- [Skippy] Add `.github/actions/**` to default never skip filters.
+
+0.7.1
+-----
+
+_2023-03-20_
+
+- [Skippy] Improve pattern configuration.
+  1. Make the default patterns public. This allows consumers to more
+     easily reuse them when customizing their own.
+  2. Use sets for the type to better enforce uniqueness requirements.
+  3. Add github actions to never-skip defaults.
+  4. Add excludePatterns to allow finer-grained control. This runs _after_
+     include filtering so that users can manually exclude certain files that
+     may otherwise be captured in an inclusion filter and is difficult to
+     describe in a simple glob pattern. GitHub action does similar controls
+     for CI matrices.
+- [Skippy] Allow relative (from the project root) to `affected_projects.txt` and allow non-existent files as a value. This makes it easy to gracefully fall back in CI.
+- [Skippy] Fix logging path matchers missing toString() impls.
+- [SKippy] Log verbosely in debug mode when skipping task deps.
+- Update oshi to `6.4.1`.
+
+0.7.0
+-----
+
+_2023-03-17_
+
+### Project Skippy
+
+This release introduces an experimental new `computeAffectedProjects` task for computing affected projects based on an input of changed files. The goal of this is to statically detect which unit test, lint, and androidTest checks can be safely skipped in CI on pull requests.
+
+Example usage
+```bash
+./gradlew computeAffectedProjects --changed-files changed_files.txt
+```
+
+Where `changed_files.txt` is resolved against the root repo directory and contains a newline-delimited list of changed files (usually inferred from a PR).
+
+A simple example of how to produce such a file with the `gh` CLI:
+
+```bash
+gh pr view ${{ github.event.number }} --json files -q '.files[].path' > changed_files.txt
+```
+
+One would run this task _first_ as a preflight task, then run subsequent builds with the `slack.avoidance.affectedProjectsFile` Gradle property pointing to its output file location (printed at the end of the task).
+
+```bash
+./gradlew ... -Pslack.avoidance.affectedProjectsFile=/Users/zacsweers/dev/slack/slack-android-ng/build/skippy/affected_projects.txt
+```
+
+The `globalCiLint`, `globalCiUnitTest`, and `aggregateAndroidTestApks` tasks all support reading this property and will avoid adding dependencies on tasks in projects that are not present in this set.
+
+The `ComputeAffectedProjectsTask` task has some sensible defaults, but can be configured further in the root projects like so.
+
+```kotlin
+tasks.named<ComputeAffectedProjectsTask>("computeAffectedProjects") {
+  // Glob patterns of files to include in computing
+  includePatterns.addAll(
+    "**/*.kt",
+    "**/*.java",
+  )
+  // Glob patterns of files that, if changed, should result in not skipping anything in the build
+  neverSkipPatterns.addAll(
+    "**/*.versions.toml",
+    "gradle/wrapper/**",
+  )
+}
+```
+
+Debug logging can be enabled via the `slack.debug=true` Gradle property. This will output timings, logs, and diagnostics for the task.
+
+The configurations used to determine the build graph can be customized via comma-separated list to the `slack.avoidance.affected-project-configurations` property.
+
+0.6.1
+-----
+
+_2023-03-15_
+
+Happy Ted Lasso season 3 premier day!
+
+- **Fix**: Remove `UseContainerSupport` jvm arg from unit tests as this appears to only work on Linux.
+
+0.6.0
+-----
+
+_2023-03-14_
+
+Happy Pi day!
+
+- Refactor how unit tests are configured.
+  - `Test` tasks are now configured more consistently across CI and local, so there should be more cache hits.
+  - Add a new `globalCiUnitTest` task to the root project to ease running `ciUnitTest` tasks across all subprojects.
+  - Add new properties to `SlackProperties` for controlling max parallelism and `forkEvery` options in `Test` tasks.
+- Refactor how lint tasks are configured.
+  - Add a new `ciLint` task to every project that depends on all lint tasks in that project. This is intended to be the inverse
+    behavior of the built-in `lint` task in Android projects, which only runs the default variant's lint task.
+  - Add a new `globalCiLint` task to the root project to ease running `ciLint` tasks across all subprojects.
+  - Add new properties to `SlackProperties` for controlling which variants should be linted.
+- Revert "Add lintErrorRuleIds property". `lint.xml` is the right place for this kind of logic.
+
+0.5.10
+------
+
+_2023-03-07_
+
+- Reduce noisy JNA load failures logging. Still have not gotten to the root cause, but at least this will reduce the log noise.
+- Add a new `slack.lint.severity.errorRuleIds` Gradle property to specify lint rule IDs that should always be error severity.
+
+0.5.9
+-----
+
+_2023-02-27_
+
+- Gracefully handle JNA load failures in thermals logging.
+
+0.5.8
+-----
+
+_2023-02-20_
+
+- **Enhancement**: Remove kotlin-dsl from the plugin. If you were indirectly relying on its APIs from this plugin, you'll need to add that dependency separately.
+- **Enhancement**: Better support fully modularized lints
+  - `checkDependencies` is no longer enabled by default.
+  - Make the baseline file name configurable via `slack.lint.baseline-file-name` property. Defaults to `lint-baseline.xml`.
+- **Fix**: `ImplicitSamInstance` lint not being enabled.
+
+0.5.7
+-----
+
+_2023-02-15_
+
+- **Fix**: `MergeFileTask.kt` was accidentally removed during a previous release.
+- **Fix**: Add `jna-platform` dependency to align with the `jna` dependency version.
+
+0.5.6
+-----
+
+_2023-02-15_
+
+Do not use! Release was accidentally messed up.
+
+0.5.5
+-----
+
+_2023-02-13_
+
+- **Fix**: `LocTask` is now compatible with Gradle 8.0 and has the correct task dependencies when Ksp, Kapt, etc are running.
+- **Fix**: `LocTask` is now compatible with remote build cache.
+- **Enhancement**: ModScore now supports KSP.
+- **Enhancement**: Binary download tasks (`KtfmtDownloadTask`, `DetektDownloadTask`, etc) now have prettier and more reliable download progress indications.
+- **Enhancement**: `UpdateRobolectricJarsTask` now uses Gradle workers to parallelize downloads. On gigabit wifi, this takes the task runtime down from ~21sec to ~13sec.
+- **Enhancement**: The boolean `SLACK_FORCE_REDOWNLOAD_ROBOLECTRIC_JARS` env variable can be used to force `UpdateRobolectricJarsTask` to redownload jars even if already downloaded.
+**Behavior change**: Mod score must now be opted in to via the `slack.gradle.config.modscore.enabled=true` gradle property.
+- **Enhancement**: Mod score can be disabled per-project via the `slack.gradle.config.modscore.ignore=true` gradle property.
+
 0.5.4
 -----
 

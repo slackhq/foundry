@@ -27,8 +27,6 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.withType
 import slack.executeWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
@@ -178,14 +176,15 @@ public fun String.decapitalizeUS(): String {
   return replaceFirstChar { it.lowercase(Locale.US) }
 }
 
-public fun String.safeCapitalize(): String {
+/** Capitalizes this string using [Locale.US]. */
+public fun String.capitalizeUS(): String {
   return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
 }
 
 /** Returns the variant used for `ciUnitTest` tasks on this (presumably) Android project. */
 internal fun Project.ciUnitTestAndroidVariant(): String {
   val ciUnitTestVariant = SlackProperties(this).ciUnitTestVariant
-  return ciUnitTestVariant.safeCapitalize()
+  return ciUnitTestVariant.capitalizeUS()
 }
 
 internal fun Project.jdkVersion(): Int {
@@ -271,15 +270,15 @@ internal inline fun <reified T : Task> Project.namedLazy(
   crossinline action: (TaskProvider<T>) -> Unit
 ) {
   try {
-    action(tasks.named<T>(targetName))
+    action(tasks.named(targetName, T::class.java))
     return
   } catch (ignored: UnknownTaskException) {}
 
   var didRun = false
 
-  tasks.withType<T> {
+  tasks.withType(T::class.java) {
     if (name == targetName) {
-      action(tasks.named<T>(name))
+      action(tasks.named(name, T::class.java))
       didRun = true
     }
   }
