@@ -97,6 +97,7 @@ dependencies {
   api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
 
+  implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
   implementation(libs.guava)
   implementation(libs.kotlinCliUtil)
@@ -117,6 +118,7 @@ dependencies {
   // Better I/O
   api(libs.okio)
 
+  testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }

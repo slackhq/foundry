@@ -29,9 +29,7 @@ dependencyResolutionManagement {
 
   // Non-delegate APIs are annoyingly not public so we have to use withGroovyBuilder
   fun hasProperty(key: String): Boolean {
-    return settings.withGroovyBuilder {
-      "hasProperty"(key) as Boolean
-    }
+    return settings.withGroovyBuilder { "hasProperty"(key) as Boolean }
   }
 
   repositories {
@@ -53,7 +51,8 @@ dependencyResolutionManagement {
 
     google()
 
-    // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only tested on CI shadow jobs
+    // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only
+    // tested on CI shadow jobs
     // https://kotlinlang.slack.com/archives/C0KLZSCHF/p1616514468003200?thread_ts=1616509748.001400&cid=C0KLZSCHF
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap") {
       name = "Kotlin-Bootstrap"
@@ -68,9 +67,7 @@ dependencyResolutionManagement {
         // For R8/D8 releases
         maven("https://storage.googleapis.com/r8-releases/raw")
       }
-      filter {
-        includeModule("com.android.tools", "r8")
-      }
+      filter { includeModule("com.android.tools", "r8") }
     }
 
     // ExclusiveContent is used here because this proxies jcenter under the hood!
@@ -84,6 +81,7 @@ dependencyResolutionManagement {
         includeModule("net.ltgt.gradle", "gradle-errorprone-plugin")
         includeModule("net.ltgt.gradle", "gradle-nullaway-plugin")
         includeModule("com.sergei-lapin.napt", "gradle")
+        includeModule("com.jraska.module.graph.assertion", "plugin")
       }
     }
   }
@@ -92,9 +90,7 @@ dependencyResolutionManagement {
 pluginManagement {
   // Non-delegate APIs are annoyingly not public so we have to use withGroovyBuilder
   fun hasProperty(key: String): Boolean {
-    return settings.withGroovyBuilder {
-      "hasProperty"(key) as Boolean
-    }
+    return settings.withGroovyBuilder { "hasProperty"(key) as Boolean }
   }
 
   repositories {
@@ -116,7 +112,8 @@ pluginManagement {
 
     google()
 
-    // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only tested on CI shadow jobs
+    // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only
+    // tested on CI shadow jobs
     // https://kotlinlang.slack.com/archives/C0KLZSCHF/p1616514468003200?thread_ts=1616509748.001400&cid=C0KLZSCHF
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap") {
       name = "Kotlin-Bootstrap"
@@ -132,7 +129,10 @@ pluginManagement {
       forRepository(::gradlePluginPortal)
       filter {
         includeModule("com.github.ben-manes", "gradle-versions-plugin")
-        includeModule("com.github.ben-manes.versions", "com.github.ben-manes.versions.gradle.plugin")
+        includeModule(
+          "com.github.ben-manes.versions",
+          "com.github.ben-manes.versions.gradle.plugin"
+        )
         includeModule("com.gradle", "gradle-enterprise-gradle-plugin")
         includeModule("com.gradle.enterprise", "com.gradle.enterprise.gradle.plugin")
         includeModule("com.diffplug.spotless", "com.diffplug.spotless.gradle.plugin")
@@ -140,11 +140,14 @@ pluginManagement {
         includeModule("org.gradle.kotlin.kotlin-dsl", "org.gradle.kotlin.kotlin-dsl.gradle.plugin")
         includeModule("org.gradle.kotlin", "gradle-kotlin-dsl-plugins")
         includeModule("com.autonomousapps", "plugin-best-practices-plugin")
-        includeModule("com.autonomousapps.plugin-best-practices-plugin", "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin")
+        includeModule(
+          "com.autonomousapps.plugin-best-practices-plugin",
+          "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin"
+        )
       }
     }
   }
-  plugins { id("com.gradle.enterprise") version "3.12.4" }
+  plugins { id("com.gradle.enterprise") version "3.12.6" }
 }
 
 plugins { id("com.gradle.enterprise") }
@@ -166,9 +169,13 @@ rootProject.name = "slack-gradle-plugin"
 
 // Please keep these in alphabetical order!
 include(":slack-plugin")
+
 include(":sgp-monkeypatch-agp")
+
 include(":agp-handlers:agp-handler-api")
+
 include(":agp-handlers:agp-handler-74")
+
 include(":agp-handlers:agp-handler-80")
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

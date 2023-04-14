@@ -33,9 +33,6 @@ import com.bugsnag.android.gradle.BugsnagPluginExtension
 import com.google.common.base.CaseFormat
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import net.ltgt.gradle.errorprone.CheckSeverity
@@ -67,6 +64,7 @@ import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
@@ -509,10 +507,16 @@ internal class StandardProjectConfigurations(
 
     pluginManager.withPlugin("com.android.test") {
       configure<TestExtension> {
-        slackExtension.androidExtension = this
+        slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
+        LintTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          this,
+          sdkVersions::value
+        )
       }
     }
 
@@ -542,13 +546,19 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<BaseAppModuleExtension> {
-        slackExtension.androidExtension = this
+        slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.value.targetSdk
         }
-        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
+        LintTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          this,
+          sdkVersions::value
+        )
         agpHandler.packagingOptions(
           this,
           resourceExclusions =
@@ -706,10 +716,19 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
               false
             )
-          if (!excluded) {
+          val isAffectedProject = globalConfig.affectedProjects?.contains(project.path) ?: true
+          if (!excluded && isAffectedProject) {
             variant.androidTest?.artifacts?.get(SingleArtifact.APK)?.let { apkArtifactsDir ->
               // Wire this up to the aggregator
               androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+            }
+          } else {
+            val reason = if (excluded) "excluded" else "not affected"
+            val log = "$LOG Skipping ${project.path}:androidTest because it is $reason."
+            if (slackProperties.debug) {
+              project.logger.lifecycle(log)
+            } else {
+              project.logger.debug(log)
             }
           }
         }
@@ -738,9 +757,15 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
-        slackExtension.androidExtension = this
+        slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
-        LintTasks.configureSubProject(project, slackProperties, this, sdkVersions::value)
+        LintTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          this,
+          sdkVersions::value
+        )
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -783,36 +808,10 @@ internal class StandardProjectConfigurations(
         jvmTargetVersion.toString()
       }
 
-    pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-      // Configuration examples https://arturbosch.github.io/detekt/kotlindsl.html
-      configure<DetektExtension> {
-        buildUponDefaultConfig = true
-        toolVersion =
-          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
-        rootProject.file("config/detekt/detekt.yml")
-        slackProperties.detektConfigs?.let { configs ->
-          for (configFile in configs) {
-            config.from(rootProject.file(configFile))
-          }
-        }
-
-        slackProperties.detektBaseline?.let { baselineFile ->
-          baseline =
-            if (globalConfig.mergeDetektBaselinesTask != null) {
-              tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
-                globalConfig.mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
-              }
-              file("$buildDir/intermediates/detekt/baseline.xml")
-            } else {
-              file(rootProject.file(baselineFile))
-            }
-        }
-      }
-
-      tasks.configureEach<Detekt> {
-        jvmTarget = actualJvmTarget
-        exclude("**/build/**")
-      }
+    val detektConfigured = AtomicBoolean()
+    // Must be outside the withType() block below because you can't apply new plugins in that block
+    if (slackProperties.autoApplyDetekt) {
+      project.pluginManager.apply("io.gitlab.arturbosch.detekt")
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
@@ -905,10 +904,26 @@ internal class StandardProjectConfigurations(
           )
         }
       }
+
+      if (!detektConfigured.getAndSet(true)) {
+        DetektTasks.configureSubProject(
+          project,
+          slackProperties,
+          globalConfig.affectedProjects,
+          actualJvmTarget,
+          globalConfig.mergeDetektBaselinesTask,
+        )
+      }
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      LintTasks.configureSubProject(project, slackProperties, null, null)
+      LintTasks.configureSubProject(
+        project,
+        slackProperties,
+        globalConfig.affectedProjects,
+        null,
+        null
+      )
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {

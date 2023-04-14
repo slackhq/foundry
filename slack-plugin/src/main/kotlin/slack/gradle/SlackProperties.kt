@@ -132,6 +132,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = optionalStringProperty("slack.compose.android.defaultBundleAlias")
 
   /**
+   * Enables live literals. Note that they are disabled by default due to
+   * https://issuetracker.google.com/issues/274207650 and
+   * https://issuetracker.google.com/issues/274231394.
+   */
+  public val composeEnableLiveLiterals: Boolean
+    get() = booleanProperty("slack.compose.android.enableLiveLiterals", false)
+
+  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *
@@ -360,6 +368,13 @@ public class SlackProperties private constructor(private val project: Project) {
   public val gitIgnoreRevsFile: File?
     get() = fileProperty("slack.git.ignoreRevsFile")
 
+  /**
+   * Optional file location for an `affected_projects.txt` file that contains a list of projects
+   * affected in this build.
+   */
+  public val affectedProjects: File?
+    get() = fileProperty("slack.avoidance.affectedProjectsFile")
+
   /* Controls for Java/JVM/JDK versions uses in compilations and execution of tests. */
 
   /** Flag to enable strict JDK mode, forcing some things like JAVA_HOME. */
@@ -416,10 +431,28 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Detekt baseline file, evaluated from rootProject.file(...). */
   public val detektBaseline: String?
     get() = optionalStringProperty("slack.detekt.baseline")
+  /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
+  public val enableFullDetekt: Boolean
+    get() = booleanProperty("slack.detekt.full")
 
   /** Comma-separated set of projects to ignore in sorting dependencies. */
   public val sortDependenciesIgnore: String?
     get() = optionalStringProperty("slack.sortDependencies.ignore")
+
+  /** Enables verbose debug logging across the plugin. */
+  public val debug: Boolean
+    get() = booleanProperty("slack.debug", defaultValue = false)
+
+  /** A comma-separated list of configurations to use in affected project detection. */
+  public val affectedProjectConfigurations: String?
+    get() = optionalStringProperty("slack.avoidance.affected-project-configurations")
+
+  /**
+   * Flag to, when true, makes [affectedProjectConfigurations] build upon the defaults rather than
+   * replace them.
+   */
+  public val buildUponDefaultAffectedProjectConfigurations: Boolean
+    get() = booleanProperty("slack.avoidance.build-upon-default-affected-project-configurations")
 
   /**
    * Global control for enabling stricter validation of projects, such as ensuring Kotlin projects

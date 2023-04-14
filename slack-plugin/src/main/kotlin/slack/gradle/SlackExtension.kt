@@ -57,12 +57,16 @@ constructor(
    * this instance. Ideally we could eventually remove this if/when AGP finally makes these
    * properties lazy.
    */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
-      androidHandler.androidExtension = value
-      featuresHandler.androidExtension = value
+      androidHandler.setAndroidExtension(value)
+      featuresHandler.setAndroidExtension(value)
     }
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>) {
+    this.androidExtension = androidExtension
+  }
 
   public fun android(action: Action<AndroidHandler>) {
     action.execute(androidHandler)
@@ -359,11 +363,15 @@ constructor(
     objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
   /** @see [SlackExtension.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
-      composeHandler.androidExtension = value
+      composeHandler.setAndroidExtension(value)
     }
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   /**
    * Enables dagger for this project.
@@ -650,7 +658,7 @@ public abstract class ComposeHandler
 constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
-  slackProperties: SlackProperties,
+  private val slackProperties: SlackProperties,
   versionCatalog: VersionCatalog
 ) {
 
@@ -666,7 +674,11 @@ constructor(
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   /** @see [AndroidHandler.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   internal fun enable(multiplatform: Boolean) {
     enabled.set(true)
@@ -680,7 +692,11 @@ constructor(
         }
       extension.apply {
         buildFeatures { compose = true }
-        composeOptions { kotlinCompilerExtensionVersion = composeCompilerVersion }
+        composeOptions {
+          kotlinCompilerExtensionVersion = composeCompilerVersion
+          // Disable live literals by default
+          useLiveLiterals = slackProperties.composeEnableLiveLiterals
+        }
       }
     }
   }
@@ -725,11 +741,15 @@ constructor(
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [SlackExtension.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
     set(value) {
       field = value
-      featuresHandler.androidExtension = value
+      featuresHandler.setAndroidExtension(value)
     }
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   public fun features(action: Action<AndroidFeaturesHandler>) {
     action.execute(featuresHandler)
@@ -768,7 +788,11 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val robolectric: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  internal var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *>? = null
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
 
   /**
    * Enables android instrumentation tests for this project.

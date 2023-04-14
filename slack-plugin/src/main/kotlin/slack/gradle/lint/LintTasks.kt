@@ -30,9 +30,9 @@ import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
+import slack.gradle.capitalizeUS
 import slack.gradle.configure
 import slack.gradle.getByType
-import slack.gradle.safeCapitalize
 
 internal object LintTasks {
   private const val GLOBAL_CI_LINT_TASK_NAME = "globalCiLint"
@@ -49,6 +49,7 @@ internal object LintTasks {
   fun configureSubProject(
     project: Project,
     slackProperties: SlackProperties,
+    affectedProjects: Set<String>?,
     commonExtension: CommonExtension<*, *, *, *>?,
     sdkVersions: (() -> SlackProperties.AndroidSdkProperties)?,
   ) {
@@ -66,7 +67,18 @@ internal object LintTasks {
       }
     }
 
-    val globalTask = project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
+    val globalTask =
+      if (affectedProjects == null || project.path in affectedProjects) {
+        project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
+      } else {
+        val log = "$LOG Skipping ${project.path}:$CI_LINT_TASK_NAME because it is not affected."
+        if (slackProperties.debug) {
+          project.logger.lifecycle(log)
+        } else {
+          project.logger.debug(log)
+        }
+        null
+      }
 
     // We only want to create tasks once, but a project might apply multiple plugins.
     val applied = AtomicBoolean(false)
@@ -94,7 +106,7 @@ internal object LintTasks {
               group = LifecycleBasePlugin.VERIFICATION_GROUP
               dependsOn("lint")
             }
-          globalTask.configure { dependsOn(ciLint) }
+          globalTask?.configure { dependsOn(ciLint) }
         }
       }
       project.pluginManager.withPlugin("java-library", javaKotlinLibraryHandler)
@@ -104,7 +116,7 @@ internal object LintTasks {
 
   private fun createAndroidCiLintTask(
     project: Project,
-    globalTask: TaskProvider<*>,
+    globalTask: TaskProvider<*>?,
     slackProperties: SlackProperties,
     extension: CommonExtension<*, *, *, *>,
     sdkVersions: SlackProperties.AndroidSdkProperties,
@@ -122,7 +134,7 @@ internal object LintTasks {
     project.logger.debug("$LOG Creating ciLint task")
     val ciLintTask =
       project.tasks.register(CI_LINT_TASK_NAME) { group = LifecycleBasePlugin.VERIFICATION_GROUP }
-    globalTask.configure { dependsOn(ciLintTask) }
+    globalTask?.configure { dependsOn(ciLintTask) }
 
     slackProperties.ciLintVariants?.let { variants ->
       ciLintTask.configure {
@@ -130,7 +142,7 @@ internal object LintTasks {
         // task configuration time.
         variants.splitToSequence(',').forEach { variant ->
           logger.debug("$LOG Using variant $variant for ciLint task")
-          val lintTaskName = "lint${variant.safeCapitalize()}"
+          val lintTaskName = "lint${variant.capitalizeUS()}"
           dependsOn(lintTaskName)
         }
       }
@@ -151,7 +163,7 @@ internal object LintTasks {
         else -> error("No AndroidComponentsExtension found for project ${project.path}")
       }
     componentsExtension.onVariants { variant ->
-      val lintTaskName = "lint${variant.name.safeCapitalize()}"
+      val lintTaskName = "lint${variant.name.capitalizeUS()}"
       project.logger.debug("$LOG Adding $lintTaskName to ciLint task")
       ciLintTask.configure {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
