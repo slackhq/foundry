@@ -6,12 +6,14 @@ on:
     branches:
       - main
     paths-ignore:
-      - '*.md'
+      - '**/*.md'
   # Always run on PRs
   pull_request:
+    branches: [ main ]
+  merge_group:
 
 concurrency:
-  group: ci-${{ github.ref }}-${{ github.head_ref }}
+  group: 'ci-${{ github.event.merge_group.head_ref || github.head_ref }}-${{ github.workflow }}'
   cancel-in-progress: true
 
 jobs:

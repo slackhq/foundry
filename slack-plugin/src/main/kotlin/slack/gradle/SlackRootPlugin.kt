@@ -25,8 +25,6 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import slack.cli.AppleSiliconCompat
-import slack.executeBlocking
-import slack.executeBlockingWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.lint.DetektTasks
@@ -39,6 +37,8 @@ import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
 import slack.gradle.util.ThermalsData
+import slack.gradle.util.gitExecProvider
+import slack.gradle.util.gitVersionProvider
 import slack.stats.ModuleStatsTasks
 import slack.unittest.UnitTests
 
@@ -309,7 +309,7 @@ internal class SlackRootPlugin : Plugin<Project> {
 
   private fun isStable(version: String): Boolean {
     val stableKeyword =
-      listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase(Locale.US).contains(it) }
+      listOf("RELEASE", "FINAL", "GA").any { version.uppercase(Locale.US).contains(it) }
     return stableKeyword || STABLE_REGEX.matches(version)
   }
 
@@ -318,21 +318,12 @@ internal class SlackRootPlugin : Plugin<Project> {
     if (!isCi) {
       slackProperties.gitHooksFile?.let { hooksPath ->
         // Configure hooks
-        "git config core.hooksPath $hooksPath".executeBlocking(
-          project.providers,
-          rootDir,
-          isRelevantToConfigurationCache = false
-        )
+        providers.gitExecProvider("git", "config", "core.hooksPath", hooksPath.canonicalPath).get()
       }
 
       val revsFile = slackProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
-      val gitVersion =
-        "git --version".executeBlockingWithResult(
-          project.providers,
-          rootDir,
-          isRelevantToConfigurationCache = false
-        )
+      val gitVersion = providers.gitVersionProvider().get()
       val versionNumber = parseGitVersion(gitVersion)
       @Suppress(
         "ReplaceCallWithBinaryOperator"
@@ -352,11 +343,9 @@ internal class SlackRootPlugin : Plugin<Project> {
         }
         else -> {
           logger.debug("Configuring blame.ignoreRevsFile")
-          "git config blame.ignoreRevsFile ${file(revsFile)}".executeBlocking(
-            project.providers,
-            rootDir,
-            isRelevantToConfigurationCache = false
-          )
+          providers
+            .gitExecProvider("git", "config", "blame.ignoreRevsFile", file(revsFile).canonicalPath)
+            .get()
         }
       }
     }
@@ -383,7 +372,6 @@ private fun Project.configureSlackRootBuildscript() {
   InstallCommitHooksTask.register(this)
 }
 
-@Suppress("UnstableApiUsage")
 private fun Project.configureMisc(slackProperties: SlackProperties) {
   tasks
     .withType(Delete::class.java)

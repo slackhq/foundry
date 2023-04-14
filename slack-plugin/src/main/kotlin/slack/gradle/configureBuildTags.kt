@@ -15,15 +15,14 @@
  */
 package slack.gradle
 
-import java.io.File
 import java.io.IOException
 import java.net.URLEncoder
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
-import slack.executeBlocking
-import slack.executeBlockingWithResult
+import slack.gradle.util.GitExecValueSource
+import slack.gradle.util.gitExecProvider
 
 private val GITHUB_ORIGIN_REGEX = Regex("(.*)github\\.com[/|:](.*)")
 
@@ -91,35 +90,17 @@ private fun ScanApi.addCiMetadata(project: Project) {
 }
 
 private fun ScanApi.addGitMetadata(project: Project) {
-  val projectDir = project.projectDir
   val providers = project.providers
   background {
-    if (!isGitInstalled(providers, projectDir)) {
+    if (!isGitInstalled(providers)) {
       return@background
     }
 
     val gitCommitId =
-      executeBlockingWithResult(
-        providers,
-        projectDir,
-        listOf("git", "rev-parse", "--short=8", "--verify", "HEAD"),
-        isRelevantToConfigurationCache = false
-      )
-    val gitBranchName =
-      executeBlockingWithResult(
-        providers,
-        projectDir,
-        listOf("git", "rev-parse", "--abbrev-ref", "HEAD"),
-        isRelevantToConfigurationCache = false
-      )
+      providers.gitExecProvider("git", "rev-parse", "--short=8", "--verify", "HEAD").orNull
+    val gitBranchName = providers.gitExecProvider("git", "rev-parse", "--abbrev-ref", "HEAD").orNull
 
-    val gitStatus =
-      executeBlockingWithResult(
-        providers,
-        projectDir,
-        listOf("git", "status", "--porcelain"),
-        isRelevantToConfigurationCache = false
-      )
+    val gitStatus = providers.gitExecProvider("git", "status", "--porcelain").orNull
 
     if (gitCommitId != null) {
       val gitCommitIdLabel = "Git commit id"
@@ -130,12 +111,7 @@ private fun ScanApi.addGitMetadata(project: Project) {
       )
 
       val originUrl =
-        executeBlockingWithResult(
-          providers,
-          projectDir,
-          listOf("git", "config", "--get", "remote.origin.url"),
-          isRelevantToConfigurationCache = false
-        )
+        providers.gitExecProvider("git", "config", "--get", "remote.origin.url").orNull
       if (originUrl != null) {
         if ("github.com/" in originUrl || "github.com:" in originUrl) {
           GITHUB_ORIGIN_REGEX.find(originUrl)?.groups?.get(2)?.value?.removeSuffix(".git")?.let {
@@ -192,9 +168,9 @@ private fun urlEncode(url: String): String {
   return URLEncoder.encode(url, Charsets.UTF_8.name())
 }
 
-private fun isGitInstalled(providers: ProviderFactory, workingDir: File): Boolean {
+private fun isGitInstalled(providers: ProviderFactory): Boolean {
   return try {
-    "git --version".executeBlocking(providers, workingDir, isRelevantToConfigurationCache = false)
+    providers.of(GitExecValueSource::class.java) {}.isPresent
     true
   } catch (ignored: IOException) {
     false

@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+
 package com.android.build.gradle.internal.tasks
 
 import com.android.utils.FileUtils
 import com.google.common.base.Charsets
+import com.google.common.io.FileWriteMode
 import com.google.common.io.Files
 import java.io.File
 import java.io.IOException
@@ -87,8 +90,8 @@ public abstract class MergeFileTask : NonIncrementalTask() {
 
       // otherwise put all the files together
       for (file in filesToUse) {
-        val content = Files.toString(file, Charsets.UTF_8)
-        Files.append("$content\n", output, Charsets.UTF_8)
+        val content = Files.asCharSource(file, Charsets.UTF_8).read()
+        Files.asCharSink(output, Charsets.UTF_8, FileWriteMode.APPEND).write("$content\n")
       }
     }
   }

@@ -27,10 +27,10 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import slack.executeWithResult
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.DependencyGroup
+import slack.gradle.util.gitExecProvider
 import slack.gradle.util.mapToBoolean
 
 /** If true, this is currently running on GitHub Actions CI. */
@@ -56,13 +56,9 @@ public fun Project.gitBranch(): Provider<String> {
   return when {
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
-      executeWithResult(
-          project.providers,
-          rootProject.rootDir,
-          listOf("git", "rev-parse", "--abbrev-ref", "HEAD"),
-          isRelevantToConfigurationCache = false
-        )
-        .map { it.lines()[0].trim() }
+      providers.gitExecProvider("git", "rev-parse", "--abbrev-ref", "HEAD").map {
+        it.lines()[0].trim()
+      }
   }
 }
 
@@ -137,22 +133,12 @@ public enum class SupportedLanguagesEnum {
 
 public val Project.fullGitSha: Provider<String>
   get() {
-    return executeWithResult(
-      providers,
-      rootProject.rootDir,
-      listOf("git", "rev-parse", "HEAD"),
-      isRelevantToConfigurationCache = true
-    )
+    return providers.gitExecProvider("git", "rev-parse", "HEAD")
   }
 
 public val Project.gitSha: Provider<String>
   get() {
-    return executeWithResult(
-      providers,
-      rootProject.rootDir,
-      listOf("git", "rev-parse", "--short", "HEAD"),
-      isRelevantToConfigurationCache = true
-    )
+    return providers.gitExecProvider("git", "rev-parse", "--short", "HEAD")
   }
 
 public val Project.ciBuildNumber: Provider<String>
@@ -171,6 +157,10 @@ public val Project.usePrototypeAppId: Boolean
   get() {
     return SlackProperties(this).usePrototypeAppId
   }
+
+public fun String.decapitalizeUS(): String {
+  return replaceFirstChar { it.lowercase(Locale.US) }
+}
 
 /** Capitalizes this string using [Locale.US]. */
 public fun String.capitalizeUS(): String {
