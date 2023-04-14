@@ -27,6 +27,7 @@ import org.gradle.api.execution.TaskExecutionGraph
 import org.gradle.api.initialization.IncludedBuild
 import org.gradle.api.initialization.Settings
 import org.gradle.api.invocation.Gradle
+import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.ObjectConfigurationAction
 import org.gradle.api.plugins.PluginContainer
 import org.gradle.api.plugins.PluginManager
@@ -70,6 +71,10 @@ class GradleStub(private val startParameter: StartParameter) : Gradle {
   override fun includedBuild(name: String): IncludedBuild = TODO()
 
   override fun getPluginManager(): PluginManager = TODO()
+
+  override fun getExtensions(): ExtensionContainer {
+    TODO()
+  }
 
   override fun removeProjectEvaluationListener(listener: ProjectEvaluationListener) = Unit
 

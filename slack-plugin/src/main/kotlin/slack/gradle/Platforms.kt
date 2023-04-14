@@ -16,7 +16,6 @@
 package slack.gradle
 
 import java.io.File
-import java.util.Locale
 import okio.buffer
 import okio.source
 import org.gradle.api.GradleException
@@ -157,9 +156,7 @@ public object Platforms {
     tomlLibForPath(identifierMap.getValue(identifier))
 
   private fun tomlLibForPath(path: String) =
-    path.removePrefix("SlackDependencies.").split(".").joinToString("-") {
-      it.decapitalize(Locale.US)
-    }
+    path.removePrefix("SlackDependencies.").split(".").joinToString("-") { it.decapitalizeUS() }
 
   /** Rewrites build files in the new toml format instead. */
   public fun rewriteBuildFiles(

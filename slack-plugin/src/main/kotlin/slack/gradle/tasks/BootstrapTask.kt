@@ -381,7 +381,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           propertiesMode.set(
             project.providers
               .gradleProperty(Properties.PROPERTIES_MODE)
-              .map { BootstrapPropertiesMode.valueOf(it.toUpperCase(Locale.US)) }
+              .map { BootstrapPropertiesMode.valueOf(it.uppercase(Locale.US)) }
               .orElse(APPEND)
           )
         }
