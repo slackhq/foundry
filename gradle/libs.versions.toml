@@ -1,5 +1,5 @@
 [versions]
-agp = "7.4.2"
+agp = "8.0.0"
 anvil = "2.4.4"
 bugsnagGradle = "7.4.0"
 compose-jb = "1.3.1"
