@@ -261,7 +261,8 @@ internal inline fun once(body: OnceCheck.() -> Unit) {
   OnceCheck().body()
 }
 
-internal inline class OnceCheck(val once: AtomicBoolean = AtomicBoolean(false)) {
+@JvmInline
+internal value class OnceCheck(val once: AtomicBoolean = AtomicBoolean(false)) {
   inline val isActive: Boolean
     get() = once.compareAndSet(false, true)
   inline fun onFirst(body: () -> Unit) {

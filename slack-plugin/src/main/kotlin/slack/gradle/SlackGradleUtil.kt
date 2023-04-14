@@ -158,6 +158,10 @@ public val Project.usePrototypeAppId: Boolean
     return SlackProperties(this).usePrototypeAppId
   }
 
+public fun String.decapitalizeUS(): String {
+  return replaceFirstChar { it.lowercase(Locale.US) }
+}
+
 /** Capitalizes this string using [Locale.US]. */
 public fun String.capitalizeUS(): String {
   return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
