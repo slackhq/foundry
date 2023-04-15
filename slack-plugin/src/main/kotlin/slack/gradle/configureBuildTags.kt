@@ -21,8 +21,8 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
-import slack.gradle.util.GitExecValueSource
 import slack.gradle.util.gitExecProvider
+import slack.gradle.util.gitVersionProvider
 
 private val GITHUB_ORIGIN_REGEX = Regex("(.*)github\\.com[/|:](.*)")
 
@@ -170,7 +170,7 @@ private fun urlEncode(url: String): String {
 
 private fun isGitInstalled(providers: ProviderFactory): Boolean {
   return try {
-    providers.of(GitExecValueSource::class.java) {}.isPresent
+    providers.gitVersionProvider().isPresent
     true
   } catch (ignored: IOException) {
     false

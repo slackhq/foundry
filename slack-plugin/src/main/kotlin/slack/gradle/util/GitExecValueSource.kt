@@ -30,6 +30,7 @@ internal fun ProviderFactory.gitVersionProvider(): Provider<String> {
 }
 
 internal fun ProviderFactory.gitExecProvider(vararg args: String): Provider<String> {
+  require(args.isNotEmpty()) { "Args list is empty" }
   return of(GitExecValueSource::class.java) { parameters.args.addAll(*args) }
 }
 
@@ -39,9 +40,11 @@ internal abstract class GitExecValueSource : ValueSource<String, GitExecValueSou
   @get:Inject abstract val execOperations: ExecOperations
 
   override fun obtain(): String {
+    val args = parameters.args.get()
+    check(args.isNotEmpty()) { "Args list is empty" }
     val output = ByteArrayOutputStream()
     execOperations.exec {
-      commandLine(parameters.args.get())
+      commandLine(args)
       standardOutput = output
     }
     return String(output.toByteArray(), Charset.defaultCharset()).trim { it <= ' ' }
