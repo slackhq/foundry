@@ -473,7 +473,7 @@ internal class StandardProjectConfigurations(
             }
 
             // Configure individual Tests tasks.
-            agpHandler.allUnitTestOptions(unitTests) { test ->
+            unitTests.all { test ->
               //
               // Note that we can't configure this to _just_ be enabled for robolectric projects
               // based on dependencies unfortunately, as the task graph is already wired by the time
@@ -559,9 +559,8 @@ internal class StandardProjectConfigurations(
           this,
           sdkVersions::value
         )
-        agpHandler.packagingOptions(
-          this,
-          resourceExclusions =
+        packaging {
+          resources.excludes +=
             setOf(
               "META-INF/LICENSE.txt",
               "META-INF/LICENSE",
@@ -580,14 +579,14 @@ internal class StandardProjectConfigurations(
               // We don't know where this comes from but it's 5MB
               // https://slack-pde.slack.com/archives/C8EER3C04/p1621353426001500
               "annotated-jdk/**"
-            ),
-          jniPickFirsts =
+            )
+          jniLibs.pickFirsts +=
             setOf(
               // Some libs like Flipper bring their own copy of common native libs (like C++) and we
               // need to de-dupe
               "**/*.so"
             )
-        )
+        }
         buildTypes {
           getByName("debug") {
             // For upstream android libraries that just have a single release variant, use that.
