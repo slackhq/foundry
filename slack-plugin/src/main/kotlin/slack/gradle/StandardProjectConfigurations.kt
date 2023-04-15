@@ -113,11 +113,13 @@ internal class StandardProjectConfigurations(
   }
 
   private fun Project.applyCommonConfigurations() {
-    if (project.buildFile.exists()) {
-      val sortDependenciesIgnoreSet =
-        globalProperties.sortDependenciesIgnore?.splitToSequence(',')?.toSet().orEmpty()
-      if (project.path !in sortDependenciesIgnoreSet) {
-        pluginManager.apply("com.squareup.sort-dependencies")
+    if (globalProperties.autoApplySortDependencies) {
+      if (project.buildFile.exists()) {
+        val sortDependenciesIgnoreSet =
+          globalProperties.sortDependenciesIgnore?.splitToSequence(',')?.toSet().orEmpty()
+        if (project.path !in sortDependenciesIgnoreSet) {
+          pluginManager.apply("com.squareup.sort-dependencies")
+        }
       }
     }
   }
