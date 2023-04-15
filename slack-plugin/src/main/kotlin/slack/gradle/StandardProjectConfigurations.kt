@@ -420,7 +420,6 @@ internal class StandardProjectConfigurations(
 
     val sdkVersions = lazy { slackProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
-    val agpHandler = slackTools().agpHandler
     val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {
