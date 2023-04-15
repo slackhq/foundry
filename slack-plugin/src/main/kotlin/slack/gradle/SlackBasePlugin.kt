@@ -17,6 +17,7 @@ package slack.gradle
 
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
+import com.diffplug.spotless.LineEnding
 import java.util.Locale
 import java.util.Optional
 import org.gradle.api.Plugin
@@ -153,6 +154,10 @@ internal class SlackBasePlugin : Plugin<Project> {
         if (isRootProject) {
           predeclareDeps()
         }
+        // Use platform native endings and don't try to inspect gitattrs
+        // https://github.com/diffplug/spotless/issues/1527
+        // https://github.com/diffplug/spotless/issues/1644
+        lineEndings = LineEnding.PLATFORM_NATIVE
       }
       if (isRootProject) {
         configure<SpotlessExtensionPredeclare> { spotlessFormatters() }
