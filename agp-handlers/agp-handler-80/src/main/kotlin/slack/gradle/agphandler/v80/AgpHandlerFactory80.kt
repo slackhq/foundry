@@ -15,7 +15,6 @@
  */
 package slack.gradle.agphandler.v80
 
-import com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.google.auto.service.AutoService
 import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.AgpHandlerFactory
@@ -25,7 +24,9 @@ import slack.gradle.agp.VersionNumber
 public class AgpHandlerFactory80 : AgpHandlerFactory {
   override val minVersion: VersionNumber = VersionNumber.parse("8.0.0")
 
-  override fun currentVersion(): String = ANDROID_GRADLE_PLUGIN_VERSION
+  @Suppress("DEPRECATION")
+  override fun currentVersion(): String =
+    com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 
   override fun create(): AgpHandler {
     return AgpHandler80()
@@ -33,6 +34,7 @@ public class AgpHandlerFactory80 : AgpHandlerFactory {
 }
 
 private class AgpHandler80 : AgpHandler {
+  @Suppress("DEPRECATION")
   override val agpVersion: String
-    get() = ANDROID_GRADLE_PLUGIN_VERSION
+    get() = com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 }
