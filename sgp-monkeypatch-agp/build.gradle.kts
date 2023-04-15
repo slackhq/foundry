@@ -7,5 +7,5 @@ dependencies {
   compileOnly(gradleApi())
   compileOnly(libs.guava)
   compileOnly(libs.agp)
-  compileOnly("com.android.tools:common:30.4.2")
+  compileOnly("com.android.tools:common:31.0.0")
 }
