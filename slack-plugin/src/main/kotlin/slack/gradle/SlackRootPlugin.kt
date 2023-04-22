@@ -71,20 +71,22 @@ internal class SlackRootPlugin : Plugin<Project> {
         .trimIndent()
     }
 
+    val slackProperties = SlackProperties(project)
     val okHttpClient = lazy { OkHttpClient.Builder().build() }
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
-    SlackTools.register(project, okHttpClient, thermalsLogJsonFile)
-    configureRootProject(project, thermalsLogJsonFile)
+    val logThermals = slackProperties.logThermals
+    SlackTools.register(project, logThermals, okHttpClient, thermalsLogJsonFile)
+    configureRootProject(project, slackProperties, thermalsLogJsonFile)
   }
 
   // These checks is a false positive because we have inner lambdas
   @Suppress("ReturnCount", "LongMethod", "ComplexMethod")
   private fun configureRootProject(
     project: Project,
+    slackProperties: SlackProperties,
     thermalsLogJsonFileProvider: Provider<RegularFile>
   ) {
-    val slackProperties = SlackProperties(project)
 
     // Check enforced JDK version
     if (slackProperties.strictJdk) {

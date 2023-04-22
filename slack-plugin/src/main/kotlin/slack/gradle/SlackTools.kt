@@ -20,8 +20,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
 import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
@@ -45,7 +45,6 @@ import slack.gradle.agp.AgpHandler
 import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
-import slack.gradle.util.mapToBoolean
 import slack.gradle.util.shutdown
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
@@ -66,15 +65,14 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
 
   public lateinit var okHttpClient: Lazy<OkHttpClient>
 
-  private var thermalsReporter: ThermalsReporter? = null
-  private val logThermals =
-    OperatingSystem.current().isMacOsX &&
-      !parameters.cleanRequested.get() &&
-      providers.gradleProperty(SlackProperties.LOG_THERMALS).mapToBoolean().getOrElse(false)
-
-  private val thermalsWatcher = if (logThermals) ThermalsWatcher(logger, ::thermalsFile) else null
-  private var thermalsAtClose: Thermals? = null
+  /** Lock file used to track if multiple [SlackTools] instances were created and not closed. */
   private val lockFile: File
+
+  // Thermals watching vars
+  private var thermalsReporter: ThermalsReporter? = null
+  private val thermalsWatcher: ThermalsWatcher?
+  private val thermalsExecutor: ExecutorService?
+  private var thermalsAtClose: Thermals? = null
 
   /** Returns the current or latest captured thermals log. */
   public val thermals: Thermals?
@@ -91,10 +89,19 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       lockFile.parentFile.mkdirs()
       lockFile.createNewFile()
     }
-    val thermalsThreadFactory = ThreadFactory { r ->
-      Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
+
+    // Thermals logging
+    if (parameters.logThermals.get()) {
+      thermalsExecutor =
+        Executors.newSingleThreadExecutor { r ->
+          Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
+        }
+      thermalsWatcher = ThermalsWatcher(logger, ::thermalsFile)
+      thermalsWatcher.start(thermalsExecutor)
+    } else {
+      thermalsWatcher = null
+      thermalsExecutor = null
     }
-    thermalsWatcher?.start(Executors.newSingleThreadExecutor(thermalsThreadFactory))
   }
 
   public fun registerExtension(extension: SlackToolsExtension) {
@@ -150,6 +157,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       if (okHttpClient.isInitialized()) {
         okHttpClient.value.shutdown()
       }
+      thermalsExecutor?.shutdown()
     }
   }
 
@@ -158,6 +166,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
 
     internal fun register(
       project: Project,
+      logThermals: Boolean,
       okHttpClient: Lazy<OkHttpClient>,
       thermalsLogJsonFileProvider: Provider<RegularFile>
     ): Provider<SlackTools> {
@@ -171,6 +180,11 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
           parameters.offline.set(project.gradle.startParameter.isOffline)
           parameters.cleanRequested.set(
             project.gradle.startParameter.taskNames.any { it.equals("clean", ignoreCase = true) }
+          )
+          parameters.logThermals.set(
+            project.provider {
+              logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
+            }
           )
         }
         .apply {
@@ -193,6 +207,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     public val thermalsOutputJsonFile: RegularFileProperty
     public val offline: Property<Boolean>
     public val cleanRequested: Property<Boolean>
+    public val logThermals: Property<Boolean>
   }
 }
 
