@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.8.5
+-----
+
+_2023-04-22_
+
+- Clean up thermals logging setup in `SlackTools` and support enabling property at different scopes (local.properties, etc).
+- Shut down thermals heartbeat executor when `SlackTools` is closed.
+- Use native Kotlin lambdas instead of `class` for SAM conversions. The minimum supported Gradle version is now 8.1, which introduced support for this.
+
 0.8.4
 -----
 
