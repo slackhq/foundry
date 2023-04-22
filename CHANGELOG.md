@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.8.3
+-----
+
+_2023-04-22_
+
+- Don't accidentally create new `SlackTools` instances when reporting background data to Gradle Enterprise. These instances would be orphaned because this would happen _after_ Gradle had closed all existing services, and create a memory leak.
+- Use a lock file to track `SlackTools` instances.
+- Use a single-threaded `Executor` for `SlackTools`' thermals heartbeat.
+
 0.8.2
 -----
 
