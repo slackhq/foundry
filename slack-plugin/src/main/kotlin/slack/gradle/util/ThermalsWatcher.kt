@@ -15,8 +15,10 @@
  */
 package slack.gradle.util
 
+import com.squareup.moshi.JsonClass
 import com.sun.jna.Library
 import com.sun.jna.Native
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.observers.DisposableObserver
@@ -190,9 +192,11 @@ internal object ThermlogParser {
   }
 }
 
+@JsonClass(generateAdapter = true, generator = "sealed:type")
 public sealed class Thermals {
   public abstract val wasThrottled: Boolean
 
+  @TypeLabel("empty")
   public object Empty : Thermals() {
     override val wasThrottled: Boolean = false
   }
@@ -208,6 +212,7 @@ public sealed class Thermals {
   }
 }
 
+@JsonClass(generateAdapter = true)
 public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
 
   init {
@@ -256,6 +261,7 @@ public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
   }
 }
 
+@JsonClass(generateAdapter = true)
 public data class ThermLog(
   public val timestamp: LocalDateTime,
   public val schedulerLimit: Int,

@@ -15,14 +15,19 @@
  */
 package slack.gradle
 
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
+import okio.buffer
+import okio.sink
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
@@ -116,6 +121,16 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   override fun close() {
     // Close thermals process and save off its current value
     thermalsAtClose = thermalsWatcher?.stop()
+    // Write final thermals to output file
+    val thermalsJsonFile = parameters.thermalsOutputJsonFile.get().asFile
+    if (thermalsJsonFile.exists()) {
+      thermalsJsonFile.delete()
+    }
+    thermalsJsonFile.parentFile.mkdirs()
+    thermalsJsonFile.createNewFile()
+    JsonWriter.of(thermalsJsonFile.sink().buffer()).use { writer ->
+      moshi.adapter<Thermals>().toJson(writer, thermalsAtClose)
+    }
     try {
       if (!parameters.offline.get()) {
         thermalsAtClose?.let { thermalsReporter?.reportThermals(it) }
@@ -144,12 +159,14 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     internal fun register(
       project: Project,
       okHttpClient: Lazy<OkHttpClient>,
+      thermalsLogJsonFileProvider: Provider<RegularFile>
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
           parameters.thermalsOutputFile.set(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
+          parameters.thermalsOutputJsonFile.set(thermalsLogJsonFileProvider)
           parameters.offline.set(project.gradle.startParameter.isOffline)
           parameters.cleanRequested.set(
             project.gradle.startParameter.taskNames.any { it.equals("clean", ignoreCase = true) }
@@ -167,6 +184,8 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   public interface Parameters : BuildServiceParameters {
     /** An output file that the thermals process (continuously) writes to during the build. */
     public val thermalsOutputFile: RegularFileProperty
+    /** A structured version of [thermalsOutputFile] using JSON. */
+    public val thermalsOutputJsonFile: RegularFileProperty
     public val offline: Property<Boolean>
     public val cleanRequested: Property<Boolean>
   }

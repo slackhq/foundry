@@ -18,10 +18,13 @@ package slack.gradle
 import com.autonomousapps.DependencyAnalysisExtension
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
+import com.squareup.moshi.adapter
 import java.util.Locale
 import okhttp3.OkHttpClient
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
+import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import slack.cli.AppleSiliconCompat
@@ -36,6 +39,8 @@ import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
+import slack.gradle.util.JsonTools
+import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsData
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
@@ -67,13 +72,18 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     val okHttpClient = lazy { OkHttpClient.Builder().build() }
-    val slackTools = SlackTools.register(project, okHttpClient)
-    configureRootProject(project, slackTools)
+    val thermalsLogJsonFile =
+      project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
+    SlackTools.register(project, okHttpClient, thermalsLogJsonFile)
+    configureRootProject(project, thermalsLogJsonFile)
   }
 
   // These checks is a false positive because we have inner lambdas
   @Suppress("ReturnCount", "LongMethod", "ComplexMethod")
-  private fun configureRootProject(project: Project, slackTools: Provider<SlackTools>) {
+  private fun configureRootProject(
+    project: Project,
+    thermalsLogJsonFileProvider: Provider<RegularFile>
+  ) {
     val slackProperties = SlackProperties(project)
 
     // Check enforced JDK version
@@ -111,10 +121,27 @@ internal class SlackRootPlugin : Plugin<Project> {
     val scanApi = ScanApi(project)
     project.configureBuildScanMetadata(scanApi)
     if (scanApi.isAvailable) {
+      // It's SUPER important to capture this log File instance separately before passing into the
+      // background call below, as this is serialized as an input to that lambda. We also cannot use
+      // slackTools() in there anymore as it's already been closed (and will be recreated) in the
+      // lambda if we call it there and then be orphaned.
+      val thermalsLogJsonFile = thermalsLogJsonFileProvider.get().asFile
       with(scanApi.requireExtension()) {
         buildFinished {
           background {
-            slackTools.get().thermals?.run {
+            var thermals: Thermals? = null
+            if (thermalsLogJsonFile.exists()) {
+              val text = thermalsLogJsonFile.readText()
+              if (text.isNotEmpty()) {
+                try {
+                  thermals =
+                    JsonTools.MOSHI.adapter<Thermals>().fromJson(thermalsLogJsonFile.readText())
+                } catch (e: Exception) {
+                  Logging.getLogger("SGP").error("Failed to parse thermals log", e)
+                }
+              }
+            }
+            thermals?.run {
               if (this is ThermalsData && wasThrottled) {
                 println("🔥 \u001b[33mBuild was thermally throttled!\u001B[0m")
                 tag("THROTTLED")
