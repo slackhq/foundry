@@ -315,7 +315,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               logger.lifecycle("($context) Unknown identifier: $identifier")
               return null
             }
-        ModuleCoordinates(newIdentifier, resolvedVersion)
+        ModuleCoordinates(newIdentifier, resolvedVersion, gradleVariantIdentification)
       }
       is FlatCoordinates,
       is IncludedBuildCoordinates,
