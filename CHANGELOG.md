@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.8.4
+-----
+
+_2023-04-22_
+
+- Fix JSON serialization for thermals data.
+
 0.8.3
 -----
 
