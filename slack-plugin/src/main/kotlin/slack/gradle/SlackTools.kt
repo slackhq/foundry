@@ -20,6 +20,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
@@ -89,7 +91,10 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
       lockFile.parentFile.mkdirs()
       lockFile.createNewFile()
     }
-    thermalsWatcher?.start()
+    val thermalsThreadFactory = ThreadFactory { r ->
+      Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
+    }
+    thermalsWatcher?.start(Executors.newSingleThreadExecutor(thermalsThreadFactory))
   }
 
   public fun registerExtension(extension: SlackToolsExtension) {
