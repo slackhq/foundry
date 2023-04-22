@@ -18,6 +18,7 @@ package slack.gradle
 import com.squareup.moshi.Moshi
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
@@ -74,6 +75,13 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     }
 
   init {
+    logger.debug("$LOG SlackTools created")
+    val newCount = INSTANCE_COUNT.incrementAndGet()
+    if (newCount > 1) {
+      logger.debug(
+        "$LOG Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount"
+      )
+    }
     thermalsWatcher?.start()
   }
 
@@ -121,6 +129,17 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   }
 
   internal companion object {
+    private const val LOG = "[SlackTools]"
+
+    /**
+     * Gradle creates a new instance of this service for each unique classpath, which we don't want.
+     * This is a best-effort mechanism to catch cases like that and have the consuming build avoid
+     * this.
+     *
+     * See https://github.com/gradle/gradle/issues/17559.
+     */
+    @JvmStatic private val INSTANCE_COUNT = AtomicInteger()
+
     internal const val SERVICE_NAME = "slack-tools"
 
     internal fun register(
