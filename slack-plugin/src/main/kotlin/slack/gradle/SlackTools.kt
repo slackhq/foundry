@@ -22,7 +22,6 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
 import okio.buffer
@@ -34,7 +33,6 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
@@ -48,8 +46,7 @@ import slack.gradle.util.ThermalsWatcher
 import slack.gradle.util.shutdown
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
-public abstract class SlackTools @Inject constructor(providers: ProviderFactory) :
-  BuildService<Parameters>, AutoCloseable {
+public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
   public val agpHandler: AgpHandler by lazy { AgpHandlers.createHandler() }
   public val moshi: Moshi
