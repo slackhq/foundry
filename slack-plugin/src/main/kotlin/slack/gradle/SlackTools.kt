@@ -79,7 +79,8 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     val newCount = INSTANCE_COUNT.incrementAndGet()
     if (newCount > 1) {
       logger.debug(
-        "$LOG Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount"
+        "$LOG Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount",
+        Throwable()
       )
     }
     thermalsWatcher?.start()

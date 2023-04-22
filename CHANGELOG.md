@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.8.2
+-----
+
+_2023-04-22_
+
+- Log a `Throwable` with multiple instances of `SlackTools` to help track origin points.
+
 0.8.1
 -----
 
