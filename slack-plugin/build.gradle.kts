@@ -93,7 +93,6 @@ dependencies {
 
   compileOnly(libs.agp)
   api(projects.agpHandlers.agpHandlerApi)
-  api(projects.agpHandlers.agpHandler74)
   api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
 

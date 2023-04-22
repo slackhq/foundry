@@ -403,6 +403,8 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.auto-apply.nullaway", defaultValue = true)
   public val autoApplyCacheFix: Boolean
     get() = booleanProperty("slack.auto-apply.cache-fix", defaultValue = true)
+  public val autoApplySortDependencies: Boolean
+    get() = booleanProperty("slack.auto-apply.sort-dependencies", defaultValue = true)
 
   /* Test retry controls. */
   public enum class TestRetryPluginType {

@@ -15,11 +15,7 @@
  */
 package slack.gradle.agphandler.v80
 
-import com.android.build.api.dsl.CommonExtension
-import com.android.build.gradle.internal.dsl.TestOptions
-import com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.google.auto.service.AutoService
-import org.gradle.api.tasks.testing.Test
 import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.AgpHandlerFactory
 import slack.gradle.agp.VersionNumber
@@ -28,7 +24,9 @@ import slack.gradle.agp.VersionNumber
 public class AgpHandlerFactory80 : AgpHandlerFactory {
   override val minVersion: VersionNumber = VersionNumber.parse("8.0.0")
 
-  override fun currentVersion(): String = ANDROID_GRADLE_PLUGIN_VERSION
+  @Suppress("DEPRECATION")
+  override fun currentVersion(): String =
+    com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 
   override fun create(): AgpHandler {
     return AgpHandler80()
@@ -36,21 +34,7 @@ public class AgpHandlerFactory80 : AgpHandlerFactory {
 }
 
 private class AgpHandler80 : AgpHandler {
+  @Suppress("DEPRECATION")
   override val agpVersion: String
-    get() = ANDROID_GRADLE_PLUGIN_VERSION
-
-  override fun allUnitTestOptions(options: TestOptions.UnitTestOptions, body: (Test) -> Unit) {
-    options.all(body)
-  }
-
-  override fun packagingOptions(
-    commonExtension: CommonExtension<*, *, *, *>,
-    resourceExclusions: Collection<String>,
-    jniPickFirsts: Collection<String>
-  ) {
-    commonExtension.packaging {
-      resources.excludes += resourceExclusions
-      jniLibs.pickFirsts += jniPickFirsts
-    }
-  }
+    get() = com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
 }

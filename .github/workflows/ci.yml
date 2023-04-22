@@ -25,7 +25,7 @@ jobs:
       matrix:
         ci_java_version: ['19']
         ci_kotlin_version: ['1.8.20']
-        ci_agp_version: ['7.4.0', '8.0.0-beta01', '8.1.0-alpha01']
+        ci_agp_version: ['8.0.0', '8.1.0-beta01']
     env:
       DEP_OVERRIDES: 'true'
       DEP_OVERRIDE_KOTLIN: '${{ matrix.ci_kotlin_version }}'
@@ -77,4 +77,29 @@ jobs:
 
       - name: Publish snapshot (main branch only)
         if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main' && matrix.ci_agp_version == '7.4.0' && matrix.ci_kotlin_version == '1.8.20' && matrix.ci_java_version == '19'
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+
+  publish-snapshot:
+    name: 'Publish snapshot (main only)'
+    runs-on: ubuntu-latest
+    needs: 'build'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ matrix.job }}-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-${{ matrix.job }}-
+
+      - name: Install JDK ${{ matrix.ci_java_version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '19'
+
+      - name: Publish snapshot
+        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main'
         run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}

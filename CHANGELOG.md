@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.8.1
+-----
+
+_2023-04-22_
+
+- Add some debug logging to `SlackTools` to track multiple instances.
+
+0.8.0
+-----
+
+_2023-04-15_
+
+- **Fix**: Wrap all exec operations in a `ValueSource` for Gradle 8.x compatibility.
+- **Fix**: Set git line endings to `PLATFORM_NATIVE` in spotless by default. Its default of looking at `.gitattributes` is expensive and incompatible with Gradle 8.1+ configuration caching.
+- **Fix**: Add `slack.auto-apply.sort-dependencies` boolean Gradle property to gate auto-applying the sort-dependencies plugin.
+- SGP now requires AGP 8.0+ (and with it – Gradle 8+).
+
 0.7.9
 -----
 

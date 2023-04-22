@@ -15,28 +15,11 @@
  */
 package slack.gradle.agp
 
-import com.android.build.api.dsl.CommonExtension
-import com.android.build.gradle.internal.dsl.TestOptions
-import org.gradle.api.tasks.testing.Test
-
 /** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
 public interface AgpHandler {
 
   /** The current AGP version. */
   public val agpVersion: String
-
-  /** Shim for `testOptions.unitTest.all`, which had a signature change in AGP 8.x. */
-  public fun allUnitTestOptions(options: TestOptions.UnitTestOptions, body: (Test) -> Unit)
-
-  /**
-   * Shim for packagingOptions, which had a signature change in AGP 8.x from `PackagingOptions` to
-   * `Packaging`.
-   */
-  public fun packagingOptions(
-    commonExtension: CommonExtension<*, *, *, *>,
-    resourceExclusions: Collection<String>,
-    jniPickFirsts: Collection<String>,
-  )
 }
 
 /**
