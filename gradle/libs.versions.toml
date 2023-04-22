@@ -35,6 +35,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
+moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 sortDependencies = { id = "com.squareup.sort-dependencies", version.ref = "sortDependencies" }
 versionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }

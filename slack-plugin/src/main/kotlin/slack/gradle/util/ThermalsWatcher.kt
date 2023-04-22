@@ -214,6 +214,7 @@ public sealed class Thermals {
   }
 }
 
+@TypeLabel("data")
 @JsonClass(generateAdapter = true)
 public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
 
