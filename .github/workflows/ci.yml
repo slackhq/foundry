@@ -70,7 +70,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install JDK ${{ matrix.ci_java_version }}
+      - name: Install JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
