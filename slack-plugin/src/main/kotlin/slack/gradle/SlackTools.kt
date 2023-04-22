@@ -75,11 +75,11 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     }
 
   init {
-    logger.debug("$LOG SlackTools created")
+    logger.debug("SlackTools created")
     val newCount = INSTANCE_COUNT.incrementAndGet()
     if (newCount > 1) {
       logger.debug(
-        "$LOG Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount",
+        "Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount",
         Throwable()
       )
     }
@@ -130,8 +130,6 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   }
 
   internal companion object {
-    private const val LOG = "[SlackTools]"
-
     /**
      * Gradle creates a new instance of this service for each unique classpath, which we don't want.
      * This is a best-effort mechanism to catch cases like that and have the consuming build avoid
@@ -187,7 +185,6 @@ public interface SlackToolsExtension {
   public fun bind(sharedDependencies: SlackToolsDependencies)
 }
 
-@Suppress("UNCHECKED_CAST")
 public fun Project.slackTools(): SlackTools {
   return slackToolsProvider().get()
 }
