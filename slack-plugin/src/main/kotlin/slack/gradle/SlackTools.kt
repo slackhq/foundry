@@ -20,13 +20,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
 import okio.buffer
 import okio.sink
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -72,6 +72,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
 
   private val thermalsWatcher = if (logThermals) ThermalsWatcher(logger, ::thermalsFile) else null
   private var thermalsAtClose: Thermals? = null
+  private val lockFile: File
 
   /** Returns the current or latest captured thermals log. */
   public val thermals: Thermals?
@@ -81,12 +82,12 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
 
   init {
     logger.debug("SlackTools created")
-    val newCount = INSTANCE_COUNT.incrementAndGet()
-    if (newCount > 1) {
-      logger.debug(
-        "Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount",
-        Throwable()
-      )
+    lockFile = parameters.lockDir.get().asFile.resolve("slack-tools.lock").canonicalFile
+    if (lockFile.exists()) {
+      logger.debug("SlackTools file already exists", Throwable())
+    } else {
+      lockFile.parentFile.mkdirs()
+      lockFile.createNewFile()
     }
     thermalsWatcher?.start()
   }
@@ -121,23 +122,26 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   override fun close() {
     // Close thermals process and save off its current value
     thermalsAtClose = thermalsWatcher?.stop()
-    // Write final thermals to output file
-    val thermalsJsonFile = parameters.thermalsOutputJsonFile.get().asFile
-    if (thermalsJsonFile.exists()) {
-      thermalsJsonFile.delete()
-    }
-    thermalsJsonFile.parentFile.mkdirs()
-    thermalsJsonFile.createNewFile()
-    JsonWriter.of(thermalsJsonFile.sink().buffer()).use { writer ->
-      moshi.adapter<Thermals>().toJson(writer, thermalsAtClose)
-    }
     try {
-      if (!parameters.offline.get()) {
-        thermalsAtClose?.let { thermalsReporter?.reportThermals(it) }
+      thermalsAtClose?.let { thermalsAtClose ->
+        // Write final thermals to output file
+        val thermalsJsonFile = parameters.thermalsOutputJsonFile.get().asFile
+        if (thermalsJsonFile.exists()) {
+          thermalsJsonFile.delete()
+        }
+        thermalsJsonFile.parentFile.mkdirs()
+        thermalsJsonFile.createNewFile()
+        JsonWriter.of(thermalsJsonFile.sink().buffer()).use { writer ->
+          moshi.adapter<Thermals>().toJson(writer, thermalsAtClose)
+        }
+        if (!parameters.offline.get()) {
+          thermalsReporter?.reportThermals(thermalsAtClose)
+        }
       }
     } catch (t: Throwable) {
       logger.error("Failed to report thermals", t)
     } finally {
+      lockFile.delete()
       if (okHttpClient.isInitialized()) {
         okHttpClient.value.shutdown()
       }
@@ -145,15 +149,6 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   }
 
   internal companion object {
-    /**
-     * Gradle creates a new instance of this service for each unique classpath, which we don't want.
-     * This is a best-effort mechanism to catch cases like that and have the consuming build avoid
-     * this.
-     *
-     * See https://github.com/gradle/gradle/issues/17559.
-     */
-    @JvmStatic private val INSTANCE_COUNT = AtomicInteger()
-
     internal const val SERVICE_NAME = "slack-tools"
 
     internal fun register(
@@ -163,6 +158,7 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
+          parameters.lockDir.set(project.layout.buildDirectory.dir("outputs/logs/lock"))
           parameters.thermalsOutputFile.set(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
@@ -182,6 +178,10 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   }
 
   public interface Parameters : BuildServiceParameters {
+    /**
+     * A lock dir that's used to check if a previous SlackTools instance was created but not closed.
+     */
+    public val lockDir: DirectoryProperty
     /** An output file that the thermals process (continuously) writes to during the build. */
     public val thermalsOutputFile: RegularFileProperty
     /** A structured version of [thermalsOutputFile] using JSON. */
