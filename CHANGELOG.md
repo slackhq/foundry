@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.8.1
+-----
+
+_2023-04-22_
+
+- Add some debug logging to `SlackTools` to track multiple instances.
+
 0.8.0
 -----
 
