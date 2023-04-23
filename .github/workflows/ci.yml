@@ -103,4 +103,4 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }} -x dokkaHtml
