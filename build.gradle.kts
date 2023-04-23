@@ -192,7 +192,7 @@ subprojects {
         // this sometimes. https://github.com/gradle/gradle/issues/16345
         allWarningsAsErrors.set(false)
         jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
-        // Required due to https://github.com/gradle/gradle/issues/24871
+        // TODO required due to https://github.com/gradle/gradle/issues/24871
         freeCompilerArgs.add("-Xsam-conversions=class")
         // We should be able to remove this in Gradle 8 when it upgrades to Kotlin 1.7
         freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
