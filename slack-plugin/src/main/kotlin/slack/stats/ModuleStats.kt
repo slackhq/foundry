@@ -19,6 +19,7 @@ import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.google.devtools.ksp.gradle.KspTask
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -439,8 +440,10 @@ internal object StatsUtils {
   }
 }
 
+@JsonClass(generateAdapter = true)
 public data class AggregateModuleScore(val scores: List<ModuleScore>)
 
+@JsonClass(generateAdapter = true)
 public data class ModuleScore(
   val moduleName: String,
   val score: Long,
@@ -484,6 +487,7 @@ private fun ModuleStats.weighted(
 // TODO capture build times in this. Percent of total build, mainly. Possibly factor it together
 // with centrality
 //  where centrality is a multiplier for build times.
+@JsonClass(generateAdapter = true)
 public data class Weights(
   val percentOfTotalCode: Double,
   val javaKotlinRatio: Double,
@@ -565,6 +569,7 @@ public data class Weights(
   }
 }
 
+@JsonClass(generateAdapter = true)
 internal data class ModuleStats(
   val modulePath: String,
   val source: Map<String, LanguageStats>,

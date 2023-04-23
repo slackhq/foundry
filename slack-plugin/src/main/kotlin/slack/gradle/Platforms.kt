@@ -15,6 +15,8 @@
  */
 package slack.gradle
 
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.adapter
 import java.io.File
 import okio.buffer
 import okio.source
@@ -254,9 +256,7 @@ public object Platforms {
       project.providers.provider {
         val path = slackProperties.versionsJson ?: return@provider sneakyNull()
         println("Parsing versions json at $path")
-        path.source().buffer().use {
-          JsonTools.MOSHI.adapter(VersionsOutput::class.java).fromJson(it)!!
-        }
+        path.source().buffer().use { JsonTools.MOSHI.adapter<VersionsOutput>().fromJson(it)!! }
       }
 
     val providers = project.providers
@@ -322,12 +322,14 @@ public object Platforms {
   }
 }
 
+@JsonClass(generateAdapter = true)
 internal data class VersionsOutput(val outdated: Outdated) {
   val identifierMap = outdated.dependencies.associateBy { "${it.group}:${it.name}" }
 }
 
-internal data class Outdated(val dependencies: Set<Artifact>)
+@JsonClass(generateAdapter = true) internal data class Outdated(val dependencies: Set<Artifact>)
 
+@JsonClass(generateAdapter = true)
 internal data class Artifact(
   val group: String,
   val available: Available,
@@ -335,6 +337,7 @@ internal data class Artifact(
   val name: String
 )
 
+@JsonClass(generateAdapter = true)
 internal data class Available(val release: String?, val integration: String?) {
   fun newTarget(): String {
     return release ?: integration ?: error("No available target found")

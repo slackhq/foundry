@@ -115,7 +115,6 @@ dependencies {
   api(libs.okhttp)
 
   implementation(libs.moshi)
-  implementation(libs.moshi.kotlin)
 
   // Graphing library with Betweenness Centrality algo for modularization score
   implementation(libs.jgrapht)
