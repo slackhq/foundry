@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.8.6
+-----
+
+_2023-04-22_
+
+- Revert using native Kotlin lambdas instead of `class` for SAM conversions due to https://github.com/gradle/gradle/issues/24871.
+
 0.8.5
 -----
 
