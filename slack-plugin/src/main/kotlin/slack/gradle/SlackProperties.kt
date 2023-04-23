@@ -502,6 +502,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val modScoreIgnore: Boolean
     get() = project.booleanProperty("slack.gradle.config.modscore.ignore")
 
+  /** Experimental flag to enable logging thermal throttling on macOS devices. */
+  public val logThermals: Boolean
+    get() = project.booleanProperty("slack.log-thermals", defaultValue = false)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")
@@ -535,10 +539,6 @@ public class SlackProperties private constructor(private val project: Project) {
      * other projects.
      */
     public const val KOTLIN_DAEMON_ARGS_KEY: String = "slack.kotlin.daemon.jvmargs"
-
-    /** Experimental flag to enable logging thermal throttling on macOS devices. */
-    // Key-only because it's used in a task init without a project instance
-    public const val LOG_THERMALS: String = "slack.log-thermals"
 
     /** Minimum xmx value for the Gradle daemon. Value is an integer and unit is gigabytes. */
     // Key-only because it's used in a task init without a project instance

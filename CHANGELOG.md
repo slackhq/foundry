@@ -1,6 +1,45 @@
 Changelog
 =========
 
+0.8.6
+-----
+
+_2023-04-22_
+
+- Revert using native Kotlin lambdas instead of `class` for SAM conversions due to https://github.com/gradle/gradle/issues/24871.
+
+0.8.5
+-----
+
+_2023-04-22_
+
+- Clean up thermals logging setup in `SlackTools` and support enabling property at different scopes (local.properties, etc).
+- Shut down thermals heartbeat executor when `SlackTools` is closed.
+- Use native Kotlin lambdas instead of `class` for SAM conversions. The minimum supported Gradle version is now 8.1, which introduced support for this.
+
+0.8.4
+-----
+
+_2023-04-22_
+
+- Fix JSON serialization for thermals data.
+
+0.8.3
+-----
+
+_2023-04-22_
+
+- Don't accidentally create new `SlackTools` instances when reporting background data to Gradle Enterprise. These instances would be orphaned because this would happen _after_ Gradle had closed all existing services, and create a memory leak.
+- Use a lock file to track `SlackTools` instances.
+- Use a single-threaded `Executor` for `SlackTools`' thermals heartbeat.
+
+0.8.2
+-----
+
+_2023-04-22_
+
+- Log a `Throwable` with multiple instances of `SlackTools` to help track origin points.
+
 0.8.1
 -----
 

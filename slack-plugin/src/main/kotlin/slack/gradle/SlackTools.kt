@@ -15,19 +15,24 @@
  */
 package slack.gradle
 
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 import okhttp3.OkHttpClient
+import okio.buffer
+import okio.sink
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
@@ -38,12 +43,10 @@ import slack.gradle.agp.AgpHandler
 import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
-import slack.gradle.util.mapToBoolean
 import slack.gradle.util.shutdown
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
-public abstract class SlackTools @Inject constructor(providers: ProviderFactory) :
-  BuildService<Parameters>, AutoCloseable {
+public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
   public val agpHandler: AgpHandler by lazy { AgpHandlers.createHandler() }
   public val moshi: Moshi
@@ -59,13 +62,13 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
 
   public lateinit var okHttpClient: Lazy<OkHttpClient>
 
-  private var thermalsReporter: ThermalsReporter? = null
-  private val logThermals =
-    OperatingSystem.current().isMacOsX &&
-      !parameters.cleanRequested.get() &&
-      providers.gradleProperty(SlackProperties.LOG_THERMALS).mapToBoolean().getOrElse(false)
+  /** Lock file used to track if multiple [SlackTools] instances were created and not closed. */
+  private val lockFile: File
 
-  private val thermalsWatcher = if (logThermals) ThermalsWatcher(logger, ::thermalsFile) else null
+  // Thermals watching vars
+  private var thermalsReporter: ThermalsReporter? = null
+  private val thermalsWatcher: ThermalsWatcher?
+  private val thermalsExecutor: ExecutorService?
   private var thermalsAtClose: Thermals? = null
 
   /** Returns the current or latest captured thermals log. */
@@ -75,14 +78,27 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     }
 
   init {
-    logger.debug("$LOG SlackTools created")
-    val newCount = INSTANCE_COUNT.incrementAndGet()
-    if (newCount > 1) {
-      logger.debug(
-        "$LOG Multiple instances of SlackTools created. This is likely a bug in the build. New count is $newCount"
-      )
+    logger.debug("SlackTools created")
+    lockFile = parameters.lockDir.get().asFile.resolve("slack-tools.lock").canonicalFile
+    if (lockFile.exists()) {
+      logger.debug("SlackTools file already exists", Throwable())
+    } else {
+      lockFile.parentFile.mkdirs()
+      lockFile.createNewFile()
     }
-    thermalsWatcher?.start()
+
+    // Thermals logging
+    if (parameters.logThermals.get()) {
+      thermalsExecutor =
+        Executors.newSingleThreadExecutor { r ->
+          Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
+        }
+      thermalsWatcher = ThermalsWatcher(logger, ::thermalsFile)
+      thermalsWatcher.start(thermalsExecutor)
+    } else {
+      thermalsWatcher = null
+      thermalsExecutor = null
+    }
   }
 
   public fun registerExtension(extension: SlackToolsExtension) {
@@ -116,44 +132,56 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
     // Close thermals process and save off its current value
     thermalsAtClose = thermalsWatcher?.stop()
     try {
-      if (!parameters.offline.get()) {
-        thermalsAtClose?.let { thermalsReporter?.reportThermals(it) }
+      thermalsAtClose?.let { thermalsAtClose ->
+        // Write final thermals to output file
+        val thermalsJsonFile = parameters.thermalsOutputJsonFile.get().asFile
+        if (thermalsJsonFile.exists()) {
+          thermalsJsonFile.delete()
+        }
+        thermalsJsonFile.parentFile.mkdirs()
+        thermalsJsonFile.createNewFile()
+        JsonWriter.of(thermalsJsonFile.sink().buffer()).use { writer ->
+          moshi.adapter<Thermals>().toJson(writer, thermalsAtClose)
+        }
+        if (!parameters.offline.get()) {
+          thermalsReporter?.reportThermals(thermalsAtClose)
+        }
       }
     } catch (t: Throwable) {
       logger.error("Failed to report thermals", t)
     } finally {
+      lockFile.delete()
       if (okHttpClient.isInitialized()) {
         okHttpClient.value.shutdown()
       }
+      thermalsExecutor?.shutdown()
     }
   }
 
   internal companion object {
-    private const val LOG = "[SlackTools]"
-
-    /**
-     * Gradle creates a new instance of this service for each unique classpath, which we don't want.
-     * This is a best-effort mechanism to catch cases like that and have the consuming build avoid
-     * this.
-     *
-     * See https://github.com/gradle/gradle/issues/17559.
-     */
-    @JvmStatic private val INSTANCE_COUNT = AtomicInteger()
-
     internal const val SERVICE_NAME = "slack-tools"
 
     internal fun register(
       project: Project,
+      logThermals: Boolean,
       okHttpClient: Lazy<OkHttpClient>,
+      thermalsLogJsonFileProvider: Provider<RegularFile>
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
+          parameters.lockDir.set(project.layout.buildDirectory.dir("outputs/logs/lock"))
           parameters.thermalsOutputFile.set(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
+          parameters.thermalsOutputJsonFile.set(thermalsLogJsonFileProvider)
           parameters.offline.set(project.gradle.startParameter.isOffline)
           parameters.cleanRequested.set(
             project.gradle.startParameter.taskNames.any { it.equals("clean", ignoreCase = true) }
+          )
+          parameters.logThermals.set(
+            project.provider {
+              logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
+            }
           )
         }
         .apply {
@@ -166,10 +194,17 @@ public abstract class SlackTools @Inject constructor(providers: ProviderFactory)
   }
 
   public interface Parameters : BuildServiceParameters {
+    /**
+     * A lock dir that's used to check if a previous SlackTools instance was created but not closed.
+     */
+    public val lockDir: DirectoryProperty
     /** An output file that the thermals process (continuously) writes to during the build. */
     public val thermalsOutputFile: RegularFileProperty
+    /** A structured version of [thermalsOutputFile] using JSON. */
+    public val thermalsOutputJsonFile: RegularFileProperty
     public val offline: Property<Boolean>
     public val cleanRequested: Property<Boolean>
+    public val logThermals: Property<Boolean>
   }
 }
 
@@ -186,7 +221,6 @@ public interface SlackToolsExtension {
   public fun bind(sharedDependencies: SlackToolsDependencies)
 }
 
-@Suppress("UNCHECKED_CAST")
 public fun Project.slackTools(): SlackTools {
   return slackToolsProvider().get()
 }

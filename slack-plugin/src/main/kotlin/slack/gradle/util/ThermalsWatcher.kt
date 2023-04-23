@@ -15,17 +15,21 @@
  */
 package slack.gradle.util
 
+import com.squareup.moshi.JsonClass
 import com.sun.jna.Library
 import com.sun.jna.Native
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.observers.DisposableObserver
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.Throws
@@ -47,7 +51,7 @@ import slack.gradle.util.charting.ChartCreator
  */
 // Can't be a sealed interface because Gradle hasn't figured out Kotlin 1.5 yet.
 internal interface ThermalsWatcher {
-  fun start()
+  fun start(executor: Executor)
 
   fun peek(): Thermals
 
@@ -70,7 +74,7 @@ internal class IntelThermalsParser(val thermalsFileProvider: () -> File) : Therm
   private var thermalsFile: File? = null
   private val started = AtomicBoolean(false)
 
-  override fun start() {
+  override fun start(executor: Executor) {
     check(!started.getAndSet(true)) { "Already started" }
     thermalsFile = thermalsFileProvider()
     process = ProcessBuilder("pmset", "-g", "thermlog").redirectOutput(thermalsFile).start()
@@ -190,9 +194,11 @@ internal object ThermlogParser {
   }
 }
 
+@JsonClass(generateAdapter = true, generator = "sealed:type")
 public sealed class Thermals {
   public abstract val wasThrottled: Boolean
 
+  @TypeLabel("empty")
   public object Empty : Thermals() {
     override val wasThrottled: Boolean = false
   }
@@ -208,6 +214,8 @@ public sealed class Thermals {
   }
 }
 
+@TypeLabel("data")
+@JsonClass(generateAdapter = true)
 public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
 
   init {
@@ -256,6 +264,7 @@ public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
   }
 }
 
+@JsonClass(generateAdapter = true)
 public data class ThermLog(
   public val timestamp: LocalDateTime,
   public val schedulerLimit: Int,
@@ -275,11 +284,11 @@ internal class AppleSiliconThermals(
   private var thermalsFile: File? = null
   private val started = AtomicBoolean(false)
 
-  override fun start() {
+  override fun start(executor: Executor) {
     check(!started.getAndSet(true)) { "Already started." }
     thermalsFile = thermalsFileProvider()
     heartbeat =
-      Observable.interval(5, SECONDS)
+      Observable.interval(5, SECONDS, Schedulers.from(executor))
         .map {
           ThermLog(
             timestamp = LocalDateTime.now(),

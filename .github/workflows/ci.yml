@@ -25,7 +25,8 @@ jobs:
       matrix:
         ci_java_version: ['19']
         ci_kotlin_version: ['1.8.20']
-        ci_agp_version: ['8.0.0', '8.1.0-beta01']
+        # TODO add back 8.1.0 after the CommonExtension generic problem is fixed
+        ci_agp_version: ['8.0.0']
     env:
       DEP_OVERRIDES: 'true'
       DEP_OVERRIDE_KOTLIN: '${{ matrix.ci_kotlin_version }}'
@@ -78,4 +79,4 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }} -x dokkaHtml
