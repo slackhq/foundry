@@ -15,6 +15,7 @@
  */
 package slack.stats
 
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
 import java.io.File
 import okio.buffer
@@ -208,6 +209,7 @@ internal abstract class LocTask : DefaultTask() {
     }
   }
 
+  @JsonClass(generateAdapter = true)
   data class LocData(
     val srcs: Map<String, LanguageStats>,
     val generatedSrcs: Map<String, LanguageStats>

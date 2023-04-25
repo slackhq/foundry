@@ -70,7 +70,7 @@ dependencies {
 
   compileOnly(platform(kotlin("bom", version = libs.versions.kotlin.get())))
   compileOnly(kotlin("gradle-plugin", version = libs.versions.kotlin.get()))
-  implementation(kotlin("reflect", version = libs.versions.kotlin.get()))
+  compileOnly(kotlin("reflect", version = libs.versions.kotlin.get()))
 
   // compileOnly because we want to leave versioning to the consumers
   // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can
@@ -115,7 +115,6 @@ dependencies {
   api(libs.okhttp)
 
   implementation(libs.moshi)
-  implementation(libs.moshi.kotlin)
 
   // Graphing library with Betweenness Centrality algo for modularization score
   implementation(libs.jgrapht)
