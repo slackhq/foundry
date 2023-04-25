@@ -27,7 +27,6 @@ import okhttp3.OkHttpClient
 import okio.buffer
 import okio.sink
 import org.gradle.api.Project
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -62,9 +61,6 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
   public lateinit var okHttpClient: Lazy<OkHttpClient>
 
-  /** Lock file used to track if multiple [SlackTools] instances were created and not closed. */
-  private val lockFile: File
-
   // Thermals watching vars
   private var thermalsReporter: ThermalsReporter? = null
   private val thermalsWatcher: ThermalsWatcher?
@@ -79,13 +75,6 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
   init {
     logger.debug("SlackTools created")
-    lockFile = parameters.lockDir.get().asFile.resolve("slack-tools.lock").canonicalFile
-    if (lockFile.exists()) {
-      logger.debug("SlackTools file already exists", Throwable())
-    } else {
-      lockFile.parentFile.mkdirs()
-      lockFile.createNewFile()
-    }
 
     // Thermals logging
     if (parameters.logThermals.get()) {
@@ -150,7 +139,6 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     } catch (t: Throwable) {
       logger.error("Failed to report thermals", t)
     } finally {
-      lockFile.delete()
       if (okHttpClient.isInitialized()) {
         okHttpClient.value.shutdown()
       }
@@ -169,7 +157,6 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
-          parameters.lockDir.set(project.layout.buildDirectory.dir("outputs/logs/lock"))
           parameters.thermalsOutputFile.set(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
@@ -194,10 +181,6 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   }
 
   public interface Parameters : BuildServiceParameters {
-    /**
-     * A lock dir that's used to check if a previous SlackTools instance was created but not closed.
-     */
-    public val lockDir: DirectoryProperty
     /** An output file that the thermals process (continuously) writes to during the build. */
     public val thermalsOutputFile: RegularFileProperty
     /** A structured version of [thermalsOutputFile] using JSON. */

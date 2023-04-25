@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.8.7
+-----
+
+_2023-04-23_
+
+- Remove lock file checking in `SlackTools` because this apparently invalidates configuration cache every time.
+
 0.8.6
 -----
 
