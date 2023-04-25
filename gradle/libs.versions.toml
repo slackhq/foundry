@@ -1,7 +1,7 @@
 [versions]
 agp = "8.0.0"
 anvil = "2.4.4"
-bugsnagGradle = "7.5.0"
+bugsnagGradle = "8.0.0"
 compose-jb = "1.4.0"
 dependencyAnalysisPlugin = "1.20.0"
 detekt = "1.22.0"
