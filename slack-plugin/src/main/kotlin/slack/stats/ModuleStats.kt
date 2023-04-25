@@ -20,9 +20,7 @@ import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.squareup.wire.gradle.WireTask
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
@@ -385,8 +383,6 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
-  private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-
   init {
     group = "slack"
   }
@@ -397,7 +393,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
     val (sources, generatedSources) =
       if (locSrcFiles.isNotEmpty()) {
         locDataFiles.singleFile.source().buffer().use {
-          moshi.adapter<LocTask.LocData>().fromJson(it)!!
+          JsonTools.MOSHI.adapter<LocTask.LocData>().fromJson(it)!!
         }
       } else {
         LocTask.LocData.EMPTY
@@ -407,8 +403,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
     logger.debug("Writing stats to ${outputFile.asFile.get()}")
     outputFile.asFile.get().sink().buffer().use { sink ->
-      moshi
-        .adapter<ModuleStats>()
+      JsonTools.MOSHI.adapter<ModuleStats>()
         .toJson(
           sink,
           ModuleStats(modulePath.get(), sources, generatedSources, tags.get(), dependencies)
