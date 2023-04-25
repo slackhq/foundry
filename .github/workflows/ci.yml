@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         ci_java_version: ['19']
-        ci_kotlin_version: ['1.8.0']
+        ci_kotlin_version: ['1.8.20']
         # TODO add back 8.1.0 after the CommonExtension generic problem is fixed
         ci_agp_version: ['8.0.0']
     env:
@@ -38,16 +38,6 @@ jobs:
 
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
-
-      - name: Generate cache key
-        run: ./.github/checksum.sh checksum.txt
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ matrix.job }}-${{ hashFiles('checksum.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-${{ matrix.job }}-
 
       - name: Install JDK ${{ matrix.ci_java_version }}
         uses: actions/setup-java@v3
@@ -65,20 +55,13 @@ jobs:
         if: always()
         run: echo ${{ steps.gradle.outputs.build-scan-url }}
 
-      - name: (Fail-only) Bundle the build report
-        if: failure()
-        run: find . -type d -name 'reports' | zip -@ -r build-reports.zip
-
-      - name: (Fail-only) Upload the build report
+      - name: (Fail-only) Upload build reports
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: error-report
-          path: build-reports.zip
-
-      - name: Publish snapshot (main branch only)
-        if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main' && matrix.ci_agp_version == '7.2.0' && matrix.ci_kotlin_version == '1.7.0' && matrix.ci_java_version == '17'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+          name: reports
+          path: |
+            **/build/reports/**
 
   publish-snapshot:
     name: 'Publish snapshot (main only)'
@@ -88,14 +71,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ matrix.job }}-${{ hashFiles('checksum.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-${{ matrix.job }}-
-
-      - name: Install JDK ${{ matrix.ci_java_version }}
+      - name: Install JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'

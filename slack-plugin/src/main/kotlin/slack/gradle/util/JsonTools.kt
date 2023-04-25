@@ -20,7 +20,6 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.addAdapter
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -30,7 +29,6 @@ internal object JsonTools {
     Moshi.Builder()
       // Used in SlackTools for thermals data
       .addAdapter<LocalDateTime>(LocalDateTimeJsonAdapter())
-      .addLast(KotlinJsonAdapterFactory())
       .build()
 }
 

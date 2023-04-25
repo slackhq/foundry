@@ -16,6 +16,7 @@
 package slack.stats
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 // Example
 // "HTML" :{
@@ -23,6 +24,7 @@ import com.squareup.moshi.Json
 //  "blank": 3575,
 //  "comment": 0,
 //  "code": 116111},
+@JsonClass(generateAdapter = true)
 internal data class LanguageStats(
   @Json(name = "nFiles") val files: Int,
   val code: Int,

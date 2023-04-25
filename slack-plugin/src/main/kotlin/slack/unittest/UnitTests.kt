@@ -80,7 +80,9 @@ internal object UnitTests {
       return
     }
 
-    if (slackProperties.ciUnitTestEnableKover) {
+    if (
+      slackProperties.ciUnitTestEnableKover && project.path != slackProperties.platformProjectPath
+    ) {
       project.pluginManager.apply("org.jetbrains.kotlinx.kover")
     }
 
