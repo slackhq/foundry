@@ -172,8 +172,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     runCatching(block).onFailure { t -> logger.error(errorMessage, t) }
   }
 
-  internal companion object {
-    internal const val SERVICE_NAME = "slack-tools"
+  public companion object {
+    public const val SERVICE_NAME: String = "SlackTools"
 
     internal fun register(
       project: Project,
