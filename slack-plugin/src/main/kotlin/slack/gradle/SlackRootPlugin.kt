@@ -121,7 +121,9 @@ internal class SlackRootPlugin : Plugin<Project> {
     ModuleStatsTasks.configureRoot(project, slackProperties)
     ComputeAffectedProjectsTask.register(project, slackProperties)
     val scanApi = ScanApi(project)
-    project.configureBuildScanMetadata(scanApi)
+    if (slackProperties.applyCommonBuildTags) {
+      project.configureBuildScanMetadata(scanApi)
+    }
     if (scanApi.isAvailable) {
       // It's SUPER important to capture this log File instance separately before passing into the
       // background call below, as this is serialized as an input to that lambda. We also cannot use

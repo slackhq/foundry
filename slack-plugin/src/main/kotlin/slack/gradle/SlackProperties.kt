@@ -506,6 +506,13 @@ public class SlackProperties private constructor(private val project: Project) {
   public val logThermals: Boolean
     get() = project.booleanProperty("slack.log-thermals", defaultValue = false)
 
+  /**
+   * Enables applying common build tags. We are likely to remove these in favor of Gradle's
+   * first-party plugin.
+   */
+  public val applyCommonBuildTags: Boolean
+    get() = project.booleanProperty("sgp.ge.apply-common-build-tags", defaultValue = true)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")
