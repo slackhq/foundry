@@ -107,8 +107,15 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
           override val okHttpClient: Lazy<OkHttpClient>
             get() = this@SlackTools.okHttpClient
         }
+      val context =
+        object : SlackToolsExtension.Context {
+          override val isOffline: Boolean
+            get() = this@SlackTools.parameters.offline.get()
+          override val sharedDependencies: SlackToolsDependencies
+            get() = dependencies
+        }
       for (extension in extensions.values) {
-        extension.bind(dependencies)
+        extension.bind(context)
         if (extension is ThermalsReporter) {
           if (thermalsReporter != null) {
             logger.warn("Multiple thermals reporters registered, only the last one will be used")
@@ -227,7 +234,12 @@ public interface SlackToolsDependencies {
 
 /** An extension for SlackTools. */
 public interface SlackToolsExtension : AutoCloseable {
-  public fun bind(sharedDependencies: SlackToolsDependencies)
+  public fun bind(context: Context)
+
+  public interface Context {
+    public val isOffline: Boolean
+    public val sharedDependencies: SlackToolsDependencies
+  }
 }
 
 public fun Project.slackTools(): SlackTools {
