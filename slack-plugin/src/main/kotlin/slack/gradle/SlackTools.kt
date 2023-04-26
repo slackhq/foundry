@@ -132,6 +132,11 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     return thermalsWatcher?.peek()
   }
 
+  /** Retrieves a loaded instance of [T], if any. */
+  public fun <T : SlackToolsExtension> findExtension(type: Class<out T>): T? {
+    @Suppress("UNCHECKED_CAST") return extensions[type] as T?
+  }
+
   override fun close() {
     // Close thermals process and save off its current value
     thermalsAtClose = thermalsWatcher?.stop()
