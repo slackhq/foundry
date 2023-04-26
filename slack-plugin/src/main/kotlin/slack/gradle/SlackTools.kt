@@ -94,7 +94,14 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
         .stream()
         .asSequence()
         .forEach { provider ->
-          val previous = put(provider.type(), provider.get())
+          val extension =
+            try {
+              provider.get()
+            } catch (e: InstantiationException) {
+              logger.error("Failed to load extension ${provider.type().simpleName}", e)
+              return@forEach
+            }
+          val previous = put(provider.type(), extension)
           check(previous == null) {
             "Duplicate extension registered for ${provider.type().simpleName}"
           }
