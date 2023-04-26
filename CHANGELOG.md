@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.8.8
+-----
+
+_2023-04-25_
+
+- Update to Kotlin 1.8.20.
+- Remove `moshi-kotlin`, only use generated adapters now.
+- Don't auto-apply the Kover plugin on a platform project.
+- Add new `sgp.ge.apply-common-build-tags` property flag to gate applying common build tags to a project.
+- Switch `SlackToolsExtension` to work as a `ServiceLoader` instead.
+
 0.8.7
 -----
 
