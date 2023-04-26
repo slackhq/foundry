@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.8.10
+-----
+
+_2023-04-25_
+
+- Add `Context` to `SlackToolsExtension`.
+
 0.8.9
 -----
 
