@@ -19,10 +19,10 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
+import java.util.ServiceLoader
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.reflect.KClass
+import kotlin.streams.asSequence
 import okhttp3.OkHttpClient
 import okio.buffer
 import okio.sink
@@ -57,7 +57,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   public lateinit var globalConfig: GlobalConfig
 
   private val logger = Logging.getLogger("SlackTools")
-  private val extensions = ConcurrentHashMap<KClass<out SlackToolsExtension>, SlackToolsExtension>()
+  private val extensions: Map<Class<out SlackToolsExtension>, SlackToolsExtension>
 
   public lateinit var okHttpClient: Lazy<OkHttpClient>
 
@@ -88,19 +88,34 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       thermalsWatcher = null
       thermalsExecutor = null
     }
-  }
 
-  public fun registerExtension(extension: SlackToolsExtension) {
-    val dependencies =
-      object : SlackToolsDependencies {
-        override val okHttpClient: Lazy<OkHttpClient>
-          get() = this@SlackTools.okHttpClient
+    extensions = buildMap {
+      ServiceLoader.load(SlackToolsExtension::class.java, SlackTools::class.java.classLoader)
+        .stream()
+        .asSequence()
+        .forEach { provider ->
+          val previous = put(provider.type(), provider.get())
+          check(previous == null) {
+            "Duplicate extension registered for ${provider.type().simpleName}"
+          }
+        }
+    }
+
+    if (extensions.isNotEmpty()) {
+      val dependencies =
+        object : SlackToolsDependencies {
+          override val okHttpClient: Lazy<OkHttpClient>
+            get() = this@SlackTools.okHttpClient
+        }
+      for (extension in extensions.values) {
+        extension.bind(dependencies)
+        if (extension is ThermalsReporter) {
+          if (thermalsReporter != null) {
+            logger.warn("Multiple thermals reporters registered, only the last one will be used")
+          }
+          thermalsReporter = extension
+        }
       }
-    val previous = extensions.put(extension::class, extension)
-    check(previous == null) { "Duplicate extension registered for ${extension::class.simpleName}" }
-    extension.bind(dependencies)
-    if (extension is ThermalsReporter) {
-      thermalsReporter = extension
     }
   }
 
@@ -120,7 +135,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   override fun close() {
     // Close thermals process and save off its current value
     thermalsAtClose = thermalsWatcher?.stop()
-    try {
+    runCatchingWithLog("Failed to report thermals") {
       thermalsAtClose?.let { thermalsAtClose ->
         // Write final thermals to output file
         val thermalsJsonFile = parameters.thermalsOutputJsonFile.get().asFile
@@ -136,14 +151,20 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
           thermalsReporter?.reportThermals(thermalsAtClose)
         }
       }
-    } catch (t: Throwable) {
-      logger.error("Failed to report thermals", t)
-    } finally {
-      if (okHttpClient.isInitialized()) {
-        okHttpClient.value.shutdown()
-      }
-      thermalsExecutor?.shutdown()
     }
+
+    runCatchingWithLog("Failed to close extension") {
+      extensions.values.forEach(SlackToolsExtension::close)
+    }
+
+    thermalsExecutor?.shutdown()
+    if (okHttpClient.isInitialized()) {
+      okHttpClient.value.shutdown()
+    }
+  }
+
+  private fun runCatchingWithLog(errorMessage: String, block: () -> Unit) {
+    runCatching(block).onFailure { t -> logger.error(errorMessage, t) }
   }
 
   internal companion object {
@@ -200,7 +221,7 @@ public interface SlackToolsDependencies {
 }
 
 /** An extension for SlackTools. */
-public interface SlackToolsExtension {
+public interface SlackToolsExtension : AutoCloseable {
   public fun bind(sharedDependencies: SlackToolsDependencies)
 }
 
