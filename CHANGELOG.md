@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.8.9
+-----
+
+_2023-04-25_
+
+- Expose missing `SlackTools.findExtension` API.
+- Expose missing `SlackTools.SERVICE_NAME` for `@ServiceReference` API.
+
 0.8.8
 -----
 
