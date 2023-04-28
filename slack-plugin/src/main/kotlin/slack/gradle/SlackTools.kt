@@ -90,7 +90,10 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     }
 
     extensions = buildMap {
-      ServiceLoader.load(SlackToolsExtension::class.java, SlackTools::class.java.classLoader)
+      ServiceLoader.load(
+          SlackToolsExtension::class.java,
+          SlackToolsExtension::class.java.classLoader
+        )
         .stream()
         .asSequence()
         .forEach { provider ->
@@ -101,7 +104,9 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
               logger.error("Failed to load extension ${provider.type().simpleName}", e)
               return@forEach
             }
-          val previous = put(provider.type(), extension)
+          val type = provider.type()
+          logger.debug("Loaded extension ${type.simpleName}")
+          val previous = put(type, extension)
           check(previous == null) {
             "Duplicate extension registered for ${provider.type().simpleName}"
           }
