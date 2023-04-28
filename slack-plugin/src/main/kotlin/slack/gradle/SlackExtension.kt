@@ -90,6 +90,8 @@ constructor(
       val allowKsp = slackProperties.allowKsp
       val allowMoshiIr = slackProperties.allowMoshiIr
       val allowNapt = slackProperties.allowNapt
+      val allowDaggerKsp = slackProperties.allowNapt
+      val allowAnvilKsp = allowDaggerKsp && slackProperties.allowAnvilKsp
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
@@ -213,8 +215,13 @@ constructor(
         }
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-          markKaptNeeded("Dagger compiler")
-          dependencies.add(aptConfiguration(), SlackDependencies.Dagger.compiler)
+          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowAnvilKsp)) {
+            markKspNeeded("Dagger compiler")
+            dependencies.add("ksp", SlackDependencies.Dagger.compiler)
+          } else {
+            markKaptNeeded("Dagger compiler")
+            dependencies.add(aptConfiguration(), SlackDependencies.Dagger.compiler)
+          }
         }
       }
 
@@ -386,23 +393,12 @@ constructor(
   /**
    * Enables dagger for this project.
    *
-   * @param enableComponents enables dagger components in this project, which in turn imposes use
-   *
-   * ```
-   *                         of the dagger compiler (slower!)
-   * @param projectHasJavaInjections
-   * ```
-   *
-   * indicates if this project has injected _Java_ files. This means
-   *
-   * ```
-   *                                 any Java file with `@Inject` or `@AssistedInject`. This imposes
-   *                                 use of the dagger compiler (slower!) because Anvil only
-   *                                 processes Kotlin files.
-   * @param action
-   * ```
-   *
-   * optional block for extra configuration, such as anvil generators or android.
+   * @param enableComponents enables dagger components in this project, which in turn imposes use of
+   *   the dagger compiler (slower!)
+   * @param projectHasJavaInjections indicates if this project has injected _Java_ files. This means
+   *   any Java file with `@Inject` or `@AssistedInject`. This imposes use of the dagger compiler
+   *   (slower!) because Anvil only processes Kotlin files.
+   * @param action optional block for extra configuration, such as anvil generators or android.
    */
   @DelicateSlackPluginApi
   public fun dagger(
@@ -584,6 +580,7 @@ public abstract class MoshiHandler {
 public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) {
   internal val enabled: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val useDaggerCompiler: Property<Boolean> = objects.property<Boolean>().convention(false)
+  internal val disableAnvil: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val runtimeOnly: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val alwaysEnableAnvilComponentMerging: Property<Boolean> =
     objects.property<Boolean>().convention(false)
@@ -617,10 +614,19 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     alwaysEnableAnvilComponentMerging.set(true)
   }
 
+  /**
+   * Disables anvil. Should only be used for cases where anvil is explicitly not wanted, such as
+   * using Dagger KSP while Anvil doesn't support it.
+   */
+  @DelicateSlackPluginApi
+  public fun disableAnvil() {
+    disableAnvil.set(true)
+  }
+
   internal fun computeConfig(): DaggerConfig? {
     if (!enabled.get()) return null
     val runtimeOnly = runtimeOnly.get()
-    val enableAnvil = !runtimeOnly
+    val enableAnvil = !runtimeOnly && !disableAnvil.get()
     var anvilFactories = true
     var anvilFactoriesOnly = false
     val useDaggerCompiler = useDaggerCompiler.get()
@@ -637,7 +643,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
       anvilFactories,
       anvilFactoriesOnly,
       useDaggerCompiler,
-      alwaysEnableAnvilComponentMerging
+      alwaysEnableAnvilComponentMerging,
     )
   }
 
@@ -647,7 +653,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     var anvilFactories: Boolean,
     var anvilFactoriesOnly: Boolean,
     val useDaggerCompiler: Boolean,
-    val alwaysEnableAnvilComponentMerging: Boolean
+    val alwaysEnableAnvilComponentMerging: Boolean,
   )
 }
 
