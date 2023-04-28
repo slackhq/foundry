@@ -260,6 +260,14 @@ public class SlackProperties private constructor(private val project: Project) {
   public val allowNapt: Boolean
     get() = booleanProperty("slack.allow-napt")
 
+  /** Flag to enable/disable Dagger KSP. */
+  public val allowDaggerKsp: Boolean
+    get() = booleanProperty("slack.ksp.allow-dagger")
+
+  /** Flag to enable/disable Anvil KSP. Requires [allowDaggerKsp]. */
+  public val allowAnvilKsp: Boolean
+    get() = booleanProperty("slack.ksp.allow-anvil")
+
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
     get() = optionalStringProperty("slack.disabledVariants")
