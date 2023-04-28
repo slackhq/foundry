@@ -39,9 +39,8 @@ import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
+import slack.gradle.util.*
 import slack.gradle.util.JsonTools
-import slack.gradle.util.Thermals
-import slack.gradle.util.ThermalsData
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
 import slack.stats.ModuleStatsTasks
@@ -76,7 +75,13 @@ internal class SlackRootPlugin : Plugin<Project> {
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals
-    SlackTools.register(project, logThermals, okHttpClient, thermalsLogJsonFile)
+    SlackTools.register(
+      project = project,
+      logThermals = logThermals,
+      enableSkippyDiagnostics = slackProperties.affectedProjects != null,
+      okHttpClient = okHttpClient,
+      thermalsLogJsonFileProvider = thermalsLogJsonFile
+    )
     configureRootProject(project, slackProperties, thermalsLogJsonFile)
   }
 

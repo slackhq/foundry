@@ -95,6 +95,7 @@ private fun Logger.logWithTag(message: String) {
 internal class StandardProjectConfigurations(
   private val globalProperties: SlackProperties,
   private val versionCatalog: VersionCatalog,
+  private val slackTools: SlackTools,
 ) {
 
   private val kotlinCompilerArgs =
@@ -107,9 +108,8 @@ internal class StandardProjectConfigurations(
 
   fun applyTo(project: Project) {
     val slackProperties = SlackProperties(project)
-    val globalConfig = project.slackTools().globalConfig
     project.applyCommonConfigurations()
-    project.applyJvmConfigurations(globalConfig, slackProperties)
+    project.applyJvmConfigurations(slackProperties)
   }
 
   private fun Project.applyCommonConfigurations() {
@@ -131,10 +131,7 @@ internal class StandardProjectConfigurations(
     }
   }
 
-  private fun Project.applyJvmConfigurations(
-    globalConfig: GlobalConfig,
-    slackProperties: SlackProperties
-  ) {
+  private fun Project.applyJvmConfigurations(slackProperties: SlackProperties) {
     val platformProjectPath = slackProperties.platformProjectPath
     if (platformProjectPath == null) {
       if (slackProperties.strictMode) {
@@ -193,15 +190,9 @@ internal class StandardProjectConfigurations(
     }
 
     // TODO always configure compileOptions here
-    configureAndroidProjects(globalConfig, slackExtension, jvmTargetVersion, slackProperties)
+    configureAndroidProjects(slackExtension, jvmTargetVersion, slackProperties)
 
-    configureKotlinProjects(
-      globalConfig,
-      jdkVersion,
-      jvmTargetVersion,
-      slackProperties,
-      slackExtension
-    )
+    configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
     configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
     slackExtension.applyTo(this)
 
@@ -386,7 +377,6 @@ internal class StandardProjectConfigurations(
 
   @Suppress("LongMethod")
   private fun Project.configureAndroidProjects(
-    globalConfig: GlobalConfig,
     slackExtension: SlackExtension,
     jvmTargetVersion: Int,
     slackProperties: SlackProperties
@@ -481,7 +471,7 @@ internal class StandardProjectConfigurations(
               // dependencies start getting resolved.
               //
               logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-              test.dependsOn(globalConfig.updateRobolectricJarsTask)
+              test.dependsOn(slackTools.globalConfig.updateRobolectricJarsTask)
 
               // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
               // https://github.com/robolectric/robolectric/issues/5115
@@ -514,7 +504,8 @@ internal class StandardProjectConfigurations(
         LintTasks.configureSubProject(
           project,
           slackProperties,
-          globalConfig.affectedProjects,
+          slackTools.globalConfig.affectedProjects,
+          slackTools::logAvoidedTask,
           this,
           sdkVersions::value
         )
@@ -556,7 +547,8 @@ internal class StandardProjectConfigurations(
         LintTasks.configureSubProject(
           project,
           slackProperties,
-          globalConfig.affectedProjects,
+          slackTools.globalConfig.affectedProjects,
+          slackTools::logAvoidedTask,
           this,
           sdkVersions::value
         )
@@ -716,7 +708,8 @@ internal class StandardProjectConfigurations(
             slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
               false
             )
-          val isAffectedProject = globalConfig.affectedProjects?.contains(project.path) ?: true
+          val isAffectedProject =
+            slackTools.globalConfig.affectedProjects?.contains(project.path) ?: true
           if (!excluded && isAffectedProject) {
             variant.androidTest?.artifacts?.get(SingleArtifact.APK)?.let { apkArtifactsDir ->
               // Wire this up to the aggregator
@@ -724,7 +717,9 @@ internal class StandardProjectConfigurations(
             }
           } else {
             val reason = if (excluded) "excluded" else "not affected"
-            val log = "$LOG Skipping ${project.path}:androidTest because it is $reason."
+            val taskPath = "${project.path}:androidTest"
+            val log = "$LOG Skipping $taskPath because it is $reason."
+            slackTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
             if (slackProperties.debug) {
               project.logger.lifecycle(log)
             } else {
@@ -762,7 +757,8 @@ internal class StandardProjectConfigurations(
         LintTasks.configureSubProject(
           project,
           slackProperties,
-          globalConfig.affectedProjects,
+          slackTools.globalConfig.affectedProjects,
+          slackTools::logAvoidedTask,
           this,
           sdkVersions::value
         )
@@ -795,7 +791,6 @@ internal class StandardProjectConfigurations(
 
   @Suppress("LongMethod")
   private fun Project.configureKotlinProjects(
-    globalConfig: GlobalConfig,
     jdkVersion: Int?,
     jvmTargetVersion: Int,
     slackProperties: SlackProperties,
@@ -815,7 +810,9 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      configure<KotlinProjectExtension> { kotlinDaemonJvmArgs = globalConfig.kotlinDaemonArgs }
+      configure<KotlinProjectExtension> {
+        kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
+      }
 
       tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
         // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
@@ -909,9 +906,9 @@ internal class StandardProjectConfigurations(
         DetektTasks.configureSubProject(
           project,
           slackProperties,
-          globalConfig.affectedProjects,
+          slackTools.globalConfig.affectedProjects,
           actualJvmTarget,
-          globalConfig.mergeDetektBaselinesTask,
+          slackTools.globalConfig.mergeDetektBaselinesTask,
         )
       }
     }
@@ -920,7 +917,8 @@ internal class StandardProjectConfigurations(
       LintTasks.configureSubProject(
         project,
         slackProperties,
-        globalConfig.affectedProjects,
+        slackTools.globalConfig.affectedProjects,
+        slackTools::logAvoidedTask,
         null,
         null
       )
