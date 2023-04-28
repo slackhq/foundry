@@ -56,6 +56,7 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -827,7 +828,10 @@ internal class StandardProjectConfigurations(
           if (!isKaptGenerateStubsTask) {
             freeCompilerArgs.addAll(kotlinCompilerArgs)
           }
-          useK2.set(slackProperties.useK2)
+
+          if (slackProperties.useK2) {
+            languageVersion.set(KotlinVersion.fromVersion("2.0"))
+          }
 
           if (slackExtension.featuresHandler.composeHandler.enabled.get()) {
             logger.debug(
