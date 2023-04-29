@@ -166,6 +166,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   }
 
   internal fun logAvoidedTask(taskType: String, taskName: String) {
+    logger.debug("[Skippy] Skipping '$taskType' task: $taskName")
     avoidedTasks.add(AvoidedTask(taskType, taskName))
   }
 
