@@ -71,7 +71,8 @@ internal object UnitTests {
   fun configureSubproject(
     project: Project,
     slackProperties: SlackProperties,
-    affectedProjects: Set<String>?
+    affectedProjects: Set<String>?,
+    onProjectSkipped: (String, String) -> Unit,
   ) {
     // Projects can opt out of creating the task with this property.
     val enabled = slackProperties.ciUnitTestEnabled
@@ -90,8 +91,9 @@ internal object UnitTests {
       if (affectedProjects == null || project.path in affectedProjects) {
         project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
       } else {
-        val log =
-          "$LOG Skipping ${project.path}:$CI_UNIT_TEST_TASK_NAME because it is not affected."
+        val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
+        onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)
+        val log = "$LOG Skipping $taskPath because it is not affected."
         if (slackProperties.debug) {
           project.logger.lifecycle(log)
         } else {
@@ -169,7 +171,7 @@ internal object UnitTests {
        */
 
       // helps when tests leak memory
-      setForkEvery(slackProperties.unitTestForkEvery)
+      @Suppress("DEPRECATION") setForkEvery(slackProperties.unitTestForkEvery as Long?)
 
       // Cap JVM args per test
       minHeapSize = "128m"

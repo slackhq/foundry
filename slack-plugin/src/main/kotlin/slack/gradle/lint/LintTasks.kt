@@ -50,6 +50,7 @@ internal object LintTasks {
     project: Project,
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
+    onProjectSkipped: (String, String) -> Unit,
     commonExtension: CommonExtension<*, *, *, *>?,
     sdkVersions: (() -> SlackProperties.AndroidSdkProperties)?,
   ) {
@@ -71,7 +72,9 @@ internal object LintTasks {
       if (affectedProjects == null || project.path in affectedProjects) {
         project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
       } else {
-        val log = "$LOG Skipping ${project.path}:$CI_LINT_TASK_NAME because it is not affected."
+        val taskPath = "${project.path}:$CI_LINT_TASK_NAME"
+        val log = "$LOG Skipping $taskPath because it is not affected."
+        onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
         if (slackProperties.debug) {
           project.logger.lifecycle(log)
         } else {

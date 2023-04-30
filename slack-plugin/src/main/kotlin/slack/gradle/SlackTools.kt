@@ -15,6 +15,7 @@
  */
 package slack.gradle
 
+import com.google.common.collect.Sets
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
@@ -73,8 +74,16 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       return thermalsAtClose ?: peekThermals()
     }
 
+  private data class AvoidedTask(val type: String, val taskName: String)
+
+  /**
+   * A set of logged [AvoidedTask]s. This is used for logging skippy diagnostics. These are written
+   * out to a diagnostics file at the end of the build if enabled.
+   */
+  private val avoidedTasks = Sets.newConcurrentHashSet<AvoidedTask>()
+
   init {
-    logger.debug("SlackTools created")
+    debugLog("SlackTools created")
 
     // Thermals logging
     if (parameters.logThermals.get()) {
@@ -105,7 +114,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
               return@forEach
             }
           val type = provider.type()
-          logger.debug("Loaded extension ${type.simpleName}")
+          debugLog("Loaded extension ${type.simpleName}")
           val previous = put(type, extension)
           check(previous == null) {
             "Duplicate extension registered for ${provider.type().simpleName}"
@@ -138,6 +147,14 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     }
   }
 
+  private fun debugLog(message: String, throwable: Throwable? = null) {
+    if (parameters.logVerbosely.get()) {
+      logger.lifecycle(message, throwable)
+    } else {
+      logger.debug(message, throwable)
+    }
+  }
+
   private fun thermalsFile(): File {
     return parameters.thermalsOutputFile.asFile.get().apply {
       if (!exists()) {
@@ -154,6 +171,11 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   /** Retrieves a loaded instance of [T], if any. */
   public fun <T : SlackToolsExtension> findExtension(type: Class<out T>): T? {
     @Suppress("UNCHECKED_CAST") return extensions[type] as T?
+  }
+
+  internal fun logAvoidedTask(taskType: String, taskName: String) {
+    debugLog("[Skippy] Skipping '$taskType' task: $taskName")
+    avoidedTasks.add(AvoidedTask(taskType, taskName))
   }
 
   override fun close() {
@@ -177,6 +199,27 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       }
     }
 
+    if (parameters.enableSkippyDiagnostics.get()) {
+      runCatchingWithLog("Failed to write Skippy diagnostics") {
+        val outputFile = parameters.skippyDiagnosticsOutputFile.get().asFile
+        if (outputFile.exists()) {
+          outputFile.delete()
+        }
+        outputFile.parentFile.mkdirs()
+
+        avoidedTasks
+          .groupBy { it.type }
+          .mapValues { (_, tasks) -> tasks.map { it.taskName }.sorted() }
+          .toSortedMap()
+          .forEach { (type, tasks) ->
+            outputFile.appendText("$type:\n")
+            for (task in tasks) {
+              outputFile.appendText("  $task\n")
+            }
+          }
+      }
+    }
+
     runCatchingWithLog("Failed to close extension") {
       extensions.values.forEach(SlackToolsExtension::close)
     }
@@ -197,6 +240,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     internal fun register(
       project: Project,
       logThermals: Boolean,
+      enableSkippyDiagnostics: Boolean,
+      logVerbosely: Boolean,
       okHttpClient: Lazy<OkHttpClient>,
       thermalsLogJsonFileProvider: Provider<RegularFile>
     ): Provider<SlackTools> {
@@ -215,6 +260,11 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
               logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
             }
           )
+          parameters.enableSkippyDiagnostics.set(enableSkippyDiagnostics)
+          parameters.skippyDiagnosticsOutputFile.set(
+            project.layout.buildDirectory.file("outputs/logs/skippy-diagnostics.txt")
+          )
+          parameters.logVerbosely.set(logVerbosely)
         }
         .apply {
           get().apply {
@@ -233,6 +283,10 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     public val offline: Property<Boolean>
     public val cleanRequested: Property<Boolean>
     public val logThermals: Property<Boolean>
+    public val enableSkippyDiagnostics: Property<Boolean>
+    /** An output file of skippy diagnostics. */
+    public val skippyDiagnosticsOutputFile: RegularFileProperty
+    public val logVerbosely: Property<Boolean>
   }
 }
 

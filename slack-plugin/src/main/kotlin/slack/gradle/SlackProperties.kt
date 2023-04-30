@@ -219,12 +219,19 @@ public class SlackProperties private constructor(private val project: Project) {
   public val ndkVersion: String?
     get() = optionalStringProperty("slack.ndkVersion")
 
+  /**
+   * Enables verbose logging in miscellaneous places of SGP. This is intended to be a less noisy
+   * alternative to running gradle with `--info` or `--debug`.
+   */
+  public val verboseLogging: Boolean
+    get() = project.booleanProperty("sgp.logging.verbose")
+
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
     get() =
       booleanProperty(
         "slack.test.verboseLogging",
-      )
+      ) || verboseLogging
 
   /**
    * Flag to enable kapt in tests. By default these are disabled due to this undesirable (but
