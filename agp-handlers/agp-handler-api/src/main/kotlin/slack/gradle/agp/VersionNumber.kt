@@ -95,6 +95,7 @@ private constructor(
   /** Returns the version number scheme. */
   public interface Scheme {
     public fun parse(value: String?): VersionNumber
+
     public fun format(versionNumber: VersionNumber): String
   }
 
@@ -135,6 +136,7 @@ private constructor(
 
     private class Scanner(val str: String) {
       var pos = 0
+
       fun hasDigit(): Boolean {
         return pos < str.length && Character.isDigit(str[pos])
       }

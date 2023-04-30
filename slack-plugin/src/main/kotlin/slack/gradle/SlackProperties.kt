@@ -410,14 +410,19 @@ public class SlackProperties private constructor(private val project: Project) {
   /* Controls for auto-applied plugins. */
   public val autoApplyTestRetry: Boolean
     get() = booleanProperty("slack.auto-apply.test-retry", defaultValue = true)
+
   public val autoApplySpotless: Boolean
     get() = booleanProperty("slack.auto-apply.spotless", defaultValue = true)
+
   public val autoApplyDetekt: Boolean
     get() = booleanProperty("slack.auto-apply.detekt", defaultValue = true)
+
   public val autoApplyNullaway: Boolean
     get() = booleanProperty("slack.auto-apply.nullaway", defaultValue = true)
+
   public val autoApplyCacheFix: Boolean
     get() = booleanProperty("slack.auto-apply.cache-fix", defaultValue = true)
+
   public val autoApplySortDependencies: Boolean
     get() = booleanProperty("slack.auto-apply.sort-dependencies", defaultValue = true)
 

@@ -25,7 +25,9 @@ internal fun interface PathMatcher {
 private class StringPathMatcher(private val pattern: String) : PathMatcher {
   // TODO if we ever support windows, there's a separate windows method.
   private val regex = Globs.toUnixRegexPattern(pattern).toRegex()
+
   override fun matches(path: String) = regex.matches(path)
+
   override fun toString() = pattern
 }
 

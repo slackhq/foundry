@@ -132,6 +132,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
         object : SlackToolsExtension.Context {
           override val isOffline: Boolean
             get() = this@SlackTools.parameters.offline.get()
+
           override val sharedDependencies: SlackToolsDependencies
             get() = dependencies
         }

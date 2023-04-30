@@ -550,7 +550,9 @@ internal object BootstrapUtils {
   }
 
   data class DaemonArgs(val gradle: GradleDaemonArgs, val kotlin: KotlinDaemonArgs)
+
   data class GradleDaemonArgs(val args: List<String>, val maxWorkers: Int)
+
   data class KotlinDaemonArgs(val args: List<String>)
 }
 

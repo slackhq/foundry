@@ -265,6 +265,7 @@ internal inline fun once(body: OnceCheck.() -> Unit) {
 internal value class OnceCheck(val once: AtomicBoolean = AtomicBoolean(false)) {
   inline val isActive: Boolean
     get() = once.compareAndSet(false, true)
+
   inline fun onFirst(body: () -> Unit) {
     if (isActive) {
       body()
