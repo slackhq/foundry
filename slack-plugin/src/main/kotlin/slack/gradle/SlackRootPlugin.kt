@@ -75,10 +75,23 @@ internal class SlackRootPlugin : Plugin<Project> {
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals
+    val enableSkippy = slackProperties.affectedProjects?.exists() == true
+    if (enableSkippy) {
+      project.logger.lifecycle(
+        "Enabling Skippy using projects in ${slackProperties.affectedProjects}"
+      )
+    } else if (slackProperties.affectedProjects != null) {
+      project.logger.lifecycle(
+        "Skippy is disabled because file '${slackProperties.affectedProjects}' does not exist."
+      )
+    } else {
+      project.logger.debug("Skippy is disabled")
+    }
     SlackTools.register(
       project = project,
       logThermals = logThermals,
-      enableSkippyDiagnostics = slackProperties.affectedProjects != null,
+      enableSkippyDiagnostics = enableSkippy,
+      logVerbosely = slackProperties.verboseLogging,
       okHttpClient = okHttpClient,
       thermalsLogJsonFileProvider = thermalsLogJsonFile
     )
