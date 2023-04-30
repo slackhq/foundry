@@ -26,5 +26,6 @@ public interface AgpHandlerFactory {
   public val minVersion: VersionNumber
   /** Attempts to get the current AGP version or throws and exception if it cannot. */
   public fun currentVersion(): String
+
   public fun create(): AgpHandler
 }

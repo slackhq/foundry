@@ -46,8 +46,10 @@ internal object PermissionChecks {
     VariantConfiguration {
     override val buildType
       get() = variant.buildType
+
     override val flavors: List<Pair<String, String>>
       get() = variant.productFlavors
+
     override val name: String
       get() = variant.name
   }

@@ -20,17 +20,26 @@ import org.gradle.api.logging.Logger
 /** A simple logging abstraction for use in SGP. */
 internal interface SgpLogger {
   fun debug(message: String)
+
   fun info(message: String)
+
   fun lifecycle(message: String)
+
   fun warn(message: String)
+
   fun warn(message: String, error: Throwable)
+
   fun error(message: String)
+
   fun error(message: String, error: Throwable)
 
   companion object {
     fun gradle(logger: Logger): SgpLogger = GradleSgpLogger(logger)
+
     fun noop(): SgpLogger = NoopSgpLogger
+
     fun system(): SgpLogger = SystemSgpLogger
+
     fun prefix(prefix: String, delegate: SgpLogger): SgpLogger = PrefixSgpLogger(prefix, delegate)
   }
 }
@@ -74,11 +83,17 @@ internal class PrefixSgpLogger(private val prefix: String, private val delegate:
 /** A quiet no-op [SgpLogger]. */
 private object NoopSgpLogger : SgpLogger {
   override fun debug(message: String) {}
+
   override fun info(message: String) {}
+
   override fun lifecycle(message: String) {}
+
   override fun warn(message: String) {}
+
   override fun warn(message: String, error: Throwable) {}
+
   override fun error(message: String) {}
+
   override fun error(message: String, error: Throwable) {}
 }
 

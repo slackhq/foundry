@@ -46,6 +46,7 @@ internal constructor(
   private fun source(source: Source): Source {
     return object : ForwardingSource(source) {
       var totalBytesRead = 0L
+
       override fun read(sink: Buffer, byteCount: Long): Long {
         val bytesRead: Long = super.read(sink, byteCount)
         // read() returns the number of bytes read, or -1 if this source is exhausted.
