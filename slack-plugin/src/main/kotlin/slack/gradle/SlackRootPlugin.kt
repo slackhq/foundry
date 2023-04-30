@@ -39,9 +39,8 @@ import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
+import slack.gradle.util.*
 import slack.gradle.util.JsonTools
-import slack.gradle.util.Thermals
-import slack.gradle.util.ThermalsData
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
 import slack.stats.ModuleStatsTasks
@@ -76,7 +75,26 @@ internal class SlackRootPlugin : Plugin<Project> {
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals
-    SlackTools.register(project, logThermals, okHttpClient, thermalsLogJsonFile)
+    val enableSkippy = slackProperties.affectedProjects?.exists() == true
+    if (enableSkippy) {
+      project.logger.lifecycle(
+        "Enabling Skippy using projects in ${slackProperties.affectedProjects}"
+      )
+    } else if (slackProperties.affectedProjects != null) {
+      project.logger.lifecycle(
+        "Skippy is disabled because file '${slackProperties.affectedProjects}' does not exist."
+      )
+    } else {
+      project.logger.debug("Skippy is disabled")
+    }
+    SlackTools.register(
+      project = project,
+      logThermals = logThermals,
+      enableSkippyDiagnostics = enableSkippy,
+      logVerbosely = slackProperties.verboseLogging,
+      okHttpClient = okHttpClient,
+      thermalsLogJsonFileProvider = thermalsLogJsonFile
+    )
     configureRootProject(project, slackProperties, thermalsLogJsonFile)
   }
 

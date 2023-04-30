@@ -42,11 +42,13 @@ internal class SlackBasePlugin : Plugin<Project> {
     if (!target.isRootProject) {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
-      StandardProjectConfigurations(slackProperties, versionCatalog).applyTo(target)
+      val slackTools = target.slackTools()
+      StandardProjectConfigurations(slackProperties, versionCatalog, slackTools).applyTo(target)
       UnitTests.configureSubproject(
         target,
         slackProperties,
-        target.slackTools().globalConfig.affectedProjects
+        slackTools.globalConfig.affectedProjects,
+        slackTools::logAvoidedTask
       )
       CoreBootstrapTask.configureSubprojectBootstrapTasks(target)
 
