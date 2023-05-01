@@ -1,6 +1,22 @@
 Changelog
 =========
 
+0.9.0
+-----
+
+_2023-04-30_
+
+- Improve Skippy logging.
+- Configure all Kotlin compilations, not just JVM compilations.
+- Split standard JVM args and common Kotlin args.
+- Simplify `OkHttpClient` setup in `SlackTools`.
+- Update to Kotlin 1.8.21.
+- Support Dagger KSP in `slack.features.dagger` DSL controls. There are two new properties to control this:
+  - `slack.ksp.allow-dagger` – allow use of Dagger in KSP.
+  - `slack.ksp.allow-anvil` – allow use of Anvil in KSP. Note this is not yet implemented in Anvil, just a toe-hold for the future.
+- Add debugging logs for loading `SlackToolsExtension` instances + fix classloader used for it.
+- Gracefully handle `SlackToolsExtension` extensions that fail to load.
+
 0.8.10
 -----
 
