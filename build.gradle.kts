@@ -113,24 +113,11 @@ data class KotlinBuildConfig(val kotlin: String) {
   val kotlinCompilerArgs: List<String> =
     listOf(
       "-progressive",
-      "-Xinline-classes",
-      "-Xjsr305=strict",
       "-opt-in=kotlin.contracts.ExperimentalContracts",
       "-opt-in=kotlin.experimental.ExperimentalTypeInference",
       "-opt-in=kotlin.ExperimentalStdlibApi",
       "-opt-in=kotlin.time.ExperimentalTime",
-      // Match JVM assertion behavior:
-      // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
-      "-Xassertions=jvm",
-      // Potentially useful for static analysis tools or annotation processors.
-      "-Xemit-jvm-type-annotations",
       "-Xproper-ieee754-comparisons",
-      // Enable new jvm-default behavior
-      // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
-      "-Xjvm-default=all",
-      // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
-      "-Xtype-enhancement-improvements-strict-mode",
-      "-Xjspecify-annotations=strict",
       // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
       // => T & Any)
       "-Xenhance-type-parameter-types-to-def-not-null",
@@ -143,11 +130,34 @@ data class KotlinBuildConfig(val kotlin: String) {
       // parameters
       "-Xself-upper-bound-inference",
     ) + extraArgs
+
+  /**
+   * See more information about these in
+   * - CommonCompilerArguments.kt
+   * - K2JVMCompilerArguments.kt
+   */
+  val kotlinJvmCompilerArgs: List<String> =
+    listOf(
+      "-Xjsr305=strict",
+      // Match JVM assertion behavior:
+      // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
+      "-Xassertions=jvm",
+      // Potentially useful for static analysis tools or annotation processors.
+      "-Xemit-jvm-type-annotations",
+      // Enable new jvm-default behavior
+      // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
+      "-Xjvm-default=all",
+      "-Xtype-enhancement-improvements-strict-mode",
+      // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
+      "-Xjspecify-annotations=strict",
+    )
+
   val kotlinJvmTarget: String = "11"
 
   fun asTemplatesMap(): Map<String, String> {
     return mapOf(
       "kotlinCompilerArgs" to kotlinCompilerArgs.joinToString(", ") { "\"$it\"" },
+      "kotlinJvmCompilerArgs" to kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" },
       "kotlinJvmTarget" to kotlinJvmTarget,
       "kotlinVersion" to kotlin
     )
@@ -156,8 +166,6 @@ data class KotlinBuildConfig(val kotlin: String) {
 
 val kotlinVersion = libs.versions.kotlin.get()
 val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
-
-val kotlinConfigMap = kotlinBuildConfig.asTemplatesMap()
 
 subprojects {
   // This is overly magic but necessary in order to plumb this
@@ -194,15 +202,13 @@ subprojects {
         jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
         // TODO required due to https://github.com/gradle/gradle/issues/24871
         freeCompilerArgs.add("-Xsam-conversions=class")
-        // We should be able to remove this in Gradle 8 when it upgrades to Kotlin 1.7
-        freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
         freeCompilerArgs.addAll(
           kotlinBuildConfig.kotlinCompilerArgs
             // -progressive is useless when running on an older language version but new compiler
             // version
             .filter { it != "-progressive" }
-            .plus("-opt-in=kotlin.RequiresOptIn")
         )
+        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
       }
     }
 

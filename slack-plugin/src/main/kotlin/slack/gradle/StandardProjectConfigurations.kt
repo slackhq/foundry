@@ -55,6 +55,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
@@ -71,7 +72,7 @@ import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
-import slack.gradle.util.configureKotlinCompile
+import slack.gradle.util.configureKotlinCompilationTask
 
 private const val LOG = "SlackPlugin:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -109,8 +110,19 @@ internal class StandardProjectConfigurations(
 
   fun applyTo(project: Project) {
     val slackProperties = SlackProperties(project)
+    val slackExtension =
+      project.extensions.create(
+        "slack",
+        SlackExtension::class.java,
+        globalProperties,
+        slackProperties,
+        versionCatalog
+      )
     project.applyCommonConfigurations()
-    project.applyJvmConfigurations(slackProperties)
+    val jdkVersion = project.jdkVersion()
+    val jvmTargetVersion = project.jvmTargetVersion()
+    project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
+    project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
   }
 
   private fun Project.applyCommonConfigurations() {
@@ -132,7 +144,12 @@ internal class StandardProjectConfigurations(
     }
   }
 
-  private fun Project.applyJvmConfigurations(slackProperties: SlackProperties) {
+  private fun Project.applyJvmConfigurations(
+    jdkVersion: Int,
+    jvmTargetVersion: Int,
+    slackProperties: SlackProperties,
+    slackExtension: SlackExtension
+  ) {
     val platformProjectPath = slackProperties.platformProjectPath
     if (platformProjectPath == null) {
       if (slackProperties.strictMode) {
@@ -167,18 +184,8 @@ internal class StandardProjectConfigurations(
       }
     }
 
-    val slackExtension =
-      extensions.create(
-        "slack",
-        SlackExtension::class.java,
-        globalProperties,
-        slackProperties,
-        versionCatalog
-      )
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
-    val jdkVersion = jdkVersion()
-    val jvmTargetVersion = jvmTargetVersion()
 
     pluginManager.onFirst(JVM_PLUGINS) {
       slackProperties.versions.bundles.commonAnnotations.ifPresent {
@@ -192,8 +199,6 @@ internal class StandardProjectConfigurations(
 
     // TODO always configure compileOptions here
     configureAndroidProjects(slackExtension, jvmTargetVersion, slackProperties)
-
-    configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
     configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
     slackExtension.applyTo(this)
 
@@ -815,7 +820,7 @@ internal class StandardProjectConfigurations(
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
       }
 
-      tasks.configureKotlinCompile(includeKaptGenerateStubsTask = true) {
+      tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
         // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
         // target compilation
         val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
@@ -824,7 +829,6 @@ internal class StandardProjectConfigurations(
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
             allWarningsAsErrors.set(true)
           }
-          jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
           if (!isKaptGenerateStubsTask) {
             freeCompilerArgs.addAll(kotlinCompilerArgs)
           }
@@ -835,7 +839,7 @@ internal class StandardProjectConfigurations(
 
           if (slackExtension.featuresHandler.composeHandler.enabled.get()) {
             logger.debug(
-              "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompile.name}"
+              "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompilationTask.name}"
             )
             if (!isKaptGenerateStubsTask) {
               freeCompilerArgs.add("-Xskip-prerelease-check")
@@ -856,8 +860,12 @@ internal class StandardProjectConfigurations(
             }
           }
 
-          // Potentially useful for static analysis or annotation processors
-          javaParameters.set(true)
+          if (this is KotlinJvmCompilerOptions) {
+            jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
+            // Potentially useful for static analysis or annotation processors
+            javaParameters.set(true)
+            freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
+          }
         }
       }
 
@@ -1010,7 +1018,7 @@ internal class StandardProjectConfigurations(
           dependencies.forEach { dependency ->
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
               if (once.compareAndSet(false, true)) {
-                tasks.configureKotlinCompile {
+                tasks.configureKotlinCompilationTask {
                   compilerOptions { freeCompilerArgs.addAll(config.args) }
                 }
               }
