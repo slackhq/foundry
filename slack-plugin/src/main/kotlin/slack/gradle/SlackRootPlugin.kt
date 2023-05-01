@@ -20,7 +20,6 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
 import com.squareup.moshi.adapter
 import java.util.Locale
-import okhttp3.OkHttpClient
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
@@ -71,7 +70,6 @@ internal class SlackRootPlugin : Plugin<Project> {
     }
 
     val slackProperties = SlackProperties(project)
-    val okHttpClient = lazy { OkHttpClient.Builder().build() }
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals
@@ -92,7 +90,6 @@ internal class SlackRootPlugin : Plugin<Project> {
       logThermals = logThermals,
       enableSkippyDiagnostics = enableSkippy,
       logVerbosely = slackProperties.verboseLogging,
-      okHttpClient = okHttpClient,
       thermalsLogJsonFileProvider = thermalsLogJsonFile
     )
     configureRootProject(project, slackProperties, thermalsLogJsonFile)

@@ -60,7 +60,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   private val logger = Logging.getLogger("SlackTools")
   private val extensions: Map<Class<out SlackToolsExtension>, SlackToolsExtension>
 
-  public lateinit var okHttpClient: Lazy<OkHttpClient>
+  private val okHttpClient = lazy { OkHttpClient.Builder().build() }
 
   // Thermals watching vars
   private var thermalsReporter: ThermalsReporter? = null
@@ -243,7 +243,6 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       logThermals: Boolean,
       enableSkippyDiagnostics: Boolean,
       logVerbosely: Boolean,
-      okHttpClient: Lazy<OkHttpClient>,
       thermalsLogJsonFileProvider: Provider<RegularFile>
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
@@ -267,12 +266,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
           )
           parameters.logVerbosely.set(logVerbosely)
         }
-        .apply {
-          get().apply {
-            globalConfig = GlobalConfig(project)
-            this.okHttpClient = okHttpClient
-          }
-        }
+        .apply { get().apply { globalConfig = GlobalConfig(project) } }
     }
   }
 
