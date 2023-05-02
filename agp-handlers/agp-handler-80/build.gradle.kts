@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
   compileOnly(gradleApi())
-  compileOnly("com.android.tools.build:gradle:8.0.0")
+  compileOnly("com.android.tools.build:gradle:8.0.1")
   api(projects.agpHandlers.agpHandlerApi)
   implementation(libs.autoService.annotations)
   ksp(libs.autoService.ksp)
