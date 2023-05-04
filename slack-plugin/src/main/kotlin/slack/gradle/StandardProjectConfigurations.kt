@@ -53,11 +53,12 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -816,8 +817,14 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      configure<KotlinProjectExtension> {
+      project.kotlinExtension.apply {
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
+        if (jdkVersion != null) {
+          jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
+            vendor.set(JvmVendorSpec.AZUL)
+          }
+        }
       }
 
       tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
@@ -866,12 +873,6 @@ internal class StandardProjectConfigurations(
             javaParameters.set(true)
             freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
           }
-        }
-      }
-
-      if (jdkVersion != null) {
-        configure<KotlinProjectExtension> {
-          jvmToolchain { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
         }
       }
 
