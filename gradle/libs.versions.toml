@@ -69,7 +69,7 @@ gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.
 guava = "com.google.guava:guava:31.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
-jgrapht = "org.jgrapht:jgrapht-core:1.5.1"
+jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 junit = "junit:junit:4.13.2"
