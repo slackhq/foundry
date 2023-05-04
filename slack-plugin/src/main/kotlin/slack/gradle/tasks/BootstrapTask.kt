@@ -400,6 +400,7 @@ internal object BootstrapUtils {
         // https://github.com/google/compile-testing/issues/222 (only javac api)
         "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+        "--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
