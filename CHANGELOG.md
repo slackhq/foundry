@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.9.1
+-----
+
+_2023-05-04_
+
+Happy May the Fourth!
+
+- Add new `sgp.config.jvmVendor` property to control the JVM vendor used in Kotlin and Java toolchains. This value is used to match a known vendor spec, such as `AZUL`.
+- Apply the kover plugin in an `afterEvaluate` block to avoid https://github.com/Kotlin/kotlinx-kover/issues/362.
+- Update jgrapht to 1.5.2.
+- Update oshi to 6.4.2.
+
 0.9.0
 -----
 
