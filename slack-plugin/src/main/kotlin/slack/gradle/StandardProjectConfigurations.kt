@@ -53,7 +53,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
@@ -142,6 +141,7 @@ internal class StandardProjectConfigurations(
   private fun Project.javaCompilerFor(version: Int): Provider<JavaCompiler> {
     return extensions.getByType<JavaToolchainService>().compilerFor {
       languageVersion.set(JavaLanguageVersion.of(version))
+      slackTools.globalConfig.jvmVendor?.let(vendor::set)
     }
   }
 
@@ -304,7 +304,10 @@ internal class StandardProjectConfigurations(
         val target = if (isAndroid) jvmTargetVersion else jdkVersion
         logger.logWithTag("Configuring toolchain for $path to $jdkVersion")
         javaCompiler.set(
-          javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(target)) }
+          javaToolchains.compilerFor {
+            languageVersion.set(JavaLanguageVersion.of(target))
+            slackTools.globalConfig.jvmVendor?.let(vendor::set)
+          }
         )
       }
     }
@@ -822,7 +825,7 @@ internal class StandardProjectConfigurations(
         if (jdkVersion != null) {
           jvmToolchain {
             languageVersion.set(JavaLanguageVersion.of(jdkVersion))
-            vendor.set(JvmVendorSpec.AZUL)
+            slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         }
       }

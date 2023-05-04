@@ -533,6 +533,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val applyCommonBuildTags: Boolean
     get() = project.booleanProperty("sgp.ge.apply-common-build-tags", defaultValue = true)
 
+  /** Defines a required vendor for JDK toolchains. */
+  public val jvmVendor: Provider<String>
+    get() = project.optionalStringProvider("sgp.config.jvmVendor")
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")

@@ -18,6 +18,7 @@ package slack.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 
@@ -28,7 +29,8 @@ private constructor(
   internal val mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
   internal val kotlinDaemonArgs: List<String>,
   internal val errorProneCheckNamesAsErrors: List<String>,
-  internal val affectedProjects: Set<String>?
+  internal val affectedProjects: Set<String>?,
+  internal val jvmVendor: JvmVendorSpec?
 ) {
 
   internal companion object {
@@ -66,6 +68,10 @@ private constructor(
               project.logger.lifecycle("[Skippy] Could not load affected projects from '$file'")
               null
             }
+          },
+        jvmVendor =
+          globalSlackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull.also {
+            project.logger.lifecycle("[SGP] JVM vendor: $it")
           }
       )
     }
