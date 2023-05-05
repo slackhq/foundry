@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.2
+-----
+
+_2023-05-05_
+
+- Fix accidental noisy JVM vendor log.
+
 0.9.1
 -----
 
