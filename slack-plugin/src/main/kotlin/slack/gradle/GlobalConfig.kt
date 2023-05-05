@@ -71,7 +71,7 @@ private constructor(
           },
         jvmVendor =
           globalSlackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull.also {
-            project.logger.lifecycle("[SGP] JVM vendor: $it")
+            project.logger.debug("[SGP] JVM vendor: $it")
           }
       )
     }
