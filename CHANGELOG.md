@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.3
+-----
+
+_2023-05-05_
+
+- Add `jdk.compiler/com.sun.tools.javac.model` to Bootstrap Gradle JVM args and exec prefixes for binaries for GJF 17.
+
 0.9.2
 -----
 
