@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.4
+-----
+
+_2023-05-06_
+
+- Fix alias naming in `SlackVersions`. See `SlackVersions.kt` for updated expected naming of aliases.
+
 0.9.3
 -----
 
