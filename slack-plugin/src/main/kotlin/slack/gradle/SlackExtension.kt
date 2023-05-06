@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.util.setDisallowChanges
 
 @DslMarker public annotation class SlackExtensionMarker
 
@@ -151,7 +152,7 @@ constructor(
           pluginManager.apply("dev.zacsweers.moshix")
         }
         if (enableSealed) {
-          configure<MoshiPluginExtension> { this.enableSealed.set(true) }
+          configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
         }
       }
 
@@ -188,8 +189,8 @@ constructor(
         if (daggerConfig.enableAnvil) {
           pluginManager.apply("com.squareup.anvil")
           configure<AnvilExtension> {
-            generateDaggerFactories.set(daggerConfig.anvilFactories)
-            generateDaggerFactoriesOnly.set(daggerConfig.anvilFactoriesOnly)
+            generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
+            generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
           }
 
           val runtimeProjects =
@@ -328,7 +329,7 @@ constructor(
           daggerConfig?.enableAnvil == true &&
           !daggerConfig.alwaysEnableAnvilComponentMerging
       ) {
-        configure<AnvilExtension> { disableComponentMerging.set(true) }
+        configure<AnvilExtension> { disableComponentMerging.setDisallowChanges(true) }
       }
     }
   }
@@ -386,7 +387,7 @@ constructor(
    * @param action optional block for extra configuration, such as anvil generators or android.
    */
   public fun dagger(action: Action<DaggerHandler>? = null) {
-    daggerHandler.enabled.set(true)
+    daggerHandler.enabled.setDisallowChanges(true)
     action?.execute(daggerHandler)
   }
 
@@ -409,15 +410,15 @@ constructor(
     check(enableComponents || projectHasJavaInjections) {
       "This function should not be called with both enableComponents and projectHasJavaInjections set to false. Either remove these parameters or call a more appropriate non-delicate dagger() overload."
     }
-    daggerHandler.enabled.set(true)
-    daggerHandler.useDaggerCompiler.set(enableComponents || projectHasJavaInjections)
+    daggerHandler.enabled.setDisallowChanges(true)
+    daggerHandler.useDaggerCompiler.setDisallowChanges(enableComponents || projectHasJavaInjections)
     action?.execute(daggerHandler)
   }
 
   /** Adds dagger's runtime as dependencies to this but runs no code generation. */
   public fun daggerRuntimeOnly() {
-    daggerHandler.enabled.set(true)
-    daggerHandler.runtimeOnly.set(true)
+    daggerHandler.enabled.setDisallowChanges(true)
+    daggerHandler.runtimeOnly.setDisallowChanges(true)
   }
 
   /**
@@ -451,11 +452,11 @@ constructor(
     with: Boolean = false,
     kotlin: Boolean = false
   ) {
-    autoValue.set(true)
-    avExtensionParcel.set(parcel)
-    avExtensionMoshi.set(moshi)
-    avExtensionWith.set(with)
-    avExtensionKotlin.set(kotlin)
+    autoValue.setDisallowChanges(true)
+    avExtensionParcel.setDisallowChanges(parcel)
+    avExtensionMoshi.setDisallowChanges(moshi)
+    avExtensionWith.setDisallowChanges(with)
+    avExtensionKotlin.setDisallowChanges(kotlin)
   }
 
   /**
@@ -474,25 +475,25 @@ constructor(
     action: Action<MoshiHandler> = Action {}
   ) {
     action.execute(moshiHandler)
-    moshiHandler.moshi.set(true)
-    moshiHandler.moshiAdapters.set(adapters)
-    moshiHandler.moshiCodegen.set(codegen)
-    moshiHandler.moshiKotlinReflect.set(kotlinReflect)
+    moshiHandler.moshi.setDisallowChanges(true)
+    moshiHandler.moshiAdapters.setDisallowChanges(adapters)
+    moshiHandler.moshiCodegen.setDisallowChanges(codegen)
+    moshiHandler.moshiKotlinReflect.setDisallowChanges(kotlinReflect)
   }
 
   /** Enables AutoService on this project. */
   public fun autoService() {
-    autoService.set(true)
+    autoService.setDisallowChanges(true)
   }
 
   /** Enables InCap on this project. */
   public fun incap() {
-    incap.set(true)
+    incap.setDisallowChanges(true)
   }
 
   /** Enables redacted-compiler-plugin on this project. */
   public fun redacted() {
-    redacted.set(true)
+    redacted.setDisallowChanges(true)
   }
 
   /**
@@ -543,9 +544,8 @@ public abstract class MoshiHandler {
     adapters: Boolean,
     metadataReflect: Boolean = false,
   ) {
-    moshi.set(true)
-    moshixAdapters.set(adapters)
-    moshixMetadataReflect.set(metadataReflect)
+    moshixAdapters.setDisallowChanges(adapters)
+    moshixMetadataReflect.setDisallowChanges(metadataReflect)
   }
 
   /**
@@ -562,16 +562,15 @@ public abstract class MoshiHandler {
     kotlinReflect: Boolean = false,
     metadataReflect: Boolean = false
   ) {
-    moshi.set(true)
-    sealed.set(true)
-    sealedCodegen.set(codegen)
-    sealedReflect.set(kotlinReflect)
-    sealedMetadataReflect.set(metadataReflect)
+    sealed.setDisallowChanges(true)
+    sealedCodegen.setDisallowChanges(codegen)
+    sealedReflect.setDisallowChanges(kotlinReflect)
+    sealedMetadataReflect.setDisallowChanges(metadataReflect)
   }
 
   /** Enables [moshi-lazy-adapters](https://github.com/serj-lotutovici/moshi-lazy-adapters). */
   public fun lazyAdapters() {
-    lazyAdapters.set(true)
+    lazyAdapters.setDisallowChanges(true)
   }
 }
 
@@ -611,7 +610,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
    */
   @DelicateSlackPluginApi
   public fun alwaysEnableAnvilComponentMerging() {
-    alwaysEnableAnvilComponentMerging.set(true)
+    alwaysEnableAnvilComponentMerging.setDisallowChanges(true)
   }
 
   /**
@@ -620,7 +619,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
    */
   @DelicateSlackPluginApi
   public fun disableAnvil() {
-    disableAnvil.set(true)
+    disableAnvil.setDisallowChanges(true)
   }
 
   internal fun computeConfig(): DaggerConfig? {
@@ -687,10 +686,8 @@ constructor(
   }
 
   internal fun enable(multiplatform: Boolean) {
-    enabled.set(true)
-    enabled.disallowChanges()
-    this.multiplatform.set(multiplatform)
-    this.multiplatform.disallowChanges()
+    enabled.setDisallowChanges(true)
+    this.multiplatform.setDisallowChanges(multiplatform)
     if (!multiplatform) {
       val extension =
         checkNotNull(androidExtension) {
@@ -714,7 +711,7 @@ constructor(
       } else {
         project.pluginManager.apply("org.jetbrains.compose")
         project.configure<ComposeExtension> {
-          kotlinCompilerPlugin.set(
+          kotlinCompilerPlugin.setDisallowChanges(
             dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
           )
         }
@@ -810,12 +807,9 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
     excludeFromFladle: Boolean = false,
     allowedVariants: Iterable<String>? = null
   ) {
-    androidTest.set(true)
-    androidTestExcludeFromFladle.set(excludeFromFladle)
-    androidTestAllowedVariants.set(allowedVariants)
-    androidTest.disallowChanges()
-    androidTestExcludeFromFladle.disallowChanges()
-    androidTestAllowedVariants.disallowChanges()
+    androidTest.setDisallowChanges(true)
+    androidTestExcludeFromFladle.setDisallowChanges(excludeFromFladle)
+    androidTestAllowedVariants.setDisallowChanges(allowedVariants)
   }
 
   /** Enables robolectric for this project. */
@@ -823,7 +817,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   public fun robolectric() {
     // Required for Robolectric to work.
     androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
-    robolectric.set(true)
+    robolectric.setDisallowChanges(true)
   }
 }
 
