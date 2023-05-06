@@ -23,6 +23,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskProvider
 import slack.gradle.capitalizeUS
 import slack.gradle.register
+import slack.gradle.util.setDisallowChanges
 
 /**
  * A task that writes runtime dependency info found in [identifiersToVersions].
@@ -69,7 +70,9 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
       return project.tasks.register<PrintFossaDependencies>(
         "print${name.capitalizeUS()}FossaDependencies"
       ) {
-        outputFile.set(project.layout.buildDirectory.file("reports/slack/fossa/$name.txt"))
+        outputFile.setDisallowChanges(
+          project.layout.buildDirectory.file("reports/slack/fossa/$name.txt")
+        )
         configureIdentifiersToVersions(configuration)
       }
     }

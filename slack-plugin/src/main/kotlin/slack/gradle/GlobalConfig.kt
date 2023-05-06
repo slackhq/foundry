@@ -21,6 +21,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.toolchain.JvmVendorSpec
 import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
+import slack.gradle.util.setDisallowChanges
 
 /** Registry of global configuration info. */
 public class GlobalConfig
@@ -44,7 +45,9 @@ private constructor(
           project.gradle.startParameter.taskNames.any { it == MergeDetektBaselinesTask.TASK_NAME }
         ) {
           project.tasks.register<MergeDetektBaselinesTask>(MergeDetektBaselinesTask.TASK_NAME) {
-            outputFile.set(project.layout.projectDirectory.file("config/detekt/baseline.xml"))
+            outputFile.setDisallowChanges(
+              project.layout.projectDirectory.file("config/detekt/baseline.xml")
+            )
           }
         } else {
           null
@@ -88,11 +91,13 @@ private fun Project.createRobolectricJarsDownloadTask(
   return tasks.register<UpdateRobolectricJarsTask>("updateRobolectricJars") {
     val sdksProvider = providers.provider { slackProperties.robolectricTestSdks }
     val iVersionProvider = providers.provider { slackProperties.robolectricIVersion }
-    sdkVersions.set(sdksProvider)
-    instrumentedVersion.set(iVersionProvider)
+    sdkVersions.setDisallowChanges(sdksProvider)
+    instrumentedVersion.setDisallowChanges(iVersionProvider)
     val gradleUserHomeDir = gradle.gradleUserHomeDir
-    outputDir.set(project.layout.dir(project.provider { robolectricJars(gradleUserHomeDir) }))
-    offline.set(project.gradle.startParameter.isOffline)
+    outputDir.setDisallowChanges(
+      project.layout.dir(project.provider { robolectricJars(gradleUserHomeDir) })
+    )
+    offline.setDisallowChanges(project.gradle.startParameter.isOffline)
 
     // If we already have the expected jars downloaded locally, then we can mark this task as up
     // to date.

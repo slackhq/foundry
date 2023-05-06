@@ -27,6 +27,7 @@ import org.gradle.api.tasks.TaskProvider
 import slack.gradle.capitalizeUS
 import slack.gradle.getVersionsCatalog
 import slack.gradle.register
+import slack.gradle.util.setDisallowChanges
 
 /**
  * A task that checks expected versions (from [mappedIdentifiersToVersions]) against runtime
@@ -90,7 +91,7 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
         "check${name.capitalizeUS()}Versions"
       ) {
         configureIdentifiersToVersions(configuration)
-        outputFile.set(
+        outputFile.setDisallowChanges(
           project.layout.buildDirectory.file(
             "reports/slack/dependencyVersionsIssues/$name/issues.txt"
           )

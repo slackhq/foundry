@@ -180,32 +180,34 @@ internal class SlackRootPlugin : Plugin<Project> {
     // Add ktlint download task
     slackProperties.versions.ktlint?.let { ktlintVersion ->
       project.tasks.register<KtLintDownloadTask>("updateKtLint") {
-        version.set(ktlintVersion)
-        outputFile.set(project.layout.projectDirectory.file("config/bin/ktlint"))
+        version.setDisallowChanges(ktlintVersion)
+        outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/ktlint"))
       }
     }
 
     // Add GJF download task
     slackProperties.versions.gjf?.let { gjfVersion ->
       project.tasks.register<GjfDownloadTask>("updateGjf") {
-        version.set(gjfVersion)
-        outputFile.set(project.layout.projectDirectory.file("config/bin/gjf"))
+        version.setDisallowChanges(gjfVersion)
+        outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/gjf"))
       }
     }
 
     // Add ktfmt download task
     slackProperties.versions.ktfmt?.let { ktfmtVersion ->
       project.tasks.register<KtfmtDownloadTask>("updateKtfmt") {
-        version.set(ktfmtVersion)
-        outputFile.set(project.layout.projectDirectory.file("config/bin/ktfmt"))
+        version.setDisallowChanges(ktfmtVersion)
+        outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/ktfmt"))
       }
     }
 
     // Add sortDependencies download task
     slackProperties.versions.sortDependencies?.let { sortDependenciesVersion ->
       project.tasks.register<SortDependenciesDownloadTask>("updateSortDependencies") {
-        version.set(sortDependenciesVersion)
-        outputFile.set(project.layout.projectDirectory.file("config/bin/sort-dependencies"))
+        version.setDisallowChanges(sortDependenciesVersion)
+        outputFile.setDisallowChanges(
+          project.layout.projectDirectory.file("config/bin/sort-dependencies")
+        )
       }
     }
 
@@ -432,26 +434,26 @@ private fun Project.configureMisc(slackProperties: SlackProperties) {
     @Suppress("MagicNumber")
     configure<DoctorExtension> {
       // We always use G1 because it's faster
-      warnWhenNotUsingParallelGC.set(false)
+      warnWhenNotUsingParallelGC.setDisallowChanges(false)
 
       /** Throw an exception when multiple Gradle Daemons are running. */
-      disallowMultipleDaemons.set(false)
+      disallowMultipleDaemons.setDisallowChanges(false)
 
       // TODO we disable these for now because local development envs are a mess, and these will
       // require more organized
       //  setup. When we do enable them though, they should just be set to `!isCi`
 
       /** Show a message if the download speed is less than this many megabytes / sec. */
-      downloadSpeedWarningThreshold.set(.5f)
+      downloadSpeedWarningThreshold.setDisallowChanges(.5f)
       /**
        * The level at which to warn when a build spends more than this percent garbage collecting.
        */
-      GCWarningThreshold.set(0.10f)
+      GCWarningThreshold.setDisallowChanges(0.10f)
       /**
        * Print a warning to the console if we spend more than this amount of time with Dagger
        * annotation processors.
        */
-      daggerThreshold.set(5000)
+      daggerThreshold.setDisallowChanges(5000)
       /**
        * By default, Gradle caches test results. This can be dangerous if tests rely on timestamps,
        * dates, or other files which are not declared as inputs.
@@ -459,29 +461,29 @@ private fun Project.configureMisc(slackProperties: SlackProperties) {
        * We don't disable caching because we don't see much instability here and disabling them
        * severely impacts CI time.
        */
-      enableTestCaching.set(true)
+      enableTestCaching.setDisallowChanges(true)
       /**
        * By default, Gradle treats empty directories as inputs to compilation tasks. This can cause
        * cache misses.
        */
-      failOnEmptyDirectories.set(true)
+      failOnEmptyDirectories.setDisallowChanges(true)
       /**
        * Do not allow building all apps simultaneously. This is likely not what the user intended.
        */
-      allowBuildingAllAndroidAppsSimultaneously.set(false)
+      allowBuildingAllAndroidAppsSimultaneously.setDisallowChanges(false)
 
       javaHome {
         /** Ensure that we are using JAVA_HOME to build with this Gradle. */
-        ensureJavaHomeMatches.set(true)
+        ensureJavaHomeMatches.setDisallowChanges(true)
 
         /** Ensure we have JAVA_HOME set. */
-        ensureJavaHomeIsSet.set(true)
+        ensureJavaHomeIsSet.setDisallowChanges(true)
 
         /** For now, we just give a heavy-handed warning with a link to our wiki! */
-        failOnError.set(provider { slackProperties.strictJdk })
+        failOnError.setDisallowChanges(provider { slackProperties.strictJdk })
 
         /** Link our wiki page in its messages to get developers up and running. */
-        extraMessage.set(
+        extraMessage.setDisallowChanges(
           "https://github.com/tinyspeck/slack-android-ng/wiki/JDK-Installation-&-JAVA_HOME"
         )
       }

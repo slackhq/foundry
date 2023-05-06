@@ -26,6 +26,7 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import slack.gradle.register
+import slack.gradle.util.setDisallowChanges
 
 /**
  * A task that aggregates all the androidTest apk paths and writes them (newline-delimited) to an
@@ -69,7 +70,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
 
     internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
       return project.tasks.register<AndroidTestApksTask>(NAME) {
-        outputFile.set(
+        outputFile.setDisallowChanges(
           project.layout.buildDirectory.file("slack/androidTestAggregator/aggregatedTestApks.txt")
         )
       }

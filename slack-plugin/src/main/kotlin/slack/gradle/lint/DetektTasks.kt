@@ -19,8 +19,8 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import java.io.File
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -31,6 +31,7 @@ import slack.gradle.isRootProject
 import slack.gradle.register
 import slack.gradle.tasks.DetektDownloadTask
 import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
+import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.sneakyNull
 
 internal object DetektTasks {
@@ -44,8 +45,8 @@ internal object DetektTasks {
     // Add detekt download task
     slackProperties.versions.detekt?.let { detektVersion ->
       project.tasks.register<DetektDownloadTask>("updateDetekt") {
-        version.set(detektVersion)
-        outputFile.set(project.layout.projectDirectory.file("config/bin/detekt"))
+        version.setDisallowChanges(detektVersion)
+        outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/detekt"))
       }
 
       project.tasks.register(GLOBAL_CI_DETEKT_TASK_NAME) {
@@ -112,12 +113,14 @@ internal object DetektTasks {
       project.tasks.configureEach<Detekt> {
         this.jvmTarget = jvmTarget
         exclude("**/build/**")
-        jdkHome.set(sneakyNull<File>())
+        // Cannot use setDisallowChanges because this property is set without a convention in Detekt
+        jdkHome.set(sneakyNull<Directory>())
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
         this.jvmTarget = jvmTarget
         exclude("**/build/**")
-        jdkHome.set(sneakyNull<File>())
+        // Cannot use setDisallowChanges because this property is set without a convention in Detekt
+        jdkHome.set(sneakyNull<Directory>())
       }
 
       // Wire up to the global task

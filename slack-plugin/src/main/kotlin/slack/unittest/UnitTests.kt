@@ -31,6 +31,7 @@ import slack.gradle.ciUnitTestAndroidVariant
 import slack.gradle.configureEach
 import slack.gradle.isActionsCi
 import slack.gradle.isCi
+import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.synchronousEnvProperty
 
 /**
@@ -167,7 +168,7 @@ internal object UnitTests {
         maxForks(slackProperties).also { logger.debug("$LOG Setting maxParallelForks to $it") }
 
       // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
-      reports.junitXml.mergeReruns.set(true)
+      reports.junitXml.mergeReruns.setDisallowChanges(true)
 
       /*
        * Much of the below is to improve memory management on CI
@@ -237,9 +238,11 @@ internal object UnitTests {
         project.pluginManager.withPlugin("org.gradle.test-retry") {
           project.tasks.withType(Test::class.java).configureEach {
             retry {
-              failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
-              maxFailures.set(slackProperties.testRetryMaxFailures)
-              maxRetries.set(slackProperties.testRetryMaxRetries)
+              failOnPassedAfterRetry.setDisallowChanges(
+                slackProperties.testRetryFailOnPassedAfterRetry
+              )
+              maxFailures.setDisallowChanges(slackProperties.testRetryMaxFailures)
+              maxRetries.setDisallowChanges(slackProperties.testRetryMaxRetries)
             }
           }
         }
@@ -247,9 +250,11 @@ internal object UnitTests {
         // TODO eventually expose if GE was enabled in settings via our own settings plugin?
         project.tasks.withType(Test::class.java).configureEach {
           geRetry {
-            failOnPassedAfterRetry.set(slackProperties.testRetryFailOnPassedAfterRetry)
-            maxFailures.set(slackProperties.testRetryMaxFailures)
-            maxRetries.set(slackProperties.testRetryMaxRetries)
+            failOnPassedAfterRetry.setDisallowChanges(
+              slackProperties.testRetryFailOnPassedAfterRetry
+            )
+            maxFailures.setDisallowChanges(slackProperties.testRetryMaxFailures)
+            maxRetries.setDisallowChanges(slackProperties.testRetryMaxRetries)
           }
         }
       }

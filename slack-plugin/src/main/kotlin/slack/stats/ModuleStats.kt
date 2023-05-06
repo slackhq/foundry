@@ -64,6 +64,7 @@ import slack.gradle.namedLazy
 import slack.gradle.register
 import slack.gradle.util.JsonTools
 import slack.gradle.util.mapToBoolean
+import slack.gradle.util.setDisallowChanges
 
 public object ModuleStatsTasks {
   public const val AGGREGATOR_NAME: String = "aggregateModuleStats"
@@ -86,8 +87,10 @@ public object ModuleStatsTasks {
     val includeGenerated = rootProject.includeGenerated()
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
-      outputFile.set(rootProject.layout.buildDirectory.file("reports/slack/moduleStats.json"))
-      this.includeGenerated.set(includeGenerated)
+      outputFile.setDisallowChanges(
+        rootProject.layout.buildDirectory.file("reports/slack/moduleStats.json")
+      )
+      this.includeGenerated.setDisallowChanges(includeGenerated)
     }
   }
 
@@ -113,8 +116,10 @@ public object ModuleStatsTasks {
         null
       } else {
         project.tasks.register<LocTask>("loc") {
-          srcsDir.set(project.layout.projectDirectory.dir("src/$mainSrcDir"))
-          outputFile.set(project.layout.buildDirectory.file("reports/slack/loc.json"))
+          srcsDir.setDisallowChanges(project.layout.projectDirectory.dir("src/$mainSrcDir"))
+          outputFile.setDisallowChanges(
+            project.layout.buildDirectory.file("reports/slack/loc.json")
+          )
         }
       }
 
@@ -126,13 +131,16 @@ public object ModuleStatsTasks {
     val moduleStatsCollector: Lazy<TaskProvider<ModuleStatsCollectorTask>> = lazy {
       val task =
         project.tasks.register<ModuleStatsCollectorTask>("moduleStats") {
-          modulePath.set(project.path)
+          modulePath.setDisallowChanges(project.path)
+          // TODO https://github.com/gradle/gradle/issues/25014
           buildFileProperty.set(project.buildFile)
           if (locTask != null) {
             locDataFiles.from(locTask.flatMap { it.outputFile })
           }
-          this.includeGenerated.set(includeGenerated)
-          outputFile.set(project.layout.buildDirectory.file("reports/slack/moduleStats.json"))
+          this.includeGenerated.setDisallowChanges(includeGenerated)
+          outputFile.setDisallowChanges(
+            project.layout.buildDirectory.file("reports/slack/moduleStats.json")
+          )
         }
 
       val aggregatorTask =
@@ -153,7 +161,9 @@ public object ModuleStatsTasks {
     val generatedSourcesAdded = AtomicBoolean()
     val addGeneratedSources = {
       if (locTask != null && generatedSourcesAdded.compareAndSet(false, true)) {
-        locTask.configure { generatedSrcsDir.set(project.layout.buildDirectory.dir("generated")) }
+        locTask.configure {
+          generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
+        }
       }
     }
 
