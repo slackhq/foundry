@@ -306,7 +306,8 @@ internal class StandardProjectConfigurations(
       if (!isAndroid) {
         val target = if (isAndroid) jvmTargetVersion else jdkVersion
         logger.logWithTag("Configuring toolchain for $path to $jdkVersion")
-        javaCompiler.setDisallowChanges(
+        // Can't use disallowChanges here because Gradle sets it again later for some reason
+        javaCompiler.set(
           javaToolchains.compilerFor {
             languageVersion.setDisallowChanges(JavaLanguageVersion.of(target))
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
