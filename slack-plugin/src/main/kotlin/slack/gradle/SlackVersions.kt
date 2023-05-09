@@ -19,8 +19,13 @@ import java.util.Optional
 import org.gradle.api.artifacts.ExternalModuleDependencyBundle
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
+import org.gradle.api.artifacts.VersionConstraint
 import org.gradle.api.provider.Provider
 
+/**
+ * A set of properties corresponding to *version* aliases in a [catalog]. The keys should be written
+ * as they appear in the toml file.
+ */
 // TODO generate something to map these in the future? Or with reflection?
 internal class SlackVersions(val catalog: VersionCatalog) {
   val agp: String?
@@ -30,13 +35,13 @@ internal class SlackVersions(val catalog: VersionCatalog) {
     get() = getOptionalValue("compose-compiler").orElse(null)
 
   val composeCompilerKotlinVersion: String?
-    get() = getOptionalValue("compose-compiler-kotlin-version").orElse(null)
+    get() = getOptionalValue("compose-compiler-kotlinVersion").orElse(null)
 
   val detekt: String?
     get() = getOptionalValue("detekt").orElse(null)
 
   val gjf: String?
-    get() = getOptionalValue("google-java-format").orElse(null)
+    get() = getOptionalValue("googleJavaFormat").orElse(null)
 
   val gson: String?
     get() = getOptionalValue("gson").orElse(null)
@@ -66,7 +71,7 @@ internal class SlackVersions(val catalog: VersionCatalog) {
     get() = getOptionalValue("compose-jb").orElse(null)
 
   val composeJbKotlinVersion: String?
-    get() = getOptionalValue("compose-compiler-kotlin-version").orElse(null)
+    get() = getOptionalValue("compose-jb-kotlinVersion").orElse(null)
 
   val bundles = Bundles()
 
@@ -88,9 +93,8 @@ internal class SlackVersions(val catalog: VersionCatalog) {
     }
   }
 
-  internal fun getOptionalValue(key: String): Optional<String> {
-    val tomlKey = tomlKey(key)
-    return catalog.findVersion(tomlKey).map { it.toString() }
+  private fun getOptionalValue(key: String): Optional<String> {
+    return catalog.findVersion(key).map(VersionConstraint::toString)
   }
 
   internal val boms: Set<Provider<MinimalExternalModuleDependency>> by lazy {

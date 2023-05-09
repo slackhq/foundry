@@ -70,6 +70,10 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   public val neverSkipPatterns: SetProperty<String> =
     project.objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
+  @get:Input
+  public val androidTestProjects: SetProperty<String> =
+    project.objects.setProperty<String>().convention(emptySet())
+
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
    * list of changed files. This is usually computed from a GitHub PR's changed files.
@@ -82,7 +86,10 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   @get:OutputDirectory public abstract val diagnosticsDir: DirectoryProperty
 
   /** The output list of affected projects. */
-  @get:OutputFile public abstract val outputFile: RegularFileProperty
+  @get:OutputFile public abstract val affectedProjectsFile: RegularFileProperty
+
+  /** The output list of affected androidTest projects. */
+  @get:OutputFile public abstract val affectedAndroidTestProjectsFile: RegularFileProperty
 
   /** An output .focus file that could be used with the Focus plugin. */
   @get:OutputFile public abstract val outputFocusFile: RegularFileProperty
@@ -108,7 +115,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     prefixLogger = SgpLogger.prefix(LOG, SgpLogger.gradle(logger))
     logTimedValue("gradle task computation") {
       // Clear outputs as needed
-      outputFile.get().asFile.apply {
+      affectedProjectsFile.get().asFile.apply {
         if (exists()) {
           delete()
         }
@@ -126,7 +133,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
           file.mkdirs()
         }
       }
-      val (affectedProjects, focusProjects) =
+      val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
         AffectedProjectsComputer(
             rootDirPath = rootDir.asFile.get().toOkioPath(normalize = true),
             dependencyGraph = {
@@ -137,6 +144,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
             includePatterns = includePatterns.get(),
             excludePatterns = excludePatterns.get(),
             neverSkipPatterns = neverSkipPatterns.get(),
+            androidTestProjects = androidTestProjects.get(),
             debug = debug.get(),
             diagnostics = this,
             changedFilePaths =
@@ -153,8 +161,15 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
           ?: return@logTimedValue
 
       // Generate affected_projects.txt
-      log("writing affected projects to: $outputFile")
-      outputFile.get().asFile.writeText(affectedProjects.sorted().joinToString("\n"))
+      log("writing affected projects to: $affectedProjectsFile")
+      affectedProjectsFile.get().asFile.writeText(affectedProjects.sorted().joinToString("\n"))
+
+      // Generate affected_android_test_projects.txt
+      log("writing affected androidTest projects to: $affectedAndroidTestProjectsFile")
+      affectedAndroidTestProjectsFile
+        .get()
+        .asFile
+        .writeText(affectedAndroidTestProjects.sorted().joinToString("\n"))
 
       // Generate .focus settings file
       log("writing focus settings to: $outputFocusFile")
@@ -192,6 +207,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   }
 
   internal companion object {
+    internal const val NAME = "computeAffectedProjects"
     private const val LOG = "[Skippy]"
     private val DEFAULT_CONFIGURATIONS =
       setOf(
@@ -238,8 +254,11 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
         diagnosticsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy/diagnostics"))
-        outputFile.setDisallowChanges(
+        affectedProjectsFile.setDisallowChanges(
           project.layout.buildDirectory.file("skippy/affected_projects.txt")
+        )
+        affectedAndroidTestProjectsFile.setDisallowChanges(
+          project.layout.buildDirectory.file("skippy/affected_android_test_projects.txt")
         )
         outputFocusFile.setDisallowChanges(
           project.layout.buildDirectory.file("skippy/focus.settings.gradle")

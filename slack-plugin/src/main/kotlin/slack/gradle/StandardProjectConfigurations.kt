@@ -64,6 +64,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
+import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.dependencies.KotlinBuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
@@ -720,14 +721,21 @@ internal class StandardProjectConfigurations(
         // Contribute these libraries to Fladle if they opt into it
         val androidTestApksAggregator =
           project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
+        val computeAffectedProjectsTask =
+          project.rootProject.tasks.named(
+            ComputeAffectedProjectsTask.NAME,
+            ComputeAffectedProjectsTask::class.java
+          )
         onVariants { variant ->
           val excluded =
             slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
               false
             )
+          val projectPath = project.path
           val isAffectedProject =
             slackTools.globalConfig.affectedProjects?.contains(project.path) ?: true
           if (!excluded && isAffectedProject) {
+            computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
             variant.androidTest?.artifacts?.get(SingleArtifact.APK)?.let { apkArtifactsDir ->
               // Wire this up to the aggregator
               androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
