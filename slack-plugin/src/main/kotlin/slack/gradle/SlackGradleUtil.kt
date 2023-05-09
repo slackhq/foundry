@@ -78,7 +78,7 @@ internal fun parseGitVersion(gitVersion: String?): VersionNumber {
       } else {
         split[0]
       }
-    val version = versionLine.removePrefix("git version ")
+    val version = versionLine.removePrefix("git version ").substringBefore("(").trim()
     return VersionNumber.parse(version)
   }
 
