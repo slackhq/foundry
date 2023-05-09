@@ -20,4 +20,5 @@ import java.util.SortedSet
 internal data class AffectedProjectsResult(
   val affectedProjects: SortedSet<String>,
   val focusProjects: SortedSet<String>,
+  val affectedAndroidTestProjects: SortedSet<String>,
 )
