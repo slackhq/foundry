@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.9.5
+-----
+
+_2023-05-09_
+
+- Use `disallowChanges()` where possible on properties SGP controls in order to avoid accidental overwrites.
+- Make `ComputeAffectedProjectsTask` also generate a `affected_android_test_projects.txt` file with a newline-delimited list of affected projects that enable `androidTest()`. This can be used in CI scripts to statically determine if instrumentation tests need to run.
+
 0.9.4
 -----
 
