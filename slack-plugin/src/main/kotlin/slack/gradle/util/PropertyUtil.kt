@@ -99,7 +99,7 @@ private fun Project.startParameterProperties(key: String): Provider<String> {
     project.rootProject.getOrCreateExtra("slack.properties.provider.start-properties") {
       val startParameters = project.gradle.startParameter.projectProperties
       it.providers.of(StartParameterProperties::class.java) {
-        parameters.properties.set(startParameters)
+        parameters.properties.setDisallowChanges(startParameters)
       }
     }
   return provider.map { sneakyNull(it[key]) }
@@ -126,7 +126,9 @@ private fun Project.localPropertiesProvider(
 /** Returns a provider of a property _only_ contained in this project's local.properties. */
 internal fun Project.localProperty(key: String): Provider<String> {
   return localPropertiesProvider(key, "slack.properties.provider.local-properties") {
-    parameters.propertiesFile.set(project.layout.projectDirectory.file("local.properties"))
+    parameters.propertiesFile.setDisallowChanges(
+      project.layout.projectDirectory.file("local.properties")
+    )
   }
 }
 
@@ -136,7 +138,9 @@ internal fun Project.localProperty(key: String): Provider<String> {
 // providers.gradleProperty -_-. https://github.com/gradle/gradle/issues/13302
 internal fun Project.localGradleProperty(key: String): Provider<String> {
   return localPropertiesProvider(key, "slack.properties.provider.local-gradle-properties") {
-    parameters.propertiesFile.set(project.layout.projectDirectory.file("gradle.properties"))
+    parameters.propertiesFile.setDisallowChanges(
+      project.layout.projectDirectory.file("gradle.properties")
+    )
   }
 }
 

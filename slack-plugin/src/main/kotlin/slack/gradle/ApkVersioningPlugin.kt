@@ -33,6 +33,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import slack.gradle.util.localGradleProperty
+import slack.gradle.util.setDisallowChanges
 
 /**
  * Uses AGP 4.0's new APIs for manipulating variant properties in a more cache-friendly way.
@@ -89,15 +90,15 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val shortGitShaProvider = project.gitSha
       val longGitShaProvider = project.fullGitSha
       project.tasks.register<VersionPropertiesTask>("generateVersionProperties") {
-        outputFile.set(
+        outputFile.setDisallowChanges(
           project.layout.buildDirectory.file("intermediates/versioning/version.properties")
         )
-        versionCode.set(versionCodeProvider)
-        versionName.set(versionNameProvider)
-        shortGitSha.set(shortGitShaProvider)
-        longGitSha.set(longGitShaProvider)
-        this.versionMajor.set(versionMajor)
-        this.versionMinor.set(versionMinor)
+        versionCode.setDisallowChanges(versionCodeProvider)
+        versionName.setDisallowChanges(versionNameProvider)
+        shortGitSha.setDisallowChanges(shortGitShaProvider)
+        longGitSha.setDisallowChanges(longGitShaProvider)
+        this.versionMajor.setDisallowChanges(versionMajor)
+        this.versionMinor.setDisallowChanges(versionMinor)
       }
     }
   }
@@ -122,7 +123,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
 
         // Have to iterate outputs because of APK splits.
         variant.outputs.forEach { variantOutput ->
-          variantOutput.versionName.set(mappedVersionNameProvider)
+          variantOutput.versionName.setDisallowChanges(mappedVersionNameProvider)
 
           // Reuse the same task and just remap its value as needed
           val mappedVersionCodeProvider =
@@ -130,7 +131,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
               @Suppress("MagicNumber")
               ApkVersioning.VERSION_CODES.getValue(variantOutput.abiString) * 10000000 + rawCode
             }
-          variantOutput.versionCode.set(mappedVersionCodeProvider)
+          variantOutput.versionCode.setDisallowChanges(mappedVersionCodeProvider)
         }
       }
     }

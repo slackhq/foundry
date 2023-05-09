@@ -64,6 +64,7 @@ import slack.gradle.tasks.BootstrapPropertiesMode.LOG
 import slack.gradle.tasks.BootstrapUtils.DaemonArgsProvider
 import slack.gradle.tasks.BootstrapUtils.computeDaemonArgs
 import slack.gradle.util.mapToInt
+import slack.gradle.util.setDisallowChanges
 
 /**
  * Other bootstrap tasks can be finalized by this and/or depend on its outputs by implementing this
@@ -345,9 +346,11 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           val jdkVersion = project.jdkVersion()
           val service = project.serviceOf<JavaToolchainService>()
           val defaultLauncher =
-            service.launcherFor { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
+            service.launcherFor {
+              languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
+            }
           this.launcher.convention(defaultLauncher)
-          this.jdkVersion.set(jdkVersion)
+          this.jdkVersion.setDisallowChanges(jdkVersion)
 
           val cacheDirProvider = project.layout.projectDirectory.dir(".cache")
           val bootstrapVersionFileProvider = cacheDirProvider.file("bootstrap.txt")
@@ -358,16 +361,18 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
             } else {
               -1
             }
-          bootstrapVersion.set(version)
-          bootstrapVersionFileProperty.set(bootstrapVersionFileProvider)
-          diagnostics.set(project.layout.buildDirectory.file("bootstrap/diagnostics.txt"))
-          javaInstallationPath.set(
+          bootstrapVersion.setDisallowChanges(version)
+          bootstrapVersionFileProperty.setDisallowChanges(bootstrapVersionFileProvider)
+          diagnostics.setDisallowChanges(
+            project.layout.buildDirectory.file("bootstrap/diagnostics.txt")
+          )
+          javaInstallationPath.setDisallowChanges(
             project.layout.buildDirectory.file("bootstrap/javaInstallation.txt")
           )
-          cacheDir.set(cacheDirProvider)
-          offlineBooleanProperty.set(project.gradle.startParameter.isOffline)
+          cacheDir.setDisallowChanges(cacheDirProvider)
+          offlineBooleanProperty.setDisallowChanges(project.gradle.startParameter.isOffline)
           val gradleHome = project.gradle.gradleUserHomeDir
-          ciBooleanProperty.set(project.isCi)
+          ciBooleanProperty.setDisallowChanges(project.isCi)
 
           // TODO for profiler, we want to set these to the local properties + append
           val propertiesFileProvider: () -> File = {
@@ -378,7 +383,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
               .get()
           }
           gradlePropertiesFile.set(propertiesFileProvider)
-          propertiesMode.set(
+          propertiesMode.setDisallowChanges(
             project.providers
               .gradleProperty(Properties.PROPERTIES_MODE)
               .map { BootstrapPropertiesMode.valueOf(it.uppercase(Locale.US)) }

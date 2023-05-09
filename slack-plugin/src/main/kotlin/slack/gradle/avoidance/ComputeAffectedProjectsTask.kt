@@ -39,6 +39,7 @@ import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
+import slack.gradle.util.setDisallowChanges
 
 /**
  * ### Usage
@@ -246,15 +247,19 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       }
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
-        debug.set(slackProperties.debug)
-        rootDir.set(project.layout.projectDirectory)
-        dependencyGraph.set(rootProject.provider { moduleGraph })
-        diagnosticsDir.set(project.layout.buildDirectory.dir("skippy/diagnostics"))
-        affectedProjectsFile.set(project.layout.buildDirectory.file("skippy/affected_projects.txt"))
-        affectedAndroidTestProjectsFile.set(
+        debug.setDisallowChanges(slackProperties.debug)
+        rootDir.setDisallowChanges(project.layout.projectDirectory)
+        dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
+        diagnosticsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy/diagnostics"))
+        affectedProjectsFile.setDisallowChanges(
+          project.layout.buildDirectory.file("skippy/affected_projects.txt")
+        )
+        affectedAndroidTestProjectsFile.setDisallowChanges(
           project.layout.buildDirectory.file("skippy/affected_android_test_projects.txt")
         )
-        outputFocusFile.set(project.layout.buildDirectory.file("skippy/focus.settings.gradle"))
+        outputFocusFile.setDisallowChanges(
+          project.layout.buildDirectory.file("skippy/focus.settings.gradle")
+        )
         // Overrides of includes/neverSkippable patterns should be done in the consuming project
         // directly
       }

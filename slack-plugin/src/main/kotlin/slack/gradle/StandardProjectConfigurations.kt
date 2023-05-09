@@ -74,6 +74,7 @@ import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
+import slack.gradle.util.setDisallowChanges
 
 private const val LOG = "SlackPlugin:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -141,7 +142,7 @@ internal class StandardProjectConfigurations(
   @Suppress("unused")
   private fun Project.javaCompilerFor(version: Int): Provider<JavaCompiler> {
     return extensions.getByType<JavaToolchainService>().compilerFor {
-      languageVersion.set(JavaLanguageVersion.of(version))
+      languageVersion.setDisallowChanges(JavaLanguageVersion.of(version))
       slackTools.globalConfig.jvmVendor?.let(vendor::set)
     }
   }
@@ -173,9 +174,10 @@ internal class StandardProjectConfigurations(
           val isNoApi = slackProperties.rakeNoApi
           val rakeDependencies =
             tasks.register<RakeDependencies>("rakeDependencies") {
+              // TODO https://github.com/gradle/gradle/issues/25014
               buildFileProperty.set(project.buildFile)
-              noApi.set(isNoApi)
-              identifierMap.set(
+              noApi.setDisallowChanges(isNoApi)
+              identifierMap.setDisallowChanges(
                 project.provider {
                   project.getVersionsCatalog().identifierMap().mapValues { (_, v) -> "libs.$v" }
                 }
@@ -207,12 +209,12 @@ internal class StandardProjectConfigurations(
     pluginManager.withPlugin("com.sergei-lapin.napt") {
       configure<NaptGradleExtension> {
         // Don't generate triggers, we'll handle ensuring Java files ourselves.
-        generateNaptTrigger.set(false)
+        generateNaptTrigger.setDisallowChanges(false)
 
         // We need to add extra args due to dagger-android running GJF.
         // Can remove once this is fixed or dagger-android's removed.
         // https://github.com/google/dagger/pull/3532
-        forkJvmArgs.set(
+        forkJvmArgs.setDisallowChanges(
           listOf(
             "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
             "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
@@ -284,7 +286,7 @@ internal class StandardProjectConfigurations(
         tasks.configureEach<JavaCompile> {
           if (!isAndroid) {
             logger.logWithTag("Configuring release option for $path")
-            options.release.set(jvmTargetVersion)
+            options.release.setDisallowChanges(jvmTargetVersion)
           }
         }
       }
@@ -304,9 +306,9 @@ internal class StandardProjectConfigurations(
       if (!isAndroid) {
         val target = if (isAndroid) jvmTargetVersion else jdkVersion
         logger.logWithTag("Configuring toolchain for $path to $jdkVersion")
-        javaCompiler.set(
+        javaCompiler.setDisallowChanges(
           javaToolchains.compilerFor {
-            languageVersion.set(JavaLanguageVersion.of(target))
+            languageVersion.setDisallowChanges(JavaLanguageVersion.of(target))
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         )
@@ -340,13 +342,15 @@ internal class StandardProjectConfigurations(
             CheckSeverity.ERROR
           }
         options.errorprone.nullaway {
-          severity.set(nullAwaySeverity)
+          severity.setDisallowChanges(nullAwaySeverity)
           annotatedPackages.add("slack")
-          checkOptionalEmptiness.set(true)
+          checkOptionalEmptiness.setDisallowChanges(true)
           if (autoPatchEnabled && nullawayBaseline) {
-            suggestSuppressions.set(true)
-            autoFixSuppressionComment.set("Nullability issue auto-patched by NullAway.")
-            castToNonNullMethod.set("slack.commons.JavaPreconditions.castToNotNull")
+            suggestSuppressions.setDisallowChanges(true)
+            autoFixSuppressionComment.setDisallowChanges(
+              "Nullability issue auto-patched by NullAway."
+            )
+            castToNonNullMethod.setDisallowChanges("slack.commons.JavaPreconditions.castToNotNull")
           }
         }
       }
@@ -358,8 +362,10 @@ internal class StandardProjectConfigurations(
 
       tasks.withType(JavaCompile::class.java).configureEach {
         options.errorprone {
-          disableWarningsInGeneratedCode.set(true)
-          excludedPaths.set(".*/build/generated/.*") // The EP flag alone isn't enough
+          disableWarningsInGeneratedCode.setDisallowChanges(true)
+          excludedPaths.setDisallowChanges(
+            ".*/build/generated/.*"
+          ) // The EP flag alone isn't enough
           // https://github.com/google/error-prone/issues/2092
           disable("HidingField")
           error(*slackTools().globalConfig.errorProneCheckNamesAsErrors.toTypedArray())
@@ -618,8 +624,9 @@ internal class StandardProjectConfigurations(
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             description =
               "Checks merged manifest permissions against a known allowlist of permissions."
+            // TODO switch to setDisallowChanges once this uses a regular file
             permissionAllowlistFile.set(file)
-            permissionAllowlist.set(allowListProvider)
+            permissionAllowlist.setDisallowChanges(allowListProvider)
           }
         }
 
@@ -650,18 +657,18 @@ internal class StandardProjectConfigurations(
             }
 
             // 5 minute timeout because let's be real, if it's taking this long something is wrong
-            requestTimeoutMs.set(FIVE_MINUTES_MS)
+            requestTimeoutMs.setDisallowChanges(FIVE_MINUTES_MS)
 
             // Enable uploads if the enable prop is enabled or the branch matches a provided pattern
             // Note we _don't_ use the BugsnagPluginExtension.enabled property itself because we do
             // want bugsnag to do most of its regular process, just skipping uploads unless enabled.
-            uploadJvmMappings.set(enabledProvider)
-            reportBuilds.set(enabledProvider)
+            uploadJvmMappings.setDisallowChanges(enabledProvider)
+            reportBuilds.setDisallowChanges(enabledProvider)
 
             // We don't use these
-            uploadNdkMappings.set(false)
-            uploadNdkUnityLibraryMappings.set(false)
-            uploadReactNativeMappings.set(false)
+            uploadNdkMappings.setDisallowChanges(false)
+            uploadNdkUnityLibraryMappings.setDisallowChanges(false)
+            uploadReactNativeMappings.setDisallowChanges(false)
           }
         }
       }
@@ -832,7 +839,7 @@ internal class StandardProjectConfigurations(
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
+            languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         }
@@ -845,14 +852,14 @@ internal class StandardProjectConfigurations(
 
         compilerOptions {
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
-            allWarningsAsErrors.set(true)
+            allWarningsAsErrors.setDisallowChanges(true)
           }
           if (!isKaptGenerateStubsTask) {
             freeCompilerArgs.addAll(kotlinCompilerArgs)
           }
 
           if (slackProperties.useK2) {
-            languageVersion.set(KotlinVersion.fromVersion("2.0"))
+            languageVersion.setDisallowChanges(KotlinVersion.fromVersion("2.0"))
           }
 
           if (slackExtension.featuresHandler.composeHandler.enabled.get()) {
@@ -879,9 +886,9 @@ internal class StandardProjectConfigurations(
           }
 
           if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
+            jvmTarget.setDisallowChanges(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors
-            javaParameters.set(true)
+            javaParameters.setDisallowChanges(true)
             freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
           }
         }

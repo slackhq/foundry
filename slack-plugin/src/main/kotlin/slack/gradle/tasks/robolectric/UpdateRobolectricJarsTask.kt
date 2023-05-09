@@ -40,6 +40,7 @@ import org.gradle.workers.WorkerExecutor
 import slack.gradle.property
 import slack.gradle.tasks.BootstrapTask
 import slack.gradle.util.mapToBoolean
+import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.shutdown
 
 /**
@@ -151,7 +152,7 @@ constructor(
         }
         destinationFile.createNewFile()
         workQueue.submit(DownloadJarAction::class.java) {
-          this.dependencyJar.set(dependencyJar)
+          this.dependencyJar.setDisallowChanges(dependencyJar)
           this.destinationFile.set(destinationFile)
         }
       }

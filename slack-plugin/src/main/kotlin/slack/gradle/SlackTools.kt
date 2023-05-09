@@ -43,6 +43,7 @@ import slack.gradle.agp.AgpHandler
 import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
+import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.shutdown
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
@@ -247,24 +248,24 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
-          parameters.thermalsOutputFile.set(
+          parameters.thermalsOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
-          parameters.thermalsOutputJsonFile.set(thermalsLogJsonFileProvider)
-          parameters.offline.set(project.gradle.startParameter.isOffline)
-          parameters.cleanRequested.set(
+          parameters.thermalsOutputJsonFile.setDisallowChanges(thermalsLogJsonFileProvider)
+          parameters.offline.setDisallowChanges(project.gradle.startParameter.isOffline)
+          parameters.cleanRequested.setDisallowChanges(
             project.gradle.startParameter.taskNames.any { it.equals("clean", ignoreCase = true) }
           )
-          parameters.logThermals.set(
+          parameters.logThermals.setDisallowChanges(
             project.provider {
               logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
             }
           )
-          parameters.enableSkippyDiagnostics.set(enableSkippyDiagnostics)
-          parameters.skippyDiagnosticsOutputFile.set(
+          parameters.enableSkippyDiagnostics.setDisallowChanges(enableSkippyDiagnostics)
+          parameters.skippyDiagnosticsOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("outputs/logs/skippy-diagnostics.txt")
           )
-          parameters.logVerbosely.set(logVerbosely)
+          parameters.logVerbosely.setDisallowChanges(logVerbosely)
         }
         .apply { get().apply { globalConfig = GlobalConfig(project) } }
     }
