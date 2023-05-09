@@ -246,7 +246,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
         GradleDependencyGraphFactory.create(rootProject, configurationsToLook).serializableGraph()
       }
 
-      rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
+      return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(slackProperties.debug)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
