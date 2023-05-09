@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.9.6
+-----
+
+_2023-05-09_
+
+- Fix wrong use of `disallowChanges()` on `javaCompiler` in JavaCompile tasks. It seems that Gradle sets this multiple times.
+- Improve git version matching.
+
 0.9.5
 -----
 
