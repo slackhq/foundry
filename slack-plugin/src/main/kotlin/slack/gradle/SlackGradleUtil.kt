@@ -62,7 +62,7 @@ public fun Project.gitBranch(): Provider<String> {
   }
 }
 
-private const val GIT_VERSION_PREFIX = "git version "
+private val GIT_VERSION_REGEX = Regex("git version (\\d+\\.\\d+(\\.\\d+)?).*")
 
 /**
  * Parses a git [VersionNumber] from a given [gitVersion], usually from a command line `git
@@ -70,16 +70,8 @@ private const val GIT_VERSION_PREFIX = "git version "
  */
 internal fun parseGitVersion(gitVersion: String?): VersionNumber {
   if (!gitVersion.isNullOrBlank()) {
-    val trimmed = gitVersion.trim()
-    val split = trimmed.split("\n").map { it.trim() }
-    val versionLine =
-      if (split.size > 1) {
-        split.first { it.startsWith(GIT_VERSION_PREFIX) }
-      } else {
-        split[0]
-      }
-    val version = versionLine.removePrefix("git version ")
-    return VersionNumber.parse(version)
+    return GIT_VERSION_REGEX.find(gitVersion)?.groupValues?.get(1)?.let(VersionNumber::parse)
+      ?: VersionNumber.UNKNOWN
   }
 
   return VersionNumber.UNKNOWN

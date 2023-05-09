@@ -49,6 +49,18 @@ class SlackGradleUtilTest {
   }
 
   @Test
+  fun appleGit() {
+    // Apple appends some stuff on the end
+    val gitVersionOutput =
+      """
+      git version 2.37.1 (Apple Git-137.1)
+      """
+        .trimIndent()
+    val parsed = parseGitVersion(gitVersionOutput)
+    assertThat(parsed.toString()).isEqualTo("2.37.1")
+  }
+
+  @Test
   fun unrecognizedFallsBackToUnknown() {
     val gitVersionOutput =
       """
