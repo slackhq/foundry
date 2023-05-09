@@ -83,6 +83,9 @@ import slack.gradle.util.SgpLogger
  *   nothing should be skipped and [compute] will return null. This is useful for globally-affecting
  *   things like root build files, `libs.versions.toml`, etc. **NOTE**: This list is always merged
  *   with [includePatterns] as these are implicitly relevant files.
+ * @property androidTestProjects A set of project names that are Android test projects. This is used
+ *   to compute the [AffectedProjectsResult.affectedAndroidTestProjects] value, which can be used to
+ *   statically determine if an instrumentation test pipeline needs to run at all.
  * @property debug Debugging flag. If enabled, extra diagnostics and logging is performed.
  * @property logger A logger to use for logging.
  */
@@ -94,6 +97,7 @@ internal class AffectedProjectsComputer(
   private val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,
   private val excludePatterns: Set<String> = emptySet(),
   private val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
+  private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
   private val logger: SgpLogger = SgpLogger.noop()
@@ -252,7 +256,14 @@ internal class AffectedProjectsComputer(
           dependencies + project
         }
         .toSortedSet()
-    return AffectedProjectsResult(allAffectedProjects, allRequiredProjects)
+
+    val affectedAndroidTestProjects =
+      allAffectedProjects.filter { it in androidTestProjects }.toSortedSet()
+    return AffectedProjectsResult(
+      allAffectedProjects,
+      allRequiredProjects,
+      affectedAndroidTestProjects
+    )
   }
 
   private fun log(message: String) {

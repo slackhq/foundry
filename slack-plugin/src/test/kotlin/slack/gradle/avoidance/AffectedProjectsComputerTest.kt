@@ -55,6 +55,7 @@ class AffectedProjectsComputerTest {
       fileSystem = fileSystem,
       dependencyGraph = { dependencyGraph },
       changedFilePaths = createChangedFilePaths(changedFilePaths),
+      androidTestProjects = setOf(":foo"),
       rootDirPath = rootDirPath,
       debug = true,
       logger = SgpLogger.system(),
@@ -84,6 +85,7 @@ class AffectedProjectsComputerTest {
       .assertComputed(
         expectedAffectedProjects = listOf(":$projectName"),
         expectedFocusProjects = listOf(":$projectName"),
+        expectedAffectedAndroidTestProjects = listOf(":$projectName"),
       )
   }
 
@@ -274,10 +276,13 @@ private fun AffectedProjectsComputer.assertEmptyCompute() = compute().assertEmpt
 private fun AffectedProjectsComputer.assertComputed(
   expectedAffectedProjects: List<String>,
   expectedFocusProjects: List<String>,
+  expectedAffectedAndroidTestProjects: List<String>,
 ) {
   val result = compute().checkNotNull()
   assertThat(result.affectedProjects).containsExactlyElementsIn(expectedAffectedProjects)
   assertThat(result.focusProjects).containsExactlyElementsIn(expectedFocusProjects)
+  assertThat(result.affectedAndroidTestProjects)
+    .containsExactlyElementsIn(expectedAffectedAndroidTestProjects)
 }
 
 private fun AffectedProjectsResult?.checkNotNull() =
