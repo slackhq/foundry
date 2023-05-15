@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.7
+-----
+
+_2023-05-15_
+
+- Fix application targets not getting marked as androidTest()-enabled.
+
 0.9.6
 -----
 
