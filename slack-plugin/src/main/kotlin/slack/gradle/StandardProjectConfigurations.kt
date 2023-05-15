@@ -18,10 +18,7 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.api.variant.HasAndroidTestBuilder
-import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.*
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
@@ -400,6 +397,16 @@ internal class StandardProjectConfigurations(
     slackProperties: SlackProperties
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
+    val computeAffectedProjectsTask =
+      project.rootProject.tasks.named(
+        ComputeAffectedProjectsTask.NAME,
+        ComputeAffectedProjectsTask::class.java
+      )
+    // Contribute these libraries to Fladle if they opt into it
+    val androidTestApksAggregator =
+      project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
+    val projectPath = project.path
+    val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -424,6 +431,36 @@ internal class StandardProjectConfigurations(
           }
           if (isApp) {
             beforeVariants { builder -> builder.enableUnitTest = false }
+          }
+        }
+
+        // Configure androidTest
+        onVariants { variant ->
+          val isLibraryVariant = variant is LibraryVariant
+          val excluded =
+            isLibraryVariant &&
+              slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
+                false
+              )
+          if (!excluded && isAffectedProject) {
+            computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
+            if (isLibraryVariant) {
+              (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
+                apkArtifactsDir ->
+                // Wire this up to the aggregator
+                androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+              }
+            }
+          } else {
+            val reason = if (excluded) "excluded" else "not affected"
+            val taskPath = "${projectPath}:androidTest"
+            val log = "$LOG Skipping $taskPath because it is $reason."
+            slackTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
+            if (slackProperties.debug) {
+              project.logger.lifecycle(log)
+            } else {
+              project.logger.debug(log)
+            }
           }
         }
       }
@@ -534,25 +571,25 @@ internal class StandardProjectConfigurations(
       prepareAndroidTestConfigurations()
       configure<ApplicationAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
-        // Disable unit tests on release variants, since it's unused
         // TODO maybe we want to disable release androidTest by default? (i.e. for slack kit
         //  playground, samples, etc)
         // TODO would be nice if we could query just non-debuggable build types.
-        project.configure<ApplicationAndroidComponentsExtension> {
-          beforeVariants { builder ->
-            if (builder.buildType == "release") {
-              builder.enableUnitTest = false
-            }
-            // Disable androidTest tasks in libraries unless they opt-in
-            val androidTestEnabled =
-              slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
-            val variantEnabled =
-              androidTestEnabled &&
-                slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                  ?.contains(builder.name)
-                  ?: true
-            builder.enableAndroidTest = variantEnabled
+        // Disable androidTest tasks unless they opt-in
+        val androidTestEnabled =
+          slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+
+        beforeVariants { builder ->
+          // Disable unit tests on release variants, since it's unused
+          if (builder.buildType == "release") {
+            builder.enableUnitTest = false
           }
+
+          val variantEnabled =
+            androidTestEnabled &&
+              slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+                ?.contains(builder.name)
+                ?: true
+          builder.enableAndroidTest = variantEnabled
         }
       }
       configure<BaseAppModuleExtension> {
@@ -719,48 +756,13 @@ internal class StandardProjectConfigurations(
           }
         }
 
-        // Contribute these libraries to Fladle if they opt into it
-        val androidTestApksAggregator =
-          project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
-        val computeAffectedProjectsTask =
-          project.rootProject.tasks.named(
-            ComputeAffectedProjectsTask.NAME,
-            ComputeAffectedProjectsTask::class.java
-          )
-        onVariants { variant ->
-          val excluded =
-            slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
-              false
-            )
-          val projectPath = project.path
-          val isAffectedProject =
-            slackTools.globalConfig.affectedProjects?.contains(project.path) ?: true
-          if (!excluded && isAffectedProject) {
-            computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
-            variant.androidTest?.artifacts?.get(SingleArtifact.APK)?.let { apkArtifactsDir ->
-              // Wire this up to the aggregator
-              androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
-            }
-          } else {
-            val reason = if (excluded) "excluded" else "not affected"
-            val taskPath = "${project.path}:androidTest"
-            val log = "$LOG Skipping $taskPath because it is $reason."
-            slackTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
-            if (slackProperties.debug) {
-              project.logger.lifecycle(log)
-            } else {
-              project.logger.debug(log)
-            }
-          }
-        }
-
         // namespace is not a property but we can hook into DSL finalizing to set it at the end
         // if the build script didn't declare one prior
         finalizeDsl { libraryExtension ->
           if (libraryExtension.namespace == null) {
             libraryExtension.namespace =
               "slack" +
-                project.path
+                projectPath
                   .asSequence()
                   .mapNotNull {
                     when (it) {
