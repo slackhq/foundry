@@ -417,6 +417,7 @@ internal class StandardProjectConfigurations(
           }
             ?: emptyMap()
         if (variantsToDisable.isNotEmpty()) {
+          logger.debug("$LOG Disabling variants: $variantsToDisable")
           val isApp = this is ApplicationAndroidComponentsExtension
           for ((flavorName, buildType) in variantsToDisable) {
             val selector =
@@ -575,20 +576,21 @@ internal class StandardProjectConfigurations(
         //  playground, samples, etc)
         // TODO would be nice if we could query just non-debuggable build types.
         // Disable androidTest tasks unless they opt-in
-        val androidTestEnabled =
-          slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
-
         beforeVariants { builder ->
           // Disable unit tests on release variants, since it's unused
           if (builder.buildType == "release") {
             builder.enableUnitTest = false
           }
 
+          // Must be in the beforeVariants block to defer read until after evaluation
+          val androidTestEnabled =
+            slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           val variantEnabled =
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name)
                 ?: true
+          logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.enableAndroidTest = variantEnabled
         }
       }
