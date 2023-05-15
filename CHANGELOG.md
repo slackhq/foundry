@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.8
+-----
+
+_2023-05-15_
+
+- Fix eager check of whether or not androidTest is enabled in `slack` DSL.
+
 0.9.7
 -----
 
