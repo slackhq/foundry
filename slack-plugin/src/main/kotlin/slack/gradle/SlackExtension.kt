@@ -30,7 +30,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.util.setDisallowChanges
@@ -720,7 +719,7 @@ constructor(
             slackProperties.versions.composeCompiler
               ?: error("Missing `compose-compiler` version in catalog")
           add(
-            PLUGIN_CLASSPATH_CONFIGURATION_NAME,
+            "kotlinCompilerPluginClasspath",
             "androidx.compose.compiler:compiler:$composeCompilerVersion"
           )
         }
