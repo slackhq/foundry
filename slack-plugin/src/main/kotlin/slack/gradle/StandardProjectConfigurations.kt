@@ -52,7 +52,9 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
@@ -840,7 +842,18 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
+      val compilerOptionsExtension: KotlinJvmCompilerOptions.() -> Unit = {
+        jvmTarget.setDisallowChanges(JvmTarget.fromTarget(actualJvmTarget))
+        // Potentially useful for static analysis or annotation processors
+        javaParameters.setDisallowChanges(true)
+        freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
+      }
       project.kotlinExtension.apply {
+        if (this is KotlinJvmProjectExtension) {
+          compilerOptions(compilerOptionsExtension)
+        } else if (this is KotlinAndroidProjectExtension) {
+          compilerOptions(compilerOptionsExtension)
+        }
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
@@ -888,13 +901,6 @@ internal class StandardProjectConfigurations(
                 "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
               )
             }
-          }
-
-          if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.setDisallowChanges(JvmTarget.fromTarget(actualJvmTarget))
-            // Potentially useful for static analysis or annotation processors
-            javaParameters.setDisallowChanges(true)
-            freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
           }
         }
       }
