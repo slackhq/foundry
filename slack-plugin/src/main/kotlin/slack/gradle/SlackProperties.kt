@@ -289,13 +289,6 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = stringProperty(KOTLIN_DAEMON_ARGS_KEY, defaultValue = "")
 
   /**
-   * Flag to enable the new K2 compiler. Plumbed into the kotlinOptions.useK2 property and here to
-   * allow for use from a `local.properties` file.
-   */
-  public val useK2: Boolean
-    get() = booleanProperty("slack.useK2", defaultValue = false)
-
-  /**
    * Flag to enable ciUnitTest on this project. Default is true.
    *
    * When enabled, a task named "ciUnitTest" will be created in this project, which will depend on

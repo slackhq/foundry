@@ -876,10 +876,6 @@ internal class StandardProjectConfigurations(
             freeCompilerArgs.addAll(kotlinCompilerArgs)
           }
 
-          if (slackProperties.useK2) {
-            languageVersion.setDisallowChanges(KotlinVersion.fromVersion("2.0"))
-          }
-
           if (slackExtension.featuresHandler.composeHandler.enabled.get()) {
             logger.debug(
               "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompilationTask.name}"
