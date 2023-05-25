@@ -52,10 +52,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
@@ -842,22 +839,26 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      val compilerOptionsExtension: KotlinJvmCompilerOptions.() -> Unit = {
-        jvmTarget.setDisallowChanges(JvmTarget.fromTarget(actualJvmTarget))
+      val configureJvmCompilerOptions: KotlinJvmCompilerOptions.() -> Unit = {
+        jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
         // Potentially useful for static analysis or annotation processors
-        javaParameters.setDisallowChanges(true)
+        javaParameters.set(true)
         freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
       }
       project.kotlinExtension.apply {
-        if (this is KotlinJvmProjectExtension) {
-          compilerOptions(compilerOptionsExtension)
-        } else if (this is KotlinAndroidProjectExtension) {
-          compilerOptions(compilerOptionsExtension)
-        }
+        // TODO file a bug for this as these aren't respected
+        //        if (this is KotlinJvmProjectExtension) {
+        //          project.logger.lifecycle("Configuring JVM args for jvm project ${project.path}")
+        //          compilerOptions(configureJvmCompilerOptions)
+        //        } else if (this is KotlinAndroidProjectExtension) {
+        //          project.logger.lifecycle("Configuring JVM args for android project
+        // ${project.path}")
+        //          compilerOptions(configureJvmCompilerOptions)
+        //        }
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
-            languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
+            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         }
@@ -869,8 +870,16 @@ internal class StandardProjectConfigurations(
         val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
 
         compilerOptions {
+          progressiveMode.set(true)
+          // TODO probably just want to make these configurable in SlackProperties
+          optIn.addAll(
+            "kotlin.contracts.ExperimentalContracts",
+            "kotlin.experimental.ExperimentalTypeInference",
+            "kotlin.ExperimentalStdlibApi",
+            "kotlin.time.ExperimentalTime",
+          )
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
-            allWarningsAsErrors.setDisallowChanges(true)
+            allWarningsAsErrors.set(true)
           }
           if (!isKaptGenerateStubsTask) {
             freeCompilerArgs.addAll(kotlinCompilerArgs)
@@ -898,6 +907,15 @@ internal class StandardProjectConfigurations(
               )
             }
           }
+
+          if (this is KotlinJvmCompilerOptions) {
+            configureJvmCompilerOptions()
+          }
+
+          // https://github.com/google/ksp/issues/1387
+          //          if (this@configureKotlinCompilationTask is KspTaskJvm) {
+          //            compilerOptions(configureJvmCompilerOptions)
+          //          }
         }
       }
 
