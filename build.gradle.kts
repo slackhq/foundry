@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import com.diffplug.gradle.spotless.SpotlessExtension
+import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
@@ -21,9 +22,9 @@ import java.net.URL
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.*
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 buildscript {
@@ -112,11 +113,6 @@ data class KotlinBuildConfig(val kotlin: String) {
    */
   val kotlinCompilerArgs: List<String> =
     listOf(
-      "-progressive",
-      "-opt-in=kotlin.contracts.ExperimentalContracts",
-      "-opt-in=kotlin.experimental.ExperimentalTypeInference",
-      "-opt-in=kotlin.ExperimentalStdlibApi",
-      "-opt-in=kotlin.time.ExperimentalTime",
       "-Xproper-ieee754-comparisons",
       // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
       // => T & Any)
@@ -192,27 +188,31 @@ subprojects {
   }
 
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-    tasks.withType<KotlinCompile>().configureEach {
-      compilerOptions {
-        languageVersion.set(KOTLIN_1_8)
-        apiVersion.set(KOTLIN_1_8)
-        // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
-        // this sometimes. https://github.com/gradle/gradle/issues/16345
-        allWarningsAsErrors.set(false)
-        jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
-        // TODO required due to https://github.com/gradle/gradle/issues/24871
-        freeCompilerArgs.add("-Xsam-conversions=class")
-        freeCompilerArgs.addAll(
-          kotlinBuildConfig.kotlinCompilerArgs
-            // -progressive is useless when running on an older language version but new compiler
-            // version
-            .filter { it != "-progressive" }
-        )
-        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
-      }
+    val configureJvmCompilerOptions: KotlinJvmCompilerOptions.() -> Unit = {
+      languageVersion.set(KOTLIN_1_8)
+      apiVersion.set(KOTLIN_1_8)
+      // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
+      // this sometimes. https://github.com/gradle/gradle/issues/16345
+      allWarningsAsErrors.set(false)
+      jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
+      // TODO required due to https://github.com/gradle/gradle/issues/24871
+      freeCompilerArgs.add("-Xsam-conversions=class")
+      freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
+      freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+      optIn.addAll(
+        "kotlin.contracts.ExperimentalContracts",
+        "kotlin.experimental.ExperimentalTypeInference",
+        "kotlin.ExperimentalStdlibApi",
+        "kotlin.time.ExperimentalTime",
+      )
+    }
+    extensions.configure<KotlinJvmProjectExtension> {
+      explicitApi()
+      compilerOptions(configureJvmCompilerOptions)
     }
 
-    extensions.configure<KotlinProjectExtension> { explicitApi() }
+    // https://github.com/google/ksp/issues/1387
+    tasks.withType<KspTaskJvm>().configureEach { compilerOptions(configureJvmCompilerOptions) }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
     apply(plugin = "kotlin-sam-with-receiver")
