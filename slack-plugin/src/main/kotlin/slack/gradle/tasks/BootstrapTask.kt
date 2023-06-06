@@ -399,10 +399,11 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 internal object BootstrapUtils {
   private val jdkOpensAndExports =
     listOf(
-        // For GJF and compile-testing
+        // For GJF, error-prone, and compile-testing
         // https://github.com/diffplug/spotless/issues/834
         // https://github.com/google/google-java-format#jdk-16
         // https://github.com/google/compile-testing/issues/222 (only javac api)
+        // https://errorprone.info/docs/installation
         "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
