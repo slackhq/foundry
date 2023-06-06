@@ -242,9 +242,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     val properties =
       mutableMapOf(
         "org.gradle.jvmargs" to
-          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError ${gradleArgs.args.joinToString(" ")}",
+          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError ${gradleArgs.args.joinToString(" ")}",
         SlackProperties.KOTLIN_DAEMON_ARGS_KEY to
-          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError ${kotlinArgs.args.joinToString(" ")}",
+          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError ${kotlinArgs.args.joinToString(" ")}",
       )
 
     // To reduce thermal throttling, we cap max workers on Intel mac devices
