@@ -342,7 +342,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
     public fun register(
       project: Project,
-      jvmVendor: Provider<JvmVendorSpec>
+      jvmVendor: JvmVendorSpec?
     ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
@@ -352,7 +352,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           val defaultLauncher =
             service.launcherFor {
               languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
-              vendor.setDisallowChanges(jvmVendor)
+              if (jvmVendor != null) {
+                vendor.setDisallowChanges(jvmVendor)
+              }
             }
           this.launcher.convention(defaultLauncher)
           this.jdkVersion.setDisallowChanges(jdkVersion)

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.10
+------
+
+_2023-06-06_
+
+- **Fix**: Don't apply vendor property to Bootstrap toolchain if it's undefined.
+
 0.9.9
 -----
 
