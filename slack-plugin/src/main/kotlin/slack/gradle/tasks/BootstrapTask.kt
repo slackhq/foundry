@@ -317,7 +317,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     /**
      * Current bootstrap version. Other bootstrap tasks can check against this as a minimum version.
      */
-    public const val VERSION: Int = 2
+    public const val VERSION: Int = 3
 
     internal fun isBootstrapEnabled(project: Project): Boolean {
       return project.gradle.startParameter.taskNames.any { it == NAME }
