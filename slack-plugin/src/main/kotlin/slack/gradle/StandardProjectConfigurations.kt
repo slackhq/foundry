@@ -519,18 +519,23 @@ internal class StandardProjectConfigurations(
             }
 
             // Configure individual Tests tasks.
-            unitTests.all { test ->
-              //
-              // Note that we can't configure this to _just_ be enabled for robolectric projects
-              // based on dependencies unfortunately, as the task graph is already wired by the time
-              // dependencies start getting resolved.
-              //
-              logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-              test.dependsOn(slackTools.globalConfig.updateRobolectricJarsTask)
+            if (globalProperties.versions.robolectric != null) {
+              unitTests.all { test ->
+                //
+                // Note that we can't configure this to _just_ be enabled for robolectric projects
+                // based on dependencies unfortunately, as the task graph is already wired by the
+                // time
+                // dependencies start getting resolved.
+                //
+                slackTools.globalConfig.updateRobolectricJarsTask?.let {
+                  logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
+                  test.dependsOn(it)
+                }
 
-              // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
-              // https://github.com/robolectric/robolectric/issues/5115
-              test.systemProperty("javax.net.ssl.trustStoreType", "JKS")
+                // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
+                // https://github.com/robolectric/robolectric/issues/5115
+                test.systemProperty("javax.net.ssl.trustStoreType", "JKS")
+              }
             }
           }
         }

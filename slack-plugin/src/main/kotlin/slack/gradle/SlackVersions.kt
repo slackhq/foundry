@@ -73,6 +73,9 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   val composeJbKotlinVersion: String?
     get() = getOptionalValue("compose-jb-kotlinVersion").orElse(null)
 
+  val robolectric: String?
+    get() = getOptionalValue("robolectric").orElse(null)
+
   val bundles = Bundles()
 
   inner class Bundles {

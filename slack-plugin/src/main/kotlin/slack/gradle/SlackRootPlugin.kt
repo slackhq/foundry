@@ -26,6 +26,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import slack.cli.AppleSiliconCompat
 import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
@@ -128,7 +129,9 @@ internal class SlackRootPlugin : Plugin<Project> {
       }
       project.configureGit(slackProperties)
     }
-    project.configureSlackRootBuildscript()
+    project.configureSlackRootBuildscript(
+      slackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull
+    )
     LintTasks.configureRootProject(project)
     DetektTasks.configureRootProject(project, slackProperties)
     project.configureMisc(slackProperties)
@@ -412,10 +415,10 @@ internal class SlackRootPlugin : Plugin<Project> {
   }
 }
 
-private fun Project.configureSlackRootBuildscript() {
+private fun Project.configureSlackRootBuildscript(jvmVendor: JvmVendorSpec?) {
   // Only register bootstrap if explicitly requested for now
   if (CoreBootstrapTask.isBootstrapEnabled(this)) {
-    CoreBootstrapTask.register(this)
+    CoreBootstrapTask.register(this, jvmVendor)
   }
   InstallCommitHooksTask.register(this)
 }

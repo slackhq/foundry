@@ -47,6 +47,7 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import oshi.SystemInfo
 import slack.cli.AppleSiliconCompat
@@ -242,9 +243,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     val properties =
       mutableMapOf(
         "org.gradle.jvmargs" to
-          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError ${gradleArgs.args.joinToString(" ")}",
+          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError ${gradleArgs.args.joinToString(" ")}",
         SlackProperties.KOTLIN_DAEMON_ARGS_KEY to
-          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError ${kotlinArgs.args.joinToString(" ")}",
+          "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError ${kotlinArgs.args.joinToString(" ")}",
       )
 
     // To reduce thermal throttling, we cap max workers on Intel mac devices
@@ -316,7 +317,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     /**
      * Current bootstrap version. Other bootstrap tasks can check against this as a minimum version.
      */
-    public const val VERSION: Int = 2
+    public const val VERSION: Int = 3
 
     internal fun isBootstrapEnabled(project: Project): Boolean {
       return project.gradle.startParameter.taskNames.any { it == NAME }
@@ -339,7 +340,10 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       }
     }
 
-    public fun register(project: Project): TaskProvider<CoreBootstrapTask> {
+    public fun register(
+      project: Project,
+      jvmVendor: JvmVendorSpec?
+    ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
         project.tasks.register<CoreBootstrapTask>(NAME) {
@@ -348,6 +352,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           val defaultLauncher =
             service.launcherFor {
               languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
+              if (jvmVendor != null) {
+                vendor.setDisallowChanges(jvmVendor)
+              }
             }
           this.launcher.convention(defaultLauncher)
           this.jdkVersion.setDisallowChanges(jdkVersion)
@@ -399,10 +406,11 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 internal object BootstrapUtils {
   private val jdkOpensAndExports =
     listOf(
-        // For GJF and compile-testing
+        // For GJF, error-prone, and compile-testing
         // https://github.com/diffplug/spotless/issues/834
         // https://github.com/google/google-java-format#jdk-16
         // https://github.com/google/compile-testing/issues/222 (only javac api)
+        // https://errorprone.info/docs/installation
         "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",

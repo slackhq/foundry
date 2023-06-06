@@ -1,6 +1,27 @@
 Changelog
 =========
 
+0.9.10
+------
+
+_2023-06-06_
+
+- **Fix**: Don't apply vendor property to Bootstrap toolchain if it's undefined.
+
+0.9.9
+-----
+
+_2023-06-06_
+
+- **New**: Robolectric is now optional. Its support will only be enabled if there is a `robolectric` key in the primary version catalog.
+- **Enhancement**: Update bootstrap JVM args to use ExitOnOutOfMemoryError for OOMs. No longer takes a heap dump on OOM.
+- **Enhancement**: Update unit test verbose mode to use CrashOnOutOfMemoryError for OOMs to produce more logs.
+- **Fix**: Bootstrap now respects the `sgp.config.jvmVendor` property.
+- Build against Wire to `4.7.0`.
+- Build against Anvil `2.4.6`.
+- Build against AGP `8.0.2`.
+- Build against Detekt `1.23.0`.
+
 0.9.8
 -----
 

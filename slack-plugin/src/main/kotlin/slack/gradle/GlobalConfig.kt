@@ -26,7 +26,7 @@ import slack.gradle.util.setDisallowChanges
 /** Registry of global configuration info. */
 public class GlobalConfig
 private constructor(
-  internal val updateRobolectricJarsTask: TaskProvider<UpdateRobolectricJarsTask>,
+  internal val updateRobolectricJarsTask: TaskProvider<UpdateRobolectricJarsTask>?,
   internal val mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
   internal val kotlinDaemonArgs: List<String>,
   internal val errorProneCheckNamesAsErrors: List<String>,
@@ -83,7 +83,12 @@ private constructor(
 
 private fun Project.createRobolectricJarsDownloadTask(
   slackProperties: SlackProperties
-): TaskProvider<UpdateRobolectricJarsTask> {
+): TaskProvider<UpdateRobolectricJarsTask>? {
+  if (slackProperties.versions.robolectric == null) {
+    // Not enabled
+    return null
+  }
+
   check(isRootProject) {
     "Robolectric jars task should only be created once on the root project. Tried to apply on $name"
   }
