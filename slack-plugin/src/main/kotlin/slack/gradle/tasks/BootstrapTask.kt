@@ -47,6 +47,7 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import oshi.SystemInfo
 import slack.cli.AppleSiliconCompat
@@ -316,7 +317,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     /**
      * Current bootstrap version. Other bootstrap tasks can check against this as a minimum version.
      */
-    public const val VERSION: Int = 2
+    public const val VERSION: Int = 3
 
     internal fun isBootstrapEnabled(project: Project): Boolean {
       return project.gradle.startParameter.taskNames.any { it == NAME }
@@ -339,7 +340,10 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       }
     }
 
-    public fun register(project: Project): TaskProvider<CoreBootstrapTask> {
+    public fun register(
+      project: Project,
+      jvmVendor: Provider<JvmVendorSpec>
+    ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
         project.tasks.register<CoreBootstrapTask>(NAME) {
@@ -348,6 +352,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
           val defaultLauncher =
             service.launcherFor {
               languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
+              vendor.setDisallowChanges(jvmVendor)
             }
           this.launcher.convention(defaultLauncher)
           this.jdkVersion.setDisallowChanges(jdkVersion)
