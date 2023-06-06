@@ -770,6 +770,9 @@ constructor(
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       if (featuresHandler.robolectric.getOrElse(false)) {
+        checkNotNull(slackProperties.versions.robolectric) {
+          "Robolectric support requested in ${project.path} but no version was specified in the version catalog."
+        }
         project.dependencies.apply {
           // For projects using robolectric, we want to make sure they include robolectric-core to
           // ensure robolectric uses our custom dependency resolver and config (which just need
