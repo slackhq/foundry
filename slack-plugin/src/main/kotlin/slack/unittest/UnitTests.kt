@@ -222,13 +222,13 @@ internal object UnitTests {
             else -> project.rootProject.projectDir.absolutePath
           }
         jvmArgs(
-          "-XX:+HeapDumpOnOutOfMemoryError",
+          "-XX:+HeapDumpOnOutOfMemoryError", // Produce a heap dump when an OOM occurs
+          "-XX:+CrashOnOutOfMemoryError", // Produce a crash report when an OOM occurs
           "-XX:+UseGCOverheadLimit",
           "-XX:GCHeapFreeLimit=10",
           "-XX:GCTimeLimit=20",
           "-XX:HeapDumpPath=$workspaceDir/fs_oom_err_pid<pid>.hprof",
-          "-XX:OnError=cat $workspaceDir/fs_oom.log",
-          "-XX:OnOutOfMemoryError=cat $workspaceDir/fs_oom_err_pid<pid>.hprof",
+          "-XX:ErrorFile=$workspaceDir/fs_oom_err_pid<pid>.log",
         )
       }
     }
