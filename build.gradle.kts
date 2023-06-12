@@ -152,13 +152,10 @@ data class KotlinBuildConfig(val kotlin: String) {
       "-Xjspecify-annotations=strict",
     )
 
-  val kotlinJvmTarget: String = "11"
-
   fun asTemplatesMap(): Map<String, String> {
     return mapOf(
       "kotlinCompilerArgs" to kotlinCompilerArgs.joinToString(", ") { "\"$it\"" },
       "kotlinJvmCompilerArgs" to kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" },
-      "kotlinJvmTarget" to kotlinJvmTarget,
       "kotlinVersion" to kotlin
     )
   }
@@ -188,20 +185,24 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach {
-      options.release.set(kotlinBuildConfig.kotlinJvmTarget.toInt())
-    }
+    tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
-        languageVersion.set(KOTLIN_1_8)
-        apiVersion.set(KOTLIN_1_8)
+        val kotlinVersion =
+          if (project.path == ":intellij-plugin") {
+            KOTLIN_1_6
+          } else {
+            KOTLIN_1_8
+          }
+        languageVersion.set(kotlinVersion)
+        apiVersion.set(kotlinVersion)
         // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
         // this sometimes. https://github.com/gradle/gradle/issues/16345
         allWarningsAsErrors.set(false)
-        jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
+        jvmTarget.set(JvmTarget.JVM_17)
         // TODO required due to https://github.com/gradle/gradle/issues/24871
         freeCompilerArgs.add("-Xsam-conversions=class")
         freeCompilerArgs.addAll(
@@ -224,7 +225,7 @@ subprojects {
     //    apply(plugin = "com.squareup.sort-dependencies")
   }
 
-  tasks.withType<Detekt>().configureEach { jvmTarget = kotlinBuildConfig.kotlinJvmTarget }
+  tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")

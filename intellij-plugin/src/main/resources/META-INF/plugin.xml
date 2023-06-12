@@ -26,4 +26,9 @@
   <extensions defaultExtensionNs="com.intellij">
 
   </extensions>
+  <actions>
+    <action id="com.slack.sgp.intellij.DemoAction" class="com.slack.sgp.intellij.DemoAction" text="Demo Action"
+            description="The most descriptive description">
+    </action>
+  </actions>
 </idea-plugin>
