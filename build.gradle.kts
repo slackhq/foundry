@@ -192,7 +192,7 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
         val kotlinVersion =
-          if (project.path == ":intellij-plugin") {
+          if (project.path == ":skate-plugin") {
             KOTLIN_1_6
           } else {
             KOTLIN_1_8
