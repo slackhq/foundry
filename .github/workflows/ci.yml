@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ci_java_version: ['19']
+        ci_java_version: ['20']
         ci_kotlin_version: ['1.8.20']
         # TODO add back 8.1.0 after the CommonExtension generic problem is fixed
         ci_agp_version: ['8.0.0']
@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '19'
+          java-version: '20'
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/slack-gradle-plugin' && github.ref == 'refs/heads/main'
