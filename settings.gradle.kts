@@ -144,6 +144,9 @@ pluginManagement {
           "com.autonomousapps.plugin-best-practices-plugin",
           "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin"
         )
+        includeModule("org.jetbrains.intellij", "org.jetbrains.intellij.gradle.plugin")
+        includeModule("org.jetbrains.intellij.plugins", "gradle-intellij-plugin")
+        includeModule("gradle.plugin.org.jetbrains.gradle.plugin.idea-ext", "gradle-idea-ext")
       }
     }
   }
@@ -173,6 +176,7 @@ include(
   ":sgp-monkeypatch-agp",
   ":agp-handlers:agp-handler-api",
   ":agp-handlers:agp-handler-80",
+  ":intellij-plugin",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

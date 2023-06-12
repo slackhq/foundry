@@ -29,6 +29,7 @@ bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", 
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+intellij = { id = "org.jetbrains.intellij", version = "1.13.3" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 # Here to trigger Renovate updates
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
