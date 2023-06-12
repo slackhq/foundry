@@ -17,7 +17,7 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import java.net.URL
+import java.net.URI
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -188,27 +188,33 @@ subprojects {
     tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
+  val isSkatePlugin = project.path == ":skate-plugin"
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
         val kotlinVersion =
-          if (project.path == ":skate-plugin") {
+          if (isSkatePlugin) {
             KOTLIN_1_6
           } else {
             KOTLIN_1_8
           }
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
-        // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
-        // this sometimes. https://github.com/gradle/gradle/issues/16345
-        allWarningsAsErrors.set(false)
+
+        if (!isSkatePlugin) {
+          // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
+          // this sometimes. https://github.com/gradle/gradle/issues/16345
+          allWarningsAsErrors.set(false)
+          // TODO required due to https://github.com/gradle/gradle/issues/24871
+          freeCompilerArgs.add("-Xsam-conversions=class")
+        } else {
+          allWarningsAsErrors.set(true)
+        }
         jvmTarget.set(JvmTarget.JVM_17)
-        // TODO required due to https://github.com/gradle/gradle/issues/24871
-        freeCompilerArgs.add("-Xsam-conversions=class")
         freeCompilerArgs.addAll(
           kotlinBuildConfig.kotlinCompilerArgs
             // -progressive is useless when running on an older language version but new compiler
-            // version
+            // version. Both Gradle and IntelliJ plugins have this issue 🙃
             .filter { it != "-progressive" }
         )
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
@@ -236,17 +242,19 @@ subprojects {
         skipDeprecated.set(true)
         // Gradle docs
         externalDocumentationLink {
-          url.set(URL("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html"))
+          url.set(URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL())
         }
         // AGP docs
         externalDocumentationLink {
           val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
           val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
           packageListUrl.set(
-            URL("https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list")
+            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list")
+              .toURL()
           )
           url.set(
-            URL("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
+            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
+              .toURL()
           )
         }
       }
