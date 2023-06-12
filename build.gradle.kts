@@ -188,7 +188,9 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach { options.release.set(11) }
+    tasks.withType<JavaCompile>().configureEach {
+      options.release.set(kotlinBuildConfig.kotlinJvmTarget.toInt())
+    }
   }
 
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
