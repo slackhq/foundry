@@ -14,7 +14,7 @@
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
   <description><![CDATA[
-    A plugin for IntelliJ and Android Studio for faster Kotlin and Android development!<br>
+    A plugin for IntelliJ and Android Studio for faster Kotlin and Android development!
   ]]></description>
 
   <!-- Product and plugin compatibility requirements.
