@@ -17,7 +17,7 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import java.net.URL
+import java.net.URI
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -152,13 +152,10 @@ data class KotlinBuildConfig(val kotlin: String) {
       "-Xjspecify-annotations=strict",
     )
 
-  val kotlinJvmTarget: String = "11"
-
   fun asTemplatesMap(): Map<String, String> {
     return mapOf(
       "kotlinCompilerArgs" to kotlinCompilerArgs.joinToString(", ") { "\"$it\"" },
       "kotlinJvmCompilerArgs" to kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" },
-      "kotlinJvmTarget" to kotlinJvmTarget,
       "kotlinVersion" to kotlin
     )
   }
@@ -188,24 +185,36 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach { options.release.set(11) }
+    tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
+  val isSkatePlugin = project.path == ":skate-plugin"
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
-        languageVersion.set(KOTLIN_1_8)
-        apiVersion.set(KOTLIN_1_8)
-        // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
-        // this sometimes. https://github.com/gradle/gradle/issues/16345
-        allWarningsAsErrors.set(false)
-        jvmTarget.set(JvmTarget.fromTarget(kotlinBuildConfig.kotlinJvmTarget))
-        // TODO required due to https://github.com/gradle/gradle/issues/24871
-        freeCompilerArgs.add("-Xsam-conversions=class")
+        val kotlinVersion =
+          if (isSkatePlugin) {
+            KOTLIN_1_6
+          } else {
+            KOTLIN_1_8
+          }
+        languageVersion.set(kotlinVersion)
+        apiVersion.set(kotlinVersion)
+
+        if (!isSkatePlugin) {
+          // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
+          // this sometimes. https://github.com/gradle/gradle/issues/16345
+          allWarningsAsErrors.set(false)
+          // TODO required due to https://github.com/gradle/gradle/issues/24871
+          freeCompilerArgs.add("-Xsam-conversions=class")
+        } else {
+          allWarningsAsErrors.set(true)
+        }
+        jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs.addAll(
           kotlinBuildConfig.kotlinCompilerArgs
             // -progressive is useless when running on an older language version but new compiler
-            // version
+            // version. Both Gradle and IntelliJ plugins have this issue 🙃
             .filter { it != "-progressive" }
         )
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
@@ -222,7 +231,7 @@ subprojects {
     //    apply(plugin = "com.squareup.sort-dependencies")
   }
 
-  tasks.withType<Detekt>().configureEach { jvmTarget = kotlinBuildConfig.kotlinJvmTarget }
+  tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")
@@ -233,17 +242,19 @@ subprojects {
         skipDeprecated.set(true)
         // Gradle docs
         externalDocumentationLink {
-          url.set(URL("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html"))
+          url.set(URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL())
         }
         // AGP docs
         externalDocumentationLink {
           val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
           val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
           packageListUrl.set(
-            URL("https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list")
+            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list")
+              .toURL()
           )
           url.set(
-            URL("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
+            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
+              .toURL()
           )
         }
       }
@@ -263,7 +274,7 @@ dependencyAnalysis {
       ignoreGeneratedCode()
     }
   }
-  dependencies {
+  this.dependencies {
     bundle("agp") {
       primary("com.android.tools.build:gradle")
       includeGroup("com.android.tools.build")
