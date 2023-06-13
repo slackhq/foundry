@@ -7,10 +7,10 @@ dependencyAnalysisPlugin = "1.20.0"
 detekt = "1.23.0"
 dokka = "1.8.20"
 errorproneGradle = "3.0.1"
-jdk = "19"
+jdk = "20"
 jna = "5.13.0"
 kotlin = "1.8.22"
-ksp = "1.8.21-1.0.11"
+ksp = "1.8.22-1.0.11"
 ktfmt = "0.44"
 mavenPublish = "0.25.2"
 moshi = "1.14.0"
@@ -21,7 +21,7 @@ okio = "3.3.0"
 sortDependencies = "0.3"
 spotless = "6.19.0"
 sqldelight = "2.0.0-alpha05"
-versionsPlugin = "0.46.0"
+versionsPlugin = "0.47.0"
 wire = "4.7.0"
 
 [plugins]
@@ -29,6 +29,7 @@ bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", 
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+intellij = { id = "org.jetbrains.intellij", version = "1.14.1" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 # Here to trigger Renovate updates
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -42,7 +43,7 @@ versionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "versions
 
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
-autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.0"
+autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.0.0"
 commonsText = "org.apache.commons:commons-text:1.10.0"
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
@@ -66,7 +67,7 @@ gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradl
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
-guava = "com.google.guava:guava:32.0.0-jre"
+guava = "com.google.guava:guava:32.0.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
