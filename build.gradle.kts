@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import java.net.URI
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -25,7 +27,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
-import java.net.URI
 
 buildscript {
   dependencies {
@@ -62,6 +63,13 @@ tasks.withType<Detekt>().configureEach {
 }
 
 val ktfmtVersion = libs.versions.ktfmt.get()
+val sidePanelPackage = "com/slack/sgp/intellij/sidepanel"
+val externalFiles =
+  arrayOf(
+    "**/$sidePanelPackage/AssistantToolWindowService.kt",
+    "**/$sidePanelPackage/AssistSidePanel.kt",
+    "**/$sidePanelPackage/OpenAssistSidePanelAction.kt",
+  )
 
 allprojects {
   apply(plugin = "com.diffplug.spotless")
@@ -77,7 +85,15 @@ allprojects {
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile(rootProject.file("spotless/spotless.kt"))
-      targetExclude("**/spotless.kt", "**/Aliases.kt")
+      targetExclude("**/spotless.kt", "**/Aliases.kt", *externalFiles)
+    }
+    // Externally adapted sources that should preserve their license header
+    format("kotlinExternal", KotlinExtension::class.java) {
+      target(*externalFiles)
+      ktfmt(ktfmtVersion).googleStyle()
+      trimTrailingWhitespace()
+      endWithNewline()
+      licenseHeaderFile(rootProject.file("spotless/spotless-external-aosp.kt"))
     }
     kotlinGradle {
       target("src/**/*.kts")
