@@ -227,8 +227,7 @@ subprojects {
     apply(plugin = "kotlin-sam-with-receiver")
     configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
 
-    // TODO toe-hold for https://github.com/square/gradle-dependencies-sorter/issues/18
-    //    apply(plugin = "com.squareup.sort-dependencies")
+    apply(plugin = "com.squareup.sort-dependencies")
   }
 
   tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
