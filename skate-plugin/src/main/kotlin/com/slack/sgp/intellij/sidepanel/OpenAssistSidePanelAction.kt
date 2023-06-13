@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.sidepanel;
+package com.slack.sgp.intellij.sidepanel
 
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 
-/**
- * Triggers the creation of the Developer Services side panel.
- */
-public class OpenAssistSidePanelAction extends AnAction {
-  @Override
-  public void actionPerformed(@NotNull AnActionEvent event) {
-    final Project thisProject = event.getProject();
-    final String actionId = ActionManager.getInstance().getId(this);
-
-    assert thisProject != null;
-    openWindow(actionId, thisProject);
+/** Triggers the creation of the Developer Services side panel. */
+class OpenAssistSidePanelAction : AnAction() {
+  override fun actionPerformed(event: AnActionEvent) {
+    val thisProject = checkNotNull(event.project)
+    val actionId = ActionManager.getInstance().getId(this)
+    openWindow(actionId, thisProject)
   }
 
-  /**
-   * Opens the assistant associated with the given actionId at the end of event thread
-   */
-  public final void openWindow(@NotNull String actionId, @NotNull Project project) {
-    ApplicationManager.getApplication()
-      .invokeLater(() -> project.getService(AssistantToolWindowService.class).openAssistant(actionId, null));
+  /** Opens the assistant associated with the given actionId at the end of event thread */
+  fun openWindow(actionId: String, project: Project) {
+    ApplicationManager.getApplication().invokeLater {
+      project.getService(AssistantToolWindowService::class.java).openAssistant(actionId, null)
+    }
   }
 }
