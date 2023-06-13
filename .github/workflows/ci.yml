@@ -26,7 +26,7 @@ jobs:
         ci_java_version: ['20']
         ci_kotlin_version: ['1.8.22']
         # TODO add back 8.1.0 after the CommonExtension generic problem is fixed
-        ci_agp_version: ['8.0.0']
+        ci_agp_version: ['8.0.2']
     env:
       DEP_OVERRIDES: 'true'
       DEP_OVERRIDE_KOTLIN: '${{ matrix.ci_kotlin_version }}'
