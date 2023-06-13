@@ -65,64 +65,56 @@ moshi {
 }
 
 dependencies {
+  api(platform(libs.okhttp.bom))
+  api(libs.okhttp)
+  // Better I/O
+  api(libs.okio)
+  api(projects.agpHandlers.agpHandler80)
+  api(projects.agpHandlers.agpHandlerApi)
+
+  implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
+  implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
+  implementation(libs.guava)
+  // Graphing library with Betweenness Centrality algo for modularization score
+  implementation(libs.jgrapht)
+  implementation(libs.jna)
+  implementation(libs.jna.platform)
+  implementation(libs.kotlinCliUtil)
+  implementation(libs.moshi)
+  implementation(libs.oshi) { because("To read hardware information") }
+  implementation(libs.rxjava)
+
+  compileOnly(platform(libs.kotlin.bom))
   compileOnly(gradleApi())
-  compileOnly(libs.gradlePlugins.enterprise)
-
-  compileOnly(platform(kotlin("bom", version = libs.versions.kotlin.get())))
-  compileOnly(kotlin("gradle-plugin", version = libs.versions.kotlin.get()))
-  compileOnly(kotlin("reflect", version = libs.versions.kotlin.get()))
-
+  compileOnly(libs.agp)
+  compileOnly(libs.detekt)
+  compileOnly(libs.gradlePlugins.anvil)
   // compileOnly because we want to leave versioning to the consumers
   // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can
   // de-dupe version
   // management between this plugin and the root build.gradle.kts file.
   compileOnly(libs.gradlePlugins.bugsnag)
   compileOnly(libs.gradlePlugins.compose)
-  compileOnly(libs.gradlePlugins.doctor)
-  compileOnly(libs.gradlePlugins.versions)
+  compileOnly(libs.gradlePlugins.dependencyAnalysis)
   compileOnly(libs.gradlePlugins.detekt)
-  compileOnly(libs.detekt)
+  compileOnly(libs.gradlePlugins.doctor)
+  compileOnly(libs.gradlePlugins.enterprise)
   compileOnly(libs.gradlePlugins.errorProne)
+  compileOnly(libs.gradlePlugins.kgp)
+  compileOnly(libs.gradlePlugins.ksp)
+  compileOnly(libs.gradlePlugins.moshix)
   compileOnly(libs.gradlePlugins.napt)
   compileOnly(libs.gradlePlugins.nullaway)
-  compileOnly(libs.gradlePlugins.dependencyAnalysis)
-  compileOnly(libs.gradlePlugins.retry)
-  compileOnly(libs.gradlePlugins.anvil)
-  compileOnly(libs.gradlePlugins.spotless)
   compileOnly(libs.gradlePlugins.redacted)
-  compileOnly(libs.gradlePlugins.moshix)
-  compileOnly(libs.gradlePlugins.wire)
+  compileOnly(libs.gradlePlugins.retry)
+  compileOnly(libs.gradlePlugins.spotless)
   compileOnly(libs.gradlePlugins.sqldelight)
-  compileOnly(libs.gradlePlugins.ksp)
+  compileOnly(libs.gradlePlugins.versions)
+  compileOnly(libs.gradlePlugins.wire)
+  compileOnly(libs.kotlin.reflect)
 
-  implementation(libs.oshi) { because("To read hardware information") }
-
-  compileOnly(libs.agp)
-  api(projects.agpHandlers.agpHandlerApi)
-  api(projects.agpHandlers.agpHandler80)
   testImplementation(libs.agp)
-
-  implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
-  implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
-  implementation(libs.guava)
-  implementation(libs.kotlinCliUtil)
-  implementation(libs.jna)
-  implementation(libs.jna.platform)
-
-  implementation(libs.rxjava)
-
-  api(platform(libs.okhttp.bom))
-  api(libs.okhttp)
-
-  implementation(libs.moshi)
-
-  // Graphing library with Betweenness Centrality algo for modularization score
-  implementation(libs.jgrapht)
-
-  // Better I/O
-  api(libs.okio)
-
-  testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.junit)
+  testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)
 }
