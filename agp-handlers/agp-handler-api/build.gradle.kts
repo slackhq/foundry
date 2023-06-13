@@ -4,7 +4,8 @@ plugins {
 }
 
 dependencies {
+  implementation(libs.guava)
+
   compileOnly(gradleApi())
   compileOnly(libs.agp)
-  implementation(libs.guava)
 }

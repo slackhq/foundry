@@ -31,7 +31,6 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij = { id = "org.jetbrains.intellij", version = "1.14.1" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-# Here to trigger Renovate updates
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
@@ -56,6 +55,8 @@ gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.8.1"
 gradlePlugins-enterprise = "com.gradle:gradle-enterprise-gradle-plugin:3.12.2"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = "com.jraska.module.graph.assertion:plugin:2.3.1"
+gradlePlugins-kgp = { module = "rg.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugins-kgp-api = { module = "rg.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
@@ -69,6 +70,8 @@ gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
 guava = "com.google.guava:guava:32.0.1-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.1.1"
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }

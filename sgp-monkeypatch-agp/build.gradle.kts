@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-  compileOnly(gradleApi())
-  compileOnly(libs.guava)
-  compileOnly(libs.agp)
   compileOnly("com.android.tools:common:31.0.2")
+  compileOnly(gradleApi())
+  compileOnly(libs.agp)
+  compileOnly(libs.guava)
 }
