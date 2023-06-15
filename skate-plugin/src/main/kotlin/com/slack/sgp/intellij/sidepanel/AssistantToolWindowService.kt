@@ -5,12 +5,13 @@
 //
 // import com.intellij.openapi.Disposable
 // import com.intellij.openapi.project.Project
+// import com.intellij.openapi.wm.ToolWindowAnchor
 // import com.intellij.openapi.wm.ToolWindowManager
 // import com.intellij.ui.content.Content
 // import com.intellij.ui.content.ContentFactory
 // import com.slack.sgp.intellij.sidepanel.AssistantToolWindowService.Companion.TOOL_WINDOW_TITLE
 //
-/// **
+///**
 // * Service for creating and maintaining assistant tool window content.
 // *
 // * Note the registration of the tool window is done programmatically (not via extension point).
@@ -46,11 +47,11 @@
 //          true
 //        )
 //      //            TODO: Add Icon
-//      toolWindow.setIcon(StudioIcons.Shell.ToolWindows.ASSISTANT)
+////      toolWindow.setIcon(StudioIcons.Shell.ToolWindows.ASSISTANT)
 //    }
 //    toolWindow.helpId = bundleId
 //
-//    createAssistantContent(bundleId, toolWindow, defaultTutorialCardId)
+//    createAssistantContent(bundleId,  defaultTutorialCardId)
 //
 //    // Always active the window, in case it was previously minimized.
 //    toolWindow.activate(null)
@@ -65,13 +66,13 @@
 //    //        assistSidePanel.showBundle(bundleId, defaultTutorialCardId) { content?.displayName =
 //    // it.name }
 //    val contentFactory = ContentFactory.getInstance()
-//    content =
-//      contentFactory.createContent(assistSidePanel.loadingPanel, null, false).also {
-//        val contentManager = toolWindow.contentManager
-//        contentManager.removeAllContents(true)
-//        contentManager.addContent(it)
-//        contentManager.setSelectedContent(it)
-//      }
-//    toolWindow.show(null)
+////    content =
+////      contentFactory.createContent(assistSidePanel.loadingPanel, null, false).also {
+////        val contentManager = toolWindow.contentManager
+////        contentManager.removeAllContents(true)
+////        contentManager.addContent(it)
+////        contentManager.setSelectedContent(it)
+////      }
+////    toolWindow.show(null)
 //  }
 // }

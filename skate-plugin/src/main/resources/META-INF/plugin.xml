@@ -27,23 +27,27 @@
 
     <!--    </extensions>-->
 
-    <extensions defaultExtensionNs="com.android.tools.idea.assistant">
-        <assistantBundleCreator
-                id="HelloWorldBundle"
-                class="com.slack.sgp.intellij.sidepanel.impl.HelloWorldAssistantBundleCreator"/>
-    </extensions>
+<!--    <extensions defaultExtensionNs="com.android.tools.idea.assistant">-->
+<!--        <assistantBundleCreator-->
+<!--                id="HelloWorldBundle"-->
+<!--                class="com.slack.sgp.intellij.sidepanel.impl.HelloWorldAssistantBundleCreator"/>-->
+<!--    </extensions>-->
 
     <actions>
-        <action id="com.slack.sgp.intellij.DemoAction" class="com.slack.sgp.intellij.sidepanel.DemoAction" text="Demo Action"
+<!--        <action id="com.slack.sgp.intellij.DemoAction" class="com.slack.sgp.intellij.sidepanel.DemoAction" text="Demo Action"
                 description="The most descriptive description">
-        </action>
-
-<!--        <action id="com.slack.sgp.intellij.OpenHelloWorldAssistant"-->
-        <!--                class="com.slack.sgp.intellij.OpenAssistSidePanelAction"-->
-        <!--                text="Open Hello World Assistant"-->
-        <!--                description="Action to open the hello world side panel">-->
-        <!--            <add-to-group group-id="ToolsMenu" anchor="last"/>-->
-        <!--        </action>-->
+        </action>-->
+        <group
+            id = "Hello World assistant"
+            description="Show it to the world!"
+        >
+            <action id="com.slack.sgp.intellij.OpenHelloWorldAssistant"
+                            class="com.slack.sgp.intellij.sidepanel.OpenAssistSidePanelAction"
+                            text="Open Hello World Assistant"
+                            description="Action to open the hello world side panel">
+                        <add-to-group group-id="ToolsMenu" anchor="last"/>
+                    </action>
+        </group>
 
     </actions>
 </idea-plugin>
