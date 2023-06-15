@@ -1,34 +1,49 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-  <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-  <id>com.slack.sgp.intellij</id>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.slack.sgp.intellij</id>
 
-  <!-- Public plugin name should be written in Title Case.
-       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-  <name>Skate</name>
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Skate</name>
 
-  <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-  <vendor email="oss@slack-corp.com" url="https://www.github.com/slackhq">Slack</vendor>
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="oss@slack-corp.com" url="https://www.github.com/slackhq">Slack</vendor>
 
-  <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-       Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
-       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-  <description><![CDATA[
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
     A plugin for IntelliJ and Android Studio for faster Kotlin and Android development!
   ]]></description>
 
-  <!-- Product and plugin compatibility requirements.
-       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-  <depends>com.intellij.modules.platform</depends>
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
 
-  <!-- Extension points defined by the plugin.
-       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-  <extensions defaultExtensionNs="com.intellij">
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <!--    <extensions defaultExtensionNs="com.intellij">-->
 
-  </extensions>
-  <actions>
-    <action id="com.slack.sgp.intellij.DemoAction" class="com.slack.sgp.intellij.DemoAction" text="Demo Action"
-            description="The most descriptive description">
-    </action>
-  </actions>
+    <!--    </extensions>-->
+
+    <extensions defaultExtensionNs="com.android.tools.idea.assistant">
+        <assistantBundleCreator
+                id="HelloWorldBundle"
+                class="com.slack.sgp.intellij.sidepanel.impl.HelloWorldAssistantBundleCreator"/>
+    </extensions>
+
+    <actions>
+        <action id="com.slack.sgp.intellij.DemoAction" class="com.slack.sgp.intellij.sidepanel.DemoAction" text="Demo Action"
+                description="The most descriptive description">
+        </action>
+
+<!--        <action id="com.slack.sgp.intellij.OpenHelloWorldAssistant"-->
+        <!--                class="com.slack.sgp.intellij.OpenAssistSidePanelAction"-->
+        <!--                text="Open Hello World Assistant"-->
+        <!--                description="Action to open the hello world side panel">-->
+        <!--            <add-to-group group-id="ToolsMenu" anchor="last"/>-->
+        <!--        </action>-->
+
+    </actions>
 </idea-plugin>
