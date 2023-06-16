@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
@@ -23,8 +22,7 @@ import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
@@ -63,13 +61,6 @@ tasks.withType<Detekt>().configureEach {
 }
 
 val ktfmtVersion = libs.versions.ktfmt.get()
-val sidePanelPackage = "com/slack/sgp/intellij/sidepanel"
-val externalFiles =
-  arrayOf(
-    "**/$sidePanelPackage/AssistantToolWindowService.kt",
-    "**/$sidePanelPackage/AssistSidePanel.kt",
-    "**/$sidePanelPackage/OpenAssistSidePanelAction.kt",
-  )
 
 allprojects {
   apply(plugin = "com.diffplug.spotless")
@@ -85,15 +76,7 @@ allprojects {
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile(rootProject.file("spotless/spotless.kt"))
-      targetExclude("**/spotless.kt", "**/Aliases.kt", *externalFiles)
-    }
-    // Externally adapted sources that should preserve their license header
-    format("kotlinExternal", KotlinExtension::class.java) {
-      target(*externalFiles)
-      ktfmt(ktfmtVersion).googleStyle()
-      trimTrailingWhitespace()
-      endWithNewline()
-      licenseHeaderFile(rootProject.file("spotless/spotless-external-aosp.kt"))
+      targetExclude("**/spotless.kt", "**/Aliases.kt")
     }
     kotlinGradle {
       target("src/**/*.kts")
@@ -238,15 +221,14 @@ subprojects {
       }
     }
 
-    if (!isSkatePlugin) {
-      extensions.configure<KotlinProjectExtension> { explicitApi() }
-    }
+    extensions.configure<KotlinProjectExtension> { explicitApi() }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
     apply(plugin = "kotlin-sam-with-receiver")
     configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
 
-    apply(plugin = "com.squareup.sort-dependencies")
+    // TODO toe-hold for https://github.com/square/gradle-dependencies-sorter/issues/18
+    //    apply(plugin = "com.squareup.sort-dependencies")
   }
 
   tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
