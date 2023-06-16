@@ -9,6 +9,10 @@ group = "com.slack.sgp.intellij"
 version = "1.0-SNAPSHOT"
 
 repositories { mavenCentral() }
+java {
+    sourceCompatibility = JavaVersion.VERSION_20
+    targetCompatibility = JavaVersion.VERSION_20
+}
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
