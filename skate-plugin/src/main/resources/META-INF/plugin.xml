@@ -23,36 +23,14 @@
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-    <!--    <extensions defaultExtensionNs="com.intellij">-->
-
-    <!--    </extensions>-->
-
-    <!--    <extensions defaultExtensionNs="com.android.tools.idea.assistant">-->
-    <!--        <assistantBundleCreator-->
-    <!--                id="HelloWorldBundle"-->
-    <!--                class="com.slack.sgp.intellij.sidepanel.impl.HelloWorldAssistantBundleCreator"/>-->
-    <!--    </extensions>-->
-
-    <!--    <actions>-->
-    <!--&lt;!&ndash;        <action id="com.slack.sgp.intellij.DemoAction" class="com.slack.sgp.intellij.sidepanel.DemoAction" text="Demo Action"-->
-    <!--                description="The most descriptive description">-->
-    <!--        </action>&ndash;&gt;-->
-    <!--        <group-->
-    <!--            id = "Hello World assistant"-->
-    <!--            description="Show it to the world!"-->
-    <!--        >-->
-    <!--            <action id="com.slack.sgp.intellij.OpenHelloWorldAssistant"-->
-    <!--                            class="com.slack.sgp.intellij.sidepanel.OpenAssistSidePanelAction"-->
-    <!--                            text="Open Hello World Assistant"-->
-    <!--                            description="Action to open the hello world side panel">-->
-    <!--                        <add-to-group group-id="ToolsMenu" anchor="last"/>-->
-    <!--                    </action>-->
-    <!--        </group>-->
-
-    <!--    </actions>-->
-
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="What's New!" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" anchor="right"
-                    factoryClass="com.slack.sgp.intellij.sidepanel.WhatsNewPanel"/>
+        <projectService
+                serviceInterface="com.slack.sgp.intellij.SkateProjectService"
+                serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
     </extensions>
+
+    <applicationListeners>
+        <listener class="com.slack.sgp.intellij.ProjectOpenCloseListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
 </idea-plugin>
