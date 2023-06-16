@@ -221,7 +221,9 @@ subprojects {
       }
     }
 
-    extensions.configure<KotlinProjectExtension> { explicitApi() }
+    if (!isSkatePlugin) {
+      extensions.configure<KotlinProjectExtension> { explicitApi() }
+    }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
     apply(plugin = "kotlin-sam-with-receiver")
