@@ -86,4 +86,4 @@ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 oshi = "com.github.oshi:oshi-core:6.4.3"
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.6"
-truth = "com.google.truth:truth:1.1.4"
+truth = "com.google.truth:truth:1.1.5"
