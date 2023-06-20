@@ -16,6 +16,8 @@
 package com.slack.sgp.intellij
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import java.util.function.Supplier
@@ -27,6 +29,13 @@ interface SkateProjectService {
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override fun showWhatsNewWindow() {
+    // TODO
+    //  Make the file configurable?
+    //  Only show when changed
+    //  Only show latest changes
+    val projectDir = project.guessProjectDir() ?: return
+    val changeLogFile = VfsUtil.findRelativeFile(projectDir, "CHANGELOG.md") ?: return
+    val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater {
       val toolWindow =
@@ -34,7 +43,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
           stripeTitle = Supplier { "What's New in Slack!" }
           anchor = ToolWindowAnchor.RIGHT
         }
-      WhatsNewPanelFactory().createToolWindowContent(toolWindow, project.name)
+      WhatsNewPanelFactory().createToolWindowContent(toolWindow, changeLogString)
       toolWindow.show()
     }
   }
