@@ -29,8 +29,13 @@ interface SkateProjectService {
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override fun showWhatsNewWindow() {
-    val changeLogFile = VfsUtil.findRelativeFile(project.guessProjectDir(), "CHANGELOG.md")
-    val changeLogString = VfsUtil.loadText(changeLogFile!!)
+    // TODO
+    //  Make the file configurable?
+    //  Only show when changed
+    //  Only show latest changes
+    val projectDir = project.guessProjectDir() ?: return
+    val changeLogFile = VfsUtil.findRelativeFile(projectDir, "CHANGELOG.md") ?: return
+    val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater {
       val toolWindow =
