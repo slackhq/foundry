@@ -355,7 +355,7 @@ internal class SlackRootPlugin : Plugin<Project> {
       }
     }
 
-    AndroidTestApksTask.register(project)
+    AndroidTestApksTask.register(project, slackProperties)
   }
 
   private fun isStable(version: String): Boolean {

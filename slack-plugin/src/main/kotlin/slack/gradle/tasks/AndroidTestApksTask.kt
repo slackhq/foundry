@@ -15,16 +15,22 @@
  */
 package slack.gradle.tasks
 
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import slack.gradle.SlackProperties
 import slack.gradle.register
 import slack.gradle.util.setDisallowChanges
 
@@ -46,6 +52,10 @@ public abstract class AndroidTestApksTask : DefaultTask() {
   @get:InputFiles
   public abstract val androidTestApkDirs: ConfigurableFileCollection
 
+  @get:Input public abstract val useRelativePaths: Property<Boolean>
+
+  @get:Internal public abstract val rootProjectDir: DirectoryProperty
+
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
@@ -54,6 +64,12 @@ public abstract class AndroidTestApksTask : DefaultTask() {
 
   @TaskAction
   public fun writeFiles() {
+    val mapper: (File) -> String =
+      if (useRelativePaths.get()) {
+        { it.relativeTo(rootProjectDir.get().asFile).path }
+      } else {
+        { it.absolutePath }
+      }
     outputFile.asFile
       .get()
       .writeText(
@@ -61,18 +77,23 @@ public abstract class AndroidTestApksTask : DefaultTask() {
           .asSequence()
           .flatMap { it.walk() }
           .filter { it.isFile && it.extension == "apk" }
-          .joinToString("\n") { apk -> "- test: ${apk.absolutePath}" }
+          .joinToString("\n") { apk -> "- test: ${mapper(apk)}" }
       )
   }
 
   public companion object {
     public const val NAME: String = "aggregateAndroidTestApks"
 
-    internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
+    internal fun register(
+      project: Project,
+      slackProperties: SlackProperties
+    ): TaskProvider<AndroidTestApksTask> {
       return project.tasks.register<AndroidTestApksTask>(NAME) {
         outputFile.setDisallowChanges(
           project.layout.buildDirectory.file("slack/androidTestAggregator/aggregatedTestApks.txt")
         )
+        useRelativePaths.convention(slackProperties.useRelativePathsInAndroidTestApksFile)
+        rootProjectDir.set(project.layout.projectDirectory)
       }
     }
   }

@@ -18,6 +18,7 @@ package slack.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.booleanProvider
 import slack.gradle.util.getOrCreateExtra
@@ -232,6 +233,10 @@ public class SlackProperties private constructor(private val project: Project) {
       booleanProperty(
         "slack.test.verboseLogging",
       ) || verboseLogging
+
+  /** Flag to control writing relative paths in [AndroidTestApksTask]. */
+  public val useRelativePathsInAndroidTestApksFile: Provider<Boolean>
+    get() = project.booleanProvider("slack.test.androidTestApks.useRelativePaths", false)
 
   /**
    * Flag to enable kapt in tests. By default these are disabled due to this undesirable (but
