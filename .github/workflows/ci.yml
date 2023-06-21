@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         ci_java_version: ['20']
-        ci_kotlin_version: ['1.9.0-Beta']
+        ci_kotlin_version: ['1.9.0-RC']
         # TODO add back 8.1.0 after the CommonExtension generic problem is fixed
         ci_agp_version: ['8.0.2']
     env:
