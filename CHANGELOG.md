@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.13
+------
+
+_2023-06-24_
+
+* Fix wrong map key name being used in exclusion.
+
 0.9.12
 ------
 

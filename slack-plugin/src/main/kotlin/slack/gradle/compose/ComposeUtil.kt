@@ -106,7 +106,7 @@ internal fun Project.configureComposeCompiler(
           } else {
             COMPOSE_COMPILER_GOOGLE_GROUP
           }
-        exclude(mapOf("group" to group, "artifact" to "compiler"))
+        exclude(mapOf("group" to group, "module" to "compiler"))
       }
   }
 }
