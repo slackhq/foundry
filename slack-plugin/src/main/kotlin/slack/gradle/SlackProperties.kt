@@ -26,6 +26,7 @@ import slack.gradle.util.intProvider
 import slack.gradle.util.optionalStringProperty
 import slack.gradle.util.optionalStringProvider
 import slack.gradle.util.safeProperty
+import slack.gradle.util.sneakyNull
 
 /**
  * (Mostly Gradle) properties for configuration of SlackPlugin.
@@ -543,7 +544,18 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
-    get() = project.optionalStringProvider("sgp.config.jvmVendor")
+    get() =
+      project.optionalStringProvider("sgp.config.jvmVendor").map {
+        if (jvmVendorOptOut) {
+          sneakyNull()
+        } else {
+          it
+        }
+      }
+
+  /** Flag to disable JVM vendor setting locally. */
+  public val jvmVendorOptOut: Boolean
+    get() = booleanProperty("sgp.config.jvmVendor.optOut", defaultValue = false)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
