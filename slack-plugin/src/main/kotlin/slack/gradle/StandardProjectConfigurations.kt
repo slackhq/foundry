@@ -872,29 +872,6 @@ internal class StandardProjectConfigurations(
             languageVersion.setDisallowChanges(KotlinVersion.fromVersion("2.0"))
           }
 
-          if (slackExtension.featuresHandler.composeHandler.enabled.get()) {
-            logger.debug(
-              "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompilationTask.name}"
-            )
-            if (!isKaptGenerateStubsTask) {
-              freeCompilerArgs.add("-Xskip-prerelease-check")
-            }
-            // Flag to disable Compose's kotlin version check because they're often behind
-            // Or ahead
-            // Or if they're the same, do nothing
-            // It's basically just very noisy.
-            val composeCompilerKotlinVersion =
-              slackProperties.versions.composeCompilerKotlinVersion
-                ?: error("Missing 'composeCompilerKotlinVersion' version in version catalog")
-            val kotlinVersion = slackProperties.versions.kotlin
-            if (!isKaptGenerateStubsTask && kotlinVersion != composeCompilerKotlinVersion) {
-              freeCompilerArgs.addAll(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
-              )
-            }
-          }
-
           if (this is KotlinJvmCompilerOptions) {
             jvmTarget.setDisallowChanges(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors

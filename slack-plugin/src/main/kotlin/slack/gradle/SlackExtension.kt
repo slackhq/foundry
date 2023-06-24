@@ -28,10 +28,9 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import slack.gradle.agp.PermissionAllowlistConfigurer
+import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.util.setDisallowChanges
 
@@ -706,24 +705,12 @@ constructor(
 
   internal fun applyTo(project: Project, slackProperties: SlackProperties) {
     if (enabled.get()) {
-      if (!multiplatform.get()) {
+      val isMultiplatform = multiplatform.get()
+      if (!isMultiplatform) {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       } else {
         project.pluginManager.apply("org.jetbrains.compose")
-        project.configure<ComposeExtension> {
-          kotlinCompilerPlugin.setDisallowChanges(
-            dependencies.compiler.forKotlin(slackProperties.versions.composeJbKotlinVersion!!)
-          )
-        }
-        project.dependencies.apply {
-          val composeCompilerVersion =
-            slackProperties.versions.composeCompiler
-              ?: error("Missing `compose-compiler` version in catalog")
-          add(
-            PLUGIN_CLASSPATH_CONFIGURATION_NAME,
-            "androidx.compose.compiler:compiler:$composeCompilerVersion"
-          )
-        }
+        project.configureComposeCompiler(slackProperties, isMultiplatform)
       }
     }
   }

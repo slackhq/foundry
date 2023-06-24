@@ -140,6 +140,14 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.compose.android.enableLiveLiterals", false)
 
   /**
+   * If true, uses the AndroidX compose compiler [SlackVersions.composeCompiler] for Compose
+   * Multiplatform compilations rather than the Jetbrains one. This can be useful in testing where
+   * AndroidX's compiler is farther ahead.
+   */
+  public val forceAndroidXComposeCompilerForComposeMultiplatform: Boolean
+    get() = booleanProperty("slack.compose.multiplatform.forceAndroidXComposeCompiler", false)
+
+  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *
