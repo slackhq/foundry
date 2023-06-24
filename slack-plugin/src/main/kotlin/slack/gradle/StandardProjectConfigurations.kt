@@ -121,7 +121,7 @@ internal class StandardProjectConfigurations(
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
     project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
-    project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
+    project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
   }
 
   private fun Project.applyCommonConfigurations() {
@@ -829,7 +829,6 @@ internal class StandardProjectConfigurations(
     jdkVersion: Int?,
     jvmTargetVersion: Int,
     slackProperties: SlackProperties,
-    slackExtension: SlackExtension
   ) {
     val actualJvmTarget =
       if (jvmTargetVersion == 8) {
