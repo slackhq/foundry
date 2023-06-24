@@ -62,7 +62,7 @@ internal interface ThermalsWatcher {
       return when (val arch = Arch.get()) {
         ARM64 -> AppleSiliconThermals(logger, thermalsFileProvider)
         X86_64 -> IntelThermalsParser(thermalsFileProvider)
-        else -> throw IllegalStateException("Unsupported architecture: $arch")
+        else -> error("Unsupported architecture: $arch")
       }
     }
   }
