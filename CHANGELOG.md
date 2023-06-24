@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.9.11
+------
+
+_2023-06-24_
+
+* Overhaul configuration of the Compose compiler across Android and multiplatform projects to make it easier to test the matrix of the AndroidX compose compiler, the JetBrains compose compiler, and new Kotlin versions.
+* **New**: Add a `sgp.compose.multiplatform.forceAndroidXComposeCompiler` Gradle property flag to force use of the AndroidX compose compiler in Compose Multiplatform projects.
+* **New**: Add a `sgp.config.jvmVendor.optOut` Gradle property flag to disable jvmVendor configuration in toolchains.
+* **Fix**: No longer try to watch thermals on Intel macOS machines when configuration cache is enabled.
+
 0.9.10
 ------
 
