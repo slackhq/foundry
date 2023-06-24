@@ -145,7 +145,7 @@ public class SlackProperties private constructor(private val project: Project) {
    * AndroidX's compiler is farther ahead.
    */
   public val forceAndroidXComposeCompilerForComposeMultiplatform: Boolean
-    get() = booleanProperty("slack.compose.multiplatform.forceAndroidXComposeCompiler", false)
+    get() = booleanProperty("sgp.compose.multiplatform.forceAndroidXComposeCompiler", false)
 
   /**
    * When this property is present, the "internalRelease" build variant will have an application id
