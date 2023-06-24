@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.12
+------
+
+_2023-06-24_
+
+* Fix wrong dependency being used for compose-compiler in new Compose configuration overhaul.
+
 0.9.11
 ------
 

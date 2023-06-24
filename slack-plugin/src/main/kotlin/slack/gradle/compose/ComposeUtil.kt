@@ -24,6 +24,9 @@ import slack.gradle.SlackProperties
 import slack.gradle.configure
 import slack.gradle.util.configureKotlinCompilationTask
 
+private const val COMPOSE_COMPILER_GOOGLE_GROUP = "androidx.compose.compiler"
+private const val COMPOSE_COMPILER_JB_GROUP = "org.jetbrains.compose.compiler"
+
 /**
  * The compose compiler has an extremely irritating version checking mechanism that requires a bunch
  * of boilerplate below to suppress. This is further magnified by the fact that Compose
@@ -44,22 +47,22 @@ internal fun Project.configureComposeCompiler(
   val (compilerDep, composeCompilerKotlinVersion) =
     if (isMultiplatform && !slackProperties.forceAndroidXComposeCompilerForComposeMultiplatform) {
       // JB version
-      val composeJbDep =
+      val composeJbDepVersion =
         slackProperties.versions.composeJb
           ?: error("No compose-jb version defined in libs.versions.toml")
       val composeJbKotlinVersion =
-        slackProperties.versions.composeJb
+        slackProperties.versions.composeJbKotlinVersion
           ?: error("No compose-jb-kotlinVersion version defined in libs.versions.toml")
-      composeJbDep to composeJbKotlinVersion
+      "$COMPOSE_COMPILER_JB_GROUP:compiler:$composeJbDepVersion" to composeJbKotlinVersion
     } else {
       // Google version
-      val composeDep =
+      val composeDepVersion =
         slackProperties.versions.composeCompiler
           ?: error("No compose-compiler version defined in libs.versions.toml")
       val composeKotlinVersion =
         slackProperties.versions.composeCompilerKotlinVersion
           ?: error("No compose-compiler-kotlinVersion version defined in libs.versions.toml")
-      composeDep to composeKotlinVersion
+      "$COMPOSE_COMPILER_GOOGLE_GROUP:compiler:$composeDepVersion" to composeKotlinVersion
     }
 
   if (isMultiplatform) {
@@ -97,15 +100,13 @@ internal fun Project.configureComposeCompiler(
     configurations
       .matching { it.name.startsWith("kotlinCompilerPluginClasspath") }
       .configureEach {
-        val (group, artifact) =
+        val group =
           if (slackProperties.forceAndroidXComposeCompilerForComposeMultiplatform) {
-            // JB version
-            "org.jetbrains.compose.compiler" to "compiler"
+            COMPOSE_COMPILER_JB_GROUP
           } else {
-            // Google version
-            "androidx.compose.compiler" to "compiler"
+            COMPOSE_COMPILER_GOOGLE_GROUP
           }
-        exclude(mapOf("group" to group, "artifact" to artifact))
+        exclude(mapOf("group" to group, "artifact" to "compiler"))
       }
   }
 }
