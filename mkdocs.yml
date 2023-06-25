@@ -58,8 +58,9 @@ markdown_extensions:
 
 nav:
   - 'Overview': index.md
-  - 'Configuration': configuration.md
-  - 'DSL': dsl.md
+  - 'Architecture': architecture.md
+#  - 'Configuration': configuration.md
+#  - 'DSL': dsl.md
   # TODO more
   - 'Discussions ⏏': https://github.com/slackhq/slack-gradle-plugin/discussions
   - 'Change Log': changelog.md
