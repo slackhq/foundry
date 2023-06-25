@@ -496,10 +496,6 @@ public class SlackProperties private constructor(private val project: Project) {
   public val strictMode: Boolean
     get() = booleanProperty("slack.strict", defaultValue = false)
 
-  /** Specific toggle for validating the presence of `.kt` files in Kotlin projects. */
-  public val strictValidateKtFilePresence: Boolean
-    get() = booleanProperty("slack.strict.validateKtFiles", defaultValue = true)
-
   /** Specific toggle for validating manifests in androidTest sources. */
   public val strictValidateAndroidTestManifest: Boolean
     get() = booleanProperty("slack.strict.validateAndroidTestManifests", defaultValue = true)

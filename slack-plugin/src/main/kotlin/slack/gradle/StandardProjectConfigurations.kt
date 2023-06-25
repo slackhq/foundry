@@ -27,7 +27,6 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
-import com.google.common.base.CaseFormat
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
 import java.io.File
@@ -361,10 +360,9 @@ internal class StandardProjectConfigurations(
       tasks.withType(JavaCompile::class.java).configureEach {
         options.errorprone {
           disableWarningsInGeneratedCode.setDisallowChanges(true)
-          excludedPaths.setDisallowChanges(
-            ".*/build/generated/.*"
-          ) // The EP flag alone isn't enough
+          // The EP flag alone isn't enough
           // https://github.com/google/error-prone/issues/2092
+          excludedPaths.setDisallowChanges(".*/build/generated/.*")
           disable("HidingField")
           error(*slackTools().globalConfig.errorProneCheckNamesAsErrors.toTypedArray())
 
@@ -655,6 +653,7 @@ internal class StandardProjectConfigurations(
           enableV4Signing = true
         }
         applicationVariants.configureEach {
+          // TODO make this configurable via properties
           mergeAssetsProvider.configure {
             // This task is too expensive to cache while we have embedded emoji fonts
             outputs.cacheIf { false }
@@ -881,43 +880,6 @@ internal class StandardProjectConfigurations(
       }
 
       configureFreeKotlinCompilerArgs()
-      if (slackProperties.strictMode && slackProperties.strictValidateKtFilePresence) {
-        // Verify that at least one `.kt` file is present in the project's `main` source set. This
-        // is important for IC, as otherwise IC will not work!
-        // https://youtrack.jetbrains.com/issue/KT-30980
-        if (project.file("src/main").walkBottomUp().none { it.extension == "kt" }) {
-          throw AssertionError(
-            """
-            '${project.path}' is a Kotlin project but does not contain any `.kt` files!
-
-            Kotlin projects _must_ have at least one `.kt` file in the `src/main` source set! This
-            is necessary in order for incremental compilation to work correctly (see
-            https://youtrack.jetbrains.com/issue/KT-30980).
-
-            If you have no files to add (resources-only projects, for instance), you can add a dummy
-            compilation marker file like so:
-
-            ```
-            /**
-             * This class exists solely to force kotlinc to produce incremental compilation
-             * information. If we ever add meaningful Kotlin sources to this project, we can then
-             * remove this class.
-             *
-             * Ref: https://youtrack.jetbrains.com/issue/KT-30980
-             */
-            @Suppress("UnusedPrivateClass")
-            private abstract class ${
-              CaseFormat.LOWER_HYPHEN.to(
-                CaseFormat.UPPER_CAMEL,
-                project.name
-              )
-            }CompilationMarker
-            ```
-            """
-              .trimIndent()
-          )
-        }
-      }
 
       if (!detektConfigured.getAndSet(true)) {
         DetektTasks.configureSubProject(
