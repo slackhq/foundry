@@ -85,6 +85,10 @@ internal fun Project.configureComposeCompiler(
         }
       }
     }
+  } else {
+    logger.debug(
+      "Not configuring compose compiler args in ${project.path}, kotlin and compose compiler versions are aligned"
+    )
   }
 
   if (isMultiplatform) {
@@ -106,6 +110,7 @@ internal fun Project.configureComposeCompiler(
           } else {
             COMPOSE_COMPILER_GOOGLE_GROUP
           }
+        logger.debug("Excluding compose compiler plugin group '$group' from configuration '$name'")
         exclude(mapOf("group" to group, "module" to "compiler"))
       }
   }

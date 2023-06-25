@@ -706,12 +706,12 @@ constructor(
   internal fun applyTo(project: Project, slackProperties: SlackProperties) {
     if (enabled.get()) {
       val isMultiplatform = multiplatform.get()
-      if (!isMultiplatform) {
-        composeBundleAlias?.let { project.dependencies.add("implementation", it) }
-      } else {
+      if (isMultiplatform) {
         project.pluginManager.apply("org.jetbrains.compose")
-        project.configureComposeCompiler(slackProperties, isMultiplatform)
+      } else {
+        composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
+      project.configureComposeCompiler(slackProperties, isMultiplatform)
     }
   }
 }

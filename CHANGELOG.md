@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.14
+------
+
+_2023-06-25_
+
+* Fix compose compiler config not applying to android projects.
+
 0.9.13
 ------
 
