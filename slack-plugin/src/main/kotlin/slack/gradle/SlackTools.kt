@@ -37,6 +37,7 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
+import slack.cli.AppleSiliconCompat
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
@@ -87,7 +88,18 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     debugLog("SlackTools created")
 
     // Thermals logging
-    if (parameters.logThermals.get()) {
+    var canLogThermals = parameters.logThermals.get()
+    if (canLogThermals && parameters.configurationCacheEnabled.get()) {
+      if (AppleSiliconCompat.Arch.get() != AppleSiliconCompat.Arch.ARM64) {
+        logger.warn(
+          "Thermals logging is enabled but configuration cache is enabled and this is not an " +
+            "Apple Silicon machine. Thermals logging will be disabled. Please set 'slack.log-thermals' " +
+            "to false in your home gradle.properties."
+        )
+        canLogThermals = false
+      }
+    }
+    if (canLogThermals) {
       thermalsExecutor =
         Executors.newSingleThreadExecutor { r ->
           Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
@@ -261,6 +273,9 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
               logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
             }
           )
+          parameters.configurationCacheEnabled.setDisallowChanges(
+            project.provider { project.gradle.startParameter.isConfigurationCacheRequested }
+          )
           parameters.enableSkippyDiagnostics.setDisallowChanges(enableSkippyDiagnostics)
           parameters.skippyDiagnosticsOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("outputs/logs/skippy-diagnostics.txt")
@@ -279,6 +294,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     public val offline: Property<Boolean>
     public val cleanRequested: Property<Boolean>
     public val logThermals: Property<Boolean>
+    public val configurationCacheEnabled: Property<Boolean>
     public val enableSkippyDiagnostics: Property<Boolean>
     /** An output file of skippy diagnostics. */
     public val skippyDiagnosticsOutputFile: RegularFileProperty
