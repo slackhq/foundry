@@ -1,4 +1,4 @@
-# This workflow triggers a code review using the OpenAI GPT-3.5 Turbo model with 16k context window
+# This workflow triggers a code review using the OpenAI GPT-3.5 Turbo model with a 16k context window
 
 on: [pull_request]
 
