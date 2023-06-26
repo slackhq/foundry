@@ -1,0 +1,10 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:slack.gradle.agphandler.v80////PointingToDeclaration/agp-handler-80/slack.gradle.agphandler.v80/index.html
+$dokka.location:slack.gradle.agphandler.v80/AgpHandlerFactory80///PointingToDeclaration/agp-handler-80/slack.gradle.agphandler.v80/-agp-handler-factory80/index.html
+$dokka.location:slack.gradle.agphandler.v80/AgpHandlerFactory80/AgpHandlerFactory80/#/PointingToDeclaration/agp-handler-80/slack.gradle.agphandler.v80/-agp-handler-factory80/-agp-handler-factory80.html
+$dokka.location:slack.gradle.agphandler.v80/AgpHandlerFactory80/create/#/PointingToDeclaration/agp-handler-80/slack.gradle.agphandler.v80/-agp-handler-factory80/create.html
+$dokka.location:slack.gradle.agphandler.v80/AgpHandlerFactory80/currentVersion/#/PointingToDeclaration/agp-handler-80/slack.gradle.agphandler.v80/-agp-handler-factory80/current-version.html
+$dokka.location:slack.gradle.agphandler.v80/AgpHandlerFactory80/minVersion/#/PointingToDeclaration/agp-handler-80/slack.gradle.agphandler.v80/-agp-handler-factory80/min-version.html
+slack.gradle.agphandler.v80
+
