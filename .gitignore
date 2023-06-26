@@ -22,3 +22,11 @@ out/
 */**/.gitignore
 
 .run/
+
+# Docs-related hings
+docs/code-of-conduct.md
+docs/contributing.md
+docs/changelog.md
+docs/api/
+site/
+temp-clone/
