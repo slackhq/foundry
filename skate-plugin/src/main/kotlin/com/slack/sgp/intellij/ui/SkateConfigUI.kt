@@ -19,6 +19,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.slack.sgp.intellij.SkateBundle
@@ -30,7 +31,20 @@ internal class SkateConfigUI(
   private val project: Project,
 ) {
 
-  fun createPanel(): DialogPanel = panel { choosePathRow() }
+  fun createPanel(): DialogPanel = panel {
+    checkBoxRow()
+    choosePathRow()
+  }
+
+  private fun Panel.checkBoxRow() {
+    row(SkateBundle.message("skate.configuration.enableWhatsNew.title")) {
+      checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
+        .bindSelected(
+          getter = { settings.isWhatsNewEnabled },
+          setter = { settings.isWhatsNewEnabled = it }
+        )
+    }
+  }
 
   private fun Panel.choosePathRow() {
     row(SkateBundle.message("skate.configuration.choosePath.title")) {
@@ -52,6 +66,7 @@ internal class SkateConfigUI(
             }
           }
         )
+        .enabled(settings.isWhatsNewEnabled)
     }
   }
 }

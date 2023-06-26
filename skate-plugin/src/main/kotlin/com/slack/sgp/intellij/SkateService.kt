@@ -37,7 +37,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     val settings = project.service<SkatePluginSettings>()
     if (!settings.isWhatsNewEnabled) return
     val projectDir = project.guessProjectDir() ?: return
-    val changeLogFile = VfsUtil.findRelativeFile(projectDir, "CHANGELOG.md") ?: return
+    val changeLogFile = VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return
     val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater {
