@@ -22,6 +22,7 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
 
+/** Manages user-specific settings for the Skate plugin */
 @Service(Service.Level.PROJECT)
 @State(name = "SkatePluginSettings", storages = [Storage("skate.xml")])
 class SkatePluginSettings(
