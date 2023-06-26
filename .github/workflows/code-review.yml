@@ -1,0 +1,13 @@
+on: [pull_request]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: fxchen/code-review@v0.1.0-alpha
+        with:
+          model: 'gpt-3.5-turbo-16k'
+          openai-key: ${{ secrets.OPENAI_API_KEY }}
