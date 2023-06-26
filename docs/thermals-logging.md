@@ -1,4 +1,0 @@
-Thermals Logging
-================
-
-TODO

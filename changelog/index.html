@@ -1,0 +1,1944 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Gradle and IntelliJ build tooling used in Slack's Android repo">
+      
+      
+        <meta name="author" content="Slack">
+      
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      <link rel="icon" href="../images/slack_logo_small.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
+    
+    
+      
+        <title>Change Log - slack-gradle-plugin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.402914a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CFira+Code:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Fira Code"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/app.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="green">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="slack-gradle-plugin" class="md-header__button md-logo" aria-label="slack-gradle-plugin" data-md-component="logo">
+      
+  <img src="../images/slack_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            slack-gradle-plugin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Change Log
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+            </label>
+          
+        
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="green"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/slackhq/slack-gradle-plugin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    slack-gradle-plugin
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="slack-gradle-plugin" class="md-nav__button md-logo" aria-label="slack-gradle-plugin" data-md-component="logo">
+      
+  <img src="../images/slack_logo.png" alt="logo">
+
+    </a>
+    slack-gradle-plugin
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/slackhq/slack-gradle-plugin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    slack-gradle-plugin
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/slackhq/slack-gradle-plugin/discussions" class="md-nav__link">
+        Discussions ⏏
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Change Log
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Change Log
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0914" class="md-nav__link">
+    0.9.14
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0913" class="md-nav__link">
+    0.9.13
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0912" class="md-nav__link">
+    0.9.12
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0911" class="md-nav__link">
+    0.9.11
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0910" class="md-nav__link">
+    0.9.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#099" class="md-nav__link">
+    0.9.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#098" class="md-nav__link">
+    0.9.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#097" class="md-nav__link">
+    0.9.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#096" class="md-nav__link">
+    0.9.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#095" class="md-nav__link">
+    0.9.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#094" class="md-nav__link">
+    0.9.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#093" class="md-nav__link">
+    0.9.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#092" class="md-nav__link">
+    0.9.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#091" class="md-nav__link">
+    0.9.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090" class="md-nav__link">
+    0.9.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0810" class="md-nav__link">
+    0.8.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#089" class="md-nav__link">
+    0.8.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#088" class="md-nav__link">
+    0.8.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#087" class="md-nav__link">
+    0.8.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#086" class="md-nav__link">
+    0.8.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#085" class="md-nav__link">
+    0.8.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#084" class="md-nav__link">
+    0.8.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#083" class="md-nav__link">
+    0.8.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#082" class="md-nav__link">
+    0.8.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#081" class="md-nav__link">
+    0.8.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080" class="md-nav__link">
+    0.8.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#079" class="md-nav__link">
+    0.7.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#078" class="md-nav__link">
+    0.7.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#077" class="md-nav__link">
+    0.7.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#076" class="md-nav__link">
+    0.7.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#075" class="md-nav__link">
+    0.7.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#074" class="md-nav__link">
+    0.7.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#073" class="md-nav__link">
+    0.7.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#072" class="md-nav__link">
+    0.7.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#071" class="md-nav__link">
+    0.7.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070" class="md-nav__link">
+    0.7.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.7.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project-skippy" class="md-nav__link">
+    Project Skippy
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#061" class="md-nav__link">
+    0.6.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060" class="md-nav__link">
+    0.6.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0510" class="md-nav__link">
+    0.5.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#059" class="md-nav__link">
+    0.5.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#058" class="md-nav__link">
+    0.5.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#057" class="md-nav__link">
+    0.5.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#056" class="md-nav__link">
+    0.5.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#055" class="md-nav__link">
+    0.5.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#054" class="md-nav__link">
+    0.5.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#053" class="md-nav__link">
+    0.5.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#052" class="md-nav__link">
+    0.5.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051" class="md-nav__link">
+    0.5.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050" class="md-nav__link">
+    0.5.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#042" class="md-nav__link">
+    0.4.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041" class="md-nav__link">
+    0.4.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040" class="md-nav__link">
+    0.4.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#038" class="md-nav__link">
+    0.3.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#037" class="md-nav__link">
+    0.3.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#036" class="md-nav__link">
+    0.3.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#035" class="md-nav__link">
+    0.3.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#034" class="md-nav__link">
+    0.3.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#033" class="md-nav__link">
+    0.3.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#032" class="md-nav__link">
+    0.3.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031" class="md-nav__link">
+    0.3.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    0.3.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#024" class="md-nav__link">
+    0.2.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#023" class="md-nav__link">
+    0.2.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#022" class="md-nav__link">
+    0.2.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#021" class="md-nav__link">
+    0.2.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020" class="md-nav__link">
+    0.2.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#012" class="md-nav__link">
+    0.1.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#011" class="md-nav__link">
+    0.1.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010" class="md-nav__link">
+    0.1.0
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/0.x/" class="md-nav__link">
+        API
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-of-conduct/" class="md-nav__link">
+        CoC
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0914" class="md-nav__link">
+    0.9.14
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0913" class="md-nav__link">
+    0.9.13
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0912" class="md-nav__link">
+    0.9.12
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0911" class="md-nav__link">
+    0.9.11
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0910" class="md-nav__link">
+    0.9.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#099" class="md-nav__link">
+    0.9.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#098" class="md-nav__link">
+    0.9.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#097" class="md-nav__link">
+    0.9.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#096" class="md-nav__link">
+    0.9.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#095" class="md-nav__link">
+    0.9.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#094" class="md-nav__link">
+    0.9.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#093" class="md-nav__link">
+    0.9.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#092" class="md-nav__link">
+    0.9.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#091" class="md-nav__link">
+    0.9.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090" class="md-nav__link">
+    0.9.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0810" class="md-nav__link">
+    0.8.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#089" class="md-nav__link">
+    0.8.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#088" class="md-nav__link">
+    0.8.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#087" class="md-nav__link">
+    0.8.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#086" class="md-nav__link">
+    0.8.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#085" class="md-nav__link">
+    0.8.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#084" class="md-nav__link">
+    0.8.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#083" class="md-nav__link">
+    0.8.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#082" class="md-nav__link">
+    0.8.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#081" class="md-nav__link">
+    0.8.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080" class="md-nav__link">
+    0.8.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#079" class="md-nav__link">
+    0.7.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#078" class="md-nav__link">
+    0.7.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#077" class="md-nav__link">
+    0.7.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#076" class="md-nav__link">
+    0.7.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#075" class="md-nav__link">
+    0.7.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#074" class="md-nav__link">
+    0.7.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#073" class="md-nav__link">
+    0.7.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#072" class="md-nav__link">
+    0.7.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#071" class="md-nav__link">
+    0.7.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070" class="md-nav__link">
+    0.7.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.7.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project-skippy" class="md-nav__link">
+    Project Skippy
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#061" class="md-nav__link">
+    0.6.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060" class="md-nav__link">
+    0.6.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0510" class="md-nav__link">
+    0.5.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#059" class="md-nav__link">
+    0.5.9
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#058" class="md-nav__link">
+    0.5.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#057" class="md-nav__link">
+    0.5.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#056" class="md-nav__link">
+    0.5.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#055" class="md-nav__link">
+    0.5.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#054" class="md-nav__link">
+    0.5.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#053" class="md-nav__link">
+    0.5.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#052" class="md-nav__link">
+    0.5.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051" class="md-nav__link">
+    0.5.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050" class="md-nav__link">
+    0.5.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#042" class="md-nav__link">
+    0.4.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041" class="md-nav__link">
+    0.4.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040" class="md-nav__link">
+    0.4.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#038" class="md-nav__link">
+    0.3.8
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#037" class="md-nav__link">
+    0.3.7
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#036" class="md-nav__link">
+    0.3.6
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#035" class="md-nav__link">
+    0.3.5
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#034" class="md-nav__link">
+    0.3.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#033" class="md-nav__link">
+    0.3.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#032" class="md-nav__link">
+    0.3.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031" class="md-nav__link">
+    0.3.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    0.3.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#024" class="md-nav__link">
+    0.2.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#023" class="md-nav__link">
+    0.2.3
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#022" class="md-nav__link">
+    0.2.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#021" class="md-nav__link">
+    0.2.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020" class="md-nav__link">
+    0.2.0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#012" class="md-nav__link">
+    0.1.2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#011" class="md-nav__link">
+    0.1.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010" class="md-nav__link">
+    0.1.0
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h2 id="0914">0.9.14<a class="headerlink" href="#0914" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-25</em></p>
+<ul>
+<li>Fix compose compiler config not applying to android projects.</li>
+</ul>
+<h2 id="0913">0.9.13<a class="headerlink" href="#0913" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-24</em></p>
+<ul>
+<li>Fix wrong map key name being used in exclusion.</li>
+</ul>
+<h2 id="0912">0.9.12<a class="headerlink" href="#0912" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-24</em></p>
+<ul>
+<li>Fix wrong dependency being used for compose-compiler in new Compose configuration overhaul.</li>
+</ul>
+<h2 id="0911">0.9.11<a class="headerlink" href="#0911" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-24</em></p>
+<ul>
+<li>Overhaul configuration of the Compose compiler across Android and multiplatform projects to make it easier to test the matrix of the AndroidX compose compiler, the JetBrains compose compiler, and new Kotlin versions.</li>
+<li><strong>New</strong>: Add a <code>sgp.compose.multiplatform.forceAndroidXComposeCompiler</code> Gradle property flag to force use of the AndroidX compose compiler in Compose Multiplatform projects.</li>
+<li><strong>New</strong>: Add a <code>sgp.config.jvmVendor.optOut</code> Gradle property flag to disable jvmVendor configuration in toolchains.</li>
+<li><strong>Fix</strong>: No longer try to watch thermals on Intel macOS machines when configuration cache is enabled.</li>
+</ul>
+<h2 id="0910">0.9.10<a class="headerlink" href="#0910" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-06</em></p>
+<ul>
+<li><strong>Fix</strong>: Don&rsquo;t apply vendor property to Bootstrap toolchain if it&rsquo;s undefined.</li>
+</ul>
+<h2 id="099">0.9.9<a class="headerlink" href="#099" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-06</em></p>
+<ul>
+<li><strong>New</strong>: Robolectric is now optional. Its support will only be enabled if there is a <code>robolectric</code> key in the primary version catalog.</li>
+<li><strong>Enhancement</strong>: Update bootstrap JVM args to use ExitOnOutOfMemoryError for OOMs. No longer takes a heap dump on OOM.</li>
+<li><strong>Enhancement</strong>: Update unit test verbose mode to use CrashOnOutOfMemoryError for OOMs to produce more logs.</li>
+<li><strong>Fix</strong>: Bootstrap now respects the <code>sgp.config.jvmVendor</code> property.</li>
+<li>Build against Wire to <code>4.7.0</code>.</li>
+<li>Build against Anvil <code>2.4.6</code>.</li>
+<li>Build against AGP <code>8.0.2</code>.</li>
+<li>Build against Detekt <code>1.23.0</code>.</li>
+</ul>
+<h2 id="098">0.9.8<a class="headerlink" href="#098" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-15</em></p>
+<ul>
+<li>Fix eager check of whether or not androidTest is enabled in <code>slack</code> DSL.</li>
+</ul>
+<h2 id="097">0.9.7<a class="headerlink" href="#097" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-15</em></p>
+<ul>
+<li>Fix application targets not getting marked as androidTest()-enabled.</li>
+</ul>
+<h2 id="096">0.9.6<a class="headerlink" href="#096" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-09</em></p>
+<ul>
+<li>Fix wrong use of <code>disallowChanges()</code> on <code>javaCompiler</code> in JavaCompile tasks. It seems that Gradle sets this multiple times.</li>
+<li>Improve git version matching.</li>
+</ul>
+<h2 id="095">0.9.5<a class="headerlink" href="#095" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-09</em></p>
+<ul>
+<li>Use <code>disallowChanges()</code> where possible on properties SGP controls in order to avoid accidental overwrites.</li>
+<li>Make <code>ComputeAffectedProjectsTask</code> also generate a <code>affected_android_test_projects.txt</code> file with a newline-delimited list of affected projects that enable <code>androidTest()</code>. This can be used in CI scripts to statically determine if instrumentation tests need to run.</li>
+</ul>
+<h2 id="094">0.9.4<a class="headerlink" href="#094" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-06</em></p>
+<ul>
+<li>Fix alias naming in <code>SlackVersions</code>. See <code>SlackVersions.kt</code> for updated expected naming of aliases.</li>
+</ul>
+<h2 id="093">0.9.3<a class="headerlink" href="#093" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-05</em></p>
+<ul>
+<li>Add <code>jdk.compiler/com.sun.tools.javac.model</code> to Bootstrap Gradle JVM args and exec prefixes for binaries for GJF 17.</li>
+</ul>
+<h2 id="092">0.9.2<a class="headerlink" href="#092" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-05</em></p>
+<ul>
+<li>Fix accidental noisy JVM vendor log.</li>
+</ul>
+<h2 id="091">0.9.1<a class="headerlink" href="#091" title="Permanent link">&para;</a></h2>
+<p><em>2023-05-04</em></p>
+<p>Happy May the Fourth!</p>
+<ul>
+<li>Add new <code>sgp.config.jvmVendor</code> property to control the JVM vendor used in Kotlin and Java toolchains. This value is used to match a known vendor spec, such as <code>AZUL</code>.</li>
+<li>Apply the kover plugin in an <code>afterEvaluate</code> block to avoid <a href="https://github.com/Kotlin/kotlinx-kover/issues/362">https://github.com/Kotlin/kotlinx-kover/issues/362</a>.</li>
+<li>Update jgrapht to 1.5.2.</li>
+<li>Update oshi to 6.4.2.</li>
+</ul>
+<h2 id="090">0.9.0<a class="headerlink" href="#090" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-30</em></p>
+<ul>
+<li>Improve Skippy logging.</li>
+<li>Configure all Kotlin compilations, not just JVM compilations.</li>
+<li>Split standard JVM args and common Kotlin args.</li>
+<li>Simplify <code>OkHttpClient</code> setup in <code>SlackTools</code>.</li>
+<li>Update to Kotlin 1.8.21.</li>
+<li>Support Dagger KSP in <code>slack.features.dagger</code> DSL controls. There are two new properties to control this:</li>
+<li><code>slack.ksp.allow-dagger</code> – allow use of Dagger in KSP.</li>
+<li><code>slack.ksp.allow-anvil</code> – allow use of Anvil in KSP. Note this is not yet implemented in Anvil, just a toe-hold for the future.</li>
+<li>Add debugging logs for loading <code>SlackToolsExtension</code> instances + fix classloader used for it.</li>
+<li>Gracefully handle <code>SlackToolsExtension</code> extensions that fail to load.</li>
+</ul>
+<h2 id="0810">0.8.10<a class="headerlink" href="#0810" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-25</em></p>
+<ul>
+<li>Add <code>Context</code> to <code>SlackToolsExtension</code>.</li>
+</ul>
+<h2 id="089">0.8.9<a class="headerlink" href="#089" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-25</em></p>
+<ul>
+<li>Expose missing <code>SlackTools.findExtension</code> API.</li>
+<li>Expose missing <code>SlackTools.SERVICE_NAME</code> for <code>@ServiceReference</code> API.</li>
+</ul>
+<h2 id="088">0.8.8<a class="headerlink" href="#088" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-25</em></p>
+<ul>
+<li>Update to Kotlin 1.8.20.</li>
+<li>Remove <code>moshi-kotlin</code>, only use generated adapters now.</li>
+<li>Don&rsquo;t auto-apply the Kover plugin on a platform project.</li>
+<li>Add new <code>sgp.ge.apply-common-build-tags</code> property flag to gate applying common build tags to a project.</li>
+<li>Switch <code>SlackToolsExtension</code> to work as a <code>ServiceLoader</code> instead.</li>
+</ul>
+<h2 id="087">0.8.7<a class="headerlink" href="#087" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-23</em></p>
+<ul>
+<li>Remove lock file checking in <code>SlackTools</code> because this apparently invalidates configuration cache every time.</li>
+</ul>
+<h2 id="086">0.8.6<a class="headerlink" href="#086" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-22</em></p>
+<ul>
+<li>Revert using native Kotlin lambdas instead of <code>class</code> for SAM conversions due to <a href="https://github.com/gradle/gradle/issues/24871">https://github.com/gradle/gradle/issues/24871</a>.</li>
+</ul>
+<h2 id="085">0.8.5<a class="headerlink" href="#085" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-22</em></p>
+<ul>
+<li>Clean up thermals logging setup in <code>SlackTools</code> and support enabling property at different scopes (local.properties, etc).</li>
+<li>Shut down thermals heartbeat executor when <code>SlackTools</code> is closed.</li>
+<li>Use native Kotlin lambdas instead of <code>class</code> for SAM conversions. The minimum supported Gradle version is now 8.1, which introduced support for this.</li>
+</ul>
+<h2 id="084">0.8.4<a class="headerlink" href="#084" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-22</em></p>
+<ul>
+<li>Fix JSON serialization for thermals data.</li>
+</ul>
+<h2 id="083">0.8.3<a class="headerlink" href="#083" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-22</em></p>
+<ul>
+<li>Don&rsquo;t accidentally create new <code>SlackTools</code> instances when reporting background data to Gradle Enterprise. These instances would be orphaned because this would happen <em>after</em> Gradle had closed all existing services, and create a memory leak.</li>
+<li>Use a lock file to track <code>SlackTools</code> instances.</li>
+<li>Use a single-threaded <code>Executor</code> for <code>SlackTools</code>&lsquo; thermals heartbeat.</li>
+</ul>
+<h2 id="082">0.8.2<a class="headerlink" href="#082" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-22</em></p>
+<ul>
+<li>Log a <code>Throwable</code> with multiple instances of <code>SlackTools</code> to help track origin points.</li>
+</ul>
+<h2 id="081">0.8.1<a class="headerlink" href="#081" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-22</em></p>
+<ul>
+<li>Add some debug logging to <code>SlackTools</code> to track multiple instances.</li>
+</ul>
+<h2 id="080">0.8.0<a class="headerlink" href="#080" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-15</em></p>
+<ul>
+<li><strong>Fix</strong>: Wrap all exec operations in a <code>ValueSource</code> for Gradle 8.x compatibility.</li>
+<li><strong>Fix</strong>: Set git line endings to <code>PLATFORM_NATIVE</code> in spotless by default. Its default of looking at <code>.gitattributes</code> is expensive and incompatible with Gradle 8.1+ configuration caching.</li>
+<li><strong>Fix</strong>: Add <code>slack.auto-apply.sort-dependencies</code> boolean Gradle property to gate auto-applying the sort-dependencies plugin.</li>
+<li>SGP now requires AGP 8.0+ (and with it – Gradle 8+).</li>
+</ul>
+<h2 id="079">0.7.9<a class="headerlink" href="#079" title="Permanent link">&para;</a></h2>
+<p><em>2023-04-01</em></p>
+<p>Happy April Fool&rsquo;s Day!</p>
+<ul>
+<li>[Skippy] Recursively resolve project dependencies to avoid missing transitive edges in the graph. Previously we only computed shallow dependencies.</li>
+</ul>
+<h2 id="078">0.7.8<a class="headerlink" href="#078" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-28</em></p>
+<ul>
+<li><strong>Fix</strong>: Add missing <code>detekt</code> task dependencies for <code>globalDetekt</code>.</li>
+<li><strong>Fix</strong>: Only apply detekt config once (even if multiple Kotlin plugins are applied).</li>
+</ul>
+<h2 id="077">0.7.7<a class="headerlink" href="#077" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-27</em></p>
+<ul>
+<li>Add new <code>slack.detekt.full</code> property to gate whether or to run full detekt (i.e. with type resolution). If disabled, <code>detektRelease</code>/<code>detektMain</code> and associated tasks will be disabled and not used in <code>detektGlobal</code>.</li>
+</ul>
+<h2 id="076">0.7.6<a class="headerlink" href="#076" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-25</em></p>
+<ul>
+<li><strong>Fix</strong>: Apply matching configurations to <code>DetektCreateBaselineTask</code> tasks too due to <a href="https://github.com/detekt/detekt/issues/5940">https://github.com/detekt/detekt/issues/5940</a>.</li>
+</ul>
+<h2 id="075">0.7.5<a class="headerlink" href="#075" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-24</em></p>
+<ul>
+<li>[Skippy] Add more default configurations.</li>
+<li>[Skippy] Add <code>slack.avoidance.build-upon-default-affected-project-configurations</code> flag to make provided configurations build upon defaults.</li>
+<li>Add new <code>globalDetekt</code> task that runs <code>detekt</code> on all subprojects. This is Skippy-compatible and responds to <code>slack.avoidance.affectedProjectsFile</code>.</li>
+</ul>
+<h2 id="074">0.7.4<a class="headerlink" href="#074" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-22</em></p>
+<ul>
+<li>Don&rsquo;t expose <code>androidExtension</code> publicly in <code>SlackExtension</code> to avoid Gradle mismatching number of type arguments in AGP 8.1.0-alpha10+.</li>
+</ul>
+<h2 id="073">0.7.3<a class="headerlink" href="#073" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-22</em></p>
+<ul>
+<li>Set <code>Detekt.jdkHome</code> to null to avoid <a href="https://github.com/detekt/detekt/issues/5925">https://github.com/detekt/detekt/issues/5925</a>.</li>
+<li>Rename <code>String.safeCapitalize()</code> to <code>String.capitalizeUS()</code> to make it more explicit.</li>
+</ul>
+<h2 id="072">0.7.2<a class="headerlink" href="#072" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-21</em></p>
+<ul>
+<li>Disable Live Literals in Compose by default due to multiple issues. They can be enabled via <code>-Pslack.compose.android.enableLiveLiterals=true</code>.</li>
+<li>Poor runtime performance: <a href="https://issuetracker.google.com/issues/274207650">https://issuetracker.google.com/issues/274207650</a>.</li>
+<li>Non-deterministic class files breaking build cache: <a href="https://issuetracker.google.com/issues/274231394">https://issuetracker.google.com/issues/274231394</a>.</li>
+<li>[Skippy] Add <code>.github/actions/**</code> to default never skip filters.</li>
+</ul>
+<h2 id="071">0.7.1<a class="headerlink" href="#071" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-20</em></p>
+<ul>
+<li>[Skippy] Improve pattern configuration.</li>
+<li>Make the default patterns public. This allows consumers to more
+     easily reuse them when customizing their own.</li>
+<li>Use sets for the type to better enforce uniqueness requirements.</li>
+<li>Add github actions to never-skip defaults.</li>
+<li>Add excludePatterns to allow finer-grained control. This runs <em>after</em>
+     include filtering so that users can manually exclude certain files that
+     may otherwise be captured in an inclusion filter and is difficult to
+     describe in a simple glob pattern. GitHub action does similar controls
+     for CI matrices.</li>
+<li>[Skippy] Allow relative (from the project root) to <code>affected_projects.txt</code> and allow non-existent files as a value. This makes it easy to gracefully fall back in CI.</li>
+<li>[Skippy] Fix logging path matchers missing toString() impls.</li>
+<li>[SKippy] Log verbosely in debug mode when skipping task deps.</li>
+<li>Update oshi to <code>6.4.1</code>.</li>
+</ul>
+<h2 id="070">0.7.0<a class="headerlink" href="#070" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-17</em></p>
+<h3 id="project-skippy">Project Skippy<a class="headerlink" href="#project-skippy" title="Permanent link">&para;</a></h3>
+<p>This release introduces an experimental new <code>computeAffectedProjects</code> task for computing affected projects based on an input of changed files. The goal of this is to statically detect which unit test, lint, and androidTest checks can be safely skipped in CI on pull requests.</p>
+<p>Example usage
+<div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>computeAffectedProjects<span class="w"> </span>--changed-files<span class="w"> </span>changed_files.txt
+</code></pre></div></p>
+<p>Where <code>changed_files.txt</code> is resolved against the root repo directory and contains a newline-delimited list of changed files (usually inferred from a PR).</p>
+<p>A simple example of how to produce such a file with the <code>gh</code> CLI:</p>
+<div class="highlight"><pre><span></span><code>gh<span class="w"> </span>pr<span class="w"> </span>view<span class="w"> </span><span class="si">${</span><span class="p">{ github.event.number </span><span class="si">}</span><span class="o">}</span><span class="w"> </span>--json<span class="w"> </span>files<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;.files[].path&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>changed_files.txt
+</code></pre></div>
+<p>One would run this task <em>first</em> as a preflight task, then run subsequent builds with the <code>slack.avoidance.affectedProjectsFile</code> Gradle property pointing to its output file location (printed at the end of the task).</p>
+<div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>...<span class="w"> </span>-Pslack.avoidance.affectedProjectsFile<span class="o">=</span>/Users/zacsweers/dev/slack/slack-android-ng/build/skippy/affected_projects.txt
+</code></pre></div>
+<p>The <code>globalCiLint</code>, <code>globalCiUnitTest</code>, and <code>aggregateAndroidTestApks</code> tasks all support reading this property and will avoid adding dependencies on tasks in projects that are not present in this set.</p>
+<p>The <code>ComputeAffectedProjectsTask</code> task has some sensible defaults, but can be configured further in the root projects like so.</p>
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">named</span><span class="o">&lt;</span><span class="n">ComputeAffectedProjectsTask</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;computeAffectedProjects&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Glob patterns of files to include in computing</span>
+<span class="w">  </span><span class="n">includePatterns</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;**/*.kt&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;**/*.java&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">)</span>
+<span class="w">  </span><span class="c1">// Glob patterns of files that, if changed, should result in not skipping anything in the build</span>
+<span class="w">  </span><span class="n">neverSkipPatterns</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;**/*.versions.toml&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;gradle/wrapper/**&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Debug logging can be enabled via the <code>slack.debug=true</code> Gradle property. This will output timings, logs, and diagnostics for the task.</p>
+<p>The configurations used to determine the build graph can be customized via comma-separated list to the <code>slack.avoidance.affected-project-configurations</code> property.</p>
+<h2 id="061">0.6.1<a class="headerlink" href="#061" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-15</em></p>
+<p>Happy Ted Lasso season 3 premier day!</p>
+<ul>
+<li><strong>Fix</strong>: Remove <code>UseContainerSupport</code> jvm arg from unit tests as this appears to only work on Linux.</li>
+</ul>
+<h2 id="060">0.6.0<a class="headerlink" href="#060" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-14</em></p>
+<p>Happy Pi day!</p>
+<ul>
+<li>Refactor how unit tests are configured.</li>
+<li><code>Test</code> tasks are now configured more consistently across CI and local, so there should be more cache hits.</li>
+<li>Add a new <code>globalCiUnitTest</code> task to the root project to ease running <code>ciUnitTest</code> tasks across all subprojects.</li>
+<li>Add new properties to <code>SlackProperties</code> for controlling max parallelism and <code>forkEvery</code> options in <code>Test</code> tasks.</li>
+<li>Refactor how lint tasks are configured.</li>
+<li>Add a new <code>ciLint</code> task to every project that depends on all lint tasks in that project. This is intended to be the inverse
+    behavior of the built-in <code>lint</code> task in Android projects, which only runs the default variant&rsquo;s lint task.</li>
+<li>Add a new <code>globalCiLint</code> task to the root project to ease running <code>ciLint</code> tasks across all subprojects.</li>
+<li>Add new properties to <code>SlackProperties</code> for controlling which variants should be linted.</li>
+<li>Revert &ldquo;Add lintErrorRuleIds property&rdquo;. <code>lint.xml</code> is the right place for this kind of logic.</li>
+</ul>
+<h2 id="0510">0.5.10<a class="headerlink" href="#0510" title="Permanent link">&para;</a></h2>
+<p><em>2023-03-07</em></p>
+<ul>
+<li>Reduce noisy JNA load failures logging. Still have not gotten to the root cause, but at least this will reduce the log noise.</li>
+<li>Add a new <code>slack.lint.severity.errorRuleIds</code> Gradle property to specify lint rule IDs that should always be error severity.</li>
+</ul>
+<h2 id="059">0.5.9<a class="headerlink" href="#059" title="Permanent link">&para;</a></h2>
+<p><em>2023-02-27</em></p>
+<ul>
+<li>Gracefully handle JNA load failures in thermals logging.</li>
+</ul>
+<h2 id="058">0.5.8<a class="headerlink" href="#058" title="Permanent link">&para;</a></h2>
+<p><em>2023-02-20</em></p>
+<ul>
+<li><strong>Enhancement</strong>: Remove kotlin-dsl from the plugin. If you were indirectly relying on its APIs from this plugin, you&rsquo;ll need to add that dependency separately.</li>
+<li><strong>Enhancement</strong>: Better support fully modularized lints</li>
+<li><code>checkDependencies</code> is no longer enabled by default.</li>
+<li>Make the baseline file name configurable via <code>slack.lint.baseline-file-name</code> property. Defaults to <code>lint-baseline.xml</code>.</li>
+<li><strong>Fix</strong>: <code>ImplicitSamInstance</code> lint not being enabled.</li>
+</ul>
+<h2 id="057">0.5.7<a class="headerlink" href="#057" title="Permanent link">&para;</a></h2>
+<p><em>2023-02-15</em></p>
+<ul>
+<li><strong>Fix</strong>: <code>MergeFileTask.kt</code> was accidentally removed during a previous release.</li>
+<li><strong>Fix</strong>: Add <code>jna-platform</code> dependency to align with the <code>jna</code> dependency version.</li>
+</ul>
+<h2 id="056">0.5.6<a class="headerlink" href="#056" title="Permanent link">&para;</a></h2>
+<p><em>2023-02-15</em></p>
+<p>Do not use! Release was accidentally messed up.</p>
+<h2 id="055">0.5.5<a class="headerlink" href="#055" title="Permanent link">&para;</a></h2>
+<p><em>2023-02-13</em></p>
+<ul>
+<li><strong>Fix</strong>: <code>LocTask</code> is now compatible with Gradle 8.0 and has the correct task dependencies when Ksp, Kapt, etc are running.</li>
+<li><strong>Fix</strong>: <code>LocTask</code> is now compatible with remote build cache.</li>
+<li><strong>Enhancement</strong>: ModScore now supports KSP.</li>
+<li><strong>Enhancement</strong>: Binary download tasks (<code>KtfmtDownloadTask</code>, <code>DetektDownloadTask</code>, etc) now have prettier and more reliable download progress indications.</li>
+<li><strong>Enhancement</strong>: <code>UpdateRobolectricJarsTask</code> now uses Gradle workers to parallelize downloads. On gigabit wifi, this takes the task runtime down from ~21sec to ~13sec.</li>
+<li><strong>Enhancement</strong>: The boolean <code>SLACK_FORCE_REDOWNLOAD_ROBOLECTRIC_JARS</code> env variable can be used to force <code>UpdateRobolectricJarsTask</code> to redownload jars even if already downloaded.
+<strong>Behavior change</strong>: Mod score must now be opted in to via the <code>slack.gradle.config.modscore.enabled=true</code> gradle property.</li>
+<li><strong>Enhancement</strong>: Mod score can be disabled per-project via the <code>slack.gradle.config.modscore.ignore=true</code> gradle property.</li>
+</ul>
+<h2 id="054">0.5.4<a class="headerlink" href="#054" title="Permanent link">&para;</a></h2>
+<p><em>2023-02-07</em></p>
+<ul>
+<li><strong>New</strong>: Integrate <a href="https://github.com/square/gradle-dependencies-sorter">gradle-dependency-sorter</a> as another formatter. This automatically apply if the <code>sortDependencies</code> toml version is present, and you can have it download+create executable binaries via <code>./gradlew downloadDependenciesSorter</code>.</li>
+<li><strong>Enhancement</strong>: Improve compose multiplatform support. Now the <code>compose()</code> DSL is moved to <code>slack.features</code> and offers an optional <code>multiplatform</code> parameter to enable the compose multiplatform plugin.
+  <div class="highlight"><pre><span></span><code><span class="n">slack</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">features</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">compose</span><span class="p">(</span><span class="n">multiplatform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="o">&gt;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></li>
+<li>Build against Kotlin <code>1.8.10</code> and AGP <code>7.4.1</code>.</li>
+</ul>
+<h2 id="053">0.5.3<a class="headerlink" href="#053" title="Permanent link">&para;</a></h2>
+<p><em>2023-01-27</em></p>
+<ul>
+<li>Fix the <code>MergeFilesTask</code> monkeypatch using env vars instead of system props.</li>
+</ul>
+<h2 id="052">0.5.2<a class="headerlink" href="#052" title="Permanent link">&para;</a></h2>
+<p><em>2023-01-26</em></p>
+<ul>
+<li>Try another fix for the <code>MergeFilesTask</code> monkeypatch plus extra logging. Feel free to skip this update if you&rsquo;re unaffected.</li>
+</ul>
+<h2 id="051">0.5.1<a class="headerlink" href="#051" title="Permanent link">&para;</a></h2>
+<p><em>2023-01-23</em></p>
+<ul>
+<li><strong>Fix</strong>: Unwrap <code>Optional</code> for <code>google-coreLibraryDesugaring</code> dependency before adding it. The Gradle API&rsquo;s lack of type safety strikes again.</li>
+</ul>
+<h2 id="050">0.5.0<a class="headerlink" href="#050" title="Permanent link">&para;</a></h2>
+<p><em>2023-01-23</em></p>
+<ul>
+<li><strong>New</strong>: Introduce a new <code>sgp-monkeypatch-agp</code> artifact. This contains monkeypatches for AGP where we try to fix bugs. This initial version contains a patched <code>MergeFilesTask</code> that sorts files before merging them to ensure deterministic outputs, as we believe this is causing our lint tasks to be non-cacheable across machines. This can be enabled via setting the <code>com.slack.sgp.sort-merge-files</code> system property to <code>true</code>.</li>
+<li><strong>New</strong>: Rework how bugsnag is enabled. Instead of only applying the plugin in release/main builds, we now always apply the plugin and only enable uploads on release/main builds. This allows us to catch issues with the plugin in updates sooner, as before we would not see them on PRs.</li>
+<li>Uploads can be force-enabled via setting the <code>slack.gradle.config.bugsnag.enabled</code> gradle property to true.</li>
+<li>Branches that allow uploads can be configured via regexp value on the <code>slack.gradle.config.bugsnag.enabledBranchPattern</code> gradle property. For example: <code>slack.gradle.config.bugsnag.enabledBranchPattern=main|release_.*</code>.</li>
+<li><strong>New</strong>: Source desugar libraries from <code>libs.versions.toml</code> instead of assuming the artifact name. Starting with 1.2.0, desugar JDK libs offers multiple artifacts. Point <code>google-coreLibraryDesugaring</code> in [libraries] to whichever artifact should be used.</li>
+<li><strong>Fix</strong>: Catch and print errors with thermal closes.</li>
+<li><strong>Misc</strong>: Update to JDK 19 and latest AGPs. The plugin itself still targets JVM 11 bytecode. AGP 7.4.0 is now required.</li>
+</ul>
+<h2 id="042">0.4.2<a class="headerlink" href="#042" title="Permanent link">&para;</a></h2>
+<p><em>2023-01-13</em></p>
+<ul>
+<li><strong>Enhancement:</strong> Change default gradle memory percent in bootstrap from 25% to 50%.</li>
+<li><strong>Fix:</strong> Support the gradle enterprise plugin retry implementation when using Gradle enterprise 3.12+.</li>
+</ul>
+<h2 id="041">0.4.1<a class="headerlink" href="#041" title="Permanent link">&para;</a></h2>
+<p><em>2023-01-09</em></p>
+<p>Happy new year!</p>
+<ul>
+<li><strong>Fix</strong>: Remove EitherNet compiler option opt-ins.</li>
+<li>Update Okio to <code>3.3.0</code>.</li>
+</ul>
+<h2 id="040">0.4.0<a class="headerlink" href="#040" title="Permanent link">&para;</a></h2>
+<p><em>2022-12-29</em></p>
+<ul>
+<li>Update to Kotlin 1.8.0. This plugin now requires Kotlin 1.8.0 or later as it only configures KGP&rsquo;s new <code>compilerOptions</code> API now.</li>
+</ul>
+<h2 id="038">0.3.8<a class="headerlink" href="#038" title="Permanent link">&para;</a></h2>
+<p><em>2022-12-22</em></p>
+<ul>
+<li>Add support for AGP 8.0.0-alpha10.</li>
+</ul>
+<h2 id="037">0.3.7<a class="headerlink" href="#037" title="Permanent link">&para;</a></h2>
+<p><em>2022-12-19</em></p>
+<ul>
+<li><strong>Fix:</strong> Don&rsquo;t apply freeCompilerArguments.</li>
+<li><strong>Fix:</strong> Add missing license information to published POM files.</li>
+</ul>
+<h2 id="036">0.3.6<a class="headerlink" href="#036" title="Permanent link">&para;</a></h2>
+<p><em>2022-12-15</em></p>
+<ul>
+<li>Backport <code>android.packagingOptions.jniLibs.pickFirst</code> for AGP 8.x compatibility, as the returned type by <code>jniLibs</code> changed from <code>JniLibsPackagingOptions</code> to <code>JniLibsPackaging</code>.</li>
+</ul>
+<h2 id="035">0.3.5<a class="headerlink" href="#035" title="Permanent link">&para;</a></h2>
+<p><em>2022-12-06</em></p>
+<ul>
+<li>Introduce <code>compileCiUnitTest</code> lifecycle task to just compile (but not run!) unit tests that are run by <code>ciUnitTest</code>.</li>
+</ul>
+<h2 id="034">0.3.4<a class="headerlink" href="#034" title="Permanent link">&para;</a></h2>
+<p><em>2022-12-04</em></p>
+<ul>
+<li>Only enable <code>isIncludeAndroidResources</code> in Android unit tests automatically when <code>robolectric()</code> is used.</li>
+</ul>
+<h2 id="033">0.3.3<a class="headerlink" href="#033" title="Permanent link">&para;</a></h2>
+<p><em>2022-11-11</em></p>
+<ul>
+<li>Add some more Kotlin compiler arguments to compilations. See <a href="https://github.com/slackhq/slack-gradle-plugin/pull/160">#160</a></li>
+</ul>
+<h2 id="032">0.3.2<a class="headerlink" href="#032" title="Permanent link">&para;</a></h2>
+<p><em>2022-11-10</em></p>
+<ul>
+<li>(Strict mode only) Check for <code>AndroidManifest.xml</code> files in androidTest sources + ensure they&rsquo;re debuggable.</li>
+</ul>
+<h2 id="031">0.3.1<a class="headerlink" href="#031" title="Permanent link">&para;</a></h2>
+<p><em>2022-10-20</em></p>
+<ul>
+<li>Exclude <code>**/build/**</code> from <code>Detekt</code> tasks.</li>
+</ul>
+<h2 id="030">0.3.0<a class="headerlink" href="#030" title="Permanent link">&para;</a></h2>
+<p><em>2022-10-14</em></p>
+<ul>
+<li><strong>New</strong>: Support <code>com.android.test</code> projects.</li>
+<li><strong>New</strong>: Preliminary support for AGP 8.x.</li>
+<li>Automatically add compose compiler dep in Compose multiplatform (i.e. <code>org.jetbrains.compose</code>) projects.</li>
+<li>Support Error Prone Gradle Plugin 3.x.</li>
+<li>Update <code>me.tongfei:progressbar</code> to <code>0.9.5</code>.</li>
+</ul>
+<h2 id="024">0.2.4<a class="headerlink" href="#024" title="Permanent link">&para;</a></h2>
+<p><em>2022-10-06</em></p>
+<ul>
+<li><strong>Fix</strong>: Only check allowed androidTest variants if any are defined.</li>
+</ul>
+<h2 id="023">0.2.3<a class="headerlink" href="#023" title="Permanent link">&para;</a></h2>
+<p><em>2022-10-03</em></p>
+<ul>
+<li><strong>Fix:</strong> Only configure bootstrap conditionally.</li>
+</ul>
+<h2 id="022">0.2.2<a class="headerlink" href="#022" title="Permanent link">&para;</a></h2>
+<p><em>2022-10-03</em></p>
+<ul>
+<li>Add necessary <code>--add-opens</code> to <code>Test</code> tasks for Robolectric 4.9+ when it&rsquo;s enabled.</li>
+<li>Avoid <code>subprojects</code> module stats and <code>allprojects</code> in bootstrap for better project isolation support.</li>
+</ul>
+<h2 id="021">0.2.1<a class="headerlink" href="#021" title="Permanent link">&para;</a></h2>
+<p><em>2022-09-27</em></p>
+<ul>
+<li><strong>Fix:</strong> New <code>androidTest(allowedVariants = ...)</code> wasn&rsquo;t running on <code>com.android.application</code> projects.</li>
+<li><strong>Fix:</strong> Configure <code>Lint</code> DSL block for <code>com.android.library</code> and <code>org.jetbrains.kotlin.jvm</code> projects too.</li>
+</ul>
+<h2 id="020">0.2.0<a class="headerlink" href="#020" title="Permanent link">&para;</a></h2>
+<p><em>2022-09-23</em></p>
+<ul>
+<li>Add option to enable only certain variants&rsquo; android tests.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">slack</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">android</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">features</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">androidTest</span><span class="p">(</span><span class="n">allowedVariants</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">setOf</span><span class="p">(</span><span class="s">&quot;internalDebug&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="012">0.1.2<a class="headerlink" href="#012" title="Permanent link">&para;</a></h2>
+<p><em>2022-09-20</em></p>
+<ul>
+<li>Support Robolectric jars for Android API 30.</li>
+</ul>
+<h2 id="011">0.1.1<a class="headerlink" href="#011" title="Permanent link">&para;</a></h2>
+<p><em>2022-09-08</em></p>
+<ul>
+<li>Fix wrong <code>slack.unit-test</code> plugin application.</li>
+</ul>
+<h2 id="010">0.1.0<a class="headerlink" href="#010" title="Permanent link">&para;</a></h2>
+<p><em>2022-09-07</em></p>
+<ul>
+<li>Update to Moshi 1.14.0.</li>
+<li>Disable <code>Instantiatable</code> lint in min SDK 28+ due to lint bug.</li>
+<li>Specify kotlin version in compose compatibility check.</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 Slack Technologies, LLC
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.ce72ebac.min.js"></script>
+      
+    
+  </body>
+</html>

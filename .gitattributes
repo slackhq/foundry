@@ -1,3 +1,0 @@
-gradlew linguist-generated=true
-gradlew.bat linguist-generated=true
-config/bin/* filter=lfs diff=lfs merge=lfs -text
