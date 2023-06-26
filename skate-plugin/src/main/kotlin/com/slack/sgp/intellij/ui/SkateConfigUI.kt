@@ -30,12 +30,12 @@ internal class SkateConfigUI(
   private val project: Project,
 ) {
 
-  fun createPanel(): DialogPanel = panel { baselineFileRow() }
+  fun createPanel(): DialogPanel = panel { choosePathRow() }
 
-  private fun Panel.baselineFileRow() {
-    row(SkateBundle.message("skate.configuration.baselineFile.title")) {
+  private fun Panel.choosePathRow() {
+    row(SkateBundle.message("skate.configuration.choosePath.title")) {
       textFieldWithBrowseButton(
-          SkateBundle.message("skate.configuration.baselineFile.dialog.title"),
+          SkateBundle.message("skate.configuration.choosePath.dialog.title"),
           project,
           FileChooserDescriptorUtil.createSingleXmlChooserDescriptor()
         )
