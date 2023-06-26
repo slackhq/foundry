@@ -18,7 +18,11 @@ package com.slack.sgp.intellij.ui
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.vfs.VirtualFile
 
-object FileChooseDescriptorSkate {
+/**
+ * * Provides utility function for creating file chooser descriptors to select specific types of
+ *   files, currently supports md files only.
+ */
+object FileChoosing {
   fun singleMdFileChooserDescriptor() = createSingleFileChooserDescriptor {
     it.extension.equals("md", ignoreCase = true)
   }

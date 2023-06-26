@@ -37,7 +37,7 @@ internal class SkateConfigUI(
       textFieldWithBrowseButton(
           SkateBundle.message("skate.configuration.choosePath.dialog.title"),
           project,
-          FileChooseDescriptorSkate.singleMdFileChooserDescriptor()
+          FileChoosing.singleMdFileChooserDescriptor()
         )
         .bindText(
           getter = {
