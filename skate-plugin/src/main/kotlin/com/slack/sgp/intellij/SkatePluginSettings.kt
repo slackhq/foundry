@@ -42,7 +42,6 @@ class SkatePluginSettings(
     }
 
   class State : BaseState() {
-    // TODO: make it enabled or disabled based on isWhatsNewEnabled
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
   }
