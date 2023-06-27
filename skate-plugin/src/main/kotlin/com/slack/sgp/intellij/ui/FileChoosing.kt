@@ -20,7 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 /**
  * Provides utility function for creating file chooser descriptors to select specific types of
- *   files, currently supports md files only.
+ * files, currently supports md files only.
  */
 object FileChoosing {
   fun singleMdFileChooserDescriptor() = createSingleFileChooserDescriptor {
