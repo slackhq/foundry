@@ -19,7 +19,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.vfs.VirtualFile
 
 /**
- * * Provides utility function for creating file chooser descriptors to select specific types of
+ * Provides utility function for creating file chooser descriptors to select specific types of
  *   files, currently supports md files only.
  */
 object FileChoosing {
