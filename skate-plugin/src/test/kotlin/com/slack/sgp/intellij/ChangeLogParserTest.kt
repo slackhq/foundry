@@ -30,7 +30,7 @@ class ChangeLogParserTest {
             0.9.14
             ------
 
-            _2023-06-25_
+            _2023-06-25_ 
 
             * Fix compose compiler config not applying to android projects.
 
@@ -55,6 +55,45 @@ class ChangeLogParserTest {
     val (changeLogString, latestEntry) = ChangelogParser.readFile(initialChangeLogString, previous)
 
     assertThat(changeLogString).isNull()
+    assertThat(latestEntry).isEqualTo(LocalDate.of(2023, 6, 25))
+  }
+
+  @Test
+  fun testChangeLogStringWithNonexistentPreviousEntry() {
+    val initialChangeLogString =
+      """
+          Changelog
+          =========
+
+          0.9.14
+          ------
+
+          _2023-06-25_
+
+          * Fix compose compiler config not applying to android projects.
+
+          0.9.13
+          ------
+
+          _2023-06-24_
+
+          * Fix wrong map key name being used in exclusion.
+
+          0.9.12
+          ------
+
+          _2023-06-24_
+
+          * Fix wrong dependency being used for compose-compiler in new Compose configuration overhaul.
+      """
+        .trimIndent()
+
+    val previousEntry = LocalDate.of(2023, 6, 24)
+
+    val (changeLogString, latestEntry) =
+      ChangelogParser.readFile(initialChangeLogString, previousEntry)
+
+    assertThat(changeLogString).isNotNull()
     assertThat(latestEntry).isEqualTo(LocalDate.of(2023, 6, 25))
   }
 

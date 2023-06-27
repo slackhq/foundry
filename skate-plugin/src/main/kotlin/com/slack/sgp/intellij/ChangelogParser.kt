@@ -20,22 +20,24 @@ object ChangelogParser {
     var previous = LocalDate.now() // var means mutable
     var entryCount = 0
     val changeLogSubstring = buildString {
+      var shouldAppend = previousEntry == null
       for (line in changeLogString.lines()) {
         if (line.isLocalDate) {
-          val localDate = LocalDate.parse(line)
-          if (entryCount == 0) {
+          val localDate = LocalDate.parse(line.trim())
+          if (localDate == previousEntry) {
+            shouldAppend = true
+          }
+          if (entryCount == 0 || (previous != null && localDate.isAfter(previous))) {
             previous = localDate
           }
           entryCount++
-          if (previousEntry == previous) {
-            break
-          } else {
+          if (shouldAppend) {
             appendLine(line)
           }
         }
       }
     }
-    return ParseResult(changeLogSubstring.takeIf { entryCount > 1 }, previous)
+    return ParseResult(changeLogSubstring.takeIf { it.isNotBlank() }, previous)
   }
   data class ParseResult(val changeLogString: String?, val latestEntry: LocalDate)
 }
