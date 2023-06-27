@@ -27,6 +27,8 @@
         <projectService
                 serviceInterface="com.slack.sgp.intellij.SkateProjectService"
                 serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
+        <projectService serviceImplementation="com.slack.sgp.intellij.SkatePluginSettings"/>
+        <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig"/>
     </extensions>
 
     <applicationListeners>
