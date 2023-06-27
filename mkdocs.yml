@@ -62,6 +62,7 @@ nav:
   - 'Dependency Rake': dependency-rake.md
   - 'Bootstrap': bootstrap.md
   - 'DSL': dsl.md
+  - 'Utilities': utilities.md
 #  - 'Configuration': configuration.md
 #  - 'DSL': dsl.md
   # TODO more

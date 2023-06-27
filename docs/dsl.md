@@ -59,6 +59,12 @@ downloads (via `UpdateRobolectricJarsTask`) for test tasks and enabling resource
 requires). There are a few other controls that `StandardProjectConfigurations` use to control or patch Robolectric's
 behavior.
 
+### Android Test
+
+By default, SGP disables androidTests in projects. These can be enabled via the `androidTest()` feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.
+
+This is important for opting in tests to [AndroidTest APK Aggregation](/utilities/#androidtest-apk-aggregation).
+
 ## Android Application Features
 
 ### Permission AllowList
