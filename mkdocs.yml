@@ -64,7 +64,6 @@ nav:
   - 'DSL': dsl.md
   - 'Utilities': utilities.md
 #  - 'Configuration': configuration.md
-#  - 'DSL': dsl.md
   # TODO more
   - 'Discussions ⏏': https://github.com/slackhq/slack-gradle-plugin/discussions
   - 'Change Log': changelog.md
