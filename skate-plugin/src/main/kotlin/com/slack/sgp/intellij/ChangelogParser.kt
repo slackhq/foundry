@@ -35,6 +35,7 @@ object ChangelogParser {
         LocalDate.parse(changeLogString.lines().firstOrNull { it.isLocalDate })
       )
     }
+
     var previous: LocalDate? = null
     var entryCount = 0
     val changeLogSubstring =
