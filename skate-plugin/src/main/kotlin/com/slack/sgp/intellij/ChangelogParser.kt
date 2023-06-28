@@ -17,8 +17,13 @@ object ChangelogParser {
     // no previous entry in the changelog
     // previous entry is found, if found, check if it's the first entry or if there's other content
     // since
+    if (previousEntry != null && !changeLogString.contains(previousEntry.toString())) {
+      return ParseResult(
+        changeLogString,
+        LocalDate.parse(changeLogString.lines().firstOrNull { it.isLocalDate })
+      )
+    }
     var previous: LocalDate? = null
-    var breakOnNextDate = false
     var entryCount = 0
     val changeLogSubstring =
       buildString {
@@ -26,9 +31,6 @@ object ChangelogParser {
           for (line in changeLogString.lines()) {
             if (line.isLocalDate) {
               val localDate = LocalDate.parse(line)
-              if (breakOnNextDate) {
-                break
-              }
               if (localDate == previousEntry) {
                 break
               }
@@ -39,11 +41,7 @@ object ChangelogParser {
               if (previous == null) {
                 previous = localDate
               }
-              if (localDate == previousEntry) {
-                breakOnNextDate = true
-              } else {
-                entryCount++
-              }
+              entryCount++
             }
             currentBlock.appendLine(line)
           }
