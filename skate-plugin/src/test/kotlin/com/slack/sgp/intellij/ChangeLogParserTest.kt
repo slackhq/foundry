@@ -35,10 +35,6 @@ class ChangeLogParserTest {
 
       * Bug fixes
       * New features
-
-      2023-06-27
-
-      * Other changes
       """
         .trimIndent()
 
