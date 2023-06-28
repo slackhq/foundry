@@ -14,9 +14,6 @@ object ChangelogParser {
     date format: yyyy-mm-dd
     */
 
-    // no previous entry in the changelog
-    // previous entry is found, if found, check if it's the first entry or if there's other content
-    // since
     if (previousEntry != null && !changeLogString.contains(previousEntry.toString())) {
       return ParseResult(
         changeLogString,

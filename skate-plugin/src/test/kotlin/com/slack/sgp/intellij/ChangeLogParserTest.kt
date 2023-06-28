@@ -5,6 +5,7 @@ import java.time.LocalDate
 import org.junit.Test
 
 class ChangeLogParserTest {
+  // test with no entries and null changelogstring
   @Test
   fun testNoEntries() {
     val (changeLogString, latestEntry) = ChangelogParser.readFile("", null)
@@ -12,6 +13,7 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(LocalDate.now())
   }
 
+  // test with one entry, no previous entry
   @Test
   fun testSingleEntryNullPreviousEntry() {
     val input = "2023-06-28\nBug fixes\nNew features"
@@ -21,6 +23,7 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
+  // test with mutliple entries, and no previous entry
   @Test
   fun testMultipleEntriesNullPreviousEntry() {
     val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
@@ -31,6 +34,7 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
+  // test with multiple entries, where the previous is the same as the latest
   @Test
   fun testPreviousEntrySameAsLatest() {
     val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
@@ -40,6 +44,7 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
+  // test with a previous entry not in the change log
   @Test
   fun testPreviousEntryNotInChangeLog() {
     val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
@@ -49,10 +54,4 @@ class ChangeLogParserTest {
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
-
-  // TODO:
-  //  ChangeLogString with an entry but null previous entry
-  //  ChangeLogString with latest entry = to previous entry
-  //  ChangeLogString where previous entry is not null, but not present in ChangeLog
-  //  ChangeLogString where previous entry is not null, not present in ChangeLog, and
 }
