@@ -15,7 +15,6 @@
  */
 package slack.gradle
 
-import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.toolchain.JvmVendorSpec
@@ -93,38 +92,5 @@ private fun Project.createRobolectricJarsDownloadTask(
     "Robolectric jars task should only be created once on the root project. Tried to apply on $name"
   }
 
-  return tasks.register<UpdateRobolectricJarsTask>("updateRobolectricJars") {
-    val sdksProvider = providers.provider { slackProperties.robolectricTestSdks }
-    val iVersionProvider = providers.provider { slackProperties.robolectricIVersion }
-    sdkVersions.setDisallowChanges(sdksProvider)
-    instrumentedVersion.setDisallowChanges(iVersionProvider)
-    val gradleUserHomeDir = gradle.gradleUserHomeDir
-    outputDir.setDisallowChanges(
-      project.layout.dir(project.provider { robolectricJars(gradleUserHomeDir) })
-    )
-    offline.setDisallowChanges(project.gradle.startParameter.isOffline)
-
-    // If we already have the expected jars downloaded locally, then we can mark this task as up
-    // to date.
-    val robolectricJarsDir = robolectricJars(gradleUserHomeDir, createDirsIfMissing = false)
-    outputs.upToDateWhen {
-      // Annoyingly this doesn't seem to actually seem to make the task _not_ run even if it
-      // returns true because Gradle APIs make no sense.
-      if (robolectricJarsDir.exists()) {
-        val actual =
-          UpdateRobolectricJarsTask.jarsIn(robolectricJarsDir).mapTo(LinkedHashSet(), File::getName)
-        val expected = sdksProvider.get().mapTo(LinkedHashSet()) { sdkFor(it).dependencyJar().name }
-
-        // If there's any delta here, let's re-run to be safe. Covers:
-        // - New jars to download
-        // - Stale old jars to delete
-        actual == expected
-      } else {
-        false
-      }
-    }
-    // We can't reliably cache this. This call is redundant since we don't declare output, but
-    // just to be explicit.
-    outputs.cacheIf { false }
-  }
+  return UpdateRobolectricJarsTask.register(this, slackProperties)
 }

@@ -52,6 +52,9 @@ internal sealed class Sdk : Comparable<Sdk> {
   /** The actual dependency jar to fetch. */
   abstract fun dependencyJar(): DependencyJar
 
+  /** The actual dependency coordinates to fetch. */
+  abstract val dependencyCoordinates: String
+
   /** Instances of `Sdk` are ordered by the API level they implement. */
   override fun compareTo(other: Sdk): Int {
     return apiLevel - other.apiLevel
@@ -71,9 +74,16 @@ internal data class DefaultSdk(
   private val requiredJavaVersion: Int,
   private val iVersion: Int
 ) : Sdk() {
-  override fun dependencyJar(): DependencyJar {
-    val version =
-      listOf(androidVersion, "robolectric", robolectricVersion, "i$iVersion").joinToString("-")
-    return DependencyJar("org.robolectric", "android-all-instrumented", version, null)
+  companion object {
+    private const val GROUP_ID = "org.robolectric"
+    private const val ARTIFACT_ID = "android-all-instrumented"
   }
+
+  private val version = "$androidVersion-robolectric-$robolectricVersion-i$iVersion"
+
+  override fun dependencyJar(): DependencyJar {
+    return DependencyJar(GROUP_ID, ARTIFACT_ID, version, null)
+  }
+
+  override val dependencyCoordinates = "$GROUP_ID:$ARTIFACT_ID:$version"
 }
