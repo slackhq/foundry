@@ -17,27 +17,42 @@ object ChangelogParser {
     // no previous entry in the changelog
     // previous entry is found, if found, check if it's the first entry or if there's other content
     // since
-    var previous = LocalDate.now() // var means mutable
+    var previous: LocalDate? = null
+    var breakOnNextDate = false
     var entryCount = 0
-    val changeLogSubstring = buildString {
-      var shouldAppend = previousEntry == null
-      for (line in changeLogString.lines()) {
-        if (line.isLocalDate) {
-          val localDate = LocalDate.parse(line.trim())
-          if (localDate == previousEntry) {
-            shouldAppend = true
+    val changeLogSubstring =
+      buildString {
+          var currentBlock = StringBuilder()
+          for (line in changeLogString.lines()) {
+            if (line.isLocalDate) {
+              val localDate = LocalDate.parse(line)
+              if (breakOnNextDate) {
+                break
+              }
+              if (localDate == previousEntry) {
+                break
+              }
+              if (previous != null) {
+                append(currentBlock.toString())
+              }
+              currentBlock = StringBuilder()
+              if (previous == null) {
+                previous = localDate
+              }
+              if (localDate == previousEntry) {
+                breakOnNextDate = true
+              } else {
+                entryCount++
+              }
+            }
+            currentBlock.appendLine(line)
           }
-          if (entryCount == 0 || (previous != null && localDate.isAfter(previous))) {
-            previous = localDate
-          }
-          entryCount++
-          if (shouldAppend) {
-            appendLine(line)
+          if (entryCount == 0) {
+            append(currentBlock.toString())
           }
         }
-      }
-    }
-    return ParseResult(changeLogSubstring.takeIf { it.isNotBlank() }, previous)
+        .trimEnd()
+    return ParseResult(changeLogSubstring.takeIf { it.isNotBlank() }, previous ?: LocalDate.now())
   }
   data class ParseResult(val changeLogString: String?, val latestEntry: LocalDate)
 }

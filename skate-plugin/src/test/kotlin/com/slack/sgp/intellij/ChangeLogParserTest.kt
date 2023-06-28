@@ -13,88 +13,41 @@ class ChangeLogParserTest {
   }
 
   @Test
-  fun testNullPreviousEntry() {
-    val initialChangeLogString = "2023-06-27"
-    val (changeLogString, latestEntry) = ChangelogParser.readFile(initialChangeLogString, null)
+  fun testSingleEntryNullPreviousEntry() {
+    val input = "2023-06-28\nBug fixes\nNew features"
+    val expectedDate = LocalDate.of(2023, 6, 28)
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
     assertThat(changeLogString).isNull()
-    assertThat(latestEntry).isEqualTo(LocalDate.of(2023, 6, 27))
+    assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
   @Test
-  fun testChangeLogStringIsNotNull() {
-    val initialChangeLogString =
-      """
-            Changelog
-            =========
-
-            0.9.14
-            ------
-
-            _2023-06-25_ 
-
-            * Fix compose compiler config not applying to android projects.
-
-            0.9.13
-            ------
-
-            _2023-06-24_
-
-            * Fix wrong map key name being used in exclusion.
-
-            0.9.12
-            ------
-
-            _2023-06-24_
-
-            * Fix wrong dependency being used for compose-compiler in new Compose configuration overhaul.
-        """
-        .trimIndent()
-
-    val previous = LocalDate.of(2023, 6, 24) // This date is prior to the latest entry date
-
-    val (changeLogString, latestEntry) = ChangelogParser.readFile(initialChangeLogString, previous)
-
-    assertThat(changeLogString).isNull()
-    assertThat(latestEntry).isEqualTo(LocalDate.of(2023, 6, 25))
+  fun testMultipleEntriesNullPreviousEntry() {
+    val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val expectedDate = LocalDate.of(2023, 6, 28)
+    val expectedString = "2023-06-28\nBug fixes\nNew features"
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
+    assertThat(changeLogString).isEqualTo(expectedString)
+    assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
   @Test
-  fun testChangeLogStringWithNonexistentPreviousEntry() {
-    val initialChangeLogString =
-      """
-          Changelog
-          =========
+  fun testPreviousEntrySameAsLatest() {
+    val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val expectedDate = LocalDate.of(2023, 6, 28)
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 28))
+    assertThat(changeLogString).isNull()
+    assertThat(latestEntry).isEqualTo(expectedDate)
+  }
 
-          0.9.14
-          ------
-
-          _2023-06-25_
-
-          * Fix compose compiler config not applying to android projects.
-
-          0.9.13
-          ------
-
-          _2023-06-24_
-
-          * Fix wrong map key name being used in exclusion.
-
-          0.9.12
-          ------
-
-          _2023-06-24_
-
-          * Fix wrong dependency being used for compose-compiler in new Compose configuration overhaul.
-      """
-        .trimIndent()
-
-    val previousEntry = LocalDate.of(2023, 6, 24)
-
-    val (changeLogString, latestEntry) =
-      ChangelogParser.readFile(initialChangeLogString, previousEntry)
-
-    assertThat(changeLogString).isNotNull()
-    assertThat(latestEntry).isEqualTo(LocalDate.of(2023, 6, 25))
+  @Test
+  fun testPreviousEntryNotInChangeLog() {
+    val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val expectedDate = LocalDate.of(2023, 6, 28)
+    val expectedString = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 29))
+    assertThat(changeLogString).isEqualTo(expectedString)
+    assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
   // TODO:
