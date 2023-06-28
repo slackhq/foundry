@@ -31,7 +31,13 @@ class ChangeLogParserTest {
   // test with one entry, no previous entry
   @Test
   fun testSingleEntryNullPreviousEntry() {
-    val input = "2023-06-28\nBug fixes\nNew features"
+    val input = """
+      2023-06-28
+      ----------
+      
+      - Bug fixes
+      - New features
+    """.trimIndent()
     val expectedDate = LocalDate.of(2023, 6, 28)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
     assertThat(changeLogString).isNull()
