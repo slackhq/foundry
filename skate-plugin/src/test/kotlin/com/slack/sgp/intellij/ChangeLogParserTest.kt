@@ -20,17 +20,15 @@ import java.time.LocalDate
 import org.junit.Test
 
 class ChangeLogParserTest {
-  // test with no entries and null changelogstring
   @Test
-  fun testNoEntries() {
+  fun `test with no entries and null changelogstring`() {
     val (changeLogString, latestEntry) = ChangelogParser.readFile("", null)
     assertThat(changeLogString).isNull()
     assertThat(latestEntry).isEqualTo(LocalDate.now())
   }
 
-  // test with one entry, no previous entry
   @Test
-  fun testSingleEntryNullPreviousEntry() {
+  fun `test with one entry, no previous entry`() {
     val input = "2023-06-28\nBug fixes\nNew features"
     val expectedDate = LocalDate.of(2023, 6, 28)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
@@ -38,9 +36,8 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
-  // test with mutliple entries, and no previous entry
   @Test
-  fun testMultipleEntriesNullPreviousEntry() {
+  fun `test with mutliple entries, and no previous entry`() {
     val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
     val expectedDate = LocalDate.of(2023, 6, 28)
     val expectedString = "2023-06-28\nBug fixes\nNew features"
@@ -49,9 +46,8 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
-  // test with multiple entries, where the previous is the same as the latest
   @Test
-  fun testPreviousEntrySameAsLatest() {
+  fun `test with multiple entries, where the previous is the same as the latest`() {
     val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
     val expectedDate = LocalDate.of(2023, 6, 28)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 28))
@@ -59,9 +55,8 @@ class ChangeLogParserTest {
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
-  // test with a previous entry not in the change log
   @Test
-  fun testPreviousEntryNotInChangeLog() {
+  fun `test with a previous entry not in the change log`() {
     val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
     val expectedDate = LocalDate.of(2023, 6, 28)
     val expectedString = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
