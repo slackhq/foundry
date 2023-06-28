@@ -29,7 +29,19 @@ class ChangeLogParserTest {
 
   @Test
   fun `one entry, no previous entries`() {
-    val input = "2023-06-28\nBug fixes\nNew features"
+    val input =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+
+      2023-06-27
+
+      * Other changes
+      """
+        .trimIndent()
+
     val expectedDate = LocalDate.of(2023, 6, 28)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
     assertThat(changeLogString).isNull()
@@ -38,9 +50,27 @@ class ChangeLogParserTest {
 
   @Test
   fun `mutliple entries, and no previous entries`() {
-    val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val input =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+
+      2023-06-27
+
+      * Other changes
+      """
+        .trimIndent()
     val expectedDate = LocalDate.of(2023, 6, 28)
-    val expectedString = "2023-06-28\nBug fixes\nNew features"
+    val expectedString =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+      """
+        .trimIndent()
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
@@ -48,7 +78,18 @@ class ChangeLogParserTest {
 
   @Test
   fun `multiple entries, where the previous is the same as the latest`() {
-    val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val input =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+
+      2023-06-27
+
+      * Other changes
+      """
+        .trimIndent()
     val expectedDate = LocalDate.of(2023, 6, 28)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 28))
     assertThat(changeLogString).isNull()
@@ -57,9 +98,31 @@ class ChangeLogParserTest {
 
   @Test
   fun `test with a previous entry not in the change log`() {
-    val input = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val input =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+
+      2023-06-27
+
+      * Other changes
+      """
+        .trimIndent()
     val expectedDate = LocalDate.of(2023, 6, 28)
-    val expectedString = "2023-06-28\nBug fixes\nNew features\n2023-06-27\nOther changes"
+    val expectedString =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+
+      2023-06-27
+
+      * Other changes
+      """
+        .trimIndent()
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 29))
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
