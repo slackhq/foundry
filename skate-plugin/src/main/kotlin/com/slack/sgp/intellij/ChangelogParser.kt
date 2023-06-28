@@ -17,6 +17,20 @@ package com.slack.sgp.intellij
 
 import java.time.LocalDate
 
+/**
+ * Reads a CHANGELOG.md file and produces a subset of it, based on a specified previous entry date.
+ *
+ * If a previous entry date is supplied and is found within the changelog, this function will return
+ * a new changelog that contains entries only up to and including this date. If the previous entry
+ * date is not found, the entire changelog is returned.
+ *
+ * @param changeLogString The entire changelog, as a string, where each entry is expected to start
+ *   with a date line.
+ * @param previousEntry The date of the previous entry. Can be null, in which case the entire
+ *   changelog is returned.
+ * @return A ParseResult object containing the filtered changelog string and the date of the latest
+ *   entry.
+ */
 private val LOCAL_DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}\$".toRegex()
 private val String.isLocalDate: Boolean
   get() {
