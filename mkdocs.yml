@@ -59,9 +59,19 @@ markdown_extensions:
 nav:
   - 'Overview': index.md
   - 'Architecture': architecture.md
+  - 'Dependency Rake': dependency-rake.md
+  - 'Bootstrap': bootstrap.md
+  - 'DSL': dsl.md
+  - 'Utilities': utilities.md
+  # TODO
 #  - 'Configuration': configuration.md
-#  - 'DSL': dsl.md
-  # TODO more
+#  - 'Lint': lint.md
+#  - 'Testing': testing.md
+#  - 'Skippy': skippy.md
+#  - 'Properties': properties.md
+#  - 'Mod Score': mod-score.md
+#  - 'Formatters & Analysis': formatters-and-analysis.md
+#  - 'Thermals Logging': thermals-logging.md
   - 'Discussions ⏏': https://github.com/slackhq/slack-gradle-plugin/discussions
   - 'Change Log': changelog.md
   - 'API': api/0.x/
