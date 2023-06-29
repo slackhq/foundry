@@ -57,6 +57,7 @@ class WhatsNewPanelFactory : DumbAware {
 
       val markdownContent = String(markdownFile.contentsToByteArray(), Charsets.UTF_8)
       val document = parser.parse(markdownContent)
+
       val htmlContent = renderer.render(document)
       println(htmlContent)
       return JPanel().apply {
@@ -81,6 +82,7 @@ class WhatsNewPanelFactory : DumbAware {
         styleSheet.addRule("h2 { font-size: 1.4em; }")
         styleSheet.addRule("h3 { font-size: 1.2em; }")
         styleSheet.addRule("li { margin: 5px 0; }")
+        styleSheet.addRule("em { font-style: italic; }")
 
         val htmlEditorKit = HTMLEditorKit()
         htmlEditorKit.styleSheet = styleSheet
