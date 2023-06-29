@@ -31,14 +31,13 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
 
   override fun showWhatsNewWindow() {
     // TODO
-    //  Make the file configurable?
     //  Only show when changed
     //  Only show latest changes
     val settings = project.service<SkatePluginSettings>()
     if (!settings.isWhatsNewEnabled) return
     val projectDir = project.guessProjectDir() ?: return
     val changeLogFile = VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return
-    val changeLogString = VfsUtil.loadText(changeLogFile)
+    //    val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater {
       val toolWindow =
@@ -46,7 +45,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
           stripeTitle = Supplier { "What's New in Slack!" }
           anchor = ToolWindowAnchor.RIGHT
         }
-      WhatsNewPanelFactory().createToolWindowContent(toolWindow, changeLogString)
+      WhatsNewPanelFactory().createToolWindowContent(toolWindow, changeLogFile)
       toolWindow.show()
     }
   }

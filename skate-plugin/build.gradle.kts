@@ -16,7 +16,7 @@ intellij {
   version.set("2022.2.5")
   type.set("IC") // Target IDE Platform
 
-  plugins.set(listOf(/* Plugin Dependencies */ ))
+  plugins.set(listOf("org.intellij.plugins.markdown"))
 }
 
 tasks {
@@ -37,4 +37,9 @@ tasks {
 dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+  implementation("com.vladsch.flexmark:flexmark-all:0.64.8")
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
 }
