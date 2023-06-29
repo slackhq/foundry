@@ -32,7 +32,7 @@ jobs:
           JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
           echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
 
-      - name: Install JDK ${{ matrix.ci_java_version }}
+      - name: Install JDK ${{ env.JDK_VERSION }}
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
@@ -71,7 +71,7 @@ jobs:
           JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
           echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
 
-      - name: Install JDK ${{ matrix.ci_java_version }}
+      - name: Install JDK ${{ env.JDK_VERSION }}
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
