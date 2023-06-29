@@ -13,13 +13,17 @@
       
       
       
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../bootstrap/">
       
       <link rel="icon" href="../images/slack_logo_small.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>Dependency rake - slack-gradle-plugin</title>
+        <title>Dependency Rake - slack-gradle-plugin</title>
       
     
     
@@ -107,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Dependency rake
+              Dependency Rake
             
           </span>
         </div>
@@ -264,6 +268,121 @@
 
   
   
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Dependency Rake
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Dependency Rake
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#types-of-fixes" class="md-nav__link">
+    Types of Fixes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    Benefits
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    Implementation
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bootstrap/" class="md-nav__link">
+        Bootstrap
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl/" class="md-nav__link">
+        DSL
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilities/" class="md-nav__link">
+        Utilities
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
   
     <li class="md-nav__item">
       <a href="https://github.com/slackhq/slack-gradle-plugin/discussions" class="md-nav__link">
@@ -353,6 +472,35 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#types-of-fixes" class="md-nav__link">
+    Types of Fixes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    Benefits
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    Implementation
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -370,7 +518,39 @@
 
 
 <h1 id="dependency-rake">Dependency Rake<a class="headerlink" href="#dependency-rake" title="Permanent link">&para;</a></h1>
-<p>TODO</p>
+<p>Dependency rake is an tool we develop within slack-gradle-plugin (SGP) to automatically clean up Gradle build files.</p>
+<p>This tool uses the outputs of
+the <a href="https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin">dependency-analysis-gradle-plugin</a> (
+DAGP) to infer and apply fixes it recommends.</p>
+<h2 id="types-of-fixes">Types of Fixes<a class="headerlink" href="#types-of-fixes" title="Permanent link">&para;</a></h2>
+<p>There are three main categories of fixes that DR applies.</p>
+<ol>
+<li>Remove unused dependencies.<ul>
+<li>Like it says on the tin, these are declared dependencies that are unused and should be removed.</li>
+</ul>
+</li>
+<li>Fix misused dependencies.<ul>
+<li>These are dependencies that are declared but only transitive dependencies they include are actually used. For
+  example - depending on RxAndroid but only using RxJava from it. These are fixed by replacing the dependency with
+  the specific transitive dependency.</li>
+</ul>
+</li>
+<li>Fix wrong configurations.<ul>
+<li>These are dependencies that declare the wrong Gradle configuration (e.g. api, implementation, etc). Dependencies
+  determined to be used in the “public ABI” of the library should be “api” configuration for use in dependent
+  projects. Anything else can be hidden as an “implementation” or “compileOnly” (if annotations-only) dependency.</li>
+</ul>
+</li>
+</ol>
+<h2 id="benefits">Benefits<a class="headerlink" href="#benefits" title="Permanent link">&para;</a></h2>
+<p>The primary benefit of dependency rake is to improve build times by more or less “raking” the build dependency graph. By
+removing and fixing dependencies, we remove unneeded edges in the build graph. This in turn provides improved build
+parallelism and better avoidance in Skippy CI pipelines.</p>
+<p>A secondary benefit is automatic upkeep of build files. As projects change over time, dependencies become obsolete and
+out of date. Most developers do not keep up with these changes over time, so automating this affords us extra upkeep
+that we currently do not do.</p>
+<h2 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h2>
+<p>The core implementation of DR lives in <code>DependencyRake.kt</code>.</p>
 
 
 

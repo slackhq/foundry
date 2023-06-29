@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../architecture/">
+        <link rel="prev" href="../utilities/">
       
       
         <link rel="next" href="../contributing/">
@@ -270,6 +270,66 @@
   
   
     <li class="md-nav__item">
+      <a href="../dependency-rake/" class="md-nav__link">
+        Dependency Rake
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bootstrap/" class="md-nav__link">
+        Bootstrap
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsl/" class="md-nav__link">
+        DSL
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilities/" class="md-nav__link">
+        Utilities
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="https://github.com/slackhq/slack-gradle-plugin/discussions" class="md-nav__link">
         Discussions ⏏
       </a>
@@ -317,6 +377,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0915" class="md-nav__link">
+    0.9.15
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#0914" class="md-nav__link">
@@ -894,6 +961,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0915" class="md-nav__link">
+    0.9.15
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0914" class="md-nav__link">
     0.9.14
   </a>
@@ -1408,6 +1482,15 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h2 id="0915">0.9.15<a class="headerlink" href="#0915" title="Permanent link">&para;</a></h2>
+<p><em>2023-06-29</em></p>
+<ul>
+<li>Switch Robolectric jar downloads to use detached configurations.</li>
+<li>This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.</li>
+<li>Docs are now published on <a href="https://slackhq.github.io/slack-gradle-plugin">https://slackhq.github.io/slack-gradle-plugin</a>. This is a work in progress.</li>
+<li>API kdocs are published at <a href="https://slackhq.github.io/slack-gradle-plugin/api/0.x/">https://slackhq.github.io/slack-gradle-plugin/api/0.x/</a>.</li>
+<li>Update <code>kotlin-cli-util</code> to 1.2.2.</li>
+</ul>
 <h2 id="0914">0.9.14<a class="headerlink" href="#0914" title="Permanent link">&para;</a></h2>
 <p><em>2023-06-25</em></p>
 <ul>
