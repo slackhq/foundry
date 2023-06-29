@@ -23,11 +23,15 @@ import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.data.MutableDataSet
 import java.awt.BorderLayout
+import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JEditorPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.ScrollPaneConstants
+import javax.swing.text.html.HTMLEditorKit
+import javax.swing.text.html.StyleSheet
 
 class WhatsNewPanelFactory : DumbAware {
   fun createToolWindowContent(toolWindow: ToolWindow, markdownFile: VirtualFile) {
@@ -56,14 +60,51 @@ class WhatsNewPanelFactory : DumbAware {
       val htmlContent = renderer.render(document)
       println(htmlContent)
       return JPanel().apply {
-        val markdownDisplay = JEditorPane("text/html", htmlContent)
+        layout = BorderLayout()
+        val markdownDisplay =
+          JEditorPane("text/html", htmlContent).apply {
+            isEditable = false
+            background = Color(0x333333) // set to a dark color
+            contentType = "text/html"
+            editorKit = HTMLEditorKit().apply { styleSheet = styleSheet }
+          }
+        markdownDisplay.contentType = "text/html"
+
+        // Enable text wrapping
+        // Enable text wrapping
+        val styleSheet = StyleSheet()
+        styleSheet.addRule(
+          "body { width: fit-content; font-family: Arial; line-height: 1.6; color: #FFF; }"
+        )
+        styleSheet.addRule("h1, h2, h3, h4, h5, h6 { color: #FFF; margin-top: 20px; }")
+        styleSheet.addRule("h1 { font-size: 1.6em; }")
+        styleSheet.addRule("h2 { font-size: 1.4em; }")
+        styleSheet.addRule("h3 { font-size: 1.2em; }")
+        styleSheet.addRule("li { margin: 5px 0; }")
+
+        val htmlEditorKit = HTMLEditorKit()
+        htmlEditorKit.styleSheet = styleSheet
+        markdownDisplay.editorKit = htmlEditorKit
+
+        markdownDisplay.text = htmlContent
         markdownDisplay.isEditable = false
-        val scrollPane = JScrollPane(markdownDisplay)
-        add(scrollPane)
+        val scrollPane =
+          JScrollPane(markdownDisplay).apply {
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+          }
+        add(scrollPane, BorderLayout.CENTER)
 
         val hideToolWindowButton = JButton("Hide")
         hideToolWindowButton.addActionListener { toolWindow.hide(null) }
-        add(hideToolWindowButton)
+        add(hideToolWindowButton, BorderLayout.PAGE_END)
+        //        val markdownDisplay = JEditorPane("text/html", htmlContent).apply { isEditable =
+        // false }
+        //        val scrollPane = JScrollPane(markdownDisplay)
+        //        add(scrollPane, BorderLayout.CENTER)
+        //
+        //        val hideToolWindowButton = JButton("Hide")
+        //        hideToolWindowButton.addActionListener { toolWindow.hide(null) }
+        //        add(hideToolWindowButton, BorderLayout.PAGE_END)
       }
     }
   }
