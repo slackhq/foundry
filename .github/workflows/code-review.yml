@@ -10,7 +10,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Trigger code review
-        uses: fxchen/code-review@v0.1.0-alpha
+        uses: fxchen/code-review@v0.2.5-alpha
         with:
           model: 'gpt-3.5-turbo-16k'
           openai-key: ${{ secrets.OPENAI_API_KEY }}
