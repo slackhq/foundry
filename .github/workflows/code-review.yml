@@ -18,7 +18,7 @@ jobs:
     if: ${{ github.actor != 'slack-oss-bot' }}
     steps:
       - name: Trigger code review
-        uses: fxchen/code-review@v0.2.5-alpha
+        uses: fxchen/code-review@v0.2.7-alpha
         with:
           model: 'gpt-3.5-turbo-16k'
           openai-key: ${{ secrets.OPENAI_API_KEY }}
