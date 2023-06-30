@@ -27,17 +27,15 @@ private val String.isLocalDate: Boolean
   }
 
 object ChangelogParser {
-
+  /**
+   * Function to parse a changelog and filter it based on a provided previous date entry.
+   *
+   * @param changeLogString The entire changelog as a string.
+   * @param previousEntry The date of the previous entry, can be null.
+   * @return A ParseResult object containing the filtered changelog and the date of the latest
+   *   entry.
+   */
   fun readFile(changeLogString: String, previousEntry: LocalDate? = null): ParseResult {
-    /**
-     * Function to parse a changelog and filter it based on a provided previous date entry.
-     *
-     * @param changeLogString The entire changelog as a string.
-     * @param previousEntry The date of the previous entry, can be null.
-     * @return A ParseResult object containing the filtered changelog and the date of the latest
-     *   entry.
-     */
-
     // If previousEntry is not null and it is not contained in changeLogString
     // the function will return the changeLogString and the first date found
     if (previousEntry != null && !changeLogString.contains(previousEntry.toString())) {
