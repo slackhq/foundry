@@ -181,7 +181,8 @@ internal class StandardProjectConfigurations(
                   buildMap {
                     for (catalogName in catalogNames) {
                       putAll(
-                        project.getVersionsCatalog().identifierMap().mapValues { (_, v) ->
+                        project.getVersionsCatalog(catalogName).identifierMap().mapValues { (_, v)
+                          ->
                           "$catalogName.$v"
                         }
                       )
