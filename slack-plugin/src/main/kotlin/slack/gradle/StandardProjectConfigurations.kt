@@ -41,6 +41,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -168,6 +169,8 @@ internal class StandardProjectConfigurations(
         // Configure rake
         plugins.withId("com.autonomousapps.dependency-analysis") {
           val isNoApi = slackProperties.rakeNoApi
+          val catalogNames =
+            extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
           val rakeDependencies =
             tasks.register<RakeDependencies>("rakeDependencies") {
               // TODO https://github.com/gradle/gradle/issues/25014
@@ -175,7 +178,16 @@ internal class StandardProjectConfigurations(
               noApi.setDisallowChanges(isNoApi)
               identifierMap.setDisallowChanges(
                 project.provider {
-                  project.getVersionsCatalog().identifierMap().mapValues { (_, v) -> "libs.$v" }
+                  buildMap {
+                    for (catalogName in catalogNames) {
+                      putAll(
+                        project.getVersionsCatalog(catalogName).identifierMap().mapValues { (_, v)
+                          ->
+                          "$catalogName.$v"
+                        }
+                      )
+                    }
+                  }
                 }
               )
             }
