@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.9.16
+------
+
+_2023-06-30_
+
+- Enable lint on test sources by default.
+- Account for all version catalogs in `DependencyRake`.
+- Update Guava to `32.1.0-jre`.
+
 0.9.15
 ------
 
