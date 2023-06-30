@@ -204,6 +204,9 @@ internal object LintTasks {
     absolutePaths = false
     this.checkDependencies = checkDependencies
 
+    ignoreTestSources = slackProperties.lintIgnoreTestSources
+    checkTestSources = slackProperties.lintCheckTestSources
+
     val lintBaselineFile = slackProperties.lintBaselineFileName
 
     // Lint is weird in that it will generate a new baseline file and fail the build if a new
