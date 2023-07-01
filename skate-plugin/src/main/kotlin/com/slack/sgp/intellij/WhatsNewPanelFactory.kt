@@ -44,7 +44,7 @@ class WhatsNewPanelFactory : DumbAware {
     private fun createControlsPanel(toolWindow: ToolWindow, projectName: String): JPanel {
 
       return JPanel().apply {
-        val helloWorldLabel = JLabel("Hello $projectName")
+        val helloWorldLabel = JLabel(projectName)
         add(helloWorldLabel)
 
         val hideToolWindowButton = JButton("Hide")

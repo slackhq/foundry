@@ -39,10 +39,12 @@ import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
-import slack.gradle.util.*
 import slack.gradle.util.JsonTools
+import slack.gradle.util.Thermals
+import slack.gradle.util.ThermalsData
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
+import slack.gradle.util.setDisallowChanges
 import slack.stats.ModuleStatsTasks
 import slack.unittest.UnitTests
 

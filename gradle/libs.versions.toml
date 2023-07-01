@@ -2,7 +2,7 @@
 agp = "8.0.2"
 anvil = "2.4.6"
 bugsnagGradle = "8.0.1"
-compose-jb = "1.4.0"
+compose-jb = "1.4.1"
 dependencyAnalysisPlugin = "1.20.0"
 detekt = "1.23.0"
 dokka = "1.8.20"
@@ -29,7 +29,7 @@ bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", 
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-intellij = { id = "org.jetbrains.intellij", version = "1.14.1" }
+intellij = { id = "org.jetbrains.intellij", version = "1.14.2" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
@@ -68,8 +68,8 @@ gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradl
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
-guava = "com.google.guava:guava:32.0.1-jre"
-kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.2.1"
+guava = "com.google.guava:guava:32.1.0-jre"
+kotlinCliUtil = "com.slack.cli:kotlin-cli-util:1.2.2"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }

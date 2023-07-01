@@ -18,20 +18,7 @@ concurrency:
 
 jobs:
   build:
-    name: JDK ${{ matrix.ci_java_version }} / AGP ${{ matrix.ci_agp_version }} / Kotlin ${{ matrix.ci_kotlin_version }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ci_java_version: ['20']
-        ci_kotlin_version: ['1.9.0-RC']
-        # TODO add back 8.1.0 after the CommonExtension generic problem is fixed
-        ci_agp_version: ['8.0.2']
-    env:
-      DEP_OVERRIDES: 'true'
-      DEP_OVERRIDE_KOTLIN: '${{ matrix.ci_kotlin_version }}'
-      DEP_OVERRIDE_AGP: '${{ matrix.ci_agp_version }}'
-      DEP_OVERRIDE_JAVA: '${{ matrix.ci_java_version }}'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,11 +26,17 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Install JDK ${{ matrix.ci_java_version }}
+      - name: Export JDK version
+        shell: bash
+        run: |
+          JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
+          echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
+
+      - name: Install JDK ${{ env.JDK_VERSION }}
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: ${{ matrix.ci_java_version }}
+          java-version: '${{ env.JDK_VERSION }}'
 
       - name: Build and run tests
         id: gradle
@@ -72,11 +65,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install JDK
+      - name: Export JDK version
+        shell: bash
+        run: |
+          JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
+          echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
+
+      - name: Install JDK ${{ env.JDK_VERSION }}
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '20'
+          java-version: '${{ env.JDK_VERSION }}'
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/slack-gradle-plugin'

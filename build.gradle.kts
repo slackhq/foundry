@@ -20,11 +20,12 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.net.URI
 import org.gradle.util.internal.VersionNumber
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 buildscript {
@@ -41,7 +42,7 @@ plugins {
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
-  alias(libs.plugins.dokka) apply false
+  alias(libs.plugins.dokka)
   alias(libs.plugins.ksp) apply false
   alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
@@ -157,6 +158,11 @@ data class KotlinBuildConfig(val kotlin: String) {
   }
 }
 
+tasks.dokkaHtmlMultiModule {
+  outputDirectory.set(rootDir.resolve("docs/api/0.x"))
+  includes.from(project.layout.projectDirectory.file("README.md"))
+}
+
 val kotlinVersion = libs.versions.kotlin.get()
 val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 
@@ -230,8 +236,6 @@ subprojects {
     configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
 
     apply(plugin = "com.squareup.sort-dependencies")
-    // TODO toe-hold for https://github.com/square/gradle-dependencies-sorter/issues/18
-    //    apply(plugin = "com.squareup.sort-dependencies")
   }
 
   tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
@@ -239,9 +243,13 @@ subprojects {
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")
 
-    tasks.withType<DokkaTask>().configureEach {
-      outputDirectory.set(rootDir.resolve("../docs/0.x"))
+    tasks.withType<DokkaTaskPartial>().configureEach {
+      outputDirectory.set(buildDir.resolve("docs/partial"))
       dokkaSourceSets.configureEach {
+        val readMeProvider = project.layout.projectDirectory.file("README.md")
+        if (readMeProvider.asFile.exists()) {
+          includes.from(readMeProvider)
+        }
         skipDeprecated.set(true)
         // Gradle docs
         externalDocumentationLink {

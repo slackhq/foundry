@@ -1,6 +1,26 @@
 Changelog
 =========
 
+0.9.16
+------
+
+_2023-06-30_
+
+- Enable lint on test sources by default.
+- Account for all version catalogs in `DependencyRake`.
+- Update Guava to `32.1.0-jre`.
+
+0.9.15
+------
+
+_2023-06-29_
+
+- Switch Robolectric jar downloads to use detached configurations.
+  - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
+- Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
+- API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+- Update `kotlin-cli-util` to 1.2.2.
+
 0.9.14
 ------
 

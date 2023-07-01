@@ -1,0 +1,21 @@
+# This workflow triggers a code review using the OpenAI GPT-3.5 Turbo model with a 16k context window
+name: Code Review
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: ${{ github.actor != 'slack-oss-bot' }}
+    steps:
+      - name: Trigger code review
+        uses: fxchen/code-review@v0.2.7-alpha
+        with:
+          model: 'gpt-3.5-turbo-16k'
+          openai-key: ${{ secrets.OPENAI_API_KEY }}

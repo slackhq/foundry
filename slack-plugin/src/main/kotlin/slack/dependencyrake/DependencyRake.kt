@@ -101,6 +101,10 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
   @TaskAction
   fun rake() {
+    if (identifierMap.get().isEmpty()) {
+      logger.warn("No identifier map found. Skipping rake.")
+      return
+    }
     val noApi = noApi.get()
     val projectAdvice = projectAdvice()
     val redundantPlugins = projectAdvice.pluginAdvice

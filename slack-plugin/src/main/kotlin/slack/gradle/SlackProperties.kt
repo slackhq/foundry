@@ -264,6 +264,14 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintBaselineFileName: String
     get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
 
+  /** Flag to control whether or not lint checks test sources. */
+  public val lintCheckTestSources: Boolean
+    get() = booleanProperty("sgp.lint.checkTestSources", true)
+
+  /** Flag to control whether or not lint checks ignores test sources. */
+  public val lintIgnoreTestSources: Boolean
+    get() = booleanProperty("sgp.lint.ignoreTestSources", false)
+
   /** Flag to enable/disable KSP. */
   public val allowKsp: Boolean
     get() = booleanProperty("slack.allow-ksp")
@@ -488,10 +496,6 @@ public class SlackProperties private constructor(private val project: Project) {
    */
   public val strictMode: Boolean
     get() = booleanProperty("slack.strict", defaultValue = false)
-
-  /** Specific toggle for validating the presence of `.kt` files in Kotlin projects. */
-  public val strictValidateKtFilePresence: Boolean
-    get() = booleanProperty("slack.strict.validateKtFiles", defaultValue = true)
 
   /** Specific toggle for validating manifests in androidTest sources. */
   public val strictValidateAndroidTestManifest: Boolean
