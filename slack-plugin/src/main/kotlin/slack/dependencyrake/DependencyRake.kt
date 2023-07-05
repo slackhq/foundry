@@ -25,6 +25,9 @@ import com.autonomousapps.model.ModuleCoordinates
 import com.autonomousapps.model.ProjectCoordinates
 import java.io.File
 import javax.inject.Inject
+import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -33,10 +36,13 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.convertProjectPathToAccessor
 
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
@@ -402,4 +408,40 @@ private fun List<String>.cleanLineFormatting(): List<String> {
 private fun List<String>.padNewline(): List<String> {
   val noEmpties = dropLastWhile { it.isBlank() }
   return noEmpties + ""
+}
+
+@UntrackedTask(because = "Dependency Rake tasks modify build files")
+internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  abstract val inputFiles: ConfigurableFileCollection
+
+  @get:OutputFile
+  abstract val outputFile: RegularFileProperty
+
+  init {
+    group = "rake"
+    description = "Aggregates missing identifiers from all upstream dependency rake tasks."
+  }
+
+  @TaskAction
+  fun aggregate() {
+    val aggregated = inputFiles
+      .flatMap { it.readLines() }
+      .toSortedSet()
+
+    val output = outputFile.asFile.get()
+    logger.lifecycle("Writing aggregated missing identifiers to $output")
+    output.writeText(aggregated.joinToString("\n"))
+  }
+
+  companion object {
+    const val NAME = "aggregateMissingIdentifiers"
+
+    fun register(rootProject: Project): TaskProvider<MissingIdentifiersAggregatorTask> {
+      return rootProject.tasks.register(NAME, MissingIdentifiersAggregatorTask::class.java) {
+        outputFile.set(rootProject.layout.buildDirectory.file("rake/aggregated_missing_identifiers.txt"))
+      }
+    }
+  }
 }

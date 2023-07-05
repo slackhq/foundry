@@ -58,6 +58,8 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.utils.named
+import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
@@ -193,6 +195,10 @@ internal class StandardProjectConfigurations(
               )
             }
           configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
+          val aggregator = project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(MissingIdentifiersAggregatorTask.NAME)
+          aggregator.configure {
+            inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
+          }
         }
       }
     }
