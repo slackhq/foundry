@@ -44,7 +44,7 @@ object MarkdownStyle {
         "pre { padding: 8px; line-height: 1; margin-bottom: 10px}",
 
         /* Lists */
-        "ul, ol { list-style-type: disc; padding-left: 15px; margin-bottom: 5px; }",
+        "ul, ol { display: inline-block; list-style-type: disc; padding-left: 15px; margin-bottom: 5px; }",
 
         /* Images */
         "img { max-width: 100%; }",
