@@ -416,8 +416,7 @@ internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
   @get:PathSensitive(PathSensitivity.RELATIVE)
   abstract val inputFiles: ConfigurableFileCollection
 
-  @get:OutputFile
-  abstract val outputFile: RegularFileProperty
+  @get:OutputFile abstract val outputFile: RegularFileProperty
 
   init {
     group = "rake"
@@ -426,9 +425,7 @@ internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
 
   @TaskAction
   fun aggregate() {
-    val aggregated = inputFiles
-      .flatMap { it.readLines() }
-      .toSortedSet()
+    val aggregated = inputFiles.flatMap { it.readLines() }.toSortedSet()
 
     val output = outputFile.asFile.get()
     logger.lifecycle("Writing aggregated missing identifiers to $output")
@@ -440,7 +437,9 @@ internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
 
     fun register(rootProject: Project): TaskProvider<MissingIdentifiersAggregatorTask> {
       return rootProject.tasks.register(NAME, MissingIdentifiersAggregatorTask::class.java) {
-        outputFile.set(rootProject.layout.buildDirectory.file("rake/aggregated_missing_identifiers.txt"))
+        outputFile.set(
+          rootProject.layout.buildDirectory.file("rake/aggregated_missing_identifiers.txt")
+        )
       }
     }
   }

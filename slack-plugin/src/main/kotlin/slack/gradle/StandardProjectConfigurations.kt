@@ -195,7 +195,10 @@ internal class StandardProjectConfigurations(
               )
             }
           configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
-          val aggregator = project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(MissingIdentifiersAggregatorTask.NAME)
+          val aggregator =
+            project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
+              MissingIdentifiersAggregatorTask.NAME
+            )
           aggregator.configure {
             inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
           }
