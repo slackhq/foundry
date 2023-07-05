@@ -36,6 +36,13 @@ object ChangelogParser {
    *   entry.
    */
   fun readFile(changeLogString: String, previousEntry: LocalDate? = null): ParseResult {
+
+    // If previousEntry is not null and it equals the latest date in the changelog, return null and
+    // previousEntry
+    if (previousEntry != null && changeLogString.startsWith(previousEntry.toString())) {
+      return ParseResult(null, previousEntry)
+    }
+
     // If previousEntry is not null and it is not contained in changeLogString
     // the function will return the changeLogString and the first date found
     if (previousEntry != null && !changeLogString.contains(previousEntry.toString())) {
@@ -64,14 +71,12 @@ object ChangelogParser {
               // Parse the date
               val localDate = LocalDate.parse(line)
 
-              // If the parsed date equals the previous entry, stop the loop
-              if (localDate == previousEntry) {
-                break
-              }
-
               // If a date was previously encountered, append the block to the final string
               if (previous != null) {
                 append(currentBlock.toString())
+                if (localDate == previousEntry) {
+                  break
+                }
               }
 
               // Reset the current block
