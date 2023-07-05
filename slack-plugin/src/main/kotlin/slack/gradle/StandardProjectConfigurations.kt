@@ -171,6 +171,9 @@ internal class StandardProjectConfigurations(
           val isNoApi = slackProperties.rakeNoApi
           val catalogNames =
             extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
+
+          val catalogs = catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
+
           val rakeDependencies =
             tasks.register<RakeDependencies>("rakeDependencies") {
               // TODO https://github.com/gradle/gradle/issues/25014
@@ -179,11 +182,11 @@ internal class StandardProjectConfigurations(
               identifierMap.setDisallowChanges(
                 project.provider {
                   buildMap {
-                    for (catalogName in catalogNames) {
+                    for (catalog in catalogs) {
                       putAll(
-                        project.getVersionsCatalog(catalogName).identifierMap().mapValues { (_, v)
+                        catalog.identifierMap().mapValues { (_, v)
                           ->
-                          "$catalogName.$v"
+                          "${catalog.name}.$v"
                         }
                       )
                     }
