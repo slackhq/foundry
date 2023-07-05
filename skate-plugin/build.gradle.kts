@@ -33,3 +33,8 @@ tasks {
 
   publishPlugin { token.set(System.getenv("PUBLISH_TOKEN")) }
 }
+
+dependencies {
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
+}
