@@ -183,15 +183,13 @@ internal class StandardProjectConfigurations(
                 project.provider {
                   buildMap {
                     for (catalog in catalogs) {
-                      putAll(
-                        catalog.identifierMap().mapValues { (_, v)
-                          ->
-                          "${catalog.name}.$v"
-                        }
-                      )
+                      putAll(catalog.identifierMap().mapValues { (_, v) -> "${catalog.name}.$v" })
                     }
                   }
                 }
+              )
+              missingIdentifiersFile.set(
+                project.layout.buildDirectory.file("rake/missing_identifiers.txt")
               )
             }
           configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
