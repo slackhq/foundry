@@ -21,6 +21,7 @@ import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
+import com.slack.sgp.intellij.ui.WhatsNewPanelFactory
 import java.util.function.Supplier
 
 interface SkateProjectService {
