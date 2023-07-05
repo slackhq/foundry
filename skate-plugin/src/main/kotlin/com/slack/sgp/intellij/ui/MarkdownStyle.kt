@@ -27,8 +27,8 @@ object MarkdownStyle {
         /* Headings */
         "h1, h2, h3, h4, h5, h6 { margin-top: 20px; margin-bottom: 10px; }",
         "h1 { font-size: 2.5em; font-weight: bold}",
-        "h2 { font-size: 1.5em; font-weight: bold}",
-        "h3 { font-size: 1.17em; }",
+        "h2 { font-size: 2.0em; font-weight: bold}",
+        "h3 { font-size: 1.5em; font-weight: bold}",
         "h4 { font-size: 1.12em; }",
         "h5 { font-size: .83em; }",
         "h6 { font-size: .75em; }",
@@ -37,26 +37,23 @@ object MarkdownStyle {
         "a { color: #0366d6; }",
 
         /* Blockquotes */
-        "blockquote { padding: 0 1em; color: #6a737d; border-left: .25em solid #dfe2e5; }",
+        "blockquote { padding: 0 1em; color: #FFF; background-color: #464140; border-left: .25em solid #dfe2e5; }",
 
         /* Code blocks and inline code */
-        "pre, code { font-family: monospace; }",
-        "pre { padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 6px; }",
+        "pre, code { display: block; background-color: #5A5A5A; font-family: monospace; padding-bottom: 10px; word-warp: normal; overflow: auto; }",
+        "pre { padding: 8px; line-height: 1; margin-bottom: 10px}",
 
-        /* Lists - not rendering properly */
-        "ul li, ol li { margin-left: 2em; }",
+        /* Lists */
+        "ul, ol { list-style-type: disc; padding-left: 15px; margin-bottom: 5px; }",
 
         /* Images */
         "img { max-width: 100%; }",
 
         /*Italics*/
-        "em { font-style: italic; }",
+        "em { font-style: italic; font-size: 1.2em; }",
 
-        /* Tables */
-        "table { border-collapse: collapse; width: 100%; }",
-        "table th, table td { padding: 6px 13px; border: 1px solid #dfe2e5; }",
-        "table th { font-weight: bold; }",
-        "table tr:nth-child(2n) { background-color: #f6f8fa; }",
+        /* Paragraphs */
+        "p { word-wrap: break-word; padding-bottom: 5px; }"
       )
 
     return StyleSheet().apply { rules.forEach { rule -> addRule(rule) } }
