@@ -72,8 +72,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
-  // We don't do ABI dependency cleanup yet, see
-  // https://github.com/tinyspeck/slack-android-ng/issues/20315
   @get:Input
   val modes: SetProperty<AnalysisMode> =
     objects
