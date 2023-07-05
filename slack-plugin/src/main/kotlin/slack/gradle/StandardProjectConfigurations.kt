@@ -161,7 +161,7 @@ internal class StandardProjectConfigurations(
       applyPlatforms(slackProperties.versions.boms, platformProjectPath)
     }
 
-    if (slackProperties.enableAnalysisPlugin && project.path != slackProperties.platformProjectPath) {
+    if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
       val buildFile = project.buildFile
       // This can run on some intermediate middle directories, like `carbonite` in
       // `carbonite:carbonite`
