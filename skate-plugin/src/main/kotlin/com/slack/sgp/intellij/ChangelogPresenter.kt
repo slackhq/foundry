@@ -1,5 +1,7 @@
 package com.slack.sgp.intellij
 
+import java.time.LocalDate
+
 // Define a regular expression that matches a date in "yyyy-mm-dd" format
 private val LOCAL_DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}\$".toRegex()
 
@@ -12,13 +14,24 @@ private val String.isLocalDate: Boolean
 class ChangelogPresenter {
   var haveRead: Boolean = false
   // instead of storing a boolean, store a date of last read
+  var lastRead: LocalDate? = null
 
   fun readFile(changeLogString: String): String? {
-    if (!haveRead) {
-      haveRead = true
-      return changeLogString
+    for (line in changeLogString.lines()) {
+      if (line.isLocalDate) {
+        if (!haveRead) {
+          haveRead = true
+          lastRead = LocalDate.parse(line)
+          return changeLogString
+        }
+        val tempDate = LocalDate.parse(line)
+        if (tempDate == lastRead) {
+          return null
+        }
+        lastRead = LocalDate.parse(line)
+      }
     }
-    return null
+    return "hi"
 
     //    // If previousEntry is not null and it is not contained in changeLogString
     //    // the function will return the changeLogString and the first date found

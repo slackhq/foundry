@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij
 
 import com.google.common.truth.Truth.assertThat
+import java.time.LocalDate
 import org.junit.Test
 
 class ChangeLogPresenterTest {
@@ -54,5 +55,27 @@ class ChangeLogPresenterTest {
 
     assertThat(firstChangeLogString).isEqualTo(input)
     assertThat(secondChangeLogString).isNull()
+  }
+
+  @Test
+  fun `seeing if it can recognize that a date was already read`() {
+    val input =
+      """
+      2023-06-28
+
+      * Bug fixes
+      * New features
+      """
+        .trimIndent()
+
+    val changeLogPresenter = ChangelogPresenter()
+
+    val firstReadDate = changeLogPresenter.readFile(input)
+    val secondReadDate = changeLogPresenter.readFile(input)
+    val expectedFirstReadDate = LocalDate.of(2023, 6, 28).toString()
+    val expectedSecondReadDate = "same"
+
+    assertThat(firstReadDate).isEqualTo(expectedFirstReadDate)
+    assertThat(secondReadDate).isEqualTo(expectedSecondReadDate)
   }
 }
