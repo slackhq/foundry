@@ -37,9 +37,4 @@ tasks {
 dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-  implementation("com.vladsch.flexmark:flexmark-all:0.64.8")
-}
-java {
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
 }

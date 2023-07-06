@@ -25,6 +25,9 @@ import com.autonomousapps.model.ModuleCoordinates
 import com.autonomousapps.model.ProjectCoordinates
 import java.io.File
 import javax.inject.Inject
+import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -33,9 +36,13 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.convertProjectPathToAccessor
 
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
@@ -72,8 +79,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
-  // We don't do ABI dependency cleanup yet, see
-  // https://github.com/tinyspeck/slack-android-ng/issues/20315
   @get:Input
   val modes: SetProperty<AnalysisMode> =
     objects
@@ -95,19 +100,31 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
   @get:Input abstract val noApi: Property<Boolean>
 
+  @get:OutputFile abstract val missingIdentifiersFile: RegularFileProperty
+
   init {
     group = "rake"
   }
 
   @TaskAction
   fun rake() {
+    if (identifierMap.get().isEmpty()) {
+      logger.warn("No identifier map found. Skipping rake.")
+      return
+    }
     val noApi = noApi.get()
     val projectAdvice = projectAdvice()
     val redundantPlugins = projectAdvice.pluginAdvice
     val advices: Set<Advice> = projectAdvice.dependencyAdvice
     val buildFile = buildFileProperty.asFile.get()
+    val missingIdentifiers = mutableSetOf<String>()
     logger.lifecycle("🌲 Raking $buildFile ")
-    rakeProject(buildFile, advices, redundantPlugins, noApi)
+    rakeProject(buildFile, advices, redundantPlugins, noApi, missingIdentifiers)
+    val identifiersFile = missingIdentifiersFile.asFile.get()
+    if (missingIdentifiers.isNotEmpty()) {
+      logger.lifecycle("⚠️ Missing identifiers found, written to $identifiersFile")
+    }
+    identifiersFile.writeText(missingIdentifiers.sorted().joinToString("\n"))
   }
 
   @Suppress("LongMethod", "ComplexMethod")
@@ -115,7 +132,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     buildFile: File,
     advices: Set<Advice>,
     redundantPlugins: Set<PluginAdvice>,
-    noApi: Boolean
+    noApi: Boolean,
+    missingIdentifiers: MutableSet<String>,
   ) {
     val resolvedModes = modes.get()
     val abiModeEnabled = AnalysisMode.ABI in resolvedModes
@@ -125,7 +143,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
         advices
           .filter { it.isRemove() }
           .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.toDependencyString("UNUSED") }
+          .associateBy { it.toDependencyString("UNUSED", missingIdentifiers) }
       } else {
         emptyMap()
       }
@@ -135,7 +153,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
         advices
           .filter { it.isRemove() }
           .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.toDependencyString("MISUSED") }
+          .associateBy { it.toDependencyString("MISUSED", missingIdentifiers) }
       } else {
         emptyMap()
       }
@@ -147,7 +165,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
         advices
           .filter { it.isChange() }
           .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.toDependencyString("CHANGE") }
+          .associateBy { it.toDependencyString("CHANGE", missingIdentifiers) }
       } else {
         emptyMap()
       }
@@ -167,7 +185,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
       if (AnalysisMode.COMPILE_ONLY in resolvedModes) {
         advices
           .filter { it.isCompileOnly() }
-          .associateBy { it.toDependencyString("ADD-COMPILE-ONLY") }
+          .associateBy { it.toDependencyString("ADD-COMPILE-ONLY", missingIdentifiers) }
       } else {
         emptyMap()
       }
@@ -196,7 +214,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               // Emit any remaining new dependencies to add
               depsToAdd.entries
                 .mapNotNull { (_, advice) ->
-                  advice.coordinates.toDependencyNotation("ADD-NEW")?.let { newNotation ->
+                  advice.coordinates.toDependencyNotation("ADD-NEW", missingIdentifiers)?.let {
+                    newNotation ->
                     var newConfiguration = advice.toConfiguration!!
                     if (noApi && newConfiguration == "api") {
                       newConfiguration = "implementation"
@@ -238,7 +257,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
                 .filter { it.isAdd() }
                 .mapNotNull { depsToAdd.remove(it.coordinates.identifier) }
                 .mapNotNull { advice ->
-                  advice.coordinates.toDependencyNotation("ADD")?.let { newNotation ->
+                  advice.coordinates.toDependencyNotation("ADD", missingIdentifiers)?.let {
+                    newNotation ->
                     val newConfiguration =
                       if (!abiModeEnabled) {
                         "implementation"
@@ -262,7 +282,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
                 if (depsToChange.keys.any { it in line }) depsToChange else compileOnlyDeps
               val (_, abiDep) =
                 which.entries.first { (_, v) ->
-                  v.coordinates.toDependencyNotation("ABI")?.let { it in line } ?: false
+                  v.coordinates.toDependencyNotation("ABI", missingIdentifiers)?.let { it in line }
+                    ?: false
                 }
               val oldConfiguration = abiDep.fromConfiguration!!
               var newConfiguration = abiDep.toConfiguration!!
@@ -305,7 +326,10 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   }
 
   /** Remaps a given [Coordinates] to a known toml lib reference or error if [error] is true. */
-  private fun Coordinates.mapIdentifier(context: String): Coordinates? {
+  private fun Coordinates.mapIdentifier(
+    context: String,
+    missingIdentifiers: MutableSet<String>
+  ): Coordinates? {
     return when (this) {
       is ModuleCoordinates -> {
         val preferredIdentifier = PREFERRED_BUNDLE_IDENTIFIERS.getOrDefault(identifier, identifier)
@@ -313,6 +337,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
           identifierMap.get()[preferredIdentifier]
             ?: run {
               logger.lifecycle("($context) Unknown identifier: $identifier")
+              missingIdentifiers += identifier
               return null
             }
         ModuleCoordinates(newIdentifier, resolvedVersion, gradleVariantIdentification)
@@ -323,14 +348,20 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     }
   }
 
-  private fun Advice.toDependencyString(context: String): String {
-    return "${fromConfiguration ?: error("Transitive dep $this")}(${coordinates.toDependencyNotation(context)})"
+  private fun Advice.toDependencyString(
+    context: String,
+    missingIdentifiers: MutableSet<String>
+  ): String {
+    return "${fromConfiguration ?: error("Transitive dep $this")}(${coordinates.toDependencyNotation(context, missingIdentifiers)})"
   }
 
-  private fun Coordinates.toDependencyNotation(context: String): String? {
+  private fun Coordinates.toDependencyNotation(
+    context: String,
+    missingIdentifiers: MutableSet<String>
+  ): String? {
     return when (this) {
       is ProjectCoordinates -> "projects.${convertProjectPathToAccessor(identifier)}"
-      is ModuleCoordinates -> mapIdentifier(context)?.identifier
+      is ModuleCoordinates -> mapIdentifier(context, missingIdentifiers)?.identifier
       is FlatCoordinates -> gav()
       is IncludedBuildCoordinates -> gav()
     }
@@ -377,4 +408,39 @@ private fun List<String>.cleanLineFormatting(): List<String> {
 private fun List<String>.padNewline(): List<String> {
   val noEmpties = dropLastWhile { it.isBlank() }
   return noEmpties + ""
+}
+
+@UntrackedTask(because = "Dependency Rake tasks modify build files")
+internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  abstract val inputFiles: ConfigurableFileCollection
+
+  @get:OutputFile abstract val outputFile: RegularFileProperty
+
+  init {
+    group = "rake"
+    description = "Aggregates missing identifiers from all upstream dependency rake tasks."
+  }
+
+  @TaskAction
+  fun aggregate() {
+    val aggregated = inputFiles.flatMap { it.readLines() }.toSortedSet()
+
+    val output = outputFile.asFile.get()
+    logger.lifecycle("Writing aggregated missing identifiers to $output")
+    output.writeText(aggregated.joinToString("\n"))
+  }
+
+  companion object {
+    const val NAME = "aggregateMissingIdentifiers"
+
+    fun register(rootProject: Project): TaskProvider<MissingIdentifiersAggregatorTask> {
+      return rootProject.tasks.register(NAME, MissingIdentifiersAggregatorTask::class.java) {
+        outputFile.set(
+          rootProject.layout.buildDirectory.file("rake/aggregated_missing_identifiers.txt")
+        )
+      }
+    }
+  }
 }

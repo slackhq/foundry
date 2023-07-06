@@ -123,4 +123,45 @@ class ChangeLogParserTest {
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
+  @Test
+  fun `multiple entries, previous entry matches but not the latest`() {
+    val input =
+      """
+        2023-06-30
+
+        * Even more bug fixes
+
+        2023-06-29
+
+        * More bug fixes
+
+        2023-06-28
+
+        * Bug fixes
+        * New features
+
+        2023-06-27
+
+        * Other changes
+        """
+        .trimIndent()
+
+    val expectedDate = LocalDate.of(2023, 6, 30)
+    val expectedString =
+      """
+        2023-06-30
+
+        * Even more bug fixes
+
+        2023-06-29
+
+        * More bug fixes
+        """
+        .trimIndent()
+
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 28))
+
+    assertThat(changeLogString).isEqualTo(expectedString)
+    assertThat(latestEntry).isEqualTo(expectedDate)
+  }
 }
