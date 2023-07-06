@@ -123,6 +123,7 @@ class ChangeLogParserTest {
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
+
   @Test
   fun `multiple entries, previous entry matches but not the latest`() {
     val input =
