@@ -35,3 +35,21 @@ that we currently do not do.
 ## Implementation
 
 The core implementation of DR lives in `DependencyRake.kt`.
+
+## Usage
+
+To run dependency rake in a project, use the below command
+
+```bash
+$ ./gradlew rakeDependencies -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache
+```
+
+This will run all `rakeDependencies` tasks in the project. This task exists on all subprojects as well, but it 
+works best if all are run together.
+
+Sometimes dependency rake will try to replace identifiers with ones that are not present in any available
+version catalogs. Sometimes this is acceptable, but often times it can result in "missing" dependencies from 
+the build after it runs. To help fix these, DR will write all missing identifiers out to a build output file.
+
+For convenience, you can also run `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+to run all dependency rake tasks and aggregate these missing identifiers into a root project build output file.

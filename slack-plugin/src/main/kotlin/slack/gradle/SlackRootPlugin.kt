@@ -28,6 +28,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.jvm.toolchain.JvmVendorSpec
 import slack.cli.AppleSiliconCompat
+import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.lint.DetektTasks
@@ -219,6 +220,10 @@ internal class SlackRootPlugin : Plugin<Project> {
     // Dependency analysis plugin for build health
     // Usage: ./gradlew clean buildHealth
     project.pluginManager.withPlugin("com.autonomousapps.dependency-analysis") {
+      // Register the missing identifiers aggregator
+      if (slackProperties.enableAnalysisPlugin) {
+        MissingIdentifiersAggregatorTask.register(project)
+      }
       project.configure<DependencyAnalysisExtension> {
         issues { all { onAny { ignoreKtx(true) } } }
         abi {
