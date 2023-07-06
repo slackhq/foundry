@@ -57,6 +57,8 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.utils.named
+import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
@@ -160,7 +162,7 @@ internal class StandardProjectConfigurations(
       applyPlatforms(slackProperties.versions.boms, platformProjectPath)
     }
 
-    if (slackProperties.enableAnalysisPlugin) {
+    if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
       val buildFile = project.buildFile
       // This can run on some intermediate middle directories, like `carbonite` in
       // `carbonite:carbonite`
@@ -170,6 +172,9 @@ internal class StandardProjectConfigurations(
           val isNoApi = slackProperties.rakeNoApi
           val catalogNames =
             extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
+
+          val catalogs = catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
+
           val rakeDependencies =
             tasks.register<RakeDependencies>("rakeDependencies") {
               // TODO https://github.com/gradle/gradle/issues/25014
@@ -178,19 +183,24 @@ internal class StandardProjectConfigurations(
               identifierMap.setDisallowChanges(
                 project.provider {
                   buildMap {
-                    for (catalogName in catalogNames) {
-                      putAll(
-                        project.getVersionsCatalog(catalogName).identifierMap().mapValues { (_, v)
-                          ->
-                          "$catalogName.$v"
-                        }
-                      )
+                    for (catalog in catalogs) {
+                      putAll(catalog.identifierMap().mapValues { (_, v) -> "${catalog.name}.$v" })
                     }
                   }
                 }
               )
+              missingIdentifiersFile.set(
+                project.layout.buildDirectory.file("rake/missing_identifiers.txt")
+              )
             }
           configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
+          val aggregator =
+            project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
+              MissingIdentifiersAggregatorTask.NAME
+            )
+          aggregator.configure {
+            inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
+          }
         }
       }
     }
