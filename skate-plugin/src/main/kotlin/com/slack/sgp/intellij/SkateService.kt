@@ -18,20 +18,25 @@ package com.slack.sgp.intellij
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
+import com.slack.sgp.intellij.ui.WhatsNewPanelFactory
 import java.util.function.Supplier
 
 interface SkateProjectService {
   fun showWhatsNewWindow()
 }
 
+/**
+ * This file's intended purpose is to pass in the changelog file from the file path into the What's
+ * New UI of the Skate Plugin
+ */
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override fun showWhatsNewWindow() {
     // TODO
-    //  Make the file configurable?
     //  Only show when changed
     //  Only show latest changes
     val settings = project.service<SkatePluginSettings>()
@@ -40,13 +45,21 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     val changeLogFile = VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return
     val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
+
     toolWindowManager.invokeLater {
       val toolWindow =
         toolWindowManager.registerToolWindow("skate-whats-new") {
           stripeTitle = Supplier { "What's New in Slack!" }
           anchor = ToolWindowAnchor.RIGHT
         }
-      WhatsNewPanelFactory().createToolWindowContent(toolWindow, changeLogString)
+
+      // The Disposable is necessary to prevent a substantial memory leak while working with
+      // MarkdownJCEFHtmlPanel
+      val parentDisposable = Disposer.newDisposable()
+
+      WhatsNewPanelFactory()
+        .createToolWindowContent(toolWindow, project, changeLogString, parentDisposable)
+
       toolWindow.show()
     }
   }
