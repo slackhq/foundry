@@ -101,7 +101,6 @@ object ChangelogParser {
           }
         }
         .trimEnd()
-
     // If the changelog substring is blank, set it as null
     // If the previous entry equals to the latest entry, or if no date is found,
     // use the previous entry date as the latest date instead of the current date.
