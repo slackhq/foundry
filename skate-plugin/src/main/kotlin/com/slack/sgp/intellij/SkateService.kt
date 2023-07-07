@@ -45,6 +45,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     val changeLogFile = VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return
     val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
+
     toolWindowManager.invokeLater {
       val toolWindow =
         toolWindowManager.registerToolWindow("skate-whats-new") {
@@ -58,6 +59,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
 
       WhatsNewPanelFactory()
         .createToolWindowContent(toolWindow, project, changeLogString, parentDisposable)
+
       toolWindow.show()
     }
   }

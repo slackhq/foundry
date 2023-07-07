@@ -23,6 +23,8 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
+import com.intellij.ui.content.ContentManagerEvent
+import com.intellij.ui.content.ContentManagerListener
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -49,6 +51,16 @@ class WhatsNewPanelFactory : DumbAware {
     val content =
       ContentFactory.getInstance().createContent(toolWindowContent.contentPanel, "", false)
     toolWindow.contentManager.addContent(content)
+    toolWindow.contentManager.addContentManagerListener(
+      object : ContentManagerListener {
+        override fun contentRemoved(event: ContentManagerEvent) {
+          if (event.content.component == toolWindowContent.contentPanel) {
+            Disposer.dispose(parentDisposable)
+            toolWindow.contentManager.removeContentManagerListener(this)
+          }
+        }
+      }
+    )
   }
 
   private class WhatsNewPanelContent(
@@ -70,7 +82,12 @@ class WhatsNewPanelFactory : DumbAware {
       @Language("Markdown") markdownFileString: String,
       parentDisposable: Disposable
     ): JComponent {
+      // to take in the parsed Changelog:
+      // val parsedChangelog = ChangelogParser.readFile(markdownFileString)
+      // then, pass in parsedChangelog instead of markdownFileString
+
       val file = LightVirtualFile("changelog.md", markdownFileString)
+
       val panel = MarkdownJCEFHtmlPanel(project, file)
       Disposer.register(parentDisposable, panel)
       val html = runReadAction {
