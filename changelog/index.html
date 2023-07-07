@@ -379,6 +379,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0917" class="md-nav__link">
+    0.9.17
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0916" class="md-nav__link">
     0.9.16
   </a>
@@ -968,6 +975,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0917" class="md-nav__link">
+    0.9.17
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0916" class="md-nav__link">
     0.9.16
   </a>
@@ -1496,6 +1510,15 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h2 id="0917">0.9.17<a class="headerlink" href="#0917" title="Permanent link">&para;</a></h2>
+<p><em>2023-07-07</em></p>
+<ul>
+<li>Don&rsquo;t register <code>RakeDependencies</code> task on platform projects.</li>
+<li>Fix configuration cache for Dependency Rake. Note that DAGP doesn&rsquo;t yet support it.</li>
+<li>Add Dependency Rake usage to its doc.</li>
+<li>Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.</li>
+<li><code>./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache</code></li>
+</ul>
 <h2 id="0916">0.9.16<a class="headerlink" href="#0916" title="Permanent link">&para;</a></h2>
 <p><em>2023-06-30</em></p>
 <ul>

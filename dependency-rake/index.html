@@ -324,6 +324,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -499,6 +506,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -551,6 +565,17 @@ out of date. Most developers do not keep up with these changes over time, so aut
 that we currently do not do.</p>
 <h2 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h2>
 <p>The core implementation of DR lives in <code>DependencyRake.kt</code>.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<p>To run dependency rake in a project, use the below command</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>./gradlew<span class="w"> </span>rakeDependencies<span class="w"> </span>-Pslack.gradle.config.enableAnalysisPlugin<span class="o">=</span><span class="nb">true</span><span class="w"> </span>--no-configuration-cache
+</code></pre></div>
+<p>This will run all <code>rakeDependencies</code> tasks in the project. This task exists on all subprojects as well, but it 
+works best if all are run together.</p>
+<p>Sometimes dependency rake will try to replace identifiers with ones that are not present in any available
+version catalogs. Sometimes this is acceptable, but often times it can result in &ldquo;missing&rdquo; dependencies from 
+the build after it runs. To help fix these, DR will write all missing identifiers out to a build output file.</p>
+<p>For convenience, you can also run <code>./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache</code>
+to run all dependency rake tasks and aggregate these missing identifiers into a root project build output file.</p>
 
 
 
