@@ -26,6 +26,10 @@ import com.slack.sgp.intellij.SkateBundle
 import com.slack.sgp.intellij.SkatePluginSettings
 import java.io.File
 
+/**
+ * This class represents the UI display of the Skate Plugin Settings. Right now, it allows users to
+ * choose a .md file and check if the panel should be displayed or not.
+ */
 internal class SkateConfigUI(
   private val settings: SkatePluginSettings,
   private val project: Project,
