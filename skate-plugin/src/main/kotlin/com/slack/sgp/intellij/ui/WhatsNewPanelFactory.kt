@@ -61,18 +61,15 @@ class WhatsNewPanelFactory : DumbAware {
     val contentPanel: JPanel =
       JPanel().apply {
         layout = BorderLayout(0, 20)
-        add(createControlsPanel(project, markdownFileString, parentDisposable), BorderLayout.CENTER)
+        add(createWhatsNewPanel(project, markdownFileString, parentDisposable), BorderLayout.CENTER)
       }
 
     // Control Panel that takes in the current project, markdown string, and a Disposable.
-    // The Disposable is necessary to prevent a substantial memory leak while working with
-    // MarkdownJCEFHtmlPanel
-    private fun createControlsPanel(
+    private fun createWhatsNewPanel(
       project: Project,
       @Language("Markdown") markdownFileString: String,
       parentDisposable: Disposable
     ): JComponent {
-      println(markdownFileString)
       val file = LightVirtualFile("changelog.md", markdownFileString)
       val panel = MarkdownJCEFHtmlPanel(project, file)
       Disposer.register(parentDisposable, panel)

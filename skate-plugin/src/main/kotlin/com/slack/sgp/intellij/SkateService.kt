@@ -52,7 +52,9 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
           anchor = ToolWindowAnchor.RIGHT
         }
 
-      val parentDisposable = Disposer.newDisposable() // Creating a new Disposable
+      // The Disposable is necessary to prevent a substantial memory leak while working with
+      // MarkdownJCEFHtmlPanel
+      val parentDisposable = Disposer.newDisposable()
 
       WhatsNewPanelFactory()
         .createToolWindowContent(toolWindow, project, changeLogString, parentDisposable)
