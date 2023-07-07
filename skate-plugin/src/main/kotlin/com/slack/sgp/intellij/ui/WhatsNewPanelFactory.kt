@@ -30,6 +30,11 @@ import org.intellij.lang.annotations.Language
 import org.intellij.plugins.markdown.ui.preview.html.MarkdownUtil
 import org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel
 
+/**
+ * The WhatsNewPanelFactory class takes the markdown file string from SkateService and displays it
+ * in a tool window. It uses MarkdownJCEFHtmlPanel and has dependency on intellij markdown plugin to
+ * properly format the markdown file and its contents
+ */
 class WhatsNewPanelFactory : DumbAware {
 
   // Function that creates the tool window
@@ -59,6 +64,9 @@ class WhatsNewPanelFactory : DumbAware {
         add(createControlsPanel(project, markdownFileString, parentDisposable), BorderLayout.CENTER)
       }
 
+    // Control Panel that takes in the current project, markdown string, and a Disposable.
+    // The Disposable is necessary to prevent a substantial memory leak while working with
+    // MarkdownJCEFHtmlPanel
     private fun createControlsPanel(
       project: Project,
       @Language("Markdown") markdownFileString: String,
