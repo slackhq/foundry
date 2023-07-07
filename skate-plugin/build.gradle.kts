@@ -16,7 +16,7 @@ intellij {
   version.set("2022.2.5")
   type.set("IC") // Target IDE Platform
 
-  plugins.set(listOf("org.intellij.plugins.markdown"))
+  plugins.add("org.intellij.plugins.markdown")
 }
 
 tasks {
