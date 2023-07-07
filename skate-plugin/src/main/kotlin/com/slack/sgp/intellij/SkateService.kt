@@ -18,6 +18,7 @@ package com.slack.sgp.intellij
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
@@ -28,6 +29,10 @@ interface SkateProjectService {
   fun showWhatsNewWindow()
 }
 
+/**
+ * This file's intended purpose is to pass in the changelog file from the file path into the What's
+ * New UI of the Skate Plugin
+ */
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override fun showWhatsNewWindow() {
@@ -38,7 +43,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     if (!settings.isWhatsNewEnabled) return
     val projectDir = project.guessProjectDir() ?: return
     val changeLogFile = VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return
-    //    val changeLogString = VfsUtil.loadText(changeLogFile)
+    val changeLogString = VfsUtil.loadText(changeLogFile)
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater {
       val toolWindow =
@@ -46,7 +51,11 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
           stripeTitle = Supplier { "What's New in Slack!" }
           anchor = ToolWindowAnchor.RIGHT
         }
-      WhatsNewPanelFactory().createToolWindowContent(toolWindow, changeLogFile)
+
+      val parentDisposable = Disposer.newDisposable() // Creating a new Disposable
+
+      WhatsNewPanelFactory()
+        .createToolWindowContent(toolWindow, project, changeLogString, parentDisposable)
       toolWindow.show()
     }
   }

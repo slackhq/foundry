@@ -15,83 +15,65 @@
  */
 package com.slack.sgp.intellij.ui
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
-import com.vladsch.flexmark.html.HtmlRenderer
-import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.util.data.MutableDataSet
 import java.awt.BorderLayout
-import java.awt.Color
-import javax.swing.BorderFactory
-import javax.swing.JEditorPane
+import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.ScrollPaneConstants
-import javax.swing.text.html.HTMLEditorKit
+import org.intellij.lang.annotations.Language
+import org.intellij.plugins.markdown.ui.preview.html.MarkdownUtil
+import org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel
 
 class WhatsNewPanelFactory : DumbAware {
-  fun createToolWindowContent(toolWindow: ToolWindow, markdownFile: VirtualFile) {
-    val toolWindowContent = WhatsNewPanelContent(markdownFile)
+
+  // Function that creates the tool window
+  fun createToolWindowContent(
+    toolWindow: ToolWindow,
+    project: Project,
+    markdownFileString: String,
+    parentDisposable: Disposable
+  ) {
+
+    val toolWindowContent = WhatsNewPanelContent(project, markdownFileString, parentDisposable)
     val content =
       ContentFactory.getInstance().createContent(toolWindowContent.contentPanel, "", false)
     toolWindow.contentManager.addContent(content)
   }
 
-  private class WhatsNewPanelContent(markdownFile: VirtualFile) {
+  private class WhatsNewPanelContent(
+    project: Project,
+    @Language("Markdown") markdownFileString: String,
+    parentDisposable: Disposable
+  ) {
 
+    // Actual panel box for What's New at Slack
     val contentPanel: JPanel =
       JPanel().apply {
         layout = BorderLayout(0, 20)
-        border = BorderFactory.createEmptyBorder(40, 0, 0, 0)
-        add(createControlsPanel(markdownFile), BorderLayout.CENTER)
+        add(createControlsPanel(project, markdownFileString, parentDisposable), BorderLayout.CENTER)
       }
 
-    private fun createControlsPanel(markdownFile: VirtualFile): JPanel {
-      val options = MutableDataSet()
-      val parser = Parser.builder(options).build()
-      val renderer = HtmlRenderer.builder(options).build()
-
-      val markdownContent = String(markdownFile.contentsToByteArray(), Charsets.UTF_8)
-      val document = parser.parse(markdownContent)
-
-      val htmlContent = renderer.render(document)
-      println(htmlContent)
-      return JPanel().apply {
-        layout = BorderLayout()
-        val markdownDisplay =
-          JEditorPane("text/html", htmlContent).apply {
-            isEditable = false
-            background = Color(0x333333) // set to a dark color
-            contentType = "text/html"
-          }
-
-        val htmlEditorKit = HTMLEditorKit()
-        htmlEditorKit.styleSheet = MarkdownStyle.createStyleSheet()
-        markdownDisplay.editorKit = htmlEditorKit
-
-        markdownDisplay.text = htmlContent
-        val scrollPane =
-          JScrollPane(markdownDisplay).apply {
-            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-          }
-        add(scrollPane, BorderLayout.CENTER)
-
-        print(htmlContent)
-
-        //        val hideToolWindowButton = JButton("Hide")
-        //        hideToolWindowButton.addActionListener { toolWindow.hide(null) }
-        //        add(hideToolWindowButton, BorderLayout.PAGE_END)
-        //        val markdownDisplay = JEditorPane("text/html", htmlContent).apply { isEditable =
-        // false }
-        //        val scrollPane = JScrollPane(markdownDisplay)
-        //        add(scrollPane, BorderLayout.CENTER)
-        //
-        //        val hideToolWindowButton = JButton("Hide")
-        //        hideToolWindowButton.addActionListener { toolWindow.hide(null) }
-        //        add(hideToolWindowButton, BorderLayout.PAGE_END)
+    private fun createControlsPanel(
+      project: Project,
+      @Language("Markdown") markdownFileString: String,
+      parentDisposable: Disposable
+    ): JComponent {
+      println(markdownFileString)
+      val file = LightVirtualFile("changelog.md", markdownFileString)
+      val panel = MarkdownJCEFHtmlPanel(project, file)
+      Disposer.register(parentDisposable, panel)
+      val html = runReadAction {
+        MarkdownUtil.generateMarkdownHtml(file, markdownFileString, project)
       }
+
+      panel.setHtml(html, 0)
+      return panel.component
     }
   }
 }
