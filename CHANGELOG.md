@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.9.17
+------
+
+_2023-07-07_
+
+- Don't register `RakeDependencies` task on platform projects.
+- Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+- Add Dependency Rake usage to its doc.
+- Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+  - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+
 0.9.16
 ------
 
