@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.slack.sgp.intellij
 
+import LocalDateConverter
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
@@ -44,7 +46,7 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
    *   entry.
    */
   data class State(
-    @OptionTag(converter = LocalDateTimeConverter::class) var latestEntry: LocalDate? = null
+    @OptionTag(converter = LocalDateConverter::class) var latestEntry: LocalDate? = null
   )
 
   private var myState = State()
