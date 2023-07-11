@@ -15,7 +15,14 @@
  */
 package com.slack.sgp.intellij
 
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
+import com.intellij.util.xmlb.XmlSerializerUtil
+import com.intellij.util.xmlb.annotations.OptionTag
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 // Define a regular expression that matches a date in "yyyy-mm-dd" format
 private val LOCAL_DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}\$".toRegex()
@@ -26,7 +33,9 @@ private val String.isLocalDate: Boolean
     return LOCAL_DATE_REGEX.matches(this)
   }
 
-object ChangelogParser {
+@State(name = "ChangelogParser", storages = [Storage("ChangelogParser.xml")])
+@Service(Service.Level.PROJECT)
+class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
   /**
    * Function to parse a changelog and filter it based on a provided previous date entry.
    *
@@ -35,7 +44,23 @@ object ChangelogParser {
    * @return A ParseResult object containing the filtered changelog and the date of the latest
    *   entry.
    */
+  data class State(
+    @OptionTag(converter = LocalDateTimeConverter::class)
+    var latestEntry: LocalDateTime = LocalDateTime.now()
+  )
+
+  private var myState = State()
+
+  override fun getState(): State? {
+    return myState
+  }
+
+  override fun loadState(state: State) {
+    XmlSerializerUtil.copyBean(state, myState)
+  }
+
   fun readFile(changeLogString: String, previousEntry: LocalDate? = null): ParseResult {
+    // TODO: remove previous entry as a parameter
 
     // If previousEntry is not null and it equals the latest date in the changelog, return null and
     // previousEntry
