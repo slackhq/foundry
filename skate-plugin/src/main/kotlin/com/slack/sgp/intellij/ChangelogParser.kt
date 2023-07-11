@@ -49,7 +49,7 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
 
   private var myState = State()
 
-  override fun getState(): State? {
+  override fun getState(): State {
     return myState
   }
 
