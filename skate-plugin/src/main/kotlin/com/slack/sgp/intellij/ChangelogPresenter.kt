@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.slack.sgp.intellij
 
 import LocalDateConverter
@@ -20,6 +35,13 @@ private val String.isLocalDate: Boolean
     return LOCAL_DATE_REGEX.matches(this)
   }
 
+private val VERSION_PATTERN_REGEX = "\\d+\\.\\d+\\.\\d+".toRegex()
+
+private val String.startsNewBlock: Boolean
+  get() {
+    return VERSION_PATTERN_REGEX.matches(this.trim())
+  }
+
 @State(name = "ChangelogPresenter", storages = [Storage("ChangelogPresenter.xml")])
 @Service(Service.Level.PROJECT)
 class ChangelogPresenter :
@@ -33,11 +55,10 @@ class ChangelogPresenter :
   override fun getState(): State {
     return myState
   }
+
   override fun loadState(state: State) {
     XmlSerializerUtil.copyBean(state, myState)
   }
-  // instead of storing a boolean, store a date of last read
-  var lastRead: LocalDate? = null
 
   fun readFile(changeLogString: String): PresentedChangelog? {
 
@@ -59,36 +80,48 @@ class ChangelogPresenter :
       return PresentedChangelog(changeLogString)
     }
 
-    var entryCount = 0
-
     // if the previous entry does not match the latest entry:
     val changeLogSubstring =
       buildString {
           var currentBlock = StringBuilder()
-          for (line in changeLogString.lines()) {
-            if (line.isLocalDate) {
-              val localDate = localDateConverter.fromString(line)
+          var blockDate: LocalDate? = null
+          var inHeader = true
+          var firstNewDate: LocalDate? = null
 
-              // if a date was previously encountered, append the block to the final string:
-              if (myState.lastReadDate != null) {
-                if (localDate == myState.lastReadDate) {
+          for (line in changeLogString.lines()) {
+            when {
+              line.isLocalDate -> {
+                val localDate = localDateConverter.fromString(line)
+                if (localDate!! > myState.lastReadDate!!) {
+                  blockDate = localDate
+                  currentBlock.appendLine(line)
+                  if (firstNewDate == null) {
+                    firstNewDate = localDate
+                  }
+                } else {
                   break
                 }
-                if (entryCount == 0) {
-                  append(currentBlock.toString())
-                }
               }
-              entryCount++
-              currentBlock = StringBuilder()
-              currentBlock.appendLine(line)
-            } else {
-              currentBlock.appendLine(line)
+              line.startsNewBlock -> {
+                if (!inHeader) {
+                  // Append the current block to the final string if the block's date is newer than
+                  // the last read date
+                  if (blockDate != null && currentBlock.isNotBlank()) {
+                    append(currentBlock.toString())
+                    currentBlock = StringBuilder()
+                  }
+                }
+                inHeader = false
+                currentBlock.appendLine(line)
+              }
+              else -> {
+                currentBlock.appendLine(line)
+              }
             }
           }
-
-          append(currentBlock.toString())
+          myState.lastReadDate = firstNewDate // update myState.lastReadDate here
         }
-        .trimEnd()
+        .trim()
 
     return PresentedChangelog(changeLogSubstring)
   }
