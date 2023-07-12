@@ -170,6 +170,11 @@ internal class StandardProjectConfigurations(
       if (buildFile.exists()) {
         // Configure rake
         plugins.withId("com.autonomousapps.dependency-analysis") {
+          if (project.pluginManager.hasPlugin("com.android.test")) {
+            // Not supported yet in DAGP
+            // https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
+            return@withId
+          }
           val isNoApi = slackProperties.rakeNoApi
           val catalogNames =
             extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
