@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.9.18
+------
+
+_2023-07-12_
+
+- Fix: Differentiate unit and instrumentation tests in Skippy. Now changing a unit test will not cause the instrumentation tests to be marked as affected.
+- Add `slack.dependencyrake.dryRun` gradle property flag for dependency rake to enable dry-run. If enabled, the project build files will not be modified and a separate `new-build.gradle.kts` file will be written to instead.
+- Update Okio to `3.4.0`.
+
 0.9.17
 ------
 
