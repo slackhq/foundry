@@ -91,7 +91,7 @@ class WhatsNewPanelFactory : DumbAware {
       val parsedChangelog =
         ChangelogParser.readFile(markdownFileString, changelogJournal.lastReadDate)
 
-      changelogJournal.lastReadDate = parsedChangelog.latestEntry
+      changelogJournal.lastReadDate = parsedChangelog.lastReadDate
 
       // then, pass in parsedChangelog instead of markdownFileString
       val file = LightVirtualFile("changelog.md", parsedChangelog.changeLogString ?: "")
