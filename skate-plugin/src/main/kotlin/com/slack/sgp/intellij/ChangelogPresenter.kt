@@ -119,7 +119,9 @@ class ChangelogPresenter :
               }
             }
           }
-          myState.lastReadDate = firstNewDate // update myState.lastReadDate here
+          if (firstNewDate != null) {
+            myState.lastReadDate = firstNewDate
+          }
         }
         .trim()
 
