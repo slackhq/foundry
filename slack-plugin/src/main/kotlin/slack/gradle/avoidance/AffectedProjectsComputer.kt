@@ -178,8 +178,10 @@ internal class AffectedProjectsComputer(
         .sortedBy { it.key }
         .joinToString("\n") { (_, v) ->
           val testOnlyString = if (v.onlyTestsAreChanged) " (tests only)" else ""
+          val androidTestOnlyString =
+            if (v.onlyAndroidTestsAreChanged) " (androidTest only)" else ""
           val lintBaselineOnly = if (v.onlyLintBaselineChanged) " (lint-baseline.xml only)" else ""
-          "${v.gradlePath}$testOnlyString$lintBaselineOnly\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
+          "${v.gradlePath}$testOnlyString$androidTestOnlyString$lintBaselineOnly\n${v.changedPaths.sorted().joinToString("\n") { "-- $it" } }"
         }
     }
 
@@ -258,7 +260,11 @@ internal class AffectedProjectsComputer(
         .toSortedSet()
 
     val affectedAndroidTestProjects =
-      allAffectedProjects.filter { it in androidTestProjects }.toSortedSet()
+      allAffectedProjects
+        .filter { it in androidTestProjects }
+        // If a project is affected but only unit tests are changed, nothing to do here
+        .filterNot { changedProjects[it]?.onlyTestsAreChanged == true }
+        .toSortedSet()
     return AffectedProjectsResult(
       allAffectedProjects,
       allRequiredProjects,
@@ -438,12 +444,20 @@ private data class ChangedProject(
   val gradlePath: String,
   val changedPaths: Set<Path>,
 ) {
+  val testPaths: Set<Path> = changedPaths.filterTo(mutableSetOf(), testPathMatcher::matches)
   /**
    * Returns true if all changed files are in a test directory and therefore do not carry-over to
    * downstream dependents.
    */
-  val testPaths: Set<Path> = changedPaths.filterTo(mutableSetOf(), testPathMatcher::matches)
   val onlyTestsAreChanged = testPaths.size == changedPaths.size
+
+  val androidTestPaths: Set<Path> =
+    changedPaths.filterTo(mutableSetOf(), androidTestPathMatcher::matches)
+  /**
+   * Returns true if all changed files are in an androidTest directory and therefore do not
+   * carry-over to downstream dependents but *do* affect app-level instrumentation tests.
+   */
+  val onlyAndroidTestsAreChanged = androidTestPaths.size == changedPaths.size
 
   /**
    * Returns true if all changed files are just `lint-baseline.xml`. This is useful because it means
@@ -457,14 +471,15 @@ private data class ChangedProject(
    * Remaining affected files that aren't test paths or lint baseline, and therefore affect
    * dependants.
    */
-  val dependantAffectingFiles = changedPaths - testPaths - lintBaseline
+  val dependantAffectingFiles = changedPaths - testPaths - androidTestPaths - lintBaseline
 
   /** Shorthand for if [dependantAffectingFiles] is not empty. */
   val affectsDependents = dependantAffectingFiles.isNotEmpty()
 
   companion object {
     // This covers snapshot tests too as they are under src/test/snapshots/**
-    private val testPathMatcher = "**/src/*{test,androidTest}/**".toPathMatcher()
+    private val testPathMatcher = "**/src/test*/**".toPathMatcher()
+    private val androidTestPathMatcher = "**/src/androidTest*/**".toPathMatcher()
     private val lintBaselinePathMatcher = "**/lint-baseline.xml".toPathMatcher()
   }
 }
