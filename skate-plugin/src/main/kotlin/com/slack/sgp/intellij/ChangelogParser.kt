@@ -15,13 +15,6 @@
  */
 package com.slack.sgp.intellij
 
-import LocalDateConverter
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
-import com.intellij.util.xmlb.XmlSerializerUtil
-import com.intellij.util.xmlb.annotations.OptionTag
 import java.time.LocalDate
 
 // Define a regular expression that matches a date in "yyyy-mm-dd" format
@@ -33,9 +26,7 @@ private val String.isLocalDate: Boolean
     return LOCAL_DATE_REGEX.matches(this)
   }
 
-@State(name = "ChangelogParser", storages = [Storage("ChangelogParser.xml")])
-@Service(Service.Level.PROJECT)
-class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
+object ChangelogParser {
   /**
    * Function to parse a changelog and filter it based on a provided previous date entry.
    *
@@ -44,31 +35,15 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
    * @return A ParseResult object containing the filtered changelog and the date of the latest
    *   entry.
    */
-  data class State(
-    @OptionTag(converter = LocalDateConverter::class) var latestEntry: LocalDate? = null
-  )
+  fun readFile(changeLogString: String, previousEntry: LocalDate? = null): ParseResult {
 
-  private var myState = State()
-
-  override fun getState(): State {
-    return myState
-  }
-
-  override fun loadState(state: State) {
-    XmlSerializerUtil.copyBean(state, myState)
-  }
-
-  fun readFile(changeLogString: String): ParseResult {
-    var previousEntry = myState.latestEntry
-    println(previousEntry)
-
-    // If previousEntry is not null, and it equals the latest date in the changelog, return null and
+    // If previousEntry is not null and it equals the latest date in the changelog, return null and
     // previousEntry
     if (previousEntry != null && changeLogString.startsWith(previousEntry.toString())) {
       return ParseResult(null, previousEntry)
     }
 
-    // If previousEntry is not null, and it is not contained in changeLogString
+    // If previousEntry is not null and it is not contained in changeLogString
     // the function will return the changeLogString and the first date found
     if (previousEntry != null && !changeLogString.contains(previousEntry.toString())) {
       return ParseResult(
@@ -77,7 +52,9 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
       )
     }
 
-    // don't need
+    // previous is used to store the last date encountered
+    var previous: LocalDate? = null
+
     // entryCount is used to track the number of date entries encountered
     var entryCount = 0
 
@@ -95,7 +72,7 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
               val localDate = LocalDate.parse(line)
 
               // If a date was previously encountered, append the block to the final string
-              if (previousEntry != null) {
+              if (previous != null) {
                 append(currentBlock.toString())
                 if (localDate == previousEntry) {
                   break
@@ -106,9 +83,8 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
               currentBlock = StringBuilder()
 
               // If this is the first date encountered, set it as previous
-              if (previousEntry == null) {
-                previousEntry = localDate
-                myState.latestEntry = localDate
+              if (previous == null) {
+                previous = localDate
               }
 
               // Increment the entry count
@@ -130,7 +106,7 @@ class ChangelogParser : PersistentStateComponent<ChangelogParser.State> {
     // use the previous entry date as the latest date instead of the current date.
     return ParseResult(
       changeLogSubstring.takeIf { it.isNotBlank() },
-      previousEntry ?: LocalDate.now()
+      previous ?: previousEntry ?: LocalDate.now()
     )
   }
 

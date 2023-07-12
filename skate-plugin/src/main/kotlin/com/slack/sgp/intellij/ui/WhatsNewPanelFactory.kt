@@ -26,7 +26,8 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
-import com.slack.sgp.intellij.ChangelogPresenter
+import com.slack.sgp.intellij.ChangelogJournal
+import com.slack.sgp.intellij.ChangelogParser
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -85,19 +86,22 @@ class WhatsNewPanelFactory : DumbAware {
       parentDisposable: Disposable
     ): JComponent {
       // to take in the parsed Changelog:
-      //      val changelogParser = project.service<ChangelogParser>()
-      val changelogPresenter = project.service<ChangelogPresenter>()
+      val changelogJournal = project.service<ChangelogJournal>()
 
-      val parsedChangelog2 = changelogPresenter.readFile(markdownFileString)
-      //      val parsedChangelog = changelogParser.readFile(markdownFileString)
+      val parsedChangelog =
+        ChangelogParser.readFile(markdownFileString, changelogJournal.lastReadDate)
+
+      changelogJournal.lastReadDate = parsedChangelog.latestEntry
+
       // then, pass in parsedChangelog instead of markdownFileString
-      val file2 = LightVirtualFile("changelog.md", parsedChangelog2?.changeLogString ?: "")
-      //      val file = LightVirtualFile("changelog.md", parsedChangelog.changeLogString ?: "")
+      val file = LightVirtualFile("changelog.md", parsedChangelog.changeLogString ?: "")
 
-      val panel = MarkdownJCEFHtmlPanel(project, file2)
+      val panel = MarkdownJCEFHtmlPanel(project, file)
       Disposer.register(parentDisposable, panel)
+
+      // TODO: if it's empty, don't show the panel
       val html = runReadAction {
-        MarkdownUtil.generateMarkdownHtml(file2, parsedChangelog2?.changeLogString ?: "", project)
+        MarkdownUtil.generateMarkdownHtml(file, parsedChangelog.changeLogString ?: "", project)
       }
 
       panel.setHtml(html, 0)
