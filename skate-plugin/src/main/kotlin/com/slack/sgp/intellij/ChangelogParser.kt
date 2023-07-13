@@ -18,7 +18,7 @@ package com.slack.sgp.intellij
 import LocalDateConverter
 import java.time.LocalDate
 
-val localDateConverter = LocalDateConverter()
+val LOCAL_DATE_CONVERTER = LocalDateConverter()
 
 // Define a regular expression that matches a date in "yyyy-mm-dd" format
 private val LOCAL_DATE_REGEX = "^_\\d{4}-\\d{2}-\\d{2}_$".toRegex()
@@ -46,24 +46,34 @@ object ChangelogParser {
    *   entry.
    */
   fun readFile(changeLogString: String, lastReadDate: LocalDate? = null): PresentedChangelog {
-
+    // Initialize lastReadDate with updated value, or will stay null if not
     var updatedLastReadDate = lastReadDate
 
+    // Check if the lastReadDate is null
     if (updatedLastReadDate == null) {
       var foundDate = false
 
+      // Iterate through every line of the changeLogString
       for (line in changeLogString.lines()) {
         if (line.isLocalDate) {
-          val date = localDateConverter.fromString(line)
+
+          // Parse the line to be a local date
+          val date = LOCAL_DATE_CONVERTER.fromString(line)
+
           updatedLastReadDate = date
           foundDate = true
 
+          // Break the loop now, the first date is found
           break
         }
       }
+
+      // If no date is found, set the lastReadDate to current date
       if (!foundDate) {
         updatedLastReadDate = LocalDate.now()
       }
+
+      // Returning the entire changelog with updated lastReadDate
       return PresentedChangelog(changeLogString, updatedLastReadDate)
     }
 
@@ -76,8 +86,10 @@ object ChangelogParser {
 
           for (line in changeLogString.lines()) {
             when {
+
+              // Check if the line matches the format of the date
               line.isLocalDate -> {
-                val localDate = localDateConverter.fromString(line)
+                val localDate = LOCAL_DATE_CONVERTER.fromString(line)
                 if (localDate!! > updatedLastReadDate!!) {
                   blockDate = localDate
                   currentBlock.appendLine(line)
@@ -88,6 +100,8 @@ object ChangelogParser {
                   break
                 }
               }
+
+              // Check if the line starts a new block associated with a new entry
               line.startsNewBlock -> {
                 if (!inHeader) {
                   if (blockDate != null && currentBlock.isNotBlank()) {

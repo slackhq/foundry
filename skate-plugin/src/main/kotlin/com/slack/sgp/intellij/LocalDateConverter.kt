@@ -29,7 +29,7 @@ class LocalDateConverter : Converter<LocalDate>() {
     } catch (e: DateTimeParseException) {
       println("Error parsing date string: $trimmedValue")
       println(e.message)
-      e.printStackTrace()
+      e.stackTraceToString()
       null
     }
   }
