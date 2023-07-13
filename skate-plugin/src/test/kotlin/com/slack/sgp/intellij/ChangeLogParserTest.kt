@@ -23,7 +23,7 @@ class ChangeLogParserTest {
   @Test
   fun `no entries and null changelogstring`() {
     val (changeLogString, latestEntry) = ChangelogParser.readFile("", null)
-    assertThat(changeLogString).isNull()
+    assertThat(changeLogString).isEmpty()
     assertThat(latestEntry).isEqualTo(LocalDate.now())
   }
 
@@ -31,16 +31,25 @@ class ChangeLogParserTest {
   fun `one entry, no previous entries`() {
     val input =
       """
-      2023-06-28
+      Changelog
+      =========
 
-      * Bug fixes
-      * New features
+      0.9.17
+      ------
+
+      _2023-07-07_
+
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
       """
         .trimIndent()
 
-    val expectedDate = LocalDate.of(2023, 6, 28)
+    val expectedDate = LocalDate.of(2023, 7, 7)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
-    assertThat(changeLogString).isNull()
+    assertThat(changeLogString).isEqualTo(input)
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
@@ -48,26 +57,41 @@ class ChangeLogParserTest {
   fun `mutliple entries, and no previous entries`() {
     val input =
       """
-      2023-06-28
+      0.9.15
+      ------
 
-      * Bug fixes
-      * New features
+      _2023-06-29_
 
-      2023-06-27
+      - Switch Robolectric jar downloads to use detached configurations.
+        - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
+      - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+      - Update `kotlin-cli-util` to 1.2.2.
 
-      * Other changes
+      0.9.14
+      ------
+
+      _2023-06-25_
+
+      * Fix compose compiler config not applying to android projects.
       """
         .trimIndent()
-    val expectedDate = LocalDate.of(2023, 6, 28)
+    val expectedDate = LocalDate.of(2023, 6, 29)
     val expectedString =
       """
-      2023-06-28
+      0.9.15
+      ------
 
-      * Bug fixes
-      * New features
+      _2023-06-29_
+
+      - Switch Robolectric jar downloads to use detached configurations.
+        - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
+      - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+      - Update `kotlin-cli-util` to 1.2.2.
       """
         .trimIndent()
-    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 25))
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
@@ -76,19 +100,33 @@ class ChangeLogParserTest {
   fun `multiple entries, where the previous is the same as the latest`() {
     val input =
       """
-      2023-06-28
+      Changelog
+      =========
 
-      * Bug fixes
-      * New features
+      0.9.17
+      ------
 
-      2023-06-27
+      _2023-07-07_
 
-      * Other changes
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+
+      0.9.16
+      ------
+
+      _2023-06-30_
+
+      - Enable lint on test sources by default.
+      - Account for all version catalogs in `DependencyRake`.
+      - Update Guava to `32.1.0-jre`.
       """
         .trimIndent()
-    val expectedDate = LocalDate.of(2023, 6, 28)
-    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 28))
-    assertThat(changeLogString).isNull()
+    val expectedDate = LocalDate.of(2023, 7, 7)
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 7, 7))
+    assertThat(changeLogString).isEmpty()
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
@@ -96,31 +134,33 @@ class ChangeLogParserTest {
   fun `test with a previous entry not in the change log`() {
     val input =
       """
-      2023-06-28
+      Changelog
+      =========
 
-      * Bug fixes
-      * New features
+      0.9.17
+      ------
 
-      2023-06-27
+      _2023-07-07_
 
-      * Other changes
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+
+      0.9.16
+      ------
+
+      _2023-06-30_
+
+      - Enable lint on test sources by default.
+      - Account for all version catalogs in `DependencyRake`.
+      - Update Guava to `32.1.0-jre`.
       """
         .trimIndent()
-    val expectedDate = LocalDate.of(2023, 6, 28)
-    val expectedString =
-      """
-      2023-06-28
-
-      * Bug fixes
-      * New features
-
-      2023-06-27
-
-      * Other changes
-      """
-        .trimIndent()
-    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 29))
-    assertThat(changeLogString).isEqualTo(expectedString)
+    val expectedDate = LocalDate.of(2023, 7, 7)
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 7, 15))
+    assertThat(changeLogString).isEmpty()
     assertThat(latestEntry).isEqualTo(expectedDate)
   }
 
@@ -128,39 +168,71 @@ class ChangeLogParserTest {
   fun `multiple entries, previous entry matches but not the latest`() {
     val input =
       """
-        2023-06-30
+        Changelog
+        =========
 
-        * Even more bug fixes
+        0.9.17
+        ------
 
-        2023-06-29
+        _2023-07-07_
 
-        * More bug fixes
+        - Don't register `RakeDependencies` task on platform projects.
+        - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+        - Add Dependency Rake usage to its doc.
+        - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+          - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
 
-        2023-06-28
+        0.9.16
+        ------
 
-        * Bug fixes
-        * New features
+        _2023-06-30_
 
-        2023-06-27
+        - Enable lint on test sources by default.
+        - Account for all version catalogs in `DependencyRake`.
+        - Update Guava to `32.1.0-jre`.
 
-        * Other changes
+        0.9.15
+        ------
+
+        _2023-06-29_
+
+        - Switch Robolectric jar downloads to use detached configurations.
+          - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
+        - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
+        - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+        - Update `kotlin-cli-util` to 1.2.2.
         """
         .trimIndent()
 
-    val expectedDate = LocalDate.of(2023, 6, 30)
+    val expectedDate = LocalDate.of(2023, 7, 7)
     val expectedString =
       """
-        2023-06-30
+        Changelog
+        =========
 
-        * Even more bug fixes
+        0.9.17
+        ------
 
-        2023-06-29
+        _2023-07-07_
 
-        * More bug fixes
+        - Don't register `RakeDependencies` task on platform projects.
+        - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+        - Add Dependency Rake usage to its doc.
+        - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+          - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+
+        0.9.16
+        ------
+
+        _2023-06-30_
+
+        - Enable lint on test sources by default.
+        - Account for all version catalogs in `DependencyRake`.
+        - Update Guava to `32.1.0-jre`.
         """
         .trimIndent()
 
-    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 28))
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 29))
 
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)

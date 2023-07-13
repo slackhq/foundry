@@ -50,12 +50,19 @@ object ChangelogParser {
     var updatedLastReadDate = lastReadDate
 
     if (updatedLastReadDate == null) {
+      var foundDate = false
+
       for (line in changeLogString.lines()) {
         if (line.isLocalDate) {
           val date = localDateConverter.fromString(line)
           updatedLastReadDate = date
+          foundDate = true
+
           break
         }
+      }
+      if (!foundDate) {
+        updatedLastReadDate = LocalDate.now()
       }
       return PresentedChangelog(changeLogString, updatedLastReadDate)
     }
