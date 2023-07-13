@@ -158,7 +158,7 @@ class ChangeLogParserTest {
       - Update Guava to `32.1.0-jre`.
       """
         .trimIndent()
-    val expectedDate = LocalDate.of(2023, 7, 7)
+    val expectedDate = LocalDate.of(2023, 7, 15)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 7, 15))
     assertThat(changeLogString).isEmpty()
     assertThat(latestEntry).isEqualTo(expectedDate)
