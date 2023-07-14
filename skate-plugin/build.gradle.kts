@@ -37,5 +37,5 @@ tasks {
 dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-  implementation("com.squareup.sqldelightruntime:1.4.4")
+  implementation(libs.bugsnag)
 }
