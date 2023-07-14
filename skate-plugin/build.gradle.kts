@@ -37,8 +37,5 @@ tasks {
 dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-}
-java {
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
+  implementation("com.squareup.sqldelightruntime:1.4.4")
 }
