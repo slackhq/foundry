@@ -26,6 +26,10 @@ import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.util.Consumer
 import java.awt.Component
 
+/**
+ * Using SqlDelightErrorHandler to use for crash reporting for the Skate plugin. Currently just have
+ * placeholders for GIT_SHA, VERSION, and BUGSNAG_KEY
+ */
 class SqlDelightErrorHandler : ErrorReportSubmitter() {
   val skateBugsnagApiKey = "BUGSNAG_KEY_PLACEHOLDER"
 
