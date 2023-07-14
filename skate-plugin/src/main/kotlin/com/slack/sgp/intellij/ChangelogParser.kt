@@ -15,13 +15,13 @@
  */
 package com.slack.sgp.intellij
 
-import LocalDateConverter
 import java.time.LocalDate
-
-val LOCAL_DATE_CONVERTER = LocalDateConverter()
+import java.time.format.DateTimeFormatter
 
 // Define a regular expression that matches a date in "yyyy-mm-dd" format
 private val LOCAL_DATE_REGEX = "^_\\d{4}-\\d{2}-\\d{2}_$".toRegex()
+
+val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
 // Define an extension function for the String class to check if a string can be parsed as a date
 private val String.isLocalDate: Boolean
@@ -58,7 +58,7 @@ object ChangelogParser {
         if (line.isLocalDate) {
 
           // Parse the line to be a local date
-          val date = LOCAL_DATE_CONVERTER.fromString(line)
+          val date: LocalDate? = LocalDate.parse(line.trim('_'), DATE_FORMATTER)
 
           updatedLastReadDate = date
           foundDate = true
@@ -89,7 +89,9 @@ object ChangelogParser {
 
               // Check if the line matches the format of the date
               line.isLocalDate -> {
-                val localDate = LOCAL_DATE_CONVERTER.fromString(line)
+                // Parse line to be local date
+                val localDate: LocalDate? = LocalDate.parse(line.trim('_'), DATE_FORMATTER)
+
                 if (localDate!! > updatedLastReadDate!!) {
                   blockDate = localDate
                   currentBlock.appendLine(line)
