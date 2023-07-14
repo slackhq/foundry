@@ -35,7 +35,7 @@ tasks {
 }
 
 dependencies {
+  implementation(libs.bugsnag)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-  implementation(libs.bugsnag)
 }
