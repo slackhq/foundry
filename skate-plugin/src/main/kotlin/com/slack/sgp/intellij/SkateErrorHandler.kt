@@ -30,7 +30,7 @@ import java.awt.Component
  * Using SqlDelightErrorHandler to use for crash reporting for the Skate plugin. Currently just have
  * placeholders for GIT_SHA, VERSION, and BUGSNAG_KEY
  */
-class SqlDelightErrorHandler : ErrorReportSubmitter() {
+class SkateErrorHandler : ErrorReportSubmitter() {
   val skateBugsnagApiKey = "BUGSNAG_KEY_PLACEHOLDER"
 
   val skateBugsnag = Bugsnag(skateBugsnagApiKey, false)
@@ -39,7 +39,7 @@ class SqlDelightErrorHandler : ErrorReportSubmitter() {
     skateBugsnag.setAutoCaptureSessions(false)
     skateBugsnag.startSession()
     skateBugsnag.setAppVersion("VERSION_PLACEHOLDER")
-    skateBugsnag.setProjectPackages("app.cash.sqldelight")
+    skateBugsnag.setProjectPackages("com.slack.sgp.intellij")
     skateBugsnag.addCallback {
       it.addToTab("Device", "osVersion", System.getProperty("os.version"))
       it.addToTab("Device", "JRE", System.getProperty("java.version"))
