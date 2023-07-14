@@ -30,9 +30,8 @@
                 serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
         <projectService serviceImplementation="com.slack.sgp.intellij.SkatePluginSettings"/>
         <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig"/>
-        <errorHandler implementation="com.slack.sgp.intellij.SqlDelightErrorHandler"/>
+        <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
     </extensions>
-
 
     <applicationListeners>
         <listener class="com.slack.sgp.intellij.ProjectOpenCloseListener"
