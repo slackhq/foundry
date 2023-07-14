@@ -38,7 +38,7 @@ internal class SkateConfigUI(
 
   private fun Panel.checkBoxRow() {
     row(SkateBundle.message("skate.configuration.enableWhatsNew.title")) {
-      checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
+      checkBox("skate.configuration.enableWhatsNew.description")
         .bindSelected(
           getter = { settings.isWhatsNewEnabled },
           setter = { settings.isWhatsNewEnabled = it }
