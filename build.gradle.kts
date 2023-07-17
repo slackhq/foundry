@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import io.gitlab.arturbosch.detekt.Detekt
@@ -63,6 +64,8 @@ tasks.withType<Detekt>().configureEach {
 
 val ktfmtVersion = libs.versions.ktfmt.get()
 
+val externalFiles = listOf("SkateErrorHandler").map { "src/**/$it.kt" }
+
 allprojects {
   apply(plugin = "com.diffplug.spotless")
   configure<SpotlessExtension> {
@@ -73,10 +76,18 @@ allprojects {
     }
     kotlin {
       target("src/**/*.kt")
+      targetExclude(externalFiles)
       ktfmt(ktfmtVersion).googleStyle()
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile(rootProject.file("spotless/spotless.kt"))
+      targetExclude("**/spotless.kt", "**/Aliases.kt", *externalFiles.toTypedArray())
+    }
+    format("kotlinExternal", KotlinExtension::class.java) {
+      target(externalFiles)
+      ktfmt(ktfmtVersion).googleStyle()
+      trimTrailingWhitespace()
+      endWithNewline()
       targetExclude("**/spotless.kt", "**/Aliases.kt")
     }
     kotlinGradle {
