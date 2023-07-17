@@ -33,21 +33,19 @@ import java.awt.Component
 // Adapted from
 // https://github.com/cashapp/sqldelight/blob/5512326251b1e9f91ddef49dda75d27405943e2f/sqldelight-idea-plugin/src/main/kotlin/app/cash/sqldelight/intellij/SqlDelightErrorHandler.kt#L35
 class SkateErrorHandler : ErrorReportSubmitter() {
-  val skateBugsnagApiKey = "BUGSNAG_KEY_PLACEHOLDER"
-
-  val skateBugsnag = Bugsnag(skateBugsnagApiKey, false)
+  private val bugsnag = Bugsnag(BUGSNAG_KEY, false)
 
   init {
-    skateBugsnag.setAutoCaptureSessions(false)
-    skateBugsnag.startSession()
-    skateBugsnag.setAppVersion("VERSION_PLACEHOLDER")
-    skateBugsnag.setProjectPackages("com.slack.sgp.intellij")
-    skateBugsnag.addCallback {
+    bugsnag.setAutoCaptureSessions(false)
+    bugsnag.startSession()
+    bugsnag.setAppVersion(VERSION)
+    bugsnag.setProjectPackages("com.slack.sgp.intellij")
+    bugsnag.addCallback {
       it.addToTab("Device", "osVersion", System.getProperty("os.version"))
       it.addToTab("Device", "JRE", System.getProperty("java.version"))
       it.addToTab("Device", "IDE Version", ApplicationInfo.getInstance().fullVersion)
       it.addToTab("Device", "IDE Build #", ApplicationInfo.getInstance().build)
-      it.addToTab("Device", "Plugin SHA", "GIT_SHA_PLACEHOLDER")
+      it.addToTab("Device", "Plugin SHA", GIT_SHA)
       PluginManagerCore.getPlugins().forEach { plugin ->
         it.addToTab("Plugins", plugin.name, "${plugin.pluginId} : ${plugin.version}")
       }
@@ -63,9 +61,9 @@ class SkateErrorHandler : ErrorReportSubmitter() {
     consumer: Consumer<in SubmittedReportInfo>
   ): Boolean {
     for (event in events) {
-      if (skateBugsnagApiKey.isNotBlank()) {
+      if (BUGSNAG_KEY.isNotBlank()) {
         val throwable = (event.data as? AbstractMessage)?.throwable ?: event.throwable
-        skateBugsnag.notify(throwable, Severity.ERROR) {
+        bugsnag.notify(throwable, Severity.ERROR) {
           it.addToTab("Data", "message", event.message)
           it.addToTab("Data", "additional info", additionalInfo)
           it.addToTab("Data", "stacktrace", event.throwableText)
