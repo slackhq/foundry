@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016 Slack Technologies, LLC
+ * Copyright (C) 2016 Square, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,25 +28,24 @@ import java.awt.Component
 
 /**
  * Using SqlDelightErrorHandler to use for crash reporting for the Skate plugin. Currently just have
- * placeholders for GIT_SHA, VERSION, and BUGSNAG_KEY. link to original source:
- * https://github.com/cashapp/sqldelight/blob/5512326251b1e9f91ddef49dda75d27405943e2f/sqldelight-idea-plugin/src/main/kotlin/app/cash/sqldelight/intellij/SqlDelightErrorHandler.kt#L35
+ * placeholders for GIT_SHA, VERSION, and BUGSNAG_KEY.
  */
+// Adapted from
+// https://github.com/cashapp/sqldelight/blob/5512326251b1e9f91ddef49dda75d27405943e2f/sqldelight-idea-plugin/src/main/kotlin/app/cash/sqldelight/intellij/SqlDelightErrorHandler.kt#L35
 class SkateErrorHandler : ErrorReportSubmitter() {
-  val skateBugsnagApiKey = "BUGSNAG_KEY_PLACEHOLDER"
-
-  val skateBugsnag = Bugsnag(skateBugsnagApiKey, false)
+  private val bugsnag = Bugsnag(BUGSNAG_KEY, false)
 
   init {
-    skateBugsnag.setAutoCaptureSessions(false)
-    skateBugsnag.startSession()
-    skateBugsnag.setAppVersion("VERSION_PLACEHOLDER")
-    skateBugsnag.setProjectPackages("com.slack.sgp.intellij")
-    skateBugsnag.addCallback {
+    bugsnag.setAutoCaptureSessions(false)
+    bugsnag.startSession()
+    bugsnag.setAppVersion(VERSION)
+    bugsnag.setProjectPackages("com.slack.sgp.intellij")
+    bugsnag.addCallback {
       it.addToTab("Device", "osVersion", System.getProperty("os.version"))
       it.addToTab("Device", "JRE", System.getProperty("java.version"))
       it.addToTab("Device", "IDE Version", ApplicationInfo.getInstance().fullVersion)
       it.addToTab("Device", "IDE Build #", ApplicationInfo.getInstance().build)
-      it.addToTab("Device", "Plugin SHA", "GIT_SHA_PLACEHOLDER")
+      it.addToTab("Device", "Plugin SHA", GIT_SHA)
       PluginManagerCore.getPlugins().forEach { plugin ->
         it.addToTab("Plugins", plugin.name, "${plugin.pluginId} : ${plugin.version}")
       }
@@ -62,9 +61,9 @@ class SkateErrorHandler : ErrorReportSubmitter() {
     consumer: Consumer<in SubmittedReportInfo>
   ): Boolean {
     for (event in events) {
-      if (skateBugsnagApiKey.isNotBlank()) {
+      if (BUGSNAG_KEY.isNotBlank()) {
         val throwable = (event.data as? AbstractMessage)?.throwable ?: event.throwable
-        skateBugsnag.notify(throwable, Severity.ERROR) {
+        bugsnag.notify(throwable, Severity.ERROR) {
           it.addToTab("Data", "message", event.message)
           it.addToTab("Data", "additional info", additionalInfo)
           it.addToTab("Data", "stacktrace", event.throwableText)
