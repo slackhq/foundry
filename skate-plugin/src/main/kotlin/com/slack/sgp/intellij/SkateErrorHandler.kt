@@ -28,9 +28,10 @@ import java.awt.Component
 
 /**
  * Using SqlDelightErrorHandler to use for crash reporting for the Skate plugin. Currently just have
- * placeholders for GIT_SHA, VERSION, and BUGSNAG_KEY. link to original source:
- * https://github.com/cashapp/sqldelight/blob/5512326251b1e9f91ddef49dda75d27405943e2f/sqldelight-idea-plugin/src/main/kotlin/app/cash/sqldelight/intellij/SqlDelightErrorHandler.kt#L35
+ * placeholders for GIT_SHA, VERSION, and BUGSNAG_KEY.
  */
+// Adapted from
+// https://github.com/cashapp/sqldelight/blob/5512326251b1e9f91ddef49dda75d27405943e2f/sqldelight-idea-plugin/src/main/kotlin/app/cash/sqldelight/intellij/SqlDelightErrorHandler.kt#L35
 class SkateErrorHandler : ErrorReportSubmitter() {
   val skateBugsnagApiKey = "BUGSNAG_KEY_PLACEHOLDER"
 
