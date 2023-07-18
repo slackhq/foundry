@@ -169,6 +169,11 @@ internal class StandardProjectConfigurations(
       if (buildFile.exists()) {
         // Configure rake
         plugins.withId("com.autonomousapps.dependency-analysis") {
+          if (project.pluginManager.hasPlugin("com.android.test")) {
+            // Not supported yet in DAGP
+            // https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
+            return@withId
+          }
           val isNoApi = slackProperties.rakeNoApi
           val catalogNames =
             extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
@@ -1250,8 +1255,10 @@ internal object AptOptionsConfigs {
         // New error messages. Feedback should go to https://github.com/google/dagger/issues/1769
         "dagger.experimentalDaggerErrorMessages" to "enabled",
         // Fast init mode for improved dagger perf on startup:
-        // https://dagger.dev/dev-guide/compiler-options.html
-        "dagger.fastInit" to "enabled"
+        // https://dagger.dev/dev-guide/compiler-options.html#fastinit-mode
+        "dagger.fastInit" to "enabled",
+        // https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
+        "dagger.ignoreProvisionKeyWildcards" to "ENABLED"
       )
   }
 

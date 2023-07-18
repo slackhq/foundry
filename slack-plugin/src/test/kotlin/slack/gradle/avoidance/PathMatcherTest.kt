@@ -28,6 +28,8 @@ class PathMatcherTest {
     "**/gradle/wrapper/**" assertDoesNotMatch "gradle/wrapper/gradle-wrapper.properties"
     "gradle/wrapper/**" assertMatches "gradle/wrapper/gradle-wrapper.properties"
     "gradle/wrapper/**" assertDoesNotMatch "nested/gradle/wrapper/gradle-wrapper.properties"
+    "src/test*/**" assertMatches "src/test/foo.kt"
+    "src/test*/**" assertMatches "src/testImplementation/foo.kt"
   }
 
   private infix fun String.assertMatches(value: String) {

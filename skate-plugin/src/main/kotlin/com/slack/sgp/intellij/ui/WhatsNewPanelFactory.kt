@@ -17,6 +17,7 @@ package com.slack.sgp.intellij.ui
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
@@ -25,6 +26,8 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
+import com.slack.sgp.intellij.ChangelogJournal
+import com.slack.sgp.intellij.ChangelogParser
 import java.awt.BorderLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -83,15 +86,22 @@ class WhatsNewPanelFactory : DumbAware {
       parentDisposable: Disposable
     ): JComponent {
       // to take in the parsed Changelog:
-      // val parsedChangelog = ChangelogParser.readFile(markdownFileString)
-      // then, pass in parsedChangelog instead of markdownFileString
+      val changelogJournal = project.service<ChangelogJournal>()
 
-      val file = LightVirtualFile("changelog.md", markdownFileString)
+      val parsedChangelog =
+        ChangelogParser.readFile(markdownFileString, changelogJournal.lastReadDate)
+
+      changelogJournal.lastReadDate = parsedChangelog.lastReadDate
+
+      // then, pass in parsedChangelog instead of markdownFileString
+      val file = LightVirtualFile("changelog.md", parsedChangelog.changeLogString ?: "")
 
       val panel = MarkdownJCEFHtmlPanel(project, file)
       Disposer.register(parentDisposable, panel)
+
+      // TODO: if it's empty, don't show the panel
       val html = runReadAction {
-        MarkdownUtil.generateMarkdownHtml(file, markdownFileString, project)
+        MarkdownUtil.generateMarkdownHtml(file, parsedChangelog.changeLogString ?: "", project)
       }
 
       panel.setHtml(html, 0)

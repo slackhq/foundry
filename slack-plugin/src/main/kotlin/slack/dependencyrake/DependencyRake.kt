@@ -44,6 +44,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.convertProjectPathToAccessor
+import slack.gradle.property
+import slack.gradle.util.mapToBoolean
 
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
 
@@ -96,6 +98,14 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               AnalysisMode.ABI
             )
           )
+      )
+
+  @get:Input
+  val dryRun: Property<Boolean> =
+    objects
+      .property<Boolean>()
+      .convention(
+        providers.gradleProperty("slack.dependencyrake.dryRun").mapToBoolean().orElse(false)
       )
 
   @get:Input abstract val noApi: Property<Boolean>
@@ -322,7 +332,20 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
         }
       }
     }
-    buildFile.writeText(newLines.cleanLineFormatting().joinToString("\n"))
+
+    val fileToWrite =
+      if (!dryRun.get()) {
+        buildFile
+      } else {
+        buildFile.parentFile.resolve("new-build.gradle.kts").apply {
+          if (exists()) {
+            delete()
+          }
+          createNewFile()
+        }
+      }
+
+    fileToWrite.writeText(newLines.cleanLineFormatting().joinToString("\n"))
   }
 
   /** Remaps a given [Coordinates] to a known toml lib reference or error if [error] is true. */
