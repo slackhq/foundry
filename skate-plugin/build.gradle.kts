@@ -10,7 +10,10 @@ group = "com.slack.sgp.intellij"
 
 version = "1.0-SNAPSHOT"
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+  maven(url = "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+}
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -34,6 +37,10 @@ tasks {
   }
 
   publishPlugin { token.set(System.getenv("PUBLISH_TOKEN")) }
+
+  runIdeForUiTests { systemProperty("robot-server.port", "8082") }
+
+  downloadRobotServerPlugin { "0.11.19" }
 }
 
 // region Version.kt template for setting the project version in the build
@@ -63,6 +70,15 @@ tasks
 
 dependencies {
   implementation(libs.bugsnag)
+  implementation("io.github.jaqat:remoterobot:0.2.2")
+  implementation("io.github.jaqat:remoterobot:0.2.2")
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
+  testImplementation("com.intellij.remoterobot:remote-robot:0.11.19")
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_19
+  targetCompatibility = JavaVersion.VERSION_19
 }
