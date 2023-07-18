@@ -36,9 +36,6 @@ interface SkateProjectService {
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override fun showWhatsNewWindow() {
-    // TODO
-    //  Only show when changed
-    //  Only show latest changes
     val settings = project.service<SkatePluginSettings>()
     if (!settings.isWhatsNewEnabled) return
     val projectDir = project.guessProjectDir() ?: return
