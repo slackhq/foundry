@@ -41,6 +41,8 @@ tasks {
   runIdeForUiTests { systemProperty("robot-server.port", "8082") }
 
   downloadRobotServerPlugin { "0.11.19" }
+
+  test { useJUnitPlatform() }
 }
 
 // region Version.kt template for setting the project version in the build
@@ -70,15 +72,22 @@ tasks
 
 dependencies {
   implementation(libs.bugsnag)
-  implementation("io.github.jaqat:remoterobot:0.2.2")
-  implementation("io.github.jaqat:remoterobot:0.2.2")
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-
+  testImplementation(libs.okhttp)
   testImplementation("com.intellij.remoterobot:remote-robot:0.11.19")
-}
+  testImplementation("com.intellij.remoterobot:remote-fixtures:0.11.19")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.3")
 
+  // Logging Network Calls
+  testImplementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+  // Video Recording
+  implementation("com.automation-remarks:video-recorder-junit5:2.0")
+}
 java {
-  sourceCompatibility = JavaVersion.VERSION_19
-  targetCompatibility = JavaVersion.VERSION_19
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
 }
