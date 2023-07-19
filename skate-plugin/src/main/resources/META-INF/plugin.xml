@@ -32,7 +32,6 @@
         <projectService serviceImplementation="com.slack.sgp.intellij.SkatePluginSettings"/>
         <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig"/>
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
-
     </extensions>
 
     <applicationListeners>
