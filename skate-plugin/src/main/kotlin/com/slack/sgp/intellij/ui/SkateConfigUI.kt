@@ -32,8 +32,11 @@ internal class SkateConfigUI(
 ) {
 
   fun createPanel(): DialogPanel = panel {
-    checkBoxRow()
-    choosePathRow()
+    resizableColumn()
+    group {
+      checkBoxRow()
+      choosePathRow()
+    }
   }
 
   private fun Panel.checkBoxRow() {
