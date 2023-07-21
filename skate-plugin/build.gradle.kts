@@ -87,7 +87,3 @@ dependencies {
   // Video Recording
   implementation("com.automation-remarks:video-recorder-junit5:2.0")
 }
-java {
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
-}

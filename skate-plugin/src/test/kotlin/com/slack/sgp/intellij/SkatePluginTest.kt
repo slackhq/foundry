@@ -1,6 +1,5 @@
 package com.slack.sgp.intellij
 
-import com.automation.remarks.junit5.Video
 import com.google.common.truth.Truth.assertThat
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.utils.keyboard
@@ -12,11 +11,9 @@ import com.slack.sgp.intellij.utils.StepsLogger
 import java.awt.event.KeyEvent.VK_A
 import java.awt.event.KeyEvent.VK_META
 import java.awt.event.KeyEvent.VK_SHIFT
-import java.time.Duration
-import java.time.Duration.ofMinutes
+import java.time.Duration.ofSeconds
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -35,7 +32,14 @@ class SkatePluginTest {
 
   @BeforeEach
   fun waitForIde(remoteRobot: RemoteRobot) {
-    waitForIgnoringError(ofMinutes(3)) { remoteRobot.callJs("true") }
+    waitForIgnoringError(
+      ofSeconds(10),
+      ofSeconds(2),
+      "Wait for Ide started",
+      "Ide is not started"
+    ) {
+      remoteRobot.callJs("true")
+    }
   }
 
   @AfterEach
@@ -55,13 +59,13 @@ class SkatePluginTest {
     }
 
   @Test
-  @Disabled
-  @Video
-  fun checkToolWindow(remoteRobot: RemoteRobot) =
+  //  @Video
+  fun checkToolWindow(remoteRobot: RemoteRobot) {
     with(remoteRobot) {
-      val toolWindow = find(ToolWindowFixture::class.java, timeout = Duration.ofSeconds(10))
+      val toolWindow = find(ToolWindowFixture::class.java, timeout = ofSeconds(10))
       assertThat(toolWindow.window.isShowing).isTrue()
     }
+  }
 
   //  @Test
   //  fun testToolWindowExists() {
