@@ -1,0 +1,20 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>com.slack.intellij.artifactory</id>
+
+    <name>Artifactory Authenticator</name>
+
+    <vendor email="oss@slack-corp.com" url="https://www.github.com/slackhq">Slack</vendor>
+
+    <description><![CDATA[
+    A plugin for authenticating plugin repositories with Artifactory.
+  ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <pluginRepositoryAuthProvider
+                implementation="com.slack.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
+        <projectConfigurable instance="com.slack.intellij.artifactory.AuthConfig"/>
+    </extensions>
+</idea-plugin>

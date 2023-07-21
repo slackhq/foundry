@@ -17,11 +17,17 @@ import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import dev.bmac.gradle.intellij.GenerateBlockMapTask
+import dev.bmac.gradle.intellij.PluginUploader
+import dev.bmac.gradle.intellij.UploadPluginTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.net.URI
+import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.intellij.tasks.BuildPluginTask
+import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -40,6 +46,7 @@ buildscript {
 }
 
 plugins {
+  alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
@@ -48,6 +55,8 @@ plugins {
   alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.sortDependencies) apply false
+  alias(libs.plugins.intellij) apply false
+  alias(libs.plugins.pluginUploader) apply false
 }
 
 configure<DetektExtension> {
@@ -201,11 +210,11 @@ subprojects {
     tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
-  val isSkatePlugin = project.path == ":skate-plugin"
+  val isIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     val configureJvmCompilerOptions: KotlinJvmCompilerOptions.() -> Unit = {
       val kotlinVersion =
-        if (isSkatePlugin) {
+        if (isIntelliJPlugin) {
           KOTLIN_1_6
         } else {
           KOTLIN_1_8
@@ -213,7 +222,7 @@ subprojects {
       languageVersion.set(kotlinVersion)
       apiVersion.set(kotlinVersion)
 
-      if (!isSkatePlugin) {
+      if (!isIntelliJPlugin) {
         // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
         // this sometimes. https://github.com/gradle/gradle/issues/16345
         allWarningsAsErrors.set(false)
@@ -233,7 +242,7 @@ subprojects {
       )
     }
     extensions.configure<KotlinJvmProjectExtension> {
-      if (!isSkatePlugin) {
+      if (!isIntelliJPlugin) {
         explicitApi()
       }
       compilerOptions(configureJvmCompilerOptions)
@@ -285,6 +294,86 @@ subprojects {
     configure<MavenPublishBaseExtension> {
       publishToMavenCentral(automaticRelease = true)
       signAllPublications()
+    }
+  }
+
+  if (isIntelliJPlugin) {
+    project.pluginManager.withPlugin("org.jetbrains.intellij") {
+      data class PluginDetails(
+        val pluginId: String,
+        val name: String,
+        val description: String,
+        val version: String,
+        val sinceBuild: String,
+        val urlSuffix: String
+      )
+
+      val pluginDetails =
+        PluginDetails(
+          pluginId = property("PLUGIN_ID").toString(),
+          name = property("PLUGIN_NAME").toString(),
+          description = property("PLUGIN_DESCRIPTION").toString(),
+          version = property("VERSION_NAME").toString(),
+          sinceBuild = property("PLUGIN_SINCE_BUILD").toString(),
+          urlSuffix = property("ARTIFACTORY_URL_SUFFIX").toString(),
+        )
+
+      project.tasks.named<PatchPluginXmlTask>("patchPluginXml") {
+        sinceBuild.set(pluginDetails.sinceBuild)
+        pluginId.set(pluginDetails.pluginId)
+        pluginDescription.set(pluginDetails.description)
+        version.set(pluginDetails.version)
+      }
+
+      if (hasProperty("sgp.intellij.artifactory.baseUrl")) {
+        pluginManager.apply(libs.plugins.pluginUploader.get().pluginId)
+        val archive = project.tasks.named<BuildPluginTask>("buildPlugin").flatMap { it.archiveFile }
+        val blockMapTask =
+          tasks.named<GenerateBlockMapTask>(GenerateBlockMapTask.TASK_NAME) {
+            notCompatibleWithConfigurationCache(
+              "Blockmap generation is not compatible with the configuration cache"
+            )
+            file.set(archive)
+            blockmapFile.set(
+              project.layout.buildDirectory.file(
+                "blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
+              )
+            )
+            blockmapHashFile.set(
+              project.layout.buildDirectory.file("blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
+            )
+          }
+
+        // Get the plugin distribution file from the signPlugin task provided from the
+        // gradle-intellij-plugin
+        tasks.register<UploadPluginTask>("uploadPluginToArtifactory") {
+          notCompatibleWithConfigurationCache(
+            "UploadPluginTask is not compatible with the configuration cache"
+          )
+          dependsOn(blockMapTask)
+          url.set(
+            providers.gradleProperty("sgp.intellij.artifactory.baseUrl").map { baseUrl ->
+              "$baseUrl/${pluginDetails.urlSuffix}"
+            }
+          )
+          pluginName.set(pluginDetails.name)
+          file.set(archive)
+          repoType.set(PluginUploader.RepoType.REST_PUT)
+          pluginId.set(pluginDetails.pluginId)
+          version.set(pluginDetails.version)
+          pluginDescription.set(pluginDetails.description)
+          //  changeNotes.set(file("change-notes.txt").readText())
+          sinceBuild.set(pluginDetails.sinceBuild)
+          authentication.set(
+            // Sip the username and token together to create an appropriate encoded auth header
+            providers.gradleProperty("sgp.intellij.artifactory.username").zip(
+              providers.gradleProperty("sgp.intellij.artifactory.token")
+            ) { username, token ->
+              "Basic ${"$username:$token".encode().base64()}"
+            }
+          )
+        }
+      }
     }
   }
 }

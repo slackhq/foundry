@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij
+package com.slack.intellij.artifactory
 
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.ui.Messages
+import com.intellij.DynamicBundle
+import org.jetbrains.annotations.Nls
+import org.jetbrains.annotations.PropertyKey
 
-public class DemoAction : AnAction() {
-  override fun actionPerformed(e: AnActionEvent) {
-    Messages.showMessageDialog("Hello WORLD!", "Demo Action", null)
-  }
+private const val BUNDLE_NAME = "messages.artifactoryAuthenticator"
+
+object AuthBundle : DynamicBundle(BUNDLE_NAME) {
+  @Nls
+  fun message(
+    @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
+    vararg params: Any,
+  ): String = getMessage(key, *params)
 }
