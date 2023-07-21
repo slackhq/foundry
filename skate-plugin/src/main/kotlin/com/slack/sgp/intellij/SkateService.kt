@@ -47,6 +47,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     val changeLogString = VfsUtil.loadText(changeLogFile)
 
     // Don't show the tool window if the parsed changelog is blank
+    // Changelog is parsed
     val parsedChangelog = ChangelogParser.readFile(changeLogString, changelogJournal.lastReadDate)
     if (parsedChangelog.changeLogString.isNullOrBlank()) return
 
@@ -65,7 +66,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
       val parentDisposable = Disposer.newDisposable()
 
       WhatsNewPanelFactory()
-        .createToolWindowContent(toolWindow, project, changeLogString, parentDisposable)
+        .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
 
       toolWindow.show()
     }
