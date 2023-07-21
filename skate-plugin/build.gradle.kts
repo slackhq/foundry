@@ -1,14 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("java")
-  kotlin("jvm")
+  java
+  alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.intellij)
+  alias(libs.plugins.pluginUploader)
 }
 
-group = "com.slack.sgp.intellij"
-
-version = "1.0-SNAPSHOT"
+group = "com.slack.intellij"
 
 repositories { mavenCentral() }
 
@@ -19,21 +18,6 @@ intellij {
   type.set("IC") // Target IDE Platform
 
   plugins.add("org.intellij.plugins.markdown")
-}
-
-tasks {
-  patchPluginXml {
-    sinceBuild.set("222")
-    untilBuild.set("232.*")
-  }
-
-  signPlugin {
-    certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-    privateKey.set(System.getenv("PRIVATE_KEY"))
-    password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-  }
-
-  publishPlugin { token.set(System.getenv("PUBLISH_TOKEN")) }
 }
 
 // region Version.kt template for setting the project version in the build
