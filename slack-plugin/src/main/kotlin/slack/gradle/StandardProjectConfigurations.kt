@@ -869,22 +869,7 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      val configureJvmCompilerOptions: KotlinJvmCompilerOptions.() -> Unit = {
-        jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
-        // Potentially useful for static analysis or annotation processors
-        javaParameters.set(true)
-        freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
-      }
       project.kotlinExtension.apply {
-        // TODO file a bug for this as these aren't respected
-        //        if (this is KotlinJvmProjectExtension) {
-        //          project.logger.lifecycle("Configuring JVM args for jvm project ${project.path}")
-        //          compilerOptions(configureJvmCompilerOptions)
-        //        } else if (this is KotlinAndroidProjectExtension) {
-        //          project.logger.lifecycle("Configuring JVM args for android project
-        // ${project.path}")
-        //          compilerOptions(configureJvmCompilerOptions)
-        //        }
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
@@ -916,13 +901,11 @@ internal class StandardProjectConfigurations(
           }
 
           if (this is KotlinJvmCompilerOptions) {
-            configureJvmCompilerOptions()
+            jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
+            // Potentially useful for static analysis or annotation processors
+            javaParameters.set(true)
+            freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
           }
-
-          // https://github.com/google/ksp/issues/1387
-          //          if (this@configureKotlinCompilationTask is KspTaskJvm) {
-          //            compilerOptions(configureJvmCompilerOptions)
-          //          }
         }
       }
 

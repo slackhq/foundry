@@ -15,7 +15,6 @@
  */
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
-import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import dev.bmac.gradle.intellij.GenerateBlockMapTask
 import dev.bmac.gradle.intellij.PluginUploader
@@ -29,7 +28,6 @@ import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.intellij.tasks.BuildPluginTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
@@ -212,44 +210,40 @@ subprojects {
 
   val isIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-    val configureJvmCompilerOptions: KotlinJvmCompilerOptions.() -> Unit = {
-      val kotlinVersion =
-        if (isIntelliJPlugin) {
-          KOTLIN_1_6
-        } else {
-          KOTLIN_1_8
-        }
-      languageVersion.set(kotlinVersion)
-      apiVersion.set(kotlinVersion)
-
-      if (!isIntelliJPlugin) {
-        // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
-        // this sometimes. https://github.com/gradle/gradle/issues/16345
-        allWarningsAsErrors.set(false)
-        // TODO required due to https://github.com/gradle/gradle/issues/24871
-        freeCompilerArgs.add("-Xsam-conversions=class")
-      } else {
-        allWarningsAsErrors.set(true)
-      }
-      jvmTarget.set(JvmTarget.JVM_17)
-      freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
-      freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
-      optIn.addAll(
-        "kotlin.contracts.ExperimentalContracts",
-        "kotlin.experimental.ExperimentalTypeInference",
-        "kotlin.ExperimentalStdlibApi",
-        "kotlin.time.ExperimentalTime",
-      )
-    }
     extensions.configure<KotlinJvmProjectExtension> {
       if (!isIntelliJPlugin) {
         explicitApi()
       }
-      compilerOptions(configureJvmCompilerOptions)
-    }
+      compilerOptions {
+        val kotlinVersion =
+          if (isIntelliJPlugin) {
+            KOTLIN_1_6
+          } else {
+            KOTLIN_1_8
+          }
+        languageVersion.set(kotlinVersion)
+        apiVersion.set(kotlinVersion)
 
-    // https://github.com/google/ksp/issues/1387
-    tasks.withType<KspTaskJvm>().configureEach { compilerOptions(configureJvmCompilerOptions) }
+        if (!isIntelliJPlugin) {
+          // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
+          // this sometimes. https://github.com/gradle/gradle/issues/16345
+          allWarningsAsErrors.set(false)
+          // TODO required due to https://github.com/gradle/gradle/issues/24871
+          freeCompilerArgs.add("-Xsam-conversions=class")
+        } else {
+          allWarningsAsErrors.set(true)
+        }
+        jvmTarget.set(JvmTarget.JVM_17)
+        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
+        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+        optIn.addAll(
+          "kotlin.contracts.ExperimentalContracts",
+          "kotlin.experimental.ExperimentalTypeInference",
+          "kotlin.ExperimentalStdlibApi",
+          "kotlin.time.ExperimentalTime",
+        )
+      }
+    }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
     apply(plugin = "kotlin-sam-with-receiver")
