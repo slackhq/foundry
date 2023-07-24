@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.util.booleanProperty
 import slack.gradle.util.setDisallowChanges
 
 @DslMarker public annotation class SlackExtensionMarker
@@ -153,7 +154,9 @@ constructor(
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
         }
-        markKspNeeded("Moshi IR code gen")
+        if (project.booleanProperty("moshix.generateProguardRules", defaultValue = true)) {
+          markKspNeeded("Moshi IR code gen")
+        }
       }
 
       fun aptConfiguration(): String {
