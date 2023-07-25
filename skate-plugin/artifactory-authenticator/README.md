@@ -21,4 +21,4 @@ SgpIntellijArtifactoryUsername=jane.doe@example.com
 SgpIntellijArtifactoryToken=1234567890abcdef1234567890abcdef12345678
 ```
 
-Then run `./gradlew uploadPluginToArtifactory` to publish the plugin to the configured repository.
+Then run `./gradlew :skate-plugin:artifactory-authenticator:uploadPluginToArtifactory` to publish the plugin to the configured repository.
