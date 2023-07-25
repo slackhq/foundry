@@ -448,14 +448,22 @@ internal class StandardProjectConfigurations(
               selector().withBuildType(buildType).withFlavor("environment" to flavorName)
             beforeVariants(selector) { builder ->
               builder.enable = false
-              builder.enableUnitTest = false
+              // AGP has confusing declaration mismatches about this deprecation so we cast it
+              if (builder is HasUnitTestBuilder) {
+                (builder as HasUnitTestBuilder).enableUnitTest = false
+              }
               if (builder is HasAndroidTestBuilder) {
                 builder.enableAndroidTest = false
               }
             }
           }
           if (isApp) {
-            beforeVariants { builder -> builder.enableUnitTest = false }
+            beforeVariants { builder ->
+              // AGP has confusing declaration mismatches about this deprecation so we cast it
+              if (builder is HasUnitTestBuilder) {
+                (builder as HasUnitTestBuilder).enableUnitTest = false
+              }
+            }
           }
         }
 
@@ -608,7 +616,8 @@ internal class StandardProjectConfigurations(
         beforeVariants { builder ->
           // Disable unit tests on release variants, since it's unused
           if (builder.buildType == "release") {
-            builder.enableUnitTest = false
+            // AGP has confusing declaration mismatches about this deprecation so we cast it
+            (builder as HasUnitTestBuilder).enableUnitTest = false
           }
 
           // Must be in the beforeVariants block to defer read until after evaluation
