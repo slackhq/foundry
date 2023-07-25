@@ -53,7 +53,6 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
@@ -449,14 +448,22 @@ internal class StandardProjectConfigurations(
               selector().withBuildType(buildType).withFlavor("environment" to flavorName)
             beforeVariants(selector) { builder ->
               builder.enable = false
-              builder.enableUnitTest = false
+              // AGP has confusing declaration mismatches about this deprecation so we cast it
+              if (builder is HasUnitTestBuilder) {
+                (builder as HasUnitTestBuilder).enableUnitTest = false
+              }
               if (builder is HasAndroidTestBuilder) {
                 builder.enableAndroidTest = false
               }
             }
           }
           if (isApp) {
-            beforeVariants { builder -> builder.enableUnitTest = false }
+            beforeVariants { builder ->
+              // AGP has confusing declaration mismatches about this deprecation so we cast it
+              if (builder is HasUnitTestBuilder) {
+                (builder as HasUnitTestBuilder).enableUnitTest = false
+              }
+            }
           }
         }
 
@@ -609,7 +616,8 @@ internal class StandardProjectConfigurations(
         beforeVariants { builder ->
           // Disable unit tests on release variants, since it's unused
           if (builder.buildType == "release") {
-            builder.enableUnitTest = false
+            // AGP has confusing declaration mismatches about this deprecation so we cast it
+            (builder as HasUnitTestBuilder).enableUnitTest = false
           }
 
           // Must be in the beforeVariants block to defer read until after evaluation
@@ -874,7 +882,7 @@ internal class StandardProjectConfigurations(
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
-            languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
+            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         }
@@ -886,21 +894,25 @@ internal class StandardProjectConfigurations(
         val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
 
         compilerOptions {
+          progressiveMode.set(true)
+          // TODO probably just want to make these configurable in SlackProperties
+          optIn.addAll(
+            "kotlin.contracts.ExperimentalContracts",
+            "kotlin.experimental.ExperimentalTypeInference",
+            "kotlin.ExperimentalStdlibApi",
+            "kotlin.time.ExperimentalTime",
+          )
           if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
-            allWarningsAsErrors.setDisallowChanges(true)
+            allWarningsAsErrors.set(true)
           }
           if (!isKaptGenerateStubsTask) {
             freeCompilerArgs.addAll(kotlinCompilerArgs)
           }
 
-          if (slackProperties.useK2) {
-            languageVersion.setDisallowChanges(KotlinVersion.fromVersion("2.0"))
-          }
-
           if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.setDisallowChanges(JvmTarget.fromTarget(actualJvmTarget))
+            jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors
-            javaParameters.setDisallowChanges(true)
+            javaParameters.set(true)
             freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
           }
         }
