@@ -20,14 +20,11 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.SimplePersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.project.Project
 
 /** Manages user-specific settings for the Skate plugin */
 @Service(Service.Level.PROJECT)
 @State(name = "SkatePluginSettings", storages = [Storage("skate.xml")])
-class SkatePluginSettings(
-  private val project: Project,
-) : SimplePersistentStateComponent<SkatePluginSettings.State>(State()) {
+class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.State>(State()) {
 
   var whatsNewFilePath: String
     get() = state.whatsNewFilePath ?: "WHATSNEW.md"
