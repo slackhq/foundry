@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.10.0
+------
+
+_2023-07-25_
+
+- Update to Kotlin `1.9.0`.
+- Update to KSP `1.9.0-1.0.12`.
+- Update to AGP `8.1.0`.
+- Update kotlin-cli-util to `1.2.3`.
+- Update MoshiX to `0.24.0`.
+- Update redacted to `1.5.0`.
+- Update wire to `4.8.0`.
+- Add new dagger flag to ignore wildcard keys by default.
+  - https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
+
 0.9.18
 ------
 
