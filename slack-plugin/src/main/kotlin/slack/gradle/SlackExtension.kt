@@ -57,14 +57,14 @@ constructor(
    * this instance. Ideally we could eventually remove this if/when AGP finally makes these
    * properties lazy.
    */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
     set(value) {
       field = value
       androidHandler.setAndroidExtension(value)
       featuresHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>) {
     this.androidExtension = androidExtension
   }
 
@@ -370,13 +370,13 @@ constructor(
     objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
   /** @see [SlackExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
     set(value) {
       field = value
       composeHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -678,9 +678,9 @@ constructor(
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -731,13 +731,13 @@ constructor(
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [SlackExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
     set(value) {
       field = value
       featuresHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -781,9 +781,9 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val robolectric: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
