@@ -31,7 +31,7 @@ val copyVersionTemplatesProvider =
     expand(
       mapOf(
         "projectVersion" to project.property("VERSION_NAME").toString(),
-        "bugsnagKey" to project.findProperty("BUGSNAG_KEY")?.toString().orEmpty(),
+        "bugsnagKey" to project.findProperty("SgpIntellijBugsnagKey")?.toString().orEmpty(),
         "gitSha" to project.findProperty("GIT_SHA")?.toString().orEmpty(),
       )
     )
