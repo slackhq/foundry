@@ -319,7 +319,7 @@ subprojects {
         version.set(pluginDetails.version)
       }
 
-      if (hasProperty("sgp.intellij.artifactory.baseUrl")) {
+      if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
         pluginManager.apply(libs.plugins.pluginUploader.get().pluginId)
         val archive = project.tasks.named<BuildPluginTask>("buildPlugin").flatMap { it.archiveFile }
         val blockMapTask =
@@ -346,7 +346,7 @@ subprojects {
           )
           dependsOn(blockMapTask)
           url.set(
-            providers.gradleProperty("sgp.intellij.artifactory.baseUrl").map { baseUrl ->
+            providers.gradleProperty("SgpIntellijArtifactoryBaseUrl").map { baseUrl ->
               "$baseUrl/${pluginDetails.urlSuffix}"
             }
           )
@@ -360,8 +360,8 @@ subprojects {
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
             // Sip the username and token together to create an appropriate encoded auth header
-            providers.gradleProperty("sgp.intellij.artifactory.username").zip(
-              providers.gradleProperty("sgp.intellij.artifactory.token")
+            providers.gradleProperty("SgpIntellijArtifactoryUsername").zip(
+              providers.gradleProperty("SgpIntellijArtifactoryToken")
             ) { username, token ->
               "Basic ${"$username:$token".encode().base64()}"
             }
