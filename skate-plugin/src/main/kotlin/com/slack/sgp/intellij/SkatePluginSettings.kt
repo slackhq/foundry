@@ -30,7 +30,7 @@ class SkatePluginSettings(
 ) : SimplePersistentStateComponent<SkatePluginSettings.State>(State()) {
 
   var whatsNewFilePath: String
-    get() = state.whatsNewFilePath ?: "CHANGELOG.md"
+    get() = state.whatsNewFilePath ?: "WHATSNEW.md"
     set(value) {
       state.whatsNewFilePath = value
     }
