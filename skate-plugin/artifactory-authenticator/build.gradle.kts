@@ -11,11 +11,6 @@ version = property("VERSION_NAME").toString()
 
 repositories { mavenCentral() }
 
-intellij {
-  version.set("2022.2.5")
-  type.set("IC")
-}
-
 dependencies {
   implementation(libs.okio)
   testImplementation(libs.junit)

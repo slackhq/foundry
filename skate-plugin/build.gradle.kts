@@ -17,12 +17,7 @@ repositories { mavenCentral() }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-  version.set("2022.2.5")
-  type.set("IC") // Target IDE Platform
-
-  plugins.add("org.intellij.plugins.markdown")
-}
+intellij { plugins.add("org.intellij.plugins.markdown") }
 
 fun isGitHash(hash: String): Boolean {
   if (hash.length != 40) {

@@ -25,6 +25,7 @@ import java.net.URI
 import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.intellij.tasks.BuildPluginTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -299,6 +300,13 @@ subprojects {
 
   if (isIntelliJPlugin) {
     project.pluginManager.withPlugin("org.jetbrains.intellij") {
+      configure<IntelliJPluginExtension> {
+        version.set("2022.2.5")
+        type.set("IC")
+        // Don't assign untilBuild to sinceBuild
+        updateSinceUntilBuild.set(false)
+      }
+
       data class PluginDetails(
         val pluginId: String,
         val name: String,
