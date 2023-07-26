@@ -32,7 +32,6 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
-import slack.gradle.util.booleanProperty
 import slack.gradle.util.setDisallowChanges
 
 @DslMarker public annotation class SlackExtensionMarker
@@ -153,9 +152,6 @@ constructor(
         }
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
-        }
-        if (project.booleanProperty("moshix.generateProguardRules", defaultValue = true)) {
-          markKspNeeded("Moshi IR code gen")
         }
       }
 
@@ -414,7 +410,7 @@ constructor(
       "This function should not be called with both enableComponents and projectHasJavaInjections set to false. Either remove these parameters or call a more appropriate non-delicate dagger() overload."
     }
     daggerHandler.enabled.setDisallowChanges(true)
-    daggerHandler.useDaggerCompiler.setDisallowChanges(true)
+    daggerHandler.useDaggerCompiler.setDisallowChanges(enableComponents || projectHasJavaInjections)
     action?.execute(daggerHandler)
   }
 

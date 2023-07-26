@@ -29,9 +29,10 @@ import org.jetbrains.intellij.IntelliJPluginExtension
 import org.jetbrains.intellij.tasks.BuildPluginTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 buildscript {
@@ -133,6 +134,11 @@ data class KotlinBuildConfig(val kotlin: String) {
    */
   val kotlinCompilerArgs: List<String> =
     listOf(
+      "-progressive",
+      "-opt-in=kotlin.contracts.ExperimentalContracts",
+      "-opt-in=kotlin.experimental.ExperimentalTypeInference",
+      "-opt-in=kotlin.ExperimentalStdlibApi",
+      "-opt-in=kotlin.time.ExperimentalTime",
       "-Xproper-ieee754-comparisons",
       // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
       // => T & Any)
@@ -211,10 +217,7 @@ subprojects {
 
   val isIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-    extensions.configure<KotlinJvmProjectExtension> {
-      if (!isIntelliJPlugin) {
-        explicitApi()
-      }
+    tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
         val kotlinVersion =
           if (isIntelliJPlugin) {
@@ -235,15 +238,18 @@ subprojects {
           allWarningsAsErrors.set(true)
         }
         jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
-        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
-        optIn.addAll(
-          "kotlin.contracts.ExperimentalContracts",
-          "kotlin.experimental.ExperimentalTypeInference",
-          "kotlin.ExperimentalStdlibApi",
-          "kotlin.time.ExperimentalTime",
+        freeCompilerArgs.addAll(
+          kotlinBuildConfig.kotlinCompilerArgs
+            // -progressive is useless when running on an older language version but new compiler
+            // version. Both Gradle and IntelliJ plugins have this issue 🙃
+            .filter { it != "-progressive" }
         )
+        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
       }
+    }
+
+    if (!isIntelliJPlugin) {
+      extensions.configure<KotlinProjectExtension> { explicitApi() }
     }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs

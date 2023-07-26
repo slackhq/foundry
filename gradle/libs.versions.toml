@@ -9,12 +9,12 @@ dokka = "1.8.20"
 errorproneGradle = "3.0.1"
 jdk = "20"
 jna = "5.13.0"
-kotlin = "1.9.0"
-ksp = "1.9.0-1.0.12"
+kotlin = "1.8.22"
+ksp = "1.8.22-1.0.11"
 ktfmt = "0.44"
 mavenPublish = "0.25.3"
 moshi = "1.14.0"
-moshix = "0.24.0"
+moshix = "0.22.1"
 nullawayGradle = "1.3.0"
 okhttp = "5.0.0-alpha.10"
 okio = "3.4.0"
@@ -63,7 +63,7 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
-gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.5.0"
+gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.4.0"
 gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
 gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }

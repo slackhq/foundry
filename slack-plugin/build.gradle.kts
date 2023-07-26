@@ -59,7 +59,10 @@ tasks.named<ProcessResources>("processResources") {
 // Necessary for gradle exec optimizations in gradle 8
 tasks.matching { it.name == "sourcesJar" }.configureEach { dependsOn(copyVersionTemplatesProvider) }
 
-moshi { enableSealed.set(true) }
+moshi {
+  enableSealed.set(true)
+  generateProguardRules.set(false)
+}
 
 dependencies {
   api(platform(libs.okhttp.bom))
