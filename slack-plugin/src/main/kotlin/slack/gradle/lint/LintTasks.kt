@@ -51,7 +51,7 @@ internal object LintTasks {
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
-    commonExtension: CommonExtension<*, *, *, *, *>?,
+    commonExtension: CommonExtension<*, *, *, *>?,
     sdkVersions: (() -> SlackProperties.AndroidSdkProperties)?,
   ) {
     project.logger.debug("$LOG Configuring lint tasks for project ${project.path}...")
@@ -121,7 +121,7 @@ internal object LintTasks {
     project: Project,
     globalTask: TaskProvider<*>?,
     slackProperties: SlackProperties,
-    extension: CommonExtension<*, *, *, *, *>,
+    extension: CommonExtension<*, *, *, *>,
     sdkVersions: SlackProperties.AndroidSdkProperties,
   ) {
     project.logger.debug("$LOG Configuring android lint tasks. isApp=${extension is AppExtension}")
