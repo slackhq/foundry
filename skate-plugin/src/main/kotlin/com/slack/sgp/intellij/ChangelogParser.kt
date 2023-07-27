@@ -19,14 +19,14 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 // Define a regular expression that matches a date in "yyyy-mm-dd" format
-private val LOCAL_DATE_REGEX = "^_\\d{4}-\\d{2}-\\d{2}_$".toRegex()
+private val LOCAL_DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$".toRegex()
 
 val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
 // Define an extension function for the String class to check if a string can be parsed as a date
 private val String.isLocalDate: Boolean
   get() {
-    return LOCAL_DATE_REGEX.matches(this)
+    return LOCAL_DATE_REGEX.matches(this.trim('_'))
   }
 
 private val VERSION_PATTERN_REGEX = "\\d+\\.\\d+\\.\\d+".toRegex()
