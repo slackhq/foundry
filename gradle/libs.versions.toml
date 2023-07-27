@@ -20,7 +20,7 @@ okhttp = "5.0.0-alpha.10"
 okio = "3.4.0"
 sortDependencies = "0.3"
 spotless = "6.20.0"
-sqldelight = "2.0.0-alpha05"
+sqldelight = "2.0.0"
 versionsPlugin = "0.47.0"
 wire = "4.8.0"
 
