@@ -15,6 +15,7 @@
  */
 package com.slack.sgp.intellij
 
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
 import org.junit.Test
@@ -236,5 +237,31 @@ class ChangeLogParserTest {
 
     assertThat(changeLogString).isEqualTo(expectedString)
     assertThat(latestEntry).isEqualTo(expectedDate)
+  }
+
+  @Test
+  fun `date in changelog with no italics`() {
+    val input =
+      """
+      Changelog
+      =========
+
+      0.9.17
+      ------
+
+      2023-07-07
+
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+      """
+        .trimIndent()
+
+    val expectedDate = LocalDate.of(2023, 7, 7)
+    val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
+    Truth.assertThat(changeLogString).isEqualTo(input)
+    Truth.assertThat(latestEntry).isEqualTo(expectedDate)
   }
 }
