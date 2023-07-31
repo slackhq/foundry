@@ -19,7 +19,7 @@ import com.intellij.ide.AppLifecycleListener
 import com.intellij.ide.plugins.auth.PluginRepositoryAuthService
 import com.intellij.openapi.components.service
 
-// code from:
+// code from
 // https://youtrack.jetbrains.com/issue/IDEA-315487/PluginRepositoryAuthProvider-is-broken-in-2022.3-making-custom-repository-authentication-impossible#focus=Comments-27-6990965.0-0
 class RepoAuthHotfix : AppLifecycleListener {
   override fun appFrameCreated(commandLineArgs: MutableList<String>) {
