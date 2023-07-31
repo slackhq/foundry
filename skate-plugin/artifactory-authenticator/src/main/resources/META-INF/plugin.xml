@@ -17,4 +17,8 @@
                 implementation="com.slack.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
         <projectConfigurable instance="com.slack.intellij.artifactory.AuthConfig"/>
     </extensions>
+    <applicationListeners>
+        <listener class="com.slack.intellij.artifactory.RepoAuthHotfix"
+                  topic="com.intellij.ide.AppLifecycleListener"/>
+    </applicationListeners>
 </idea-plugin>

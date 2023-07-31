@@ -35,7 +35,5 @@
     <applicationListeners>
         <listener class="com.slack.sgp.intellij.ProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
-        <listener class="com.slack.sgp.intellij.RepoAuthHotfix"
-                  topic="com.intellij.ide.AppLifecycleListener"/>
     </applicationListeners>
 </idea-plugin>
