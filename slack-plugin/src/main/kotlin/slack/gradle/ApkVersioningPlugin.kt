@@ -47,11 +47,6 @@ import slack.gradle.util.setDisallowChanges
 @Suppress("unused")
 internal class ApkVersioningPlugin : Plugin<Project> {
 
-  private val VariantOutput.abiString: String?
-    get() {
-      return filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
-    }
-
   @Suppress("LongMethod")
   override fun apply(project: Project) {
     project.plugins.withType(AppPlugin::class.java) {
