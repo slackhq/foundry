@@ -129,7 +129,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
           val mappedVersionCodeProvider =
             versionCodeProvider.map { rawCode ->
               @Suppress("MagicNumber")
-              ApkVersioning.VERSION_CODES.getValue(variantOutput.abiString) * 10000000 + rawCode
+              ApkVersioning.VERSION_CODE * 10000000 + rawCode
             }
           variantOutput.versionCode.setDisallowChanges(mappedVersionCodeProvider)
         }
@@ -142,16 +142,7 @@ private object ApkVersioning {
 
   const val DEFAULT_VERSION_CODE: Int = 9999
 
-  // Override version code based on the ABI
-  // https://androidbycode.wordpress.com/2015/06/30/android-ndk-version-code-scheme-for-publishing-apks-per-architecture/
-  val VERSION_CODES: Map<String?, Int> =
-    mapOf(
-      null to 0, // Universal APK for CI
-      "arm64-v8a" to 3,
-      "armeabi-v7a" to 2,
-      "x86" to 8,
-      "x86_64" to 9
-    )
+  const val VERSION_CODE: Int = 9
 }
 
 /**
