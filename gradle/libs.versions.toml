@@ -2,7 +2,7 @@
 agp = "8.1.0"
 anvil = "2.4.6"
 bugsnagGradle = "8.0.1"
-compose-jb = "1.4.1"
+compose-jb = "1.4.3"
 dependencyAnalysisPlugin = "1.20.0"
 detekt = "1.23.0"
 dokka = "1.8.20"
