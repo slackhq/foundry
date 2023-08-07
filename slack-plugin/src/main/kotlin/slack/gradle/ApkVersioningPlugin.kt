@@ -18,8 +18,6 @@
 package slack.gradle
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.api.variant.FilterConfiguration
-import com.android.build.api.variant.VariantOutput
 import com.android.build.gradle.AppPlugin
 import java.util.Properties
 import org.gradle.api.DefaultTask
