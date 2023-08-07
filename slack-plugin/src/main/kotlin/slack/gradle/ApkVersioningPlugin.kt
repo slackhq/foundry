@@ -117,14 +117,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         // Have to iterate outputs because of APK splits.
         variant.outputs.forEach { variantOutput ->
           variantOutput.versionName.setDisallowChanges(mappedVersionNameProvider)
-
-          // Reuse the same task and just remap its value as needed
-          val mappedVersionCodeProvider =
-            versionCodeProvider.map { rawCode ->
-              @Suppress("MagicNumber")
-              ApkVersioning.VERSION_CODE * 10000000 + rawCode
-            }
-          variantOutput.versionCode.setDisallowChanges(mappedVersionCodeProvider)
+          variantOutput.versionCode.setDisallowChanges(versionCodeProvider)
         }
       }
     }
@@ -134,8 +127,6 @@ internal class ApkVersioningPlugin : Plugin<Project> {
 private object ApkVersioning {
 
   const val DEFAULT_VERSION_CODE: Int = 9999
-
-  const val VERSION_CODE: Int = 9
 }
 
 /**
