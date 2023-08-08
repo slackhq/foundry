@@ -12,7 +12,6 @@ version = property("VERSION_NAME").toString()
 repositories { mavenCentral() }
 
 dependencies {
-  implementation(libs.okio)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
