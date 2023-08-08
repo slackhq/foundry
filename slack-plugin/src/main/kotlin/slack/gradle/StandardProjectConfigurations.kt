@@ -475,24 +475,27 @@ internal class StandardProjectConfigurations(
               slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
                 false
               )
-          if (!excluded && isAffectedProject) {
-            computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
-            if (isLibraryVariant) {
-              (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
-                apkArtifactsDir ->
-                // Wire this up to the aggregator
-                androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+          val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
+          if (isAndroidTestEnabled) {
+            if (!excluded && isAffectedProject) {
+              computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
+              if (isLibraryVariant) {
+                (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
+                  apkArtifactsDir ->
+                  // Wire this up to the aggregator
+                  androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+                }
               }
-            }
-          } else {
-            val reason = if (excluded) "excluded" else "not affected"
-            val taskPath = "${projectPath}:androidTest"
-            val log = "$LOG Skipping $taskPath because it is $reason."
-            slackTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
-            if (slackProperties.debug) {
-              project.logger.lifecycle(log)
             } else {
-              project.logger.debug(log)
+              val reason = if (excluded) "excluded" else "not affected"
+              val taskPath = "${projectPath}:androidTest"
+              val log = "$LOG Skipping $taskPath because it is $reason."
+              slackTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
+              if (slackProperties.debug) {
+                project.logger.lifecycle(log)
+              } else {
+                project.logger.debug(log)
+              }
             }
           }
         }
