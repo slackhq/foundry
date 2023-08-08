@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.10.1
+------
+
+_2023-08-07_
+
+- Use a single version code for all APK architectures.
+  - Before, we used to compute a different version code for each architecture. This is kinda silly, and broke with AGP 8.1.0. So now we no longer do this. This means that by default, no custom version code is set unless an override is set in `{rootProject}/build/ci/release.version`. The default behavior will be to just use the version set in the `android` DSL.
+- Update to Detekt `1.23.1`.
+- Update to Gradle Enterprise `3.14.1`.
+- Update to Compose Multiplatform `1.4.3`.
+- Update to SqlDelight `2.0.0`.
+- Update to Anvil `2.4.7`.
+
 0.10.0
 ------
 

@@ -73,9 +73,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         project.rootProject.layout.projectDirectory.file("ci/release.version")
       val ciContent = project.providers.fileContents(ciVersionFileProvider)
       val versionCodeProvider: Provider<Int> =
-        project.ciBuildNumber
-          .flatMap { ciContent.asText.map { it.toInt() } }
-          .orElse(project.providers.provider { ApkVersioning.DEFAULT_VERSION_CODE })
+        project.ciBuildNumber.flatMap { ciContent.asText.map { it.toInt() } }
 
       configureVariants(project, versionNameProvider, versionCodeProvider)
 
@@ -122,11 +120,6 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       }
     }
   }
-}
-
-private object ApkVersioning {
-
-  const val DEFAULT_VERSION_CODE: Int = 90009999
 }
 
 /**
