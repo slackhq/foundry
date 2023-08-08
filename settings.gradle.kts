@@ -180,6 +180,7 @@ include(
   ":agp-handlers:agp-handler-80",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
+  ":skate-plugin:linker",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance
