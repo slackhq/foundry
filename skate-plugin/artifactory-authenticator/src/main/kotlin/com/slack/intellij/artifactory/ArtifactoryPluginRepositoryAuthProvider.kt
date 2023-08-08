@@ -18,7 +18,7 @@ package com.slack.intellij.artifactory
 import com.intellij.ide.plugins.auth.PluginRepositoryAuthProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
-import okio.ByteString.Companion.encode
+import java.util.Base64
 
 class ArtifactoryPluginRepositoryAuthProvider : PluginRepositoryAuthProvider {
 
@@ -26,13 +26,15 @@ class ArtifactoryPluginRepositoryAuthProvider : PluginRepositoryAuthProvider {
     ApplicationManager.getApplication().getService(AuthPluginSettings::class.java)
   private val logger = logger<ArtifactoryPluginRepositoryAuthProvider>()
 
+  private fun String.encodeBase64() = Base64.getEncoder().encodeToString(encodeToByteArray())
+
   override fun getAuthHeaders(url: String): Map<String, String> {
     logger.debug("Getting auth headers for $url")
     val username = settings.username
     val token = settings.token
     logger.debug("Username: $username, token is null? ${token == null}")
     return if (username != null && token != null) {
-      val encodedValue = "Basic " + "$username:$token".encode().base64()
+      val encodedValue = "Basic " + "$username:$token".encodeBase64()
       mapOf("Authorization" to encodedValue)
     } else {
       emptyMap()
