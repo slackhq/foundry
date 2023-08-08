@@ -77,6 +77,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val skipAndroidxCheck: Boolean
     get() = booleanProperty("slack.gradle.skipAndroidXCheck")
 
+  /** Default version code used for APK outputs. */
+  public val defaultVersionCode: Int
+    get() = intProperty("slack.gradle.defaultVersionCode", 90009999)
+
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
     get() = booleanProperty("slack.gradle.config.enableSnapshots")

@@ -75,7 +75,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val versionCodeProvider: Provider<Int> =
         project.ciBuildNumber
           .flatMap { ciContent.asText.map { it.toInt() } }
-          .orElse(project.providers.provider { ApkVersioning.DEFAULT_VERSION_CODE })
+          .orElse(SlackProperties(project).defaultVersionCode)
 
       configureVariants(project, versionNameProvider, versionCodeProvider)
 
@@ -122,11 +122,6 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       }
     }
   }
-}
-
-private object ApkVersioning {
-
-  const val DEFAULT_VERSION_CODE: Int = 90009999
 }
 
 /**
