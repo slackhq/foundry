@@ -126,7 +126,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
 
 private object ApkVersioning {
 
-  const val DEFAULT_VERSION_CODE: Int = 9999
+  const val DEFAULT_VERSION_CODE: Int = 90009999
 }
 
 /**
