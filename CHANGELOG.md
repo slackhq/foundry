@@ -4,6 +4,13 @@ Changelog
 0.10.1
 ------
 
+_2023-08-08_
+
+- Apparently the bugsnag plugin relies on the version code to be set in the variant output, so now we set a default again (configurable via `slack.gradle.defaultVersionCode`). The default is `90009999`, for _reasons_.
+
+0.10.1
+------
+
 _2023-08-07_
 
 - Use a single version code for all APK architectures.
