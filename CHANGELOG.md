@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.10.3
+------
+
+_2023-08-08_
+
+- Fix an issue with Skippy where we would accidentally mark all library projects as affected androidTest projects even if they didn't have androidTest enabled.
+- Update Guava to `32.1.2-jre`.
+
 0.10.2
 ------
 
