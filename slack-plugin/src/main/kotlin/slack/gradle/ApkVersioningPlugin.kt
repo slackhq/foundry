@@ -73,7 +73,9 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         project.rootProject.layout.projectDirectory.file("ci/release.version")
       val ciContent = project.providers.fileContents(ciVersionFileProvider)
       val versionCodeProvider: Provider<Int> =
-        project.ciBuildNumber.flatMap { ciContent.asText.map { it.toInt() } }
+        project.ciBuildNumber
+          .flatMap { ciContent.asText.map { it.toInt() } }
+          .orElse(SlackProperties(project).defaultVersionCode)
 
       configureVariants(project, versionNameProvider, versionCodeProvider)
 
