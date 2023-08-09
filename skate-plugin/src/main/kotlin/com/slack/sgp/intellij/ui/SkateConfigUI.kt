@@ -59,8 +59,10 @@ internal class SkateConfigUI(
           },
           setter = {
             if (File(it).isFile) {
-              settings.whatsNewFilePath =
-                LocalFileSystem.getInstance().findFileByPath(it)?.path.orEmpty()
+              val absolutePath = LocalFileSystem.getInstance().findFileByPath(it)?.path.orEmpty()
+              val projectPath = project.basePath ?: ""
+              val relativePath = absolutePath.removePrefix(projectPath).trimStart('/')
+              settings.whatsNewFilePath = relativePath
             } else {
               settings.whatsNewFilePath = ""
             }
