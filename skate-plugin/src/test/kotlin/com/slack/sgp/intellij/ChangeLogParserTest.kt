@@ -15,7 +15,6 @@
  */
 package com.slack.sgp.intellij
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
 import org.junit.Test
@@ -261,7 +260,7 @@ class ChangeLogParserTest {
 
     val expectedDate = LocalDate.of(2023, 7, 7)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, null)
-    Truth.assertThat(changeLogString).isEqualTo(input)
-    Truth.assertThat(latestEntry).isEqualTo(expectedDate)
+    assertThat(changeLogString).isEqualTo(input)
+    assertThat(latestEntry).isEqualTo(expectedDate)
   }
 }
