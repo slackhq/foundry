@@ -1,6 +1,34 @@
 Changelog
 =========
 
+0.10.4
+------
+
+_2023-08-10_
+
+- **New**: New DSL API for enabling Android resources.
+
+This streamlines configuration of enabling `androidResources` and enforces use of a resource prefix to avoid conflicts.
+
+May your avatars never be wrongly sized again.
+
+```kotlin
+slack {
+  android {
+    features {
+      resources("prefix_")
+    }
+  }
+}
+```
+
+- Update kotlin-cli-util to `2.0.0`.
+- Update Moshi to `1.15.0`.
+- Update sort-dependencies to `0.4`.
+- Update KSP to `1.9.0-1.0.13`.
+- Update Okio to `3.5.0`.
+- Update Jetbrains Markdown to `0.5.0`.
+
 0.10.3
 ------
 
