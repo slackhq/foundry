@@ -18,6 +18,7 @@
 package slack.gradle
 
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.gradle.LibraryExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import javax.inject.Inject
@@ -812,6 +813,20 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
     // Required for Robolectric to work.
     androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
     robolectric.setDisallowChanges(true)
+  }
+
+  /**
+   * **LIBRARIES ONLY**
+   *
+   * Enables android resources in this library and enforces use of the given [prefix] for all
+   * resources.
+   */
+  public fun resources(prefix: String) {
+    val libraryExtension =
+      androidExtension as? LibraryExtension
+        ?: error("slack.android.features.resources() is only applicable in libraries!")
+    libraryExtension.resourcePrefix = prefix
+    libraryExtension.buildFeatures { androidResources = true }
   }
 }
 
