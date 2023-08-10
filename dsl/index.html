@@ -396,6 +396,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    Resources
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -608,6 +615,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    Resources
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -695,6 +709,9 @@ behavior.</p>
 <h3 id="android-test">Android Test<a class="headerlink" href="#android-test" title="Permanent link">&para;</a></h3>
 <p>By default, SGP disables androidTests in projects. These can be enabled via the <code>androidTest()</code> feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.</p>
 <p>This is important for opting in tests to <a href="/utilities/#androidtest-apk-aggregation">AndroidTest APK Aggregation</a>.</p>
+<h3 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h3>
+<p>By default, we disable <em>Android</em> resources (different from <em>Java</em> resources) and libraries have to opt-in to using them.</p>
+<p>This can be enabled via the <code>resources()</code> feature, which will enable the relevant <code>BuildFeature</code> in the Android plugin and also takes a required <code>prefix</code> parameter that is used as the required <code>resourcePrefix</code> for that library&rsquo;s resources to avoid naming conflicts.</p>
 <h2 id="android-application-features">Android Application Features<a class="headerlink" href="#android-application-features" title="Permanent link">&para;</a></h2>
 <h3 id="permission-allowlist">Permission AllowList<a class="headerlink" href="#permission-allowlist" title="Permanent link">&para;</a></h3>
 <p>This enables checking of a permission allowlist. See <a href="/utilities/#permissionchecks"><code>PermissionChecks</code></a> for more

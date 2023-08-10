@@ -379,6 +379,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0104" class="md-nav__link">
+    0.10.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0103" class="md-nav__link">
     0.10.3
   </a>
@@ -1010,6 +1017,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0104" class="md-nav__link">
+    0.10.4
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0103" class="md-nav__link">
     0.10.3
   </a>
@@ -1580,6 +1594,29 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h2 id="0104">0.10.4<a class="headerlink" href="#0104" title="Permanent link">&para;</a></h2>
+<p><em>2023-08-10</em></p>
+<ul>
+<li><strong>New</strong>: New DSL API for enabling Android resources.</li>
+</ul>
+<p>This streamlines configuration of enabling <code>androidResources</code> and enforces use of a resource prefix to avoid conflicts.</p>
+<p>May your avatars never be wrongly sized again.</p>
+<div class="highlight"><pre><span></span><code><span class="n">slack</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">android</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">features</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">resources</span><span class="p">(</span><span class="s">&quot;prefix_&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>Update kotlin-cli-util to <code>2.0.0</code>.</li>
+<li>Update Moshi to <code>1.15.0</code>.</li>
+<li>Update sort-dependencies to <code>0.4</code>.</li>
+<li>Update KSP to <code>1.9.0-1.0.13</code>.</li>
+<li>Update Okio to <code>3.5.0</code>.</li>
+<li>Update Jetbrains Markdown to <code>0.5.0</code>.</li>
+</ul>
 <h2 id="0103">0.10.3<a class="headerlink" href="#0103" title="Permanent link">&para;</a></h2>
 <p><em>2023-08-08</em></p>
 <ul>
