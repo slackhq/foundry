@@ -65,6 +65,12 @@ By default, SGP disables androidTests in projects. These can be enabled via the 
 
 This is important for opting in tests to [AndroidTest APK Aggregation](/utilities/#androidtest-apk-aggregation).
 
+### Resources
+
+By default, we disable _Android_ resources (different from _Java_ resources) and libraries have to opt-in to using them.
+
+This can be enabled via the `resources()` feature, which will enable the relevant `BuildFeature` in the Android plugin and also takes a required `prefix` parameter that is used as the required `resourcePrefix` for that library's resources to avoid naming conflicts.
+
 ## Android Application Features
 
 ### Permission AllowList
