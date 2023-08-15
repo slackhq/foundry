@@ -16,12 +16,10 @@
 package slack.unittest
 
 import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
 import kotlin.math.roundToInt
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.retry
@@ -71,6 +69,7 @@ internal object UnitTests {
 
   fun configureSubproject(
     project: Project,
+    pluginId: String,
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
@@ -107,16 +106,13 @@ internal object UnitTests {
         null
       }
 
-    // We only want to create tasks once, but a project might apply multiple plugins.
-    val applied = AtomicBoolean(false)
-
-    project.pluginManager.withPlugin("com.android.base") {
-      if (applied.compareAndSet(false, true)) {
+    when (pluginId) {
+      "com.android.application",
+      "com.android.library" -> {
         createAndroidCiUnitTestTask(project, globalTask)
       }
-    }
-    val javaKotlinLibraryHandler = { _: AppliedPlugin ->
-      if (applied.compareAndSet(false, true)) {
+      else -> {
+        // Standard JVM projects like kotlin-jvm, java-library, etc
         project.logger.debug("$LOG Creating CI unit test tasks")
         val ciUnitTest =
           project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
@@ -130,8 +126,6 @@ internal object UnitTests {
         }
       }
     }
-    project.pluginManager.withPlugin("java-library", javaKotlinLibraryHandler)
-    project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm", javaKotlinLibraryHandler)
 
     configureTestTasks(project, slackProperties)
   }

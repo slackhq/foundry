@@ -73,6 +73,7 @@ import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
+import slack.unittest.UnitTests
 
 private const val LOG = "SlackPlugin:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -162,64 +163,78 @@ internal class StandardProjectConfigurations(
       applyPlatforms(slackProperties.versions.boms, platformProjectPath)
     }
 
-    if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
-      val buildFile = project.buildFile
-      // This can run on some intermediate middle directories, like `carbonite` in
-      // `carbonite:carbonite`
-      if (buildFile.exists()) {
-        // Configure rake
-        plugins.withId("com.autonomousapps.dependency-analysis") {
-          if (project.pluginManager.hasPlugin("com.android.test")) {
-            // Not supported yet in DAGP
-            // https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
-            return@withId
-          }
-          val isNoApi = slackProperties.rakeNoApi
-          val catalogNames =
-            extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
-
-          val catalogs = catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
-
-          val rakeDependencies =
-            tasks.register<RakeDependencies>("rakeDependencies") {
-              // TODO https://github.com/gradle/gradle/issues/25014
-              buildFileProperty.set(project.buildFile)
-              noApi.setDisallowChanges(isNoApi)
-              identifierMap.setDisallowChanges(
-                project.provider {
-                  buildMap {
-                    for (catalog in catalogs) {
-                      putAll(catalog.identifierMap().mapValues { (_, v) -> "${catalog.name}.$v" })
-                    }
-                  }
-                }
-              )
-              missingIdentifiersFile.set(
-                project.layout.buildDirectory.file("rake/missing_identifiers.txt")
-              )
-            }
-          configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
-          val aggregator =
-            project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
-              MissingIdentifiersAggregatorTask.NAME
-            )
-          aggregator.configure {
-            inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
-          }
-        }
-      }
-    }
-
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
 
-    pluginManager.onFirst(JVM_PLUGINS) {
+    pluginManager.onFirst(JVM_PLUGINS) { pluginId ->
       slackProperties.versions.bundles.commonAnnotations.ifPresent {
         dependencies.add("implementation", it)
       }
 
-      slackProperties.versions.bundles.commonTest.ifPresent {
-        dependencies.add("testImplementation", it)
+      if (pluginId != "com.android.test") {
+        // Configure tests
+        UnitTests.configureSubproject(
+          project,
+          pluginId,
+          slackProperties,
+          slackTools.globalConfig.affectedProjects,
+          slackTools::logAvoidedTask
+        )
+
+        slackProperties.versions.bundles.commonTest.ifPresent {
+          dependencies.add("testImplementation", it)
+        }
+
+        // Configure dependencyAnalysis
+        // TODO move up once DAGP supports com.android.test projects
+        //  https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
+        if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
+          val buildFile = project.buildFile
+          // This can run on some intermediate middle directories, like `carbonite` in
+          // `carbonite:carbonite`
+          if (buildFile.exists()) {
+            // Configure rake
+            plugins.withId("com.autonomousapps.dependency-analysis") {
+              val isNoApi = slackProperties.rakeNoApi
+              val catalogNames =
+                extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
+
+              val catalogs =
+                catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
+
+              val rakeDependencies =
+                tasks.register<RakeDependencies>("rakeDependencies") {
+                  // TODO https://github.com/gradle/gradle/issues/25014
+                  buildFileProperty.set(project.buildFile)
+                  noApi.setDisallowChanges(isNoApi)
+                  identifierMap.setDisallowChanges(
+                    project.provider {
+                      buildMap {
+                        for (catalog in catalogs) {
+                          putAll(
+                            catalog.identifierMap().mapValues { (_, v) -> "${catalog.name}.$v" }
+                          )
+                        }
+                      }
+                    }
+                  )
+                  missingIdentifiersFile.set(
+                    project.layout.buildDirectory.file("rake/missing_identifiers.txt")
+                  )
+                }
+              configure<DependencyAnalysisSubExtension> {
+                registerPostProcessingTask(rakeDependencies)
+              }
+              val aggregator =
+                project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
+                  MissingIdentifiersAggregatorTask.NAME
+                )
+              aggregator.configure {
+                inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
+              }
+            }
+          }
+        }
       }
     }
 
@@ -597,14 +612,16 @@ internal class StandardProjectConfigurations(
         slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-        LintTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask,
-          this,
-          sdkVersions::value
-        )
+        if (slackProperties.enableLintInAndroidTestProjects) {
+          LintTasks.configureSubProject(
+            project,
+            slackProperties,
+            slackTools.globalConfig.affectedProjects,
+            slackTools::logAvoidedTask,
+            this,
+            sdkVersions::value
+          )
+        }
       }
     }
 
@@ -1050,7 +1067,8 @@ internal class StandardProjectConfigurations(
         "java-library",
         "org.jetbrains.kotlin.jvm",
         "com.android.library",
-        "com.android.application"
+        "com.android.application",
+        "com.android.test",
       )
 
     private fun isKnownConfiguration(configurationName: String, knownNames: Set<String>): Boolean {

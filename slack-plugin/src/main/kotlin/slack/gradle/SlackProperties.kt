@@ -276,6 +276,15 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintIgnoreTestSources: Boolean
     get() = booleanProperty("sgp.lint.ignoreTestSources", false)
 
+  /**
+   * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
+   * is a flag to eventually support this in the future.
+   *
+   * https://issuetracker.google.com/issues/208765813
+   */
+  public val enableLintInAndroidTestProjects: Boolean
+    get() = booleanProperty("sgp.lint.enableOnAndroidTestProjects", false)
+
   /** Flag to enable/disable KSP. */
   public val allowKsp: Boolean
     get() = booleanProperty("slack.allow-ksp")

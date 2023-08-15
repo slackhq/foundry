@@ -27,7 +27,6 @@ import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.provider.Provider
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.stats.ModuleStatsTasks
-import slack.unittest.UnitTests
 
 /**
  * Simple base plugin over [StandardProjectConfigurations]. Eventually functionality from this will
@@ -44,12 +43,6 @@ internal class SlackBasePlugin : Plugin<Project> {
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       val slackTools = target.slackTools()
       StandardProjectConfigurations(slackProperties, versionCatalog, slackTools).applyTo(target)
-      UnitTests.configureSubproject(
-        target,
-        slackProperties,
-        slackTools.globalConfig.affectedProjects,
-        slackTools::logAvoidedTask
-      )
       CoreBootstrapTask.configureSubprojectBootstrapTasks(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
