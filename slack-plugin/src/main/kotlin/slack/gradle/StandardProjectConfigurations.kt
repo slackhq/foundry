@@ -73,6 +73,7 @@ import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
+import slack.unittest.UnitTests
 
 private const val LOG = "SlackPlugin:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -219,6 +220,15 @@ internal class StandardProjectConfigurations(
       }
 
       if (pluginId != "com.android.test") {
+        // Configure tests
+        UnitTests.configureSubproject(
+          project,
+          pluginId,
+          slackProperties,
+          slackTools.globalConfig.affectedProjects,
+          slackTools::logAvoidedTask
+        )
+
         slackProperties.versions.bundles.commonTest.ifPresent {
           dependencies.add("testImplementation", it)
         }
