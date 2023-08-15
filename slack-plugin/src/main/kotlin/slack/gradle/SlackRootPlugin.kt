@@ -436,7 +436,7 @@ private fun Project.configureMisc(slackProperties: SlackProperties) {
     .matching { it.name == "clean" }
     .configureEach {
       group = "build"
-      delete(rootProject.buildDir)
+      delete(rootProject.layout.buildDirectory)
     }
 
   // Configure gradle doctor
