@@ -1050,7 +1050,8 @@ internal class StandardProjectConfigurations(
         "java-library",
         "org.jetbrains.kotlin.jvm",
         "com.android.library",
-        "com.android.application"
+        "com.android.application",
+        "com.android.test",
       )
 
     private fun isKnownConfiguration(configurationName: String, knownNames: Set<String>): Boolean {
