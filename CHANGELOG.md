@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.10.5
+------
+
+_2023-08-15_
+
+- **Fix**: Better support `com.android.test` projects in a few ways
+  - No longer apply lint configurations as they don't support them.
+  - No longer apply DAGP as it doesn't support them yet.
+  - No longer apply unit test configurations as they don't have unit tests.
+- Build against Gradle 8.3 + fix a few deprecated `Project.buildDir` API usages.
+- Update `kotlin-cli-util` to `2.1.0`.
+
 0.10.4
 ------
 
