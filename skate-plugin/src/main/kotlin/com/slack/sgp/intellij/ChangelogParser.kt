@@ -15,118 +15,107 @@
  */
 package com.slack.sgp.intellij
 
+import com.slack.sgp.intellij.util.memoized
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-// Define a regular expression that matches a date in "yyyy-mm-dd" format
-private val LOCAL_DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$".toRegex()
-
-val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-// Define an extension function for the String class to check if a string can be parsed as a date
-private val String.isLocalDate: Boolean
-  get() {
-    return LOCAL_DATE_REGEX.matches(this.trim('_'))
-  }
-
-private val VERSION_PATTERN_REGEX = "\\d+\\.\\d+\\.\\d+".toRegex()
-
-private val String.startsNewBlock: Boolean
-  get() {
-    return VERSION_PATTERN_REGEX.matches(this.trim())
-  }
+import java.time.format.DateTimeParseException
 
 object ChangelogParser {
+  // Define a regular expression that matches a date in "yyyy-mm-dd" format
+  private val LOCAL_DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$".toRegex()
+
+  private val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+  // Define an extension function for the String class to check if a string can be parsed as a date
+  private val String.isLocalDate: Boolean
+    get() {
+      return LOCAL_DATE_REGEX.matches(this)
+    }
+
   /**
    * Function to parse a changelog and filter it based on a provided previous date entry.
    *
-   * @param changeLogString The entire changelog as a string.
-   * @param previousEntry The date of the previous entry, can be null.
-   * @return A ParseResult object containing the filtered changelog and the date of the latest
-   *   entry.
+   * @param changelogContent The entire changelog content as a string.
+   * @param lastReadDate The date of the previous seen entry, can be null.
+   * @return A [PresentedChangelog] object containing the filtered changelog and the date of the
+   *   latest entry.
    */
-  fun readFile(changeLogString: String, lastReadDate: LocalDate? = null): PresentedChangelog {
-    // Initialize lastReadDate with updated value, or will stay null if not
-    var updatedLastReadDate = lastReadDate
-
-    // Check if the lastReadDate is null
-    if (updatedLastReadDate == null) {
-      var foundDate = false
-
-      // Iterate through every line of the changeLogString
-      for (line in changeLogString.lines()) {
-        if (line.isLocalDate) {
-
-          // Parse the line to be a local date
-          val date: LocalDate? = LocalDate.parse(line.trim('_'), DATE_FORMATTER)
-
-          updatedLastReadDate = date
-          foundDate = true
-
-          // Break the loop now, the first date is found
-          break
-        }
-      }
-
-      // If no date is found, set the lastReadDate to current date
-      if (!foundDate) {
-        updatedLastReadDate = LocalDate.now()
-      }
-
-      // Returning the entire changelog with updated lastReadDate
-      return PresentedChangelog(changeLogString, updatedLastReadDate)
+  fun readFile(changelogContent: String, lastReadDate: LocalDate?): PresentedChangelog {
+    val newTime = LocalDate.now()
+    if (changelogContent.isBlank()) {
+      return PresentedChangelog(null, newTime)
     }
 
-    val changeLogSubstring =
-      buildString {
-          var currentBlock = StringBuilder()
-          var blockDate: LocalDate? = null
-          var inHeader = true
-          var firstNewDate: LocalDate? = null
-
-          for (line in changeLogString.lines()) {
-            when {
-
-              // Check if the line matches the format of the date
-              line.isLocalDate -> {
-                // Parse line to be local date
-                val localDate: LocalDate? = LocalDate.parse(line.trim('_'), DATE_FORMATTER)
-
-                if (localDate!! > updatedLastReadDate!!) {
-                  blockDate = localDate
-                  currentBlock.appendLine(line)
-                  if (firstNewDate == null) {
-                    firstNewDate = localDate
-                  }
-                } else {
-                  break
-                }
-              }
-
-              // Check if the line starts a new block associated with a new entry
-              line.startsNewBlock -> {
-                if (!inHeader) {
-                  if (blockDate != null && currentBlock.isNotBlank()) {
-                    append(currentBlock.toString())
-                    currentBlock = StringBuilder()
-                  }
-                }
-                inHeader = false
-                currentBlock.appendLine(line)
-              }
-              else -> {
-                currentBlock.appendLine(line)
-              }
+    // Lazily evaluated sequence of changelog sections
+    val sectionsSequence =
+      changelogContent
+        .lineSequence()
+        .partitionByDelimiter { line ->
+          if (line.isLocalDate) {
+            try {
+              LocalDate.parse(line, DATE_FORMATTER)
+            } catch (e: DateTimeParseException) {
+              null
             }
-          }
-          if (firstNewDate != null) {
-            updatedLastReadDate = firstNewDate
+          } else {
+            null
           }
         }
-        .trim()
+        .memoized()
 
-    return PresentedChangelog(changeLogSubstring, updatedLastReadDate)
+    val sections =
+      if (lastReadDate == null) {
+        sectionsSequence.take(1)
+      } else {
+        sectionsSequence.takeWhile { section -> section.date > lastReadDate }
+      }
+
+    val sectionsList = sections.toList()
+    return if (sectionsList.isEmpty()) {
+      // Second read is ok as it's memoized
+      PresentedChangelog(null, sectionsSequence.firstOrNull()?.date)
+    } else {
+      PresentedChangelog(sectionsList.joinToString("\n\n") { it.content }, sectionsList[0].date)
+    }
   }
 
+  /** Partitions a given sequence into [ChangelogSection]s based on a given [dateParser]. */
+  private fun Sequence<String>.partitionByDelimiter(
+    dateParser: (line: String) -> LocalDate?
+  ): Sequence<ChangelogSection> = sequence {
+    val iterator = iterator()
+    val currentPartition = StringBuilder()
+    var currentPartitionDate: LocalDate? = null
+
+    while (iterator.hasNext()) {
+      val line = iterator.next()
+
+      val parsedDate = dateParser(line)
+      if (parsedDate != null) {
+        if (currentPartition.isNotEmpty() && currentPartitionDate != null) {
+          yield(ChangelogSection(currentPartitionDate, currentPartition.toString().trim()))
+          currentPartition.clear()
+        }
+        currentPartition.appendLine(line)
+        currentPartitionDate = parsedDate
+      } else {
+        currentPartition.appendLine(line)
+      }
+    }
+
+    if (currentPartition.isNotEmpty()) {
+      if (currentPartitionDate != null) {
+        yield(ChangelogSection(currentPartitionDate, currentPartition.toString().trim()))
+      } else {
+        // Un-delimited changelog, probably just the title. Yield nothing
+        println("Un-delimited changelog, probably just the title.")
+      }
+    }
+  }
+
+  /** Represents a parsed [changeLogString] to present up to the given [lastReadDate]. */
   data class PresentedChangelog(val changeLogString: String?, val lastReadDate: LocalDate?)
+
+  /** Represents a dated section of a changelog. */
+  private data class ChangelogSection(val date: LocalDate, val content: String)
 }
