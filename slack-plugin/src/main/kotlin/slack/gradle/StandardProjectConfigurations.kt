@@ -163,54 +163,6 @@ internal class StandardProjectConfigurations(
       applyPlatforms(slackProperties.versions.boms, platformProjectPath)
     }
 
-    if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
-      val buildFile = project.buildFile
-      // This can run on some intermediate middle directories, like `carbonite` in
-      // `carbonite:carbonite`
-      if (buildFile.exists()) {
-        // Configure rake
-        plugins.withId("com.autonomousapps.dependency-analysis") {
-          if (project.pluginManager.hasPlugin("com.android.test")) {
-            // Not supported yet in DAGP
-            // https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
-            return@withId
-          }
-          val isNoApi = slackProperties.rakeNoApi
-          val catalogNames =
-            extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
-
-          val catalogs = catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
-
-          val rakeDependencies =
-            tasks.register<RakeDependencies>("rakeDependencies") {
-              // TODO https://github.com/gradle/gradle/issues/25014
-              buildFileProperty.set(project.buildFile)
-              noApi.setDisallowChanges(isNoApi)
-              identifierMap.setDisallowChanges(
-                project.provider {
-                  buildMap {
-                    for (catalog in catalogs) {
-                      putAll(catalog.identifierMap().mapValues { (_, v) -> "${catalog.name}.$v" })
-                    }
-                  }
-                }
-              )
-              missingIdentifiersFile.set(
-                project.layout.buildDirectory.file("rake/missing_identifiers.txt")
-              )
-            }
-          configure<DependencyAnalysisSubExtension> { registerPostProcessingTask(rakeDependencies) }
-          val aggregator =
-            project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
-              MissingIdentifiersAggregatorTask.NAME
-            )
-          aggregator.configure {
-            inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
-          }
-        }
-      }
-    }
-
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
 
@@ -231,6 +183,57 @@ internal class StandardProjectConfigurations(
 
         slackProperties.versions.bundles.commonTest.ifPresent {
           dependencies.add("testImplementation", it)
+        }
+
+        // Configure dependencyAnalysis
+        // TODO move up once DAGP supports com.android.test projects
+        //  https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
+        if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
+          val buildFile = project.buildFile
+          // This can run on some intermediate middle directories, like `carbonite` in
+          // `carbonite:carbonite`
+          if (buildFile.exists()) {
+            // Configure rake
+            plugins.withId("com.autonomousapps.dependency-analysis") {
+              val isNoApi = slackProperties.rakeNoApi
+              val catalogNames =
+                extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
+
+              val catalogs =
+                catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
+
+              val rakeDependencies =
+                tasks.register<RakeDependencies>("rakeDependencies") {
+                  // TODO https://github.com/gradle/gradle/issues/25014
+                  buildFileProperty.set(project.buildFile)
+                  noApi.setDisallowChanges(isNoApi)
+                  identifierMap.setDisallowChanges(
+                    project.provider {
+                      buildMap {
+                        for (catalog in catalogs) {
+                          putAll(
+                            catalog.identifierMap().mapValues { (_, v) -> "${catalog.name}.$v" }
+                          )
+                        }
+                      }
+                    }
+                  )
+                  missingIdentifiersFile.set(
+                    project.layout.buildDirectory.file("rake/missing_identifiers.txt")
+                  )
+                }
+              configure<DependencyAnalysisSubExtension> {
+                registerPostProcessingTask(rakeDependencies)
+              }
+              val aggregator =
+                project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
+                  MissingIdentifiersAggregatorTask.NAME
+                )
+              aggregator.configure {
+                inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
+              }
+            }
+          }
         }
       }
     }
