@@ -213,13 +213,15 @@ internal class StandardProjectConfigurations(
     checkAndroidXDependencies(slackProperties)
     configureAnnotationProcessors()
 
-    pluginManager.onFirst(JVM_PLUGINS) {
+    pluginManager.onFirst(JVM_PLUGINS) { pluginId ->
       slackProperties.versions.bundles.commonAnnotations.ifPresent {
         dependencies.add("implementation", it)
       }
 
-      slackProperties.versions.bundles.commonTest.ifPresent {
-        dependencies.add("testImplementation", it)
+      if (pluginId != "com.android.test") {
+        slackProperties.versions.bundles.commonTest.ifPresent {
+          dependencies.add("testImplementation", it)
+        }
       }
     }
 
@@ -597,14 +599,16 @@ internal class StandardProjectConfigurations(
         slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-        LintTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask,
-          this,
-          sdkVersions::value
-        )
+        if (slackProperties.enableLintInAndroidTestProjects) {
+          LintTasks.configureSubProject(
+            project,
+            slackProperties,
+            slackTools.globalConfig.affectedProjects,
+            slackTools::logAvoidedTask,
+            this,
+            sdkVersions::value
+          )
+        }
       }
     }
 
