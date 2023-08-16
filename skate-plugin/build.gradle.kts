@@ -17,7 +17,15 @@ repositories { mavenCentral() }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij { plugins.add("org.intellij.plugins.markdown") }
+intellij {
+  plugins.addAll(
+    "org.intellij.plugins.markdown", // Markdown plugin for What's New panel
+    "com.facebook.ktfmt_idea_plugin", // ktfmt plugin for formatting Kotlin code
+    "google-java-format", // GJF plugin for formatting Java code
+    "detekt",
+    "com.squareup.sqldelight"
+  )
+}
 
 fun isGitHash(hash: String): Boolean {
   if (hash.length != 40) {
