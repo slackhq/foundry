@@ -18,10 +18,21 @@ repositories { mavenCentral() }
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
+  // Built-in plugin dependencies
   plugins.addAll(
-    "org.intellij.plugins.markdown", // Markdown plugin for What's New panel
-    "com.facebook.ktfmt_idea_plugin", // ktfmt plugin for formatting Kotlin code
-    "google-java-format", // GJF plugin for formatting Java code
+    // Markdown plugin for What's New panel
+    "org.intellij.plugins.markdown",
+    "com.intellij.gradle",
+    "com.intellij.java",
+    "org.jetbrains.android",
+  )
+  // External plugin dependencies
+  this.extraDependencies
+  pluginDependencies.addAll(
+    // ktfmt plugin for formatting Kotlin code
+    "com.facebook.ktfmt_idea_plugin",
+    // GJF plugin for formatting Java code
+    "google-java-format",
     "detekt",
     "com.squareup.sqldelight"
   )
