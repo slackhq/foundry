@@ -259,7 +259,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     tasks.withType<DokkaTaskPartial>().configureEach {
-      outputDirectory.set(buildDir.resolve("docs/partial"))
+      outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
       dokkaSourceSets.configureEach {
         val readMeProvider = project.layout.projectDirectory.file("README.md")
         if (readMeProvider.asFile.exists()) {
