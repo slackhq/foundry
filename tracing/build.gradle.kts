@@ -14,10 +14,11 @@ wire {
 
 dependencies {
   api(platform(libs.coroutines.bom))
-  implementation(libs.coroutines.core)
-  implementation(libs.retrofit.converters.wire)
-  implementation(libs.retrofit)
   api(platform(libs.okhttp.bom))
+
+  implementation(libs.coroutines.core)
   implementation(libs.okhttp)
   implementation(libs.okio)
+  implementation(libs.retrofit)
+  implementation(libs.retrofit.converters.wire)
 }
