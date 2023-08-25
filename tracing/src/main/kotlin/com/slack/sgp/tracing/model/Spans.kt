@@ -15,7 +15,6 @@
  */
 package com.slack.sgp.tracing.model
 
-import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.Span
 import okio.ByteString
 
@@ -27,7 +26,7 @@ public fun buildSpan(
   durationMicros: Long,
   traceId: ByteString = makeId(),
   parentId: ByteString = ByteString.EMPTY,
-  addTags: MutableList<KeyValue>.() -> Unit = {},
+  addTags: TagBuilder.() -> Unit = {},
 ): Span {
   return Span(
     id = makeId(),
@@ -36,6 +35,6 @@ public fun buildSpan(
     trace_id = traceId,
     start_timestamp_micros = startTimestampMicros,
     duration_micros = durationMicros,
-    tags = mutableListOf<KeyValue>().apply(addTags)
+    tags = tagBuilderImpl().apply(addTags)
   )
 }
