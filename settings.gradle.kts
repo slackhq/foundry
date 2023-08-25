@@ -176,6 +176,7 @@ rootProject.name = "slack-gradle-plugin"
 include(
   ":agp-handlers:agp-handler-80",
   ":agp-handlers:agp-handler-api",
+  ":tracing",
   ":sgp-monkeypatch-agp",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
