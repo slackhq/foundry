@@ -15,10 +15,10 @@
  */
 package slack.gradle
 
+import com.android.build.api.AndroidPluginVersion
 import java.util.ServiceLoader
 import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.AgpHandlerFactory
-import slack.gradle.agp.VersionNumber
 
 internal object AgpHandlers {
   fun createHandler(): AgpHandler {
@@ -31,12 +31,12 @@ internal object AgpHandlers {
           // Filter out any factories that can't compute the AGP version, as
           // they're _definitely_ not compatible
           try {
-            FactoryData(VersionNumber.parse(factory.currentVersion()), factory)
+            FactoryData(factory.currentVersion, factory)
           } catch (t: Throwable) {
             null
           }
         }
-        .filter { (agpVersion, factory) -> agpVersion.baseVersion >= factory.minVersion }
+        .filter { (agpVersion, factory) -> agpVersion >= factory.minVersion }
         .maxByOrNull { (_, factory) -> factory.minVersion }
         ?.factory
         ?: error("Unrecognized AGP version!")
@@ -45,4 +45,7 @@ internal object AgpHandlers {
   }
 }
 
-private data class FactoryData(val agpVersion: VersionNumber, val factory: AgpHandlerFactory)
+private data class FactoryData(
+  val agpVersion: AndroidPluginVersion,
+  val factory: AgpHandlerFactory
+)
