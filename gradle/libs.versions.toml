@@ -76,7 +76,7 @@ gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", versi
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
 guava = "com.google.guava:guava:32.1.2-jre"
-kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.1.0"
+kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.2.1"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
@@ -94,5 +94,5 @@ okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", versio
 oshi = "com.github.oshi:oshi-core:6.4.5"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
-rxjava = "io.reactivex.rxjava3:rxjava:3.1.6"
+rxjava = "io.reactivex.rxjava3:rxjava:3.1.7"
 truth = "com.google.truth:truth:1.1.5"
