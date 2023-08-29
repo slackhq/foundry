@@ -174,12 +174,13 @@ rootProject.name = "slack-gradle-plugin"
 
 // Please keep these in alphabetical order!
 include(
-  ":slack-plugin",
-  ":sgp-monkeypatch-agp",
-  ":agp-handlers:agp-handler-api",
   ":agp-handlers:agp-handler-80",
+  ":agp-handlers:agp-handler-api",
+  ":sgp-monkeypatch-agp",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
+  ":slack-plugin",
+  ":tracing"
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance
