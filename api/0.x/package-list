@@ -14,6 +14,9 @@ slack.gradle.dependencies
 slack.gradle.tasks
 slack.gradle.util
 slack.stats
+module:tracing
+com.slack.sgp.tracing.model
+com.slack.sgp.tracing.reporter
 module:agp-handler-80
 slack.gradle.agphandler.v80
 module:agp-handler-api
