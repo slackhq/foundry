@@ -430,6 +430,13 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
 
+  /**
+   * Optional override for buildToolsVersion in Android projects. Sometimes temporarily necessary to
+   * pick up new fixes.
+   */
+  public val buildToolsVersionOverride: String? =
+    optionalStringProperty("sgp.android.buildToolsVersionOverride")
+
   /* Controls for auto-applied plugins. */
   public val autoApplyTestRetry: Boolean
     get() = booleanProperty("slack.auto-apply.test-retry", defaultValue = true)
