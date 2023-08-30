@@ -86,8 +86,8 @@ tasks
 
 dependencies {
   implementation(libs.bugsnag)
-  implementation(libs.kotlin.stdlib)
   implementation(libs.kotlin.compiler.embeddable)
+  implementation(libs.kotlin.stdlib)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
