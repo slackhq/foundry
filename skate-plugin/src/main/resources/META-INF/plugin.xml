@@ -33,6 +33,8 @@
     </extensions>
 
     <applicationListeners>
+        <listener class="com.slack.sgp.intellij.featureflags.FeatureFlagFileListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
         <listener class="com.slack.sgp.intellij.ProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
