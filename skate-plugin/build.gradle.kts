@@ -85,8 +85,8 @@ tasks
 // endregion
 
 dependencies {
-  compileOnly(libs.kotlin.compiler.embeddable)
   implementation(libs.bugsnag)
+  compileOnly(libs.kotlin.compiler.embeddable)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }

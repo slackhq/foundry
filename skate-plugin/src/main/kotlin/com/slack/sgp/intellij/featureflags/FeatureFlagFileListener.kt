@@ -39,6 +39,6 @@ class FeatureFlagFileListener : FileEditorManagerListener {
   }
 
   private fun isFeatureFile(file: VirtualFile): Boolean {
-    return file.name.matches(Regex(".*Feature\\.kt"))
+    return file.name.endsWith("Feature.kt")
   }
 }
