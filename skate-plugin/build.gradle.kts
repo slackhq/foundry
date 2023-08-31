@@ -89,4 +89,8 @@ dependencies {
   compileOnly(libs.kotlin.compiler.embeddable)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+  testImplementation(libs.kotlin.compiler.embeddable)
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+  testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+  testImplementation("io.mockk:mockk:1.13.7")
 }
