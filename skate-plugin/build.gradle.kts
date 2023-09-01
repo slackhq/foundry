@@ -85,7 +85,7 @@ tasks
 // endregion
 
 dependencies {
-  implementation(libs.bugsnag)
+  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
