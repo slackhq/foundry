@@ -273,7 +273,14 @@ internal class StandardProjectConfigurations(
     platformProject: String,
   ) {
     configurations.configureEach {
+      if (Configurations.isTest(name) && Configurations.isApi(name)) {
+        // Don't add dependencies to testApi configurations as these are never used
+        // https://youtrack.jetbrains.com/issue/KT-61653
+        project.logger.debug("Ignoring boms on ${project.path}:$name")
+        return@configureEach
+      }
       if (isPlatformConfigurationName(name)) {
+        project.logger.debug("Adding boms to ${project.path}:$name")
         project.dependencies.apply {
           for (bom in boms) {
             add(name, platform(bom))
