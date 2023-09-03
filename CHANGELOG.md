@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.10.7
+------
+
+_2023-08-29_
+
+- **Fix**: Don't apply BOMs to testApi configurations.
+
 0.10.6
 ------
 
