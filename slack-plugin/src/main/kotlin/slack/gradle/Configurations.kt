@@ -18,7 +18,8 @@ package slack.gradle
 internal object Configurations {
 
   // The "(?i)" makes the regex case-insensitive
-  private val testConfigurationRegex = Regex("(?i).*?(androidTest|unitTest|instrumentedTest|jvmTest|androidUnitTest).*")
+  private val testConfigurationRegex =
+    Regex("(?i).*?(androidTest|unitTest|instrumentedTest|jvmTest|androidUnitTest).*")
 
   const val COMPILE_ONLY = "compileOnly"
   const val CORE_LIBRARY_DESUGARING = "coreLibraryDesugaring"
