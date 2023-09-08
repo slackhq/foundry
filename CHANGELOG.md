@@ -1,6 +1,34 @@
 Changelog
 =========
 
+0.10.7
+------
+
+_2023-08-29_
+
+- **Fix**: Don't apply BOMs to testApi configurations.
+
+0.10.6
+------
+
+_2023-08-29_
+
+- **New**: Publish a generic Tracing API under the `sgp-tracing` artifact ID. We use this internally to collect extra build metadata, but it's generic enough for general use. Not currently used in slack-plugin yet.
+- Add `sgp.android.buildToolsVersionOverride` property to override the default build tools version in Android.
+- Migrate to `AndroidPluginVersion` API in `AgpHandler`.
+- Fix a few more deprecated Gradle API usages.
+- Build against AGP `8.1.1`.
+- Build against Spotless `6.21.0`.
+- Build against Compose Multiplatform `1.5.0`.
+- Update to Kotlin `1.9.10`.
+- Update to KSP `1.9.10-1.0.13`.
+- Update to RxJava `3.1.7`.
+- Update to kotlin-cli-util `2.2.1`.
+- Update to Oshi `6.4.5`.
+- Update to Wire `4.8.1`
+- Update to DAGP `1.21.0`.
+- Update to Gradle `8.3`.
+
 0.10.5
 ------
 

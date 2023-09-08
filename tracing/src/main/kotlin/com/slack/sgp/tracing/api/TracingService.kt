@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2023 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.agp
+package com.slack.sgp.tracing.api
 
-import com.android.build.api.AndroidPluginVersion
+import com.slack.sgp.tracing.ListOfSpans
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Url
 
-/** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
-public interface AgpHandler {
-  /** The current AGP version. */
-  public val agpVersion: AndroidPluginVersion
+/** Represents a simple tracing API that accepts [ListOfSpans] proto bodies. */
+internal interface TracingService {
+  @POST suspend fun sendTrace(@Url url: String, @Body spans: ListOfSpans)
 }
-
-/** Returns a new [AndroidPluginVersion] with any preview information stripped. */
-public val AndroidPluginVersion.baseVersion: AndroidPluginVersion
-  get() = AndroidPluginVersion(major, minor, micro)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2023 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.agp
+package com.slack.sgp.tracing.reporter
 
-import com.android.build.api.AndroidPluginVersion
+import com.slack.sgp.tracing.ListOfSpans
 
-/** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
-public interface AgpHandler {
-  /** The current AGP version. */
-  public val agpVersion: AndroidPluginVersion
+/** Reports a build trace (modeled as list of spans, in protocol buffer format) to some location. */
+public interface TraceReporter {
+  public suspend fun sendTrace(spans: ListOfSpans)
+
+  public object NoOpTraceReporter : TraceReporter {
+    override suspend fun sendTrace(spans: ListOfSpans) {
+      // Do nothing!
+    }
+  }
 }
-
-/** Returns a new [AndroidPluginVersion] with any preview information stripped. */
-public val AndroidPluginVersion.baseVersion: AndroidPluginVersion
-  get() = AndroidPluginVersion(major, minor, micro)

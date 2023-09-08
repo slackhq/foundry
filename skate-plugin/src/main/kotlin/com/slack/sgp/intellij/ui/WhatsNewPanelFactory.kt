@@ -134,7 +134,7 @@ class WhatsNewPanelFactory : DumbAware {
             }
           panel {
             row {
-                cell(htmlPanel)
+                scrollCell(htmlPanel)
                   .horizontalAlign(HorizontalAlign.FILL)
                   .verticalAlign(VerticalAlign.FILL)
               }

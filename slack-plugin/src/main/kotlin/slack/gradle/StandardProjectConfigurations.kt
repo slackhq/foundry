@@ -150,7 +150,7 @@ internal class StandardProjectConfigurations(
     jdkVersion: Int,
     jvmTargetVersion: Int,
     slackProperties: SlackProperties,
-    slackExtension: SlackExtension
+    slackExtension: SlackExtension,
   ) {
     val platformProjectPath = slackProperties.platformProjectPath
     if (platformProjectPath == null) {
@@ -270,10 +270,17 @@ internal class StandardProjectConfigurations(
    */
   private fun Project.applyPlatforms(
     boms: Set<Provider<MinimalExternalModuleDependency>>,
-    platformProject: String
+    platformProject: String,
   ) {
     configurations.configureEach {
+      if (Configurations.isTest(name) && Configurations.isApi(name)) {
+        // Don't add dependencies to testApi configurations as these are never used
+        // https://youtrack.jetbrains.com/issue/KT-61653
+        project.logger.debug("Ignoring boms on ${project.path}:$name")
+        return@configureEach
+      }
       if (isPlatformConfigurationName(name)) {
+        project.logger.debug("Adding boms to ${project.path}:$name")
         project.dependencies.apply {
           for (bom in boms) {
             add(name, platform(bom))
@@ -311,7 +318,7 @@ internal class StandardProjectConfigurations(
   private fun Project.configureJavaProject(
     jdkVersion: Int,
     jvmTargetVersion: Int,
-    slackProperties: SlackProperties
+    slackProperties: SlackProperties,
   ) {
     plugins.withType(JavaBasePlugin::class.java).configureEach {
       project.configure<JavaPluginExtension> {
@@ -433,7 +440,7 @@ internal class StandardProjectConfigurations(
   private fun Project.configureAndroidProjects(
     slackExtension: SlackExtension,
     jvmTargetVersion: Int,
-    slackProperties: SlackProperties
+    slackProperties: SlackProperties,
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
     val computeAffectedProjectsTask =
@@ -526,6 +533,7 @@ internal class StandardProjectConfigurations(
 
         compileSdkVersion(sdkVersions.value.compileSdk)
         slackProperties.ndkVersion?.let { ndkVersion = it }
+        slackProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
           minSdk = sdkVersions.value.minSdk
@@ -830,7 +838,7 @@ internal class StandardProjectConfigurations(
                       // Skip dashes and underscores. We could camelcase but it looks weird in a
                       // package name
                       '-',
-                      '_' -> null
+                      '_', -> null
                       // Use the project path as the real dot namespacing
                       ':' -> '.'
                       else -> it
@@ -1192,12 +1200,12 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
    */
   open fun newConfigurer(
     project: Project,
-    basicConfigurer: AptOptionsConfigurer
+    basicConfigurer: AptOptionsConfigurer,
   ): AptOptionsConfigurer = basicConfigurer
 
   private class BasicAptOptionsConfigurer(
     override val project: Project,
-    private val baseConfig: BasicAptOptionsConfig
+    private val baseConfig: BasicAptOptionsConfig,
   ) : AptOptionsConfigurer {
 
     private val baseBuildTypeAction =
