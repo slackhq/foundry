@@ -24,6 +24,18 @@ import com.intellij.openapi.diagnostic.Logger
 class FeatureFlagExtractor {
 
   private val LOG: Logger = Logger.getInstance(FeatureFlagExtractor::class.java)
+
+  companion object {
+    private val featureFlagCache = mutableMapOf<com.intellij.psi.PsiFile, List<String>>()
+  }
+
+  fun setFeatureFlagsForPsiFile(psiFile: com.intellij.psi.PsiFile, flags: List<String>) {
+    featureFlagCache[psiFile] = flags
+  }
+
+  fun getFeatureFlagsForPsiFile(psiFile: com.intellij.psi.PsiFile): List<String>? {
+    return featureFlagCache[psiFile]
+  }
   /**
    * Extracts the names of feature flags from the provided PSI file. Only processes Kotlin files.
    *
@@ -49,10 +61,7 @@ class FeatureFlagExtractor {
     val annotatedEnumEntries = mutableListOf<String>()
 
     fun addIfAnnotatedEnum(element: Any) {
-      if (
-        element.javaClass.name == "org.jetbrains.kotlin.psi.KtEnumEntry" &&
-          hasFeatureFlagAnnotation(element)
-      ) {
+      if (isKtEnumEntry(element) && hasFeatureFlagAnnotation(element)) {
         element.javaClass
           .getMethod("getName")
           .invoke(element)
@@ -88,5 +97,21 @@ class FeatureFlagExtractor {
       shortName?.toString() == "FeatureFlag"
     }
       ?: false
+  }
+
+  fun isKtEnumEntry(element: Any): Boolean {
+    LOG.info("Checking if element is KtEnumEntry")
+    val result = element.javaClass.name == "org.jetbrains.kotlin.psi.KtEnumEntry"
+    LOG.info("Element isKtEnumEntry: $result")
+    return result
+  }
+
+  fun getElementName(element: Any): String? {
+    return try {
+      val nameMethod = element.javaClass.getMethod("getName")
+      nameMethod.invoke(element) as? String
+    } catch (e: NoSuchMethodException) {
+      null
+    }
   }
 }

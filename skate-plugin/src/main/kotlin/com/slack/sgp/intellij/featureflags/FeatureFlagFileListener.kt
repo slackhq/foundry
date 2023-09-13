@@ -33,7 +33,8 @@ class FeatureFlagFileListener : FileEditorManagerListener {
       val psiFile = PsiUtilBase.getPsiFileInEditor(editor!!, source.project)
       psiFile?.let {
         val featureFlagHandler = FeatureFlagExtractor()
-        featureFlagHandler.extractFeatureFlags(psiFile)
+        val flags = featureFlagHandler.extractFeatureFlags(psiFile)
+        featureFlagHandler.setFeatureFlagsForPsiFile(psiFile, flags)
       }
     }
   }
