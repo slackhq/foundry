@@ -30,6 +30,7 @@
                 serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
         <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig"/>
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
+        <externalAnnotator language="kotlin" implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
     </extensions>
 
     <applicationListeners>

@@ -38,8 +38,22 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isWhatsNewEnabled = value
     }
 
+  var isLinkifiedFeatureFlagsEnabled: Boolean
+    get() = state.isLinkifiedFeatureFlagsEnabled
+    set(value) {
+      state.isLinkifiedFeatureFlagsEnabled = value
+    }
+
+  var featureFlagBaseUrl: String?
+    get() = state.featureFlagBaseUrl ?: "https://houston.tinyspeck.com/experiments/all"
+    set(value) {
+      state.featureFlagBaseUrl = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
+    var isLinkifiedFeatureFlagsEnabled by property(true)
+    var featureFlagBaseUrl by string()
   }
 }

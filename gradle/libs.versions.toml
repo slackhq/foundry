@@ -78,6 +78,7 @@ gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.
 guava = "com.google.guava:guava:32.1.2-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.2.1"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-compilerEmbeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
