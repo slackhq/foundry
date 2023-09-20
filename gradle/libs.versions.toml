@@ -1,6 +1,6 @@
 [versions]
 agp = "8.1.1"
-anvil = "2.4.7"
+anvil = "2.4.8"
 bugsnagGradle = "8.0.1"
 compose-jb = "1.5.1"
 coroutines = "1.7.3"
