@@ -79,7 +79,7 @@ if [[ ! -z ${kts_files_list} ]]; then
     fi
 fi
 
-# TODO eventually support detekt here too once we can wire baseline and config fils
+# TODO eventually support detekt here too once we can wire baseline and config files
 #### ktfmt
 # Get a list of staged files, parsing .kt or .kts files
 kotlin_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*"  | grep -Ei "\.kt(s)?$")"
