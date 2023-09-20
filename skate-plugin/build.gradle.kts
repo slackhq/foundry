@@ -17,7 +17,10 @@ repositories { mavenCentral() }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij { plugins.add("org.intellij.plugins.markdown") }
+intellij {
+  plugins.add("org.intellij.plugins.markdown")
+  plugins.add("org.jetbrains.kotlin")
+}
 
 fun isGitHash(hash: String): Boolean {
   if (hash.length != 40) {
@@ -85,7 +88,7 @@ tasks
 // endregion
 
 dependencies {
-  implementation(libs.kotlin.compilerEmbeddable)
+  compileOnly(libs.kotlin.compilerEmbeddable)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   testImplementation(libs.junit)
   testImplementation(libs.truth)

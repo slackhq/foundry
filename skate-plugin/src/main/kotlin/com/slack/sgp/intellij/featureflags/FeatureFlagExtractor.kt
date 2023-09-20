@@ -43,10 +43,6 @@ class FeatureFlagExtractor {
    * @return A list of feature flag names in a file
    */
   fun extractFeatureFlags(psiFile: com.intellij.psi.PsiFile): List<String> {
-    if (!isKtFile(psiFile)) {
-      LOG.info("$psiFile is not a KtFile")
-      return emptyList()
-    }
     LOG.info("Getting Enum Entries")
     val enumsWithAnnotation = findAnnotatedEnums(psiFile)
     LOG.info("Enums with Annotations: $enumsWithAnnotation")
