@@ -77,6 +77,10 @@ public class SlackProperties private constructor(private val project: Project) {
   public val skipAndroidxCheck: Boolean
     get() = booleanProperty("slack.gradle.skipAndroidXCheck")
 
+  /** Default version code used for APK outputs. */
+  public val defaultVersionCode: Int
+    get() = intProperty("slack.gradle.defaultVersionCode", 90009999)
+
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
     get() = booleanProperty("slack.gradle.config.enableSnapshots")
@@ -272,6 +276,15 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintIgnoreTestSources: Boolean
     get() = booleanProperty("sgp.lint.ignoreTestSources", false)
 
+  /**
+   * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
+   * is a flag to eventually support this in the future.
+   *
+   * https://issuetracker.google.com/issues/208765813
+   */
+  public val enableLintInAndroidTestProjects: Boolean
+    get() = booleanProperty("sgp.lint.enableOnAndroidTestProjects", false)
+
   /** Flag to enable/disable KSP. */
   public val allowKsp: Boolean
     get() = booleanProperty("slack.allow-ksp")
@@ -304,13 +317,6 @@ public class SlackProperties private constructor(private val project: Project) {
    */
   public val kotlinDaemonArgs: String
     get() = stringProperty(KOTLIN_DAEMON_ARGS_KEY, defaultValue = "")
-
-  /**
-   * Flag to enable the new K2 compiler. Plumbed into the kotlinOptions.useK2 property and here to
-   * allow for use from a `local.properties` file.
-   */
-  public val useK2: Boolean
-    get() = booleanProperty("slack.useK2", defaultValue = false)
 
   /**
    * Flag to enable ciUnitTest on this project. Default is true.
@@ -423,6 +429,13 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
+
+  /**
+   * Optional override for buildToolsVersion in Android projects. Sometimes temporarily necessary to
+   * pick up new fixes.
+   */
+  public val buildToolsVersionOverride: String? =
+    optionalStringProperty("sgp.android.buildToolsVersionOverride")
 
   /* Controls for auto-applied plugins. */
   public val autoApplyTestRetry: Boolean

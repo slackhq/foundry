@@ -147,10 +147,12 @@ pluginManagement {
         includeModule("org.jetbrains.intellij", "org.jetbrains.intellij.gradle.plugin")
         includeModule("org.jetbrains.intellij.plugins", "gradle-intellij-plugin")
         includeModule("gradle.plugin.org.jetbrains.gradle.plugin.idea-ext", "gradle-idea-ext")
+        includeGroup("dev.bmac.intellij.plugins")
+        includeGroup("dev.bmac.intellij.plugin-uploader")
       }
     }
   }
-  plugins { id("com.gradle.enterprise") version "3.13.4" }
+  plugins { id("com.gradle.enterprise") version "3.14.1" }
 }
 
 plugins { id("com.gradle.enterprise") }
@@ -172,11 +174,13 @@ rootProject.name = "slack-gradle-plugin"
 
 // Please keep these in alphabetical order!
 include(
-  ":slack-plugin",
-  ":sgp-monkeypatch-agp",
-  ":agp-handlers:agp-handler-api",
   ":agp-handlers:agp-handler-80",
+  ":agp-handlers:agp-handler-api",
+  ":sgp-monkeypatch-agp",
   ":skate-plugin",
+  ":skate-plugin:artifactory-authenticator",
+  ":slack-plugin",
+  ":tracing"
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

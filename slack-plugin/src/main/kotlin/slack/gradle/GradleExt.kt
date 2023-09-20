@@ -248,10 +248,13 @@ internal operator fun ExtensionContainer.set(key: String, value: Any) {
 internal val BuildType.ext: ExtraPropertiesExtension
   get() = (this as ExtensionAware).extensions.getByName("ext") as ExtraPropertiesExtension
 
-internal fun PluginManager.onFirst(pluginIds: Iterable<String>, body: AppliedPlugin.() -> Unit) {
+internal fun PluginManager.onFirst(
+  pluginIds: Iterable<String>,
+  body: AppliedPlugin.(id: String) -> Unit
+) {
   once {
     for (id in pluginIds) {
-      withPlugin(id) { onFirst { body() } }
+      withPlugin(id) { onFirst { body(id) } }
     }
   }
 }

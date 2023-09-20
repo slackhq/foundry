@@ -89,7 +89,7 @@ internal object DetektTasks {
               project.tasks.configureEach<DetektCreateBaselineTask> {
                 mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
               }
-              project.file("${project.buildDir}/intermediates/detekt/baseline.xml")
+              project.layout.buildDirectory.file("intermediates/detekt/baseline.xml").get().asFile
             } else {
               project.file(project.rootProject.file(baselineFile))
             }

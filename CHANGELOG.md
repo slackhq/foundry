@@ -1,6 +1,117 @@
 Changelog
 =========
 
+0.10.7
+------
+
+_2023-08-29_
+
+- **Fix**: Don't apply BOMs to testApi configurations.
+
+0.10.6
+------
+
+_2023-08-29_
+
+- **New**: Publish a generic Tracing API under the `sgp-tracing` artifact ID. We use this internally to collect extra build metadata, but it's generic enough for general use. Not currently used in slack-plugin yet.
+- Add `sgp.android.buildToolsVersionOverride` property to override the default build tools version in Android.
+- Migrate to `AndroidPluginVersion` API in `AgpHandler`.
+- Fix a few more deprecated Gradle API usages.
+- Build against AGP `8.1.1`.
+- Build against Spotless `6.21.0`.
+- Build against Compose Multiplatform `1.5.0`.
+- Update to Kotlin `1.9.10`.
+- Update to KSP `1.9.10-1.0.13`.
+- Update to RxJava `3.1.7`.
+- Update to kotlin-cli-util `2.2.1`.
+- Update to Oshi `6.4.5`.
+- Update to Wire `4.8.1`
+- Update to DAGP `1.21.0`.
+- Update to Gradle `8.3`.
+
+0.10.5
+------
+
+_2023-08-15_
+
+- **Fix**: Better support `com.android.test` projects in a few ways
+  - No longer apply lint configurations as they don't support them.
+  - No longer apply DAGP as it doesn't support them yet.
+  - No longer apply unit test configurations as they don't have unit tests.
+- Build against Gradle 8.3 + fix a few deprecated `Project.buildDir` API usages.
+- Update `kotlin-cli-util` to `2.1.0`.
+
+0.10.4
+------
+
+_2023-08-10_
+
+- **New**: New DSL API for enabling Android resources.
+
+This streamlines configuration of enabling `androidResources` and enforces use of a resource prefix to avoid conflicts.
+
+May your avatars never be wrongly sized again.
+
+```kotlin
+slack {
+  android {
+    features {
+      resources("prefix_")
+    }
+  }
+}
+```
+
+- Update kotlin-cli-util to `2.0.0`.
+- Update Moshi to `1.15.0`.
+- Update sort-dependencies to `0.4`.
+- Update KSP to `1.9.0-1.0.13`.
+- Update Okio to `3.5.0`.
+- Update Jetbrains Markdown to `0.5.0`.
+
+0.10.3
+------
+
+_2023-08-08_
+
+- Fix an issue with Skippy where we would accidentally mark all library projects as affected androidTest projects even if they didn't have androidTest enabled.
+- Update Guava to `32.1.2-jre`.
+
+0.10.2
+------
+
+_2023-08-08_
+
+- Apparently the bugsnag plugin relies on the version code to be set in the variant output, so now we set a default again (configurable via `slack.gradle.defaultVersionCode`). The default is `90009999`, for _reasons_.
+
+0.10.1
+------
+
+_2023-08-07_
+
+- Use a single version code for all APK architectures.
+  - Before, we used to compute a different version code for each architecture. This is kinda silly, and broke with AGP 8.1.0. So now we no longer do this. This means that by default, no custom version code is set unless an override is set in `{rootProject}/build/ci/release.version`. The default behavior will be to just use the version set in the `android` DSL.
+- Update to Detekt `1.23.1`.
+- Update to Gradle Enterprise `3.14.1`.
+- Update to Compose Multiplatform `1.4.3`.
+- Update to SqlDelight `2.0.0`.
+- Update to Anvil `2.4.7`.
+
+0.10.0
+------
+
+_2023-07-25_
+
+- Update to Kotlin `1.9.0`.
+- Update to KSP `1.9.0-1.0.12`.
+- Update to AGP `8.1.0`.
+- Update kotlin-cli-util to `1.2.3`.
+- Update MoshiX to `0.24.0`.
+- Update redacted to `1.5.0`.
+- Update wire to `4.8.0`.
+- Add new dagger flag to ignore wildcard keys by default.
+  - https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
+
 0.9.18
 ------
 

@@ -15,6 +15,8 @@
  */
 package slack.gradle.agp
 
+import com.android.build.api.AndroidPluginVersion
+
 /**
  * A basic factory interface for creating [AgpHandler] instances. These should be implemented and
  * contributed as a service loader via something like `@AutoService`.
@@ -23,9 +25,9 @@ package slack.gradle.agp
  * [currentVersion] and [create].
  */
 public interface AgpHandlerFactory {
-  public val minVersion: VersionNumber
+  public val minVersion: AndroidPluginVersion
   /** Attempts to get the current AGP version or throws and exception if it cannot. */
-  public fun currentVersion(): String
+  public val currentVersion: AndroidPluginVersion
 
   public fun create(): AgpHandler
 }

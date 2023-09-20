@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import dev.bmac.gradle.intellij.GenerateBlockMapTask
+import dev.bmac.gradle.intellij.PluginUploader
+import dev.bmac.gradle.intellij.UploadPluginTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.net.URI
+import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.intellij.IntelliJPluginExtension
+import org.jetbrains.intellij.tasks.BuildPluginTask
+import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 buildscript {
@@ -38,6 +45,7 @@ buildscript {
 }
 
 plugins {
+  alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
@@ -46,6 +54,8 @@ plugins {
   alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.sortDependencies) apply false
+  alias(libs.plugins.intellij) apply false
+  alias(libs.plugins.pluginUploader) apply false
 }
 
 configure<DetektExtension> {
@@ -63,6 +73,8 @@ tasks.withType<Detekt>().configureEach {
 
 val ktfmtVersion = libs.versions.ktfmt.get()
 
+val externalFiles = listOf("SkateErrorHandler", "MemoizedSequence").map { "src/**/$it.kt" }
+
 allprojects {
   apply(plugin = "com.diffplug.spotless")
   configure<SpotlessExtension> {
@@ -73,10 +85,18 @@ allprojects {
     }
     kotlin {
       target("src/**/*.kt")
+      targetExclude(externalFiles)
       ktfmt(ktfmtVersion).googleStyle()
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile(rootProject.file("spotless/spotless.kt"))
+      targetExclude("**/spotless.kt", "**/Aliases.kt", *externalFiles.toTypedArray())
+    }
+    format("kotlinExternal", KotlinExtension::class.java) {
+      target(externalFiles)
+      ktfmt(ktfmtVersion).googleStyle()
+      trimTrailingWhitespace()
+      endWithNewline()
       targetExclude("**/spotless.kt", "**/Aliases.kt")
     }
     kotlinGradle {
@@ -113,11 +133,6 @@ data class KotlinBuildConfig(val kotlin: String) {
    */
   val kotlinCompilerArgs: List<String> =
     listOf(
-      "-progressive",
-      "-opt-in=kotlin.contracts.ExperimentalContracts",
-      "-opt-in=kotlin.experimental.ExperimentalTypeInference",
-      "-opt-in=kotlin.ExperimentalStdlibApi",
-      "-opt-in=kotlin.time.ExperimentalTime",
       "-Xproper-ieee754-comparisons",
       // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
       // => T & Any)
@@ -194,12 +209,15 @@ subprojects {
     tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
-  val isSkatePlugin = project.path == ":skate-plugin"
+  val isIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-    tasks.withType<KotlinCompile>().configureEach {
+    extensions.configure<KotlinJvmProjectExtension> {
+      if (!isIntelliJPlugin) {
+        explicitApi()
+      }
       compilerOptions {
         val kotlinVersion =
-          if (isSkatePlugin) {
+          if (isIntelliJPlugin) {
             KOTLIN_1_6
           } else {
             KOTLIN_1_8
@@ -207,7 +225,7 @@ subprojects {
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
 
-        if (!isSkatePlugin) {
+        if (!isIntelliJPlugin) {
           // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
           // this sometimes. https://github.com/gradle/gradle/issues/16345
           allWarningsAsErrors.set(false)
@@ -217,18 +235,15 @@ subprojects {
           allWarningsAsErrors.set(true)
         }
         jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.addAll(
-          kotlinBuildConfig.kotlinCompilerArgs
-            // -progressive is useless when running on an older language version but new compiler
-            // version. Both Gradle and IntelliJ plugins have this issue 🙃
-            .filter { it != "-progressive" }
-        )
+        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+        optIn.addAll(
+          "kotlin.contracts.ExperimentalContracts",
+          "kotlin.experimental.ExperimentalTypeInference",
+          "kotlin.ExperimentalStdlibApi",
+          "kotlin.time.ExperimentalTime",
+        )
       }
-    }
-
-    if (!isSkatePlugin) {
-      extensions.configure<KotlinProjectExtension> { explicitApi() }
     }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
@@ -244,7 +259,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     tasks.withType<DokkaTaskPartial>().configureEach {
-      outputDirectory.set(buildDir.resolve("docs/partial"))
+      outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
       dokkaSourceSets.configureEach {
         val readMeProvider = project.layout.projectDirectory.file("README.md")
         if (readMeProvider.asFile.exists()) {
@@ -274,6 +289,93 @@ subprojects {
     configure<MavenPublishBaseExtension> {
       publishToMavenCentral(automaticRelease = true)
       signAllPublications()
+    }
+  }
+
+  if (isIntelliJPlugin) {
+    project.pluginManager.withPlugin("org.jetbrains.intellij") {
+      configure<IntelliJPluginExtension> {
+        version.set("2022.2.5")
+        type.set("IC")
+        // Don't assign untilBuild to sinceBuild
+        updateSinceUntilBuild.set(false)
+      }
+
+      data class PluginDetails(
+        val pluginId: String,
+        val name: String,
+        val description: String,
+        val version: String,
+        val sinceBuild: String,
+        val urlSuffix: String
+      )
+
+      val pluginDetails =
+        PluginDetails(
+          pluginId = property("PLUGIN_ID").toString(),
+          name = property("PLUGIN_NAME").toString(),
+          description = property("PLUGIN_DESCRIPTION").toString(),
+          version = property("VERSION_NAME").toString(),
+          sinceBuild = property("PLUGIN_SINCE_BUILD").toString(),
+          urlSuffix = property("ARTIFACTORY_URL_SUFFIX").toString(),
+        )
+
+      project.tasks.named<PatchPluginXmlTask>("patchPluginXml") {
+        sinceBuild.set(pluginDetails.sinceBuild)
+        pluginId.set(pluginDetails.pluginId)
+        pluginDescription.set(pluginDetails.description)
+        version.set(pluginDetails.version)
+      }
+
+      if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
+        pluginManager.apply(libs.plugins.pluginUploader.get().pluginId)
+        val archive = project.tasks.named<BuildPluginTask>("buildPlugin").flatMap { it.archiveFile }
+        val blockMapTask =
+          tasks.named<GenerateBlockMapTask>(GenerateBlockMapTask.TASK_NAME) {
+            notCompatibleWithConfigurationCache(
+              "Blockmap generation is not compatible with the configuration cache"
+            )
+            file.set(archive)
+            blockmapFile.set(
+              project.layout.buildDirectory.file(
+                "blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
+              )
+            )
+            blockmapHashFile.set(
+              project.layout.buildDirectory.file("blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
+            )
+          }
+
+        // Get the plugin distribution file from the signPlugin task provided from the
+        // gradle-intellij-plugin
+        tasks.register<UploadPluginTask>("uploadPluginToArtifactory") {
+          notCompatibleWithConfigurationCache(
+            "UploadPluginTask is not compatible with the configuration cache"
+          )
+          dependsOn(blockMapTask)
+          url.set(
+            providers.gradleProperty("SgpIntellijArtifactoryBaseUrl").map { baseUrl ->
+              "$baseUrl/${pluginDetails.urlSuffix}"
+            }
+          )
+          pluginName.set(pluginDetails.name)
+          file.set(archive)
+          repoType.set(PluginUploader.RepoType.REST_PUT)
+          pluginId.set(pluginDetails.pluginId)
+          version.set(pluginDetails.version)
+          pluginDescription.set(pluginDetails.description)
+          //  changeNotes.set(file("change-notes.txt").readText())
+          sinceBuild.set(pluginDetails.sinceBuild)
+          authentication.set(
+            // Sip the username and token together to create an appropriate encoded auth header
+            providers.gradleProperty("SgpIntellijArtifactoryUsername").zip(
+              providers.gradleProperty("SgpIntellijArtifactoryToken")
+            ) { username, token ->
+              "Basic ${"$username:$token".encode().base64()}"
+            }
+          )
+        }
+      }
     }
   }
 }

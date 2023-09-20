@@ -38,7 +38,7 @@ internal class SkateConfigUI(
 
   private fun Panel.checkBoxRow() {
     row(SkateBundle.message("skate.configuration.enableWhatsNew.title")) {
-      checkBox("skate.configuration.enableWhatsNew.description")
+      checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
         .bindSelected(
           getter = { settings.isWhatsNewEnabled },
           setter = { settings.isWhatsNewEnabled = it }
@@ -59,8 +59,10 @@ internal class SkateConfigUI(
           },
           setter = {
             if (File(it).isFile) {
-              settings.whatsNewFilePath =
-                LocalFileSystem.getInstance().findFileByPath(it)?.path.orEmpty()
+              val absolutePath = LocalFileSystem.getInstance().findFileByPath(it)?.path.orEmpty()
+              val projectPath = project.basePath ?: ""
+              val relativePath = absolutePath.removePrefix(projectPath).removePrefix("/")
+              settings.whatsNewFilePath = relativePath
             } else {
               settings.whatsNewFilePath = ""
             }

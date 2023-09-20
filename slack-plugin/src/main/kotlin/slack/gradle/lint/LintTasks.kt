@@ -40,6 +40,10 @@ internal object LintTasks {
   private const val COMPILE_CI_LINT_NAME = "compileCiLint"
   private const val LOG = "SlackLints:"
 
+  private fun Project.log(message: String) {
+    logger.debug("$LOG $message")
+  }
+
   fun configureRootProject(project: Project): TaskProvider<Task> =
     project.tasks.register(GLOBAL_CI_LINT_TASK_NAME) {
       group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -51,14 +55,14 @@ internal object LintTasks {
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
-    commonExtension: CommonExtension<*, *, *, *>?,
+    commonExtension: CommonExtension<*, *, *, *, *>?,
     sdkVersions: (() -> SlackProperties.AndroidSdkProperties)?,
   ) {
-    project.logger.debug("$LOG Configuring lint tasks for project ${project.path}...")
+    project.log("Configuring lint tasks for project ${project.path}...")
     // Projects can opt out of creating the task with this property.
     val enabled = slackProperties.ciLintEnabled
     if (!enabled) {
-      project.logger.debug("$LOG Skipping creation of \"$CI_LINT_TASK_NAME\" task")
+      project.log("Skipping creation of \"$CI_LINT_TASK_NAME\" task")
       return
     }
 
@@ -73,12 +77,12 @@ internal object LintTasks {
         project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
       } else {
         val taskPath = "${project.path}:$CI_LINT_TASK_NAME"
-        val log = "$LOG Skipping $taskPath because it is not affected."
+        val log = "Skipping $taskPath because it is not affected."
         onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
         if (slackProperties.debug) {
-          project.logger.lifecycle(log)
+          project.log(log)
         } else {
-          project.logger.debug(log)
+          project.log(log)
         }
         null
       }
@@ -87,7 +91,7 @@ internal object LintTasks {
     val applied = AtomicBoolean(false)
 
     if (commonExtension != null) {
-      project.logger.debug("$LOG Applying ciLint to Android project")
+      project.log("Applying ciLint to Android project")
       applyCommonLints()
       createAndroidCiLintTask(
         project,
@@ -103,7 +107,7 @@ internal object LintTasks {
           project.pluginManager.apply("com.android.lint")
           project.configure<Lint> { configureLint(project, slackProperties, null, false) }
           applyCommonLints()
-          project.logger.debug("$LOG Creating ciLint task")
+          project.log("Creating ciLint task")
           val ciLint =
             project.tasks.register(COMPILE_CI_LINT_NAME) {
               group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -121,10 +125,10 @@ internal object LintTasks {
     project: Project,
     globalTask: TaskProvider<*>?,
     slackProperties: SlackProperties,
-    extension: CommonExtension<*, *, *, *>,
+    extension: CommonExtension<*, *, *, *, *>,
     sdkVersions: SlackProperties.AndroidSdkProperties,
   ) {
-    project.logger.debug("$LOG Configuring android lint tasks. isApp=${extension is AppExtension}")
+    project.log("Configuring android lint tasks. isApp=${extension is AppExtension}")
     extension.lint {
       configureLint(
         project,
@@ -134,7 +138,7 @@ internal object LintTasks {
       )
     }
 
-    project.logger.debug("$LOG Creating ciLint task")
+    project.log("Creating ciLint task")
     val ciLintTask =
       project.tasks.register(CI_LINT_TASK_NAME) { group = LifecycleBasePlugin.VERIFICATION_GROUP }
     globalTask?.configure { dependsOn(ciLintTask) }
@@ -144,7 +148,7 @@ internal object LintTasks {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
         // task configuration time.
         variants.splitToSequence(',').forEach { variant ->
-          logger.debug("$LOG Using variant $variant for ciLint task")
+          logger.lifecycle("Using variant $variant for ciLint task")
           val lintTaskName = "lint${variant.capitalizeUS()}"
           dependsOn(lintTaskName)
         }
@@ -167,7 +171,7 @@ internal object LintTasks {
       }
     componentsExtension.onVariants { variant ->
       val lintTaskName = "lint${variant.name.capitalizeUS()}"
-      project.logger.debug("$LOG Adding $lintTaskName to ciLint task")
+      project.log("Adding $lintTaskName to ciLint task")
       ciLintTask.configure {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
         // task configuration time.

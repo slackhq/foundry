@@ -15,23 +15,14 @@
  */
 package slack.gradle.agp
 
+import com.android.build.api.AndroidPluginVersion
+
 /** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
 public interface AgpHandler {
-
   /** The current AGP version. */
-  public val agpVersion: String
+  public val agpVersion: AndroidPluginVersion
 }
 
-/**
- * Raw AGP [VersionNumber], which can include qualifiers like `-beta03`. Not usually what you want
- * in comparisons.
- */
-internal val AgpHandler.agpVersionNumberRaw: VersionNumber
-  get() = VersionNumber.parse(agpVersion)
-
-/**
- * Base AGP [VersionNumber], which won't include qualifiers like `-beta03`. Usually what you want in
- * comparisons.
- */
-public val AgpHandler.agpVersionNumber: VersionNumber
-  get() = agpVersionNumberRaw.baseVersion
+/** Returns a new [AndroidPluginVersion] with any preview information stripped. */
+public val AndroidPluginVersion.baseVersion: AndroidPluginVersion
+  get() = AndroidPluginVersion(major, minor, micro)

@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij
+package com.slack.intellij.artifactory
 
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.ui.Messages
+import com.intellij.ide.AppLifecycleListener
+import com.intellij.ide.plugins.auth.PluginRepositoryAuthService
+import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 
-public class DemoAction : AnAction() {
-  override fun actionPerformed(e: AnActionEvent) {
-    Messages.showMessageDialog("Hello WORLD!", "Demo Action", null)
+/** Workaround for https://youtrack.jetbrains.com/issue/IDEA-315487. */
+class RepoAuthHotfix : AppLifecycleListener {
+  private val logger = logger<RepoAuthHotfix>()
+
+  override fun appFrameCreated(commandLineArgs: List<String>) {
+    logger.debug("Initializing ${PluginRepositoryAuthService::class.simpleName}")
+    service<PluginRepositoryAuthService>()
   }
 }

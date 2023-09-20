@@ -18,6 +18,7 @@
 package slack.gradle
 
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.gradle.LibraryExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import javax.inject.Inject
@@ -32,6 +33,7 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.util.booleanProperty
 import slack.gradle.util.setDisallowChanges
 
 @DslMarker public annotation class SlackExtensionMarker
@@ -57,14 +59,14 @@ constructor(
    * this instance. Ideally we could eventually remove this if/when AGP finally makes these
    * properties lazy.
    */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
     set(value) {
       field = value
       androidHandler.setAndroidExtension(value)
       featuresHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>) {
     this.androidExtension = androidExtension
   }
 
@@ -152,6 +154,9 @@ constructor(
         }
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
+        }
+        if (project.booleanProperty("moshix.generateProguardRules", defaultValue = true)) {
+          markKspNeeded("Moshi IR code gen")
         }
       }
 
@@ -370,13 +375,13 @@ constructor(
     objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
   /** @see [SlackExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
     set(value) {
       field = value
       composeHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -410,7 +415,7 @@ constructor(
       "This function should not be called with both enableComponents and projectHasJavaInjections set to false. Either remove these parameters or call a more appropriate non-delicate dagger() overload."
     }
     daggerHandler.enabled.setDisallowChanges(true)
-    daggerHandler.useDaggerCompiler.setDisallowChanges(enableComponents || projectHasJavaInjections)
+    daggerHandler.useDaggerCompiler.setDisallowChanges(true)
     action?.execute(daggerHandler)
   }
 
@@ -678,9 +683,9 @@ constructor(
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -731,13 +736,13 @@ constructor(
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [SlackExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
     set(value) {
       field = value
       featuresHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -781,9 +786,9 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val robolectric: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -808,6 +813,20 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
     // Required for Robolectric to work.
     androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
     robolectric.setDisallowChanges(true)
+  }
+
+  /**
+   * **LIBRARIES ONLY**
+   *
+   * Enables android resources in this library and enforces use of the given [prefix] for all
+   * resources.
+   */
+  public fun resources(prefix: String) {
+    val libraryExtension =
+      androidExtension as? LibraryExtension
+        ?: error("slack.android.features.resources() is only applicable in libraries!")
+    libraryExtension.resourcePrefix = prefix
+    libraryExtension.buildFeatures { androidResources = true }
   }
 }
 

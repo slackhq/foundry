@@ -18,8 +18,6 @@
 package slack.gradle
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.api.variant.FilterConfiguration
-import com.android.build.api.variant.VariantOutput
 import com.android.build.gradle.AppPlugin
 import java.util.Properties
 import org.gradle.api.DefaultTask
@@ -46,11 +44,6 @@ import slack.gradle.util.setDisallowChanges
  */
 @Suppress("unused")
 internal class ApkVersioningPlugin : Plugin<Project> {
-
-  private val VariantOutput.abiString: String?
-    get() {
-      return filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
-    }
 
   @Suppress("LongMethod")
   override fun apply(project: Project) {
@@ -82,7 +75,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val versionCodeProvider: Provider<Int> =
         project.ciBuildNumber
           .flatMap { ciContent.asText.map { it.toInt() } }
-          .orElse(project.providers.provider { ApkVersioning.DEFAULT_VERSION_CODE })
+          .orElse(SlackProperties(project).defaultVersionCode)
 
       configureVariants(project, versionNameProvider, versionCodeProvider)
 
@@ -124,34 +117,11 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         // Have to iterate outputs because of APK splits.
         variant.outputs.forEach { variantOutput ->
           variantOutput.versionName.setDisallowChanges(mappedVersionNameProvider)
-
-          // Reuse the same task and just remap its value as needed
-          val mappedVersionCodeProvider =
-            versionCodeProvider.map { rawCode ->
-              @Suppress("MagicNumber")
-              ApkVersioning.VERSION_CODES.getValue(variantOutput.abiString) * 10000000 + rawCode
-            }
-          variantOutput.versionCode.setDisallowChanges(mappedVersionCodeProvider)
+          variantOutput.versionCode.setDisallowChanges(versionCodeProvider)
         }
       }
     }
   }
-}
-
-private object ApkVersioning {
-
-  const val DEFAULT_VERSION_CODE: Int = 9999
-
-  // Override version code based on the ABI
-  // https://androidbycode.wordpress.com/2015/06/30/android-ndk-version-code-scheme-for-publishing-apks-per-architecture/
-  val VERSION_CODES: Map<String?, Int> =
-    mapOf(
-      null to 0, // Universal APK for CI
-      "arm64-v8a" to 3,
-      "armeabi-v7a" to 2,
-      "x86" to 8,
-      "x86_64" to 9
-    )
 }
 
 /**

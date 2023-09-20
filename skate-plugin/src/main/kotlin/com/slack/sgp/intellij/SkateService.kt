@@ -36,14 +36,22 @@ interface SkateProjectService {
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override fun showWhatsNewWindow() {
-    // TODO
-    //  Only show when changed
-    //  Only show latest changes
+
     val settings = project.service<SkatePluginSettings>()
+    val changelogJournal = project.service<ChangelogJournal>()
+
     if (!settings.isWhatsNewEnabled) return
     val projectDir = project.guessProjectDir() ?: return
+
     val changeLogFile = VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return
     val changeLogString = VfsUtil.loadText(changeLogFile)
+
+    // Don't show the tool window if the parsed changelog is blank
+    // Changelog is parsed
+    val parsedChangelog = ChangelogParser.readFile(changeLogString, changelogJournal.lastReadDate)
+    if (parsedChangelog.changeLogString.isNullOrBlank()) return
+
+    // Creating the tool window
     val toolWindowManager = ToolWindowManager.getInstance(project)
 
     toolWindowManager.invokeLater {
@@ -58,7 +66,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
       val parentDisposable = Disposer.newDisposable()
 
       WhatsNewPanelFactory()
-        .createToolWindowContent(toolWindow, project, changeLogString, parentDisposable)
+        .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
 
       toolWindow.show()
     }
