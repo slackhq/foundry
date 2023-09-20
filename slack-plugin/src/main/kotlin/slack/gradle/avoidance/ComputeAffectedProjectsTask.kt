@@ -157,8 +157,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
               },
             logger = prefixLogger,
           )
-          .compute()
-          ?: return@logTimedValue
+          .compute() ?: return@logTimedValue
 
       // Generate affected_projects.txt
       log("writing affected projects to: $affectedProjectsFile")
@@ -238,8 +237,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
           } else {
             providedConfigSet
           }
-        }
-          ?: DEFAULT_CONFIGURATIONS
+        } ?: DEFAULT_CONFIGURATIONS
       }
 
       val moduleGraph by lazy {

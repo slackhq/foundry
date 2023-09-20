@@ -460,8 +460,7 @@ internal class StandardProjectConfigurations(
           slackProperties.disabledVariants?.splitToSequence(",")?.associate {
             val (flavorName, buildType) = it.split("+")
             flavorName to buildType
-          }
-            ?: emptyMap()
+          } ?: emptyMap()
         if (variantsToDisable.isNotEmpty()) {
           logger.debug("$LOG Disabling variants: $variantsToDisable")
           val isApp = this is ApplicationAndroidComponentsExtension
@@ -654,8 +653,7 @@ internal class StandardProjectConfigurations(
           val variantEnabled =
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.name)
-                ?: true
+                ?.contains(builder.name) ?: true
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.enableAndroidTest = variantEnabled
         }
@@ -808,8 +806,7 @@ internal class StandardProjectConfigurations(
           val variantEnabled =
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.name)
-                ?: true
+                ?.contains(builder.name) ?: true
           builder.enableAndroidTest = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly
