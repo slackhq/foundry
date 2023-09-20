@@ -38,8 +38,7 @@ internal object AgpHandlers {
         }
         .filter { (agpVersion, factory) -> agpVersion >= factory.minVersion }
         .maxByOrNull { (_, factory) -> factory.minVersion }
-        ?.factory
-        ?: error("Unrecognized AGP version!")
+        ?.factory ?: error("Unrecognized AGP version!")
 
     return targetFactory.create()
   }
