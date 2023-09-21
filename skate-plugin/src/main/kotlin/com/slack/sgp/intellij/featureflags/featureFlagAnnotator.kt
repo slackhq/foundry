@@ -25,7 +25,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
@@ -42,33 +41,25 @@ import javax.swing.Icon
 import org.jetbrains.kotlin.idea.KotlinLanguage
 
 class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>() {
-  private val LOG: Logger = Logger.getInstance(FeatureFlagAnnotator::class.java)
   private val extractor = FeatureFlagExtractor()
 
   override fun collectInformation(file: PsiFile): PsiFile? {
     if (!isKotlinFeatureFile(file)) {
-      LOG.info("Skipping non-Feature Kotlin file: $file")
       return null
     }
-    LOG.info("Getting CollectedInformation for file: $file")
     if (extractor.getFeatureFlagsForPsiFile(file) == null) {
-      LOG.info("Extracting featureFlags")
       val flags = extractor.extractFeatureFlags(file)
-      LOG.info("FeatureFlags found: $flags")
       extractor.setFeatureFlagsForPsiFile(file, flags)
     }
     return file
   }
 
   override fun doAnnotate(collectedInfo: PsiFile): List<FeatureFlagSymbol> {
-    LOG.info("Starting Annotation")
     if (!collectedInfo.project.isLinkifiedFeatureFlagsEnabled() || !isKotlinFile(collectedInfo)) {
-      LOG.info("This is not a kotline file or FF not enabled for file: $collectedInfo")
       return emptyList()
     }
 
     val flagsForFile = extractor.getFeatureFlagsForPsiFile(collectedInfo)
-    LOG.info("Transform Feature Flag method called")
     return transformToFeatureFlagSymbols(collectedInfo, flagsForFile)
   }
 
@@ -76,15 +67,11 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
     psiFile: PsiFile,
     flags: List<String>?
   ): List<FeatureFlagSymbol> {
-    LOG.info("Transforming feature flags: $flags")
-    if (flags == null || flags.isEmpty()) {
-      LOG.info("No flags to transform. Flags, returning empty list")
+    if (flags.isNullOrEmpty()) {
       return emptyList()
     }
+    val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
 
-    val settings = psiFile.project.service<SkatePluginSettings>()
-    val baseUrl = settings.featureFlagBaseUrl.orEmpty()
-    LOG.info("BaseURL is : $baseUrl")
     return flags.mapNotNull { flag ->
       val textRange =
         ApplicationManager.getApplication().runReadAction<TextRange?> {
@@ -100,16 +87,8 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
   }
 
   private fun findTextRangeForFlag(psiFile: PsiFile, flag: String): TextRange? {
-    LOG.info("Finding text range for a flag: $flag")
-    // Use Pita's approach of traversing the PSI structure to find the text range
     val elements = PsiTreeUtil.findChildrenOfType(psiFile, PsiElement::class.java)
-    for (element in elements) {
-      if (element.text == flag) {
-        LOG.info("Text range found: ${element.textRange}")
-        return element.textRange
-      }
-    }
-    return null
+    return elements.firstOrNull { it.text == flag }?.textRange
   }
 
   private fun isKotlinFile(psiFile: PsiFile): Boolean =
@@ -124,15 +103,13 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
     holder: AnnotationHolder
   ) {
     for (symbol in annotationResult) {
-      LOG.info("Applying Annotation for a symbol: $symbol")
-      val textRange = symbol.textRange
       val message = "Open on Houston: ${symbol.url}"
       holder
         .newAnnotation(
           HighlightSeverity.INFORMATION,
           "More details about feature flag on Houston..."
         )
-        .range(textRange)
+        .range(symbol.textRange)
         .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
         .gutterIconRenderer(MyGutterIconRenderer(symbol.url))

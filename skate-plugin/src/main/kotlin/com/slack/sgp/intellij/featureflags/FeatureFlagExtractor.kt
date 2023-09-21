@@ -18,13 +18,14 @@ package com.slack.sgp.intellij.featureflags
 import com.intellij.openapi.diagnostic.Logger
 
 /**
- * Extracts feature flags from Kotlin files. It searches for enum entries annotated with
- * 'FeatureFlag'.
+ * Responsible for extracting feature flags. Searches for enum entries annotated with 'FeatureFlag'
+ * to identify feature flags.
  */
 class FeatureFlagExtractor {
 
-  private val LOG: Logger = Logger.getInstance(FeatureFlagExtractor::class.java)
+  private val log: Logger = Logger.getInstance(FeatureFlagExtractor::class.java)
 
+  // Caches the feature flags for a given PSI file to optimize repeated lookups
   companion object {
     private val featureFlagCache = mutableMapOf<com.intellij.psi.PsiFile, List<String>>()
   }
@@ -43,17 +44,14 @@ class FeatureFlagExtractor {
    * @return A list of feature flag names in a file
    */
   fun extractFeatureFlags(psiFile: com.intellij.psi.PsiFile): List<String> {
-    LOG.info("Getting Enum Entries")
+    log.info("Looking for feature flags in a file: ${psiFile.toString()}")
     val enumsWithAnnotation = findAnnotatedEnums(psiFile)
-    LOG.info("Enums with Annotations: $enumsWithAnnotation")
+    log.info("Found feature flags: $enumsWithAnnotation")
     return enumsWithAnnotation
   }
 
-  fun isKtFile(obj: Any): Boolean {
-    return obj.javaClass.getName() == "org.jetbrains.kotlin.psi.KtFile"
-  }
-
-  fun findAnnotatedEnums(psiFile: Any): List<String> {
+  /** Recursively searches the given PSI file for enums with 'FeatureFlag' annotations. */
+  private fun findAnnotatedEnums(psiFile: Any): List<String> {
     val annotatedEnumEntries = mutableListOf<String>()
 
     fun addIfAnnotatedEnum(element: Any) {
@@ -68,7 +66,6 @@ class FeatureFlagExtractor {
 
     fun recurse(element: Any) {
       addIfAnnotatedEnum(element)
-      // Traverse children
       element.javaClass.methods
         .find { it.name == "getChildren" }
         ?.let { method -> (method.invoke(element) as? Array<*>)?.forEach { recurse(it!!) } }
@@ -78,8 +75,7 @@ class FeatureFlagExtractor {
   }
 
   /**
-   * Checks if a given enum entry is a feature flag. An enum is considered a feature flag if it's
-   * within a Kotlin class and has an annotation named "FeatureFlag".
+   * Determines if a given PSI element is an enum entry annotated with 'FeatureFlag'.
    *
    * @param element The enum entry to check.
    * @return true if the enum entry is a feature flag, false otherwise.
@@ -91,14 +87,14 @@ class FeatureFlagExtractor {
       val shortNameMethod = it!!.javaClass.getMethod("getShortName")
       val shortName = shortNameMethod.invoke(it)
       shortName?.toString() == "FeatureFlag"
-    }
-      ?: false
+    } ?: false
   }
 
+  /** Checks if the given PSI element is a Kotlin enum entry. */
   private fun isKtEnumEntry(element: Any): Boolean {
-    LOG.info("Checking if element is KtEnumEntry")
+    log.info("Checking if element is a Kotlin Enum Entry")
     val result = element.javaClass.name == "org.jetbrains.kotlin.psi.KtEnumEntry"
-    LOG.info("Element isKtEnumEntry: $result")
+    log.info("Element is Kotlin Enum Entry: $result")
     return result
   }
 }
