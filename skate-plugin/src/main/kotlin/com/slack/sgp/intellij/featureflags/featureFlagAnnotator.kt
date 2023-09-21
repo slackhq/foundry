@@ -86,9 +86,10 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
     val baseUrl = settings.featureFlagBaseUrl.orEmpty()
     LOG.info("BaseURL is : $baseUrl")
     return flags.mapNotNull { flag ->
-      val textRange = ApplicationManager.getApplication().runReadAction<TextRange?> {
-        findTextRangeForFlag(psiFile, flag)
-      }
+      val textRange =
+        ApplicationManager.getApplication().runReadAction<TextRange?> {
+          findTextRangeForFlag(psiFile, flag)
+        }
       if (textRange != null) {
         val url = "$baseUrl?q=$flag"
         FeatureFlagSymbol(textRange, url)
