@@ -91,7 +91,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
           findTextRangeForFlag(psiFile, flag)
         }
       if (textRange != null) {
-        val url = "$baseUrl?q=$flag"
+        val url = "$baseUrl?q=${flag.lowercase()}"
         FeatureFlagSymbol(textRange, url)
       } else {
         null

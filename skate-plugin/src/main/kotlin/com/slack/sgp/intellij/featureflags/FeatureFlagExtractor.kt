@@ -84,7 +84,7 @@ class FeatureFlagExtractor {
    * @param element The enum entry to check.
    * @return true if the enum entry is a feature flag, false otherwise.
    */
-  fun hasFeatureFlagAnnotation(element: Any): Boolean {
+  private fun hasFeatureFlagAnnotation(element: Any): Boolean {
     val annotationEntriesMethod = element.javaClass.getMethod("getAnnotationEntries")
     val annotationEntries = annotationEntriesMethod.invoke(element) as? List<*>
     return annotationEntries?.any {
@@ -95,7 +95,7 @@ class FeatureFlagExtractor {
       ?: false
   }
 
-  fun isKtEnumEntry(element: Any): Boolean {
+  private fun isKtEnumEntry(element: Any): Boolean {
     LOG.info("Checking if element is KtEnumEntry")
     val result = element.javaClass.name == "org.jetbrains.kotlin.psi.KtEnumEntry"
     LOG.info("Element isKtEnumEntry: $result")
