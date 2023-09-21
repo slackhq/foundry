@@ -88,8 +88,8 @@ tasks
 // endregion
 
 dependencies {
-  compileOnly(libs.kotlin.compilerEmbeddable)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  compileOnly(libs.kotlin.compilerEmbeddable)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
