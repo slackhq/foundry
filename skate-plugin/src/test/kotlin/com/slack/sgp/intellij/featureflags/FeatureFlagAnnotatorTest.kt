@@ -22,7 +22,21 @@ import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestC
 import com.slack.sgp.intellij.SkatePluginSettings
 import org.junit.Test
 
-class FeatureFlagAnnotatortest : LightPlatformCodeInsightFixture4TestCase() {
+class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
+  private val fileContent =
+    """
+            @FeatureFlags(ForComplianceFeature::class)
+            enum class ComplianceFeature(override val dependencies: Set<FeatureFlagEnum> = emptySet()) :
+              FeatureFlagEnum {
+              /** Enables validation of app-scoped environment variant */
+              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED) ANDROID_ENV_VARIANT_VALIDATION,
+              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED)
+              ANDROID_GOV_SLACK_CUSTOM_AWARENESS,
+              @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
+              ANDROID_GOV_SLACK_CUSTOM_AWARENESS_TEAM_SWITCH;
+              override val key: String by computeKey()
+            }
+        """
 
   @Test
   fun `test returns empty list when linkify is disabled`() {
@@ -37,25 +51,8 @@ class FeatureFlagAnnotatortest : LightPlatformCodeInsightFixture4TestCase() {
   @Test
   fun `test extraction of feature flags from provided content`() {
     val featureFlagExtractor = FeatureFlagExtractor()
-    val content =
-      """
-            @FeatureFlags(ForComplianceFeature::class)
-            enum class ComplianceFeature(override val dependencies: Set<FeatureFlagEnum> = emptySet()) :
-              FeatureFlagEnum {
-              /** Enables validation of app-scoped environment variant */
-              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED) ANDROID_ENV_VARIANT_VALIDATION,
-              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED)
-              ANDROID_GOV_SLACK_CUSTOM_AWARENESS,
-              @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
-              ANDROID_GOV_SLACK_CUSTOM_AWARENESS_TEAM_SWITCH;
-              override val key: String by computeKey()
-            }
-        """
-
-    // Create a KtFile from the content
-    val psiFile = createKotlinFile("ComplianceFeature.kt", content)
+    val psiFile = createKotlinFile("ComplianceFeature.kt", fileContent)
     val featureFlags = featureFlagExtractor.extractFeatureFlags(psiFile)
-    // Assertions
     assertTrue(featureFlags.contains("ANDROID_ENV_VARIANT_VALIDATION"))
     assertTrue(featureFlags.contains("ANDROID_GOV_SLACK_CUSTOM_AWARENESS"))
     assertTrue(featureFlags.contains("ANDROID_GOV_SLACK_CUSTOM_AWARENESS_TEAM_SWITCH"))
@@ -63,21 +60,7 @@ class FeatureFlagAnnotatortest : LightPlatformCodeInsightFixture4TestCase() {
 
   private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {
     project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
-    val content =
-      """
-            @FeatureFlags(ForComplianceFeature::class)
-            enum class ComplianceFeature(override val dependencies: Set<FeatureFlagEnum> = emptySet()) :
-              FeatureFlagEnum {
-              /** Enables validation of app-scoped environment variant */
-              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED) ANDROID_ENV_VARIANT_VALIDATION,
-              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED)
-              ANDROID_GOV_SLACK_CUSTOM_AWARENESS,
-              @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
-              ANDROID_GOV_SLACK_CUSTOM_AWARENESS_TEAM_SWITCH;
-              override val key: String by computeKey()
-            }
-        """
-    val file = createKotlinFile("ComplianceFeature.kt", content)
+    val file = createKotlinFile("ComplianceFeature.kt", fileContent)
     FeatureFlagAnnotator().collectInformation(file)
     return FeatureFlagAnnotator().doAnnotate(file)
   }
