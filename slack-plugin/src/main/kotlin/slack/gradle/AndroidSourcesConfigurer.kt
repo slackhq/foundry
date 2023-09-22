@@ -34,7 +34,11 @@ internal object AndroidSourcesConfigurer {
   internal const val MARKER_FILE_NAME = "slack_patched_marker"
 
   fun patchSdkSources(requestedSdkVersion: Int, rootProject: Project, latest: Int) {
-    val sdkDir = rootProject.slackTools().agpHandler.getAndroidSdkDirectory(rootProject.projectDir)
+    val sdkDir =
+      rootProject
+        .slackTools()
+        .agpHandler
+        .getAndroidSdkDirectory(rootProject.projectDir, rootProject.providers)
     patchSdkSources(requestedSdkVersion, sdkDir, rootProject.logger, latest)
   }
 

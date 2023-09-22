@@ -17,6 +17,7 @@ package slack.gradle.agp
 
 import com.android.build.api.AndroidPluginVersion
 import java.io.File
+import org.gradle.api.provider.ProviderFactory
 
 /** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
 public interface AgpHandler {
@@ -24,7 +25,7 @@ public interface AgpHandler {
   public val agpVersion: AndroidPluginVersion
 
   /** Returns the Android SDK directory. This API changed in AGP 8.3.0-alpha05. */
-  public fun getAndroidSdkDirectory(projectRootDir: File): File
+  public fun getAndroidSdkDirectory(projectRootDir: File, providers: ProviderFactory): File
 
   /**
    * A basic factory interface for creating [AgpHandler] instances. These should be implemented and
