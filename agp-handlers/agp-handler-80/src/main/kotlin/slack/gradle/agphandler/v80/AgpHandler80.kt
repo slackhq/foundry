@@ -18,12 +18,11 @@ package slack.gradle.agphandler.v80
 import com.android.build.api.AndroidPluginVersion
 import com.google.auto.service.AutoService
 import slack.gradle.agp.AgpHandler
-import slack.gradle.agp.AgpHandlerFactory
 
 public class AgpHandler80 private constructor(override val agpVersion: AndroidPluginVersion) :
   AgpHandler {
-  @AutoService(AgpHandlerFactory::class)
-  public class Factory : AgpHandlerFactory {
+  @AutoService(AgpHandler.Factory::class)
+  public class Factory : AgpHandler.Factory {
     override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 0, 0)
 
     // TODO Remove once it's public
