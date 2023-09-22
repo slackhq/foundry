@@ -16,32 +16,26 @@
 package com.slack.sgp.intellij.featureflags
 
 import com.intellij.codeInsight.intention.IntentionAction
-import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.ExternalAnnotator
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.IconUtil
 import com.slack.sgp.intellij.SkatePluginSettings
 import com.slack.sgp.intellij.TEST_KOTLIN_LANGUAGE_ID_KEY
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import java.net.URI
-import javax.swing.Icon
 import org.jetbrains.kotlin.idea.KotlinLanguage
 
 class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>() {
-  private val extractor = FeatureFlagExtractor()
+  private val extractor by lazy { FeatureFlagExtractor() }
 
   override fun collectInformation(file: PsiFile): PsiFile? {
     if (!isKotlinFeatureFile(file)) {
@@ -73,10 +67,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
     val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
 
     return flags.mapNotNull { flag ->
-      val textRange =
-        ApplicationManager.getApplication().runReadAction<TextRange?> {
-          findTextRangeForFlag(psiFile, flag)
-        }
+      val textRange = runReadAction { findTextRangeForFlag(psiFile, flag) }
       if (textRange != null) {
         val url = "$baseUrl?q=${flag.lowercase()}"
         FeatureFlagSymbol(textRange, url)
@@ -112,7 +103,6 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
         .range(symbol.textRange)
         .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
-        .gutterIconRenderer(MyGutterIconRenderer(symbol.url))
         .create()
     }
   }
@@ -137,22 +127,4 @@ class UrlIntentionAction(
   override fun startInWriteAction(): Boolean {
     return false
   }
-}
-
-class MyGutterIconRenderer(private val url: String) : GutterIconRenderer() {
-
-  private val scaledWebIcon: Icon = IconUtil.scale(AllIcons.General.Web, null, 0.5f)
-
-  override fun getIcon() = scaledWebIcon
-
-  override fun getClickAction() =
-    object : AnAction() {
-      override fun actionPerformed(e: AnActionEvent) {
-        BrowserUtil.browse(url)
-      }
-    }
-
-  override fun equals(other: Any?) = other is MyGutterIconRenderer && other.url == url
-
-  override fun hashCode() = url.hashCode()
 }
