@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij.featureflags
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.psi.PsiFile
 
 /**
  * Responsible for extracting feature flags. Searches for enum entries annotated with 'FeatureFlag'
@@ -27,14 +28,14 @@ class FeatureFlagExtractor {
 
   // Caches the feature flags for a given PSI file to optimize repeated lookups
   companion object {
-    private val featureFlagCache = mutableMapOf<com.intellij.psi.PsiFile, List<String>>()
+    private val featureFlagCache = mutableMapOf<PsiFile, List<String>>()
   }
 
-  fun setFeatureFlagsForPsiFile(psiFile: com.intellij.psi.PsiFile, flags: List<String>) {
+  fun setFeatureFlagsForPsiFile(psiFile: PsiFile, flags: List<String>) {
     featureFlagCache[psiFile] = flags
   }
 
-  fun getFeatureFlagsForPsiFile(psiFile: com.intellij.psi.PsiFile): List<String>? {
+  fun getFeatureFlagsForPsiFile(psiFile: PsiFile): List<String>? {
     return featureFlagCache[psiFile]
   }
   /**
@@ -43,8 +44,8 @@ class FeatureFlagExtractor {
    * @param psiFile The PSI representation of the file to process.
    * @return A list of feature flag names in a file
    */
-  fun extractFeatureFlags(psiFile: com.intellij.psi.PsiFile): List<String> {
-    log.info("Looking for feature flags in a file: ${psiFile.toString()}")
+  fun extractFeatureFlags(psiFile: PsiFile): List<String> {
+    log.info("Looking for feature flags in a file: $psiFile")
     val enumsWithAnnotation = findAnnotatedEnums(psiFile)
     log.info("Found feature flags: $enumsWithAnnotation")
     return enumsWithAnnotation
