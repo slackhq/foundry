@@ -16,11 +16,19 @@
 package slack.gradle.agphandler.v80
 
 import com.android.build.api.AndroidPluginVersion
+import com.android.build.gradle.internal.SdkLocator
+import com.android.builder.errors.EvalIssueException
+import com.android.builder.errors.IssueReporter
 import com.google.auto.service.AutoService
+import java.io.File
 import slack.gradle.agp.AgpHandler
 
 public class AgpHandler80 private constructor(override val agpVersion: AndroidPluginVersion) :
   AgpHandler {
+
+  override fun getAndroidSdkDirectory(projectRootDir: File): File =
+    SdkLocator.getSdkDirectory(projectRootDir, NoOpReporter)
+
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
     override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 0, 0)
@@ -32,5 +40,13 @@ public class AgpHandler80 private constructor(override val agpVersion: AndroidPl
       com.android.build.api.extension.impl.CURRENT_AGP_VERSION
 
     override fun create(): AgpHandler = AgpHandler80(currentVersion)
+  }
+
+  private object NoOpReporter : IssueReporter() {
+    override fun hasIssue(type: Type) = false
+
+    override fun reportIssue(type: Type, severity: Severity, exception: EvalIssueException) {
+      // No-op
+    }
   }
 }
