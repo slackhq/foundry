@@ -23,6 +23,7 @@ import com.slack.sgp.intellij.SkatePluginSettings
 import org.junit.Test
 
 class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
+  // language=kotlin
   private val fileContent =
     """
         enum class TestFeatures :
