@@ -25,17 +25,12 @@ import org.junit.Test
 class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
   private val fileContent =
     """
-            @FeatureFlags(ForComplianceFeature::class)
-            enum class ComplianceFeature(override val dependencies: Set<FeatureFlagEnum> = emptySet()) :
-              FeatureFlagEnum {
-              /** Enables validation of app-scoped environment variant */
-              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED) ANDROID_ENV_VARIANT_VALIDATION,
-              @FeatureFlag(defaultValue = false, minimization = UNAUTHENTICATED)
-              ANDROID_GOV_SLACK_CUSTOM_AWARENESS,
-              @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
-              ANDROID_GOV_SLACK_CUSTOM_AWARENESS_TEAM_SWITCH;
-              override val key: String by computeKey()
-            }
+        enum class TestFeatures :
+          FeatureFlagEnum {
+          @FeatureFlag FLAG_ONE,
+          @FeatureFlag FLAG_TWO,
+          @FeatureFlag FLAG_THREE,
+        }
         """
 
   @Test
@@ -51,16 +46,16 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
   @Test
   fun `test extraction of feature flags from provided content`() {
     val featureFlagExtractor = FeatureFlagExtractor()
-    val psiFile = createKotlinFile("ComplianceFeature.kt", fileContent)
+    val psiFile = createKotlinFile("TestFeature.kt", fileContent)
     val featureFlags = featureFlagExtractor.extractFeatureFlags(psiFile)
-    assertTrue(featureFlags.contains("ANDROID_ENV_VARIANT_VALIDATION"))
-    assertTrue(featureFlags.contains("ANDROID_GOV_SLACK_CUSTOM_AWARENESS"))
-    assertTrue(featureFlags.contains("ANDROID_GOV_SLACK_CUSTOM_AWARENESS_TEAM_SWITCH"))
+    assertTrue(featureFlags.contains("FLAG_ONE"))
+    assertTrue(featureFlags.contains("FLAG_TWO"))
+    assertTrue(featureFlags.contains("FLAG_THREE"))
   }
 
   private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {
     project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
-    val file = createKotlinFile("ComplianceFeature.kt", fileContent)
+    val file = createKotlinFile("TestFeature.kt", fileContent)
     FeatureFlagAnnotator().collectInformation(file)
     return FeatureFlagAnnotator().doAnnotate(file)
   }
