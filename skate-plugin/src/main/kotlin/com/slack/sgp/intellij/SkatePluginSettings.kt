@@ -45,7 +45,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     }
 
   var featureFlagBaseUrl: String?
-    get() = state.featureFlagBaseUrl ?: "https://houston.tinyspeck.com/experiments/all"
+    get() = state.featureFlagBaseUrl
     set(value) {
       state.featureFlagBaseUrl = value
     }
