@@ -21,6 +21,21 @@ import com.android.build.api.AndroidPluginVersion
 public interface AgpHandler {
   /** The current AGP version. */
   public val agpVersion: AndroidPluginVersion
+
+  /**
+   * A basic factory interface for creating [AgpHandler] instances. These should be implemented and
+   * contributed as a service loader via something like `@AutoService`.
+   *
+   * **IMPORTANT:** This interface should _not_ use any AGP APIs outside the implementation of
+   * [currentVersion] and [create].
+   */
+  public interface Factory {
+    public val minVersion: AndroidPluginVersion
+    /** Attempts to get the current AGP version or throws and exception if it cannot. */
+    public val currentVersion: AndroidPluginVersion
+
+    public fun create(): AgpHandler
+  }
 }
 
 /** Returns a new [AndroidPluginVersion] with any preview information stripped. */
