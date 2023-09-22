@@ -31,7 +31,7 @@ public class AgpHandler83 private constructor(override val agpVersion: AndroidPl
 
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
-    override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 0, 0)
+    override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 3, 0)
 
     // TODO Remove once it's public
     //  https://issuetracker.google.com/issues/297440098
