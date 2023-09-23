@@ -67,6 +67,7 @@ dependencies {
   // Better I/O
   api(libs.okio)
   api(projects.agpHandlers.agpHandler80)
+  api(projects.agpHandlers.agpHandler83)
   api(projects.agpHandlers.agpHandlerApi)
 
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
