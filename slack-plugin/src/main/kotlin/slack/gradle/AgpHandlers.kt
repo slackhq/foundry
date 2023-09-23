@@ -18,13 +18,14 @@ package slack.gradle
 import com.android.build.api.AndroidPluginVersion
 import java.util.ServiceLoader
 import slack.gradle.agp.AgpHandler
-import slack.gradle.agp.AgpHandlerFactory
 
 internal object AgpHandlers {
   fun createHandler(): AgpHandler {
-    /** Load handlers and pick the highest compatible version (by [AgpHandlerFactory.minVersion]) */
+    /**
+     * Load handlers and pick the highest compatible version (by [AgpHandler.Factory.minVersion])
+     */
     val targetFactory =
-      ServiceLoader.load(AgpHandlerFactory::class.java)
+      ServiceLoader.load(AgpHandler.Factory::class.java)
         .iterator()
         .asSequence()
         .mapNotNull { factory ->
@@ -46,5 +47,5 @@ internal object AgpHandlers {
 
 private data class FactoryData(
   val agpVersion: AndroidPluginVersion,
-  val factory: AgpHandlerFactory
+  val factory: AgpHandler.Factory
 )
