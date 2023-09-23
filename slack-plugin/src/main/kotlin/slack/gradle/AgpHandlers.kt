@@ -17,17 +17,26 @@ package slack.gradle
 
 import com.android.build.api.AndroidPluginVersion
 import java.util.ServiceLoader
+import org.jetbrains.annotations.VisibleForTesting
 import slack.gradle.agp.AgpHandler
 
 internal object AgpHandlers {
-  fun createHandler(): AgpHandler {
-    /**
-     * Load handlers and pick the highest compatible version (by [AgpHandler.Factory.minVersion])
-     */
+
+  private fun loadFactories(): Sequence<AgpHandler.Factory> {
+    return ServiceLoader.load(AgpHandler.Factory::class.java).asSequence()
+  }
+
+  /**
+   * Load [factories][AgpHandler.Factory] and pick the highest compatible version (by
+   * [AgpHandler.Factory.minVersion])
+   */
+  @VisibleForTesting
+  fun resolveFactory(
+    factories: Sequence<AgpHandler.Factory> = loadFactories(),
+    testAgpVersion: AndroidPluginVersion? = null,
+  ): AgpHandler.Factory {
     val targetFactory =
-      ServiceLoader.load(AgpHandler.Factory::class.java)
-        .iterator()
-        .asSequence()
+      factories
         .mapNotNull { factory ->
           // Filter out any factories that can't compute the AGP version, as
           // they're _definitely_ not compatible
@@ -37,11 +46,14 @@ internal object AgpHandlers {
             null
           }
         }
-        .filter { (agpVersion, factory) -> agpVersion >= factory.minVersion }
+        .filter { (agpVersion, factory) -> (testAgpVersion ?: agpVersion) >= factory.minVersion }
         .maxByOrNull { (_, factory) -> factory.minVersion }
         ?.factory ?: error("Unrecognized AGP version!")
+    return targetFactory
+  }
 
-    return targetFactory.create()
+  fun createHandler(): AgpHandler {
+    return resolveFactory().create()
   }
 }
 
