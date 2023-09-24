@@ -7,6 +7,7 @@
   "repositories": [
     "slackhq/slack-gradle-plugin"  
   ],
+  "platformAutomerge": true,
   "packageRules": [
     {
       "matchPackageNames": [
