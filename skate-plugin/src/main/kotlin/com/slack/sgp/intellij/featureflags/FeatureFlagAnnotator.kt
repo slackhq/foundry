@@ -31,46 +31,22 @@ import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import java.net.URI
 import org.jetbrains.kotlin.idea.KotlinLanguage
 
-class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>() {
-  private val extractor by lazy { FeatureFlagExtractor() }
+class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<FeatureFlagSymbol>>() {
 
-  override fun collectInformation(file: PsiFile): PsiFile? {
-    if (!isKotlinFeatureFile(file)) {
-      return null
-    }
-    if (extractor.getFeatureFlagsForPsiFile(file) == null) {
-      val flags = extractor.extractFeatureFlags(file)
-      extractor.setFeatureFlagsForPsiFile(file, flags)
-    }
-    return file
-  }
-
-  override fun doAnnotate(collectedInfo: PsiFile): List<FeatureFlagSymbol> {
-    if (!collectedInfo.project.isLinkifiedFeatureFlagsEnabled() || !isKotlinFile(collectedInfo)) {
+  override fun collectInformation(file: PsiFile): List<FeatureFlagSymbol> {
+    if (
+      !file.project.isLinkifiedFeatureFlagsEnabled() ||
+        !isKotlinFile(file) ||
+        !isKotlinFeatureFile(file)
+    ) {
       return emptyList()
     }
-
-    val flagsForFile = extractor.getFeatureFlagsForPsiFile(collectedInfo)
-    return transformToFeatureFlagSymbols(collectedInfo, flagsForFile)
+    val flags = FeatureFlagExtractor.extractFeatureFlags(file)
+    return transformToFeatureFlagSymbols(file, flags)
   }
 
-  private fun transformToFeatureFlagSymbols(
-    psiFile: PsiFile,
-    flags: List<PsiElement>?
-  ): List<FeatureFlagSymbol> {
-    if (flags.isNullOrEmpty()) {
-      return emptyList()
-    }
-    val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
-
-    return flags.map { flag -> FeatureFlagSymbol(flag, "$baseUrl?q=${flag.text}") }
-  }
-
-  private fun isKotlinFile(psiFile: PsiFile): Boolean =
-    psiFile.language.id == KotlinLanguage.INSTANCE.id ||
-      psiFile.getUserData(TEST_KOTLIN_LANGUAGE_ID_KEY) == KotlinLanguage.INSTANCE.id
-
-  private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean = psiFile.name.endsWith("Feature.kt")
+  override fun doAnnotate(collectedInfo: List<FeatureFlagSymbol>): List<FeatureFlagSymbol> =
+    collectedInfo
 
   override fun apply(
     file: PsiFile,
@@ -78,18 +54,29 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
     holder: AnnotationHolder
   ) {
     for (symbol in annotationResult) {
-      val message = "Open on Houston: ${symbol.url}"
+      val message = "Open at: ${symbol.url}"
       holder
-        .newAnnotation(
-          HighlightSeverity.INFORMATION,
-          "More details about feature flag on Houston..."
-        )
+        .newAnnotation(HighlightSeverity.INFORMATION, "Open for more details.")
         .range(symbol.element)
         .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
         .create()
     }
   }
+
+  private fun transformToFeatureFlagSymbols(
+    psiFile: PsiFile,
+    flags: List<PsiElement>?
+  ): List<FeatureFlagSymbol> {
+    val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
+    return flags.orEmpty().map { flag -> FeatureFlagSymbol(flag, "$baseUrl?q=${flag.text}") }
+  }
+
+  private fun isKotlinFile(psiFile: PsiFile): Boolean =
+    psiFile.language.id == KotlinLanguage.INSTANCE.id ||
+      psiFile.getUserData(TEST_KOTLIN_LANGUAGE_ID_KEY) == KotlinLanguage.INSTANCE.id
+
+  private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean = psiFile.name.endsWith("Feature.kt")
 }
 
 class FeatureFlagSymbol(val element: PsiElement, val url: String)

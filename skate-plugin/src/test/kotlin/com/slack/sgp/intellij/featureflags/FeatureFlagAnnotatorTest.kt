@@ -50,9 +50,8 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
 
   @Test
   fun `test extraction of feature flags from provided content`() {
-    val featureFlagExtractor = FeatureFlagExtractor()
     val psiFile = createKotlinFile("TestFeature.kt", fileContent)
-    val featureFlags = featureFlagExtractor.extractFeatureFlags(psiFile)
+    val featureFlags = FeatureFlagExtractor.extractFeatureFlags(psiFile)
     val convertPsiElementToText = featureFlags.map { it.text }
     assertTrue(convertPsiElementToText.size == 3)
     assertTrue(convertPsiElementToText.contains("FLAG_ONE"))
@@ -63,8 +62,8 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
   private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {
     project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
     val file = createKotlinFile("TestFeature.kt", fileContent)
-    FeatureFlagAnnotator().collectInformation(file)
-    return FeatureFlagAnnotator().doAnnotate(file)
+    val flags = FeatureFlagAnnotator().collectInformation(file)
+    return FeatureFlagAnnotator().doAnnotate(flags)
   }
 
   private fun createKotlinFile(

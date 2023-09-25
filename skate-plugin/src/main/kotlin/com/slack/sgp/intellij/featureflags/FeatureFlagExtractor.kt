@@ -23,22 +23,10 @@ import com.intellij.psi.PsiFile
  * Responsible for extracting feature flags. Searches for enum entries annotated with 'FeatureFlag'
  * to identify feature flags.
  */
-class FeatureFlagExtractor {
+object FeatureFlagExtractor {
 
   private val log: Logger = Logger.getInstance(FeatureFlagExtractor::class.java)
 
-  // Caches the feature flags for a given PSI file to optimize repeated lookups
-  companion object {
-    private val featureFlagCache = mutableMapOf<PsiFile, List<PsiElement>>()
-  }
-
-  fun setFeatureFlagsForPsiFile(psiFile: PsiFile, flags: List<PsiElement>) {
-    featureFlagCache[psiFile] = flags
-  }
-
-  fun getFeatureFlagsForPsiFile(psiFile: PsiFile): List<PsiElement>? {
-    return featureFlagCache[psiFile]
-  }
   /**
    * Extracts the names of feature flags from the provided PSI file. Only processes Kotlin files.
    *
