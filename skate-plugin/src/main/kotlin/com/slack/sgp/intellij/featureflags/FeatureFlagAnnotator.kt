@@ -20,14 +20,11 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.ExternalAnnotator
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.util.PsiTreeUtil
 import com.slack.sgp.intellij.SkatePluginSettings
 import com.slack.sgp.intellij.TEST_KOTLIN_LANGUAGE_ID_KEY
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
@@ -59,27 +56,14 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
 
   private fun transformToFeatureFlagSymbols(
     psiFile: PsiFile,
-    flags: List<String>?
+    flags: List<PsiElement>?
   ): List<FeatureFlagSymbol> {
     if (flags.isNullOrEmpty()) {
       return emptyList()
     }
     val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
 
-    return flags.mapNotNull { flag ->
-      val textRange = runReadAction { findTextRangeForFlag(psiFile, flag) }
-      if (textRange != null) {
-        val url = "$baseUrl?q=${flag.lowercase()}"
-        FeatureFlagSymbol(textRange, url)
-      } else {
-        null
-      }
-    }
-  }
-
-  private fun findTextRangeForFlag(psiFile: PsiFile, flag: String): TextRange? {
-    val elements = PsiTreeUtil.findChildrenOfType(psiFile, PsiElement::class.java)
-    return elements.firstOrNull { it.text == flag }?.textRange
+    return flags.map { flag -> FeatureFlagSymbol(flag, "$baseUrl?q=${flag.text}") }
   }
 
   private fun isKotlinFile(psiFile: PsiFile): Boolean =
@@ -100,7 +84,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
           HighlightSeverity.INFORMATION,
           "More details about feature flag on Houston..."
         )
-        .range(symbol.textRange)
+        .range(symbol.element)
         .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
         .create()
@@ -108,7 +92,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<PsiFile, List<FeatureFlagSymbol>>
   }
 }
 
-class FeatureFlagSymbol(val textRange: TextRange, val url: String)
+class FeatureFlagSymbol(val element: PsiElement, val url: String)
 
 class UrlIntentionAction(
   private val message: String,

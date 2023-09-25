@@ -28,9 +28,13 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
     """
         enum class TestFeatures :
           FeatureFlagEnum {
-          @FeatureFlag FLAG_ONE,
-          @FeatureFlag FLAG_TWO,
-          @FeatureFlag FLAG_THREE,
+          @Deprecated("test")
+          @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
+          FLAG_ONE,
+          @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
+          FLAG_TWO,
+          @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
+          FLAG_THREE,
         }
         """
 
@@ -49,9 +53,11 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
     val featureFlagExtractor = FeatureFlagExtractor()
     val psiFile = createKotlinFile("TestFeature.kt", fileContent)
     val featureFlags = featureFlagExtractor.extractFeatureFlags(psiFile)
-    assertTrue(featureFlags.contains("FLAG_ONE"))
-    assertTrue(featureFlags.contains("FLAG_TWO"))
-    assertTrue(featureFlags.contains("FLAG_THREE"))
+    val convertPsiElementToText = featureFlags.map { it.text }
+    assertTrue(convertPsiElementToText.size == 3)
+    assertTrue(convertPsiElementToText.contains("FLAG_ONE"))
+    assertTrue(convertPsiElementToText.contains("FLAG_TWO"))
+    assertTrue(convertPsiElementToText.contains("FLAG_THREE"))
   }
 
   private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {

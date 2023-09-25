@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij.featureflags
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 
 /**
@@ -28,14 +29,14 @@ class FeatureFlagExtractor {
 
   // Caches the feature flags for a given PSI file to optimize repeated lookups
   companion object {
-    private val featureFlagCache = mutableMapOf<PsiFile, List<String>>()
+    private val featureFlagCache = mutableMapOf<PsiFile, List<PsiElement>>()
   }
 
-  fun setFeatureFlagsForPsiFile(psiFile: PsiFile, flags: List<String>) {
+  fun setFeatureFlagsForPsiFile(psiFile: PsiFile, flags: List<PsiElement>) {
     featureFlagCache[psiFile] = flags
   }
 
-  fun getFeatureFlagsForPsiFile(psiFile: PsiFile): List<String>? {
+  fun getFeatureFlagsForPsiFile(psiFile: PsiFile): List<PsiElement>? {
     return featureFlagCache[psiFile]
   }
   /**
@@ -44,58 +45,22 @@ class FeatureFlagExtractor {
    * @param psiFile The PSI representation of the file to process.
    * @return A list of feature flag names in a file
    */
-  fun extractFeatureFlags(psiFile: PsiFile): List<String> {
+  fun extractFeatureFlags(psiFile: PsiFile): List<PsiElement> {
     log.info("Looking for feature flags in a file: $psiFile")
-    val enumsWithAnnotation = findAnnotatedEnums(psiFile)
+    val enumsWithAnnotation = findAnnotatedEnumElements(psiFile)
     log.info("Found feature flags: $enumsWithAnnotation")
     return enumsWithAnnotation
   }
 
-  /** Recursively searches the given PSI file for enums with 'FeatureFlag' annotations. */
-  private fun findAnnotatedEnums(psiFile: Any): List<String> {
-    val annotatedEnumEntries = mutableListOf<String>()
-
-    fun addIfAnnotatedEnum(element: Any) {
-      if (isKtEnumEntry(element) && hasFeatureFlagAnnotation(element)) {
-        element.javaClass
-          .getMethod("getName")
-          .invoke(element)
-          .takeIf { it is String }
-          ?.let { annotatedEnumEntries.add(it as String) }
+  private fun findAnnotatedEnumElements(psiFile: PsiFile): List<PsiElement> {
+    val annotatedEnumEntries = mutableListOf<PsiElement>()
+    fun recurse(element: PsiElement) {
+      if (element.isEnum() && element.hasAnnotation("FeatureFlag")) {
+        element.getEnumIdentifier()?.let { annotatedEnumEntries.add(it) }
       }
-    }
-
-    fun recurse(element: Any) {
-      addIfAnnotatedEnum(element)
-      element.javaClass.methods
-        .find { it.name == "getChildren" }
-        ?.let { method -> (method.invoke(element) as? Array<*>)?.forEach { recurse(it!!) } }
+      element.children.forEach { recurse(it) }
     }
     recurse(psiFile)
     return annotatedEnumEntries
-  }
-
-  /**
-   * Determines if a given PSI element is an enum entry annotated with 'FeatureFlag'.
-   *
-   * @param element The enum entry to check.
-   * @return true if the enum entry is a feature flag, false otherwise.
-   */
-  private fun hasFeatureFlagAnnotation(element: Any): Boolean {
-    val annotationEntriesMethod = element.javaClass.getMethod("getAnnotationEntries")
-    val annotationEntries = annotationEntriesMethod.invoke(element) as? List<*>
-    return annotationEntries?.any {
-      val shortNameMethod = it!!.javaClass.getMethod("getShortName")
-      val shortName = shortNameMethod.invoke(it)
-      shortName?.toString() == "FeatureFlag"
-    } ?: false
-  }
-
-  /** Checks if the given PSI element is a Kotlin enum entry. */
-  private fun isKtEnumEntry(element: Any): Boolean {
-    log.info("Checking if element is a Kotlin Enum Entry")
-    val result = element.javaClass.name == "org.jetbrains.kotlin.psi.KtEnumEntry"
-    log.info("Element is Kotlin Enum Entry: $result")
-    return result
   }
 }
