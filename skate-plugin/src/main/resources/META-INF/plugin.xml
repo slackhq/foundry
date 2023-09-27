@@ -22,6 +22,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.intellij.plugins.markdown</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -31,6 +32,7 @@
                 serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
         <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig"/>
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
+        <annotator language="kotlin" implementationClass="com.slack.sgp.intellij.modeltranslator.TranslatorAnnotator"/>
     </extensions>
 
     <applicationListeners>
@@ -39,8 +41,8 @@
     </applicationListeners>
 
     <actions>
-        <action id="com.slack.sgp.intellij.ProjectGenAction"
-                class="com.slack.sgp.intellij.ProjectGenAction"
+        <action id="com.slack.sgp.intellij.ProjectGenMenuAction"
+                class="com.slack.sgp.intellij.ProjectGenMenuAction"
                 text="Slack Project Generator"
                 description="Launch the Desktop Slack Project Generator app">
             <add-to-group group-id="ToolsMenu" anchor="first"/>

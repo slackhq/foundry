@@ -23,18 +23,19 @@ import com.intellij.openapi.project.Project
 import java.io.IOException
 import org.jetbrains.plugins.terminal.TerminalView
 
-class ProjectGenAction : AnAction() {
+class ProjectGenMenuAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
     val settings = currentProject.service<SkatePluginSettings>()
     if (!settings.isProjectGenMenuActionEnabled) return
-    val terminalView: TerminalView = TerminalView.getInstance(currentProject)
 
+    val terminalView: TerminalView = TerminalView.getInstance(currentProject)
+    val projectGenCliCommand: String = settings.projectGenRunCommand
     try {
       // Create new terminal window to run project gen command
       terminalView
         .createLocalShellWidget(currentProject.basePath, PROJECT_GEN_TAB_NAME)
-        .executeCommand(PROJECT_GEN_COMMAND)
+        .executeCommand(projectGenCliCommand)
     } catch (err: IOException) {
       err.printStackTrace()
       LOG.warn("Failed to launch Project Gen Desktop App")
@@ -42,8 +43,7 @@ class ProjectGenAction : AnAction() {
   }
 
   companion object {
-    private val LOG: Logger = Logger.getInstance(ProjectGenAction::class.java)
+    private val LOG: Logger = Logger.getInstance(ProjectGenMenuAction::class.java)
     const val PROJECT_GEN_TAB_NAME: String = "ProjectGen"
-    const val PROJECT_GEN_COMMAND: String = "./slackw generate-project"
   }
 }
