@@ -15,8 +15,8 @@
  */
 package com.slack.sgp.intellij.util
 
-private val pattern = "_[a-z0-9]".toRegex()
+import com.google.common.base.CaseFormat
 
 fun String.snakeToCamelCase(): String {
-  return replace(pattern) { it.value.last().uppercase() }
+  return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this)
 }
