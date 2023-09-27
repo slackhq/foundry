@@ -53,17 +53,25 @@ object TranslatorHelper {
   fun extractBundle(element: PsiElement): TranslatorBundle? {
     val settings = element.project.service<SkatePluginSettings>()
 
+    // Only process this element if it's a named Kotlin function in a translator file.
     if (
       element.containingFile.name.endsWith(settings.translatorFileNameSuffix) &&
         element is KtNamedFunction
     ) {
 
+      // If the function isn't an extension function, then it can't be a translator and no need to
+      // process it.
       val sourceModel = element.receiverTypeReference?.text ?: return null
-      val sourceModelTopMostParent = getTopMostParent(sourceModel)
 
+      // The source model might be an inner type, e.g. Call.Action,
+      // so get the top most parent type and find the import for it.
+      val sourceModelTopMostParent = getTopMostParent(sourceModel)
       val importDirectives = element.containingKtFile.importDirectives
       val sourceModelImport = importDirectives.findImport(sourceModelTopMostParent, sourceModel)
 
+      // If the import, or the fully qualified name, for the source model doesn't start with the
+      // right package name,
+      // then no need to process this function.
       if (
         !(sourceModelImport?.importedFqName?.asString() ?: sourceModel).startsWith(
           settings.translatorSourceModelsPackageName
@@ -72,11 +80,16 @@ object TranslatorHelper {
         return null
 
       val bodyExpression = element.bodyBlockExpression
+      // If the function doesn't have a body, i.e. a single-expression function, or it contains a
+      // return expression,
+      // then it's already implemented and no need to process it.
       if (
         bodyExpression == null || bodyExpression.findDescendantOfType<KtReturnExpression>() != null
       )
         return null
 
+      // If the function doesn't have a return type, then it can't be a translator and no need to
+      // process it.
       val destinationModelRef = element.getReturnTypeReference()
       val destinationModel = destinationModelRef?.text ?: return null
 
