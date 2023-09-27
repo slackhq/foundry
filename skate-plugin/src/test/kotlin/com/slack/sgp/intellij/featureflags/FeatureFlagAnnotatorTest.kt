@@ -34,6 +34,8 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
 
   private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {
     project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com?q="
+    project.service<SkatePluginSettings>().featureFlagAnnotation = "slack.featureflag.FeatureFlag"
     val file = createKotlinFile("TestFeature.kt", fileContent)
     val flags = FeatureFlagAnnotator().collectInformation(file)
     return FeatureFlagAnnotator().doAnnotate(flags)

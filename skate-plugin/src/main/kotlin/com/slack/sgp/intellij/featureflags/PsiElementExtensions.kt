@@ -15,28 +15,14 @@
  */
 package com.slack.sgp.intellij.featureflags
 
-import com.intellij.psi.PsiElement
-import com.intellij.psi.impl.source.tree.LeafPsiElement
-import com.intellij.psi.util.childrenOfType
-import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.psi.KtAnnotationEntry
-import org.jetbrains.kotlin.psi.KtEnumEntry
-import org.jetbrains.uast.UExpression
-import org.jetbrains.uast.toUElement
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UFile
 
-fun KtEnumEntry.getAnnotation(name: String): KtAnnotationEntry? {
-  return this.getAnnotationEntries().firstOrNull { it.shortName?.asString() == name }
+fun UFile.allClassesAndInnerClasses(): Sequence<UClass> {
+  return classes.asSequence().flatMap(UClass::asSequenceWithInnerClasses)
 }
 
-fun PsiElement.getEnumIdentifier(): LeafPsiElement? {
-  return this.childrenOfType<LeafPsiElement>().firstOrNull { it.elementType == KtTokens.IDENTIFIER }
-}
-
-fun KtAnnotationEntry.getKeyArgumentValue(key: String): String? {
-  val argumentExpression =
-    this.valueArguments
-      .firstOrNull { it.getArgumentName()?.asName?.asString() == key }
-      ?.getArgumentExpression()
-  return (argumentExpression as? PsiElement)?.toUElement(UExpression::class.java)?.evaluate()
-    as? String
+fun UClass.asSequenceWithInnerClasses(): Sequence<UClass> {
+  return sequenceOf(this)
+    .plus(innerClasses.asSequence().flatMap(UClass::asSequenceWithInnerClasses))
 }

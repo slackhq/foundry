@@ -22,7 +22,6 @@ import com.intellij.lang.annotation.ExternalAnnotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.slack.sgp.intellij.TEST_KOTLIN_LANGUAGE_ID_KEY
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
@@ -54,7 +53,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
       val message = "Open at: ${symbol.url}"
       holder
         .newAnnotation(HighlightSeverity.INFORMATION, "Open for more details.")
-        .range(symbol.element as PsiElement)
+        .range(symbol.range)
         .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
         .create()

@@ -15,21 +15,65 @@
  */
 package com.slack.sgp.intellij.featureflags
 
+import com.google.common.truth.Truth.assertThat
 import com.intellij.openapi.components.service
 import com.slack.sgp.intellij.SkatePluginSettings
+import com.slack.sgp.intellij.featureflags.FeatureFlagExtractor.ANNOTATION_EMPTY_ERROR
+import com.slack.sgp.intellij.featureflags.FeatureFlagExtractor.BASE_URL_EMPTY_ERROR
+import com.slack.sgp.intellij.featureflags.FeatureFlagExtractor.BASE_URL_QUERY_PARAM_ERROR
 import org.junit.Test
 
 class FeatureFlagExtractorTest : BaseFeatureFlagTest() {
 
   @Test
+  fun `test throws error when featureFlagBaseUrl is empty`() {
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = ""
+    val file = createKotlinFile("TestFeature.kt", fileContent)
+    try {
+      FeatureFlagAnnotator().collectInformation(file)
+      fail("Expected an IllegalArgumentException to be thrown, but it wasn't.")
+    } catch (e: IllegalArgumentException) {
+      assertThat(e).hasMessageThat().contains(BASE_URL_EMPTY_ERROR)
+    }
+  }
+
+  @Test
+  fun `test throws error when featureFlagBaseUrl doesn't end with query param`() {
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "https://example.com/"
+    val file = createKotlinFile("TestFeature.kt", fileContent)
+    try {
+      FeatureFlagAnnotator().collectInformation(file)
+      fail("Expected an IllegalArgumentException to be thrown, but it wasn't.")
+    } catch (e: IllegalArgumentException) {
+      assertThat(e).hasMessageThat().contains(BASE_URL_QUERY_PARAM_ERROR)
+    }
+  }
+
+  @Test
+  fun `test throws error when featureFlagAnnotation is empty`() {
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com?q="
+    project.service<SkatePluginSettings>().featureFlagAnnotation = ""
+    val file = createKotlinFile("TestFeature.kt", fileContent)
+    try {
+      FeatureFlagAnnotator().collectInformation(file)
+      fail("Expected an IllegalArgumentException to be thrown, but it wasn't.")
+    } catch (e: IllegalArgumentException) {
+      assertThat(e).hasMessageThat().contains(ANNOTATION_EMPTY_ERROR)
+    }
+  }
+
+  @Test
   fun `test extraction of feature flags from provided content`() {
-    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com"
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com?q="
+    project.service<SkatePluginSettings>().featureFlagAnnotation = "slack.featureflag.FeatureFlag"
     val psiFile = createKotlinFile("TestFeature.kt", fileContent)
     val featureFlags = FeatureFlagExtractor.extractFeatureFlags(psiFile)
     val flagUrls = featureFlags.map { it.url }
-    assertTrue(flagUrls.size == 3)
-    assertTrue(flagUrls.contains("test.com?q=test_flag_one"))
-    assertTrue(flagUrls.contains("test.com?q=flag_two"))
-    assertTrue(flagUrls.contains("test.com?q=flag_three"))
+    assertThat(flagUrls)
+      .containsExactly(
+        "test.com?q=test_flag_one",
+        "test.com?q=flag_two",
+        "test.com?q=flag_three",
+      )
   }
 }

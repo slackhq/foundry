@@ -22,6 +22,12 @@ abstract class BaseFeatureFlagTest : LightPlatformCodeInsightFixture4TestCase() 
   // language=kotlin
   protected val fileContent =
     """
+        package slack.featureflag
+
+        annotation class FeatureFlag(defaultValue: Boolean, val key: String = "", minimization: Minimization)
+
+        enum class Minimization { AUTHENTICATED }
+
         enum class TestFeatures :
           FeatureFlagEnum {
           @Deprecated("test")

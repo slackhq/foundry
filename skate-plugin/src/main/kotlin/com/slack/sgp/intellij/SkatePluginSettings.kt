@@ -50,10 +50,17 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.featureFlagBaseUrl = value
     }
 
+  var featureFlagAnnotation: String?
+    get() = state.featureFlagAnnotation
+    set(value) {
+      state.featureFlagAnnotation = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
     var isLinkifiedFeatureFlagsEnabled by property(true)
     var featureFlagBaseUrl by string()
+    var featureFlagAnnotation by string()
   }
 }
