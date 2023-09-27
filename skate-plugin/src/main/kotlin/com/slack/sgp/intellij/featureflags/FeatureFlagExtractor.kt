@@ -20,7 +20,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import com.slack.sgp.intellij.SkatePluginSettings
 import java.util.Locale
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.uast.UEnumConstant
 import org.jetbrains.uast.UFile
 import org.jetbrains.uast.evaluateString
@@ -52,7 +51,6 @@ object FeatureFlagExtractor {
     require(baseUrl.endsWith("?q=")) { BASE_URL_QUERY_PARAM_ERROR }
     require(flagAnnotation.isNotBlank()) { ANNOTATION_EMPTY_ERROR }
 
-    if (psiFile !is KtFile) return emptyList()
     val uFile = psiFile.toUElementOfType<UFile>() ?: return emptyList()
 
     return uFile

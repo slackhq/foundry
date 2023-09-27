@@ -23,17 +23,16 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
-import com.slack.sgp.intellij.TEST_KOTLIN_LANGUAGE_ID_KEY
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import java.net.URI
-import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.psi.KtFile
 
 class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<FeatureFlagSymbol>>() {
 
   override fun collectInformation(file: PsiFile): List<FeatureFlagSymbol> {
     if (
       !file.project.isLinkifiedFeatureFlagsEnabled() ||
-        !isKotlinFile(file) ||
+        file !is KtFile ||
         !isKotlinFeatureFile(file)
     ) {
       return emptyList()
@@ -59,10 +58,6 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
         .create()
     }
   }
-
-  private fun isKotlinFile(psiFile: PsiFile): Boolean =
-    psiFile.language.id == KotlinLanguage.INSTANCE.id ||
-      psiFile.getUserData(TEST_KOTLIN_LANGUAGE_ID_KEY) == KotlinLanguage.INSTANCE.id
 
   private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean = psiFile.name.endsWith("Feature.kt")
 }
