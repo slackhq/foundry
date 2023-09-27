@@ -24,10 +24,6 @@ import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.toUElement
 
-fun KtEnumEntry.hasAnnotation(name: String): Boolean {
-  return this.getAnnotationEntries().any { it.shortName?.asString() == name }
-}
-
 fun KtEnumEntry.getAnnotation(name: String): KtAnnotationEntry? {
   return this.getAnnotationEntries().firstOrNull { it.shortName?.asString() == name }
 }

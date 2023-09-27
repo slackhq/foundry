@@ -16,7 +16,6 @@
 package com.slack.sgp.intellij.featureflags
 
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.source.tree.LeafPsiElement
@@ -29,24 +28,23 @@ import org.jetbrains.kotlin.psi.KtEnumEntry
  */
 object FeatureFlagExtractor {
 
-  private val log: Logger = Logger.getInstance(FeatureFlagExtractor::class.java)
-
   /**
    * Extracts the names of feature flags from the provided PSI file. Only processes Kotlin files.
    *
    * @param psiFile The PSI representation of the file to process.
-   * @return A list of feature flag names in a file
    */
   fun extractFeatureFlags(psiFile: PsiFile): List<FeatureFlagSymbol> {
     val annotatedEnumEntries = mutableListOf<FeatureFlagSymbol>()
     val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
     fun recurse(element: PsiElement) {
-      if (element is KtEnumEntry && element.hasAnnotation("FeatureFlag")) {
-        val keyValue = element.getAnnotation("FeatureFlag")?.getKeyArgumentValue("key")
-        element.getEnumIdentifier()?.let {
-          annotatedEnumEntries.add(
-            FeatureFlagSymbol(it, "$baseUrl?q=${keyValue ?: it.text.lowercase()}")
-          )
+      if (element is KtEnumEntry) {
+        element.getAnnotation("FeatureFlag")?.let { annotation ->
+          val keyValue = annotation.getKeyArgumentValue("key")
+          element.getEnumIdentifier()?.let { identifier ->
+            annotatedEnumEntries.add(
+              FeatureFlagSymbol(identifier, "$baseUrl?q=${keyValue ?: identifier.text.lowercase()}")
+            )
+          }
         }
       }
       element.children.forEach { recurse(it) }
