@@ -92,7 +92,15 @@ object TranslatorHelper {
     }
   }
 
-  /** Generates and returns the model translator body using the [bundle] information. */
+  /**
+   * Generates and returns the model translator body using the [bundle] information.
+   *
+   * Example:
+   * ```
+   * { return Call(id = id, title = title.toDomainModel(), dateStart = dateStart,
+   * dateEnded = dateEnd, actions = actions.map { it.toDomainModel() }) }
+   * ```
+   */
   fun generateBody(bundle: TranslatorBundle): KtBlockExpression? {
     val (sourceModel, destinationModel, element, importDirectives) = bundle
 
