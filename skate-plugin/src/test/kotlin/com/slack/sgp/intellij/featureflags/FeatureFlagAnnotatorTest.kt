@@ -29,7 +29,7 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
         enum class TestFeatures :
           FeatureFlagEnum {
           @Deprecated("test")
-          @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
+          @FeatureFlag(defaultValue = false,  key ="test_flag_one", minimization = AUTHENTICATED)
           FLAG_ONE,
           @FeatureFlag(defaultValue = false, minimization = AUTHENTICATED)
           FLAG_TWO,
@@ -50,13 +50,14 @@ class FeatureFlagAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
 
   @Test
   fun `test extraction of feature flags from provided content`() {
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com"
     val psiFile = createKotlinFile("TestFeature.kt", fileContent)
     val featureFlags = FeatureFlagExtractor.extractFeatureFlags(psiFile)
-    val convertPsiElementToText = featureFlags.map { it.text }
-    assertTrue(convertPsiElementToText.size == 3)
-    assertTrue(convertPsiElementToText.contains("FLAG_ONE"))
-    assertTrue(convertPsiElementToText.contains("FLAG_TWO"))
-    assertTrue(convertPsiElementToText.contains("FLAG_THREE"))
+    val flagUrls = featureFlags.map { it.url }
+    assertTrue(flagUrls.size == 3)
+    assertTrue(flagUrls.contains("test.com?q=test_flag_one"))
+    assertTrue(flagUrls.contains("test.com?q=flag_two"))
+    assertTrue(flagUrls.contains("test.com?q=flag_three"))
   }
 
   private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {

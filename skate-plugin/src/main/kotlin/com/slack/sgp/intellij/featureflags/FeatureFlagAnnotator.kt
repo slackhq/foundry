@@ -20,12 +20,10 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.ExternalAnnotator
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.slack.sgp.intellij.SkatePluginSettings
 import com.slack.sgp.intellij.TEST_KOTLIN_LANGUAGE_ID_KEY
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import java.net.URI
@@ -41,8 +39,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
     ) {
       return emptyList()
     }
-    val flags = FeatureFlagExtractor.extractFeatureFlags(file)
-    return transformToFeatureFlagSymbols(file, flags)
+    return FeatureFlagExtractor.extractFeatureFlags(file)
   }
 
   override fun doAnnotate(collectedInfo: List<FeatureFlagSymbol>): List<FeatureFlagSymbol> =
@@ -57,19 +54,11 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
       val message = "Open at: ${symbol.url}"
       holder
         .newAnnotation(HighlightSeverity.INFORMATION, "Open for more details.")
-        .range(symbol.element)
+        .range(symbol.element as PsiElement)
         .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
         .create()
     }
-  }
-
-  private fun transformToFeatureFlagSymbols(
-    psiFile: PsiFile,
-    flags: List<PsiElement>?
-  ): List<FeatureFlagSymbol> {
-    val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
-    return flags.orEmpty().map { flag -> FeatureFlagSymbol(flag, "$baseUrl?q=${flag.text}") }
   }
 
   private fun isKotlinFile(psiFile: PsiFile): Boolean =
@@ -78,8 +67,6 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
 
   private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean = psiFile.name.endsWith("Feature.kt")
 }
-
-class FeatureFlagSymbol(val element: PsiElement, val url: String)
 
 class UrlIntentionAction(
   private val message: String,

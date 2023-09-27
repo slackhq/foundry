@@ -16,34 +16,31 @@
 package com.slack.sgp.intellij.featureflags
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.childrenOfType
+import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtAnnotationEntry
+import org.jetbrains.kotlin.psi.KtEnumEntry
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.toUElement
 
-fun PsiElement.getFirstChild(elementType: String): PsiElement? {
-  return this.childrenOfType<PsiElement>().firstOrNull {
-    it.node.elementType.toString() == elementType
-  }
+fun KtEnumEntry.hasAnnotation(name: String): Boolean {
+  return this.getAnnotationEntries().any { it.shortName?.asString() == name }
 }
 
-fun PsiElement.getChildren(elementType: String): List<PsiElement> {
-  return this.childrenOfType<PsiElement>().filter { it.node.elementType.toString() == elementType }
+fun KtEnumEntry.getAnnotation(name: String): KtAnnotationEntry? {
+  return this.getAnnotationEntries().firstOrNull { it.shortName?.asString() == name }
 }
 
-fun PsiElement.getAnnotationEntries(): List<PsiElement> {
-  return this.getFirstChild("MODIFIER_LIST")?.getChildren("ANNOTATION_ENTRY") ?: listOf()
+fun PsiElement.getEnumIdentifier(): LeafPsiElement? {
+  return this.childrenOfType<LeafPsiElement>().firstOrNull { it.elementType == KtTokens.IDENTIFIER }
 }
 
-fun PsiElement.getAnnotationName(): String? {
-  return this.getFirstChild("CONSTRUCTOR_CALLEE")?.text
-}
-
-fun PsiElement.isEnum(): Boolean {
-  return this.node?.elementType?.toString() == "ENUM_ENTRY"
-}
-
-fun PsiElement.hasAnnotation(name: String): Boolean {
-  return this.getAnnotationEntries().any { it.getAnnotationName() == name }
-}
-
-fun PsiElement.getEnumIdentifier(): PsiElement? {
-  return this.getFirstChild("IDENTIFIER")
+fun KtAnnotationEntry.getKeyArgumentValue(key: String): String? {
+  val argumentExpression =
+    this.valueArguments
+      .firstOrNull { it.getArgumentName()?.asName?.asString() == key }
+      ?.getArgumentExpression()
+  return (argumentExpression as? PsiElement)?.toUElement(UExpression::class.java)?.evaluate()
+    as? String
 }

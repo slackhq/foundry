@@ -15,9 +15,13 @@
  */
 package com.slack.sgp.intellij.featureflags
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.slack.sgp.intellij.SkatePluginSettings
+import org.jetbrains.kotlin.psi.KtEnumEntry
 
 /**
  * Responsible for extracting feature flags. Searches for enum entries annotated with 'FeatureFlag'
@@ -33,18 +37,17 @@ object FeatureFlagExtractor {
    * @param psiFile The PSI representation of the file to process.
    * @return A list of feature flag names in a file
    */
-  fun extractFeatureFlags(psiFile: PsiFile): List<PsiElement> {
-    log.info("Looking for feature flags in a file: $psiFile")
-    val enumsWithAnnotation = findAnnotatedEnumElements(psiFile)
-    log.info("Found feature flags: $enumsWithAnnotation")
-    return enumsWithAnnotation
-  }
-
-  private fun findAnnotatedEnumElements(psiFile: PsiFile): List<PsiElement> {
-    val annotatedEnumEntries = mutableListOf<PsiElement>()
+  fun extractFeatureFlags(psiFile: PsiFile): List<FeatureFlagSymbol> {
+    val annotatedEnumEntries = mutableListOf<FeatureFlagSymbol>()
+    val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
     fun recurse(element: PsiElement) {
-      if (element.isEnum() && element.hasAnnotation("FeatureFlag")) {
-        element.getEnumIdentifier()?.let { annotatedEnumEntries.add(it) }
+      if (element is KtEnumEntry && element.hasAnnotation("FeatureFlag")) {
+        val keyValue = element.getAnnotation("FeatureFlag")?.getKeyArgumentValue("key")
+        element.getEnumIdentifier()?.let {
+          annotatedEnumEntries.add(
+            FeatureFlagSymbol(it, "$baseUrl?q=${keyValue ?: it.text.lowercase()}")
+          )
+        }
       }
       element.children.forEach { recurse(it) }
     }
@@ -52,3 +55,5 @@ object FeatureFlagExtractor {
     return annotatedEnumEntries
   }
 }
+
+data class FeatureFlagSymbol(val element: LeafPsiElement, val url: String)
