@@ -19,6 +19,16 @@ import com.intellij.openapi.util.TextRange
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
+/**
+ * Contains the necessary information to annotate and generate a model translator.
+ *
+ * @property sourceModel The model to translate from.
+ * @property destinationModel The model to translate to.
+ * @property element The translator function.
+ * @property importDirectives The list of imports in the translator file.
+ * @property functionHeaderRange The text range from the begging of the translator function until
+ *   the end of the [destinationModel].
+ */
 data class TranslatorBundle(
   val sourceModel: String,
   val destinationModel: String,
