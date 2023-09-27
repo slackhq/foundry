@@ -38,8 +38,15 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isWhatsNewEnabled = value
     }
 
+  var isProjectGenMenuActionEnabled: Boolean
+    get() = state.isProjectGenMenuActionEnabled
+    set(value) {
+      state.isProjectGenMenuActionEnabled = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
+    var isProjectGenMenuActionEnabled by property(true)
   }
 }

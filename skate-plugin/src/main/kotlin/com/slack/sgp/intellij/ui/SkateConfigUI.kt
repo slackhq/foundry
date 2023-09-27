@@ -34,6 +34,7 @@ internal class SkateConfigUI(
   fun createPanel(): DialogPanel = panel {
     checkBoxRow()
     choosePathRow()
+    enableProjectGenMenuAction()
   }
 
   private fun Panel.checkBoxRow() {
@@ -69,6 +70,16 @@ internal class SkateConfigUI(
           }
         )
         .enabled(settings.isWhatsNewEnabled)
+    }
+  }
+
+  private fun Panel.enableProjectGenMenuAction() {
+    row(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.title")) {
+      checkBox(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.description"))
+        .bindSelected(
+          getter = { settings.isProjectGenMenuActionEnabled },
+          setter = { settings.isProjectGenMenuActionEnabled = it }
+        )
     }
   }
 }

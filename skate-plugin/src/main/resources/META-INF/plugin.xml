@@ -21,6 +21,7 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.intellij.plugins.markdown</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -36,4 +37,14 @@
         <listener class="com.slack.sgp.intellij.ProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
+
+    <actions>
+        <action id="com.slack.sgp.intellij.ProjectGenAction"
+                class="com.slack.sgp.intellij.ProjectGenAction"
+                text="Slack Project Generator"
+                description="Launch the Desktop Slack Project Generator app">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+    </actions>
+
 </idea-plugin>
