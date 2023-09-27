@@ -214,7 +214,12 @@ object TranslatorHelper {
   }
 
   private fun String.isPlatformType(): Boolean {
-    return !contains(DOT) || contains("java.lang.") || contains("kotlin.")
+    return !contains(DOT) ||
+      contains("java.lang.") ||
+      contains("kotlin.") ||
+      contains("kotlinx.") ||
+      contains("android.") ||
+      contains("androidx.")
   }
 
   private fun getTopMostParent(model: String): String? {
