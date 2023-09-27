@@ -15,27 +15,21 @@
  */
 package com.slack.sgp.intellij.featureflags
 
-import com.google.common.truth.Truth.assertThat
 import com.intellij.openapi.components.service
 import com.slack.sgp.intellij.SkatePluginSettings
 import org.junit.Test
 
-class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
+class FeatureFlagExtractorTest : BaseFeatureFlagTest() {
 
   @Test
-  fun `test returns empty list when linkify is disabled`() {
-    assertThat(runAnnotator(enabled = false)).isEmpty()
-  }
-
-  @Test
-  fun `test report symbols when linkify is enabled`() {
-    assertThat(runAnnotator(enabled = true)).isNotEmpty()
-  }
-
-  private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {
-    project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
-    val file = createKotlinFile("TestFeature.kt", fileContent)
-    val flags = FeatureFlagAnnotator().collectInformation(file)
-    return FeatureFlagAnnotator().doAnnotate(flags)
+  fun `test extraction of feature flags from provided content`() {
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com"
+    val psiFile = createKotlinFile("TestFeature.kt", fileContent)
+    val featureFlags = FeatureFlagExtractor.extractFeatureFlags(psiFile)
+    val flagUrls = featureFlags.map { it.url }
+    assertTrue(flagUrls.size == 3)
+    assertTrue(flagUrls.contains("test.com?q=test_flag_one"))
+    assertTrue(flagUrls.contains("test.com?q=flag_two"))
+    assertTrue(flagUrls.contains("test.com?q=flag_three"))
   }
 }
