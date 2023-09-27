@@ -15,6 +15,7 @@
  */
 package com.slack.sgp.intellij.modeltranslator.helper
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
@@ -23,6 +24,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
+import com.slack.sgp.intellij.SkatePluginSettings
 import com.slack.sgp.intellij.modeltranslator.model.TranslatorBundle
 import com.slack.sgp.intellij.util.snakeToCamelCase
 import org.jetbrains.kotlin.idea.quickfix.createFromUsage.callableBuilder.getReturnTypeReference
@@ -38,9 +40,7 @@ import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
 object TranslatorHelper {
-  private const val API_PACKAGE_NAME = "slack.api.schemas"
   private const val DOT = "."
-  private const val FILENAME_SUFFIX = "Translator.kt"
   private const val TRANSLATOR_FUNC_CALL = ".toDomainModel()"
   private const val UNKNOWN_ENUM_VALUE = "UNKNOWN"
   private const val JSON_NAME_ASSIGNMENT = "(name = \""
@@ -51,7 +51,12 @@ object TranslatorHelper {
    * translator if [element] has the header of one and doesn't contain a return statement.
    */
   fun extractBundle(element: PsiElement): TranslatorBundle? {
-    if (element.containingFile.name.endsWith(FILENAME_SUFFIX) && element is KtNamedFunction) {
+    val settings = element.project.service<SkatePluginSettings>()
+
+    if (
+      element.containingFile.name.endsWith(settings.translatorFileNameSuffix) &&
+        element is KtNamedFunction
+    ) {
 
       val sourceModel = element.receiverTypeReference?.text ?: return null
       val sourceModelTopMostParent = getTopMostParent(sourceModel)
@@ -60,7 +65,9 @@ object TranslatorHelper {
       val sourceModelImport = importDirectives.findImport(sourceModelTopMostParent, sourceModel)
 
       if (
-        !(sourceModelImport?.importedFqName?.asString() ?: sourceModel).startsWith(API_PACKAGE_NAME)
+        !(sourceModelImport?.importedFqName?.asString() ?: sourceModel).startsWith(
+          settings.translatorSourceModelsPackageName
+        )
       )
         return null
 

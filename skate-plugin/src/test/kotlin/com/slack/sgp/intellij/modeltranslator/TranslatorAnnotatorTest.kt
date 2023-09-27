@@ -18,8 +18,12 @@ package com.slack.sgp.intellij.modeltranslator
 import com.google.common.truth.Truth.assertThat
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import com.slack.sgp.intellij.DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
+import com.slack.sgp.intellij.DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
 import com.slack.sgp.intellij.SkateBundle
+import com.slack.sgp.intellij.SkatePluginSettings
 
 class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
 
@@ -27,6 +31,15 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
 
   override fun getTestDataPath(): String {
     return "src/test/testData"
+  }
+
+  override fun setUp() {
+    super.setUp()
+
+    // Reset relevant settings.
+    val settings = skatePluginSettings()
+    settings.translatorSourceModelsPackageName = DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
+    settings.translatorFileNameSuffix = DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
   }
 
   fun testAnnotator() {
@@ -69,6 +82,18 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  fun testAnnotator_AlternativeFileNameSuffix() {
+    val settings = skatePluginSettings()
+    settings.translatorFileNameSuffix = "Extensions.kt"
+
+    myFixture.configureByFiles("CallExtensions.kt", "Call.kt")
+
+    val translatorWarning =
+      myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
+    assertThat(translatorWarning).isNotNull()
+    assertTranslatorWarning(translatorWarning)
+  }
+
   fun testAnnotator_NoTranslator() {
     myFixture.configureByFiles("Call.kt")
 
@@ -83,6 +108,18 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     val translatorWarning =
       myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
     assertThat(translatorWarning).isNull()
+  }
+
+  fun testAnnotator_AlternativeSourcePackageName() {
+    val settings = skatePluginSettings()
+    settings.translatorSourceModelsPackageName = "slack.api"
+
+    myFixture.configureByFiles("CallObjectsTranslator.kt", "Call.kt")
+
+    val translatorWarning =
+      myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
+    assertThat(translatorWarning).isNotNull()
+    assertTranslatorWarning(translatorWarning)
   }
 
   fun testAnnotator_NoDestination() {
@@ -113,4 +150,6 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNotNull()
     assertThat(translatorWarning!!.description).isEqualTo(warningDescription)
   }
+
+  private fun skatePluginSettings() = project.service<SkatePluginSettings>()
 }

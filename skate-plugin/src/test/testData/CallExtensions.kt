@@ -16,6 +16,6 @@
 import slack.api.schemas.CallObject
 import slack.model.Call
 
-fun CallObject.toDomainModel(): Call? {
-  return null
+fun CallObject.toDomainModel(): Call {
+  TODO()
 }
