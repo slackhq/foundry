@@ -939,6 +939,11 @@ internal class StandardProjectConfigurations(
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
             freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
+
+            // Set the module name to a dashified version of the project path to ensure uniqueness
+            // in created .kotlin_module files
+            val pathProvider = project.provider { project.path.replace(":", "-") }
+            moduleName.set(pathProvider)
           }
         }
       }

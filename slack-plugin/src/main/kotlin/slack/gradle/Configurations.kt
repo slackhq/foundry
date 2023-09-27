@@ -50,7 +50,6 @@ internal object Configurations {
         *ERROR_PRONE.toTypedArray(),
         *RUNTIME.toTypedArray(),
         COMPILE_ONLY,
-        CORE_LIBRARY_DESUGARING,
         "androidTestUtil",
         "lintChecks",
         "lintRelease"

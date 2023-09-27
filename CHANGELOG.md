@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.10.8
+------
+
+_2023-09-22_
+
+- **Fix**: Don't apply boms to the `coreLibraryDesugaring` configuration.
+- **Enhancement**: Set Kotlin `compilerOptions.moduleName` to a dashified version of the Gradle project path.
+- Update MoshiX to `0.24.3`
+- Compile against Anvil `2.4.8`.
+- Compile against CM `1.5.1`.
+- Compile against DAGP `1.22.0`.
+- Compile against redacted-compiler-plugin `1.6.1`.
+
 0.10.7
 ------
 

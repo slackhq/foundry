@@ -20,6 +20,11 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.SimplePersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import org.jetbrains.annotations.VisibleForTesting
+
+@VisibleForTesting
+internal const val DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME = "slack.api.schemas"
+@VisibleForTesting internal const val DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX = "Translator.kt"
 
 /** Manages user-specific settings for the Skate plugin */
 @Service(Service.Level.PROJECT)
@@ -36,6 +41,18 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     get() = state.isWhatsNewEnabled
     set(value) {
       state.isWhatsNewEnabled = value
+    }
+
+  var translatorSourceModelsPackageName: String
+    get() = state.translatorSourceModelsPackageName ?: DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
+    set(value) {
+      state.translatorSourceModelsPackageName = value
+    }
+
+  var translatorFileNameSuffix: String
+    get() = state.translatorFileNameSuffix ?: DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
+    set(value) {
+      state.translatorFileNameSuffix = value
     }
 
   var isLinkifiedFeatureFlagsEnabled: Boolean
@@ -59,6 +76,8 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
+    var translatorSourceModelsPackageName by string()
+    var translatorFileNameSuffix by string()
     var isLinkifiedFeatureFlagsEnabled by property(true)
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()
