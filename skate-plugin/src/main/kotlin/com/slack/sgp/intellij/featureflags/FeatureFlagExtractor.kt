@@ -44,9 +44,9 @@ object FeatureFlagExtractor {
   fun extractFeatureFlags(psiFile: PsiFile): List<FeatureFlagSymbol> {
     // Ensure baseUrl and flagAnnotation are not empty when the feature flag linkifying is enabled
     // Ensure baseUrl ends with query param - "?q="
-    val baseUrl = psiFile.project.service<SkatePluginSettings>().featureFlagBaseUrl.orEmpty()
-    val flagAnnotation =
-      psiFile.project.service<SkatePluginSettings>().featureFlagAnnotation.orEmpty()
+    val settings = psiFile.project.service<SkatePluginSettings>()
+    val baseUrl = settings.featureFlagBaseUrl.orEmpty()
+    val flagAnnotation = settings.featureFlagAnnotation.orEmpty()
     require(baseUrl.isNotBlank()) { BASE_URL_EMPTY_ERROR }
     require(baseUrl.endsWith("?q=")) { BASE_URL_QUERY_PARAM_ERROR }
     require(flagAnnotation.isNotBlank()) { ANNOTATION_EMPTY_ERROR }

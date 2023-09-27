@@ -30,7 +30,7 @@ class FeatureFlagExtractorTest : BaseFeatureFlagTest() {
     project.service<SkatePluginSettings>().featureFlagBaseUrl = ""
     val file = createKotlinFile("TestFeature.kt", fileContent)
     try {
-      FeatureFlagAnnotator().collectInformation(file)
+      FeatureFlagExtractor.extractFeatureFlags(file)
       fail("Expected an IllegalArgumentException to be thrown, but it wasn't.")
     } catch (e: IllegalArgumentException) {
       assertThat(e).hasMessageThat().contains(BASE_URL_EMPTY_ERROR)
@@ -39,10 +39,10 @@ class FeatureFlagExtractorTest : BaseFeatureFlagTest() {
 
   @Test
   fun `test throws error when featureFlagBaseUrl doesn't end with query param`() {
-    project.service<SkatePluginSettings>().featureFlagBaseUrl = "https://example.com/"
+    project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com"
     val file = createKotlinFile("TestFeature.kt", fileContent)
     try {
-      FeatureFlagAnnotator().collectInformation(file)
+      FeatureFlagExtractor.extractFeatureFlags(file)
       fail("Expected an IllegalArgumentException to be thrown, but it wasn't.")
     } catch (e: IllegalArgumentException) {
       assertThat(e).hasMessageThat().contains(BASE_URL_QUERY_PARAM_ERROR)
@@ -55,7 +55,7 @@ class FeatureFlagExtractorTest : BaseFeatureFlagTest() {
     project.service<SkatePluginSettings>().featureFlagAnnotation = ""
     val file = createKotlinFile("TestFeature.kt", fileContent)
     try {
-      FeatureFlagAnnotator().collectInformation(file)
+      FeatureFlagExtractor.extractFeatureFlags(file)
       fail("Expected an IllegalArgumentException to be thrown, but it wasn't.")
     } catch (e: IllegalArgumentException) {
       assertThat(e).hasMessageThat().contains(ANNOTATION_EMPTY_ERROR)
