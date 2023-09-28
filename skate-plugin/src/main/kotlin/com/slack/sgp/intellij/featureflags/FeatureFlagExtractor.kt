@@ -49,11 +49,11 @@ object FeatureFlagExtractor {
       .flatMap { enumClass -> enumClass.uastDeclarations.filterIsInstance<UEnumConstant>() }
       .mapNotNull { enumConstant ->
         enumConstant.findAnnotation(flagAnnotation)?.let { flagAnnotation ->
+          val textRange = enumConstant.sourcePsi?.textRange ?: return@mapNotNull null
           val key =
             flagAnnotation.findAttributeValue("key")?.evaluateString()?.takeUnless {
               it.trim().isBlank()
             } ?: enumConstant.name.lowercase(Locale.US)
-          val textRange = enumConstant.sourcePsi?.textRange ?: return@mapNotNull null
           FeatureFlagSymbol(textRange, "$baseUrl$key")
         }
       }
