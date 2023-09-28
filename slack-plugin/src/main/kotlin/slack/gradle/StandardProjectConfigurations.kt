@@ -713,13 +713,6 @@ internal class StandardProjectConfigurations(
           enableV3Signing = true
           enableV4Signing = true
         }
-        applicationVariants.configureEach {
-          // TODO make this configurable via properties
-          mergeAssetsProvider.configure {
-            // This task is too expensive to cache while we have embedded emoji fonts
-            outputs.cacheIf { false }
-          }
-        }
 
         PermissionChecks.configure(
           project = project,
