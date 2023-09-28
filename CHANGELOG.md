@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.10.9
+------
+
+_2023-09-28_
+
+- Don't disable caching on MergeAssets tasks by default. Leave that to consuming repos.
+- Update permission allowlist API to use a `allowListFile` file property instead.
+- Don't exclude coroutines' debug probes in debug build packaging.
+- Support AGP 8.3.0-alpha05+.
+- Build against Wire `4.9.1`.
+- Build against Compose Multiplatform `1.5.2`.
+- Update to Oshi `6.4.6`.
+
 0.10.8
 ------
 
