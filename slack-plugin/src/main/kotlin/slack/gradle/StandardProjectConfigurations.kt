@@ -657,6 +657,11 @@ internal class StandardProjectConfigurations(
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.enableAndroidTest = variantEnabled
         }
+
+        onVariants(selector().withBuildType("release")) { variant ->
+          // Metadata for coroutines not relevant to release builds
+          variant.packaging.resources.excludes.add("DebugProbesKt.bin")
+        }
       }
       configure<BaseAppModuleExtension> {
         slackExtension.setAndroidExtension(this)
@@ -685,8 +690,6 @@ internal class StandardProjectConfigurations(
               "META-INF/DEPENDENCIES",
               "**/*.pro",
               "**/*.proto",
-              // Metadata for coroutines not relevant to release builds
-              "DebugProbesKt.bin",
               // Weird bazel build metadata brought in by Tink
               "build-data.properties",
               "LICENSE_*",
