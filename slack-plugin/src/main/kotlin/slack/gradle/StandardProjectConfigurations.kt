@@ -729,8 +729,7 @@ internal class StandardProjectConfigurations(
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             description =
               "Checks merged manifest permissions against a known allowlist of permissions."
-            // TODO switch to setDisallowChanges once this uses a regular file
-            permissionAllowlistFile.set(file)
+            permissionAllowlistFile.setDisallowChanges(file)
             permissionAllowlist.setDisallowChanges(allowListProvider)
           }
         }
