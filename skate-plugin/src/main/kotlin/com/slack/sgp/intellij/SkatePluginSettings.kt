@@ -78,7 +78,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var isWhatsNewEnabled by property(true)
     var translatorSourceModelsPackageName by string()
     var translatorFileNameSuffix by string()
-    var isLinkifiedFeatureFlagsEnabled by property(true)
+    var isLinkifiedFeatureFlagsEnabled by property(false)
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()
   }

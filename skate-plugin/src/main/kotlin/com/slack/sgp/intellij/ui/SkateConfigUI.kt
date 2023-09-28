@@ -18,10 +18,14 @@ package com.slack.sgp.intellij.ui
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.selected
+import com.intellij.ui.layout.ComponentPredicate
 import com.slack.sgp.intellij.SkateBundle
 import com.slack.sgp.intellij.SkatePluginSettings
 import java.io.File
@@ -34,6 +38,7 @@ internal class SkateConfigUI(
   fun createPanel(): DialogPanel = panel {
     checkBoxRow()
     choosePathRow()
+    featureFlagSettings()
   }
 
   private fun Panel.checkBoxRow() {
@@ -69,6 +74,55 @@ internal class SkateConfigUI(
           }
         )
         .enabled(settings.isWhatsNewEnabled)
+    }
+  }
+
+  private fun Panel.featureFlagSettings() {
+    lateinit var linkifiedFeatureFlagsCheckBox: Cell<JBCheckBox>
+
+    row(SkateBundle.message("skate.configuration.enableFeatureFlagLinking.title")) {
+      linkifiedFeatureFlagsCheckBox =
+        checkBox(SkateBundle.message("skate.configuration.enableFeatureFlagLinking.description"))
+          .bindSelected(
+            getter = { settings.isLinkifiedFeatureFlagsEnabled },
+            setter = { settings.isLinkifiedFeatureFlagsEnabled = it }
+          )
+    }
+
+    bindAndValidateTextFieldRow(
+      titleMessageKey = "skate.configuration.featureFlagAnnotation.title",
+      getter = { settings.featureFlagAnnotation },
+      setter = { settings.featureFlagAnnotation = it },
+      errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
+      enabledCondition = linkifiedFeatureFlagsCheckBox.selected
+    )
+
+    bindAndValidateTextFieldRow(
+      titleMessageKey = "skate.configuration.featureFlagBaseUrl.title",
+      getter = { settings.featureFlagBaseUrl },
+      setter = { settings.featureFlagBaseUrl = it },
+      errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
+      enabledCondition = linkifiedFeatureFlagsCheckBox.selected
+    )
+  }
+
+  private fun Panel.bindAndValidateTextFieldRow(
+    titleMessageKey: String,
+    getter: () -> String?,
+    setter: (String) -> Unit,
+    errorMessageKey: String,
+    enabledCondition: ComponentPredicate? = null
+  ) {
+    row(SkateBundle.message(titleMessageKey)) {
+      textField()
+        .bindText(getter = { getter().orEmpty() }, setter = setter)
+        .validationOnApply {
+          if (it.text.isBlank()) error(SkateBundle.message(errorMessageKey)) else null
+        }
+        .validationOnInput {
+          if (it.text.isBlank()) error(SkateBundle.message(errorMessageKey)) else null
+        }
+        .apply { enabledCondition?.let { enabledIf(it) } }
     }
   }
 }

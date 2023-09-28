@@ -30,11 +30,6 @@ import org.jetbrains.uast.toUElementOfType
  * to identify feature flags.
  */
 object FeatureFlagExtractor {
-  internal const val BASE_URL_EMPTY_ERROR =
-    "FeatureFlagBaseUrl cannot be empty when isLinkifiedFeatureFlagsEnabled is enabled"
-  internal const val BASE_URL_QUERY_PARAM_ERROR = "FeatureFlagBaseUrl must end with '?q='."
-  internal const val ANNOTATION_EMPTY_ERROR =
-    "featureFlagAnnotation cannot be empty when isLinkifiedFeatureFlagsEnabled is enabled"
 
   /**
    * Extracts the names of feature flags from the provided PSI file. Only processes Kotlin files.
@@ -42,14 +37,9 @@ object FeatureFlagExtractor {
    * @param psiFile The PSI representation of the file to process.
    */
   fun extractFeatureFlags(psiFile: PsiFile): List<FeatureFlagSymbol> {
-    // Ensure baseUrl and flagAnnotation are not empty when the feature flag linkifying is enabled
-    // Ensure baseUrl ends with query param - "?q="
     val settings = psiFile.project.service<SkatePluginSettings>()
-    val baseUrl = settings.featureFlagBaseUrl.orEmpty()
+    val baseUrl = settings.featureFlagBaseUrl
     val flagAnnotation = settings.featureFlagAnnotation.orEmpty()
-    require(baseUrl.isNotBlank()) { BASE_URL_EMPTY_ERROR }
-    require(baseUrl.endsWith("?q=")) { BASE_URL_QUERY_PARAM_ERROR }
-    require(flagAnnotation.isNotBlank()) { ANNOTATION_EMPTY_ERROR }
 
     val uFile = psiFile.toUElementOfType<UFile>() ?: return emptyList()
 
