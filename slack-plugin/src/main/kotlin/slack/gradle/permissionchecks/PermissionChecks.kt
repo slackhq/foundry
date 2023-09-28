@@ -37,7 +37,7 @@ import slack.gradle.tasks.CheckManifestPermissionsTask
 // TODO simplify this now that it's no longer in AgpHandler
 internal object PermissionChecks {
 
-  class DefaultPermissionAllowlistConfigurer
+  abstract class DefaultPermissionAllowlistConfigurer
   @Inject
   constructor(
     objects: ObjectFactory,
