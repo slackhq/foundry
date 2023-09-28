@@ -18,28 +18,32 @@ package slack.gradle.permissionchecks
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
-import java.io.File
 import java.util.LinkedHashSet
 import java.util.Locale
+import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.agp.VariantConfiguration
 import slack.gradle.configure
+import slack.gradle.newInstance
 import slack.gradle.tasks.CheckManifestPermissionsTask
 
 // TODO simplify this now that it's no longer in AgpHandler
 internal object PermissionChecks {
 
-  private class DefaultPermissionAllowlistConfigurer(variant: ApplicationVariant) :
-    PermissionAllowlistConfigurer, VariantConfiguration by DefaultVariantConfiguration(variant) {
-    var file: File? = null
-
-    override fun setAllowlistFile(file: File) {
-      this.file = file
-    }
+  class DefaultPermissionAllowlistConfigurer
+  @Inject
+  constructor(
+    objects: ObjectFactory,
+    variant: ApplicationVariant,
+  ) : PermissionAllowlistConfigurer, VariantConfiguration by DefaultVariantConfiguration(variant) {
+    override val allowListFile: RegularFileProperty = objects.fileProperty()
   }
 
   private class DefaultVariantConfiguration(private val variant: ApplicationVariant) :
@@ -58,20 +62,22 @@ internal object PermissionChecks {
     project: Project,
     allowListActionGetter: () -> Action<PermissionAllowlistConfigurer>?,
     createTask:
-      (taskName: String, file: File, allowListProvider: Provider<Set<String>>) -> TaskProvider<
-          out CheckManifestPermissionsTask
-        >
+      (
+        taskName: String, file: Provider<RegularFile>, allowListProvider: Provider<Set<String>>
+      ) -> TaskProvider<out CheckManifestPermissionsTask>,
   ) {
     project.configure<ApplicationAndroidComponentsExtension> {
+      val objects = project.objects
       onVariants { variant ->
         allowListActionGetter()?.let { allowListAction ->
-          val configurer = DefaultPermissionAllowlistConfigurer(variant)
+          val configurer = objects.newInstance<DefaultPermissionAllowlistConfigurer>(variant)
           allowListAction.execute(configurer)
-          configurer.file?.let { file ->
-            // We've got a allowlist! Wire up a task for each output manifest
-            // Cache the allowlist parse, it's shared by however many outputs there are below
-            val cachedAllowlist = lazy { file.readLines().mapTo(LinkedHashSet(), String::trim) }
-            val allowlist: Provider<Set<String>> = project.provider { cachedAllowlist.value }
+          if (configurer.allowListFile.isPresent) {
+            // We've got an allowlist! Wire up a task for each output manifest
+            val allowlist: Provider<Set<String>> =
+              configurer.allowListFile.map {
+                it.asFile.readLines().mapTo(LinkedHashSet(), String::trim)
+              }
             val capitalizedName =
               variant.name.replaceFirstChar {
                 if (it.isLowerCase()) {
@@ -81,8 +87,8 @@ internal object PermissionChecks {
                 }
               }
             val taskName = "check${capitalizedName}PermissionsAllowlist"
-            @Suppress("UnstableApiUsage")
-            val checkPermissionsAllowlist = createTask(taskName, file, allowlist)
+            val checkPermissionsAllowlist =
+              createTask(taskName, configurer.allowListFile, allowlist)
             variant.artifacts
               .use(checkPermissionsAllowlist)
               .wiredWithFiles(

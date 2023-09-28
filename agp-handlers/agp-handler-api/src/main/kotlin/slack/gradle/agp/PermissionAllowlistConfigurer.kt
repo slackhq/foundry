@@ -15,13 +15,13 @@
  */
 package slack.gradle.agp
 
-import java.io.File
+import org.gradle.api.file.RegularFileProperty
 
 public interface PermissionAllowlistConfigurer : VariantConfiguration {
   /**
-   * Sets a file containing a newline-delimited allowlist of permissions. If set, merged manifest
-   * permissions for this variant will have their permissions checked against the allowlist defined
-   * in [file].
+   * Represents a configurable file containing a newline-delimited allowlist of permissions. If set,
+   * merged manifest permissions for this variant will have their permissions checked against the
+   * allowlist defined in [allowListFile].
    */
-  public fun setAllowlistFile(file: File)
+  public val allowListFile: RegularFileProperty
 }
