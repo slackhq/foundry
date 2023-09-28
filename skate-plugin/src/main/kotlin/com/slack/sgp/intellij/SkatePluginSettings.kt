@@ -55,10 +55,31 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.translatorFileNameSuffix = value
     }
 
+  var isLinkifiedFeatureFlagsEnabled: Boolean
+    get() = state.isLinkifiedFeatureFlagsEnabled
+    set(value) {
+      state.isLinkifiedFeatureFlagsEnabled = value
+    }
+
+  var featureFlagBaseUrl: String?
+    get() = state.featureFlagBaseUrl
+    set(value) {
+      state.featureFlagBaseUrl = value
+    }
+
+  var featureFlagAnnotation: String?
+    get() = state.featureFlagAnnotation
+    set(value) {
+      state.featureFlagAnnotation = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
     var translatorSourceModelsPackageName by string()
     var translatorFileNameSuffix by string()
+    var isLinkifiedFeatureFlagsEnabled by property(false)
+    var featureFlagBaseUrl by string()
+    var featureFlagAnnotation by string()
   }
 }
