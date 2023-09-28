@@ -30,11 +30,10 @@ import org.jetbrains.kotlin.psi.KtFile
 class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<FeatureFlagSymbol>>() {
 
   override fun collectInformation(file: PsiFile): List<FeatureFlagSymbol> {
-    if (
-      !file.project.isLinkifiedFeatureFlagsEnabled() ||
-        file !is KtFile ||
-        !isKotlinFeatureFile(file)
-    ) {
+    val isEligibleForLinkifiedFeatureProcessing =
+      file.project.isLinkifiedFeatureFlagsEnabled() && file is KtFile && isKotlinFeatureFile(file)
+
+    if (!isEligibleForLinkifiedFeatureProcessing) {
       return emptyList()
     }
     return FeatureFlagExtractor.extractFeatureFlags(file)
