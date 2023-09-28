@@ -555,7 +555,7 @@ critical to a release pipeline. <code>PermissionChecks</code> is a feature to he
 <ul>
 <li>We check in a <code>permissionsAllowlist.txt</code> file in the Slack android repo.</li>
 <li>This file is owned in GitHub by a specific codeowner rule that adds a permission reviewers group.</li>
-<li>This file is passed into the <code>permissionAllowlist()</code> <a href="/dsl/#permission-allowlist">DSL feature</a> in the application
+<li>This file is passed into the <code>allowListFile</code> <a href="/dsl/#permission-allowlist">DSL feature</a> in the application
   project.</li>
 <li>On each build, SGP automatically checks that the permissions present in the release APK manifest match the ones
   defined in the allowlist.</li>
