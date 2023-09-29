@@ -43,9 +43,9 @@
     <actions>
         <action id="com.slack.sgp.intellij.ProjectGenMenuAction"
                 class="com.slack.sgp.intellij.ProjectGenMenuAction"
-                text="Slack Project Generator"
+                text="Slack Project"
                 description="Launch the Desktop Slack Project Generator app">
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <add-to-group group-id="NewGroup" anchor="last"/>
         </action>
     </actions>
 
