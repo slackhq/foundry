@@ -1,8 +1,9 @@
+
 import com.jetbrains.plugin.structure.base.utils.exists
-import java.nio.file.Paths
-import java.util.Locale
-import kotlin.io.path.readText
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.nio.file.Paths
+import java.util.*
+import kotlin.io.path.readText
 
 plugins {
   java
@@ -92,4 +93,5 @@ dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+  testImplementation("org.mockito:mockito-core:5.5.0")
 }

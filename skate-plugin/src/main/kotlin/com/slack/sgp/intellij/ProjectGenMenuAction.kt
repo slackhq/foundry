@@ -20,22 +20,28 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import java.io.IOException
 import org.jetbrains.plugins.terminal.TerminalView
+import java.io.IOException
 
 class ProjectGenMenuAction : AnAction() {
+
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
     val settings = currentProject.service<SkatePluginSettings>()
-    if (!settings.isProjectGenMenuActionEnabled) return
+    val isProjectGenMenuActionEnabled = settings.isProjectGenMenuActionEnabled
+    val projectGenRunCommand = settings.projectGenRunCommand
+    if (!isProjectGenMenuActionEnabled) return
+    executeProjectGenCommand(currentProject, projectGenRunCommand)
+  }
 
-    val terminalView: TerminalView = TerminalView.getInstance(currentProject)
-    val projectGenCliCommand: String = settings.projectGenRunCommand
+  fun executeProjectGenCommand(project: Project, projectGenCliCommand: String) {
+    val terminalView = TerminalView.getInstance(project)
     try {
       // Create new terminal window to run project gen command
-      terminalView
-        .createLocalShellWidget(currentProject.basePath, PROJECT_GEN_TAB_NAME)
-        .executeCommand(projectGenCliCommand)
+      val shellTerminalWidget = terminalView
+        .createLocalShellWidget(project.basePath, PROJECT_GEN_TAB_NAME)
+
+      shellTerminalWidget.executeCommand(projectGenCliCommand)
     } catch (err: IOException) {
       err.printStackTrace()
       LOG.warn("Failed to launch Project Gen Desktop App")
