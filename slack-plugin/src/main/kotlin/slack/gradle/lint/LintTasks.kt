@@ -148,7 +148,7 @@ internal object LintTasks {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
         // task configuration time.
         variants.splitToSequence(',').forEach { variant ->
-          logger.lifecycle("Using variant $variant for ciLint task")
+          logger.debug("Using variant $variant for ciLint task")
           val lintTaskName = "lint${variant.capitalizeUS()}"
           dependsOn(lintTaskName)
         }
