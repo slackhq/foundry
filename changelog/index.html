@@ -379,6 +379,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#01010" class="md-nav__link">
+    0.10.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0109" class="md-nav__link">
     0.10.9
   </a>
@@ -1052,6 +1059,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#01010" class="md-nav__link">
+    0.10.10
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0109" class="md-nav__link">
     0.10.9
   </a>
@@ -1664,6 +1678,16 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h2 id="01010">0.10.10<a class="headerlink" href="#01010" title="Permanent link">&para;</a></h2>
+<p><em>2023-10-02</em></p>
+<ul>
+<li>Make debug builds everywhere (local and CI) use consistent version codes and version names. This way remote build cache entries for them are compatible.</li>
+<li>Default debug version code is governed by <code>slack.gradle.debugVersionCode</code> and defaults to <code>90009999</code>.</li>
+<li>Default version name user suffix is governed by <code>slack.gradle.debugUserString</code> and defaults to <code>debug</code>.</li>
+<li>Non-debug build types are the same as before.</li>
+<li>Remove a noisy lifecycle log around lint variant selection.</li>
+<li>Build against Bugsnag Gradle Plugin <code>8.1.0</code>.</li>
+</ul>
 <h2 id="0109">0.10.9<a class="headerlink" href="#0109" title="Permanent link">&para;</a></h2>
 <p><em>2023-09-28</em></p>
 <ul>
