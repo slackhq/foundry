@@ -83,7 +83,7 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** User string used for debug APK outputs. */
   public val debugUserString: String
-    get() = stringProperty("slack.gradle.debugVersionCode", "debug")
+    get() = stringProperty("slack.gradle.debugUserString", "debug")
 
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
