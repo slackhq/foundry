@@ -21,8 +21,9 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.SkatePluginSettings
 
-class ProjectGenMenuAction @JvmOverloads constructor(
-  private val terminalViewWrapper: TerminalViewInterface? = null) : AnAction() {
+class ProjectGenMenuAction
+@JvmOverloads
+constructor(private val terminalViewWrapper: TerminalViewWrapper? = null) : AnAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return

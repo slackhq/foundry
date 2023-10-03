@@ -16,25 +16,14 @@
 package com.slack.sgp.intellij.projectgen
 
 import com.intellij.openapi.project.Project
-import java.io.IOException
 import org.jetbrains.plugins.terminal.TerminalView
 
 /* Wrapper around Jetbrains TerminalView to help simplify testing */
-class RealTerminalViewWrapper(
-  private val project: Project
-) : TerminalViewInterface {
+class RealTerminalViewWrapper(private val project: Project) : TerminalViewWrapper {
   override fun executeCommand(command: TerminalCommand) {
-    try {
-      // Create new terminal window to run given command
-      TerminalView.getInstance(project)
-        .createLocalShellWidget(command.projectPath, command.tabName)
-        .executeCommand(command.command)
-    } catch (err: IOException) {
-      err.printStackTrace()
-    }
-  }
-
-  fun getTerminalViewFromIntellijProject(project: Project) {
+    // Create new terminal window to run given command
     TerminalView.getInstance(project)
+      .createLocalShellWidget(command.projectPath, command.tabName)
+      .executeCommand(command.command)
   }
 }

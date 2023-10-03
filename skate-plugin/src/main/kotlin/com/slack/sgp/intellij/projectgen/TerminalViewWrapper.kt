@@ -15,7 +15,7 @@
  */
 package com.slack.sgp.intellij.projectgen
 
-interface TerminalViewInterface {
+interface TerminalViewWrapper {
   fun executeCommand(command: TerminalCommand)
 }
 

@@ -17,10 +17,10 @@ package com.slack.sgp.intellij.fakes
 
 import com.google.common.truth.Truth.assertThat
 import com.slack.sgp.intellij.projectgen.TerminalCommand
-import com.slack.sgp.intellij.projectgen.TerminalViewInterface
+import com.slack.sgp.intellij.projectgen.TerminalViewWrapper
 import org.jetbrains.kotlin.backend.common.push
 
-class FakeTerminalViewWrapper : TerminalViewInterface {
+class FakeTerminalViewWrapper : TerminalViewWrapper {
   private val commands = ArrayDeque<TerminalCommand>()
 
   override fun executeCommand(command: TerminalCommand) {
