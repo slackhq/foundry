@@ -2,7 +2,7 @@
 import com.jetbrains.plugin.structure.base.utils.exists
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Paths
-import java.util.*
+import java.util.Locale
 import kotlin.io.path.readText
 
 plugins {
