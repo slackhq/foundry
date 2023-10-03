@@ -169,7 +169,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
           return@forEach
         }
         if (!inDependenciesBlock) {
-          if (line.trimStart().startsWith("dependencies {")) {
+          if (line.startsWith("dependencies {")) {
             inDependenciesBlock = true
           }
           newLines += line
