@@ -33,7 +33,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -82,25 +81,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   abstract val buildFileProperty: RegularFileProperty
 
   @get:Input
-  val modes: SetProperty<AnalysisMode> =
-    objects
-      .setProperty(AnalysisMode::class.java)
-      .convention(
-        providers
-          .gradleProperty("slack.dependencyrake.modes")
-          .map { it.splitToSequence(",").map(AnalysisMode::valueOf).toSet() }
-          .orElse(
-            setOf(
-              AnalysisMode.COMPILE_ONLY,
-              AnalysisMode.UNUSED,
-              AnalysisMode.MISUSED,
-              AnalysisMode.PLUGINS,
-              AnalysisMode.ABI
-            )
-          )
-      )
-
-  @get:Input
   val dryRun: Property<Boolean> =
     objects
       .property<Boolean>()
@@ -145,60 +125,39 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     noApi: Boolean,
     missingIdentifiers: MutableSet<String>,
   ) {
-    val resolvedModes = modes.get()
-    val abiModeEnabled = AnalysisMode.ABI in resolvedModes
+    val abiModeEnabled = true
 
     val unusedDepsToRemove =
-      if (AnalysisMode.UNUSED in resolvedModes) {
-        advices
-          .filter { it.isRemove() }
-          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.toDependencyString("UNUSED", missingIdentifiers) }
-      } else {
-        emptyMap()
-      }
+      advices
+        .filter { it.isRemove() }
+        .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+        .associateBy { it.toDependencyString("UNUSED", missingIdentifiers) }
 
     val misusedDepsToRemove =
-      if (AnalysisMode.MISUSED in resolvedModes) {
-        advices
-          .filter { it.isRemove() }
-          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.toDependencyString("MISUSED", missingIdentifiers) }
-      } else {
-        emptyMap()
-      }
+      advices
+        .filter { it.isRemove() }
+        .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+        .associateBy { it.toDependencyString("MISUSED", missingIdentifiers) }
 
     val depsToRemove = (unusedDepsToRemove + misusedDepsToRemove)
 
     val depsToChange =
-      if (AnalysisMode.ABI in resolvedModes) {
-        advices
-          .filter { it.isChange() }
-          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.toDependencyString("CHANGE", missingIdentifiers) }
-      } else {
-        emptyMap()
-      }
+      advices
+        .filter { it.isChange() }
+        .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+        .associateBy { it.toDependencyString("CHANGE", missingIdentifiers) }
 
     val depsToAdd =
-      if (AnalysisMode.MISUSED in resolvedModes) {
-        advices
-          .filter { it.isAdd() }
-          .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
-          .associateBy { it.coordinates.identifier }
-          .toMutableMap()
-      } else {
-        mutableMapOf()
-      }
+      advices
+        .filter { it.isAdd() }
+        .filterNot { it.coordinates.identifier in MANAGED_DEPENDENCIES }
+        .associateBy { it.coordinates.identifier }
+        .toMutableMap()
 
     val compileOnlyDeps =
-      if (AnalysisMode.COMPILE_ONLY in resolvedModes) {
-        advices
-          .filter { it.isCompileOnly() }
-          .associateBy { it.toDependencyString("ADD-COMPILE-ONLY", missingIdentifiers) }
-      } else {
-        emptyMap()
-      }
+      advices
+        .filter { it.isCompileOnly() }
+        .associateBy { it.toDependencyString("ADD-COMPILE-ONLY", missingIdentifiers) }
 
     // Now start rewriting the build file
     val newLines = mutableListOf<String>()
@@ -317,19 +276,17 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
       }
     }
 
-    if (AnalysisMode.PLUGINS in resolvedModes) {
-      redundantPlugins.forEach { (id, reason) ->
-        val lookFor =
-          if (id.startsWith("org.jetbrains.kotlin.")) {
-            "kotlin(\"${id.removePrefix("org.jetbrains.kotlin.")}\")"
-          } else {
-            "id(\"$id\")"
-          }
-        val pluginLine = newLines.indexOfFirst { lookFor == it.trim() }
-        if (pluginLine != -1) {
-          logger.lifecycle("Removing unused plugin \'$id\' in $buildFile. $reason")
-          newLines.removeAt(pluginLine)
+    redundantPlugins.forEach { (id, reason) ->
+      val lookFor =
+        if (id.startsWith("org.jetbrains.kotlin.")) {
+          "kotlin(\"${id.removePrefix("org.jetbrains.kotlin.")}\")"
+        } else {
+          "id(\"$id\")"
         }
+      val pluginLine = newLines.indexOfFirst { lookFor == it.trim() }
+      if (pluginLine != -1) {
+        logger.lifecycle("Removing unused plugin \'$id\' in $buildFile. $reason")
+        newLines.removeAt(pluginLine)
       }
     }
 
@@ -388,23 +345,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
       is FlatCoordinates -> gav()
       is IncludedBuildCoordinates -> gav()
     }
-  }
-
-  enum class AnalysisMode {
-    /** Remove unused dependencies. */
-    UNUSED,
-
-    /** Modify dependencies that could be `compileOnly`. */
-    COMPILE_ONLY,
-
-    /** Fix dependencies that should be `api`. */
-    ABI,
-
-    /** Replace misused dependencies with their transitively-used dependencies. */
-    MISUSED,
-
-    /** Remove unused or redundant plugins. */
-    PLUGINS
   }
 }
 
