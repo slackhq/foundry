@@ -31,7 +31,6 @@ class ProjectGenMenuAction @JvmOverloads constructor(
     val projectGenRunCommand = settings.projectGenRunCommand
     if (!isProjectGenMenuActionEnabled) return
     executeProjectGenCommand(projectGenRunCommand, currentProject)
-
   }
 
   fun executeProjectGenCommand(command: String, project: Project) {
