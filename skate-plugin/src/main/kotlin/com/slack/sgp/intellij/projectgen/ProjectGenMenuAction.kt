@@ -23,7 +23,11 @@ import com.slack.sgp.intellij.SkatePluginSettings
 
 class ProjectGenMenuAction
 @JvmOverloads
-constructor(private val terminalViewWrapper: TerminalViewWrapper? = null) : AnAction() {
+constructor(
+  private val terminalViewWrapper: (Project) -> TerminalViewWrapper = { project: Project ->
+    RealTerminalViewWrapper(project)
+  }
+) : AnAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
@@ -36,11 +40,7 @@ constructor(private val terminalViewWrapper: TerminalViewWrapper? = null) : AnAc
 
   fun executeProjectGenCommand(command: String, project: Project) {
     val terminalCommand = TerminalCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
-    if (terminalViewWrapper == null) {
-      RealTerminalViewWrapper(project).executeCommand(terminalCommand)
-    } else {
-      terminalViewWrapper.executeCommand(terminalCommand)
-    }
+    terminalViewWrapper(project).executeCommand(terminalCommand)
   }
 
   companion object {
