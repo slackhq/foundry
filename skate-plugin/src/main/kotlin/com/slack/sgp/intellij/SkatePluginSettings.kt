@@ -31,6 +31,7 @@ internal const val DEFAULT_PROJECT_GEN_CLI_COMMAND = "./slackw generate-project"
 @Service(Service.Level.PROJECT)
 @State(name = "SkatePluginSettings", storages = [Storage("skate.xml")])
 class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.State>(State()) {
+
   var whatsNewFilePath: String
     get() = state.whatsNewFilePath ?: "WHATSNEW.md"
     set(value) {

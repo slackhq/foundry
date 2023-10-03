@@ -28,7 +28,7 @@ class FakeTerminalViewWrapper : TerminalViewInterface {
   }
 
   fun assertCommand(expected: TerminalCommand) {
-    assertThat(commands.first()).isEqualTo(expected)
+    assertThat(commands.removeFirst()).isEqualTo(expected)
   }
 
   fun assertEmptyCommand() {
