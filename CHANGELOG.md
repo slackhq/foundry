@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.10.10
+-------
+
+_2023-10-02_
+
+- Make debug builds everywhere (local and CI) use consistent version codes and version names. This way remote build cache entries for them are compatible.
+  - Default debug version code is governed by `slack.gradle.debugVersionCode` and defaults to `90009999`.
+  - Default version name user suffix is governed by `slack.gradle.debugUserString` and defaults to `debug`.
+  - Non-debug build types are the same as before.
+- Remove a noisy lifecycle log around lint variant selection.
+- Build against Bugsnag Gradle Plugin `8.1.0`.
+
 0.10.9
 ------
 

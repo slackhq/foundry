@@ -77,9 +77,13 @@ public class SlackProperties private constructor(private val project: Project) {
   public val skipAndroidxCheck: Boolean
     get() = booleanProperty("slack.gradle.skipAndroidXCheck")
 
-  /** Default version code used for APK outputs. */
-  public val defaultVersionCode: Int
-    get() = intProperty("slack.gradle.defaultVersionCode", 90009999)
+  /** Version code used for debug APK outputs. */
+  public val debugVersionCode: Int
+    get() = intProperty("slack.gradle.debugVersionCode", 90009999)
+
+  /** User string used for debug APK outputs. */
+  public val debugUserString: String
+    get() = stringProperty("slack.gradle.debugUserString", "debug")
 
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
@@ -90,8 +94,8 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.gradle.config.enableMavenLocal")
 
   /**
-   * Flag to indicate that that this project should have no api dependencies, such as if it's solely
-   * an annotation processor.
+   * Flag to indicate that this project should have no api dependencies, such as if it's solely an
+   * annotation processor.
    */
   public val rakeNoApi: Boolean
     get() = booleanProperty("slack.gradle.config.rake.noapi")
