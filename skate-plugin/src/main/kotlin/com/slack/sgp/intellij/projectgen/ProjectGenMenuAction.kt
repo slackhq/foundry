@@ -24,9 +24,7 @@ import com.slack.sgp.intellij.SkatePluginSettings
 class ProjectGenMenuAction
 @JvmOverloads
 constructor(
-  private val terminalViewWrapper: (Project) -> TerminalViewWrapper = { project: Project ->
-    RealTerminalViewWrapper(project)
-  }
+  private val terminalViewWrapper: (Project) -> TerminalViewWrapper = ::RealTerminalViewWrapper
 ) : AnAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
