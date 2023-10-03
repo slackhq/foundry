@@ -125,8 +125,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     noApi: Boolean,
     missingIdentifiers: MutableSet<String>,
   ) {
-    val abiModeEnabled = true
-
     val unusedDepsToRemove =
       advices
         .filter { it.isRemove() }
@@ -228,13 +226,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
                 .mapNotNull { advice ->
                   advice.coordinates.toDependencyNotation("ADD", missingIdentifiers)?.let {
                     newNotation ->
-                    val newConfiguration =
-                      if (!abiModeEnabled) {
-                        "implementation"
-                      } else {
-                        advice.toConfiguration
-                      }
-                    "  $newConfiguration($newNotation)"
+                    "  ${advice.toConfiguration}($newNotation)"
                   }
                 }
                 .sorted()
@@ -256,8 +248,14 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
                 }
               val oldConfiguration = abiDep.fromConfiguration!!
               var newConfiguration = abiDep.toConfiguration!!
-              if (noApi && newConfiguration == "api") {
-                newConfiguration = "implementation"
+              if (noApi && newConfiguration.endsWith("api", ignoreCase = true)) {
+                val (oldSuffix, newSuffix) = if (newConfiguration.endsWith("api")) {
+                  "api" to "implementation"
+                } else {
+                  // Ends in "Api"
+                  "Api" to "Implementation"
+                }
+                newConfiguration = newConfiguration.substringBeforeLast(oldSuffix) + newSuffix
               }
               // Replace the oldConfiguration name with API
               val newLine = line.replace("$oldConfiguration(", "$newConfiguration(")
