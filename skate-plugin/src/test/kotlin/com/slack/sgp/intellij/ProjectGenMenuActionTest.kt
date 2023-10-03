@@ -15,36 +15,50 @@
  */
 package com.slack.sgp.intellij
 
-import com.intellij.openapi.actionSystem.AnActionEvent
+import com.google.common.truth.Truth.assertThat
 import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import org.jetbrains.plugins.terminal.ShellTerminalWidget
-import org.jetbrains.plugins.terminal.TerminalView
-import org.mockito.Mockito
-import org.mockito.Mockito.verify
+import com.slack.sgp.intellij.fakes.FakeTerminalViewWrapper
+import com.slack.sgp.intellij.projectgen.ProjectGenMenuAction
+import com.slack.sgp.intellij.projectgen.ProjectGenMenuAction.Companion.PROJECT_GEN_TAB_NAME
 
 class ProjectGenMenuActionTest : BasePlatformTestCase() {
   override fun setUp() {
     super.setUp()
 
     // Reset relevant settings.
-    val settings = skatePluginSettings()
+    val settings = project.service<SkatePluginSettings>()
     settings.isProjectGenMenuActionEnabled = true
     settings.projectGenRunCommand = "echo Hello World"
   }
 
-  private fun skatePluginSettings() = project.service<SkatePluginSettings>()
-
-  fun testCommandLineParam() {
+  fun testCorrectArgumentsPassedIntoTerminalView() {
     val action = ProjectGenMenuAction()
-    val mockTerminal = Mockito.mock(TerminalView::class.java)
-    val mockShellWidget = Mockito.mock(ShellTerminalWidget::class.java)
-    Mockito.`when`(mockTerminal.createLocalShellWidget(project.basePath, ProjectGenMenuAction.PROJECT_GEN_TAB_NAME)).thenReturn(mockShellWidget)
+    action.terminalViewWrapper = FakeTerminalViewWrapper()
 
-    val actionEvent = Mockito.mock(AnActionEvent::class.java)
-    Mockito.`when`(actionEvent.project).thenReturn(project)
+    // Perform action
+    myFixture.testAction(action)
 
-    action.actionPerformed(actionEvent)
-    verify(mockShellWidget).executeCommand("echo Hello World")
+    // Verify right arguments are passed into the terminal
+    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).commandRan)
+      .isEqualTo("echo Hello World")
+    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).projectPath)
+      .isEqualTo(project.basePath)
+    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).tabName)
+      .isEqualTo(PROJECT_GEN_TAB_NAME)
+  }
+
+  fun testTerminalViewNotRunningWhenActionDisabled() {
+    val action = ProjectGenMenuAction()
+    action.terminalViewWrapper = FakeTerminalViewWrapper()
+    project.service<SkatePluginSettings>().isProjectGenMenuActionEnabled = false
+
+    // Perform action
+    myFixture.testAction(action)
+
+    // Verify action didn't run any terminal command
+    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).commandRan).isNull()
+    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).projectPath).isNull()
+    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).tabName).isNull()
   }
 }

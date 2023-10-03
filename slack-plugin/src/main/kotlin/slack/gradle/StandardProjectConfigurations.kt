@@ -657,6 +657,11 @@ internal class StandardProjectConfigurations(
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.enableAndroidTest = variantEnabled
         }
+
+        onVariants(selector().withBuildType("release")) { variant ->
+          // Metadata for coroutines not relevant to release builds
+          variant.packaging.resources.excludes.add("DebugProbesKt.bin")
+        }
       }
       configure<BaseAppModuleExtension> {
         slackExtension.setAndroidExtension(this)
@@ -685,8 +690,6 @@ internal class StandardProjectConfigurations(
               "META-INF/DEPENDENCIES",
               "**/*.pro",
               "**/*.proto",
-              // Metadata for coroutines not relevant to release builds
-              "DebugProbesKt.bin",
               // Weird bazel build metadata brought in by Tink
               "build-data.properties",
               "LICENSE_*",
@@ -713,13 +716,6 @@ internal class StandardProjectConfigurations(
           enableV3Signing = true
           enableV4Signing = true
         }
-        applicationVariants.configureEach {
-          // TODO make this configurable via properties
-          mergeAssetsProvider.configure {
-            // This task is too expensive to cache while we have embedded emoji fonts
-            outputs.cacheIf { false }
-          }
-        }
 
         PermissionChecks.configure(
           project = project,
@@ -729,8 +725,7 @@ internal class StandardProjectConfigurations(
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             description =
               "Checks merged manifest permissions against a known allowlist of permissions."
-            // TODO switch to setDisallowChanges once this uses a regular file
-            permissionAllowlistFile.set(file)
+            permissionAllowlistFile.setDisallowChanges(file)
             permissionAllowlist.setDisallowChanges(allowListProvider)
           }
         }

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij
+package com.slack.sgp.intellij.projectgen
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.slack.sgp.intellij.SkatePluginSettings
 import org.jetbrains.plugins.terminal.TerminalView
-import java.io.IOException
 
 class ProjectGenMenuAction : AnAction() {
+  var terminalViewWrapper: TerminalViewInterface? = null
 
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
@@ -31,25 +31,24 @@ class ProjectGenMenuAction : AnAction() {
     val isProjectGenMenuActionEnabled = settings.isProjectGenMenuActionEnabled
     val projectGenRunCommand = settings.projectGenRunCommand
     if (!isProjectGenMenuActionEnabled) return
-    executeProjectGenCommand(currentProject, projectGenRunCommand)
+    executeProjectGenCommand(projectGenRunCommand, currentProject)
   }
 
-  fun executeProjectGenCommand(project: Project, projectGenCliCommand: String) {
-    val terminalView = TerminalView.getInstance(project)
-    try {
-      // Create new terminal window to run project gen command
-      val shellTerminalWidget = terminalView
-        .createLocalShellWidget(project.basePath, PROJECT_GEN_TAB_NAME)
-
-      shellTerminalWidget.executeCommand(projectGenCliCommand)
-    } catch (err: IOException) {
-      err.printStackTrace()
-      LOG.warn("Failed to launch Project Gen Desktop App")
+  fun executeProjectGenCommand(command: String, project: Project) {
+    if (terminalViewWrapper != null) {
+      terminalViewWrapper!!.executeCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
+    } else {
+      val terminalView: TerminalView = TerminalView.getInstance(project)
+      terminalViewWrapper = TerminalViewWrapper(terminalView)
+      (terminalViewWrapper as TerminalViewWrapper).executeCommand(
+        command,
+        project.basePath,
+        PROJECT_GEN_TAB_NAME
+      )
     }
   }
 
   companion object {
-    private val LOG: Logger = Logger.getInstance(ProjectGenMenuAction::class.java)
     const val PROJECT_GEN_TAB_NAME: String = "ProjectGen"
   }
 }

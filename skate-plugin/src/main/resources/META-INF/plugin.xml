@@ -33,6 +33,7 @@
         <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig"/>
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
         <annotator language="kotlin" implementationClass="com.slack.sgp.intellij.modeltranslator.TranslatorAnnotator"/>
+        <externalAnnotator language="kotlin" implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
     </extensions>
 
     <applicationListeners>
@@ -41,8 +42,8 @@
     </applicationListeners>
 
     <actions>
-        <action id="com.slack.sgp.intellij.ProjectGenMenuAction"
-                class="com.slack.sgp.intellij.ProjectGenMenuAction"
+        <action id="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
+                class="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
                 text="Slack Subproject"
                 description="Create new Slack subproject through Desktop Slack Project Generator app">
             <add-to-group group-id="NewGroup" anchor="last"/>

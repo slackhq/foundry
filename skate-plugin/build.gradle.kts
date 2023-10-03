@@ -93,5 +93,4 @@ dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-  testImplementation("org.mockito:mockito-core:5.5.0")
 }

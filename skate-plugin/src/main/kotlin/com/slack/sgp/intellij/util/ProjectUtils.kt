@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2023 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.agp
+package com.slack.sgp.intellij.util
 
-import org.gradle.api.file.RegularFileProperty
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.slack.sgp.intellij.SkatePluginSettings
 
-public interface PermissionAllowlistConfigurer : VariantConfiguration {
-  /**
-   * Represents a configurable file containing a newline-delimited allowlist of permissions. If set,
-   * merged manifest permissions for this variant will have their permissions checked against the
-   * allowlist defined in [allowListFile].
-   */
-  public val allowListFile: RegularFileProperty
-}
+fun Project.settings(): SkatePluginSettings = service<SkatePluginSettings>()
+
+fun Project.isLinkifiedFeatureFlagsEnabled(): Boolean = settings().isLinkifiedFeatureFlagsEnabled
