@@ -15,16 +15,23 @@
  */
 package com.slack.sgp.intellij.fakes
 
+import com.google.common.truth.Truth.assertThat
+import com.slack.sgp.intellij.projectgen.TerminalCommand
 import com.slack.sgp.intellij.projectgen.TerminalViewInterface
+import org.jetbrains.kotlin.backend.common.push
 
 class FakeTerminalViewWrapper : TerminalViewInterface {
-  var commandRan: String? = null
-  var projectPath: String? = null
-  var tabName: String? = null
+  private val commands = ArrayDeque<TerminalCommand>()
 
-  override fun executeCommand(command: String, projectPath: String?, tabName: String) {
-    this.commandRan = command
-    this.projectPath = projectPath
-    this.tabName = tabName
+  override fun executeCommand(command: TerminalCommand) {
+    commands.push(command)
+  }
+
+  fun assertCommand(expected: TerminalCommand) {
+    assertThat(commands.first()).isEqualTo(expected)
+  }
+
+  fun assertEmptyCommand() {
+    assertThat(commands).isEmpty()
   }
 }

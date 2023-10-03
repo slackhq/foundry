@@ -24,7 +24,7 @@ import org.jetbrains.plugins.terminal.TerminalView
 
 class ProjectGenMenuAction : AnAction() {
   var terminalViewWrapper: TerminalViewInterface? = null
-
+  /** Represents a parsed [changeLogString] to present up to the given [lastReadDate]. */
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
     val settings = currentProject.service<SkatePluginSettings>()
@@ -35,16 +35,13 @@ class ProjectGenMenuAction : AnAction() {
   }
 
   fun executeProjectGenCommand(command: String, project: Project) {
+    val terminalCommand = TerminalCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
     if (terminalViewWrapper != null) {
-      terminalViewWrapper!!.executeCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
+      terminalViewWrapper!!.executeCommand(terminalCommand)
     } else {
       val terminalView: TerminalView = TerminalView.getInstance(project)
       terminalViewWrapper = TerminalViewWrapper(terminalView)
-      (terminalViewWrapper as TerminalViewWrapper).executeCommand(
-        command,
-        project.basePath,
-        PROJECT_GEN_TAB_NAME
-      )
+      (terminalViewWrapper as TerminalViewWrapper).executeCommand(terminalCommand)
     }
   }
 

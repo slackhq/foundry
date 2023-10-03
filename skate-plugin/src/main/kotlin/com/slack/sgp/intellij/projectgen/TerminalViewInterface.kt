@@ -16,5 +16,7 @@
 package com.slack.sgp.intellij.projectgen
 
 interface TerminalViewInterface {
-  fun executeCommand(command: String, projectPath: String?, tabName: String)
+  fun executeCommand(command: TerminalCommand)
 }
+
+data class TerminalCommand(val command: String, val projectPath: String?, val tabName: String)

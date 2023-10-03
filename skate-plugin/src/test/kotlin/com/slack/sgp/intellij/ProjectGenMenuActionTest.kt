@@ -15,12 +15,12 @@
  */
 package com.slack.sgp.intellij
 
-import com.google.common.truth.Truth.assertThat
 import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.slack.sgp.intellij.fakes.FakeTerminalViewWrapper
 import com.slack.sgp.intellij.projectgen.ProjectGenMenuAction
 import com.slack.sgp.intellij.projectgen.ProjectGenMenuAction.Companion.PROJECT_GEN_TAB_NAME
+import com.slack.sgp.intellij.projectgen.TerminalCommand
 
 class ProjectGenMenuActionTest : BasePlatformTestCase() {
   override fun setUp() {
@@ -40,12 +40,8 @@ class ProjectGenMenuActionTest : BasePlatformTestCase() {
     myFixture.testAction(action)
 
     // Verify right arguments are passed into the terminal
-    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).commandRan)
-      .isEqualTo("echo Hello World")
-    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).projectPath)
-      .isEqualTo(project.basePath)
-    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).tabName)
-      .isEqualTo(PROJECT_GEN_TAB_NAME)
+    val expectedComand = TerminalCommand("echo Hello World", project.basePath, PROJECT_GEN_TAB_NAME)
+    (action.terminalViewWrapper as FakeTerminalViewWrapper).assertCommand(expectedComand)
   }
 
   fun testTerminalViewNotRunningWhenActionDisabled() {
@@ -57,8 +53,6 @@ class ProjectGenMenuActionTest : BasePlatformTestCase() {
     myFixture.testAction(action)
 
     // Verify action didn't run any terminal command
-    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).commandRan).isNull()
-    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).projectPath).isNull()
-    assertThat((action.terminalViewWrapper as FakeTerminalViewWrapper).tabName).isNull()
+    (action.terminalViewWrapper as FakeTerminalViewWrapper).assertEmptyCommand()
   }
 }

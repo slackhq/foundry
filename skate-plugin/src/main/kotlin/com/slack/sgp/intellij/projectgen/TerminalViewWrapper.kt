@@ -22,10 +22,12 @@ import org.jetbrains.plugins.terminal.TerminalView
 class TerminalViewWrapper(
   private val view: TerminalView,
 ) : TerminalViewInterface {
-  override fun executeCommand(command: String, projectPath: String?, tabName: String) {
+  override fun executeCommand(command: TerminalCommand) {
     try {
       // Create new terminal window to run given command
-      view.createLocalShellWidget(projectPath, tabName).executeCommand(command)
+      view
+        .createLocalShellWidget(command.projectPath, command.tabName)
+        .executeCommand(command.command)
     } catch (err: IOException) {
       err.printStackTrace()
     }
