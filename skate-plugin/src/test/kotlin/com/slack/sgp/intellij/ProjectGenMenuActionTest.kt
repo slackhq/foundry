@@ -33,26 +33,26 @@ class ProjectGenMenuActionTest : BasePlatformTestCase() {
   }
 
   fun testCorrectArgumentsPassedIntoTerminalView() {
-    val action = ProjectGenMenuAction()
-    action.terminalViewWrapper = FakeTerminalViewWrapper()
+    val fakeTerminalViewWrapper = FakeTerminalViewWrapper()
+    val action = ProjectGenMenuAction(fakeTerminalViewWrapper)
 
     // Perform action
     myFixture.testAction(action)
 
     // Verify right arguments are passed into the terminal
     val expectedComand = TerminalCommand("echo Hello World", project.basePath, PROJECT_GEN_TAB_NAME)
-    (action.terminalViewWrapper as FakeTerminalViewWrapper).assertCommand(expectedComand)
+    fakeTerminalViewWrapper.assertCommand(expectedComand)
   }
 
   fun testTerminalViewNotRunningWhenActionDisabled() {
-    val action = ProjectGenMenuAction()
-    action.terminalViewWrapper = FakeTerminalViewWrapper()
+    val fakeTerminalViewWrapper = FakeTerminalViewWrapper()
+    val action = ProjectGenMenuAction(fakeTerminalViewWrapper)
     project.service<SkatePluginSettings>().isProjectGenMenuActionEnabled = false
 
     // Perform action
     myFixture.testAction(action)
 
     // Verify action didn't run any terminal command
-    (action.terminalViewWrapper as FakeTerminalViewWrapper).assertEmptyCommand()
+    fakeTerminalViewWrapper.assertEmptyCommand()
   }
 }

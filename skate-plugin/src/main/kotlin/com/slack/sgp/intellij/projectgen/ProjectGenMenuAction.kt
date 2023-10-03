@@ -20,11 +20,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.SkatePluginSettings
-import org.jetbrains.plugins.terminal.TerminalView
 
-class ProjectGenMenuAction : AnAction() {
-  var terminalViewWrapper: TerminalViewInterface? = null
-  /** Represents a parsed [changeLogString] to present up to the given [lastReadDate]. */
+class ProjectGenMenuAction @JvmOverloads constructor(
+  private val terminalViewWrapper: TerminalViewInterface? = null) : AnAction() {
+
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
     val settings = currentProject.service<SkatePluginSettings>()
@@ -32,16 +31,15 @@ class ProjectGenMenuAction : AnAction() {
     val projectGenRunCommand = settings.projectGenRunCommand
     if (!isProjectGenMenuActionEnabled) return
     executeProjectGenCommand(projectGenRunCommand, currentProject)
+
   }
 
   fun executeProjectGenCommand(command: String, project: Project) {
     val terminalCommand = TerminalCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
-    if (terminalViewWrapper != null) {
-      terminalViewWrapper!!.executeCommand(terminalCommand)
+    if (terminalViewWrapper == null) {
+      RealTerminalViewWrapper(project).executeCommand(terminalCommand)
     } else {
-      val terminalView: TerminalView = TerminalView.getInstance(project)
-      terminalViewWrapper = TerminalViewWrapper(terminalView)
-      (terminalViewWrapper as TerminalViewWrapper).executeCommand(terminalCommand)
+      terminalViewWrapper.executeCommand(terminalCommand)
     }
   }
 
