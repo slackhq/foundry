@@ -86,6 +86,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.featureFlagAnnotation = value
     }
 
+  var featureFlagFilePatterns: String?
+    get() = state.featureFlagFilePatterns
+    set(value) {
+      state.featureFlagFilePatterns = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -96,5 +102,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var isLinkifiedFeatureFlagsEnabled by property(false)
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()
+    var featureFlagFilePatterns by string()
   }
 }

@@ -23,6 +23,7 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import com.slack.sgp.intellij.util.featureFlagFilePatterns
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import java.net.URI
 import org.jetbrains.kotlin.psi.KtFile
@@ -59,7 +60,8 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
   }
 
   private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean {
-    return psiFile.name.endsWith("Feature.kt") || psiFile.name.endsWith("Features.kt")
+    val filePatterns = psiFile.project.featureFlagFilePatterns() ?: return false
+    return filePatterns.split(",").any { psiFile.name.endsWith(it.trim()) }
   }
 }
 
