@@ -24,19 +24,24 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
 
   @Test
   fun `test returns empty list when linkify is disabled`() {
-    assertThat(runAnnotator(enabled = false)).isEmpty()
+    assertThat(runAnnotator(enabled = false, "TestFeature.kt")).isEmpty()
   }
 
   @Test
-  fun `test report symbols when linkify is enabled`() {
-    assertThat(runAnnotator(enabled = true)).isNotEmpty()
+  fun `test report symbols when linkify is enabled for file ending with Feature`() {
+    assertThat(runAnnotator(enabled = true, "TestFeature.kt")).isNotEmpty()
   }
 
-  private fun runAnnotator(enabled: Boolean): List<FeatureFlagSymbol> {
+  @Test
+  fun `test report symbols when linkify is enabled for file ending with Features`() {
+    assertThat(runAnnotator(enabled = true, "TestFeatures.kt")).isNotEmpty()
+  }
+
+  private fun runAnnotator(enabled: Boolean, fileName: String): List<FeatureFlagSymbol> {
     project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
     project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com?q="
     project.service<SkatePluginSettings>().featureFlagAnnotation = "slack.featureflag.FeatureFlag"
-    val file = createKotlinFile("TestFeature.kt", fileContent)
+    val file = createKotlinFile(fileName, fileContent)
     val flags = FeatureFlagAnnotator().collectInformation(file)
     return FeatureFlagAnnotator().doAnnotate(flags)
   }

@@ -58,7 +58,9 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
     }
   }
 
-  private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean = psiFile.name.endsWith("Feature.kt")
+  private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean {
+    return psiFile.name.endsWith("Feature.kt") || psiFile.name.endsWith("Features.kt")
+  }
 }
 
 class UrlIntentionAction(
