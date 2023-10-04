@@ -29,9 +29,19 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
   }
 
   @Test
-  fun `test report symbols when linkify is enabled for file with correct file pattern`() {
+  fun `test report symbols when linkify is enabled`() {
+    assertThat(runAnnotator(enabled = true, "TestFeature.kt", filePattern = ".*Feature(s)?\\.kt\$"))
+      .isNotEmpty()
+  }
+
+  @Test
+  fun `test report symbols when comma separated list of regex file patterns`() {
     assertThat(
-        runAnnotator(enabled = true, "TestFeatures.kt", filePattern = "Feature.kt,Features.kt")
+        runAnnotator(
+          enabled = true,
+          "TestFeatures.kt",
+          filePattern = ".*Feature\\.kt$,.*Features\\.kt$"
+        )
       )
       .isNotEmpty()
   }

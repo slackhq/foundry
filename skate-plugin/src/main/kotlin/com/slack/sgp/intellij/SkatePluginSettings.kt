@@ -86,6 +86,13 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.featureFlagAnnotation = value
     }
 
+  /**
+   * Comma-separated list of regex patterns to match file names for feature flag checks. E.g.,
+   * ".*Feature(s)?\\.kt$"
+   *
+   * This property is used to determine which Kotlin files in the project should be processed for
+   * feature flag annotations based on their file name patterns.
+   */
   var featureFlagFilePatterns: String?
     get() = state.featureFlagFilePatterns
     set(value) {
