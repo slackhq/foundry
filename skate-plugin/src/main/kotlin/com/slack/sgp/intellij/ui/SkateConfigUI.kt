@@ -101,6 +101,14 @@ internal class SkateConfigUI(
     }
 
     bindAndValidateTextFieldRow(
+      titleMessageKey = "skate.configuration.featureFlagFilePattern.title",
+      getter = { settings.featureFlagFilePattern },
+      setter = { settings.featureFlagFilePattern = it },
+      errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
+      enabledCondition = linkifiedFeatureFlagsCheckBox.selected
+    )
+
+    bindAndValidateTextFieldRow(
       titleMessageKey = "skate.configuration.featureFlagAnnotation.title",
       getter = { settings.featureFlagAnnotation },
       setter = { settings.featureFlagAnnotation = it },

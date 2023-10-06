@@ -22,3 +22,5 @@ import com.slack.sgp.intellij.SkatePluginSettings
 fun Project.settings(): SkatePluginSettings = service<SkatePluginSettings>()
 
 fun Project.isLinkifiedFeatureFlagsEnabled(): Boolean = settings().isLinkifiedFeatureFlagsEnabled
+
+fun Project.featureFlagFilePattern(): String? = settings().featureFlagFilePattern
