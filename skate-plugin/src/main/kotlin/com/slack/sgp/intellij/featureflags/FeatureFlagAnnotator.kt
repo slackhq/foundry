@@ -61,7 +61,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
 
   private fun isKotlinFeatureFile(psiFile: PsiFile): Boolean {
     val filePattern = psiFile.project.featureFlagFilePattern() ?: return false
-    return psiFile.name.matches(Regex(filePattern.trim()))
+    return filePattern.toRegex().matches(psiFile.name)
   }
 }
 

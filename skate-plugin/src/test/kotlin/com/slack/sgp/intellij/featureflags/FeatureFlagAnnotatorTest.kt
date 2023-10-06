@@ -44,7 +44,7 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
 
   @Test
   fun `test return empty list when test file does not match the file pattern`() {
-    assertThat(runAnnotator(enabled = true, "TestFeatures.kt", filePattern = "Feature.kt"))
+    assertThat(runAnnotator(enabled = true, "TestFeatures.kt", filePattern = "Feature\\.kt"))
       .isEmpty()
   }
 
