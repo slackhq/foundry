@@ -92,10 +92,10 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
    * This property is used to determine which Kotlin files in the project should be processed for
    * feature flag annotations based on their file name patterns.
    */
-  var featureFlagFilePatterns: String?
-    get() = state.featureFlagFilePatterns
+  var featureFlagFilePattern: String?
+    get() = state.featureFlagFilePattern
     set(value) {
-      state.featureFlagFilePatterns = value
+      state.featureFlagFilePattern = value
     }
 
   class State : BaseState() {
@@ -108,6 +108,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var isLinkifiedFeatureFlagsEnabled by property(false)
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()
-    var featureFlagFilePatterns by string()
+    var featureFlagFilePattern by string()
   }
 }

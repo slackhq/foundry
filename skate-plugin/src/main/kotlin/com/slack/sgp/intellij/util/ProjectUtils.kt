@@ -23,4 +23,4 @@ fun Project.settings(): SkatePluginSettings = service<SkatePluginSettings>()
 
 fun Project.isLinkifiedFeatureFlagsEnabled(): Boolean = settings().isLinkifiedFeatureFlagsEnabled
 
-fun Project.featureFlagFilePatterns(): String? = settings().featureFlagFilePatterns
+fun Project.featureFlagFilePattern(): String? = settings().featureFlagFilePattern
