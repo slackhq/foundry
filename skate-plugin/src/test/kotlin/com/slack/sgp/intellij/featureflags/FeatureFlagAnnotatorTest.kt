@@ -37,11 +37,7 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
   @Test
   fun `test report symbols when comma separated list of regex file patterns`() {
     assertThat(
-        runAnnotator(
-          enabled = true,
-          "TestFeatures.kt",
-          filePattern = ".*Feature\\.kt$,.*Features\\.kt$"
-        )
+        runAnnotator(enabled = true, "TestFeatures.kt", filePattern = ".*Feature(s)?\\.kt\$")
       )
       .isNotEmpty()
   }
