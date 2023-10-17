@@ -34,7 +34,8 @@ class ProjectGenMenuActionTest : BasePlatformTestCase() {
 
   fun testCorrectArgumentsPassedIntoTerminalView() {
     val fakeTerminalViewWrapper = FakeTerminalViewWrapper()
-    val action = ProjectGenMenuAction { fakeTerminalViewWrapper }
+    val action =
+      ProjectGenMenuAction(terminalViewWrapper = { fakeTerminalViewWrapper }, offline = true)
 
     // Perform action
     myFixture.testAction(action)
@@ -47,7 +48,8 @@ class ProjectGenMenuActionTest : BasePlatformTestCase() {
 
   fun testTerminalViewNotRunningWhenActionDisabled() {
     val fakeTerminalViewWrapper = FakeTerminalViewWrapper()
-    val action = ProjectGenMenuAction { fakeTerminalViewWrapper }
+    val action =
+      ProjectGenMenuAction(terminalViewWrapper = { fakeTerminalViewWrapper }, offline = true)
     project.service<SkatePluginSettings>().isProjectGenMenuActionEnabled = false
 
     // Perform action

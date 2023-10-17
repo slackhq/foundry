@@ -98,6 +98,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.featureFlagFilePattern = value
     }
 
+  var isTracingEnabled: Boolean
+    get() = state.isTracingEnabled
+    set(value) {
+      state.isTracingEnabled = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -109,5 +115,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()
     var featureFlagFilePattern by string()
+    var isTracingEnabled by property(true)
   }
 }

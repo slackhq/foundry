@@ -37,5 +37,5 @@ public interface TagBuilder : MutableList<KeyValue> {
     KeyValue(key = this, v_type = ValueType.BINARY, v_binary = value).also(::add)
 }
 
-internal fun tagBuilderImpl(): TagBuilder =
+public fun tagBuilderImpl(): TagBuilder =
   object : TagBuilder, MutableList<KeyValue> by mutableListOf() {}

@@ -20,28 +20,54 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.SkatePluginSettings
+import com.slack.sgp.intellij.tracing.SkateMetricCollector
+import com.slack.sgp.intellij.tracing.SkateMetricCollector.Companion.ProjectGenAction
+import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.util.isProjectGenMenuActionEnabled
+import com.slack.sgp.intellij.util.isTracingEnabled
+import com.slack.sgp.intellij.util.projectGenRunCommand
+import java.time.Instant
 
 class ProjectGenMenuAction
 @JvmOverloads
 constructor(
-  private val terminalViewWrapper: (Project) -> TerminalViewWrapper = ::RealTerminalViewWrapper
+  private val terminalViewWrapper: (Project) -> TerminalViewWrapper = ::RealTerminalViewWrapper,
+  private val offline: Boolean = false
 ) : AnAction() {
+
+  private val skateMetricCollector = SkateMetricCollector()
+  private val startTimestamp = Instant.now()
 
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
-    val settings = currentProject.service<SkatePluginSettings>()
-    val isProjectGenMenuActionEnabled = settings.isProjectGenMenuActionEnabled
-    val projectGenRunCommand = settings.projectGenRunCommand
-    if (!isProjectGenMenuActionEnabled) return
-    executeProjectGenCommand(projectGenRunCommand, currentProject)
+    val projectGenRunCommand = currentProject.projectGenRunCommand()
+    if (!currentProject.isProjectGenMenuActionEnabled()) {
+      skateMetricCollector.addSpanTag("event", ProjectGenAction.PROJECT_GEN_DISABLED.name)
+    } else {
+      executeProjectGenCommand(projectGenRunCommand, currentProject)
+    }
+    sendUsageTrace(currentProject, currentProject.isTracingEnabled())
   }
 
   fun executeProjectGenCommand(command: String, project: Project) {
     val terminalCommand = TerminalCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
     terminalViewWrapper(project).executeCommand(terminalCommand)
+    skateMetricCollector.addSpanTag("event", ProjectGenAction.TERMINAL_OPENED.name)
+  }
+
+  fun sendUsageTrace(project: Project, isTracingEnabled: Boolean) {
+    if (!isTracingEnabled) return
+    skateMetricCollector.addSpanTag("project_name", project.name)
+    SkateTraceReporter(offline)
+      .createPluginUsageTraceAndSendTrace(
+        PROJECT_GEN_TRACE_NAME,
+        startTimestamp,
+        skateMetricCollector.getKeyValueList()
+      )
   }
 
   companion object {
     const val PROJECT_GEN_TAB_NAME: String = "ProjectGen"
+    const val PROJECT_GEN_TRACE_NAME: String = "project_gen"
   }
 }

@@ -22,7 +22,9 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
+import com.slack.sgp.intellij.tracing.SkateMetricCollector
 import com.slack.sgp.intellij.ui.WhatsNewPanelFactory
+import java.time.Instant
 import java.util.function.Supplier
 
 interface SkateProjectService {
@@ -34,6 +36,8 @@ interface SkateProjectService {
  * New UI of the Skate Plugin
  */
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
+  private val skateMetricCollector = SkateMetricCollector()
+  private val startTimestamp = Instant.now()
 
   override fun showWhatsNewWindow() {
 
@@ -49,26 +53,29 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     // Don't show the tool window if the parsed changelog is blank
     // Changelog is parsed
     val parsedChangelog = ChangelogParser.readFile(changeLogString, changelogJournal.lastReadDate)
-    if (parsedChangelog.changeLogString.isNullOrBlank()) return
+    val isChangelogEmpty = parsedChangelog.changeLogString.isNullOrBlank()
+    if (!isChangelogEmpty) {
+      // Creating the tool window
+      val toolWindowManager = ToolWindowManager.getInstance(project)
+      toolWindowManager.invokeLater {
+        val toolWindow =
+          toolWindowManager.registerToolWindow(WHATS_NEW_PANEL_ID) {
+            stripeTitle = Supplier { "What's New in Slack!" }
+            anchor = ToolWindowAnchor.RIGHT
+          }
+        // The Disposable is necessary to prevent a substantial memory leak while working with
+        // MarkdownJCEFHtmlPanel
+        val parentDisposable = Disposer.newDisposable()
 
-    // Creating the tool window
-    val toolWindowManager = ToolWindowManager.getInstance(project)
+        WhatsNewPanelFactory()
+          .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
 
-    toolWindowManager.invokeLater {
-      val toolWindow =
-        toolWindowManager.registerToolWindow("skate-whats-new") {
-          stripeTitle = Supplier { "What's New in Slack!" }
-          anchor = ToolWindowAnchor.RIGHT
-        }
-
-      // The Disposable is necessary to prevent a substantial memory leak while working with
-      // MarkdownJCEFHtmlPanel
-      val parentDisposable = Disposer.newDisposable()
-
-      WhatsNewPanelFactory()
-        .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
-
-      toolWindow.show()
+        toolWindow.show()
+      }
     }
+  }
+
+  companion object {
+    const val WHATS_NEW_PANEL_ID = "skate-whats-new"
   }
 }

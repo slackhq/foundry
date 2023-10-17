@@ -24,3 +24,11 @@ fun Project.settings(): SkatePluginSettings = service<SkatePluginSettings>()
 fun Project.isLinkifiedFeatureFlagsEnabled(): Boolean = settings().isLinkifiedFeatureFlagsEnabled
 
 fun Project.featureFlagFilePattern(): String? = settings().featureFlagFilePattern
+
+fun Project.isTracingEnabled(): Boolean = settings().isTracingEnabled
+
+fun Project.isProjectGenMenuActionEnabled(): Boolean = settings().isProjectGenMenuActionEnabled
+
+fun Project.projectGenRunCommand(): String = settings().projectGenRunCommand
+
+
