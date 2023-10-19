@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.10.11
+-------
+
+_2023-10-19_
+
+- Support AGP `8.3.0-alpha08`.
+- Build against Gradle `8.4`.
+- Build against compose-multiplatform `1.5.3`.
+
 0.10.10
 -------
 
