@@ -16,6 +16,7 @@
 package slack.gradle.agphandler.v83
 
 import com.android.build.api.AndroidPluginVersion
+import com.android.build.gradle.internal.SdkLocationSourceSet
 import com.android.build.gradle.internal.SdkLocator
 import com.google.auto.service.AutoService
 import java.io.File
@@ -27,7 +28,11 @@ public class AgpHandler83 private constructor(override val agpVersion: AndroidPl
   AgpHandler {
 
   override fun getAndroidSdkDirectory(projectRootDir: File, providers: ProviderFactory): File =
-    SdkLocator.getSdkDirectory(projectRootDir, NoOpIssueReporter, providers)
+    SdkLocator.getSdkDirectory(
+      projectRootDir,
+      NoOpIssueReporter,
+      SdkLocationSourceSet(projectRootDir, providers)
+    )
 
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
