@@ -15,6 +15,10 @@
  */
 package slack.gradle
 
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.google.common.base.CaseFormat
 import java.io.File
 import java.util.Locale
@@ -185,6 +189,17 @@ internal fun Project.getVersionsCatalogOrNull(name: String = "libs"): VersionCat
     null
   }
 }
+
+internal val Project.androidExtension: AndroidComponentsExtension<*, *, *>
+  get() =
+    androidExtensionNullable
+      ?: throw IllegalArgumentException("Failed to find any registered Android extension")
+
+internal val Project.androidExtensionNullable: AndroidComponentsExtension<*, *, *>?
+  get() =
+    extensions.findByType<LibraryAndroidComponentsExtension>()
+      ?: extensions.findByType<ApplicationAndroidComponentsExtension>()
+      ?: extensions.findByType<TestAndroidComponentsExtension>()
 
 internal val Project.multiplatformExtension
   get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
