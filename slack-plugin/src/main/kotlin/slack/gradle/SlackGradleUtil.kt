@@ -27,6 +27,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.DependencyGroup
@@ -184,6 +185,9 @@ internal fun Project.getVersionsCatalogOrNull(name: String = "libs"): VersionCat
     null
   }
 }
+
+internal val Project.multiplatformExtension
+  get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
 
 /** Returns a map of module identifiers to toml library reference aliases */
 internal fun VersionCatalog.identifierMap(): Map<String, String> {
