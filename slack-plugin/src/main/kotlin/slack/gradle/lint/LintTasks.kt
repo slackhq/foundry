@@ -208,15 +208,7 @@ internal object LintTasks {
     ignoreTestSources = slackProperties.lintIgnoreTestSources
     checkTestSources = slackProperties.lintCheckTestSources
 
-    val lintBaselineFile = slackProperties.lintBaselineFileName
-
-    // Lint is weird in that it will generate a new baseline file and fail the build if a new
-    // one was generated, even if empty.
-    // If we're updating baselines, always take the baseline so that we populate it if absent.
-    project.layout.projectDirectory
-      .file(lintBaselineFile)
-      .asFile
-      .takeIf { it.exists() || slackProperties.lintUpdateBaselines }
-      ?.let { baseline = it }
+    baseline = project.objects.fileProperty().fileValue(File(project.projectDir, slackProperties.lintBaselineFileName))
+      .get().asFile
   }
 }
