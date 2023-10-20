@@ -192,9 +192,6 @@ internal object LintTasks {
     disable += "NewerVersionAvailable"
     // These store qualified gradle caches in their paths and always change in baselines
     disable += "ObsoleteLintCustomCheck"
-    // https://groups.google.com/g/lint-dev/c/Bj0-I1RIPyU/m/mlP5Jpe4AQAJ
-    enable += "ImplicitSamInstance"
-    error += "ImplicitSamInstance"
 
     androidSdkVersions?.let { sdkVersions ->
       if (sdkVersions.minSdk >= 28) {
