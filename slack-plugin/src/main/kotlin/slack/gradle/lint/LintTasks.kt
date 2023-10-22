@@ -23,7 +23,6 @@ import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.lint.VariantInputs
-import java.io.File
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -330,12 +329,7 @@ internal object LintTasks {
 
       lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
 
-      baseline =
-        objects
-          .fileProperty()
-          .fileValue(File(projectDir, slackProperties.lintBaselineFileName))
-          .get()
-          .asFile
+      baseline = project.layout.projectDirectory.file(slackProperties.lintBaselineFileName).asFile
     }
   }
 
