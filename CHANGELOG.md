@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.11.0
+------
+
+_2023-10-22_
+
+- Revamp some lint configuration and best-effort support KMP projects.
+- Remove `slack.lint.update-baselines` property in favor of AGP's modern `updateBaselines` task.
+- Remove hidden `ImplicitSamInstance` lint config.
+- Disable newer issues for dependency checks.
+
 0.10.11
 -------
 
