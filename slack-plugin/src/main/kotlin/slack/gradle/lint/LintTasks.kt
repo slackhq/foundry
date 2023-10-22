@@ -193,7 +193,7 @@ internal object LintTasks {
 
     // For Android projects, the Android Gradle Plugin is responsible for applying the lint plugin;
     // however, we need to apply it ourselves for non-Android projects.
-    apply(mapOf("plugin" to "com.android.lint"))
+    pluginManager.apply("com.android.lint")
 
     // Create task aliases matching those creates by AGP for Android projects, since those are what
     // developers expect to invoke. Redirect them to the "real" lint task.
