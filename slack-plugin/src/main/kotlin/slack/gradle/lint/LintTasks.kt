@@ -274,43 +274,45 @@ internal object LintTasks {
       noLines = false
       quiet = true
 
+      // Turn off the "lintVital<buildVariant>" tasks that are included by default in release
+      // builds.
+      // We run lint separately from release builds on CI, which makes these tasks redundant.
+      checkReleaseBuilds = false
+
       // We run lint on each library, so we don't want transitive checking of each dependency
       checkDependencies = false
 
-      fatal.add("VisibleForTests")
+      fatal += "VisibleForTests"
 
       if (isMultiplatform) {
         // Disable classfile-based checks because lint cannot find the class files for
         // multiplatform projects and `SourceSet.java.classesDirectory` is not configurable.
         // This is not ideal, but it's better than having no lint checks at all.
-        disable.add("LintError")
+        disable += "LintError"
       }
 
       // Disable dependency checks that suggest to change them. We want libraries to be
       // intentional with their dependency version bumps.
-      disable.add("KtxExtensionAvailable")
-      disable.add("GradleDependency")
+      disable += "KtxExtensionAvailable"
+      disable += "GradleDependency"
 
       // These store qualified gradle caches in their paths and always change in baselines
       disable += "ObsoleteLintCustomCheck"
 
       // Explicitly disable StopShip check (see b/244617216)
-      disable.add("StopShip")
+      disable += "StopShip"
 
-      fatal.add("Assert")
-      fatal.add("NewApi")
-      fatal.add("ObsoleteSdkInt")
-      fatal.add("NoHardKeywords")
-      fatal.add("UnusedResources")
-      fatal.add("KotlinPropertyAccess")
-      fatal.add("LambdaLast")
+      fatal += "Assert"
+      fatal += "NewApi"
+      fatal += "ObsoleteSdkInt"
 
       // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
       // remove these accessors
-      disable.add("SyntheticAccessor")
+      disable += "SyntheticAccessor"
 
-      // Only check for missing translations in finalized (beta and later) modules.
-      fatal.add("MissingTranslation")
+      // Lint doesn't like abstract classes extending Initializer
+      // see https://issuetracker.google.com/issues/265962219
+      disable += "EnsureInitializerMetadata"
 
       if (androidExtensionNullable is ApplicationAndroidComponentsExtension) {
         checkDependencies = true
