@@ -119,14 +119,14 @@ internal class StandardProjectConfigurations(
         slackProperties,
         versionCatalog
       )
-    project.applyCommonConfigurations()
+    project.applyCommonConfigurations(slackProperties)
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
     project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
     project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
   }
 
-  private fun Project.applyCommonConfigurations() {
+  private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
     if (globalProperties.autoApplySortDependencies) {
       if (project.buildFile.exists()) {
         val sortDependenciesIgnoreSet =
@@ -136,6 +136,12 @@ internal class StandardProjectConfigurations(
         }
       }
     }
+    LintTasks.configureSubProject(
+      project,
+      slackProperties,
+      slackTools.globalConfig.affectedProjects,
+      slackTools::logAvoidedTask,
+    )
   }
 
   @Suppress("unused")
@@ -619,16 +625,6 @@ internal class StandardProjectConfigurations(
         slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-        if (slackProperties.enableLintInAndroidTestProjects) {
-          LintTasks.configureSubProject(
-            project,
-            slackProperties,
-            slackTools.globalConfig.affectedProjects,
-            slackTools::logAvoidedTask,
-            this,
-            sdkVersions::value
-          )
-        }
       }
     }
 
@@ -670,14 +666,6 @@ internal class StandardProjectConfigurations(
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.value.targetSdk
         }
-        LintTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask,
-          this,
-          sdkVersions::value
-        )
         packaging {
           resources.excludes +=
             setOf(
@@ -843,14 +831,6 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
-        LintTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask,
-          this,
-          sdkVersions::value
-        )
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -954,17 +934,6 @@ internal class StandardProjectConfigurations(
           slackTools.globalConfig.mergeDetektBaselinesTask,
         )
       }
-    }
-
-    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      LintTasks.configureSubProject(
-        project,
-        slackProperties,
-        slackTools.globalConfig.affectedProjects,
-        slackTools::logAvoidedTask,
-        null,
-        null
-      )
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {

@@ -264,10 +264,6 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintErrorsOnly: Boolean
     get() = booleanProperty("slack.lint.errors-only")
 
-  /** Flag to indicate that we're currently running a baseline update. */
-  public val lintUpdateBaselines: Boolean
-    get() = booleanProperty("slack.lint.update-baselines")
-
   /** File name to use for a project's lint baseline. */
   public val lintBaselineFileName: String
     get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
