@@ -66,7 +66,7 @@ internal object LintTasks {
       description = "Global lifecycle task to run all dependent lint tasks."
     }
 
-  fun configureSubProject2(
+  fun configureSubProject(
     project: Project,
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,

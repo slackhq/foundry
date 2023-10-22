@@ -136,7 +136,7 @@ internal class StandardProjectConfigurations(
         }
       }
     }
-    LintTasks.configureSubProject2(
+    LintTasks.configureSubProject(
       project,
       slackProperties,
       slackTools.globalConfig.affectedProjects,
