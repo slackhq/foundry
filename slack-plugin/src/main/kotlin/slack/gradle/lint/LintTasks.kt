@@ -258,9 +258,6 @@ internal object LintTasks {
     // Lint is configured entirely in finalizeDsl so that individual projects cannot easily
     // disable individual checks in the DSL for any reason.
     lint.apply {
-      // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
-      checkReleaseBuilds = false
-
       ignoreWarnings = slackProperties.lintErrorsOnly
 
       // Run lint on tests. Uses top-level lint.xml to specify checks.
