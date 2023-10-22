@@ -136,15 +136,15 @@ internal object LintTasks {
     onProjectSkipped: (String, String) -> Unit,
   ) =
     androidExtension.finalizeDsl { extension ->
-      project.log("Applying ciLint to Android project")
+      log("Applying ciLint to Android project")
 
-      project.log(
+      log(
         "Configuring android lint tasks. isApp=${extension is ApplicationAndroidComponentsExtension}"
       )
 
-      project.log("Creating ciLint task")
+      log("Creating ciLint task")
       val ciLintTask =
-        project.tasks.register(CI_LINT_TASK_NAME) { group = LifecycleBasePlugin.VERIFICATION_GROUP }
+        tasks.register(CI_LINT_TASK_NAME) { group = LifecycleBasePlugin.VERIFICATION_GROUP }
 
       val ciLintVariants = slackProperties.ciLintVariants
       if (ciLintVariants != null) {
@@ -160,7 +160,7 @@ internal object LintTasks {
       } else {
         androidExtension.onVariants { variant ->
           val lintTaskName = "lint${variant.name.capitalizeUS()}"
-          project.log("Adding $lintTaskName to ciLint task")
+          log("Adding $lintTaskName to ciLint task")
           ciLintTask.configure {
             // Even if the task isn't created yet, we can do this by name alone and it will resolve
             // at
@@ -208,9 +208,9 @@ internal object LintTasks {
       enabled = false
     }
 
-    project.log("Creating ciLint task")
+    log("Creating ciLint task")
     val ciLint =
-      project.tasks.register(COMPILE_CI_LINT_NAME) {
+      tasks.register(COMPILE_CI_LINT_NAME) {
         group = LifecycleBasePlugin.VERIFICATION_GROUP
         dependsOn("lint")
       }
@@ -218,7 +218,7 @@ internal object LintTasks {
     // For Android projects, we can run lint configuration last using `DslLifecycle.finalizeDsl`;
     // however, we need to run it using `Project.afterEvaluate` for non-Android projects.
     configureLint(
-      project.extensions.getByType(),
+      extensions.getByType(),
       ciLint,
       slackProperties,
       affectedProjects,
@@ -234,23 +234,21 @@ internal object LintTasks {
     onProjectSkipped: (String, String) -> Unit,
     androidSdkVersions: SlackProperties.AndroidSdkProperties? = null,
   ) {
-    val isMultiplatform = project.multiplatformExtension != null
+    val isMultiplatform = multiplatformExtension != null
 
-    slackProperties.versions.bundles.commonLint.ifPresent {
-      project.dependencies.add("lintChecks", it)
-    }
+    slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
 
     val globalTask =
-      if (affectedProjects == null || project.path in affectedProjects) {
-        project.rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
+      if (affectedProjects == null || path in affectedProjects) {
+        rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
       } else {
-        val taskPath = "${project.path}:$CI_LINT_TASK_NAME"
+        val taskPath = "${path}:$CI_LINT_TASK_NAME"
         val log = "Skipping $taskPath because it is not affected."
         onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
         if (slackProperties.debug) {
-          project.log(log)
+          log(log)
         } else {
-          project.log(log)
+          log(log)
         }
         null
       }
@@ -333,12 +331,12 @@ internal object LintTasks {
         }
       }
 
-      lintConfig = project.rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
+      lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
 
       baseline =
-        project.objects
+        objects
           .fileProperty()
-          .fileValue(File(project.projectDir, slackProperties.lintBaselineFileName))
+          .fileValue(File(projectDir, slackProperties.lintBaselineFileName))
           .get()
           .asFile
     }
@@ -347,7 +345,6 @@ internal object LintTasks {
   /**
    * If the project is using multiplatform, adds configurations and source sets expected by the lint
    * plugin, which allows it to configure itself when running against a non-Android multiplatform
-   * project.
    *
    * The version of lint that we're using does not directly support Kotlin multiplatform, but we can
    * synthesize the necessary configurations and source sets from existing `jvm` configurations and
@@ -356,16 +353,16 @@ internal object LintTasks {
    * This method *must* run after evaluation.
    */
   private fun Project.addSourceSetsForMultiplatformAfterEvaluate() {
-    val kmpTargets = project.multiplatformExtension?.targets ?: return
+    val kmpTargets = multiplatformExtension?.targets ?: return
 
     // Synthesize target configurations based on multiplatform configurations.
     val kmpApiElements = kmpTargets.map { it.apiElementsConfigurationName }
     val kmpRuntimeElements = kmpTargets.map { it.runtimeElementsConfigurationName }
     listOf(kmpRuntimeElements to "runtimeElements", kmpApiElements to "apiElements").forEach {
       (kmpConfigNames, targetConfigName) ->
-      project.configurations.maybeCreate(targetConfigName).apply {
+      configurations.maybeCreate(targetConfigName).apply {
         kmpConfigNames
-          .mapNotNull { configName -> project.configurations.findByName(configName) }
+          .mapNotNull { configName -> configurations.findByName(configName) }
           .forEach { config -> extendsFrom(config) }
       }
     }
@@ -397,7 +394,7 @@ internal object LintTasks {
    * no longer be needed. See also b/195329463.
    */
   private fun Project.addSourceSetsForAndroidMultiplatformAfterEvaluate() {
-    val multiplatformExtension = project.multiplatformExtension ?: return
+    val multiplatformExtension = multiplatformExtension ?: return
     multiplatformExtension.targets.findByName("android") ?: return
 
     val androidMain =
@@ -421,15 +418,13 @@ internal object LintTasks {
     }
 
     // Add the new sources to the lint analysis tasks.
-    project.tasks.withType(AndroidLintAnalysisTask::class.java).configureEach {
+    tasks.withType(AndroidLintAnalysisTask::class.java).configureEach {
       variantInputs.addSourceSets()
     }
 
     // Also configure the model writing task, so that we don't run into mismatches between
     // analyzed sources in one module and a downstream module
-    project.tasks.withType(LintModelWriterTask::class.java).configureEach {
-      variantInputs.addSourceSets()
-    }
+    tasks.withType(LintModelWriterTask::class.java).configureEach { variantInputs.addSourceSets() }
   }
 
   /**
