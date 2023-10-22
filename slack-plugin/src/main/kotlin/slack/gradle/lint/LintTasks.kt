@@ -211,7 +211,7 @@ internal object LintTasks {
     val ciLint =
       tasks.register(COMPILE_CI_LINT_NAME) {
         group = LifecycleBasePlugin.VERIFICATION_GROUP
-        dependsOn("lint")
+        dependsOn(lintTask)
       }
 
     // For Android projects, we can run lint configuration last using `DslLifecycle.finalizeDsl`;
@@ -256,14 +256,12 @@ internal object LintTasks {
 
     afterEvaluate { addSourceSetsForAndroidMultiplatformAfterEvaluate() }
 
-    lint.apply {
-      // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
-      checkReleaseBuilds = false
-    }
-
     // Lint is configured entirely in finalizeDsl so that individual projects cannot easily
     // disable individual checks in the DSL for any reason.
     lint.apply {
+      // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
+      checkReleaseBuilds = false
+
       ignoreWarnings = slackProperties.lintErrorsOnly
 
       // Run lint on tests. Uses top-level lint.xml to specify checks.
