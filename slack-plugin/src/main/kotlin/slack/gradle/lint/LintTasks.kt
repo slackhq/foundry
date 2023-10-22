@@ -359,9 +359,7 @@ internal object LintTasks {
     }
 
     // Synthesize source sets based on multiplatform source sets.
-    val javaExtension =
-      project.extensions.findByType(JavaPluginExtension::class.java)
-        ?: throw GradleException("Failed to find extension of type 'JavaPluginExtension'")
+    val javaExtension = project.extensions.getByType<JavaPluginExtension>()
     listOf("main" to "main", "test" to "test").forEach { (kmpCompilationName, targetSourceSetName)
       ->
       javaExtension.sourceSets.maybeCreate(targetSourceSetName).apply {
