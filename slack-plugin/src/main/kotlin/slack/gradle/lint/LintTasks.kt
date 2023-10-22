@@ -163,8 +163,7 @@ internal object LintTasks {
           log("Adding $lintTaskName to ciLint task")
           ciLintTask.configure {
             // Even if the task isn't created yet, we can do this by name alone and it will resolve
-            // at
-            // task configuration time.
+            // at task configuration time.
             dependsOn(lintTaskName)
           }
         }
