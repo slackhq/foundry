@@ -282,7 +282,9 @@ internal object LintTasks {
       // We run lint on each library, so we don't want transitive checking of each dependency
       checkDependencies = false
 
-      fatal += "VisibleForTests"
+      if (!slackProperties.isTestLibrary) {
+        fatal += "VisibleForTests"
+      }
 
       if (isMultiplatform) {
         // Disable classfile-based checks because lint cannot find the class files for

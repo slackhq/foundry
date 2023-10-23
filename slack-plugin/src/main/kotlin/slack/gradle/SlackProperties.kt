@@ -277,6 +277,13 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("sgp.lint.ignoreTestSources", false)
 
   /**
+   * Flag to indicate whether this project is a test library (such as test utils, test fixtures,
+   * etc).
+   */
+  public val isTestLibrary: Boolean
+    get() = booleanProperty("sgp.isTestLibrary", false) || project.name == "test-fixtures"
+
+  /**
    * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
    * is a flag to eventually support this in the future.
    *

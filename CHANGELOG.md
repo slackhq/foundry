@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.11.1
+------
+
+_2023-10-22_
+
+- Add new `sgp.isTestLibrary` property to indicate if a library is a test library. Note that projects that are named `test-fixtures` are implicitly considered test libraries.
+- **Fix**: Don't impose `VisibleForTests` lint on test libraries.
+
 0.11.0
 ------
 
