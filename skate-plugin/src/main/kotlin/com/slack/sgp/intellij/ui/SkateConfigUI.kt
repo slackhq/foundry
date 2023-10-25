@@ -40,7 +40,7 @@ internal class SkateConfigUI(
     choosePathRow()
     enableProjectGenMenuAction()
     featureFlagSettings()
-    enabledTracing()
+    tracingSettings()
   }
 
   private fun Panel.checkBoxRow() {
@@ -126,6 +126,26 @@ internal class SkateConfigUI(
     )
   }
 
+  private fun Panel.tracingSettings() {
+    lateinit var tracingEnabledButton: Cell<JBCheckBox>
+
+    row(SkateBundle.message("skate.configuration.enableTracing.title")) {
+      tracingEnabledButton =
+        checkBox(SkateBundle.message("skate.configuration.enableTracing.description"))
+          .bindSelected(
+            getter = { settings.isTracingEnabled },
+            setter = { settings.isTracingEnabled = it }
+          )
+    }
+    bindAndValidateTextFieldRow(
+      titleMessageKey = "skate.configuration.tracingEndpoint.title",
+      getter = { settings.tracingEndpoint },
+      setter = { settings.tracingEndpoint = it },
+      errorMessageKey = "skate.configuration.tracingEndpoint.description",
+      enabledCondition = tracingEnabledButton.selected
+    )
+  }
+
   private fun Panel.bindAndValidateTextFieldRow(
     titleMessageKey: String,
     getter: () -> String?,
@@ -143,16 +163,6 @@ internal class SkateConfigUI(
           if (it.text.isBlank()) error(SkateBundle.message(errorMessageKey)) else null
         }
         .apply { enabledCondition?.let { enabledIf(it) } }
-    }
-  }
-
-  private fun Panel.enabledTracing() {
-    row(SkateBundle.message("skate.configuration.enableTracing.title")) {
-      checkBox(SkateBundle.message("skate.configuration.enableTracing.description"))
-        .bindSelected(
-          getter = { settings.isTracingEnabled },
-          setter = { settings.isTracingEnabled = it }
-        )
     }
   }
 }

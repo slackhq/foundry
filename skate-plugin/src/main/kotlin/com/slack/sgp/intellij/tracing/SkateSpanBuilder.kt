@@ -19,30 +19,27 @@ import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.model.TagBuilder
 import com.slack.sgp.tracing.model.tagBuilderImpl
 
-class SkateMetricCollector {
+class SkateSpanBuilder {
   private val keyValueList: TagBuilder = tagBuilderImpl()
 
   fun addSpanTag(key: String, value: String) {
     keyValueList.apply { key tagTo value }
   }
 
+  fun addSpanTag(key: String, value: SkateTracingEvent) {
+    keyValueList.apply { key tagTo value.type.name }
+  }
+
   fun getKeyValueList(): List<KeyValue> {
     return keyValueList.toList()
   }
+}
 
-  companion object {
-    enum class ProjectGenAction {
-      TERMINAL_OPENED,
-      PROJECT_GEN_DISABLED
-    }
-
-    enum class FeatureFlagAnnotatorAction {
-      HOUSTON_LINK_CLICKED
-    }
-
-    enum class WhatsNewPanelAction {
-      PANEL_OPENED,
-      PANEL_CLOSED
-    }
+class SkateTracingEvent(val type: EventType) {
+  enum class EventType {
+    PROJECT_GEN_OPENED,
+    HOUSTON_FEATURE_FLAG_URL_CLICKED,
+    SKATE_WHATS_NEW_PANEL_OPENED,
+    SKATE_WHATS_NEW_PANEL_CLOSED
   }
 }

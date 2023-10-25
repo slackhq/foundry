@@ -19,6 +19,8 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.extensions.PluginId
+import com.intellij.openapi.project.Project
+import com.slack.sgp.intellij.util.tracingEndpoint
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.ListOfSpans
 import com.slack.sgp.tracing.model.buildSpan
@@ -35,7 +37,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.apache.http.HttpException
 
-class SkateTraceReporter(private val offline: Boolean = false) : TraceReporter {
+class SkateTraceReporter(private val project: Project, private val offline: Boolean = false) :
+  TraceReporter {
 
   private val delegate by lazy {
     val okHttpClient = lazy { OkHttpClient.Builder().build() }
@@ -48,14 +51,17 @@ class SkateTraceReporter(private val offline: Boolean = false) : TraceReporter {
     if (offline) {
       NoOpTraceReporter
     } else {
-      SimpleTraceReporter(TRACING_ENDPOINT, loggingClient)
+      val endPoint =
+        project.tracingEndpoint()
+          ?: throw RuntimeException("Required tracing endpoint to upload analytics")
+      SimpleTraceReporter(endPoint, loggingClient)
     }
   }
 
   override suspend fun sendTrace(spans: ListOfSpans) {
     try {
-      LOG.info(spans.toString())
       delegate.sendTrace(spans)
+      LOG.info(spans.toString())
     } catch (httpException: HttpException) {
       LOG.error("Uploading Skate plugin trace failed.", httpException)
     }
@@ -64,10 +70,12 @@ class SkateTraceReporter(private val offline: Boolean = false) : TraceReporter {
   fun createPluginUsageTraceAndSendTrace(
     spanName: String,
     startTimestamp: Instant,
-    spanDataMap: List<KeyValue>
+    spanDataMap: List<KeyValue>,
+    ideVersion: String = ApplicationInfo.getInstance().fullVersion,
+    skatePluginVersion: String? =
+      PluginManagerCore.getPlugin(PluginId.getId("com.slack.intellij.skate"))?.version
   ): ListOfSpans? {
-    if (spanDataMap.isEmpty()) {
-      LOG.debug("Skipping sending traces because span data is missing")
+    if (spanDataMap.isEmpty() || skatePluginVersion.isNullOrBlank()) {
       return null
     }
     val traceTags =
@@ -86,14 +94,10 @@ class SkateTraceReporter(private val offline: Boolean = false) : TraceReporter {
             .toDuration(DurationUnit.MILLISECONDS)
             .inWholeMicroseconds
       ) {
-        try {
-          val skatePlugin = PluginManagerCore.getPlugin(PluginId.getId("com.slack.intellij.skate"))
-          if (skatePlugin != null) "skate_version" tagTo skatePlugin.version
-          "ide_version" tagTo ApplicationInfo.getInstance().fullVersion
-        } catch (nullPointerException: NullPointerException) {
-          LOG.warn("Failed to get IDE and Plugin version", nullPointerException)
-        }
+        "skate_version" tagTo skatePluginVersion
+        "ide_version" tagTo ideVersion
         "user" tagTo System.getenv("USER")
+        "project_name" tagTo project.name
         this.addAll(spanDataMap)
       }
     val spans = ListOfSpans(spans = listOf(span), tags = traceTags)
@@ -104,7 +108,6 @@ class SkateTraceReporter(private val offline: Boolean = false) : TraceReporter {
   companion object {
     const val SERVICE_NAME: String = "skate_plugin"
     const val DATABASE_NAME: String = "itools"
-    const val TRACING_ENDPOINT: String = "https://slackb.com/traces/v1/list_of_spans/proto"
     private val LOG: Logger = Logger.getInstance(SkateTraceReporter::class.java)
   }
 }

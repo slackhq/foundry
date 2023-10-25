@@ -23,9 +23,10 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
-import com.slack.sgp.intellij.tracing.SkateMetricCollector
-import com.slack.sgp.intellij.tracing.SkateMetricCollector.Companion.FeatureFlagAnnotatorAction
+import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTracingEvent
+import com.slack.sgp.intellij.tracing.SkateTracingEvent.EventType.HOUSTON_FEATURE_FLAG_URL_CLICKED
 import com.slack.sgp.intellij.util.featureFlagFilePattern
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
@@ -75,7 +76,7 @@ class UrlIntentionAction(
 ) : IntentionAction {
 
   private val startTimestamp = Instant.now()
-  private val skateMetricCollector = SkateMetricCollector()
+  private val skateMetricCollector = SkateSpanBuilder()
 
   override fun getText(): String = message
 
@@ -85,7 +86,7 @@ class UrlIntentionAction(
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
-    skateMetricCollector.addSpanTag("event", FeatureFlagAnnotatorAction.HOUSTON_LINK_CLICKED.name)
+    skateMetricCollector.addSpanTag("event", SkateTracingEvent(HOUSTON_FEATURE_FLAG_URL_CLICKED))
     sendUsageTrace(project, project.isTracingEnabled())
   }
 
@@ -95,16 +96,11 @@ class UrlIntentionAction(
 
   fun sendUsageTrace(project: Project, isTracingEnabled: Boolean) {
     if (!isTracingEnabled) return
-    skateMetricCollector.addSpanTag("project_name", project.name)
-    SkateTraceReporter()
+    SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
-        FEATURE_FLAG_ANNOTATOR_TRACE_NAME,
+        "feature_flag_annotator",
         startTimestamp,
         skateMetricCollector.getKeyValueList()
       )
-  }
-
-  companion object {
-    const val FEATURE_FLAG_ANNOTATOR_TRACE_NAME = "feature_flag_annotator"
   }
 }

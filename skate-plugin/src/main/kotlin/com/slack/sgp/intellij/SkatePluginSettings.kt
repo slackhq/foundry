@@ -104,6 +104,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isTracingEnabled = value
     }
 
+  var tracingEndpoint: String?
+    get() = state.tracingEndpoint
+    set(value) {
+      state.tracingEndpoint = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -116,5 +122,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var featureFlagAnnotation by string()
     var featureFlagFilePattern by string()
     var isTracingEnabled by property(true)
+    var tracingEndpoint by string()
   }
 }
