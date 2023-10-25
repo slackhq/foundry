@@ -36,9 +36,6 @@ interface SkateProjectService {
  * New UI of the Skate Plugin
  */
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
-  private val skateMetricCollector = SkateMetricCollector()
-  private val startTimestamp = Instant.now()
-
   override fun showWhatsNewWindow() {
 
     val settings = project.service<SkatePluginSettings>()
@@ -53,25 +50,23 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     // Don't show the tool window if the parsed changelog is blank
     // Changelog is parsed
     val parsedChangelog = ChangelogParser.readFile(changeLogString, changelogJournal.lastReadDate)
-    val isChangelogEmpty = parsedChangelog.changeLogString.isNullOrBlank()
-    if (!isChangelogEmpty) {
-      // Creating the tool window
-      val toolWindowManager = ToolWindowManager.getInstance(project)
-      toolWindowManager.invokeLater {
-        val toolWindow =
-          toolWindowManager.registerToolWindow(WHATS_NEW_PANEL_ID) {
-            stripeTitle = Supplier { "What's New in Slack!" }
-            anchor = ToolWindowAnchor.RIGHT
-          }
-        // The Disposable is necessary to prevent a substantial memory leak while working with
-        // MarkdownJCEFHtmlPanel
-        val parentDisposable = Disposer.newDisposable()
+    if (parsedChangelog.changeLogString.isNullOrBlank()) return
+    // Creating the tool window
+    val toolWindowManager = ToolWindowManager.getInstance(project)
+    toolWindowManager.invokeLater {
+      val toolWindow =
+        toolWindowManager.registerToolWindow(WHATS_NEW_PANEL_ID) {
+          stripeTitle = Supplier { "What's New in Slack!" }
+          anchor = ToolWindowAnchor.RIGHT
+        }
+      // The Disposable is necessary to prevent a substantial memory leak while working with
+      // MarkdownJCEFHtmlPanel
+      val parentDisposable = Disposer.newDisposable()
 
-        WhatsNewPanelFactory()
-          .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
+      WhatsNewPanelFactory()
+        .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
 
-        toolWindow.show()
-      }
+      toolWindow.show()
     }
   }
 
