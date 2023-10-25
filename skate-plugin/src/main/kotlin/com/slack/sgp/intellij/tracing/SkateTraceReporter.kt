@@ -102,7 +102,7 @@ class SkateTraceReporter(private val offline: Boolean = false) : TraceReporter {
   }
 
   companion object {
-    const val SERVICE_NAME: String = "lp_test_skate_plugin"
+    const val SERVICE_NAME: String = "skate_plugin"
     const val DATABASE_NAME: String = "itools"
     const val TRACING_ENDPOINT: String = "https://slackb.com/traces/v1/list_of_spans/proto"
     private val LOG: Logger = Logger.getInstance(SkateTraceReporter::class.java)
