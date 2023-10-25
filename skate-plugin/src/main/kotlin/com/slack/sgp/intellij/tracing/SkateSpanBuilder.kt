@@ -22,10 +22,6 @@ import com.slack.sgp.tracing.model.tagBuilderImpl
 class SkateSpanBuilder {
   private val keyValueList: TagBuilder = tagBuilderImpl()
 
-  fun addSpanTag(key: String, value: String) {
-    keyValueList.apply { key tagTo value }
-  }
-
   fun addSpanTag(key: String, value: SkateTracingEvent) {
     keyValueList.apply { key tagTo value.type.name }
   }
