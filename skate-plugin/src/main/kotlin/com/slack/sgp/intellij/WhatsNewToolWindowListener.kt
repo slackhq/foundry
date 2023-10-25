@@ -15,7 +15,6 @@
  */
 package com.slack.sgp.intellij
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
@@ -27,18 +26,18 @@ import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
 class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManagerListener {
+  //  Initial state of screen should be hidden
   private var wasVisible = false
   private val startTimestamp = Instant.now()
 
   override fun stateChanged(toolWindowManager: ToolWindowManager) {
     super.stateChanged(toolWindowManager)
     if (!project.isTracingEnabled()) return
-    val skateMetricCollector = SkateMetricCollector()
 
+    val skateMetricCollector = SkateMetricCollector()
     val toolWindow = toolWindowManager.getToolWindow(WHATS_NEW_PANEL_ID) ?: return
     val isVisible = toolWindow.isVisible
-    val visibilityChanged = isVisible != wasVisible
-    wasVisible = isVisible
+    val visibilityChanged = visibilityChanged(isVisible)
 
     if (visibilityChanged) {
       if (isVisible) {
@@ -54,5 +53,11 @@ class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManag
           skateMetricCollector.getKeyValueList()
         )
     }
+  }
+
+  fun visibilityChanged(isVisible: Boolean): Boolean {
+    val visibilityChanged = isVisible != wasVisible
+    wasVisible = isVisible
+    return visibilityChanged
   }
 }

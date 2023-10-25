@@ -17,9 +17,7 @@ package com.slack.sgp.intellij.projectgen
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.slack.sgp.intellij.SkatePluginSettings
 import com.slack.sgp.intellij.tracing.SkateMetricCollector
 import com.slack.sgp.intellij.tracing.SkateMetricCollector.Companion.ProjectGenAction
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
