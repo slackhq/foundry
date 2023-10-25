@@ -22,9 +22,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
-import com.slack.sgp.intellij.tracing.SkateMetricCollector
 import com.slack.sgp.intellij.ui.WhatsNewPanelFactory
-import java.time.Instant
 import java.util.function.Supplier
 
 interface SkateProjectService {

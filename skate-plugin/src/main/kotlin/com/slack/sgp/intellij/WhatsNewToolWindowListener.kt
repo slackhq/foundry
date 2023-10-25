@@ -25,6 +25,7 @@ import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
+/* Custom listener for tool window for whats new panel */
 class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManagerListener {
   //  Initial state of screen should be hidden
   private var wasVisible = false
