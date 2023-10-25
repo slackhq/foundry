@@ -50,13 +50,14 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
         KeyValue("database", ValueType.STRING, DATABASE_NAME)
       )
 
-    val expectedSpanTags = tagBuilderImpl().apply {
-      "skate_version" tagTo "0.2.0"
-      "ide_version" tagTo "Studio Giraffe"
-      "user" tagTo System.getenv("USER")
-      "project_name" tagTo project.name
-      addAll(traceTags)
-    }
+    val expectedSpanTags =
+      tagBuilderImpl().apply {
+        "skate_version" tagTo "0.2.0"
+        "ide_version" tagTo "Studio Giraffe"
+        "user" tagTo System.getenv("USER")
+        "project_name" tagTo project.name
+        addAll(traceTags)
+      }
 
     assertThat(listOfSpans).isNotNull()
     if (listOfSpans != null) {

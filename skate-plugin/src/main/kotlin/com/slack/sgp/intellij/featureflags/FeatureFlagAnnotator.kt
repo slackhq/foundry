@@ -86,16 +86,16 @@ class UrlIntentionAction(
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
+    if (!project.isTracingEnabled()) return
     skateMetricCollector.addSpanTag("event", SkateTracingEvent(HOUSTON_FEATURE_FLAG_URL_CLICKED))
-    sendUsageTrace(project, project.isTracingEnabled())
+    sendUsageTrace(project)
   }
 
   override fun startInWriteAction(): Boolean {
     return false
   }
 
-  fun sendUsageTrace(project: Project, isTracingEnabled: Boolean) {
-    if (!isTracingEnabled) return
+  fun sendUsageTrace(project: Project) {
     SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
         "feature_flag_annotator",
