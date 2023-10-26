@@ -30,4 +30,6 @@ We're sending analytics for almost all Skate features to track user usage. To se
 3. Make call to `SkateTraceReporter` to send up the traces
 
 ## Publishing
-Run `publish-skate` Github Action to publish to the configured repository.
+Run `publish-skate` Github Action to publish to the configured repository. 
+
+Behind the scene the action's running`./gradlew :skate-plugin:uploadPluginToArtifactory`
