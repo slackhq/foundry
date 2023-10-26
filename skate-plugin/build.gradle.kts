@@ -92,7 +92,7 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
-  implementation(project(mapOf("path" to ":tracing")))
+  implementation(projects.tracing)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }

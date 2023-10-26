@@ -27,7 +27,7 @@ import com.slack.sgp.intellij.tracing.SkateTracingEvent.EventType.SKATE_WHATS_NE
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
-/* Custom listener for tool window for whats new panel */
+/** Custom listener for WhatsNew Tool Window. */
 class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManagerListener {
   //  Initial state of screen should be hidden
   private var wasVisible = false
@@ -37,22 +37,22 @@ class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManag
     super.stateChanged(toolWindowManager)
     if (!project.isTracingEnabled()) return
 
-    val skateMetricCollector = SkateSpanBuilder()
+    val skateSpanBuilder = SkateSpanBuilder()
     val toolWindow = toolWindowManager.getToolWindow(WHATS_NEW_PANEL_ID) ?: return
     val isVisible = toolWindow.isVisible
     val visibilityChanged = visibilityChanged(isVisible)
 
     if (visibilityChanged) {
       if (isVisible) {
-        skateMetricCollector.addSpanTag("event", SkateTracingEvent(SKATE_WHATS_NEW_PANEL_OPENED))
+        skateSpanBuilder.addSpanTag("event", SkateTracingEvent(SKATE_WHATS_NEW_PANEL_OPENED))
       } else {
-        skateMetricCollector.addSpanTag("event", SkateTracingEvent(SKATE_WHATS_NEW_PANEL_CLOSED))
+        skateSpanBuilder.addSpanTag("event", SkateTracingEvent(SKATE_WHATS_NEW_PANEL_CLOSED))
       }
       SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(
           WHATS_NEW_PANEL_ID.replace('-', '_'),
           startTimestamp,
-          skateMetricCollector.getKeyValueList()
+          skateSpanBuilder.getKeyValueList()
         )
     }
   }

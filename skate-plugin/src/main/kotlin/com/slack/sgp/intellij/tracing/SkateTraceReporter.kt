@@ -24,7 +24,7 @@ import com.slack.sgp.intellij.util.tracingEndpoint
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.ListOfSpans
 import com.slack.sgp.tracing.model.buildSpan
-import com.slack.sgp.tracing.model.tagBuilderImpl
+import com.slack.sgp.tracing.model.newTagBuilder
 import com.slack.sgp.tracing.reporter.SimpleTraceReporter
 import com.slack.sgp.tracing.reporter.TraceReporter
 import com.slack.sgp.tracing.reporter.TraceReporter.NoOpTraceReporter
@@ -79,7 +79,7 @@ class SkateTraceReporter(private val project: Project, private val offline: Bool
       return null
     }
     val traceTags =
-      tagBuilderImpl().apply {
+      newTagBuilder().apply {
         "service_name" tagTo SERVICE_NAME
         "database" tagTo DATABASE_NAME
       }
@@ -96,7 +96,7 @@ class SkateTraceReporter(private val project: Project, private val offline: Bool
       ) {
         "skate_version" tagTo skatePluginVersion
         "ide_version" tagTo ideVersion
-        "user" tagTo System.getenv("USER")
+        System.getenv("USER").takeUnless { it.isBlank() }?.let { "user" tagTo it }
         "project_name" tagTo project.name
         this.addAll(spanDataMap)
       }

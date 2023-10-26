@@ -34,7 +34,7 @@ constructor(
   private val offline: Boolean = false
 ) : AnAction() {
 
-  private val skateMetricCollector = SkateSpanBuilder()
+  private val skateSpanBuilder = SkateSpanBuilder()
   private val startTimestamp = Instant.now()
 
   override fun actionPerformed(e: AnActionEvent) {
@@ -52,7 +52,7 @@ constructor(
   fun executeProjectGenCommand(command: String, project: Project) {
     val terminalCommand = TerminalCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
     terminalViewWrapper(project).executeCommand(terminalCommand)
-    skateMetricCollector.addSpanTag("event", SkateTracingEvent(PROJECT_GEN_OPENED))
+    skateSpanBuilder.addSpanTag("event", SkateTracingEvent(PROJECT_GEN_OPENED))
   }
 
   fun sendUsageTrace(project: Project) {
@@ -60,7 +60,7 @@ constructor(
       .createPluginUsageTraceAndSendTrace(
         "project_generator",
         startTimestamp,
-        skateMetricCollector.getKeyValueList()
+        skateSpanBuilder.getKeyValueList()
       )
   }
 

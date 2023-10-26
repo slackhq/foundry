@@ -17,10 +17,10 @@ package com.slack.sgp.intellij.tracing
 
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.model.TagBuilder
-import com.slack.sgp.tracing.model.tagBuilderImpl
+import com.slack.sgp.tracing.model.newTagBuilder
 
 class SkateSpanBuilder {
-  private val keyValueList: TagBuilder = tagBuilderImpl()
+  private val keyValueList: TagBuilder = newTagBuilder()
 
   fun addSpanTag(key: String, value: String) {
     keyValueList.apply { key tagTo value }

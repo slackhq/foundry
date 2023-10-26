@@ -35,6 +35,6 @@ public fun buildSpan(
     trace_id = traceId,
     start_timestamp_micros = startTimestampMicros,
     duration_micros = durationMicros,
-    tags = tagBuilderImpl().apply(addTags)
+    tags = newTagBuilder().apply(addTags)
   )
 }

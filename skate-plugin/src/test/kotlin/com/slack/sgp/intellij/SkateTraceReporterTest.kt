@@ -22,13 +22,13 @@ import com.slack.sgp.intellij.tracing.SkateTraceReporter.Companion.DATABASE_NAME
 import com.slack.sgp.intellij.tracing.SkateTraceReporter.Companion.SERVICE_NAME
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.ValueType
-import com.slack.sgp.tracing.model.tagBuilderImpl
+import com.slack.sgp.tracing.model.newTagBuilder
 import java.time.Instant
 
 class SkateTraceReporterTest : BasePlatformTestCase() {
   fun testSpanCreatedWithCorrectTags() {
     val traceTags =
-      tagBuilderImpl().apply {
+      newTagBuilder().apply {
         "test_string" tagTo "test_value"
         "test_boolean" tagTo true
         "test_long" tagTo 10000000L
@@ -50,13 +50,14 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
         KeyValue("database", ValueType.STRING, DATABASE_NAME)
       )
 
-    val expectedSpanTags = tagBuilderImpl().apply {
-      "skate_version" tagTo "0.2.0"
-      "ide_version" tagTo "Studio Giraffe"
-      "user" tagTo System.getenv("USER")
-      "project_name" tagTo project.name
-      addAll(traceTags)
-    }
+    val expectedSpanTags =
+      newTagBuilder().apply {
+        "skate_version" tagTo "0.2.0"
+        "ide_version" tagTo "Studio Giraffe"
+        "user" tagTo System.getenv("USER")
+        "project_name" tagTo project.name
+        addAll(traceTags)
+      }
 
     assertThat(listOfSpans).isNotNull()
     if (listOfSpans != null) {
@@ -71,7 +72,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
         .createPluginUsageTraceAndSendTrace(
           "fake_span_name",
           Instant.now(),
-          tagBuilderImpl(),
+          newTagBuilder(),
           "Studio Giraffe",
           "0.2.0"
         )
@@ -84,7 +85,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
         .createPluginUsageTraceAndSendTrace(
           "fake_span_name",
           Instant.now(),
-          tagBuilderImpl(),
+          newTagBuilder(),
           "Studio Giraffe",
           ""
         )

@@ -76,7 +76,7 @@ class UrlIntentionAction(
 ) : IntentionAction {
 
   private val startTimestamp = Instant.now()
-  private val skateMetricCollector = SkateSpanBuilder()
+  private val skateSpanBuilder = SkateSpanBuilder()
 
   override fun getText(): String = message
 
@@ -86,7 +86,7 @@ class UrlIntentionAction(
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
-    skateMetricCollector.addSpanTag("event", SkateTracingEvent(HOUSTON_FEATURE_FLAG_URL_CLICKED))
+    skateSpanBuilder.addSpanTag("event", SkateTracingEvent(HOUSTON_FEATURE_FLAG_URL_CLICKED))
     sendUsageTrace(project, project.isTracingEnabled())
   }
 
@@ -100,7 +100,7 @@ class UrlIntentionAction(
       .createPluginUsageTraceAndSendTrace(
         "feature_flag_annotator",
         startTimestamp,
-        skateMetricCollector.getKeyValueList()
+        skateSpanBuilder.getKeyValueList()
       )
   }
 }
