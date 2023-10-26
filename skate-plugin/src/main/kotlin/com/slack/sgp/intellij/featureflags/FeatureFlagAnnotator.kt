@@ -23,13 +23,18 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import com.slack.sgp.intellij.tracing.SkateSpanBuilder
+import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTracingEvent
+import com.slack.sgp.intellij.tracing.SkateTracingEvent.EventType.HOUSTON_FEATURE_FLAG_URL_CLICKED
 import com.slack.sgp.intellij.util.featureFlagFilePattern
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
+import com.slack.sgp.intellij.util.isTracingEnabled
 import java.net.URI
+import java.time.Instant
 import org.jetbrains.kotlin.psi.KtFile
 
 class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<FeatureFlagSymbol>>() {
-
   override fun collectInformation(file: PsiFile): List<FeatureFlagSymbol> {
     val isEligibleForLinkifiedFeatureProcessing =
       file.project.isLinkifiedFeatureFlagsEnabled() && file is KtFile && isKotlinFeatureFile(file)
@@ -69,6 +74,10 @@ class UrlIntentionAction(
   private val message: String,
   private val url: String,
 ) : IntentionAction {
+
+  private val startTimestamp = Instant.now()
+  private val skateSpanBuilder = SkateSpanBuilder()
+
   override fun getText(): String = message
 
   override fun getFamilyName(): String = text
@@ -77,9 +86,21 @@ class UrlIntentionAction(
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
+    skateSpanBuilder.addSpanTag("event", SkateTracingEvent(HOUSTON_FEATURE_FLAG_URL_CLICKED))
+    sendUsageTrace(project, project.isTracingEnabled())
   }
 
   override fun startInWriteAction(): Boolean {
     return false
+  }
+
+  fun sendUsageTrace(project: Project, isTracingEnabled: Boolean) {
+    if (!isTracingEnabled) return
+    SkateTraceReporter(project)
+      .createPluginUsageTraceAndSendTrace(
+        "feature_flag_annotator",
+        startTimestamp,
+        skateSpanBuilder.getKeyValueList()
+      )
   }
 }

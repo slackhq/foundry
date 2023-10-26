@@ -40,6 +40,11 @@
         <listener class="com.slack.sgp.intellij.ProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
+    <projectListeners>
+        <listener
+                class="com.slack.sgp.intellij.WhatsNewToolWindowListener"
+                topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
+    </projectListeners>
 
     <actions>
         <action id="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"

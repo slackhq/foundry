@@ -40,6 +40,7 @@ internal class SkateConfigUI(
     choosePathRow()
     enableProjectGenMenuAction()
     featureFlagSettings()
+    tracingSettings()
   }
 
   private fun Panel.checkBoxRow() {
@@ -122,6 +123,26 @@ internal class SkateConfigUI(
       setter = { settings.featureFlagBaseUrl = it },
       errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
       enabledCondition = linkifiedFeatureFlagsCheckBox.selected
+    )
+  }
+
+  private fun Panel.tracingSettings() {
+    lateinit var tracingEnabledButton: Cell<JBCheckBox>
+
+    row(SkateBundle.message("skate.configuration.enableTracing.title")) {
+      tracingEnabledButton =
+        checkBox(SkateBundle.message("skate.configuration.enableTracing.description"))
+          .bindSelected(
+            getter = { settings.isTracingEnabled },
+            setter = { settings.isTracingEnabled = it }
+          )
+    }
+    bindAndValidateTextFieldRow(
+      titleMessageKey = "skate.configuration.tracingEndpoint.title",
+      getter = { settings.tracingEndpoint },
+      setter = { settings.tracingEndpoint = it },
+      errorMessageKey = "skate.configuration.tracingEndpoint.description",
+      enabledCondition = tracingEnabledButton.selected
     )
   }
 

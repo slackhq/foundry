@@ -1,8 +1,8 @@
 import com.jetbrains.plugin.structure.base.utils.exists
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
@@ -90,6 +90,10 @@ tasks
 
 dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.okhttp)
+  implementation(libs.okhttp.loggingInterceptor)
+  implementation(projects.tracing)
+
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
