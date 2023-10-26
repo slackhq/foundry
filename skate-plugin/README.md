@@ -3,11 +3,11 @@ Skate Plugin
 
 An Intellij plugin that helps to improve local developer productivity by surfacing useful information in the IDE.
 
-We use this at Slack for several for couple use cases:
+We use this at Slack for s several use cases:
 * Announce updates, latest changes and improvements through "What's New" panel
 * Annotate Feature Flag to help easily access its setup
 * Generate API model translators when migrating legacy API
-* Create new initial new subproject setup from `File` dropdown
+* Create initial new subproject setup from `File` dropdown
 
 ## Installation
 
