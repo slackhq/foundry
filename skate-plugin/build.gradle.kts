@@ -89,10 +89,11 @@ tasks
 // endregion
 
 dependencies {
+  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   implementation(projects.tracing)
+
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
