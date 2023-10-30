@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.11.2
+------
+
+_2023-10-30_
+
+- Make detekt and lint baselines default to `null` if their property values are blank.
+- No longer publish monkeypatch artifact as it's no longer necessary.
+
 0.11.1
 ------
 
