@@ -49,7 +49,7 @@ agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.0"
-commonsText = "org.apache.commons:commons-text:1.10.0"
+commonsText = "org.apache.commons:commons-text:1.11.0"
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
