@@ -5,8 +5,6 @@ $dokka.location://slack/org.gradle.api.Project#kotlin.Function1[slack.gradle.Sla
 $dokka.location://slackAndroid/org.gradle.api.Project#org.gradle.api.Action[slack.gradle.AndroidHandler]/PointingToDeclaration/slack-plugin/[root]/slack-android.html
 $dokka.location://slackAndroidApp/org.gradle.api.Project#org.gradle.api.Action[slack.gradle.SlackAndroidAppExtension]/PointingToDeclaration/slack-plugin/[root]/slack-android-app.html
 $dokka.location://slackAndroidLibrary/org.gradle.api.Project#org.gradle.api.Action[slack.gradle.SlackAndroidLibraryExtension]/PointingToDeclaration/slack-plugin/[root]/slack-android-library.html
-module:sgp-monkeypatch-agp
-com.android.build.gradle.internal.tasks
 module:slack-plugin
 slack.gradle
 slack.gradle.avoidance
