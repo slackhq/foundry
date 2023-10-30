@@ -91,7 +91,7 @@ internal object DetektTasks {
               }
               project.layout.buildDirectory.file("intermediates/detekt/baseline.xml").get().asFile
             } else {
-              project.file(project.rootProject.file(baselineFile))
+              project.rootProject.layout.projectDirectory.file(baselineFile).asFile
             }
         }
       }

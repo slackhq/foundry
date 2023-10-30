@@ -330,7 +330,10 @@ internal object LintTasks {
 
       lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
 
-      baseline = project.layout.projectDirectory.file(slackProperties.lintBaselineFileName).asFile
+      baseline =
+        slackProperties.lintBaselineFileName?.let {
+          project.layout.projectDirectory.file(it).asFile
+        }
     }
   }
 

@@ -52,8 +52,14 @@ public class SlackProperties private constructor(private val project: Project) {
   private fun stringProperty(key: String, defaultValue: String): String =
     optionalStringProperty(key, defaultValue)!!
 
-  private fun optionalStringProperty(key: String, defaultValue: String? = null): String? =
-    project.optionalStringProperty(key, defaultValue = defaultValue)
+  private fun optionalStringProperty(
+    key: String,
+    defaultValue: String? = null,
+    blankIsNull: Boolean = false
+  ): String? =
+    project.optionalStringProperty(key, defaultValue = defaultValue)?.takeUnless {
+      blankIsNull && it.isBlank()
+    }
 
   internal val versions: SlackVersions by lazy {
     project.rootProject.getOrCreateExtra("slack-versions") {
@@ -265,8 +271,8 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.lint.errors-only")
 
   /** File name to use for a project's lint baseline. */
-  public val lintBaselineFileName: String
-    get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
+  public val lintBaselineFileName: String?
+    get() = optionalStringProperty("slack.lint.baseline-file-name", blankIsNull = true)
 
   /** Flag to control whether or not lint checks test sources. */
   public val lintCheckTestSources: Boolean
@@ -487,9 +493,9 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Detekt config files, evaluated from rootProject.file(...). */
   public val detektConfigs: List<String>?
     get() = optionalStringProperty("slack.detekt.configs")?.split(",")
-  /** Detekt baseline file, evaluated from rootProject.file(...). */
+  /** Detekt baseline file, evaluated from rootProject.layout.projectDirectory.file(...). */
   public val detektBaseline: String?
-    get() = optionalStringProperty("slack.detekt.baseline")
+    get() = optionalStringProperty("slack.detekt.baseline", blankIsNull = true)
   /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
   public val enableFullDetekt: Boolean
     get() = booleanProperty("slack.detekt.full")
