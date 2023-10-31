@@ -36,114 +36,118 @@ internal class SkateConfigUI(
 ) {
 
   fun createPanel(): DialogPanel = panel {
-    checkBoxRow()
-    choosePathRow()
+    whatsNewPanelSettings()
     enableProjectGenMenuAction()
     featureFlagSettings()
     tracingSettings()
   }
 
-  private fun Panel.checkBoxRow() {
-    row(SkateBundle.message("skate.configuration.enableWhatsNew.title")) {
-      checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
-        .bindSelected(
-          getter = { settings.isWhatsNewEnabled },
-          setter = { settings.isWhatsNewEnabled = it }
-        )
-    }
-  }
-
-  private fun Panel.choosePathRow() {
-    row(SkateBundle.message("skate.configuration.choosePath.title")) {
-      textFieldWithBrowseButton(
-          SkateBundle.message("skate.configuration.choosePath.dialog.title"),
-          project,
-          FileChoosing.singleMdFileChooserDescriptor()
-        )
-        .bindText(
-          getter = {
-            LocalFileSystem.getInstance().extractPresentableUrl(settings.whatsNewFilePath)
-          },
-          setter = {
-            if (File(it).isFile) {
-              val absolutePath = LocalFileSystem.getInstance().findFileByPath(it)?.path.orEmpty()
-              val projectPath = project.basePath ?: ""
-              val relativePath = absolutePath.removePrefix(projectPath).removePrefix("/")
-              settings.whatsNewFilePath = relativePath
-            } else {
-              settings.whatsNewFilePath = ""
+  private fun Panel.whatsNewPanelSettings() {
+    group(SkateBundle.message("skate.configuration.whatsNewPanel.title")) {
+      row {
+        checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
+          .bindSelected(
+            getter = { settings.isWhatsNewEnabled },
+            setter = { settings.isWhatsNewEnabled = it }
+          )
+      }
+      row(SkateBundle.message("skate.configuration.choosePath.title")) {
+        textFieldWithBrowseButton(
+            SkateBundle.message("skate.configuration.choosePath.dialog.title"),
+            project,
+            FileChoosing.singleMdFileChooserDescriptor()
+          )
+          .bindText(
+            getter = {
+              LocalFileSystem.getInstance().extractPresentableUrl(settings.whatsNewFilePath)
+            },
+            setter = {
+              if (File(it).isFile) {
+                val absolutePath = LocalFileSystem.getInstance().findFileByPath(it)?.path.orEmpty()
+                val projectPath = project.basePath ?: ""
+                val relativePath = absolutePath.removePrefix(projectPath).removePrefix("/")
+                settings.whatsNewFilePath = relativePath
+              } else {
+                settings.whatsNewFilePath = ""
+              }
             }
-          }
-        )
-        .enabled(settings.isWhatsNewEnabled)
+          )
+          .enabled(settings.isWhatsNewEnabled)
+      }
     }
   }
 
   private fun Panel.enableProjectGenMenuAction() {
-    row(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.title")) {
-      checkBox(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.description"))
-        .bindSelected(
-          getter = { settings.isProjectGenMenuActionEnabled },
-          setter = { settings.isProjectGenMenuActionEnabled = it }
-        )
+    group(SkateBundle.message("skate.configuration.projectGenMenuAction.title")) {
+      row {
+        checkBox(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.description"))
+          .bindSelected(
+            getter = { settings.isProjectGenMenuActionEnabled },
+            setter = { settings.isProjectGenMenuActionEnabled = it }
+          )
+      }
     }
   }
 
   private fun Panel.featureFlagSettings() {
-    lateinit var linkifiedFeatureFlagsCheckBox: Cell<JBCheckBox>
+    group(SkateBundle.message("skate.configuration.featureFlagAnnotator.title")) {
+      lateinit var linkifiedFeatureFlagsCheckBox: Cell<JBCheckBox>
 
-    row(SkateBundle.message("skate.configuration.enableFeatureFlagLinking.title")) {
-      linkifiedFeatureFlagsCheckBox =
-        checkBox(SkateBundle.message("skate.configuration.enableFeatureFlagLinking.description"))
-          .bindSelected(
-            getter = { settings.isLinkifiedFeatureFlagsEnabled },
-            setter = { settings.isLinkifiedFeatureFlagsEnabled = it }
-          )
+      row() {
+        linkifiedFeatureFlagsCheckBox =
+          checkBox(SkateBundle.message("skate.configuration.enableFeatureFlagLinking.description"))
+            .bindSelected(
+              getter = { settings.isLinkifiedFeatureFlagsEnabled },
+              setter = { settings.isLinkifiedFeatureFlagsEnabled = it }
+            )
+      }
+
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.featureFlagFilePattern.title",
+        getter = { settings.featureFlagFilePattern },
+        setter = { settings.featureFlagFilePattern = it },
+        errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
+        enabledCondition = linkifiedFeatureFlagsCheckBox.selected,
+      )
+
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.featureFlagAnnotation.title",
+        getter = { settings.featureFlagAnnotation },
+        setter = { settings.featureFlagAnnotation = it },
+        errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
+        enabledCondition = linkifiedFeatureFlagsCheckBox.selected,
+      )
+
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.featureFlagBaseUrl.title",
+        getter = { settings.featureFlagBaseUrl },
+        setter = { settings.featureFlagBaseUrl = it },
+        errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
+        enabledCondition = linkifiedFeatureFlagsCheckBox.selected
+      )
     }
-
-    bindAndValidateTextFieldRow(
-      titleMessageKey = "skate.configuration.featureFlagFilePattern.title",
-      getter = { settings.featureFlagFilePattern },
-      setter = { settings.featureFlagFilePattern = it },
-      errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
-      enabledCondition = linkifiedFeatureFlagsCheckBox.selected
-    )
-
-    bindAndValidateTextFieldRow(
-      titleMessageKey = "skate.configuration.featureFlagAnnotation.title",
-      getter = { settings.featureFlagAnnotation },
-      setter = { settings.featureFlagAnnotation = it },
-      errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
-      enabledCondition = linkifiedFeatureFlagsCheckBox.selected
-    )
-
-    bindAndValidateTextFieldRow(
-      titleMessageKey = "skate.configuration.featureFlagBaseUrl.title",
-      getter = { settings.featureFlagBaseUrl },
-      setter = { settings.featureFlagBaseUrl = it },
-      errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
-      enabledCondition = linkifiedFeatureFlagsCheckBox.selected
-    )
   }
 
   private fun Panel.tracingSettings() {
-    lateinit var tracingEnabledButton: Cell<JBCheckBox>
+    group(SkateBundle.message("skate.configuration.tracing.title")) {
+      lateinit var tracingEnabledButton: Cell<JBCheckBox>
 
-    row(SkateBundle.message("skate.configuration.enableTracing.title")) {
-      tracingEnabledButton =
-        checkBox(SkateBundle.message("skate.configuration.enableTracing.description"))
-          .bindSelected(
-            getter = { settings.isTracingEnabled },
-            setter = { settings.isTracingEnabled = it }
-          )
+      row {
+        tracingEnabledButton =
+          checkBox(SkateBundle.message("skate.configuration.enableTracing.description"))
+            .bindSelected(
+              getter = { settings.isTracingEnabled },
+              setter = { settings.isTracingEnabled = it }
+            )
+      }
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.tracingEndpoint.title",
+        getter = { settings.tracingEndpoint },
+        setter = { settings.tracingEndpoint = it },
+        errorMessageKey = "skate.configuration.tracingEndpoint.error",
+        enabledCondition = tracingEnabledButton.selected,
+      )
     }
-    bindAndValidateTextFieldRow(
-      titleMessageKey = "skate.configuration.tracingEndpoint.title",
-      getter = { settings.tracingEndpoint },
-      setter = { settings.tracingEndpoint = it },
-      errorMessageKey = "skate.configuration.tracingEndpoint.description",
-      enabledCondition = tracingEnabledButton.selected
-    )
   }
 
   private fun Panel.bindAndValidateTextFieldRow(
@@ -151,7 +155,7 @@ internal class SkateConfigUI(
     getter: () -> String?,
     setter: (String) -> Unit,
     errorMessageKey: String,
-    enabledCondition: ComponentPredicate? = null
+    enabledCondition: ComponentPredicate? = null,
   ) {
     row(SkateBundle.message(titleMessageKey)) {
       textField()
