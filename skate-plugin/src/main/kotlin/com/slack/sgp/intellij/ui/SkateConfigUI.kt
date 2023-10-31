@@ -36,14 +36,14 @@ internal class SkateConfigUI(
 ) {
 
   fun createPanel(): DialogPanel = panel {
-    whatsNewPanel()
+    whatsNewPanelSettings()
     enableProjectGenMenuAction()
     featureFlagSettings()
     tracingSettings()
   }
 
-  private fun Panel.whatsNewPanel() {
-    group("skate.configuration.whatsNewPanel.title") {
+  private fun Panel.whatsNewPanelSettings() {
+    group(SkateBundle.message("skate.configuration.whatsNewPanel.title")) {
       row {
         checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
           .bindSelected(
@@ -78,7 +78,7 @@ internal class SkateConfigUI(
   }
 
   private fun Panel.enableProjectGenMenuAction() {
-    group("skate.configuration.projectGenMenuAction.title") {
+    group(SkateBundle.message("skate.configuration.projectGenMenuAction.title")) {
       row {
         checkBox(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.description"))
           .bindSelected(
@@ -90,7 +90,7 @@ internal class SkateConfigUI(
   }
 
   private fun Panel.featureFlagSettings() {
-    group("skate.configuration.featureFlagAnnotator.title") {
+    group(SkateBundle.message("skate.configuration.featureFlagAnnotator.title")) {
       lateinit var linkifiedFeatureFlagsCheckBox: Cell<JBCheckBox>
 
       row() {
@@ -129,7 +129,7 @@ internal class SkateConfigUI(
   }
 
   private fun Panel.tracingSettings() {
-    group("Analytics") {
+    group(SkateBundle.message("skate.configuration.tracing.title")) {
       lateinit var tracingEnabledButton: Cell<JBCheckBox>
 
       row {
