@@ -1,6 +1,79 @@
 Changelog
 =========
 
+0.11.2
+------
+
+_2023-10-30_
+
+- Make detekt and lint baselines default to `null` if their property values are blank.
+- No longer publish monkeypatch artifact as it's no longer necessary.
+
+0.11.1
+------
+
+_2023-10-22_
+
+- Add new `sgp.isTestLibrary` property to indicate if a library is a test library. Note that projects that are named `test-fixtures` are implicitly considered test libraries.
+- **Fix**: Don't impose `VisibleForTests` lint on test libraries.
+
+0.11.0
+------
+
+_2023-10-22_
+
+- Revamp some lint configuration and best-effort support KMP projects.
+- Remove `slack.lint.update-baselines` property in favor of AGP's modern `updateBaselines` task.
+- Remove hidden `ImplicitSamInstance` lint config.
+- Disable newer issues for dependency checks.
+
+0.10.11
+-------
+
+_2023-10-19_
+
+- Support AGP `8.3.0-alpha08`.
+- Build against Gradle `8.4`.
+- Build against compose-multiplatform `1.5.3`.
+
+0.10.10
+-------
+
+_2023-10-02_
+
+- Make debug builds everywhere (local and CI) use consistent version codes and version names. This way remote build cache entries for them are compatible.
+  - Default debug version code is governed by `slack.gradle.debugVersionCode` and defaults to `90009999`.
+  - Default version name user suffix is governed by `slack.gradle.debugUserString` and defaults to `debug`.
+  - Non-debug build types are the same as before.
+- Remove a noisy lifecycle log around lint variant selection.
+- Build against Bugsnag Gradle Plugin `8.1.0`.
+
+0.10.9
+------
+
+_2023-09-28_
+
+- Don't disable caching on MergeAssets tasks by default. Leave that to consuming repos.
+- Update permission allowlist API to use a `allowListFile` file property instead.
+- Don't exclude coroutines' debug probes in debug build packaging.
+- Support AGP 8.3.0-alpha05+.
+- Build against Wire `4.9.1`.
+- Build against Compose Multiplatform `1.5.2`.
+- Update to Oshi `6.4.6`.
+
+0.10.8
+------
+
+_2023-09-22_
+
+- **Fix**: Don't apply boms to the `coreLibraryDesugaring` configuration.
+- **Enhancement**: Set Kotlin `compilerOptions.moduleName` to a dashified version of the Gradle project path.
+- Update MoshiX to `0.24.3`
+- Compile against Anvil `2.4.8`.
+- Compile against CM `1.5.1`.
+- Compile against DAGP `1.22.0`.
+- Compile against redacted-compiler-plugin `1.6.1`.
+
 0.10.7
 ------
 

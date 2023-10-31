@@ -16,14 +16,21 @@
 package slack.gradle.agphandler.v80
 
 import com.android.build.api.AndroidPluginVersion
+import com.android.build.gradle.internal.SdkLocator
 import com.google.auto.service.AutoService
+import java.io.File
+import org.gradle.api.provider.ProviderFactory
 import slack.gradle.agp.AgpHandler
-import slack.gradle.agp.AgpHandlerFactory
+import slack.gradle.agp.internal.NoOpIssueReporter
 
 public class AgpHandler80 private constructor(override val agpVersion: AndroidPluginVersion) :
   AgpHandler {
-  @AutoService(AgpHandlerFactory::class)
-  public class Factory : AgpHandlerFactory {
+
+  override fun getAndroidSdkDirectory(projectRootDir: File, providers: ProviderFactory): File =
+    SdkLocator.getSdkDirectory(projectRootDir, NoOpIssueReporter)
+
+  @AutoService(AgpHandler.Factory::class)
+  public class Factory : AgpHandler.Factory {
     override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 0, 0)
 
     // TODO Remove once it's public

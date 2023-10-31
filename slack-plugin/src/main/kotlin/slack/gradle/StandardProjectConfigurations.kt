@@ -119,14 +119,14 @@ internal class StandardProjectConfigurations(
         slackProperties,
         versionCatalog
       )
-    project.applyCommonConfigurations()
+    project.applyCommonConfigurations(slackProperties)
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
     project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
     project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
   }
 
-  private fun Project.applyCommonConfigurations() {
+  private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
     if (globalProperties.autoApplySortDependencies) {
       if (project.buildFile.exists()) {
         val sortDependenciesIgnoreSet =
@@ -136,6 +136,12 @@ internal class StandardProjectConfigurations(
         }
       }
     }
+    LintTasks.configureSubProject(
+      project,
+      slackProperties,
+      slackTools.globalConfig.affectedProjects,
+      slackTools::logAvoidedTask,
+    )
   }
 
   @Suppress("unused")
@@ -460,8 +466,7 @@ internal class StandardProjectConfigurations(
           slackProperties.disabledVariants?.splitToSequence(",")?.associate {
             val (flavorName, buildType) = it.split("+")
             flavorName to buildType
-          }
-            ?: emptyMap()
+          } ?: emptyMap()
         if (variantsToDisable.isNotEmpty()) {
           logger.debug("$LOG Disabling variants: $variantsToDisable")
           val isApp = this is ApplicationAndroidComponentsExtension
@@ -620,16 +625,6 @@ internal class StandardProjectConfigurations(
         slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-        if (slackProperties.enableLintInAndroidTestProjects) {
-          LintTasks.configureSubProject(
-            project,
-            slackProperties,
-            slackTools.globalConfig.affectedProjects,
-            slackTools::logAvoidedTask,
-            this,
-            sdkVersions::value
-          )
-        }
       }
     }
 
@@ -654,10 +649,14 @@ internal class StandardProjectConfigurations(
           val variantEnabled =
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.name)
-                ?: true
+                ?.contains(builder.name) ?: true
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.enableAndroidTest = variantEnabled
+        }
+
+        onVariants(selector().withBuildType("release")) { variant ->
+          // Metadata for coroutines not relevant to release builds
+          variant.packaging.resources.excludes.add("DebugProbesKt.bin")
         }
       }
       configure<BaseAppModuleExtension> {
@@ -667,14 +666,6 @@ internal class StandardProjectConfigurations(
           // TODO this won't work with SDK previews but will fix in a followup
           targetSdk = sdkVersions.value.targetSdk
         }
-        LintTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask,
-          this,
-          sdkVersions::value
-        )
         packaging {
           resources.excludes +=
             setOf(
@@ -687,8 +678,6 @@ internal class StandardProjectConfigurations(
               "META-INF/DEPENDENCIES",
               "**/*.pro",
               "**/*.proto",
-              // Metadata for coroutines not relevant to release builds
-              "DebugProbesKt.bin",
               // Weird bazel build metadata brought in by Tink
               "build-data.properties",
               "LICENSE_*",
@@ -715,13 +704,6 @@ internal class StandardProjectConfigurations(
           enableV3Signing = true
           enableV4Signing = true
         }
-        applicationVariants.configureEach {
-          // TODO make this configurable via properties
-          mergeAssetsProvider.configure {
-            // This task is too expensive to cache while we have embedded emoji fonts
-            outputs.cacheIf { false }
-          }
-        }
 
         PermissionChecks.configure(
           project = project,
@@ -731,8 +713,7 @@ internal class StandardProjectConfigurations(
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             description =
               "Checks merged manifest permissions against a known allowlist of permissions."
-            // TODO switch to setDisallowChanges once this uses a regular file
-            permissionAllowlistFile.set(file)
+            permissionAllowlistFile.setDisallowChanges(file)
             permissionAllowlist.setDisallowChanges(allowListProvider)
           }
         }
@@ -808,8 +789,7 @@ internal class StandardProjectConfigurations(
           val variantEnabled =
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.name)
-                ?: true
+                ?.contains(builder.name) ?: true
           builder.enableAndroidTest = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly
@@ -851,14 +831,6 @@ internal class StandardProjectConfigurations(
       configure<LibraryExtension> {
         slackExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
-        LintTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask,
-          this,
-          sdkVersions::value
-        )
         if (isLibraryWithVariants) {
           buildTypes {
             getByName("debug") {
@@ -942,6 +914,11 @@ internal class StandardProjectConfigurations(
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
             freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
+
+            // Set the module name to a dashified version of the project path to ensure uniqueness
+            // in created .kotlin_module files
+            val pathProvider = project.provider { project.path.replace(":", "-") }
+            moduleName.set(pathProvider)
           }
         }
       }
@@ -957,17 +934,6 @@ internal class StandardProjectConfigurations(
           slackTools.globalConfig.mergeDetektBaselinesTask,
         )
       }
-    }
-
-    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-      LintTasks.configureSubProject(
-        project,
-        slackProperties,
-        slackTools.globalConfig.affectedProjects,
-        slackTools::logAvoidedTask,
-        null,
-        null
-      )
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.android") {

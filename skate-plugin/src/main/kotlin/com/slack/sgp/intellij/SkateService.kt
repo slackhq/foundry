@@ -34,7 +34,6 @@ interface SkateProjectService {
  * New UI of the Skate Plugin
  */
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
-
   override fun showWhatsNewWindow() {
 
     val settings = project.service<SkatePluginSettings>()
@@ -50,17 +49,14 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     // Changelog is parsed
     val parsedChangelog = ChangelogParser.readFile(changeLogString, changelogJournal.lastReadDate)
     if (parsedChangelog.changeLogString.isNullOrBlank()) return
-
     // Creating the tool window
     val toolWindowManager = ToolWindowManager.getInstance(project)
-
     toolWindowManager.invokeLater {
       val toolWindow =
-        toolWindowManager.registerToolWindow("skate-whats-new") {
+        toolWindowManager.registerToolWindow(WHATS_NEW_PANEL_ID) {
           stripeTitle = Supplier { "What's New in Slack!" }
           anchor = ToolWindowAnchor.RIGHT
         }
-
       // The Disposable is necessary to prevent a substantial memory leak while working with
       // MarkdownJCEFHtmlPanel
       val parentDisposable = Disposer.newDisposable()
@@ -70,5 +66,9 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
 
       toolWindow.show()
     }
+  }
+
+  companion object {
+    const val WHATS_NEW_PANEL_ID = "skate-whats-new"
   }
 }

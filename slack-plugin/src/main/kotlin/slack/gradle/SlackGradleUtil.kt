@@ -15,6 +15,10 @@
  */
 package slack.gradle
 
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.google.common.base.CaseFormat
 import java.io.File
 import java.util.Locale
@@ -27,6 +31,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import slack.gradle.agp.VersionNumber
 import slack.gradle.dependencies.DependencyDef
 import slack.gradle.dependencies.DependencyGroup
@@ -184,6 +189,20 @@ internal fun Project.getVersionsCatalogOrNull(name: String = "libs"): VersionCat
     null
   }
 }
+
+internal val Project.androidExtension: AndroidComponentsExtension<*, *, *>
+  get() =
+    androidExtensionNullable
+      ?: throw IllegalArgumentException("Failed to find any registered Android extension")
+
+internal val Project.androidExtensionNullable: AndroidComponentsExtension<*, *, *>?
+  get() =
+    extensions.findByType<LibraryAndroidComponentsExtension>()
+      ?: extensions.findByType<ApplicationAndroidComponentsExtension>()
+      ?: extensions.findByType<TestAndroidComponentsExtension>()
+
+internal val Project.multiplatformExtension
+  get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
 
 /** Returns a map of module identifiers to toml library reference aliases */
 internal fun VersionCatalog.identifierMap(): Map<String, String> {

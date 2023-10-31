@@ -15,9 +15,6 @@
  */
 package slack.gradle
 
-import com.android.build.gradle.internal.SdkLocator
-import com.android.builder.errors.EvalIssueException
-import com.android.builder.errors.IssueReporter
 import java.io.File
 import kotlin.system.measureTimeMillis
 import org.gradle.api.Project
@@ -37,7 +34,11 @@ internal object AndroidSourcesConfigurer {
   internal const val MARKER_FILE_NAME = "slack_patched_marker"
 
   fun patchSdkSources(requestedSdkVersion: Int, rootProject: Project, latest: Int) {
-    val sdkDir = inferAndroidHome(rootProject.projectDir)
+    val sdkDir =
+      rootProject
+        .slackTools()
+        .agpHandler
+        .getAndroidSdkDirectory(rootProject.projectDir, rootProject.providers)
     patchSdkSources(requestedSdkVersion, sdkDir, rootProject.logger, latest)
   }
 
@@ -112,17 +113,5 @@ internal object AndroidSourcesConfigurer {
           }
       }
     }
-  }
-
-  private fun inferAndroidHome(projectRootDir: File): File {
-    return SdkLocator.getSdkDirectory(projectRootDir, NoOpReporter)
-  }
-}
-
-private object NoOpReporter : IssueReporter() {
-  override fun hasIssue(type: Type) = false
-
-  override fun reportIssue(type: Type, severity: Severity, exception: EvalIssueException) {
-    // No-op
   }
 }

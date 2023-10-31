@@ -52,8 +52,14 @@ public class SlackProperties private constructor(private val project: Project) {
   private fun stringProperty(key: String, defaultValue: String): String =
     optionalStringProperty(key, defaultValue)!!
 
-  private fun optionalStringProperty(key: String, defaultValue: String? = null): String? =
-    project.optionalStringProperty(key, defaultValue = defaultValue)
+  private fun optionalStringProperty(
+    key: String,
+    defaultValue: String? = null,
+    blankIsNull: Boolean = false
+  ): String? =
+    project.optionalStringProperty(key, defaultValue = defaultValue)?.takeUnless {
+      blankIsNull && it.isBlank()
+    }
 
   internal val versions: SlackVersions by lazy {
     project.rootProject.getOrCreateExtra("slack-versions") {
@@ -77,9 +83,13 @@ public class SlackProperties private constructor(private val project: Project) {
   public val skipAndroidxCheck: Boolean
     get() = booleanProperty("slack.gradle.skipAndroidXCheck")
 
-  /** Default version code used for APK outputs. */
-  public val defaultVersionCode: Int
-    get() = intProperty("slack.gradle.defaultVersionCode", 90009999)
+  /** Version code used for debug APK outputs. */
+  public val debugVersionCode: Int
+    get() = intProperty("slack.gradle.debugVersionCode", 90009999)
+
+  /** User string used for debug APK outputs. */
+  public val debugUserString: String
+    get() = stringProperty("slack.gradle.debugUserString", "debug")
 
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
@@ -90,8 +100,8 @@ public class SlackProperties private constructor(private val project: Project) {
     get() = booleanProperty("slack.gradle.config.enableMavenLocal")
 
   /**
-   * Flag to indicate that that this project should have no api dependencies, such as if it's solely
-   * an annotation processor.
+   * Flag to indicate that this project should have no api dependencies, such as if it's solely an
+   * annotation processor.
    */
   public val rakeNoApi: Boolean
     get() = booleanProperty("slack.gradle.config.rake.noapi")
@@ -260,13 +270,9 @@ public class SlackProperties private constructor(private val project: Project) {
   public val lintErrorsOnly: Boolean
     get() = booleanProperty("slack.lint.errors-only")
 
-  /** Flag to indicate that we're currently running a baseline update. */
-  public val lintUpdateBaselines: Boolean
-    get() = booleanProperty("slack.lint.update-baselines")
-
   /** File name to use for a project's lint baseline. */
-  public val lintBaselineFileName: String
-    get() = stringProperty("slack.lint.baseline-file-name", "lint-baseline.xml")
+  public val lintBaselineFileName: String?
+    get() = optionalStringProperty("slack.lint.baseline-file-name", blankIsNull = true)
 
   /** Flag to control whether or not lint checks test sources. */
   public val lintCheckTestSources: Boolean
@@ -275,6 +281,13 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Flag to control whether or not lint checks ignores test sources. */
   public val lintIgnoreTestSources: Boolean
     get() = booleanProperty("sgp.lint.ignoreTestSources", false)
+
+  /**
+   * Flag to indicate whether this project is a test library (such as test utils, test fixtures,
+   * etc).
+   */
+  public val isTestLibrary: Boolean
+    get() = booleanProperty("sgp.isTestLibrary", false) || project.name == "test-fixtures"
 
   /**
    * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
@@ -480,9 +493,9 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Detekt config files, evaluated from rootProject.file(...). */
   public val detektConfigs: List<String>?
     get() = optionalStringProperty("slack.detekt.configs")?.split(",")
-  /** Detekt baseline file, evaluated from rootProject.file(...). */
+  /** Detekt baseline file, evaluated from rootProject.layout.projectDirectory.file(...). */
   public val detektBaseline: String?
-    get() = optionalStringProperty("slack.detekt.baseline")
+    get() = optionalStringProperty("slack.detekt.baseline", blankIsNull = true)
   /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
   public val enableFullDetekt: Boolean
     get() = booleanProperty("slack.detekt.full")

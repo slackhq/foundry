@@ -52,32 +52,47 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val versionMinor = project.localGradleProperty("versionMinor")
       val versionPatch = project.localGradleProperty("versionPatch")
 
-      val user =
-        project.ciBuildNumber
-          .map { "" }
-          // Only provider the user if this is _not_ running on jenkins. Composition of properties
-          // is still a little weird in Gradle.
-          .orElse(project.providers.environmentVariable("USER"))
+      val slackProperties = SlackProperties(project)
 
-      val versionNameProvider =
-        versionMajor
-          .zip(versionMinor) { major, minor -> "$major.$minor" }
-          .zip(versionPatch) { prev, patch -> "$prev.$patch" }
-          .zip(user) { prev, possibleUser ->
-            val addOn =
-              possibleUser.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: ""
-            "$prev$addOn"
-          }
+      val debugVersionNameProvider =
+        versionNameProvider(
+          versionMajor,
+          versionMinor,
+          versionPatch,
+          user = project.provider { slackProperties.debugUserString },
+        )
+
+      val defaultVersionNameProvider =
+        versionNameProvider(
+          versionMajor,
+          versionMinor,
+          versionPatch,
+          user =
+            project.ciBuildNumber
+              .map { "" }
+              // Only provider the user if this is _not_ running on CI. Composition of properties
+              // is still a little weird in Gradle.
+              .orElse(project.providers.environmentVariable("USER"))
+        )
+
+      val debugVersionCodeProvider: Provider<Int> =
+        project.provider { SlackProperties(project).debugVersionCode }
 
       val ciVersionFileProvider =
         project.rootProject.layout.projectDirectory.file("ci/release.version")
       val ciContent = project.providers.fileContents(ciVersionFileProvider)
-      val versionCodeProvider: Provider<Int> =
+      val defaultVersionCodeProvider: Provider<Int> =
         project.ciBuildNumber
           .flatMap { ciContent.asText.map { it.toInt() } }
-          .orElse(SlackProperties(project).defaultVersionCode)
+          .orElse(debugVersionCodeProvider)
 
-      configureVariants(project, versionNameProvider, versionCodeProvider)
+      configureVariants(
+        project,
+        debugVersionNameProvider,
+        debugVersionCodeProvider,
+        defaultVersionNameProvider,
+        defaultVersionCodeProvider,
+      )
 
       // Register a version properties task. This is run on ci via android_preflight.sh
       val shortGitShaProvider = project.gitSha
@@ -86,8 +101,8 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         outputFile.setDisallowChanges(
           project.layout.buildDirectory.file("intermediates/versioning/version.properties")
         )
-        versionCode.setDisallowChanges(versionCodeProvider)
-        versionName.setDisallowChanges(versionNameProvider)
+        versionCode.setDisallowChanges(defaultVersionCodeProvider)
+        versionName.setDisallowChanges(defaultVersionNameProvider)
         shortGitSha.setDisallowChanges(shortGitShaProvider)
         longGitSha.setDisallowChanges(longGitShaProvider)
         this.versionMajor.setDisallowChanges(versionMajor)
@@ -98,14 +113,28 @@ internal class ApkVersioningPlugin : Plugin<Project> {
 
   private fun configureVariants(
     project: Project,
-    versionNameProvider: Provider<String>,
-    versionCodeProvider: Provider<Int>
+    debugVersionNameProvider: Provider<String>,
+    debugVersionCodeProvider: Provider<Int>,
+    defaultVersionNameProvider: Provider<String>,
+    defaultVersionCodeProvider: Provider<Int>,
   ) {
     // Register version calculations for variants
     project.configure<ApplicationAndroidComponentsExtension> {
       onVariants { variant ->
         val flavorName = variant.flavorName
 
+        val versionCodeProvider =
+          if (variant.buildType == "debug") {
+            debugVersionCodeProvider
+          } else {
+            defaultVersionCodeProvider
+          }
+        val versionNameProvider =
+          if (variant.buildType == "debug") {
+            debugVersionNameProvider
+          } else {
+            defaultVersionNameProvider
+          }
         val mappedVersionNameProvider =
           if (flavorName != "external") {
             // Replacement for versionNameSuffix, which this overrides
@@ -121,6 +150,22 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         }
       }
     }
+  }
+
+  private fun versionNameProvider(
+    versionMajor: Provider<String>,
+    versionMinor: Provider<String>,
+    versionPatch: Provider<String>,
+    user: Provider<String>,
+  ): Provider<String> {
+    return versionMajor
+      .zip(versionMinor) { major, minor -> "$major.$minor" }
+      .zip(versionPatch) { prev, patch -> "$prev.$patch" }
+      .zip(user) { prev, possibleUser ->
+        val addOn =
+          possibleUser.takeIf { it.isNotEmpty() }?.let { presentUser -> "-$presentUser" } ?: ""
+        "$prev$addOn"
+      }
   }
 }
 
