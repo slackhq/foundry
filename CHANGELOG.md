@@ -6,7 +6,7 @@ Changelog
 
 _2023-11-02_
 
-- Support Robolectric 4.11 jars for Android API 30.
+- Support Robolectric 4.11 jars for Android API 34.
 
 0.11.2
 ------
