@@ -18,15 +18,12 @@ package slack.gradle
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.toolchain.JvmVendorSpec
-import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
-import slack.gradle.util.setDisallowChanges
 
 /** Registry of global configuration info. */
 public class GlobalConfig
 private constructor(
   internal val updateRobolectricJarsTask: TaskProvider<UpdateRobolectricJarsTask>?,
-  internal val mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
   internal val kotlinDaemonArgs: List<String>,
   internal val errorProneCheckNamesAsErrors: List<String>,
   internal val affectedProjects: Set<String>?,
@@ -39,21 +36,8 @@ private constructor(
       val globalSlackProperties = SlackProperties(project)
       val robolectricJarsDownloadTask =
         project.createRobolectricJarsDownloadTask(globalSlackProperties)
-      val mergeDetektBaselinesTask =
-        if (
-          project.gradle.startParameter.taskNames.any { it == MergeDetektBaselinesTask.TASK_NAME }
-        ) {
-          project.tasks.register<MergeDetektBaselinesTask>(MergeDetektBaselinesTask.TASK_NAME) {
-            outputFile.setDisallowChanges(
-              project.layout.projectDirectory.file("config/detekt/baseline.xml")
-            )
-          }
-        } else {
-          null
-        }
       return GlobalConfig(
         updateRobolectricJarsTask = robolectricJarsDownloadTask,
-        mergeDetektBaselinesTask = mergeDetektBaselinesTask,
         kotlinDaemonArgs = globalSlackProperties.kotlinDaemonArgs.split(" "),
         errorProneCheckNamesAsErrors =
           globalSlackProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty(),
