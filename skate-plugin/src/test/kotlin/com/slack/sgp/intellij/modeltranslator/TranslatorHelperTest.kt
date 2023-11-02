@@ -16,10 +16,9 @@
 package com.slack.sgp.intellij.modeltranslator
 
 import com.google.common.truth.Truth.assertThat
-import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
-import com.slack.sgp.intellij.SkatePluginSettings
 import com.slack.sgp.intellij.modeltranslator.helper.TranslatorHelper
+import com.slack.sgp.intellij.util.settings
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
@@ -33,7 +32,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
   }
 
   fun testGenerateBody_String_Enum() {
-    val settings = skatePluginSettings()
+    val settings = project.settings()
     settings.translatorEnumIdentifier = "getSerializedName()"
     myFixture.configureByFiles("StatusStringTranslator.kt", "Call.kt")
 
@@ -156,6 +155,4 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
   private fun generateBody(): KtBlockExpression? {
     return TranslatorHelper.generateBody(TranslatorHelper.extractBundle(getNamedFunction())!!)
   }
-
-  private fun skatePluginSettings() = project.service<SkatePluginSettings>()
 }

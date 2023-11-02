@@ -18,12 +18,11 @@ package com.slack.sgp.intellij.modeltranslator
 import com.google.common.truth.Truth.assertThat
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import com.slack.sgp.intellij.DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
 import com.slack.sgp.intellij.DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
 import com.slack.sgp.intellij.SkateBundle
-import com.slack.sgp.intellij.SkatePluginSettings
+import com.slack.sgp.intellij.util.settings
 
 class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
 
@@ -37,7 +36,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     super.setUp()
 
     // Reset relevant settings.
-    val settings = skatePluginSettings()
+    val settings = project.settings()
     settings.translatorSourceModelsPackageName = DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
     settings.translatorFileNameSuffix = DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
   }
@@ -91,7 +90,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
   }
 
   fun testAnnotator_AlternativeFileNameSuffix() {
-    val settings = skatePluginSettings()
+    val settings = project.settings()
     settings.translatorFileNameSuffix = "Extensions.kt"
 
     myFixture.configureByFiles("CallExtensions.kt", "Call.kt")
@@ -119,7 +118,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
   }
 
   fun testAnnotator_AlternativeSourcePackageName() {
-    val settings = skatePluginSettings()
+    val settings = project.settings()
     settings.translatorSourceModelsPackageName = "slack.api"
 
     myFixture.configureByFiles("CallObjectsTranslator.kt", "Call.kt")
@@ -166,6 +165,4 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNotNull()
     assertThat(translatorWarning!!.description).isEqualTo(warningDescription)
   }
-
-  private fun skatePluginSettings() = project.service<SkatePluginSettings>()
 }
