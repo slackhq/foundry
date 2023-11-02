@@ -25,6 +25,7 @@ import org.jetbrains.annotations.VisibleForTesting
 @VisibleForTesting
 internal const val DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME = "slack.api.schemas"
 @VisibleForTesting internal const val DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX = "Translator.kt"
+@VisibleForTesting internal const val DEFAULT_TRANSLATOR_ENUM_IDENTIFIER = "name"
 internal const val DEFAULT_PROJECT_GEN_CLI_COMMAND = "./slackw generate-project"
 
 /** Manages user-specific settings for the Skate plugin */
@@ -54,6 +55,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     get() = state.translatorFileNameSuffix ?: DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
     set(value) {
       state.translatorFileNameSuffix = value
+    }
+
+  var translatorEnumIdentifier: String
+    get() = state.translatorEnumIdentifier ?: DEFAULT_TRANSLATOR_ENUM_IDENTIFIER
+    set(value) {
+      state.translatorEnumIdentifier = value
     }
 
   var isProjectGenMenuActionEnabled: Boolean
@@ -115,6 +122,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var isWhatsNewEnabled by property(true)
     var translatorSourceModelsPackageName by string()
     var translatorFileNameSuffix by string()
+    var translatorEnumIdentifier by string()
     var isProjectGenMenuActionEnabled by property(true)
     var projectGenCliCommand by string()
     var isLinkifiedFeatureFlagsEnabled by property(false)

@@ -50,6 +50,14 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  fun testAnnotator_StringSource_EnumDestination() {
+    myFixture.configureByFiles("StatusStringTranslator.kt", "Call.kt")
+
+    val translatorWarning =
+      myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
+    assertTranslatorWarning(translatorWarning)
+  }
+
   fun testAnnotator_NestedSource() {
     myFixture.configureByFiles("ActionTranslator.kt", "Call.kt")
 
@@ -140,6 +148,14 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
 
   fun testAnnotator_HasReturnExpression() {
     myFixture.configureByFiles("NullableCallTranslator.kt", "Call.kt")
+
+    val translatorWarning =
+      myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
+    assertThat(translatorWarning).isNull()
+  }
+
+  fun testAnnotator_StringSource_NonEnumDestination() {
+    myFixture.configureByFiles("TranscriptionStringTranslator.kt", "Call.kt")
 
     val translatorWarning =
       myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
