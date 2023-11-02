@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij.modeltranslator.helper
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
@@ -69,13 +70,16 @@ object TranslatorHelper {
       val importDirectives = element.containingKtFile.importDirectives
       val sourceModelImport = importDirectives.findImport(sourceModelTopMostParent, sourceModel)
 
+      var isSourceModelString = false
+
       // If the import, or the fully qualified name, for the source model doesn't start with the
       // right package name,
       // then no need to process this function.
+      // The exception is if the source model is a String and the destination is an enum.
       if (
         !(sourceModelImport?.importedFqName?.asString() ?: sourceModel).startsWith(
           settings.translatorSourceModelsPackageName
-        )
+        ) && (sourceModel != String::class.simpleName).also { isSourceModelString = !it }
       )
         return null
 
@@ -92,6 +96,15 @@ object TranslatorHelper {
       // process it.
       val destinationModelRef = element.getReturnTypeReference()
       val destinationModel = destinationModelRef?.text ?: return null
+
+      // If the source model is a String and the destination isn't an enum,
+      // then no need to process this function.
+      if (isSourceModelString) {
+        val destinationModelClass = getModelClass(importDirectives, destinationModel, element)
+        if (destinationModelClass == null || !destinationModelClass.isEnum) {
+          return null
+        }
+      }
 
       return TranslatorBundle(
         sourceModel,
@@ -117,27 +130,14 @@ object TranslatorHelper {
   fun generateBody(bundle: TranslatorBundle): KtBlockExpression? {
     val (sourceModel, destinationModel, element, importDirectives) = bundle
 
-    val destinationModelTopMostParent = getTopMostParent(destinationModel)
-
-    val destinationModelImport =
-      importDirectives.findImport(destinationModelTopMostParent, destinationModel)
-    val destinationModelFqImport =
-      destinationModelImport?.importedFqName?.asString() ?: destinationModel
-    val destinationModelFqName =
-      if (destinationModelTopMostParent != null)
-        "$destinationModelFqImport.${element.getReturnTypeReference()?.nameForReceiverLabel()}"
-      else destinationModelFqImport
-
-    val project = element.project
-    val modelClass =
-      JavaPsiFacade.getInstance(project)
-        .findClass(destinationModelFqName, GlobalSearchScope.projectScope(project))
+    val modelClass = getModelClass(importDirectives, destinationModel, element)
     if (modelClass != null) {
+      val project = element.project
       val bodyBlock =
         KtPsiFactory(project)
           .createBlock(
             if (modelClass.isEnum) {
-              generateEnumBody(modelClass, sourceModel, destinationModel)
+              generateEnumBody(modelClass, sourceModel, destinationModel, project)
             } else {
               generateClassBody(modelClass, destinationModel)
             }
@@ -145,6 +145,26 @@ object TranslatorHelper {
       return bodyBlock
     }
     return null
+  }
+
+  private fun getModelClass(
+    importDirectives: List<KtImportDirective>,
+    destinationModel: String,
+    element: KtNamedFunction
+  ): PsiClass? {
+    val destinationModelTopMostParent = getTopMostParent(destinationModel)
+    val destinationModelImport =
+      importDirectives.findImport(destinationModelTopMostParent, destinationModel)
+    val destinationModelFqImport =
+      destinationModelImport?.importedFqName?.asString() ?: destinationModel
+    val destinationModelFqName =
+      if (destinationModelTopMostParent != null)
+        "$destinationModelFqImport${destinationModel.removePrefix(destinationModelTopMostParent)}"
+      else destinationModelFqImport
+
+    val project = element.project
+    return JavaPsiFacade.getInstance(project)
+      .findClass(destinationModelFqName, GlobalSearchScope.projectScope(project))
   }
 
   private fun List<KtImportDirective>.findImport(
@@ -160,15 +180,45 @@ object TranslatorHelper {
   private fun generateEnumBody(
     modelClass: PsiClass,
     sourceModel: String,
-    destinationModel: String
+    destinationModel: String,
+    project: Project
   ): String {
     val lineSeparator = System.lineSeparator()
     val whenBlock =
-      modelClass.fields.reversed().joinToString(lineSeparator) {
-        if (it.name != UNKNOWN_ENUM_VALUE) "$sourceModel.${it.name} -> $destinationModel.${it.name}"
-        else "else -> $destinationModel.${it.name}"
-      }
+      if (sourceModel == String::class.simpleName)
+        generateStringToEnumTranslatorBody(modelClass, lineSeparator, destinationModel, project)
+      else
+        generateEnumToEnumTranslatorBody(modelClass, lineSeparator, sourceModel, destinationModel)
     return "return when(this) {$lineSeparator$whenBlock$lineSeparator}"
+  }
+
+  private fun generateEnumToEnumTranslatorBody(
+    modelClass: PsiClass,
+    lineSeparator: String,
+    sourceModel: String,
+    destinationModel: String
+  ): String {
+    return modelClass.fields.reversed().joinToString(lineSeparator) {
+      if (it.name != UNKNOWN_ENUM_VALUE) "$sourceModel.${it.name} -> $destinationModel.${it.name}"
+      else "else -> $destinationModel.${it.name}"
+    }
+  }
+
+  private fun generateStringToEnumTranslatorBody(
+    modelClass: PsiClass,
+    lineSeparator: String,
+    destinationModel: String,
+    project: Project
+  ): String {
+
+    val settings = project.service<SkatePluginSettings>()
+    val enumIdentifier = settings.translatorEnumIdentifier
+
+    return modelClass.fields.reversed().joinToString(lineSeparator) {
+      if (it.name != UNKNOWN_ENUM_VALUE)
+        "$destinationModel.${it.name}.$enumIdentifier -> $destinationModel.${it.name}"
+      else "else -> $destinationModel.${it.name}"
+    }
   }
 
   private fun generateClassBody(modelClass: PsiClass, destinationModel: String): String {

@@ -18,6 +18,7 @@ package com.slack.sgp.intellij.modeltranslator
 import com.google.common.truth.Truth.assertThat
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import com.slack.sgp.intellij.modeltranslator.helper.TranslatorHelper
+import com.slack.sgp.intellij.util.settings
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
@@ -28,6 +29,30 @@ private const val ASSIGNMENTS =
 class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
   override fun getTestDataPath(): String {
     return "src/test/testData"
+  }
+
+  fun testGenerateBody_String_Enum() {
+    val settings = project.settings()
+    settings.translatorEnumIdentifier = "getSerializedName()"
+    myFixture.configureByFiles("StatusStringTranslator.kt", "Call.kt")
+
+    val body = generateBody()
+
+    assertThat(body).isNotNull()
+    assertThat(body!!.text)
+      .isEqualTo(
+        """
+        {
+        return when(this) {
+        Call.Transcription.Status.PROCESSING.getSerializedName() -> Call.Transcription.Status.PROCESSING
+        Call.Transcription.Status.FAILED.getSerializedName() -> Call.Transcription.Status.FAILED
+        Call.Transcription.Status.COMPLETE.getSerializedName() -> Call.Transcription.Status.COMPLETE
+        else -> Call.Transcription.Status.UNKNOWN
+        }
+        }
+        """
+          .trimIndent()
+      )
   }
 
   fun testGenerateBody_Enum() {

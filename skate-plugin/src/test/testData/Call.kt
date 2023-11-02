@@ -60,4 +60,16 @@ data class Call(
     @Json(name = "missed") MISSED,
     @Json(name = "declined") DECLINED
   }
+
+  @JsonClass(generateAdapter = true)
+  data class Transcription(val status: Status?, val lines: List<String>? = emptyList()) {
+    @JsonClass(generateAdapter = false)
+    enum class Status {
+      // Indicates a missing or unrecognized value
+      UNKNOWN,
+      @Json(name = "complete") COMPLETE,
+      @Json(name = "failed") FAILED,
+      @Json(name = "processing") PROCESSING
+    }
+  }
 }
