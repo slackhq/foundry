@@ -79,7 +79,7 @@ object TranslatorHelper {
       if (
         !(sourceModelImport?.importedFqName?.asString() ?: sourceModel).startsWith(
           settings.translatorSourceModelsPackageName
-        ) && !(sourceModel == String::class.simpleName).also { isSourceModelString = it }
+        ) && (sourceModel != String::class.simpleName).also { isSourceModelString = !it }
       )
         return null
 
