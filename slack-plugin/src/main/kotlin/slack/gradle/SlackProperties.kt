@@ -493,9 +493,9 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Detekt config files, evaluated from rootProject.file(...). */
   public val detektConfigs: List<String>?
     get() = optionalStringProperty("slack.detekt.configs")?.split(",")
-  /** Detekt baseline file, evaluated from rootProject.layout.projectDirectory.file(...). */
-  public val detektBaseline: String?
-    get() = optionalStringProperty("slack.detekt.baseline", blankIsNull = true)
+  /** Detekt baseline file, evaluated from project.layout.projectDirectory.file(...). */
+  public val detektBaselineFileName: String?
+    get() = optionalStringProperty("slack.detekt.baselineFileName", blankIsNull = true)
   /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
   public val enableFullDetekt: Boolean
     get() = booleanProperty("slack.detekt.full")
