@@ -931,6 +931,7 @@ internal class StandardProjectConfigurations(
           slackProperties,
           slackTools.globalConfig.affectedProjects,
           actualJvmTarget,
+          slackTools.globalConfig.mergeDetektBaselinesTask,
         )
       }
     }

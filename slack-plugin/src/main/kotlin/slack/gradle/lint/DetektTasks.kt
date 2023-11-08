@@ -22,6 +22,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.configure
@@ -29,6 +30,7 @@ import slack.gradle.configureEach
 import slack.gradle.isRootProject
 import slack.gradle.register
 import slack.gradle.tasks.DetektDownloadTask
+import slack.gradle.tasks.detektbaseline.MergeDetektBaselinesTask
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.sneakyNull
 
@@ -59,6 +61,7 @@ internal object DetektTasks {
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     jvmTarget: String,
+    mergeDetektBaselinesTask: TaskProvider<MergeDetektBaselinesTask>?,
   ) {
     check(!project.isRootProject) {
       "This method should only be called for subprojects, not the root project."
@@ -80,8 +83,16 @@ internal object DetektTasks {
           }
         }
 
-        slackProperties.detektBaselineFileName?.let { baselineFile ->
-          baseline = project.layout.projectDirectory.file(baselineFile).asFile
+        slackProperties.detektBaseline?.let { baselineFile ->
+          baseline =
+            if (mergeDetektBaselinesTask != null) {
+              project.tasks.configureEach<DetektCreateBaselineTask> {
+                mergeDetektBaselinesTask.configure { baselineFiles.from(baseline) }
+              }
+              project.layout.buildDirectory.file("intermediates/detekt/baseline.xml").get().asFile
+            } else {
+              project.rootProject.layout.projectDirectory.file(baselineFile).asFile
+            }
         }
       }
 
