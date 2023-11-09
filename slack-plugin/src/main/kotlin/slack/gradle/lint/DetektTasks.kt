@@ -80,9 +80,13 @@ internal object DetektTasks {
           }
         }
 
-        slackProperties.detektBaselineFileName?.let { baselineFile ->
-          baseline = project.layout.projectDirectory.file(baselineFile).asFile
-        }
+        // Note we need to _explicitly_ null this out if it's not present, as otherwise detekt will
+        // default to using the project's "detekt-baseline.xml" file if available, which we don't
+        // want.
+        baseline =
+          slackProperties.detektBaselineFileName?.let { baselineFile ->
+            project.layout.projectDirectory.file(baselineFile).asFile
+          }
       }
 
       val globalTask =
