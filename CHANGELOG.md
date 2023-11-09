@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.11.6
+------
+
+_2023-11-09_
+
+- Explicitly set `Detekt.baseline` to null if we don't specify one, as we don't want it to fall back to its default location.
+
 0.11.5
 ------
 
