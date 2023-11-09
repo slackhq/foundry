@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.11.4
+------
+
+_2023-11-08_
+
+- Detekt baselines are now generated into their corresponding projects. This matches how we handle lint baselines, and global baselines are no longer supported.
+- You do now need to specify a `slack.detekt.baseline-file-name` property to indicate what the simple file name should be. This is evaluated against `project.layout.projectDirectory.file(...)`. This replaces the previous `slack.detekt.baseline` property.
+- Build against Kotlin `1.9.20`.
+- Build against AGP `8.1.3`.
+- Build against Compose Multiplatform `1.5.10`.
+
 0.11.3
 ------
 
