@@ -11,6 +11,6 @@ dependencies {
 
   implementation(libs.autoService.annotations)
 
-  compileOnly("com.android.tools.build:gradle:8.3.0-alpha08")
+  compileOnly("com.android.tools.build:gradle:8.3.0-alpha13")
   compileOnly(gradleApi())
 }
