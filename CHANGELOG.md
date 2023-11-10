@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.11.7
+------
+
+_2023-11-10_
+
+- Make AGP version resolution lazy in AgpHandlers.
+
 0.11.6
 ------
 
