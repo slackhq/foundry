@@ -44,8 +44,7 @@ public class AgpHandler83 private constructor(override val agpVersion: AndroidPl
         )
         .alpha(13)
 
-    override val currentVersion: AndroidPluginVersion
-      get() = AndroidPluginVersion.getCurrent()
+    override val currentVersion: AndroidPluginVersion by lazy { AndroidPluginVersion.getCurrent() }
 
     override fun create(): AgpHandler = AgpHandler83(currentVersion)
   }

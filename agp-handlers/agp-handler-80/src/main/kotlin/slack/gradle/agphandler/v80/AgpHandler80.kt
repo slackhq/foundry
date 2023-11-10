@@ -36,8 +36,9 @@ public class AgpHandler80 private constructor(override val agpVersion: AndroidPl
     // TODO Remove once it's public
     //  https://issuetracker.google.com/issues/297440098
     @Suppress("invisible_reference", "invisible_member")
-    override val currentVersion: AndroidPluginVersion =
+    override val currentVersion: AndroidPluginVersion by lazy {
       com.android.build.api.extension.impl.CURRENT_AGP_VERSION
+    }
 
     override fun create(): AgpHandler = AgpHandler80(currentVersion)
   }
