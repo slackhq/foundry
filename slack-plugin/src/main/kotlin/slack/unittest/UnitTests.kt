@@ -170,7 +170,7 @@ internal object UnitTests {
        */
 
       // helps when tests leak memory
-      @Suppress("DEPRECATION") setForkEvery(slackProperties.unitTestForkEvery as Long?)
+      setForkEvery(slackProperties.unitTestForkEvery)
 
       // Cap JVM args per test
       minHeapSize = "128m"
