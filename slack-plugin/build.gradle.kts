@@ -78,6 +78,9 @@ dependencies {
   implementation(libs.jna)
   implementation(libs.jna.platform)
   implementation(libs.kotlinCliUtil)
+  implementation(libs.lint)
+  implementation(libs.lint.api)
+  implementation(libs.lint.checks)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
@@ -113,6 +116,8 @@ dependencies {
 
   testImplementation(libs.agp)
   testImplementation(libs.junit)
+  testImplementation(libs.lint.testUtils)
+  testImplementation(libs.lint.tests)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)
 }
