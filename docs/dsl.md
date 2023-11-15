@@ -25,6 +25,12 @@ slack {
 
 ## Features
 
+### Circuit
+
+The Circuit feature automatically sets up [Circuit](https://github.com/slackhq/circuit) in the project. This includes
+controls for different Circuit artifacts and code gen. The default `circuit()` call will just enable Circuit's
+runtime + code gen.
+
 ### Dagger
 
 The Dagger feature automatically sets up both Dagger and Anvil. This includes optional parameters to control whether or

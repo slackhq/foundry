@@ -230,6 +230,12 @@ constructor(
         }
       }
 
+      if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
+        markKspNeeded("Circuit")
+        dependencies.add(aptConfiguration(), "com.slack.circuit:circuit-codegen")
+        dependencies.add("compileOnly", "com.slack.circuit:circuit-codegen-annotations")
+      }
+
       if (featuresHandler.autoValue.getOrElse(false)) {
         markKaptNeeded("AutoValue")
         dependencies.add("compileOnly", SlackDependencies.Auto.Value.annotations)
@@ -351,6 +357,9 @@ constructor(
   // Dagger features
   internal val daggerHandler = objects.newInstance<DaggerHandler>()
 
+  // Circuit features
+  internal val circuitHandler = objects.newInstance<CircuitHandler>()
+
   /** Enables AutoService on this project. */
   internal abstract val autoService: Property<Boolean>
 
@@ -383,6 +392,32 @@ constructor(
 
   internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
+  }
+
+  /**
+   * Configures Circuit on this project.
+   *
+   * @param codegen configures code gen on this project, including KSP setup and annotations. True
+   *   by default.
+   * @param runtime configures the circuit-runtime dependencies, including screen/ui/presenter. True
+   *   by default.
+   * @param commonBundle configures the project-common dependencies, defined by the circuit-common
+   *   bundle ID in `libs.versions.toml`. True by default.
+   * @param foundation configures the circuit-foundation dependency, false by default.
+   * @param action optional configuration block for further Circuit config, such as CircuitX.
+   */
+  public fun circuit(
+    codegen: Boolean = true,
+    runtime: Boolean = true,
+    commonBundle: Boolean = true,
+    foundation: Boolean = false,
+    action: Action<CircuitHandler> = Action {},
+  ) {
+    circuitHandler.codegen.set(codegen)
+    circuitHandler.runtime.set(runtime)
+    circuitHandler.commonBundle.set(commonBundle)
+    circuitHandler.foundation.set(foundation)
+    action.execute(circuitHandler)
   }
 
   /**
@@ -517,11 +552,11 @@ constructor(
 
   internal fun applyTo(project: Project) {
     composeHandler.applyTo(project, slackProperties)
+    circuitHandler.applyTo(project, slackProperties)
   }
 }
 
 @SlackExtensionMarker
-@Suppress("UnnecessaryAbstractClass")
 public abstract class MoshiHandler {
   internal abstract val moshi: Property<Boolean>
   internal abstract val moshiAdapters: Property<Boolean>
@@ -578,8 +613,70 @@ public abstract class MoshiHandler {
   }
 }
 
+/** DSL for configuring Circuit. */
 @SlackExtensionMarker
-@Suppress("UnnecessaryAbstractClass")
+public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory) {
+  /** Sets up circuit code gen, includes annotations and KSP setup. */
+  public val codegen: Property<Boolean> = objects.property<Boolean>().convention(false)
+  /** Includes the circuit-runtime dep (including screen, ui, presenter). */
+  public val runtime: Property<Boolean> = objects.property<Boolean>().convention(false)
+  /** Includes the circuit-foundation dep. */
+  public val foundation: Property<Boolean> = objects.property<Boolean>().convention(false)
+  /**
+   * When enabled, includes a common bundle as defined by the `circuit-common` bundle ID in
+   * `libs.versions.toml`.
+   */
+  public val commonBundle: Property<Boolean> = objects.property<Boolean>().convention(false)
+  public val circuitx: CircuitXHandler = objects.newInstance<CircuitXHandler>()
+
+  /** DSL entrypoint for CircuitX dependencies. */
+  public fun circuitx(action: Action<CircuitXHandler>) {
+    action.execute(circuitx)
+  }
+
+  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+    if (runtime.getOrElse(false)) {
+      project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime")
+      project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime-presenter")
+      project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime-ui")
+      project.dependencies.add("testImplementation", "com.slack.circuit:circuit-test")
+    }
+    if (foundation.getOrElse(false)) {
+      project.dependencies.add("implementation", "com.slack.circuit:circuit-foundation")
+    }
+    if (commonBundle.getOrElse(false)) {
+      slackProperties.versions.bundles.commonCircuit.ifPresent {
+        project.dependencies.add("implementation", it)
+      }
+    }
+
+    circuitx.applyTo(project)
+  }
+
+  @SlackExtensionMarker
+  public abstract class CircuitXHandler @Inject constructor(objects: ObjectFactory) {
+    /** Correpsonds to the circuitx-android artifact. */
+    public val android: Property<Boolean> = objects.property<Boolean>().convention(false)
+    /** Correpsonds to the circuitx-gesture-navigation artifact. */
+    public val gestureNav: Property<Boolean> = objects.property<Boolean>().convention(false)
+    /** Correpsonds to the circuitx-overlays artifact. */
+    public val overlays: Property<Boolean> = objects.property<Boolean>().convention(false)
+
+    internal fun applyTo(project: Project) {
+      if (android.getOrElse(false)) {
+        project.dependencies.add("implementation", "com.slack.circuit:circuitx-android")
+      }
+      if (gestureNav.getOrElse(false)) {
+        project.dependencies.add("implementation", "com.slack.circuit:circuitx-gesture-navigation")
+      }
+      if (overlays.getOrElse(false)) {
+        project.dependencies.add("implementation", "com.slack.circuit:circuitx-overlays")
+      }
+    }
+  }
+}
+
+@SlackExtensionMarker
 public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) {
   internal val enabled: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val useDaggerCompiler: Property<Boolean> = objects.property<Boolean>().convention(false)
@@ -661,7 +758,6 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
 }
 
 @SlackExtensionMarker
-@Suppress("UnnecessaryAbstractClass")
 public abstract class ComposeHandler
 @Inject
 constructor(
@@ -722,7 +818,6 @@ constructor(
 }
 
 @SlackExtensionMarker
-@Suppress("UnnecessaryAbstractClass")
 public abstract class AndroidHandler
 @Inject
 constructor(

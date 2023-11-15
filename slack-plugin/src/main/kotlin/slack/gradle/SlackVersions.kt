@@ -88,6 +88,9 @@ internal class SlackVersions(val catalog: VersionCatalog) {
     val commonTest: Optional<Provider<ExternalModuleDependencyBundle>> by lazy {
       catalog.findBundle("common-test")
     }
+    val commonCircuit: Optional<Provider<ExternalModuleDependencyBundle>> by lazy {
+      catalog.findBundle("common-circuit")
+    }
   }
 
   internal fun getValue(key: String): String {
