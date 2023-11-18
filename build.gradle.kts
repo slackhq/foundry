@@ -30,8 +30,8 @@ import org.jetbrains.intellij.tasks.BuildPluginTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_7
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 buildscript {
@@ -218,9 +218,9 @@ subprojects {
       compilerOptions {
         val kotlinVersion =
           if (isIntelliJPlugin) {
-            KOTLIN_1_6
+            KOTLIN_1_7
           } else {
-            KOTLIN_1_8
+            KOTLIN_1_9
           }
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
