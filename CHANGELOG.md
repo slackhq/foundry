@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.12.0
+------
+
+_2023-11-20_
+
+- **New**: Add a `SlackExtension.circuit()` DSL. This makes it easy to set up [Circuit](https://github.com/slackhq/circuit) in a project. See the DSL docs for more details.
+  ```kotlin
+  slack {
+    features {
+      circuit()
+    }
+  }
+  ```
+- Don't configure `KspTask` subtypes of `KotlinCompile` tasks.
+- Remove `autoValue()` APIs from `SlackExtension`.
+- Fix deprecated forkEvery call.
+
 0.11.7
 ------
 
