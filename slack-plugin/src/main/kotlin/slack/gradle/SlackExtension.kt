@@ -29,7 +29,6 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
@@ -86,7 +85,6 @@ constructor(
 
       var kaptRequired = false
       var naptRequired = false
-      val avMoshiEnabled = featuresHandler.avExtensionMoshi.getOrElse(false)
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
       val allowKsp = slackProperties.allowKsp
@@ -236,27 +234,6 @@ constructor(
         dependencies.add("compileOnly", "com.slack.circuit:circuit-codegen-annotations")
       }
 
-      if (featuresHandler.autoValue.getOrElse(false)) {
-        markKaptNeeded("AutoValue")
-        dependencies.add("compileOnly", SlackDependencies.Auto.Value.annotations)
-        dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.autovalue)
-        if (avMoshiEnabled) {
-          dependencies.add("implementation", SlackDependencies.Auto.Value.Moshi.runtime)
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.Moshi.extension)
-        }
-        if (featuresHandler.avExtensionParcel.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Auto.Value.Parcel.adapter)
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.Parcel.extension)
-        }
-        if (featuresHandler.avExtensionWith.getOrElse(false)) {
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.with)
-        }
-        if (featuresHandler.avExtensionKotlin.getOrElse(false)) {
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.kotlin)
-          configure<KaptExtension> { arguments { arg("avkSrc", project.file("src/main/java")) } }
-        }
-      }
-
       if (featuresHandler.autoService.getOrElse(false)) {
         if (allowKsp) {
           markKspNeeded("AutoService")
@@ -267,12 +244,6 @@ constructor(
           dependencies.add("compileOnly", SlackDependencies.Auto.Service.annotations)
           dependencies.add(aptConfiguration(), SlackDependencies.Auto.Service.autoservice)
         }
-      }
-
-      if (featuresHandler.incap.getOrElse(false)) {
-        markKaptNeeded("Incap")
-        dependencies.add("compileOnly", SlackDependencies.Incap.incap)
-        dependencies.add(aptConfiguration(), SlackDependencies.Incap.processor)
       }
 
       if (featuresHandler.redacted.getOrElse(false)) {
@@ -363,18 +334,8 @@ constructor(
   /** Enables AutoService on this project. */
   internal abstract val autoService: Property<Boolean>
 
-  /** Enables InCap on this project. */
-  internal abstract val incap: Property<Boolean>
-
   /** Enables redacted-compiler-plugin on this project. */
   internal abstract val redacted: Property<Boolean>
-
-  // AutoValue
-  internal abstract val autoValue: Property<Boolean>
-  internal abstract val avExtensionMoshi: Property<Boolean>
-  internal abstract val avExtensionParcel: Property<Boolean>
-  internal abstract val avExtensionWith: Property<Boolean>
-  internal abstract val avExtensionKotlin: Property<Boolean>
 
   // Moshi
   internal val moshiHandler = objects.newInstance<MoshiHandler>()
@@ -461,44 +422,6 @@ constructor(
   }
 
   /**
-   * Enables AutoValue for this project.
-   *
-   * @param moshi Enables auto-value-moshi
-   * @param parcel Enables auto-value-parcel
-   * @param with Enables auto-value-with
-   */
-  @OptIn(DelicateSlackPluginApi::class)
-  public fun autoValue(
-    moshi: Boolean = false,
-    parcel: Boolean = false,
-    with: Boolean = false,
-  ) {
-    autoValue(moshi, parcel, with, kotlin = false)
-  }
-
-  /**
-   * Enables AutoValue for this project.
-   *
-   * @param moshi Enables auto-value-moshi
-   * @param parcel Enables auto-value-parcel
-   * @param with Enables auto-value-with
-   * @param kotlin Enables auto-value-kotlin. THIS SHOULD ONLY BE TEMPORARY FOR MIGRATION PURPOSES!
-   */
-  @DelicateSlackPluginApi
-  public fun autoValue(
-    moshi: Boolean = false,
-    parcel: Boolean = false,
-    with: Boolean = false,
-    kotlin: Boolean = false
-  ) {
-    autoValue.setDisallowChanges(true)
-    avExtensionParcel.setDisallowChanges(parcel)
-    avExtensionMoshi.setDisallowChanges(moshi)
-    avExtensionWith.setDisallowChanges(with)
-    avExtensionKotlin.setDisallowChanges(kotlin)
-  }
-
-  /**
    * Enables Moshi for this project.
    *
    * @param codegen Enables codegen.
@@ -523,11 +446,6 @@ constructor(
   /** Enables AutoService on this project. */
   public fun autoService() {
     autoService.setDisallowChanges(true)
-  }
-
-  /** Enables InCap on this project. */
-  public fun incap() {
-    incap.setDisallowChanges(true)
   }
 
   /** Enables redacted-compiler-plugin on this project. */

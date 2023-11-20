@@ -100,42 +100,6 @@ internal object SlackDependencies : DependencySet() {
       // Intentionally public as we use AutoService annotations only in some places
       val annotations: Any by artifact("auto-service-annotations")
     }
-
-    object Value : DependencyGroup("com.google.auto.value", "auto-value") {
-      // Intentionally public for custom AutoValue extensions to build against
-      val autovalue: Any by artifact("auto-value")
-      // Intentionally public as we use AutoValue annotations only in some places
-      val annotations: Any by artifact("auto-value-annotations")
-
-      val kotlin: Any by
-        artifact(
-          groupOverride = "com.slack.auto.value",
-          artifact = "auto-value-kotlin",
-          gradleProperty = "auto-value-kotlin"
-        )
-
-      // TODO Switch to using slack.features.autovalue in the build file.
-      val with: Any by
-        artifact(
-          groupOverride = "com.gabrielittner.auto.value",
-          artifact = "auto-value-with",
-          gradleProperty = "auto-value-with"
-        )
-
-      object Moshi : DependencyGroup("com.ryanharter.auto.value", "auto-value-moshi") {
-        // TODO Switch to using slack.features.autovalue in the build file.
-        val runtime: Any by artifact("auto-value-moshi-runtime")
-        // TODO Switch to using slack.features.autovalue in the build file.
-        val extension: Any by artifact("auto-value-moshi-extension")
-      }
-
-      object Parcel : DependencyGroup("com.ryanharter.auto.value", "auto-value-parcel") {
-        // Intentionally public as we host some custom adapters externally
-        val adapter: Any by artifact("auto-value-parcel-adapter")
-        // TODO Switch to using slack.features.autovalue in the build file.
-        val extension: Any by artifact("auto-value-parcel")
-      }
-    }
   }
 
   internal object Dagger : DependencyGroup("com.google.dagger") {
@@ -146,11 +110,6 @@ internal object SlackDependencies : DependencySet() {
   object ErrorProne : DependencyGroup("com.google.errorprone") {
     val annotations: Any by artifact("error_prone_annotations")
     internal val core: Any by artifact("error_prone_core")
-  }
-
-  object Incap : DependencyGroup("net.ltgt.gradle.incap") {
-    val incap: Any by artifact()
-    val processor: Any by artifact("incap-processor")
   }
 
   object Moshi : DependencyGroup("com.squareup.moshi") {
