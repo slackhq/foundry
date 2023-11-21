@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.12.1
+------
+
+_2023-11-21_
+
+- Fix circuit() extension code gen using the wrong configuration.
+
 0.12.0
 ------
 
