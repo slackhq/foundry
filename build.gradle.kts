@@ -283,6 +283,17 @@ subprojects {
               .toURL()
           )
         }
+        sourceLink {
+          localDirectory.set(layout.projectDirectory.dir("src").asFile)
+          val relPath = rootProject.projectDir.toPath().relativize(projectDir.toPath())
+          remoteUrl.set(
+            providers.gradleProperty("POM_SCM_URL")
+              .map { scmUrl ->
+                URI("$scmUrl/tree/main/$relPath/src").toURL()
+              }
+          )
+          remoteLineSuffix.set("#L")
+        }
       }
     }
 
