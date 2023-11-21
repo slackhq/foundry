@@ -230,7 +230,7 @@ constructor(
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
         markKspNeeded("Circuit")
-        dependencies.add(aptConfiguration(), "com.slack.circuit:circuit-codegen")
+        dependencies.add("ksp", "com.slack.circuit:circuit-codegen")
         dependencies.add("compileOnly", "com.slack.circuit:circuit-codegen-annotations")
       }
 
