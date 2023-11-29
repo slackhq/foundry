@@ -19,12 +19,20 @@ import java.io.IOException
 import java.net.URLEncoder
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
 
 private val GITHUB_ORIGIN_REGEX = Regex("(.*)github\\.com[/|:](.*)")
+
+internal fun BuildFeatures.reportTo(scanApi: ScanApi) {
+  scanApi.value("bf-configuration-cache-requested", configurationCache.requested.getOrElse(false))
+  scanApi.value("bf-configuration-cache-active", configurationCache.active.getOrElse(false))
+  scanApi.value("bf-isolated-projects-requested", isolatedProjects.requested.getOrElse(false))
+  scanApi.value("bf-isolated-projects-active", isolatedProjects.active.getOrElse(false))
+}
 
 internal fun Project.configureBuildScanMetadata(scanApi: ScanApi) {
   if (invokedFromIde) {
