@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.13.0
+------
+
+_2023-11-30_
+
+- Update to Gradle 8.5. This version requires Gradle 8.5+.
+- Report Gradle 8.5's new `BuildFeatures` to build scans as custom values, starting with configuration cache and isolated projects.
+- Update Guava to `32.1.3-jre`.
+- Update Oshi to `6.4.8`.
+- Build against AGP `8.1.4` (main) and `8.3.0-alpha15` (agp handler 8.3).
+- Build against compose multipaltform `1.5.11`.
+- Include source links in Dokka docs.
+
 0.12.1
 ------
 
