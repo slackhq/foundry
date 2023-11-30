@@ -20,8 +20,10 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
 import com.squareup.moshi.adapter
 import java.util.Locale
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
@@ -53,7 +55,8 @@ import slack.unittest.UnitTests
  * A common entry point for Slack project configuration. This should only be applied once and on the
  * root project, with a full view of the entire project tree.
  */
-internal class SlackRootPlugin : Plugin<Project> {
+internal class SlackRootPlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
+  Plugin<Project> {
 
   override fun apply(project: Project) {
     require(project == project.rootProject) {
@@ -146,6 +149,7 @@ internal class SlackRootPlugin : Plugin<Project> {
       project.configureBuildScanMetadata(scanApi)
     }
     if (scanApi.isAvailable) {
+      buildFeatures.reportTo(scanApi)
       // It's SUPER important to capture this log File instance separately before passing into the
       // background call below, as this is serialized as an input to that lambda. We also cannot use
       // slackTools() in there anymore as it's already been closed (and will be recreated) in the
