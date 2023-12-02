@@ -22,7 +22,7 @@ okio = "3.5.0"
 retrofit = "2.9.0"
 sortDependencies = "0.4"
 spotless = "6.22.0"
-sqldelight = "2.0.0"
+sqldelight = "2.0.1"
 versionsPlugin = "0.47.0"
 wire = "4.9.1"
 
