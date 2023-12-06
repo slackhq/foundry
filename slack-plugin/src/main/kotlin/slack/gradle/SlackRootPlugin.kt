@@ -97,7 +97,8 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
       logThermals = logThermals,
       enableSkippyDiagnostics = enableSkippy,
       logVerbosely = slackProperties.verboseLogging,
-      thermalsLogJsonFileProvider = thermalsLogJsonFile
+      thermalsLogJsonFileProvider = thermalsLogJsonFile,
+      buildFeatures.configurationCache.requested,
     )
     configureRootProject(project, slackProperties, thermalsLogJsonFile)
   }

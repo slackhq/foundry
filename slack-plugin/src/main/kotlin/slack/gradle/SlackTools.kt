@@ -256,7 +256,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       logThermals: Boolean,
       enableSkippyDiagnostics: Boolean,
       logVerbosely: Boolean,
-      thermalsLogJsonFileProvider: Provider<RegularFile>
+      thermalsLogJsonFileProvider: Provider<RegularFile>,
+      isConfigurationCacheRequested: Provider<Boolean>,
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
@@ -273,9 +274,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
               logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
             }
           )
-          parameters.configurationCacheEnabled.setDisallowChanges(
-            project.provider { project.gradle.startParameter.isConfigurationCacheRequested }
-          )
+          parameters.configurationCacheEnabled.setDisallowChanges(isConfigurationCacheRequested)
           parameters.enableSkippyDiagnostics.setDisallowChanges(enableSkippyDiagnostics)
           parameters.skippyDiagnosticsOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("outputs/logs/skippy-diagnostics.txt")
