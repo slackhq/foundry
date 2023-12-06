@@ -63,7 +63,7 @@ private fun ScanApi.tagOs() {
 private fun ScanApi.tagIde(project: Project, isCi: Boolean) {
   if (project.hasProperty("android.injected.invoked.from.ide")) {
     tag("Android Studio")
-    project.findProperty("android.injected.studio.version")?.let {
+    project.findProperty("android.studio.version")?.let {
       value("Android Studio version", it.toString())
     }
   } else if (System.getProperty("idea.version") != null) {
