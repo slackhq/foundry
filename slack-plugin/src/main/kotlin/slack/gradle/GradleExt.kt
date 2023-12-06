@@ -282,7 +282,7 @@ internal value class OnceCheck(val once: AtomicBoolean = AtomicBoolean(false)) {
  * "generateXSources" for each project that follows it. (We may want to track these in the future
  * too, but for now they're pretty noisy.)
  */
-internal val Project.isSyncing: Boolean
+public val Project.isSyncing: Boolean
   get() =
     invokedFromIde &&
       (findProperty(AndroidProject.PROPERTY_BUILD_MODEL_ONLY) == "true" ||
