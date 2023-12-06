@@ -1,6 +1,24 @@
 Changelog
 =========
 
+0.13.1
+------
+
+_2023-12-05_
+
+- Make `Project.isSyncing` public.
+- Update to new `android.studio.version` property for reporting to build scans.
+- Update to Wire `4.9.3`.
+- Update to RxJava `3.1.8`.
+- Build against Kotlin `1.9.21`.
+- Build against KSP `1.9.21-1.0.15`.
+- Build against MoshiX `0.25.1`.
+- Build against AGP `8.2.0`.
+- Build against SqlDelight `2.0.1`.
+- Build against Redacted Compiler Plugin `1.7.1`.
+- Build against Detekt `1.23.4`.
+- Build against Gradle Doctor `0.9.1`.
+
 0.13.0
 ------
 
