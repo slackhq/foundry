@@ -5,11 +5,9 @@ plugins {
   alias(libs.plugins.buildConfig)
 }
 
-val agpVersion = libs.versions.agp.get()
-
 buildConfig {
   packageName("slack.gradle.agphandler.v82")
-  buildConfigField("String", "AGP_VERSION", "\"$agpVersion\"")
+  buildConfigField("String", "AGP_VERSION", libs.versions.agp.map { "\"$it\"" })
 }
 
 dependencies {
