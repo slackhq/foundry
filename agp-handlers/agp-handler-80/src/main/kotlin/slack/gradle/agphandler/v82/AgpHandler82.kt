@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.agphandler.v80
+package slack.gradle.agphandler.v82
 
 import com.android.build.api.AndroidPluginVersion
 import com.android.build.gradle.internal.SdkLocator
@@ -23,7 +23,7 @@ import org.gradle.api.provider.ProviderFactory
 import slack.gradle.agp.AgpHandler
 import slack.gradle.agp.internal.NoOpIssueReporter
 
-public class AgpHandler80 private constructor(override val agpVersion: AndroidPluginVersion) :
+public class AgpHandler82 private constructor(override val agpVersion: AndroidPluginVersion) :
   AgpHandler {
 
   override fun getAndroidSdkDirectory(projectRootDir: File, providers: ProviderFactory): File =
@@ -31,15 +31,14 @@ public class AgpHandler80 private constructor(override val agpVersion: AndroidPl
 
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
-    override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 0, 0)
+    override val minVersion: AndroidPluginVersion = AndroidPluginVersion(8, 2, 0)
 
-    // TODO Remove once it's public
-    //  https://issuetracker.google.com/issues/297440098
+    // Public in AGP 8.3 https://issuetracker.google.com/issues/297440098
     @Suppress("invisible_reference", "invisible_member")
     override val currentVersion: AndroidPluginVersion by lazy {
       com.android.build.api.extension.impl.CURRENT_AGP_VERSION
     }
 
-    override fun create(): AgpHandler = AgpHandler80(currentVersion)
+    override fun create(): AgpHandler = AgpHandler82(currentVersion)
   }
 }
