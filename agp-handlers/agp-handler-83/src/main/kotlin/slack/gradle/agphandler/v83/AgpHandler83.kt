@@ -38,7 +38,7 @@ public class AgpHandler83 private constructor(override val agpVersion: AndroidPl
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
     override val minVersion: AndroidPluginVersion by lazy {
-      computeAndroidPluginVersion(BuildConfig.AGP_VERSION)
+      computeAndroidPluginVersion(AGP_VERSION)
     }
 
     override val currentVersion: AndroidPluginVersion by lazy { AndroidPluginVersion.getCurrent() }

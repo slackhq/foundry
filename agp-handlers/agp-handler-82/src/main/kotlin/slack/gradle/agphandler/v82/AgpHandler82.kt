@@ -33,7 +33,7 @@ public class AgpHandler82 private constructor(override val agpVersion: AndroidPl
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
     override val minVersion: AndroidPluginVersion by lazy {
-      computeAndroidPluginVersion(BuildConfig.AGP_VERSION)
+      computeAndroidPluginVersion(AGP_VERSION)
     }
 
     // Public in AGP 8.3 https://issuetracker.google.com/issues/297440098

@@ -8,6 +8,10 @@ plugins {
 buildConfig {
   packageName("slack.gradle.agphandler.v83")
   buildConfigField("String", "AGP_VERSION", libs.versions.agpAlpha.map { "\"$it\"" })
+  useKotlinOutput {
+    topLevelConstants = true
+    internalVisibility = true
+  }
 }
 
 dependencies {
