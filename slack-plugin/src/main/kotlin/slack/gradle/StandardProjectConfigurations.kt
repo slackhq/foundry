@@ -63,7 +63,7 @@ import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
-import slack.gradle.dependencies.KotlinBuildConfig
+import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
@@ -104,7 +104,8 @@ internal class StandardProjectConfigurations(
   private val kotlinCompilerArgs =
     mutableListOf<String>()
       .apply {
-        addAll(KotlinBuildConfig.kotlinCompilerArgs)
+        @Suppress("UNCHECKED_CAST")
+        addAll(BuildConfig.KOTLIN_COMPILER_ARGS as List<String>)
         // Left as a toe-hold for any future dynamic arguments
       }
       .distinct()
@@ -913,7 +914,8 @@ internal class StandardProjectConfigurations(
             jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
-            freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
+            @Suppress("UNCHECKED_CAST")
+            freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS as List<String>)
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files
