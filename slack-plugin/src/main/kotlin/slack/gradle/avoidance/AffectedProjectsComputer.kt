@@ -19,8 +19,6 @@ import com.jraska.module.graph.DependencyGraph
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
 import slack.gradle.util.SgpLogger
 
 /**
@@ -38,12 +36,13 @@ import slack.gradle.util.SgpLogger
  * The primary input is [changedFilePaths], which is a newline-delimited list of files that have
  * changed. Usually the files changed in a pull request.
  *
- * [includePatterns] is a list of glob patterns that are used to filter the list of changed files.
- * These should usually be source files that are deemed to participate in builds (e.g. `.kt` files).
+ * [SkippyConfig.includePatterns] is a list of glob patterns that are used to filter the list of
+ * changed files. These should usually be source files that are deemed to participate in builds
+ * (e.g. `.kt` files).
  *
- * [neverSkipPatterns] is a list of glob patterns that, if matched with any changed file, indicate
- * that nothing should be skipped and the full build should run. This is important for files like
- * version catalog toml files or root build.gradle file changes.
+ * [SkippyConfig.neverSkipPatterns] is a list of glob patterns that, if matched with any changed
+ * file, indicate that nothing should be skipped and the full build should run. This is important
+ * for files like version catalog toml files or root build.gradle file changes.
  *
  * ### Outputs
  *
@@ -56,9 +55,9 @@ import slack.gradle.util.SgpLogger
  * dropbox/focus plugin, and will be a minimal list of projects needed to build the affected
  * projects.
  *
- * With both outputs, if any "never-skippable" files [neverSkipPatterns] are changed, then no output
- * file is produced and all projects are considered affected. If a file is produced but has no
- * content written to it, that simply means that no projects are affected.
+ * With both outputs, if any "never-skippable" files [SkippyConfig.neverSkipPatterns] are changed,
+ * then no output file is produced and all projects are considered affected. If a file is produced
+ * but has no content written to it, that simply means that no projects are affected.
  *
  * ### Debugging
  *
@@ -73,16 +72,7 @@ import slack.gradle.util.SgpLogger
  * @property changedFilePaths A relative (to the repo root) path to a changed_files.txt that
  *   contains a newline-delimited list of changed files. This is usually computed from a GitHub PR's
  *   changed files.
- * @property includePatterns A set of glob patterns for files to include in computing affected
- *   projects. This should usually be source files, build files, gradle.properties files, and other
- *   projects that affect builds.
- * @property excludePatterns A set of glob patterns for files to exclude from computing affected
- *   projects. This is run _after_ [includePatterns] and can be useful for excluding files that
- *   would otherwise be included by an existing inclusion pattern.
- * @property neverSkipPatterns A set of glob patterns that, if matched with a file, indicate that
- *   nothing should be skipped and [compute] will return null. This is useful for globally-affecting
- *   things like root build files, `libs.versions.toml`, etc. **NOTE**: This list is always merged
- *   with [includePatterns] as these are implicitly relevant files.
+ * @property configs see [SkippyConfig] docs.
  * @property androidTestProjects A set of project names that are Android test projects. This is used
  *   to compute the [AffectedProjectsResult.affectedAndroidTestProjects] value, which can be used to
  *   statically determine if an instrumentation test pipeline needs to run at all.
@@ -94,9 +84,7 @@ internal class AffectedProjectsComputer(
   private val dependencyGraph: () -> DependencyGraph,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
-  private val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,
-  private val excludePatterns: Set<String> = emptySet(),
-  private val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
+  private val configs: Map<String, SkippyConfig> = mapOf("default" to SkippyConfig()),
   private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
@@ -107,6 +95,14 @@ internal class AffectedProjectsComputer(
   }
 
   private fun computeImpl(): AffectedProjectsResult? {
+    // TODO this is not yet implemented granularly
+    val includePatterns: Set<String> =
+      configs.values.flatMapTo(mutableSetOf()) { it.includePatterns }
+    val neverSkipPatterns: Set<String> =
+      configs.values.flatMapTo(mutableSetOf()) { it.neverSkipPatterns }
+    val excludePatterns: Set<String> =
+      configs.values.flatMapTo(mutableSetOf()) { it.excludePatterns }
+
     log("root dir path is: $rootDirPath")
     check(rootDirPath.exists()) { "Root dir path $rootDirPath does not exist" }
     log("changedFilePaths: $changedFilePaths")

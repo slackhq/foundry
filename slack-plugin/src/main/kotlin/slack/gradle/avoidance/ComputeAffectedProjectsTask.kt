@@ -21,6 +21,7 @@ import kotlin.time.measureTimedValue
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -35,8 +36,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.setDisallowChanges
@@ -59,16 +58,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     project.objects.property(Boolean::class.java).convention(false)
 
   @get:Input
-  public val includePatterns: SetProperty<String> =
-    project.objects.setProperty<String>().convention(DEFAULT_INCLUDE_PATTERNS)
-
-  @get:Input
-  public val excludePatterns: SetProperty<String> =
-    project.objects.setProperty<String>().convention(emptySet())
-
-  @get:Input
-  public val neverSkipPatterns: SetProperty<String> =
-    project.objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
+  public val configs: NamedDomainObjectContainer<SkippyGradleConfig> =
+    project.objects.domainObjectContainer(SkippyGradleConfig::class.java)
 
   @get:Input
   public val androidTestProjects: SetProperty<String> =
@@ -141,9 +132,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
                 DependencyGraph.create(dependencyGraph.get())
               }
             },
-            includePatterns = includePatterns.get(),
-            excludePatterns = excludePatterns.get(),
-            neverSkipPatterns = neverSkipPatterns.get(),
+            configs = configs.asMap.mapValues { (_, v) -> v.asSkippyConfig() },
             androidTestProjects = androidTestProjects.get(),
             debug = debug.get(),
             diagnostics = this,
@@ -229,6 +218,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       rootProject: Project,
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjectsTask> {
+      val extension = rootProject.extensions.create("skippy", SkippyExtension::class.java)
       val configurationsToLook by lazy {
         val providedConfigs = slackProperties.affectedProjectConfigurations
         providedConfigs?.splitToSequence(',')?.toSet()?.let { providedConfigSet ->
@@ -246,6 +236,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(slackProperties.debug)
+        configs.addAll(extension.configs)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
         diagnosticsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy/diagnostics"))
