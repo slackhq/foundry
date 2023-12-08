@@ -128,6 +128,11 @@ pluginManagement {
     exclusiveContent {
       forRepository(::gradlePluginPortal)
       filter {
+        includeModule("com.github.gmazzo.buildconfig", "plugin")
+        includeModule(
+          "com.github.gmazzo.buildconfig",
+          "com.github.gmazzo.buildconfig.gradle.plugin"
+        )
         includeModule("com.github.ben-manes", "gradle-versions-plugin")
         includeModule(
           "com.github.ben-manes.versions",

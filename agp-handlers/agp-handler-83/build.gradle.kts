@@ -2,6 +2,14 @@ plugins {
   kotlin("jvm")
   alias(libs.plugins.ksp)
   alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.buildConfig)
+}
+
+val agpVersion = libs.versions.agpAlpha.get()
+
+buildConfig {
+  packageName("slack.gradle.agphandler.v83")
+  buildConfigField("String", "AGP_VERSION", "\"$agpVersion\"")
 }
 
 dependencies {
@@ -11,6 +19,6 @@ dependencies {
 
   implementation(libs.autoService.annotations)
 
-  compileOnly("com.android.tools.build:gradle:8.3.0-alpha16")
   compileOnly(gradleApi())
+  compileOnly(libs.agpAlpha)
 }

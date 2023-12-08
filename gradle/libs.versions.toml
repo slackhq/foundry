@@ -1,5 +1,6 @@
 [versions]
 agp = "8.2.0"
+agpAlpha = "8.3.0-alpha17"
 anvil = "2.4.8"
 bugsnagGradle = "8.1.0"
 compose-jb = "1.5.11"
@@ -28,6 +29,7 @@ wire = "4.9.3"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "4.2.0" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
@@ -46,6 +48,7 @@ wire = { id = "com.squareup.wire", version.ref = "wire" }
 
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+agpAlpha = { module = "com.android.tools.build:gradle", version.ref = "agpAlpha" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.1"

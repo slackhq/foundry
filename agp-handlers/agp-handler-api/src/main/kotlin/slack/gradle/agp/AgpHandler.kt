@@ -19,6 +19,8 @@ import com.android.build.api.AndroidPluginVersion
 import java.io.File
 import org.gradle.api.provider.ProviderFactory
 
+private val NUMBER_REGEX = Regex("d")
+
 /** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
 public interface AgpHandler {
   /** The current AGP version. */
@@ -46,3 +48,32 @@ public interface AgpHandler {
 /** Returns a new [AndroidPluginVersion] with any preview information stripped. */
 public val AndroidPluginVersion.baseVersion: AndroidPluginVersion
   get() = AndroidPluginVersion(major, minor, micro)
+
+/** Returns a computed [AndroidPluginVersion] for the given [input] version string. */
+public fun computeAndroidPluginVersion(input: String): AndroidPluginVersion {
+  val split = input.split('-')
+  require(split.isNotEmpty()) { "Could not parse AGP version from '$input'" }
+  val baseVersionNumberStrings = split[0].split('.')
+  val (major, minor, micro) =
+    Array(3) { index ->
+      if (baseVersionNumberStrings.size >= index + 1) {
+        baseVersionNumberStrings[index].toInt()
+      } else {
+        0
+      }
+    }
+  val baseVersion = AndroidPluginVersion(major, minor, micro)
+  return if (split.size == 2) {
+    // There's a preview here
+    val (previewType, number) = split[1].partition { !it.isDigit() }
+    when (previewType) {
+      "alpha" -> baseVersion.alpha(number.toInt())
+      "beta" -> baseVersion.beta(number.toInt())
+      "rc" -> baseVersion.rc(number.toInt())
+      "dev" -> baseVersion.dev()
+      else -> error("Unrecognized preview type '$previewType' with version '$number'")
+    }
+  } else {
+    baseVersion
+  }
+}
