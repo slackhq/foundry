@@ -104,8 +104,7 @@ internal class StandardProjectConfigurations(
   private val kotlinCompilerArgs =
     mutableListOf<String>()
       .apply {
-        @Suppress("UNCHECKED_CAST")
-        addAll(BuildConfig.KOTLIN_COMPILER_ARGS as List<String>)
+        @Suppress("UNCHECKED_CAST") addAll(BuildConfig.KOTLIN_COMPILER_ARGS as List<String>)
         // Left as a toe-hold for any future dynamic arguments
       }
       .distinct()
