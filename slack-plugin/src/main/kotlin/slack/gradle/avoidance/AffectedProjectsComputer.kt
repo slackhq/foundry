@@ -72,7 +72,7 @@ import slack.gradle.util.SgpLogger
  * @property changedFilePaths A relative (to the repo root) path to a changed_files.txt that
  *   contains a newline-delimited list of changed files. This is usually computed from a GitHub PR's
  *   changed files.
- * @property configs see [SkippyConfig] docs.
+ * @property config see [SkippyConfig] docs.
  * @property androidTestProjects A set of project names that are Android test projects. This is used
  *   to compute the [AffectedProjectsResult.affectedAndroidTestProjects] value, which can be used to
  *   statically determine if an instrumentation test pipeline needs to run at all.
@@ -84,24 +84,21 @@ internal class AffectedProjectsComputer(
   private val dependencyGraph: () -> DependencyGraph,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
-  private val configs: Map<String, SkippyConfig> = mapOf("default" to SkippyConfig()),
+  private val config: SkippyConfig = SkippyConfig(SkippyExtension.GLOBAL_TOOL),
   private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
-  private val logger: SgpLogger = SgpLogger.noop()
+  private val logger: SgpLogger = SgpLogger.noop(),
 ) {
   fun compute(): AffectedProjectsResult? {
     return logTimedValue("full computation") { computeImpl() }
   }
 
   private fun computeImpl(): AffectedProjectsResult? {
-    // TODO this is not yet implemented granularly
-    val includePatterns: Set<String> =
-      configs.values.flatMapTo(mutableSetOf()) { it.includePatterns }
-    val neverSkipPatterns: Set<String> =
-      configs.values.flatMapTo(mutableSetOf()) { it.neverSkipPatterns }
-    val excludePatterns: Set<String> =
-      configs.values.flatMapTo(mutableSetOf()) { it.excludePatterns }
+    val tool = config.tool
+    val includePatterns = config.includePatterns
+    val neverSkipPatterns = config.neverSkipPatterns
+    val excludePatterns = config.excludePatterns
 
     log("root dir path is: $rootDirPath")
     check(rootDirPath.exists()) { "Root dir path $rootDirPath does not exist" }
@@ -169,7 +166,7 @@ internal class AffectedProjectsComputer(
             gradlePath to ChangedProject(relativePath, gradlePath, files.toSet())
           }
       }
-    diagnostics.write("changedProjects.txt") {
+    diagnostics.write(tool, "changedProjects.txt") {
       changedProjects.entries
         .sortedBy { it.key }
         .joinToString("\n") { (_, v) ->
@@ -192,7 +189,7 @@ internal class AffectedProjectsComputer(
         }
       }
 
-    diagnostics.write("shallowProjectsToDependencies.txt") {
+    diagnostics.write(tool, "shallowProjectsToDependencies.txt") {
       buildString {
         for ((project, dependencies) in shallowProjectsToDependencies.toSortedMap()) {
           appendLine(project)
@@ -210,7 +207,7 @@ internal class AffectedProjectsComputer(
         }
       }
 
-    diagnostics.write("projectsToDependencies.txt") {
+    diagnostics.write(tool, "projectsToDependencies.txt") {
       buildString {
         for ((project, dependencies) in projectsToDependencies.toSortedMap()) {
           appendLine(project)
@@ -223,7 +220,7 @@ internal class AffectedProjectsComputer(
 
     val projectsToDependents = logTimedValue("computing dependents", projectsToDependencies::flip)
 
-    diagnostics.write("projectsToDependents.txt") {
+    diagnostics.write(tool, "projectsToDependents.txt") {
       buildString {
         for ((project, dependencies) in projectsToDependents.toSortedMap()) {
           appendLine(project)
@@ -347,11 +344,14 @@ internal class AffectedProjectsComputer(
     fun filterIncludes(filePaths: List<Path>, includePatterns: Collection<String>) =
       filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
 
-    /** Returns a filtered list of [filePaths] that do _not_ match the given [includePatterns]. */
+    /**
+     * Returns a filtered list of [filePaths] that do _not_ match the given
+     * [SkippyConfig.includePatterns].
+     */
     fun filterExcludes(filePaths: List<Path>, excludePatterns: Collection<String>) =
       filePaths.filterNot { excludePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
 
-    /** Returns whether any [filePaths] match any [neverSkipPatterns]. */
+    /** Returns whether any [filePaths] match any [SkippyConfig.neverSkipPatterns]. */
     fun anyNeverSkip(filePaths: List<Path>, neverSkipPathMatchers: List<PathMatcher>) =
       filePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }
 
