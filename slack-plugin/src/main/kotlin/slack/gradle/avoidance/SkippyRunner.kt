@@ -2,19 +2,17 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import java.nio.file.Path
+import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.createParentDirectories
+import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.readLines
 import kotlin.io.path.writeLines
 import kotlin.io.path.writeText
 import kotlin.time.measureTimedValue
-import kotlinx.coroutines.CloseableCoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
@@ -22,11 +20,10 @@ import slack.gradle.util.SgpLogger
 import slack.gradle.util.flatMapToSet
 import slack.gradle.util.parallelMapNotNull
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPathApi::class)
+@OptIn(ExperimentalPathApi::class)
 internal class SkippyRunner(
   private val debug: Boolean,
   private val logger: SgpLogger,
-  private val createDispatcher: (Int) -> CloseableCoroutineDispatcher,
   private val mergeOutputs: Boolean,
   private val outputsDir: Path,
   private val diagnosticsDir: Path,
@@ -46,11 +43,21 @@ internal class SkippyRunner(
     check(changedFilesPath.exists()) { "changedFilesPath does not exist: $changedFilesPath" }
   }
 
-  internal fun run() {
-    if (outputsDir.exists()) {
-      outputsDir.deleteRecursively()
+  internal suspend fun run(context: CoroutineContext) {
+    outputsDir.apply {
+      if (exists()) {
+        deleteRecursively()
+      }
+      createDirectories()
     }
-    outputsDir.createParentDirectories()
+    if (debug) {
+      diagnosticsDir.apply {
+        if (exists()) {
+          deleteRecursively()
+        }
+        createDirectories()
+      }
+    }
 
     val configMap = originalConfigMap.toMutableMap()
     // Extract the global config and apply it to each of the tools
@@ -65,36 +72,30 @@ internal class SkippyRunner(
       }
 
     val baseOutputDir = outputsDir
-    createDispatcher(configs.size).use { dispatcher ->
-      runBlocking {
-        withContext(dispatcher) {
-          val outputs =
-            configs.parallelMapNotNull(configs.size) { config ->
-              computeForTool(config, baseOutputDir)
-            }
-          if (mergeOutputs) {
-            val mergedOutput = WritableSkippyOutput("merged", baseOutputDir)
-            val mergedAffectedProjects = async {
-              outputs.flatMapToSet { it.affectedProjectsFile.readLines() }.toSortedSet()
-            }
-            val mergedAffectedAndroidTestProjects = async {
-              outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines() }.toSortedSet()
-            }
-            val mergedFocusProjects = async {
-              outputs.flatMapToSet { it.outputFocusFile.readLines() }.toSortedSet()
-            }
-            val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
-              listOf(
-                  mergedAffectedProjects,
-                  mergedAffectedAndroidTestProjects,
-                  mergedFocusProjects,
-                )
-                .awaitAll()
-            mergedOutput.affectedProjectsFile.writeLines(affectedProjects)
-            mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects)
-            mergedOutput.outputFocusFile.writeLines(focusProjects)
-          }
+    withContext(context) {
+      val outputs =
+        configs.parallelMapNotNull(configs.size) { config -> computeForTool(config, baseOutputDir) }
+      if (mergeOutputs) {
+        val mergedOutput = WritableSkippyOutput("merged", baseOutputDir)
+        val mergedAffectedProjects = async {
+          outputs.flatMapToSet { it.affectedProjectsFile.readLines() }.toSortedSet()
         }
+        val mergedAffectedAndroidTestProjects = async {
+          outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines() }.toSortedSet()
+        }
+        val mergedFocusProjects = async {
+          outputs.flatMapToSet { it.outputFocusFile.readLines() }.toSortedSet()
+        }
+        val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
+          listOf(
+              mergedAffectedProjects,
+              mergedAffectedAndroidTestProjects,
+              mergedFocusProjects,
+            )
+            .awaitAll()
+        mergedOutput.affectedProjectsFile.writeLines(affectedProjects)
+        mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects)
+        mergedOutput.outputFocusFile.writeLines(focusProjects)
       }
     }
   }
@@ -106,16 +107,6 @@ internal class SkippyRunner(
     val skippyOutputs = WritableSkippyOutput(tool, outputDir)
     val prefixLogger = SgpLogger.prefix("$LOG_PREFIX[$tool]", logger)
     return logTimedValue(tool, "gradle task computation") {
-      if (debug) {
-        diagnosticsDir.also { file ->
-          diagnosticsDir.apply {
-            if (parent.exists()) {
-              parent.deleteRecursively()
-            }
-            createParentDirectories()
-          }
-        }
-      }
       val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
         AffectedProjectsComputer(
             rootDirPath = rootDir.toOkioPath(normalize = true),

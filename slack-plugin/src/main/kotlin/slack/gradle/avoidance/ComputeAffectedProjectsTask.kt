@@ -17,8 +17,11 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -98,22 +101,32 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   @TaskAction
   internal fun compute() {
     val rootDirPath = rootDir.get().asFile.toPath()
-    SkippyRunner(
-        debug = debug.get(),
-        logger = SgpLogger.gradle(logger),
-        createDispatcher = { newFixedThreadPoolContext(it, "computeAffectedProjects") },
-        mergeOutputs = mergeOutputs.get(),
-        outputsDir = outputsDir.get().asFile.toPath(),
-        diagnosticsDir = diagnosticsDir.get().asFile.toPath(),
-        androidTestProjects = androidTestProjects.get(),
-        rootDir = rootDirPath,
-        dependencyGraph = dependencyGraph.get(),
-        diagnosticWriter = this,
-        changedFilesPath = rootDirPath.resolve(changedFiles.get()),
-        originalConfigMap =
-          configs.asMap.mapValues { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) },
-      )
-      .run()
+    val body: suspend (context: CoroutineContext) -> Unit = { context ->
+      SkippyRunner(
+          debug = debug.get(),
+          logger = SgpLogger.gradle(logger),
+          mergeOutputs = mergeOutputs.get(),
+          outputsDir = outputsDir.get().asFile.toPath(),
+          diagnosticsDir = diagnosticsDir.get().asFile.toPath(),
+          androidTestProjects = androidTestProjects.get(),
+          rootDir = rootDirPath,
+          dependencyGraph = dependencyGraph.get(),
+          diagnosticWriter = this@ComputeAffectedProjectsTask,
+          changedFilesPath = rootDirPath.resolve(changedFiles.get()),
+          originalConfigMap =
+            configs.asMap.mapValues { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) },
+        )
+        .run(context)
+    }
+    runBlocking {
+      if (configs.size == 1) {
+        body(Dispatchers.Unconfined)
+      } else {
+        newFixedThreadPoolContext(configs.size, "computeAffectedProjects").use { dispatcher ->
+          body(dispatcher)
+        }
+      }
+    }
   }
 
   override fun write(tool: String, name: String, content: () -> String) {
