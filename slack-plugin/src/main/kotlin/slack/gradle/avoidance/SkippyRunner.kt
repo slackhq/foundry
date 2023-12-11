@@ -121,6 +121,7 @@ internal class SkippyRunner(
                 changedFilesPath.readLines(fs).map { it.trim().toPath(normalize = true) }
               },
             logger = prefixLogger,
+            fileSystem = fs,
           )
           .compute() ?: return@logTimedValue null
 

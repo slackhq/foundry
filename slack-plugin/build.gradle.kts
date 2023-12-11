@@ -113,7 +113,9 @@ dependencies {
   compileOnly(libs.gradlePlugins.wire)
   compileOnly(libs.kotlin.reflect)
 
+  testImplementation(platform(libs.coroutines.bom))
   testImplementation(libs.agp)
+  testImplementation(libs.coroutines.test)
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)

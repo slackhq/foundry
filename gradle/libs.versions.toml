@@ -52,6 +52,7 @@ bugsnag = "com.bugsnag:bugsnag:3.7.1"
 commonsText = "org.apache.commons:commons-text:1.11.0"
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
 gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
