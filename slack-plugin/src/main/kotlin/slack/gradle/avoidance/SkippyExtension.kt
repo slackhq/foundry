@@ -19,8 +19,10 @@ import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.jetbrains.annotations.CheckReturnValue
 import slack.gradle.SlackExtensionMarker
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
@@ -28,12 +30,20 @@ import slack.gradle.setProperty
 
 @SlackExtensionMarker
 public abstract class SkippyExtension @Inject constructor(objects: ObjectFactory) {
+
+  internal companion object {
+    const val GLOBAL_TOOL = "global"
+  }
+
+  public val mergeOutputs: Property<Boolean> =
+    objects.property(Boolean::class.java).convention(true)
+
   internal val configs: NamedDomainObjectContainer<SkippyGradleConfig> =
     objects.domainObjectContainer(SkippyGradleConfig::class.java)
 
   init {
     // One global default
-    configs.maybeCreate("global")
+    configs.maybeCreate(GLOBAL_TOOL)
   }
 
   public fun config(name: String, action: Action<SkippyGradleConfig>) {
@@ -55,13 +65,13 @@ public abstract class SkippyGradleConfig @Inject constructor(objects: ObjectFact
   public val neverSkipPatterns: SetProperty<String> =
     objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
-  internal fun asSkippyConfig(): SkippyConfig {
-    return SkippyConfig(includePatterns.get(), excludePatterns.get(), neverSkipPatterns.get())
+  internal fun asSkippyConfig(tool: String): SkippyConfig {
+    return SkippyConfig(tool, includePatterns.get(), excludePatterns.get(), neverSkipPatterns.get())
   }
 }
 
 /**
- * Represents a Skippy configuration for a specific tool.
+ * Represents a Skippy configuration for a specific [tool].
  *
  * @property includePatterns A set of glob patterns for files to include in computing affected
  *   projects. This should usually be source files, build files, gradle.properties files, and other
@@ -76,7 +86,17 @@ public abstract class SkippyGradleConfig @Inject constructor(objects: ObjectFact
  *   files.
  */
 public data class SkippyConfig(
+  public val tool: String,
   public val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,
   public val excludePatterns: Set<String> = emptySet(),
   public val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
-)
+) {
+  @CheckReturnValue
+  public fun overlayWith(other: SkippyConfig): SkippyConfig {
+    return copy(
+      includePatterns = includePatterns + other.includePatterns,
+      excludePatterns = excludePatterns + other.excludePatterns,
+      neverSkipPatterns = neverSkipPatterns + other.neverSkipPatterns
+    )
+  }
+}
