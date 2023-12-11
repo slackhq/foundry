@@ -15,6 +15,7 @@
  */
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
+import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import dev.bmac.gradle.intellij.GenerateBlockMapTask
 import dev.bmac.gradle.intellij.PluginUploader
@@ -56,6 +57,7 @@ plugins {
   alias(libs.plugins.sortDependencies) apply false
   alias(libs.plugins.intellij) apply false
   alias(libs.plugins.pluginUploader) apply false
+  alias(libs.plugins.buildConfig) apply false
 }
 
 configure<DetektExtension> {
@@ -167,14 +169,6 @@ data class KotlinBuildConfig(val kotlin: String) {
       // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
       "-Xjspecify-annotations=strict",
     )
-
-  fun asTemplatesMap(): Map<String, String> {
-    return mapOf(
-      "kotlinCompilerArgs" to kotlinCompilerArgs.joinToString(", ") { "\"$it\"" },
-      "kotlinJvmCompilerArgs" to kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" },
-      "kotlinVersion" to kotlin
-    )
-  }
 }
 
 tasks.dokkaHtmlMultiModule {
@@ -186,16 +180,18 @@ val kotlinVersion = libs.versions.kotlin.get()
 val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 
 subprojects {
-  // This is overly magic but necessary in order to plumb this
-  // down to subprojects
-  tasks
-    .withType<Copy>()
-    .matching { it.name == "copyVersionTemplates" }
-    .configureEach {
-      val templatesMap = kotlinBuildConfig.asTemplatesMap()
-      inputs.property("buildversions", templatesMap.hashCode())
-      expand(templatesMap)
+  if (project.path == ":slack-plugin") {
+    project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
+      configure<BuildConfigExtension> {
+        buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
+        // Using Any here due to https://github.com/gmazzo/gradle-buildconfig-plugin/issues/9
+        buildConfigField("kotlin.Any", "KOTLIN_COMPILER_ARGS",
+                         "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})")
+        buildConfigField("kotlin.Any", "KOTLIN_JVM_COMPILER_ARGS",
+                         "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})")
+      }
     }
+  }
 
   pluginManager.withPlugin("java") {
     configure<JavaPluginExtension> {

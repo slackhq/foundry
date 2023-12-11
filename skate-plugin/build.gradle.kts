@@ -1,5 +1,4 @@
 import com.jetbrains.plugin.structure.base.utils.exists
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
@@ -9,6 +8,7 @@ plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
+  alias(libs.plugins.buildConfig)
 }
 
 group = "com.slack.intellij"
@@ -61,32 +61,16 @@ fun readGitRepoCommit(): String? {
   }
 }
 
-// region Version.kt template for setting the project version in the build
-sourceSets {
-  main { java.srcDir(layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main")) }
-}
-
-val copyVersionTemplatesProvider =
-  tasks.register<Copy>("copySkateVersionTemplates") {
-    inputs.property("version", project.property("VERSION_NAME"))
-    from(project.layout.projectDirectory.dir("version-templates"))
-    into(project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main"))
-    expand(
-      mapOf(
-        "projectVersion" to project.property("VERSION_NAME").toString(),
-        "bugsnagKey" to project.findProperty("SgpIntellijBugsnagKey")?.toString().orEmpty(),
-        "gitSha" to readGitRepoCommit().orEmpty(),
-      )
-    )
-    filteringCharset = "UTF-8"
+buildConfig {
+  packageName("com.slack.sgp.intellij")
+  buildConfigField("String", "VERSION", "\"${project.property("VERSION_NAME")}\"")
+  buildConfigField("String", "BUGSNAG_KEY", "\"${project.findProperty("SgpIntellijBugsnagKey")?.toString().orEmpty()}\"")
+  buildConfigField("String", "GIT_SHA", provider { "\"${readGitRepoCommit().orEmpty()}\"" })
+  useKotlinOutput {
+    topLevelConstants = true
+    internalVisibility = true
   }
-
-tasks.withType<KotlinCompile>().configureEach { dependsOn(copyVersionTemplatesProvider) }
-
-tasks
-  .matching { it.name == "kotlinSourcesJar" }
-  .configureEach { dependsOn(copyVersionTemplatesProvider) }
-// endregion
+}
 
 dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }

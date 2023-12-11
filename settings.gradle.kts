@@ -128,6 +128,11 @@ pluginManagement {
     exclusiveContent {
       forRepository(::gradlePluginPortal)
       filter {
+        includeModule("com.github.gmazzo.buildconfig", "plugin")
+        includeModule(
+          "com.github.gmazzo.buildconfig",
+          "com.github.gmazzo.buildconfig.gradle.plugin"
+        )
         includeModule("com.github.ben-manes", "gradle-versions-plugin")
         includeModule(
           "com.github.ben-manes.versions",
@@ -174,7 +179,7 @@ rootProject.name = "slack-gradle-plugin"
 
 // Please keep these in alphabetical order!
 include(
-  ":agp-handlers:agp-handler-80",
+  ":agp-handlers:agp-handler-82",
   ":agp-handlers:agp-handler-83",
   ":agp-handlers:agp-handler-api",
   ":skate-plugin",
