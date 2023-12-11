@@ -17,14 +17,21 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
+import java.nio.file.DirectoryNotEmptyException
+import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.deleteRecursively
+import kotlin.io.path.readLines
+import kotlin.io.path.writeLines
+import kotlin.io.path.writeText
+import kotlin.time.measureTimedValue
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.time.measureTimedValue
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
@@ -44,19 +51,9 @@ import slack.gradle.SlackProperties
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.flatMapToSet
-import slack.gradle.util.parallelForEach
-import slack.gradle.util.parallelMap
 import slack.gradle.util.parallelMapNotNull
 import slack.gradle.util.prepareForGradleOutput
 import slack.gradle.util.setDisallowChanges
-import java.nio.file.DirectoryNotEmptyException
-import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.readLines
-import kotlin.io.path.writeLines
-import kotlin.io.path.writeText
 
 /**
  * ### Usage
@@ -121,45 +118,45 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     val configMap = configs.asMap
 
     // Extract the global config and apply it to each of the tools
-    val configs = if (configMap.size == 1) {
-      configMap.map { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) }
-    } else {
-      // No per-service configs, just use the global one
-      val globalConfig = configMap.remove(SkippyExtension.GLOBAL_TOOL)?.asSkippyConfig(SkippyExtension.GLOBAL_TOOL)
-        ?: error("No global config!")
-      configMap.map { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) }
-        .map { config ->
-          config.overlayWith(globalConfig)
-        }
-    }
+    val configs =
+      if (configMap.size == 1) {
+        configMap.map { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) }
+      } else {
+        // No per-service configs, just use the global one
+        val globalConfig =
+          configMap.remove(SkippyExtension.GLOBAL_TOOL)?.asSkippyConfig(SkippyExtension.GLOBAL_TOOL)
+            ?: error("No global config!")
+        configMap
+          .map { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) }
+          .map { config -> config.overlayWith(globalConfig) }
+      }
 
     val baseOutputDir = outputsDir.asFile.get().toPath()
     newFixedThreadPoolContext(configs.size, "computeAffectedProjects").use { dispatcher ->
       runBlocking {
         withContext(dispatcher) {
-          val outputs = configs
-            .parallelMapNotNull(configs.size) { config ->
+          val outputs =
+            configs.parallelMapNotNull(configs.size) { config ->
               computeForTool(config, baseOutputDir)
             }
           if (mergeOutputs.get()) {
             val mergedOutput = WritableSkippyOutput("merged", baseOutputDir)
             val mergedAffectedProjects = async {
-              outputs.flatMapToSet { it.affectedProjectsFile.readLines() }
-                .toSortedSet()
+              outputs.flatMapToSet { it.affectedProjectsFile.readLines() }.toSortedSet()
             }
             val mergedAffectedAndroidTestProjects = async {
-              outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines() }
-                .toSortedSet()
+              outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines() }.toSortedSet()
             }
             val mergedFocusProjects = async {
-              outputs.flatMapToSet { it.outputFocusFile.readLines() }
-                .toSortedSet()
+              outputs.flatMapToSet { it.outputFocusFile.readLines() }.toSortedSet()
             }
-            val (affectedProjects, affectedAndroidTestProjects, focusProjects) = listOf(
-              mergedAffectedProjects,
-              mergedAffectedAndroidTestProjects,
-              mergedFocusProjects,
-            ).awaitAll()
+            val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
+              listOf(
+                  mergedAffectedProjects,
+                  mergedAffectedAndroidTestProjects,
+                  mergedFocusProjects,
+                )
+                .awaitAll()
             mergedOutput.affectedProjectsFile.writeLines(affectedProjects)
             mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects)
             mergedOutput.outputFocusFile.writeLines(focusProjects)
@@ -169,9 +166,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     }
   }
 
-  /**
-   * Computes a [SkippyOutput] for the given [config].
-   */
+  /** Computes a [SkippyOutput] for the given [config]. */
   private fun computeForTool(config: SkippyConfig, outputDir: Path): SkippyOutput? {
     val tool = config.tool
     val skippyOutputs = WritableSkippyOutput(tool, outputDir)
@@ -214,14 +209,19 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       skippyOutputs.affectedProjectsFile.writeText(affectedProjects.sorted().joinToString("\n"))
 
       // Generate affected_android_test_projects.txt
-      log(tool, "writing affected androidTest projects to: ${skippyOutputs.affectedAndroidTestProjectsFile}")
-      skippyOutputs.affectedAndroidTestProjectsFile
-        .writeText(affectedAndroidTestProjects.sorted().joinToString("\n"))
+      log(
+        tool,
+        "writing affected androidTest projects to: ${skippyOutputs.affectedAndroidTestProjectsFile}"
+      )
+      skippyOutputs.affectedAndroidTestProjectsFile.writeText(
+        affectedAndroidTestProjects.sorted().joinToString("\n")
+      )
 
       // Generate .focus settings file
       log(tool, "writing focus settings to: ${skippyOutputs.outputFocusFile}")
-      skippyOutputs.outputFocusFile
-        .writeText(focusProjects.joinToString("\n") { "include(\"$it\")" })
+      skippyOutputs.outputFocusFile.writeText(
+        focusProjects.joinToString("\n") { "include(\"$it\")" }
+      )
 
       skippyOutputs.delegate
     }
@@ -320,26 +320,26 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
     public val outputFocusFile: Path
   }
 
-  public class SimpleSkippyOutput(
-    public override val subDir: Path
-  ): SkippyOutput {
+  public class SimpleSkippyOutput(public override val subDir: Path) : SkippyOutput {
     public override val affectedProjectsFile: Path = subDir.resolve("affected_projects.txt")
-    public override val affectedAndroidTestProjectsFile: Path = subDir.resolve("affected_android_test_projects.txt")
+    public override val affectedAndroidTestProjectsFile: Path =
+      subDir.resolve("affected_android_test_projects.txt")
     public override val outputFocusFile: Path = subDir.resolve("focus.settings.gradle")
   }
 
-  public class WritableSkippyOutput(tool: String, outputDir: Path): SkippyOutput {
+  public class WritableSkippyOutput(tool: String, outputDir: Path) : SkippyOutput {
     internal val delegate = SimpleSkippyOutput(outputDir.resolve(tool))
 
     // Eagerly init the subdir and clear it if exists
     @OptIn(ExperimentalPathApi::class)
-    public override val subDir: Path = delegate.subDir.apply {
-      try {
-        deleteIfExists()
-      } catch (e: DirectoryNotEmptyException) {
-        deleteRecursively()
+    public override val subDir: Path =
+      delegate.subDir.apply {
+        try {
+          deleteIfExists()
+        } catch (e: DirectoryNotEmptyException) {
+          deleteRecursively()
+        }
       }
-    }
 
     public override val affectedProjectsFile: Path by lazy {
       delegate.affectedProjectsFile.prepareForGradleOutput()
