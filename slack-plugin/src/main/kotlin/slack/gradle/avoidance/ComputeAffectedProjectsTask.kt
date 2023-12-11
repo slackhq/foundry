@@ -17,20 +17,8 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
-import java.nio.file.Path
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.readLines
-import kotlin.io.path.writeLines
-import kotlin.io.path.writeText
-import kotlin.time.measureTimedValue
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.newFixedThreadPoolContext
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import okio.Path.Companion.toOkioPath
-import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -47,8 +35,6 @@ import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
-import slack.gradle.util.flatMapToSet
-import slack.gradle.util.parallelMapNotNull
 import slack.gradle.util.setDisallowChanges
 
 /**
@@ -111,147 +97,36 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   @OptIn(DelicateCoroutinesApi::class)
   @TaskAction
   internal fun compute() {
-    val configMap = configs.asMap
-
-    // Extract the global config and apply it to each of the tools
-    val configs =
-      if (configMap.size == 1) {
-        configMap.map { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) }
-      } else {
-        // No per-service configs, just use the global one
-        val globalConfig =
-          configMap.remove(SkippyExtension.GLOBAL_TOOL)?.asSkippyConfig(SkippyExtension.GLOBAL_TOOL)
-            ?: error("No global config!")
-        configMap
-          .map { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) }
-          .map { config -> config.overlayWith(globalConfig) }
-      }
-
-    val baseOutputDir = outputsDir.asFile.get().toPath()
-    newFixedThreadPoolContext(configs.size, "computeAffectedProjects").use { dispatcher ->
-      runBlocking {
-        withContext(dispatcher) {
-          val outputs =
-            configs.parallelMapNotNull(configs.size) { config ->
-              computeForTool(config, baseOutputDir)
-            }
-          if (mergeOutputs.get()) {
-            val mergedOutput = WritableSkippyOutput("merged", baseOutputDir)
-            val mergedAffectedProjects = async {
-              outputs.flatMapToSet { it.affectedProjectsFile.readLines() }.toSortedSet()
-            }
-            val mergedAffectedAndroidTestProjects = async {
-              outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines() }.toSortedSet()
-            }
-            val mergedFocusProjects = async {
-              outputs.flatMapToSet { it.outputFocusFile.readLines() }.toSortedSet()
-            }
-            val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
-              listOf(
-                  mergedAffectedProjects,
-                  mergedAffectedAndroidTestProjects,
-                  mergedFocusProjects,
-                )
-                .awaitAll()
-            mergedOutput.affectedProjectsFile.writeLines(affectedProjects)
-            mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects)
-            mergedOutput.outputFocusFile.writeLines(focusProjects)
-          }
-        }
-      }
-    }
-  }
-
-  /** Computes a [SkippyOutput] for the given [config]. */
-  private fun computeForTool(config: SkippyConfig, outputDir: Path): SkippyOutput? {
-    val tool = config.tool
-    val skippyOutputs = WritableSkippyOutput(tool, outputDir)
-    val prefixLogger = SgpLogger.prefix("$LOG_PREFIX[$tool]", SgpLogger.gradle(logger))
-    return logTimedValue(tool, "gradle task computation") {
-      if (debug.get()) {
-        diagnosticsDir.get().asFile.also { file ->
-          if (file.exists()) {
-            file.deleteRecursively()
-          }
-          file.mkdirs()
-        }
-      }
-      val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
-        AffectedProjectsComputer(
-            rootDirPath = rootDir.asFile.get().toOkioPath(normalize = true),
-            dependencyGraph = {
-              logTimedValue(tool, "creating dependency graph") {
-                DependencyGraph.create(dependencyGraph.get())
-              }
-            },
-            config = config,
-            androidTestProjects = androidTestProjects.get(),
-            debug = debug.get(),
-            diagnostics = this,
-            changedFilePaths =
-              logTimedValue(tool, "reading changed files") {
-                val file = changedFiles.get()
-                log(tool, "reading changed files from: $file")
-                rootDir.file(file).get().asFile.readLines().map {
-                  it.trim().toPath(normalize = true)
-                }
-              },
-            logger = prefixLogger,
-          )
-          .compute() ?: return@logTimedValue null
-
-      // Generate affected_projects.txt
-      log(tool, "writing affected projects to: ${skippyOutputs.affectedProjectsFile}")
-      skippyOutputs.affectedProjectsFile.writeText(affectedProjects.sorted().joinToString("\n"))
-
-      // Generate affected_android_test_projects.txt
-      log(
-        tool,
-        "writing affected androidTest projects to: ${skippyOutputs.affectedAndroidTestProjectsFile}"
+    val rootDirPath = rootDir.get().asFile.toPath()
+    SkippyRunner(
+        debug = debug.get(),
+        logger = SgpLogger.gradle(logger),
+        createDispatcher = { newFixedThreadPoolContext(it, "computeAffectedProjects") },
+        mergeOutputs = mergeOutputs.get(),
+        outputsDir = outputsDir.get().asFile.toPath(),
+        diagnosticsDir = diagnosticsDir.get().asFile.toPath(),
+        androidTestProjects = androidTestProjects.get(),
+        rootDir = rootDirPath,
+        dependencyGraph = dependencyGraph.get(),
+        diagnosticWriter = this,
+        changedFilesPath = rootDirPath.resolve(changedFiles.get()),
+        originalConfigMap =
+          configs.asMap.mapValues { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) },
       )
-      skippyOutputs.affectedAndroidTestProjectsFile.writeText(
-        affectedAndroidTestProjects.sorted().joinToString("\n")
-      )
-
-      // Generate .focus settings file
-      log(tool, "writing focus settings to: ${skippyOutputs.outputFocusFile}")
-      skippyOutputs.outputFocusFile.writeText(
-        focusProjects.joinToString("\n") { "include(\"$it\")" }
-      )
-
-      skippyOutputs.delegate
-    }
+      .run()
   }
 
   override fun write(tool: String, name: String, content: () -> String) {
     if (debug.get()) {
       val file = diagnosticsDir.get().file("$name.txt").asFile
-      log(tool, "writing diagnostic file: $path")
+      logger.lifecycle(tool, "writing diagnostic file: $path")
       file.parentFile.mkdirs()
       file.writeText(content())
     }
   }
 
-  private fun log(tool: String, message: String) {
-    val withPrefix = "$LOG_PREFIX[$tool] $message"
-    // counter-intuitive to read but lifecycle is preferable when actively debugging, whereas
-    // debug() only logs quietly unless --debug is used
-    if (debug.get()) {
-      logger.lifecycle(withPrefix)
-    } else {
-      logger.debug(withPrefix)
-    }
-  }
-
-  private inline fun <T> logTimedValue(tool: String, name: String, body: () -> T): T {
-    val (value, duration) = measureTimedValue(body)
-    log(tool, "$name took $duration")
-    return value
-  }
-
   internal companion object {
     internal const val NAME = "computeAffectedProjects"
-    private const val LOG_PREFIX = "[Skippy]"
     private val DEFAULT_CONFIGURATIONS =
       setOf(
         "androidTestImplementation",

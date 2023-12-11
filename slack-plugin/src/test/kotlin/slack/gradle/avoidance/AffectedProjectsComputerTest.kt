@@ -34,7 +34,9 @@ import slack.gradle.util.SgpLogger
 class AffectedProjectsComputerTest {
 
   private val diagnostics = mutableMapOf<String, String>()
-  private val diagnosticWriter = DiagnosticWriter { name, content -> diagnostics[name] = content() }
+  private val diagnosticWriter = DiagnosticWriter { tool, name, content ->
+    diagnostics[tool + name] = content()
+  }
   private val fileSystem = FakeFileSystem()
   private lateinit var rootDirPath: Path
   private lateinit var rootTestProject: TestProject
