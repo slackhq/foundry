@@ -46,6 +46,10 @@ public abstract class SkippyExtension @Inject constructor(objects: ObjectFactory
     configs.maybeCreate(GLOBAL_TOOL)
   }
 
+  public fun global(action: Action<SkippyGradleConfig>) {
+    action.execute(configs.maybeCreate(GLOBAL_TOOL))
+  }
+
   public fun config(name: String, action: Action<SkippyGradleConfig>) {
     action.execute(configs.maybeCreate(name))
   }
