@@ -22,6 +22,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -100,18 +102,19 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   @OptIn(DelicateCoroutinesApi::class)
   @TaskAction
   internal fun compute() {
-    val rootDirPath = rootDir.get().asFile.toPath()
+    val rootDirPath = rootDir.get().asFile.toOkioPath()
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug.get(),
           logger = SgpLogger.gradle(logger),
           mergeOutputs = mergeOutputs.get(),
-          outputsDir = outputsDir.get().asFile.toPath(),
-          diagnosticsDir = diagnosticsDir.get().asFile.toPath(),
+          outputsDir = outputsDir.get().asFile.toOkioPath(),
+          diagnosticsDir = diagnosticsDir.get().asFile.toOkioPath(),
           androidTestProjects = androidTestProjects.get(),
           rootDir = rootDirPath,
+          fs = FileSystem.SYSTEM,
           dependencyGraph = dependencyGraph.get(),
-          diagnosticWriter = this@ComputeAffectedProjectsTask,
+          diagnostics = this@ComputeAffectedProjectsTask,
           changedFilesPath = rootDirPath.resolve(changedFiles.get()),
           originalConfigMap =
             configs.asMap.mapValues { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) },

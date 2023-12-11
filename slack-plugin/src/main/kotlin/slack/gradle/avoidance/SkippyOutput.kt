@@ -1,10 +1,7 @@
 package slack.gradle.avoidance
 
-import java.nio.file.DirectoryNotEmptyException
-import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.deleteRecursively
+import okio.FileSystem
+import okio.Path
 import slack.gradle.util.prepareForGradleOutput
 
 public interface SkippyOutput {
@@ -28,29 +25,26 @@ public class SimpleSkippyOutput(public override val subDir: Path) : SkippyOutput
   public override val outputFocusFile: Path = subDir.resolve("focus.settings.gradle")
 }
 
-public class WritableSkippyOutput(tool: String, outputDir: Path) : SkippyOutput {
+public class WritableSkippyOutput(tool: String, outputDir: Path, fs: FileSystem) : SkippyOutput {
   internal val delegate = SimpleSkippyOutput(outputDir.resolve(tool))
 
   // Eagerly init the subdir and clear it if exists
-  @OptIn(ExperimentalPathApi::class)
   public override val subDir: Path =
     delegate.subDir.apply {
-      try {
-        deleteIfExists()
-      } catch (e: DirectoryNotEmptyException) {
-        deleteRecursively()
+      if (fs.exists(this)) {
+        fs.deleteRecursively(this)
       }
     }
 
   public override val affectedProjectsFile: Path by lazy {
-    delegate.affectedProjectsFile.prepareForGradleOutput()
+    delegate.affectedProjectsFile.prepareForGradleOutput(fs)
   }
 
   public override val affectedAndroidTestProjectsFile: Path by lazy {
-    delegate.affectedAndroidTestProjectsFile.prepareForGradleOutput()
+    delegate.affectedAndroidTestProjectsFile.prepareForGradleOutput(fs)
   }
 
   public override val outputFocusFile: Path by lazy {
-    delegate.outputFocusFile.prepareForGradleOutput()
+    delegate.outputFocusFile.prepareForGradleOutput(fs)
   }
 }

@@ -15,13 +15,33 @@
  */
 package slack.gradle.util
 
-import java.nio.file.Path
-import kotlin.io.path.createFile
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.deleteIfExists
+import okio.FileSystem
+import okio.Path
 
-internal fun Path.prepareForGradleOutput() = apply {
-  deleteIfExists()
-  createParentDirectories()
-  createFile()
+internal fun Path.prepareForGradleOutput(fs: FileSystem) = apply {
+  if (fs.exists(this)) fs.delete(this)
+  parent?.let(fs::createDirectories)
+}
+
+internal fun Path.readLines(fs: FileSystem): List<String> {
+  return fs.read(this) {
+    val lines = mutableListOf<String>()
+    while (!exhausted()) {
+      readUtf8Line()?.let { lines += it }
+    }
+    lines
+  }
+}
+
+internal fun Path.writeLines(lines: Iterable<String>, fs: FileSystem) {
+  fs.write(this) {
+    lines.forEach { line ->
+      writeUtf8(line)
+      writeUtf8("\n")
+    }
+  }
+}
+
+internal fun Path.writeText(text: String, fs: FileSystem) {
+  fs.write(this) { writeUtf8(text) }
 }
