@@ -398,7 +398,7 @@ dependencyAnalysis {
       ignoreGeneratedCode()
     }
   }
-  this.dependencies {
+  structure {
     bundle("agp") {
       primary("com.android.tools.build:gradle")
       includeGroup("com.android.tools.build")
