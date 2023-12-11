@@ -17,10 +17,7 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
-import java.nio.file.DirectoryNotEmptyException
 import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.readLines
 import kotlin.io.path.writeLines
@@ -52,7 +49,6 @@ import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.flatMapToSet
 import slack.gradle.util.parallelMapNotNull
-import slack.gradle.util.prepareForGradleOutput
 import slack.gradle.util.setDisallowChanges
 
 /**
@@ -303,54 +299,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
         // Overrides of includes/neverSkippable patterns should be done in the consuming project
         // directly
       }
-    }
-  }
-
-  public interface SkippyOutput {
-    /** The tool-specific directory. */
-    public val subDir: Path
-
-    /** The output list of affected projects. */
-    public val affectedProjectsFile: Path
-
-    /** The output list of affected androidTest projects. */
-    public val affectedAndroidTestProjectsFile: Path
-
-    /** An output .focus file that could be used with the Focus plugin. */
-    public val outputFocusFile: Path
-  }
-
-  public class SimpleSkippyOutput(public override val subDir: Path) : SkippyOutput {
-    public override val affectedProjectsFile: Path = subDir.resolve("affected_projects.txt")
-    public override val affectedAndroidTestProjectsFile: Path =
-      subDir.resolve("affected_android_test_projects.txt")
-    public override val outputFocusFile: Path = subDir.resolve("focus.settings.gradle")
-  }
-
-  public class WritableSkippyOutput(tool: String, outputDir: Path) : SkippyOutput {
-    internal val delegate = SimpleSkippyOutput(outputDir.resolve(tool))
-
-    // Eagerly init the subdir and clear it if exists
-    @OptIn(ExperimentalPathApi::class)
-    public override val subDir: Path =
-      delegate.subDir.apply {
-        try {
-          deleteIfExists()
-        } catch (e: DirectoryNotEmptyException) {
-          deleteRecursively()
-        }
-      }
-
-    public override val affectedProjectsFile: Path by lazy {
-      delegate.affectedProjectsFile.prepareForGradleOutput()
-    }
-
-    public override val affectedAndroidTestProjectsFile: Path by lazy {
-      delegate.affectedAndroidTestProjectsFile.prepareForGradleOutput()
-    }
-
-    public override val outputFocusFile: Path by lazy {
-      delegate.outputFocusFile.prepareForGradleOutput()
     }
   }
 }
