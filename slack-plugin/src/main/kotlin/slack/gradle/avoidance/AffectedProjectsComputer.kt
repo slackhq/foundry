@@ -19,6 +19,7 @@ import com.jraska.module.graph.DependencyGraph
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
+import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
 import slack.gradle.util.SgpLogger
 
 /**
@@ -84,7 +85,7 @@ internal class AffectedProjectsComputer(
   private val dependencyGraph: () -> DependencyGraph,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
-  private val config: SkippyConfig = SkippyConfig(SkippyExtension.GLOBAL_TOOL),
+  private val config: SkippyConfig = SkippyConfig(GLOBAL_TOOL),
   private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,

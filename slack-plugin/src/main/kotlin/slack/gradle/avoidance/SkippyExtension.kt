@@ -17,6 +17,7 @@ package slack.gradle.avoidance
 
 import javax.inject.Inject
 import org.gradle.api.Action
+import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -26,14 +27,11 @@ import org.jetbrains.annotations.CheckReturnValue
 import slack.gradle.SlackExtensionMarker
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
+import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
 import slack.gradle.setProperty
 
 @SlackExtensionMarker
 public abstract class SkippyExtension @Inject constructor(objects: ObjectFactory) {
-
-  internal companion object {
-    const val GLOBAL_TOOL = "global"
-  }
 
   public val mergeOutputs: Property<Boolean> =
     objects.property(Boolean::class.java).convention(true)
@@ -56,7 +54,11 @@ public abstract class SkippyExtension @Inject constructor(objects: ObjectFactory
 }
 
 /** A gradle representation of [SkippyConfig]. See its doc for more details. */
-public abstract class SkippyGradleConfig @Inject constructor(objects: ObjectFactory) {
+public abstract class SkippyGradleConfig
+@Inject
+constructor(private val name: String, objects: ObjectFactory) : Named {
+  override fun getName(): String = name
+
   @get:Input
   public val includePatterns: SetProperty<String> =
     objects.setProperty<String>().convention(DEFAULT_INCLUDE_PATTERNS)
@@ -69,8 +71,8 @@ public abstract class SkippyGradleConfig @Inject constructor(objects: ObjectFact
   public val neverSkipPatterns: SetProperty<String> =
     objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
-  internal fun asSkippyConfig(tool: String): SkippyConfig {
-    return SkippyConfig(tool, includePatterns.get(), excludePatterns.get(), neverSkipPatterns.get())
+  internal fun asSkippyConfig(): SkippyConfig {
+    return SkippyConfig(name, includePatterns.get(), excludePatterns.get(), neverSkipPatterns.get())
   }
 }
 
@@ -95,6 +97,10 @@ public data class SkippyConfig(
   public val excludePatterns: Set<String> = emptySet(),
   public val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
 ) {
+  public companion object {
+    public const val GLOBAL_TOOL: String = "global"
+  }
+
   @CheckReturnValue
   public fun overlayWith(other: SkippyConfig): SkippyConfig {
     return copy(

@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.flatMapToSet
 import slack.gradle.util.parallelMapNotNull
@@ -77,8 +78,7 @@ internal class SkippyRunner(
         configMap.values
       } else {
         // No per-service configs, just use the global one
-        val globalConfig =
-          configMap.remove(SkippyExtension.GLOBAL_TOOL) ?: error("No global config!")
+        val globalConfig = configMap.remove(GLOBAL_TOOL) ?: error("No global config!")
         configMap.values.map { config -> config.overlayWith(globalConfig) }
       }
 

@@ -117,7 +117,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
           diagnostics = this@ComputeAffectedProjectsTask,
           changedFilesPath = rootDirPath.resolve(changedFiles.get()),
           originalConfigMap =
-            configs.asMap.mapValues { (tool, gradleConfig) -> gradleConfig.asSkippyConfig(tool) },
+            configs.map(SkippyGradleConfig::asSkippyConfig).associateBy { it.tool },
         )
         .run(context)
     }
