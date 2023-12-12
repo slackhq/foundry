@@ -36,7 +36,6 @@ import slack.gradle.util.writeText
 
 internal class SkippyRunner(
   private val outputsDir: Path,
-  private val diagnosticsDir: Path,
   private val androidTestProjects: Set<String> = emptySet(),
   private val rootDir: Path,
   private val dependencyGraph: DependencyGraph.SerializableGraph,
@@ -46,7 +45,6 @@ internal class SkippyRunner(
   private val debug: Boolean = false,
   private val logger: SgpLogger = SgpLogger.noop(),
   private val mergeOutputs: Boolean = true,
-  private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
 ) {
   companion object {
     private const val LOG_PREFIX = "[Skippy]"
@@ -63,14 +61,6 @@ internal class SkippyRunner(
         fs.deleteRecursively(this)
       }
       fs.createDirectories(this)
-    }
-    if (debug) {
-      diagnosticsDir.apply {
-        if (fs.exists(this)) {
-          fs.deleteRecursively(this)
-        }
-        fs.createDirectories(this)
-      }
     }
 
     val configMap = originalConfigMap.toMutableMap()
@@ -89,26 +79,31 @@ internal class SkippyRunner(
       val outputs =
         configs.parallelMapNotNull(configs.size) { config -> computeForTool(config, baseOutputDir) }
       if (mergeOutputs) {
+        // Always init the merged output dir so it clears any existing files
         val mergedOutput = WritableSkippyOutput("merged", baseOutputDir, fs)
-        val mergedAffectedProjects = async {
-          outputs.flatMapToSet { it.affectedProjectsFile.readLines(fs) }.toSortedSet()
+        // If any of the outputs are null, then we should skip the merge as a
+        // never-skip scenario for one means never-skip for all
+        if (outputs.size == configs.size) {
+          val mergedAffectedProjects = async {
+            outputs.flatMapToSet { it.affectedProjectsFile.readLines(fs) }.toSortedSet()
+          }
+          val mergedAffectedAndroidTestProjects = async {
+            outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines(fs) }.toSortedSet()
+          }
+          val mergedFocusProjects = async {
+            outputs.flatMapToSet { it.outputFocusFile.readLines(fs) }.toSortedSet()
+          }
+          val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
+            listOf(
+                mergedAffectedProjects,
+                mergedAffectedAndroidTestProjects,
+                mergedFocusProjects,
+              )
+              .awaitAll()
+          mergedOutput.affectedProjectsFile.writeLines(affectedProjects, fs)
+          mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects, fs)
+          mergedOutput.outputFocusFile.writeLines(focusProjects, fs)
         }
-        val mergedAffectedAndroidTestProjects = async {
-          outputs.flatMapToSet { it.affectedAndroidTestProjectsFile.readLines(fs) }.toSortedSet()
-        }
-        val mergedFocusProjects = async {
-          outputs.flatMapToSet { it.outputFocusFile.readLines(fs) }.toSortedSet()
-        }
-        val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
-          listOf(
-              mergedAffectedProjects,
-              mergedAffectedAndroidTestProjects,
-              mergedFocusProjects,
-            )
-            .awaitAll()
-        mergedOutput.affectedProjectsFile.writeLines(affectedProjects, fs)
-        mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects, fs)
-        mergedOutput.outputFocusFile.writeLines(focusProjects, fs)
       }
     }
   }
@@ -118,9 +113,21 @@ internal class SkippyRunner(
     val tool = config.tool
     val skippyOutputs = WritableSkippyOutput(tool, outputDir, fs)
     val prefixLogger = SgpLogger.prefix("$LOG_PREFIX[$tool]", logger)
-    return logTimedValue(tool, "gradle task computation") {
+    val diagnostics =
+      if (debug) {
+        val diagnosticsDir = outputsDir / tool / "diagnostics"
+        fs.createDirectories(diagnosticsDir)
+        DiagnosticWriter { name, content ->
+          val path = diagnosticsDir / name
+          prefixLogger.lifecycle("writing diagnostic file: $path")
+          fs.write(path) { writeUtf8(content()) }
+        }
+      } else {
+        DiagnosticWriter.NoOp
+      }
+    return logTimedValue(tool, "SkippyRunner computation") {
       // Write the config to a diagnostic file
-      diagnostics.write(tool, "config.json") {
+      diagnostics.write("config.json") {
         JsonTools.MOSHI.adapter<SkippyConfig>().indent("  ").toJson(config)
       }
 

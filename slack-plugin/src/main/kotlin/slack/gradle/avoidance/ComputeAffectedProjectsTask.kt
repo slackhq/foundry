@@ -53,7 +53,7 @@ import slack.gradle.util.setDisallowChanges
  *   match 1:1 to the properties of that class.
  */
 @UntrackedTask(because = "This task is a meta task that more or less runs as a utility script.")
-public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWriter {
+public abstract class ComputeAffectedProjectsTask : DefaultTask() {
 
   @get:Input
   public val debug: Property<Boolean> =
@@ -78,9 +78,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   @get:Option(option = "changed-files", description = "A relative file path to changed_files.txt.")
   @get:Input
   public abstract val changedFiles: Property<String>
-
-  /** Output diagnostics directory for use in debugging. */
-  @get:OutputDirectory public abstract val diagnosticsDir: DirectoryProperty
 
   /** Output dir for skippy outputs. */
   @get:OutputDirectory public abstract val outputsDir: DirectoryProperty
@@ -109,12 +106,10 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
           logger = SgpLogger.gradle(logger),
           mergeOutputs = mergeOutputs.get(),
           outputsDir = outputsDir.get().asFile.toOkioPath(),
-          diagnosticsDir = diagnosticsDir.get().asFile.toOkioPath(),
           androidTestProjects = androidTestProjects.get(),
           rootDir = rootDirPath,
           fs = FileSystem.SYSTEM,
           dependencyGraph = dependencyGraph.get(),
-          diagnostics = this@ComputeAffectedProjectsTask,
           changedFilesPath = rootDirPath.resolve(changedFiles.get()),
           originalConfigMap =
             configs.map(SkippyGradleConfig::asSkippyConfig).associateBy { it.tool },
@@ -129,15 +124,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
           body(dispatcher)
         }
       }
-    }
-  }
-
-  override fun write(tool: String, name: String, content: () -> String) {
-    if (debug.get()) {
-      val file = diagnosticsDir.get().file("$name.txt").asFile
-      logger.lifecycle(tool, "writing diagnostic file: $path")
-      file.parentFile.mkdirs()
-      file.writeText(content())
     }
   }
 
@@ -187,7 +173,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
         configs.addAll(extension.configs)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
-        diagnosticsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy/diagnostics"))
         outputsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy"))
         // Overrides of includes/neverSkippable patterns should be done in the consuming project
         // directly

@@ -96,7 +96,6 @@ internal class AffectedProjectsComputer(
   }
 
   private fun computeImpl(): AffectedProjectsResult? {
-    val tool = config.tool
     val includePatterns = config.includePatterns
     val neverSkipPatterns = config.neverSkipPatterns
     val excludePatterns = config.excludePatterns
@@ -167,7 +166,7 @@ internal class AffectedProjectsComputer(
             gradlePath to ChangedProject(relativePath, gradlePath, files.toSet())
           }
       }
-    diagnostics.write(tool, "changedProjects.txt") {
+    diagnostics.write("changedProjects.txt") {
       changedProjects.entries
         .sortedBy { it.key }
         .joinToString("\n") { (_, v) ->
@@ -190,7 +189,7 @@ internal class AffectedProjectsComputer(
         }
       }
 
-    diagnostics.write(tool, "shallowProjectsToDependencies.txt") {
+    diagnostics.write("shallowProjectsToDependencies.txt") {
       buildString {
         for ((project, dependencies) in shallowProjectsToDependencies.toSortedMap()) {
           appendLine(project)
@@ -208,7 +207,7 @@ internal class AffectedProjectsComputer(
         }
       }
 
-    diagnostics.write(tool, "projectsToDependencies.txt") {
+    diagnostics.write("projectsToDependencies.txt") {
       buildString {
         for ((project, dependencies) in projectsToDependencies.toSortedMap()) {
           appendLine(project)
@@ -221,7 +220,7 @@ internal class AffectedProjectsComputer(
 
     val projectsToDependents = logTimedValue("computing dependents", projectsToDependencies::flip)
 
-    diagnostics.write(tool, "projectsToDependents.txt") {
+    diagnostics.write("projectsToDependents.txt") {
       buildString {
         for ((project, dependencies) in projectsToDependents.toSortedMap()) {
           appendLine(project)
@@ -366,6 +365,7 @@ internal class AffectedProjectsComputer(
     ): Map<Path, PathMatcher?> =
       filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
 
+    // TODO pre-compute this in SkippyRunner and pass it in
     /** Returns a deep set of all dependencies for the given [project], including transitive. */
     // TODO future optimization could be to include previously-computed project dependencies as a
     //  cache.

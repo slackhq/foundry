@@ -24,7 +24,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
-import org.jetbrains.annotations.CheckReturnValue
 import slack.gradle.SlackExtensionMarker
 import slack.gradle.SlackProperties
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
@@ -78,6 +77,15 @@ constructor(private val name: String, objects: ObjectFactory) : Named {
   public val neverSkipPatterns: SetProperty<String> =
     objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
 
+  /**
+   * Apply the default patterns to this config. This is useful when adding to them but wanting to
+   * keep the defaults applied too.
+   */
+  public fun applyDefaults() {
+    includePatterns.addAll(DEFAULT_INCLUDE_PATTERNS)
+    neverSkipPatterns.addAll(DEFAULT_NEVER_SKIP_PATTERNS)
+  }
+
   internal fun asSkippyConfig(): SkippyConfig {
     return SkippyConfig(name, includePatterns.get(), excludePatterns.get(), neverSkipPatterns.get())
   }
@@ -109,7 +117,6 @@ public data class SkippyConfig(
     public const val GLOBAL_TOOL: String = "global"
   }
 
-  @CheckReturnValue
   public fun overlayWith(other: SkippyConfig): SkippyConfig {
     return copy(
       includePatterns = includePatterns + other.includePatterns,

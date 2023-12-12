@@ -16,9 +16,9 @@
 package slack.gradle.avoidance
 
 internal fun interface DiagnosticWriter {
-  fun write(tool: String, name: String, content: () -> String)
+  fun write(name: String, content: () -> String)
 
   object NoOp : DiagnosticWriter {
-    override fun write(tool: String, name: String, content: () -> String) {}
+    override fun write(name: String, content: () -> String) {}
   }
 }
