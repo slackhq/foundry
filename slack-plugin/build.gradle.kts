@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   kotlin("jvm")
@@ -27,9 +26,7 @@ gradlePlugin {
 
 buildConfig {
   packageName("slack.gradle.dependencies")
-  useKotlinOutput {
-    internalVisibility = true
-  }
+  useKotlinOutput { internalVisibility = true }
 }
 
 // Copy our hooks into resources for InstallCommitHooks
@@ -41,6 +38,17 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 moshi { enableSealed.set(true) }
+
+// This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
+// apply disambiguation rules
+dependencies.constraints {
+  add("implementation", "io.github.pdvrieze.xmlutil:serialization") {
+    attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+  }
+  add("implementation", "io.github.pdvrieze.xmlutil:core") {
+    attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+  }
+}
 
 dependencies {
   api(platform(libs.okhttp.bom))
@@ -60,16 +68,6 @@ dependencies {
   implementation(libs.jgrapht)
   implementation(libs.jna)
   implementation(libs.jna.platform)
-  // This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
-  // apply disambiguation rules
-  dependencies.constraints {
-    add("implementation", "io.github.pdvrieze.xmlutil:serialization") {
-      attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
-    }
-    add("implementation", "io.github.pdvrieze.xmlutil:core") {
-      attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
-    }
-  }
   implementation(libs.kotlinCliUtil)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
