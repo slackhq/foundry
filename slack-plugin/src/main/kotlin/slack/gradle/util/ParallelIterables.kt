@@ -27,12 +27,13 @@ import kotlinx.coroutines.sync.Semaphore
  */
 internal suspend inline fun <A, B> Iterable<A>.parallelMap(
   parallelism: Int,
+  start: CoroutineStart = CoroutineStart.DEFAULT,
   crossinline mapper: suspend (A) -> B
 ): List<B> = coroutineScope {
   val semaphore = Semaphore(parallelism)
   map {
       semaphore.acquire()
-      async(start = CoroutineStart.UNDISPATCHED) {
+      async(start = start) {
         try {
           mapper(it)
         } finally {
@@ -49,12 +50,13 @@ internal suspend inline fun <A, B> Iterable<A>.parallelMap(
  */
 internal suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
   parallelism: Int,
+  start: CoroutineStart = CoroutineStart.DEFAULT,
   crossinline mapper: suspend (A) -> B?
 ): List<B> = coroutineScope {
   val semaphore = Semaphore(parallelism)
   map {
       semaphore.acquire()
-      async(start = CoroutineStart.UNDISPATCHED) {
+      async(start = start) {
         try {
           mapper(it)
         } finally {
@@ -72,12 +74,13 @@ internal suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
  */
 internal suspend inline fun <A> Iterable<A>.parallelForEach(
   parallelism: Int,
+  start: CoroutineStart = CoroutineStart.DEFAULT,
   crossinline action: suspend (A) -> Unit
 ): Unit = coroutineScope {
   val semaphore = Semaphore(parallelism)
   forEach {
     semaphore.acquire()
-    launch(start = CoroutineStart.UNDISPATCHED) {
+    launch(start = start) {
       try {
         action(it)
       } finally {
