@@ -91,7 +91,7 @@ internal class AffectedProjectsComputer(
   private val logger: SgpLogger = SgpLogger.noop(),
 ) {
   fun compute(): AffectedProjectsResult? {
-    return logTimedValue("full computation") { computeImpl() }
+    return logTimedValue("full computation on thread ${Thread.currentThread()}") { computeImpl() }
   }
 
   private fun computeImpl(): AffectedProjectsResult? {

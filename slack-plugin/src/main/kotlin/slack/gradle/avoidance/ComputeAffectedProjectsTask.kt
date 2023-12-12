@@ -120,6 +120,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
       if (configs.size == 1) {
         body(Dispatchers.Unconfined)
       } else {
+        // TODO what's up here?
+        logger.lifecycle("Running ${configs.size} configs in parallel")
         newFixedThreadPoolContext(configs.size, "computeAffectedProjects").use { dispatcher ->
           body(dispatcher)
         }
