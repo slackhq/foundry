@@ -1,6 +1,68 @@
 Changelog
 =========
 
+0.14.0
+------
+
+_2023-12-12_
+
+- Support granular Skippy configuration. Now each tool can be configured independently with both global and per-tool configuration. These are controlled via public `skippy` extension now. These outputs and diagnostics are stored at `build/skippy/{tool}/...`. Merged outputs can be generated as well to `build/skippy/merged`. This allows for creating dynamic pipelines based on the outputs of each tool. The global config is always overlaid onto each tool-specific config.
+
+```kotlin
+skippy {
+  debug.set(true)
+  mergeOutputs.set(true)
+  computeInParallel.set(true)
+  global {
+    applyDefaults()
+    // Glob patterns of files to include in computing
+    includePatterns.addAll(
+      "**/*.pro",
+      "**/src/**/sqldelight/**",
+    )
+    excludePatterns.addAll(".idea/**/*.kt")
+    // Glob patterns of files that, if changed, should result in not skipping anything in the build
+    neverSkipPatterns.addAll(
+      ".buildkite/**",
+      ".github/actions/**",
+      "ci/**",
+      "config/health-score/**",
+      "tooling/scripts/**",
+    )
+  }
+  config("lint") {
+    includePatterns.addAll(
+      // project-local lint.xml files
+      // this doesn't fuuuuully work with skippy because these layer like .gitignore does
+      "**/lint.xml",
+      // Lint baselines
+      "**/lint-baseline.xml",
+    )
+    neverSkipPatterns.addAll(
+      // Global lint config
+      "config/lint/lint.xml",
+      // Houston feature flags, which is an input to our feature flags lints
+      "config/feature-flags/experiments.txt",
+    )
+  }
+  config("detekt") {
+    // Detekt baselines
+    includePatterns.add("**/detekt-baseline.xml")
+    // Global detekt configs
+    neverSkipPatterns.add("config/detekt/*")
+  }
+}
+```
+
+- Update Kotlin language version to `1.9`.
+- Upgrade away from deprecated CC API check.
+- Update to okio `3.6.0`
+- Update to oshi `6.4.9`
+- Update to JNA `5.14.0`
+- Update to kotlin-cli-util `2.5.4`
+- Build against AGP `8.3.0-alpha17` in AgpHandler 8.3 artifact.
+- Build against DAGP `1.27.0`.
+
 0.13.1
 ------
 
