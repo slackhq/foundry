@@ -8,4 +8,9 @@ dependencies {
 
   compileOnly(gradleApi())
   compileOnly(libs.agp)
+
+  testImplementation(gradleApi())
+  testImplementation(libs.agp)
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
 }

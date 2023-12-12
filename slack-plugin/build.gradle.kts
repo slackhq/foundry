@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.bestPracticesPlugin)
   alias(libs.plugins.moshix)
+  alias(libs.plugins.buildConfig)
 }
 
 gradlePlugin {
@@ -24,30 +25,12 @@ gradlePlugin {
   }
 }
 
-sourceSets {
-  main.configure {
-    java.srcDir(
-      project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main")
-    )
+buildConfig {
+  packageName("slack.gradle.dependencies")
+  useKotlinOutput {
+    internalVisibility = true
   }
 }
-
-// NOTE: DON'T CHANGE THIS TASK NAME WITHOUT CHANGING IT IN THE ROOT BUILD FILE TOO!
-val copyVersionTemplatesProvider =
-  tasks.register<Copy>("copyVersionTemplates") {
-    from(project.layout.projectDirectory.dir("version-templates"))
-    into(project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main"))
-    filteringCharset = "UTF-8"
-
-    doFirst {
-      if (destinationDir.exists()) {
-        // Clear output dir first if anything is present
-        destinationDir.listFiles()?.forEach { it.delete() }
-      }
-    }
-  }
-
-tasks.named<KotlinCompile>("compileKotlin") { dependsOn(copyVersionTemplatesProvider) }
 
 // Copy our hooks into resources for InstallCommitHooks
 tasks.named<ProcessResources>("processResources") {
@@ -57,9 +40,6 @@ tasks.named<ProcessResources>("processResources") {
   }
 }
 
-// Necessary for gradle exec optimizations in gradle 8
-tasks.matching { it.name == "sourcesJar" }.configureEach { dependsOn(copyVersionTemplatesProvider) }
-
 moshi { enableSealed.set(true) }
 
 dependencies {
@@ -67,7 +47,7 @@ dependencies {
   api(libs.okhttp)
   // Better I/O
   api(libs.okio)
-  api(projects.agpHandlers.agpHandler80)
+  api(projects.agpHandlers.agpHandler82)
   api(projects.agpHandlers.agpHandler83)
   api(projects.agpHandlers.agpHandlerApi)
 
