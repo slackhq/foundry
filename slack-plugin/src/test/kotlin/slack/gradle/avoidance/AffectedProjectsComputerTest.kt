@@ -16,7 +16,6 @@
 package slack.gradle.avoidance
 
 import com.google.common.truth.Truth.assertThat
-import com.jraska.module.graph.DependencyGraph
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
@@ -31,9 +30,7 @@ import slack.gradle.util.SgpLogger
 class AffectedProjectsComputerTest {
 
   private val diagnostics = mutableMapOf<String, String>()
-  private val diagnosticWriter = DiagnosticWriter { tool, name, content ->
-    diagnostics[tool + name] = content()
-  }
+  private val diagnosticWriter = DiagnosticWriter { name, content -> diagnostics[name] = content() }
   private val fileSystem = FakeFileSystem()
   private lateinit var rootDirPath: Path
   private lateinit var rootTestProject: TestProject
@@ -49,10 +46,13 @@ class AffectedProjectsComputerTest {
       }
   }
 
-  private fun createComputer(dependencyGraph: DependencyGraph, changedFilePaths: List<String>) =
+  private fun createComputer(
+    dependencyMetadata: DependencyMetadata,
+    changedFilePaths: List<String>
+  ) =
     AffectedProjectsComputer(
       fileSystem = fileSystem,
-      dependencyGraph = { dependencyGraph },
+      dependencyMetadata = dependencyMetadata,
       changedFilePaths = createChangedFilePaths(changedFilePaths),
       androidTestProjects = setOf(":foo"),
       rootDirPath = rootDirPath,
@@ -64,7 +64,11 @@ class AffectedProjectsComputerTest {
   @Test
   fun `singular graph with no changes and no files is empty`() {
     createComputer(
-        dependencyGraph = DependencyGraph.createSingular(":foo"),
+        dependencyMetadata =
+          DependencyMetadata(
+            projectsToDependents = mapOf(":foo" to emptySet()),
+            projectsToDependencies = mapOf(":foo" to emptySet()),
+          ),
         changedFilePaths = emptyList(),
       )
       .assertEmptyCompute()
@@ -78,7 +82,11 @@ class AffectedProjectsComputerTest {
       sourceFile("Example.kt", "class Example")
     }
     createComputer(
-        dependencyGraph = DependencyGraph.createSingular(":$projectName"),
+        dependencyMetadata =
+          DependencyMetadata(
+            projectsToDependents = mapOf(":$projectName" to emptySet()),
+            projectsToDependencies = mapOf(":$projectName" to emptySet()),
+          ),
         changedFilePaths = listOf("$projectName/src/main/kotlin/com/example/Example.kt"),
       )
       .assertComputed(
@@ -237,16 +245,11 @@ class AffectedProjectsComputerTest {
           ),
       )
 
-    val allRequiredProjects =
-      AffectedProjectsComputer.getAllDependencies(":test", projectsToDependencies)
+    val allRequiredProjects = SkippyRunner.getAllDependencies(":test", projectsToDependencies)
     assertThat(allRequiredProjects).containsExactly(":lib1", ":lib2", ":lib3", ":lib4")
 
     val allRequiredProjectsWithSelf =
-      AffectedProjectsComputer.getAllDependencies(
-        ":test",
-        projectsToDependencies,
-        includeSelf = true
-      )
+      SkippyRunner.getAllDependencies(":test", projectsToDependencies, includeSelf = true)
     assertThat(allRequiredProjectsWithSelf)
       .containsExactly(":test", ":lib1", ":lib2", ":lib3", ":lib4")
   }

@@ -29,10 +29,6 @@ import slack.gradle.util.writeLines
 
 class SkippyRunnerTest {
 
-  private val diagnostics = mutableMapOf<String, String>()
-  private val diagnosticWriter = DiagnosticWriter { tool, name, content ->
-    diagnostics[tool + name] = content()
-  }
   private val fs = FakeFileSystem()
   private lateinit var rootDirPath: Path
   private lateinit var rootTestProject: TestProject
@@ -58,7 +54,6 @@ class SkippyRunnerTest {
     SkippyRunner(
         rootDir = rootDirPath,
         outputsDir = rootDirPath / "build" / "skippy" / "outputs",
-        diagnosticsDir = rootDirPath / "build" / "skippy" / "diagnostics",
         androidTestProjects = setOf(":foo"),
         dependencyGraph = dependencyGraph.serializableGraph(),
         changedFilesPath = changedFilesPath,
@@ -66,7 +61,6 @@ class SkippyRunnerTest {
         debug = true,
         logger = SgpLogger.system(),
         mergeOutputs = true,
-        diagnostics = diagnosticWriter,
         fs = fs,
       )
       .run(coroutineContext)

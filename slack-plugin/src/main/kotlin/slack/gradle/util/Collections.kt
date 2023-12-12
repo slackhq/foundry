@@ -15,10 +15,36 @@
  */
 package slack.gradle.util
 
+import slack.gradle.avoidance.ComputeAffectedProjectsTask
+
 internal fun <T, R> Collection<T>.mapToSet(transform: (T) -> R): Set<R> {
   return mapTo(mutableSetOf(), transform)
 }
 
 internal fun <T, R> Collection<T>.flatMapToSet(transform: (T) -> Iterable<R>): Set<R> {
   return flatMapTo(mutableSetOf(), transform)
+}
+
+/**
+ * Flips a map. In the context of [ComputeAffectedProjectsTask], we use this to flip a map of
+ * projects to their dependencies to a map of projects to the projects that depend on them. We use
+ * this to find all affected projects given a seed of changed projects.
+ *
+ * Example:
+ *
+ *  ```
+ *  Given a map
+ *  {a:[b, c], b:[d], c:[d], d:[]}
+ *  return
+ *  {b:[a], c:[a], d:[b, c]}
+ *  ```
+ */
+internal fun Map<String, Set<String>>.flip(): Map<String, Set<String>> {
+  val flipped = mutableMapOf<String, MutableSet<String>>()
+  for ((project, dependenciesSet) in this) {
+    for (dependency in dependenciesSet) {
+      flipped.getOrPut(dependency, ::mutableSetOf).add(project)
+    }
+  }
+  return flipped
 }

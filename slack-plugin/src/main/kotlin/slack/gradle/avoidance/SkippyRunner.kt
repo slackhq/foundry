@@ -29,6 +29,7 @@ import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
 import slack.gradle.util.JsonTools
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.flatMapToSet
+import slack.gradle.util.flip
 import slack.gradle.util.parallelMapNotNull
 import slack.gradle.util.readLines
 import slack.gradle.util.writeLines
@@ -46,10 +47,6 @@ internal class SkippyRunner(
   private val logger: SgpLogger = SgpLogger.noop(),
   private val mergeOutputs: Boolean = true,
 ) {
-  companion object {
-    private const val LOG_PREFIX = "[Skippy]"
-  }
-
   init {
     check(fs.exists(rootDir)) { "rootDir does not exist: $rootDir" }
     check(fs.exists(changedFilesPath)) { "changedFilesPath does not exist: $changedFilesPath" }
@@ -76,8 +73,80 @@ internal class SkippyRunner(
 
     val baseOutputDir = outputsDir
     withContext(context) {
+      // Pre-compute dependency graph shape
+      val resolvedDependencyGraph =
+        logTimedValue("diagnostics", "resolving graph") { DependencyGraph.create(dependencyGraph) }
+      val diagnostics =
+        if (debug) {
+          val diagnosticsDir = outputsDir / "diagnostics"
+          fs.createDirectories(diagnosticsDir)
+          DiagnosticWriter { name, content ->
+            val path = diagnosticsDir / name
+            logger.lifecycle("writing diagnostic file: $path")
+            fs.write(path) { writeUtf8(content()) }
+          }
+        } else {
+          DiagnosticWriter.NoOp
+        }
+
+      val shallowProjectsToDependencies: Map<String, Set<String>> =
+        logTimedValue("diagnostics", "computing shallow dependencies") {
+          resolvedDependencyGraph.nodes().associate { node ->
+            val dependencies = mutableSetOf<DependencyGraph.Node>()
+            node.visitDependencies(dependencies)
+            node.key to dependencies.mapTo(mutableSetOf()) { it.key }
+          }
+        }
+
+      diagnostics.write("shallowProjectsToDependencies.txt") {
+        buildString {
+          for ((project, dependencies) in shallowProjectsToDependencies.toSortedMap()) {
+            appendLine(project)
+            for (dep in dependencies.sorted()) {
+              appendLine("-> $dep")
+            }
+          }
+        }
+      }
+
+      val projectsToDependencies =
+        logTimedValue("diagnostics", "computing full dependencies") {
+          shallowProjectsToDependencies.mapValues { (project, _) ->
+            getAllDependencies(project, shallowProjectsToDependencies)
+          }
+        }
+
+      diagnostics.write("projectsToDependencies.txt") {
+        buildString {
+          for ((project, dependencies) in projectsToDependencies.toSortedMap()) {
+            appendLine(project)
+            for (dep in dependencies.sorted()) {
+              appendLine("-> $dep")
+            }
+          }
+        }
+      }
+
+      val projectsToDependents =
+        logTimedValue("diagnostics", "computing dependents", projectsToDependencies::flip)
+
+      diagnostics.write("projectsToDependents.txt") {
+        buildString {
+          for ((project, dependencies) in projectsToDependents.toSortedMap()) {
+            appendLine(project)
+            for (dep in dependencies.sorted()) {
+              appendLine("-> $dep")
+            }
+          }
+        }
+      }
+
+      val dependencyMetadata = DependencyMetadata(projectsToDependents, projectsToDependencies)
+
       val outputs =
-        configs.parallelMapNotNull(configs.size) { config -> computeForTool(config, baseOutputDir) }
+        configs.parallelMapNotNull(configs.size) { config ->
+          computeForTool(config, baseOutputDir, dependencyMetadata)
+        }
       if (mergeOutputs) {
         // Always init the merged output dir so it clears any existing files
         val mergedOutput = WritableSkippyOutput("merged", baseOutputDir, fs)
@@ -109,7 +178,11 @@ internal class SkippyRunner(
   }
 
   /** Computes a [SkippyOutput] for the given [config]. */
-  private fun computeForTool(config: SkippyConfig, outputDir: Path): SkippyOutput? {
+  private fun computeForTool(
+    config: SkippyConfig,
+    outputDir: Path,
+    dependencyMetadata: DependencyMetadata,
+  ): SkippyOutput? {
     val tool = config.tool
     val skippyOutputs = WritableSkippyOutput(tool, outputDir, fs)
     val prefixLogger = SgpLogger.prefix("$LOG_PREFIX[$tool]", logger)
@@ -134,11 +207,7 @@ internal class SkippyRunner(
       val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
         AffectedProjectsComputer(
             rootDirPath = rootDir,
-            dependencyGraph = {
-              logTimedValue(tool, "creating dependency graph") {
-                DependencyGraph.create(dependencyGraph)
-              }
-            },
+            dependencyMetadata = dependencyMetadata,
             config = config,
             androidTestProjects = androidTestProjects,
             debug = debug,
@@ -193,5 +262,41 @@ internal class SkippyRunner(
     val (value, duration) = measureTimedValue(body)
     log(tool, "$name took $duration")
     return value
+  }
+
+  private fun DependencyGraph.Node.visitDependencies(setToAddTo: MutableSet<DependencyGraph.Node>) {
+    for (dependency in dependsOn) {
+      if (!setToAddTo.add(dependency)) {
+        // Only add transitives if we haven't already seen this dependency.
+        dependency.visitDependencies(setToAddTo)
+      }
+    }
+  }
+
+  companion object {
+    private const val LOG_PREFIX = "[Skippy]"
+
+    /** Returns a deep set of all dependencies for the given [project], including transitive. */
+    // TODO future optimization could be to include previously-computed project dependencies as a
+    //  cache.
+    internal fun getAllDependencies(
+      project: String,
+      projectsToDependencies: Map<String, Set<String>>,
+      includeSelf: Boolean = false,
+    ): Set<String> {
+      val result = mutableSetOf<String>()
+      fun addDependent(project: String) {
+        if (result.add(project)) {
+          projectsToDependencies[project]?.forEach(::addDependent)
+        }
+      }
+
+      addDependent(project)
+
+      if (!includeSelf) {
+        result.remove(project)
+      }
+      return result
+    }
   }
 }

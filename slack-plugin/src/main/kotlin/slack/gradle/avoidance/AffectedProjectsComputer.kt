@@ -15,7 +15,6 @@
  */
 package slack.gradle.avoidance
 
-import com.jraska.module.graph.DependencyGraph
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
@@ -68,8 +67,8 @@ import slack.gradle.util.SgpLogger
  *
  * @property rootDirPath Root repo directory. Used to compute relative paths and not considered an
  *   input.
- * @property dependencyGraph The serialized dependency graph as computed from our known
- *   configurations. Lazily loaded and only invoked onces.
+ * @property dependencyMetadata The dependency graph metadata as computed from our known
+ *   configurations. Lazily loaded and only invoked once.
  * @property changedFilePaths A relative (to the repo root) path to a changed_files.txt that
  *   contains a newline-delimited list of changed files. This is usually computed from a GitHub PR's
  *   changed files.
@@ -82,7 +81,7 @@ import slack.gradle.util.SgpLogger
  */
 internal class AffectedProjectsComputer(
   private val rootDirPath: Path,
-  private val dependencyGraph: () -> DependencyGraph,
+  private val dependencyMetadata: DependencyMetadata,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
   private val config: SkippyConfig = SkippyConfig(GLOBAL_TOOL),
@@ -178,65 +177,12 @@ internal class AffectedProjectsComputer(
         }
     }
 
-    val resolvedDependencyGraph = logTimedValue("resolving graph") { dependencyGraph() }
-
-    val shallowProjectsToDependencies: Map<String, Set<String>> =
-      logTimedValue("computing shallow dependencies") {
-        resolvedDependencyGraph.nodes().associate { node ->
-          val dependencies = mutableSetOf<DependencyGraph.Node>()
-          node.visitDependencies(dependencies)
-          node.key to dependencies.mapTo(mutableSetOf()) { it.key }
-        }
-      }
-
-    diagnostics.write("shallowProjectsToDependencies.txt") {
-      buildString {
-        for ((project, dependencies) in shallowProjectsToDependencies.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
-    val projectsToDependencies =
-      logTimedValue("computing full dependencies") {
-        shallowProjectsToDependencies.mapValues { (project, _) ->
-          getAllDependencies(project, shallowProjectsToDependencies)
-        }
-      }
-
-    diagnostics.write("projectsToDependencies.txt") {
-      buildString {
-        for ((project, dependencies) in projectsToDependencies.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
-    val projectsToDependents = logTimedValue("computing dependents", projectsToDependencies::flip)
-
-    diagnostics.write("projectsToDependents.txt") {
-      buildString {
-        for ((project, dependencies) in projectsToDependents.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
     val allAffectedProjects =
       buildSet {
           for ((path, change) in changedProjects) {
             add(path)
             if (change.affectsDependents) {
-              addAll(projectsToDependents[path] ?: emptySet())
+              addAll(dependencyMetadata.projectsToDependents[path] ?: emptySet())
             }
           }
         }
@@ -247,7 +193,7 @@ internal class AffectedProjectsComputer(
     val allRequiredProjects =
       allAffectedProjects
         .flatMap { project ->
-          val dependencies = projectsToDependencies[project].orEmpty()
+          val dependencies = dependencyMetadata.projectsToDependencies[project].orEmpty()
           dependencies + project
         }
         .toSortedSet()
@@ -364,64 +310,7 @@ internal class AffectedProjectsComputer(
       neverSkipPathMatchers: List<PathMatcher>
     ): Map<Path, PathMatcher?> =
       filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
-
-    // TODO pre-compute this in SkippyRunner and pass it in
-    /** Returns a deep set of all dependencies for the given [project], including transitive. */
-    // TODO future optimization could be to include previously-computed project dependencies as a
-    //  cache.
-    internal fun getAllDependencies(
-      project: String,
-      projectsToDependencies: Map<String, Set<String>>,
-      includeSelf: Boolean = false,
-    ): Set<String> {
-      val result = mutableSetOf<String>()
-      fun addDependent(project: String) {
-        if (result.add(project)) {
-          projectsToDependencies[project]?.forEach(::addDependent)
-        }
-      }
-
-      addDependent(project)
-
-      if (!includeSelf) {
-        result.remove(project)
-      }
-      return result
-    }
   }
-}
-
-private fun DependencyGraph.Node.visitDependencies(setToAddTo: MutableSet<DependencyGraph.Node>) {
-  for (dependency in dependsOn) {
-    if (!setToAddTo.add(dependency)) {
-      // Only add transitives if we haven't already seen this dependency.
-      dependency.visitDependencies(setToAddTo)
-    }
-  }
-}
-
-/**
- * Flips a map. In the context of [ComputeAffectedProjectsTask], we use this to flip a map of
- * projects to their dependencies to a map of projects to the projects that depend on them. We use
- * this to find all affected projects given a seed of changed projects.
- *
- * Example:
- *
- *  ```
- *  Given a map
- *  {a:[b, c], b:[d], c:[d], d:[]}
- *  return
- *  {b:[a], c:[a], d:[b, c]}
- *  ```
- */
-private fun Map<String, Set<String>>.flip(): Map<String, Set<String>> {
-  val flipped = mutableMapOf<String, MutableSet<String>>()
-  for ((project, dependenciesSet) in this) {
-    for (dependency in dependenciesSet) {
-      flipped.getOrPut(dependency, ::mutableSetOf).add(project)
-    }
-  }
-  return flipped
 }
 
 /** Return a new map with null keys filtered out. */
