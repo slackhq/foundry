@@ -23,6 +23,7 @@ import okio.fakefilesystem.FakeFileSystem
 import org.junit.Before
 import org.junit.Test
 import slack.gradle.util.SgpLogger
+import slack.gradle.util.readLines
 import slack.gradle.util.writeLines
 
 class SkippyRunnerTest {
@@ -50,7 +51,7 @@ class SkippyRunnerTest {
     dependencyGraph: DependencyGraph,
     changedFilePaths: List<String>,
     configs: List<SkippyConfig> = listOf(SkippyConfig(SkippyExtension.GLOBAL_TOOL)),
-  ) = runTest {
+  ): Unit = runTest {
     val changedFilesPath = rootDirPath / "changed_files.txt"
     changedFilesPath.writeLines(changedFilePaths, fs)
     SkippyRunner(
@@ -99,9 +100,95 @@ class SkippyRunnerTest {
       .isFalse()
   }
 
-  // TODO
-  //  - Single global
-  //  - Multiple tools global
-  //  - Merged outputs
-  //  - individual outputs
+  @Test
+  fun `simple change with multiple tools that affects all tools`() {
+    val projectName = "foo"
+    newSubProject(projectName) {
+      buildFile()
+      sourceFile("Example.kt", "class Example")
+    }
+    runSkippy(
+      dependencyGraph = DependencyGraph.createSingular(":$projectName"),
+      changedFilePaths = listOf("$projectName/src/main/kotlin/com/example/Example.kt"),
+      configs = listOf(SkippyConfig(SkippyExtension.GLOBAL_TOOL), SkippyConfig("lint"))
+    )
+
+    // Both lint and merged should have the same affected projects
+    for (tool in listOf("lint", "merged")) {
+      assertComputed(
+        tool,
+        expectedAffectedProjects = listOf(":$projectName"),
+        expectedFocusProjects = listOf(":$projectName"),
+        expectedAffectedAndroidTestProjects = listOf(":$projectName"),
+      )
+    }
+  }
+
+  @Test
+  fun `simple change with multiple tools that affects only affects some tools`() {
+    val fooProject = "foo"
+    newSubProject(fooProject) {
+      buildFile()
+      sourceFile("Example.kt", "class Example")
+    }
+    val barProject = "bar"
+    newSubProject(barProject) {
+      buildFile()
+      projectFile("lint-baseline.xml", "<lint-baseline></lint-baseline>")
+    }
+
+    runSkippy(
+      dependencyGraph = DependencyGraph.create(":$fooProject" to ":$barProject"),
+      changedFilePaths = listOf("$barProject/lint-baseline.xml"),
+      configs =
+        listOf(
+          SkippyConfig(SkippyExtension.GLOBAL_TOOL),
+          SkippyConfig("unitTest"),
+          SkippyConfig("lint").let {
+            it.copy(includePatterns = it.includePatterns + "**/lint-baseline.xml")
+          },
+        )
+    )
+
+    // Both lint and merged should have the same affected projects
+    for (tool in listOf("lint", "merged")) {
+      assertComputed(
+        tool,
+        expectedAffectedProjects = listOf(":$barProject"),
+        expectedFocusProjects = listOf(":$barProject"),
+        // Lint xml file doesn't affect android tests
+        expectedAffectedAndroidTestProjects = emptyList(),
+      )
+    }
+    assertComputed(
+      "unitTest",
+      expectedAffectedProjects = emptyList(),
+      expectedFocusProjects = emptyList(),
+      expectedAffectedAndroidTestProjects = emptyList(),
+    )
+  }
+
+  private fun skippyOutput(tool: String, fileName: String) =
+    rootDirPath.resolve("build/skippy/outputs/$tool/$fileName")
+
+  private fun assertComputed(
+    tool: String,
+    expectedAffectedProjects: List<String>,
+    expectedFocusProjects: List<String>,
+    expectedAffectedAndroidTestProjects: List<String>,
+  ) {
+    val includedProjects = expectedFocusProjects.map { "include(\"$it\")" }
+    assertThat(skippyOutput(tool, SkippyOutput.AFFECTED_PROJECTS_FILE_NAME).readLines(fs))
+      .containsExactlyElementsIn(expectedAffectedProjects)
+    assertThat(skippyOutput(tool, SkippyOutput.FOCUS_SETTINGS_FILE_NAME).readLines(fs))
+      .containsExactlyElementsIn(includedProjects)
+    assertThat(
+        skippyOutput(tool, SkippyOutput.AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME).readLines(fs)
+      )
+      .containsExactlyElementsIn(expectedAffectedAndroidTestProjects)
+  }
+
+  private fun newSubProject(name: String, body: TestProject.() -> Unit): TestProject {
+    return rootTestProject.subproject(name, body)
+  }
 }

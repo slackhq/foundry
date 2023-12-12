@@ -65,6 +65,10 @@ class TestProject(
     }
   }
 
+  fun projectFile(name: String, content: String) {
+    fileSystem.write(projectPath / name) { writeUtf8(content) }
+  }
+
   fun sourceFile(name: String, content: String) {
     sourceFile(name) { writeUtf8(content) }
   }

@@ -100,7 +100,7 @@ public data class SkippyConfig(
     return copy(
       includePatterns = includePatterns + other.includePatterns,
       excludePatterns = excludePatterns + other.excludePatterns,
-      neverSkipPatterns = neverSkipPatterns + other.neverSkipPatterns
+      neverSkipPatterns = neverSkipPatterns + other.neverSkipPatterns,
     )
   }
 }

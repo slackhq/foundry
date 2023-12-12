@@ -17,6 +17,9 @@ package slack.gradle.avoidance
 
 import okio.FileSystem
 import okio.Path
+import slack.gradle.avoidance.SkippyOutput.Companion.AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME
+import slack.gradle.avoidance.SkippyOutput.Companion.AFFECTED_PROJECTS_FILE_NAME
+import slack.gradle.avoidance.SkippyOutput.Companion.FOCUS_SETTINGS_FILE_NAME
 import slack.gradle.util.prepareForGradleOutput
 
 public interface SkippyOutput {
@@ -31,13 +34,20 @@ public interface SkippyOutput {
 
   /** An output .focus file that could be used with the Focus plugin. */
   public val outputFocusFile: Path
+
+  public companion object {
+    internal const val AFFECTED_PROJECTS_FILE_NAME: String = "affected_projects.txt"
+    internal const val AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME: String =
+      "affected_android_test_projects.txt"
+    internal const val FOCUS_SETTINGS_FILE_NAME: String = "focus.settings.gradle"
+  }
 }
 
 public class SimpleSkippyOutput(public override val subDir: Path) : SkippyOutput {
-  public override val affectedProjectsFile: Path = subDir.resolve("affected_projects.txt")
+  public override val affectedProjectsFile: Path = subDir.resolve(AFFECTED_PROJECTS_FILE_NAME)
   public override val affectedAndroidTestProjectsFile: Path =
-    subDir.resolve("affected_android_test_projects.txt")
-  public override val outputFocusFile: Path = subDir.resolve("focus.settings.gradle")
+    subDir.resolve(AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME)
+  public override val outputFocusFile: Path = subDir.resolve(FOCUS_SETTINGS_FILE_NAME)
 }
 
 public class WritableSkippyOutput(tool: String, outputDir: Path, fs: FileSystem) : SkippyOutput {
