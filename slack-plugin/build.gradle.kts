@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -79,6 +80,16 @@ dependencies {
   implementation(libs.jgrapht)
   implementation(libs.jna)
   implementation(libs.jna.platform)
+  // This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
+  // apply disambiguation rules
+  dependencies.constraints {
+    add("implementation", "io.github.pdvrieze.xmlutil:serialization") {
+      attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+    }
+    add("implementation", "io.github.pdvrieze.xmlutil:core") {
+      attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+    }
+  }
   implementation(libs.kotlinCliUtil)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
