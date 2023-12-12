@@ -15,8 +15,8 @@ slack.stats
 module:tracing
 com.slack.sgp.tracing.model
 com.slack.sgp.tracing.reporter
-module:agp-handler-80
-slack.gradle.agphandler.v80
+module:agp-handler-82
+slack.gradle.agphandler.v82
 module:agp-handler-83
 slack.gradle.agphandler.v83
 module:agp-handler-api
