@@ -15,6 +15,7 @@
  */
 package slack.gradle.avoidance
 
+import com.squareup.moshi.JsonClass
 import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Named
@@ -91,6 +92,7 @@ constructor(private val name: String, objects: ObjectFactory) : Named {
  *   **NOTE**: This list is always merged with [includePatterns] as these are implicitly relevant
  *   files.
  */
+@JsonClass(generateAdapter = true)
 public data class SkippyConfig(
   public val tool: String,
   public val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,

@@ -16,6 +16,7 @@
 package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
+import com.squareup.moshi.adapter
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.async
@@ -25,6 +26,7 @@ import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
+import slack.gradle.util.JsonTools
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.flatMapToSet
 import slack.gradle.util.parallelMapNotNull
@@ -117,7 +119,11 @@ internal class SkippyRunner(
     val skippyOutputs = WritableSkippyOutput(tool, outputDir, fs)
     val prefixLogger = SgpLogger.prefix("$LOG_PREFIX[$tool]", logger)
     return logTimedValue(tool, "gradle task computation") {
-      // TODO write the config to a diagnostic too
+      // Write the config to a diagnostic file
+      diagnostics.write(tool, "config.json") {
+        JsonTools.MOSHI.adapter<SkippyConfig>().indent("  ").toJson(config)
+      }
+
       val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
         AffectedProjectsComputer(
             rootDirPath = rootDir,
