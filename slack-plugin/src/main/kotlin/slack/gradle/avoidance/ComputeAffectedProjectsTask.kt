@@ -38,6 +38,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
+import slack.gradle.property
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.setDisallowChanges
@@ -56,16 +57,18 @@ import slack.gradle.util.setDisallowChanges
 public abstract class ComputeAffectedProjectsTask : DefaultTask() {
 
   @get:Input
-  public val debug: Property<Boolean> =
-    project.objects.property(Boolean::class.java).convention(false)
+  public val debug: Property<Boolean> = project.objects.property<Boolean>().convention(false)
 
   @get:Input
-  public val mergeOutputs: Property<Boolean> =
-    project.objects.property(Boolean::class.java).convention(true)
+  public val mergeOutputs: Property<Boolean> = project.objects.property<Boolean>().convention(true)
 
   @get:Input
   public val configs: NamedDomainObjectContainer<SkippyGradleConfig> =
     project.objects.domainObjectContainer(SkippyGradleConfig::class.java)
+
+  @get:Input
+  public val computeInParallel: Property<Boolean> =
+    project.objects.property<Boolean>().convention(true)
 
   @get:Input
   public val androidTestProjects: SetProperty<String> =
@@ -100,6 +103,12 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   @TaskAction
   internal fun compute() {
     val rootDirPath = rootDir.get().asFile.toOkioPath()
+    val parallelism =
+      if (computeInParallel.get() && configs.size > 1) {
+        configs.size
+      } else {
+        1
+      }
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug.get(),
@@ -108,6 +117,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
           outputsDir = outputsDir.get().asFile.toOkioPath(),
           androidTestProjects = androidTestProjects.get(),
           rootDir = rootDirPath,
+          parallelism = parallelism,
           fs = FileSystem.SYSTEM,
           dependencyGraph = dependencyGraph.get(),
           changedFilesPath = rootDirPath.resolve(changedFiles.get()),
@@ -116,11 +126,12 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
         )
         .run(context)
     }
+
     runBlocking {
-      if (configs.size == 1) {
+      if (parallelism == 1) {
         body(Dispatchers.Unconfined)
       } else {
-        logger.lifecycle("Running ${configs.size} configs in parallel")
+        logger.lifecycle("Running $parallelism configs in parallel")
         newFixedThreadPoolContext(3, "computeAffectedProjects").use { dispatcher ->
           body(dispatcher)
         }
@@ -171,6 +182,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(extension.debug)
         mergeOutputs.setDisallowChanges(extension.mergeOutputs)
+        computeInParallel.setDisallowChanges(extension.computeInParallel)
         configs.addAll(extension.configs)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })

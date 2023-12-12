@@ -42,6 +42,7 @@ internal class SkippyRunner(
   private val dependencyGraph: DependencyGraph.SerializableGraph,
   private val changedFilesPath: Path,
   private val originalConfigMap: Map<String, SkippyConfig>,
+  private val parallelism: Int = originalConfigMap.size,
   private val fs: FileSystem = FileSystem.SYSTEM,
   private val debug: Boolean = false,
   private val logger: SgpLogger = SgpLogger.noop(),
@@ -144,7 +145,7 @@ internal class SkippyRunner(
       val dependencyMetadata = DependencyMetadata(projectsToDependents, projectsToDependencies)
 
       val outputs =
-        configs.parallelMapNotNull(configs.size) { config ->
+        configs.parallelMapNotNull(parallelism) { config ->
           computeForTool(config, baseOutputDir, dependencyMetadata)
         }
       if (mergeOutputs) {

@@ -29,6 +29,7 @@ import slack.gradle.SlackProperties
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
 import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
+import slack.gradle.property
 import slack.gradle.setProperty
 
 @SlackExtensionMarker
@@ -37,10 +38,11 @@ public abstract class SkippyExtension
 constructor(slackProperties: SlackProperties, objects: ObjectFactory) {
 
   public val debug: Property<Boolean> =
-    objects.property(Boolean::class.java).convention(slackProperties.debug)
+    objects.property<Boolean>().convention(slackProperties.debug)
 
-  public val mergeOutputs: Property<Boolean> =
-    objects.property(Boolean::class.java).convention(true)
+  public val mergeOutputs: Property<Boolean> = objects.property<Boolean>().convention(true)
+
+  public val computeInParallel: Property<Boolean> = objects.property<Boolean>().convention(true)
 
   internal val configs: NamedDomainObjectContainer<SkippyGradleConfig> =
     objects.domainObjectContainer(SkippyGradleConfig::class.java)
