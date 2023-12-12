@@ -164,7 +164,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       rootProject: Project,
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjectsTask> {
-      val extension = rootProject.extensions.create("skippy", SkippyExtension::class.java)
+      val extension =
+        rootProject.extensions.create("skippy", SkippyExtension::class.java, slackProperties)
       val configurationsToLook by lazy {
         val providedConfigs = slackProperties.affectedProjectConfigurations
         providedConfigs?.splitToSequence(',')?.toSet()?.let { providedConfigSet ->
@@ -181,7 +182,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       }
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
-        debug.setDisallowChanges(slackProperties.debug)
+        debug.setDisallowChanges(extension.debug)
+        mergeOutputs.setDisallowChanges(extension.mergeOutputs)
         configs.addAll(extension.configs)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })

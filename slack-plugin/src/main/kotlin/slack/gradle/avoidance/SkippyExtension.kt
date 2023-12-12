@@ -26,13 +26,19 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.jetbrains.annotations.CheckReturnValue
 import slack.gradle.SlackExtensionMarker
+import slack.gradle.SlackProperties
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
 import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
 import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
 import slack.gradle.setProperty
 
 @SlackExtensionMarker
-public abstract class SkippyExtension @Inject constructor(objects: ObjectFactory) {
+public abstract class SkippyExtension
+@Inject
+constructor(slackProperties: SlackProperties, objects: ObjectFactory) {
+
+  public val debug: Property<Boolean> =
+    objects.property(Boolean::class.java).convention(slackProperties.debug)
 
   public val mergeOutputs: Property<Boolean> =
     objects.property(Boolean::class.java).convention(true)
