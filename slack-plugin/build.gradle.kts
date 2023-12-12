@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   kotlin("jvm")
@@ -26,9 +26,7 @@ gradlePlugin {
 
 buildConfig {
   packageName("slack.gradle.dependencies")
-  useKotlinOutput {
-    internalVisibility = true
-  }
+  useKotlinOutput { internalVisibility = true }
 }
 
 // Copy our hooks into resources for InstallCommitHooks
@@ -41,6 +39,17 @@ tasks.named<ProcessResources>("processResources") {
 
 moshi { enableSealed.set(true) }
 
+// This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
+// apply disambiguation rules
+dependencies.constraints {
+  add("implementation", "io.github.pdvrieze.xmlutil:serialization") {
+    attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+  }
+  add("implementation", "io.github.pdvrieze.xmlutil:core") {
+    attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+  }
+}
+
 dependencies {
   api(platform(libs.okhttp.bom))
   api(libs.okhttp)
@@ -50,7 +59,9 @@ dependencies {
   api(projects.agpHandlers.agpHandler83)
   api(projects.agpHandlers.agpHandlerApi)
 
+  implementation(platform(libs.coroutines.bom))
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
+  implementation(libs.coroutines.core)
   implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
   implementation(libs.guava)
   // Graphing library with Betweenness Centrality algo for modularization score
@@ -91,7 +102,9 @@ dependencies {
   compileOnly(libs.gradlePlugins.wire)
   compileOnly(libs.kotlin.reflect)
 
+  testImplementation(platform(libs.coroutines.bom))
   testImplementation(libs.agp)
+  testImplementation(libs.coroutines.test)
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)

@@ -16,12 +16,8 @@
 package slack.gradle.avoidance
 
 import com.google.common.truth.Truth.assertThat
-import com.jraska.module.graph.DependencyGraph
-import okio.BufferedSink
-import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
-import okio.buffer
 import okio.fakefilesystem.FakeFileSystem
 import org.junit.Before
 import org.junit.Test
@@ -50,10 +46,13 @@ class AffectedProjectsComputerTest {
       }
   }
 
-  private fun createComputer(dependencyGraph: DependencyGraph, changedFilePaths: List<String>) =
+  private fun createComputer(
+    dependencyMetadata: DependencyMetadata,
+    changedFilePaths: List<String>
+  ) =
     AffectedProjectsComputer(
       fileSystem = fileSystem,
-      dependencyGraph = { dependencyGraph },
+      dependencyMetadata = dependencyMetadata,
       changedFilePaths = createChangedFilePaths(changedFilePaths),
       androidTestProjects = setOf(":foo"),
       rootDirPath = rootDirPath,
@@ -65,7 +64,11 @@ class AffectedProjectsComputerTest {
   @Test
   fun `singular graph with no changes and no files is empty`() {
     createComputer(
-        dependencyGraph = DependencyGraph.createSingular(":foo"),
+        dependencyMetadata =
+          DependencyMetadata(
+            projectsToDependents = mapOf(":foo" to emptySet()),
+            projectsToDependencies = mapOf(":foo" to emptySet()),
+          ),
         changedFilePaths = emptyList(),
       )
       .assertEmptyCompute()
@@ -79,7 +82,11 @@ class AffectedProjectsComputerTest {
       sourceFile("Example.kt", "class Example")
     }
     createComputer(
-        dependencyGraph = DependencyGraph.createSingular(":$projectName"),
+        dependencyMetadata =
+          DependencyMetadata(
+            projectsToDependents = mapOf(":$projectName" to emptySet()),
+            projectsToDependencies = mapOf(":$projectName" to emptySet()),
+          ),
         changedFilePaths = listOf("$projectName/src/main/kotlin/com/example/Example.kt"),
       )
       .assertComputed(
@@ -238,16 +245,11 @@ class AffectedProjectsComputerTest {
           ),
       )
 
-    val allRequiredProjects =
-      AffectedProjectsComputer.getAllDependencies(":test", projectsToDependencies)
+    val allRequiredProjects = SkippyRunner.getAllDependencies(":test", projectsToDependencies)
     assertThat(allRequiredProjects).containsExactly(":lib1", ":lib2", ":lib3", ":lib4")
 
     val allRequiredProjectsWithSelf =
-      AffectedProjectsComputer.getAllDependencies(
-        ":test",
-        projectsToDependencies,
-        includeSelf = true
-      )
+      SkippyRunner.getAllDependencies(":test", projectsToDependencies, includeSelf = true)
     assertThat(allRequiredProjectsWithSelf)
       .containsExactly(":test", ":lib1", ":lib2", ":lib3", ":lib4")
   }
@@ -296,78 +298,4 @@ private fun AffectedProjectsResult?.assertEmpty() {
   val result = checkNotNull()
   assertThat(result.affectedProjects).isEmpty()
   assertThat(result.focusProjects).isEmpty()
-}
-
-private class TestProject(
-  private val fileSystem: FileSystem,
-  private val rootPath: Path,
-  private val gradlePath: String,
-  body: TestProject.() -> Unit
-) {
-  private val relativePath = gradlePath.removePrefix(":").replace(":", Path.DIRECTORY_SEPARATOR)
-  private val projectPath = rootPath / relativePath
-  private val sourcePath =
-    projectPath / "src" / "main" / "kotlin" / "com" / "example" / relativePath
-  private var settingsFile: Path? = null
-
-  val subprojects = mutableListOf<TestProject>()
-
-  init {
-    // Creates the project and source dirs
-    fileSystem.createDirectories(projectPath)
-    body()
-  }
-
-  fun subproject(gradlePath: String, body: TestProject.() -> Unit): TestProject {
-    val project = TestProject(fileSystem, rootPath, gradlePath, body)
-    subprojects += project
-    appendToSettings(gradlePath)
-    return project
-  }
-
-  fun buildFile(
-    isKts: Boolean = false,
-    content: String = "buildscript { repositories { mavenCentral() } }"
-  ) {
-    buildFile(isKts) { writeUtf8(content) }
-  }
-
-  fun buildFile(isKts: Boolean = false, body: BufferedSink.() -> Unit) {
-    val name = if (isKts) "build.gradle.kts" else "build.gradle"
-    fileSystem.write(projectPath / name, writerAction = body)
-  }
-
-  private fun ensureSourcePath() {
-    if (!fileSystem.exists(sourcePath)) {
-      fileSystem.createDirectories(sourcePath)
-    }
-  }
-
-  fun sourceFile(name: String, content: String) {
-    sourceFile(name) { writeUtf8(content) }
-  }
-
-  fun sourceFile(name: String, body: BufferedSink.() -> Unit) {
-    ensureSourcePath()
-    fileSystem.write(sourcePath / name, writerAction = body)
-  }
-
-  fun settingsFile(isKts: Boolean = false, vararg includes: String) {
-    settingsFile(isKts) { writeUtf8(includes.joinToString("\n") { "include(\"$it\")" }) }
-  }
-
-  fun appendToSettings(gradlePath: String) {
-    settingsFile?.let {
-      fileSystem.appendingSink(it, mustExist = true).buffer().use {
-        it.writeUtf8("\ninclude(\"$gradlePath\")")
-      }
-    }
-  }
-
-  fun settingsFile(isKts: Boolean = false, body: BufferedSink.() -> Unit) {
-    val name = if (isKts) "settings.gradle.kts" else "settings.gradle"
-    val path = projectPath / name
-    fileSystem.write(path, writerAction = body)
-    settingsFile = path
-  }
 }

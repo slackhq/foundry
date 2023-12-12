@@ -17,26 +17,28 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
-import kotlin.time.measureTimedValue
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.runBlocking
+import okio.FileSystem
 import okio.Path.Companion.toOkioPath
-import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
+import slack.gradle.property
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.setDisallowChanges
@@ -52,23 +54,21 @@ import slack.gradle.util.setDisallowChanges
  *   match 1:1 to the properties of that class.
  */
 @UntrackedTask(because = "This task is a meta task that more or less runs as a utility script.")
-public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWriter {
+public abstract class ComputeAffectedProjectsTask : DefaultTask() {
 
   @get:Input
-  public val debug: Property<Boolean> =
-    project.objects.property(Boolean::class.java).convention(false)
+  public val debug: Property<Boolean> = project.objects.property<Boolean>().convention(false)
 
   @get:Input
-  public val includePatterns: SetProperty<String> =
-    project.objects.setProperty<String>().convention(DEFAULT_INCLUDE_PATTERNS)
+  public val mergeOutputs: Property<Boolean> = project.objects.property<Boolean>().convention(true)
 
   @get:Input
-  public val excludePatterns: SetProperty<String> =
-    project.objects.setProperty<String>().convention(emptySet())
+  public val configs: NamedDomainObjectContainer<SkippyGradleConfig> =
+    project.objects.domainObjectContainer(SkippyGradleConfig::class.java)
 
   @get:Input
-  public val neverSkipPatterns: SetProperty<String> =
-    project.objects.setProperty<String>().convention(DEFAULT_NEVER_SKIP_PATTERNS)
+  public val computeInParallel: Property<Boolean> =
+    project.objects.property<Boolean>().convention(true)
 
   @get:Input
   public val androidTestProjects: SetProperty<String> =
@@ -82,17 +82,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
   @get:Input
   public abstract val changedFiles: Property<String>
 
-  /** Output diagnostics directory for use in debugging. */
-  @get:OutputDirectory public abstract val diagnosticsDir: DirectoryProperty
-
-  /** The output list of affected projects. */
-  @get:OutputFile public abstract val affectedProjectsFile: RegularFileProperty
-
-  /** The output list of affected androidTest projects. */
-  @get:OutputFile public abstract val affectedAndroidTestProjectsFile: RegularFileProperty
-
-  /** An output .focus file that could be used with the Focus plugin. */
-  @get:OutputFile public abstract val outputFocusFile: RegularFileProperty
+  /** Output dir for skippy outputs. */
+  @get:OutputDirectory public abstract val outputsDir: DirectoryProperty
 
   /*
    * Internal properties.
@@ -103,111 +94,53 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
 
   @get:Input internal abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
 
-  private lateinit var prefixLogger: SgpLogger
-
   init {
     group = "slack"
-    description = "Computes affected projects and writes them to a file."
+    description = "Computes affected projects and writes output files to an output directory."
   }
 
+  @OptIn(DelicateCoroutinesApi::class)
   @TaskAction
   internal fun compute() {
-    prefixLogger = SgpLogger.prefix(LOG, SgpLogger.gradle(logger))
-    logTimedValue("gradle task computation") {
-      // Clear outputs as needed
-      affectedProjectsFile.get().asFile.apply {
-        if (exists()) {
-          delete()
+    val rootDirPath = rootDir.get().asFile.toOkioPath()
+    val parallelism =
+      if (computeInParallel.get() && configs.size > 1) {
+        configs.size
+      } else {
+        1
+      }
+    val body: suspend (context: CoroutineContext) -> Unit = { context ->
+      SkippyRunner(
+          debug = debug.get(),
+          logger = SgpLogger.gradle(logger),
+          mergeOutputs = mergeOutputs.get(),
+          outputsDir = outputsDir.get().asFile.toOkioPath(),
+          androidTestProjects = androidTestProjects.get(),
+          rootDir = rootDirPath,
+          parallelism = parallelism,
+          fs = FileSystem.SYSTEM,
+          dependencyGraph = dependencyGraph.get(),
+          changedFilesPath = rootDirPath.resolve(changedFiles.get()),
+          originalConfigMap =
+            configs.map(SkippyGradleConfig::asSkippyConfig).associateBy { it.tool },
+        )
+        .run(context)
+    }
+
+    runBlocking {
+      if (parallelism == 1) {
+        body(Dispatchers.Unconfined)
+      } else {
+        logger.lifecycle("Running $parallelism configs in parallel")
+        newFixedThreadPoolContext(3, "computeAffectedProjects").use { dispatcher ->
+          body(dispatcher)
         }
       }
-      outputFocusFile.get().asFile.apply {
-        if (exists()) {
-          delete()
-        }
-      }
-      if (debug.get()) {
-        diagnosticsDir.get().asFile.also { file ->
-          if (file.exists()) {
-            file.deleteRecursively()
-          }
-          file.mkdirs()
-        }
-      }
-      val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
-        AffectedProjectsComputer(
-            rootDirPath = rootDir.asFile.get().toOkioPath(normalize = true),
-            dependencyGraph = {
-              logTimedValue("creating dependency graph") {
-                DependencyGraph.create(dependencyGraph.get())
-              }
-            },
-            includePatterns = includePatterns.get(),
-            excludePatterns = excludePatterns.get(),
-            neverSkipPatterns = neverSkipPatterns.get(),
-            androidTestProjects = androidTestProjects.get(),
-            debug = debug.get(),
-            diagnostics = this,
-            changedFilePaths =
-              logTimedValue("reading changed files") {
-                val file = changedFiles.get()
-                log("reading changed files from: $file")
-                rootDir.file(file).get().asFile.readLines().map {
-                  it.trim().toPath(normalize = true)
-                }
-              },
-            logger = prefixLogger,
-          )
-          .compute() ?: return@logTimedValue
-
-      // Generate affected_projects.txt
-      log("writing affected projects to: $affectedProjectsFile")
-      affectedProjectsFile.get().asFile.writeText(affectedProjects.sorted().joinToString("\n"))
-
-      // Generate affected_android_test_projects.txt
-      log("writing affected androidTest projects to: $affectedAndroidTestProjectsFile")
-      affectedAndroidTestProjectsFile
-        .get()
-        .asFile
-        .writeText(affectedAndroidTestProjects.sorted().joinToString("\n"))
-
-      // Generate .focus settings file
-      log("writing focus settings to: $outputFocusFile")
-      outputFocusFile
-        .get()
-        .asFile
-        .writeText(focusProjects.joinToString("\n") { "include(\"$it\")" })
     }
-  }
-
-  override fun write(name: String, content: () -> String) {
-    if (debug.get()) {
-      val file = diagnosticsDir.get().file("$name.txt").asFile
-      log("writing diagnostic file: $path")
-      file.parentFile.mkdirs()
-      file.writeText(content())
-    }
-  }
-
-  private fun log(message: String) {
-    val withPrefix = "$LOG $message"
-    // counter-intuitive to read but lifecycle is preferable when actively debugging, whereas
-    // debug() only logs quietly unless --debug is used
-    if (debug.get()) {
-      logger.lifecycle(withPrefix)
-    } else {
-      logger.debug(withPrefix)
-    }
-  }
-
-  private inline fun <T> logTimedValue(name: String, body: () -> T): T {
-    val (value, duration) = measureTimedValue(body)
-    log("$name took $duration")
-    return value
   }
 
   internal companion object {
     internal const val NAME = "computeAffectedProjects"
-    private const val LOG = "[Skippy]"
     private val DEFAULT_CONFIGURATIONS =
       setOf(
         "androidTestImplementation",
@@ -229,6 +162,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       rootProject: Project,
       slackProperties: SlackProperties
     ): TaskProvider<ComputeAffectedProjectsTask> {
+      val extension =
+        rootProject.extensions.create("skippy", SkippyExtension::class.java, slackProperties)
       val configurationsToLook by lazy {
         val providedConfigs = slackProperties.affectedProjectConfigurations
         providedConfigs?.splitToSequence(',')?.toSet()?.let { providedConfigSet ->
@@ -245,19 +180,13 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask(), DiagnosticWri
       }
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
-        debug.setDisallowChanges(slackProperties.debug)
+        debug.setDisallowChanges(extension.debug)
+        mergeOutputs.setDisallowChanges(extension.mergeOutputs)
+        computeInParallel.setDisallowChanges(extension.computeInParallel)
+        configs.addAll(extension.configs)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
-        diagnosticsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy/diagnostics"))
-        affectedProjectsFile.setDisallowChanges(
-          project.layout.buildDirectory.file("skippy/affected_projects.txt")
-        )
-        affectedAndroidTestProjectsFile.setDisallowChanges(
-          project.layout.buildDirectory.file("skippy/affected_android_test_projects.txt")
-        )
-        outputFocusFile.setDisallowChanges(
-          project.layout.buildDirectory.file("skippy/focus.settings.gradle")
-        )
+        outputsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy"))
         // Overrides of includes/neverSkippable patterns should be done in the consuming project
         // directly
       }

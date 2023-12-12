@@ -15,12 +15,10 @@
  */
 package slack.gradle.avoidance
 
-import com.jraska.module.graph.DependencyGraph
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
-import slack.gradle.avoidance.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
+import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
 import slack.gradle.util.SgpLogger
 
 /**
@@ -38,12 +36,13 @@ import slack.gradle.util.SgpLogger
  * The primary input is [changedFilePaths], which is a newline-delimited list of files that have
  * changed. Usually the files changed in a pull request.
  *
- * [includePatterns] is a list of glob patterns that are used to filter the list of changed files.
- * These should usually be source files that are deemed to participate in builds (e.g. `.kt` files).
+ * [SkippyConfig.includePatterns] is a list of glob patterns that are used to filter the list of
+ * changed files. These should usually be source files that are deemed to participate in builds
+ * (e.g. `.kt` files).
  *
- * [neverSkipPatterns] is a list of glob patterns that, if matched with any changed file, indicate
- * that nothing should be skipped and the full build should run. This is important for files like
- * version catalog toml files or root build.gradle file changes.
+ * [SkippyConfig.neverSkipPatterns] is a list of glob patterns that, if matched with any changed
+ * file, indicate that nothing should be skipped and the full build should run. This is important
+ * for files like version catalog toml files or root build.gradle file changes.
  *
  * ### Outputs
  *
@@ -56,9 +55,9 @@ import slack.gradle.util.SgpLogger
  * dropbox/focus plugin, and will be a minimal list of projects needed to build the affected
  * projects.
  *
- * With both outputs, if any "never-skippable" files [neverSkipPatterns] are changed, then no output
- * file is produced and all projects are considered affected. If a file is produced but has no
- * content written to it, that simply means that no projects are affected.
+ * With both outputs, if any "never-skippable" files [SkippyConfig.neverSkipPatterns] are changed,
+ * then no output file is produced and all projects are considered affected. If a file is produced
+ * but has no content written to it, that simply means that no projects are affected.
  *
  * ### Debugging
  *
@@ -68,21 +67,12 @@ import slack.gradle.util.SgpLogger
  *
  * @property rootDirPath Root repo directory. Used to compute relative paths and not considered an
  *   input.
- * @property dependencyGraph The serialized dependency graph as computed from our known
- *   configurations. Lazily loaded and only invoked onces.
+ * @property dependencyMetadata The dependency graph metadata as computed from our known
+ *   configurations. Lazily loaded and only invoked once.
  * @property changedFilePaths A relative (to the repo root) path to a changed_files.txt that
  *   contains a newline-delimited list of changed files. This is usually computed from a GitHub PR's
  *   changed files.
- * @property includePatterns A set of glob patterns for files to include in computing affected
- *   projects. This should usually be source files, build files, gradle.properties files, and other
- *   projects that affect builds.
- * @property excludePatterns A set of glob patterns for files to exclude from computing affected
- *   projects. This is run _after_ [includePatterns] and can be useful for excluding files that
- *   would otherwise be included by an existing inclusion pattern.
- * @property neverSkipPatterns A set of glob patterns that, if matched with a file, indicate that
- *   nothing should be skipped and [compute] will return null. This is useful for globally-affecting
- *   things like root build files, `libs.versions.toml`, etc. **NOTE**: This list is always merged
- *   with [includePatterns] as these are implicitly relevant files.
+ * @property config see [SkippyConfig] docs.
  * @property androidTestProjects A set of project names that are Android test projects. This is used
  *   to compute the [AffectedProjectsResult.affectedAndroidTestProjects] value, which can be used to
  *   statically determine if an instrumentation test pipeline needs to run at all.
@@ -91,22 +81,24 @@ import slack.gradle.util.SgpLogger
  */
 internal class AffectedProjectsComputer(
   private val rootDirPath: Path,
-  private val dependencyGraph: () -> DependencyGraph,
+  private val dependencyMetadata: DependencyMetadata,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
-  private val includePatterns: Set<String> = DEFAULT_INCLUDE_PATTERNS,
-  private val excludePatterns: Set<String> = emptySet(),
-  private val neverSkipPatterns: Set<String> = DEFAULT_NEVER_SKIP_PATTERNS,
+  private val config: SkippyConfig = SkippyConfig(GLOBAL_TOOL),
   private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
-  private val logger: SgpLogger = SgpLogger.noop()
+  private val logger: SgpLogger = SgpLogger.noop(),
 ) {
   fun compute(): AffectedProjectsResult? {
-    return logTimedValue("full computation") { computeImpl() }
+    return logTimedValue("full computation of ${config.tool}") { computeImpl() }
   }
 
   private fun computeImpl(): AffectedProjectsResult? {
+    val includePatterns = config.includePatterns
+    val neverSkipPatterns = config.neverSkipPatterns
+    val excludePatterns = config.excludePatterns
+
     log("root dir path is: $rootDirPath")
     check(rootDirPath.exists()) { "Root dir path $rootDirPath does not exist" }
     log("changedFilePaths: $changedFilePaths")
@@ -185,65 +177,12 @@ internal class AffectedProjectsComputer(
         }
     }
 
-    val resolvedDependencyGraph = logTimedValue("resolving graph") { dependencyGraph() }
-
-    val shallowProjectsToDependencies: Map<String, Set<String>> =
-      logTimedValue("computing shallow dependencies") {
-        resolvedDependencyGraph.nodes().associate { node ->
-          val dependencies = mutableSetOf<DependencyGraph.Node>()
-          node.visitDependencies(dependencies)
-          node.key to dependencies.mapTo(mutableSetOf()) { it.key }
-        }
-      }
-
-    diagnostics.write("shallowProjectsToDependencies.txt") {
-      buildString {
-        for ((project, dependencies) in shallowProjectsToDependencies.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
-    val projectsToDependencies =
-      logTimedValue("computing full dependencies") {
-        shallowProjectsToDependencies.mapValues { (project, _) ->
-          getAllDependencies(project, shallowProjectsToDependencies)
-        }
-      }
-
-    diagnostics.write("projectsToDependencies.txt") {
-      buildString {
-        for ((project, dependencies) in projectsToDependencies.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
-    val projectsToDependents = logTimedValue("computing dependents", projectsToDependencies::flip)
-
-    diagnostics.write("projectsToDependents.txt") {
-      buildString {
-        for ((project, dependencies) in projectsToDependents.toSortedMap()) {
-          appendLine(project)
-          for (dep in dependencies.sorted()) {
-            appendLine("-> $dep")
-          }
-        }
-      }
-    }
-
     val allAffectedProjects =
       buildSet {
           for ((path, change) in changedProjects) {
             add(path)
             if (change.affectsDependents) {
-              addAll(projectsToDependents[path] ?: emptySet())
+              addAll(dependencyMetadata.projectsToDependents[path] ?: emptySet())
             }
           }
         }
@@ -254,7 +193,7 @@ internal class AffectedProjectsComputer(
     val allRequiredProjects =
       allAffectedProjects
         .flatMap { project ->
-          val dependencies = projectsToDependencies[project].orEmpty()
+          val dependencies = dependencyMetadata.projectsToDependencies[project].orEmpty()
           dependencies + project
         }
         .toSortedSet()
@@ -351,11 +290,14 @@ internal class AffectedProjectsComputer(
     fun filterIncludes(filePaths: List<Path>, includePatterns: Collection<String>) =
       filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
 
-    /** Returns a filtered list of [filePaths] that do _not_ match the given [includePatterns]. */
+    /**
+     * Returns a filtered list of [filePaths] that do _not_ match the given
+     * [SkippyConfig.includePatterns].
+     */
     fun filterExcludes(filePaths: List<Path>, excludePatterns: Collection<String>) =
       filePaths.filterNot { excludePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
 
-    /** Returns whether any [filePaths] match any [neverSkipPatterns]. */
+    /** Returns whether any [filePaths] match any [SkippyConfig.neverSkipPatterns]. */
     fun anyNeverSkip(filePaths: List<Path>, neverSkipPathMatchers: List<PathMatcher>) =
       filePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }
 
@@ -368,63 +310,7 @@ internal class AffectedProjectsComputer(
       neverSkipPathMatchers: List<PathMatcher>
     ): Map<Path, PathMatcher?> =
       filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
-
-    /** Returns a deep set of all dependencies for the given [project], including transitive. */
-    // TODO future optimization could be to include previously-computed project dependencies as a
-    //  cache.
-    internal fun getAllDependencies(
-      project: String,
-      projectsToDependencies: Map<String, Set<String>>,
-      includeSelf: Boolean = false,
-    ): Set<String> {
-      val result = mutableSetOf<String>()
-      fun addDependent(project: String) {
-        if (result.add(project)) {
-          projectsToDependencies[project]?.forEach(::addDependent)
-        }
-      }
-
-      addDependent(project)
-
-      if (!includeSelf) {
-        result.remove(project)
-      }
-      return result
-    }
   }
-}
-
-private fun DependencyGraph.Node.visitDependencies(setToAddTo: MutableSet<DependencyGraph.Node>) {
-  for (dependency in dependsOn) {
-    if (!setToAddTo.add(dependency)) {
-      // Only add transitives if we haven't already seen this dependency.
-      dependency.visitDependencies(setToAddTo)
-    }
-  }
-}
-
-/**
- * Flips a map. In the context of [ComputeAffectedProjectsTask], we use this to flip a map of
- * projects to their dependencies to a map of projects to the projects that depend on them. We use
- * this to find all affected projects given a seed of changed projects.
- *
- * Example:
- *
- *  ```
- *  Given a map
- *  {a:[b, c], b:[d], c:[d], d:[]}
- *  return
- *  {b:[a], c:[a], d:[b, c]}
- *  ```
- */
-private fun Map<String, Set<String>>.flip(): Map<String, Set<String>> {
-  val flipped = mutableMapOf<String, MutableSet<String>>()
-  for ((project, dependenciesSet) in this) {
-    for (dependency in dependenciesSet) {
-      flipped.getOrPut(dependency, ::mutableSetOf).add(project)
-    }
-  }
-  return flipped
 }
 
 /** Return a new map with null keys filtered out. */
