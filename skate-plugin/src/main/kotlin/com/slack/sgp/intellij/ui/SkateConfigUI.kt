@@ -40,6 +40,7 @@ internal class SkateConfigUI(
     enableProjectGenMenuAction()
     featureFlagSettings()
     tracingSettings()
+    codeOwnerSettings()
   }
 
   private fun Panel.whatsNewPanelSettings() {
@@ -146,6 +147,28 @@ internal class SkateConfigUI(
         setter = { settings.tracingEndpoint = it },
         errorMessageKey = "skate.configuration.tracingEndpoint.error",
         enabledCondition = tracingEnabledButton.selected,
+      )
+    }
+  }
+
+  private fun Panel.codeOwnerSettings() {
+    group(SkateBundle.message("skate.configuration.codeOwner.title")) {
+      lateinit var codeOwnerEnabledButton: Cell<JBCheckBox>
+
+      row {
+        codeOwnerEnabledButton =
+          checkBox(SkateBundle.message("skate.configuration.codeOwner.enabledDescription"))
+            .bindSelected(
+              getter = { settings.isCodeOwnerEnabled },
+              setter = { settings.isCodeOwnerEnabled = it }
+            )
+      }
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.codeOwnerFile.title",
+        getter = { settings.codeOwnerFilePath },
+        setter = { settings.codeOwnerFilePath = it },
+        errorMessageKey = "skate.configuration.codeOwnerFile.error",
+        enabledCondition = codeOwnerEnabledButton.selected,
       )
     }
   }

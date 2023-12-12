@@ -27,6 +27,7 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
+        <statusBarWidgetFactory implementation="com.slack.sgp.intellij.ui.CodeOwnerWidgetFactory" id="CodeOwnerWidget"/>
         <projectService
                 serviceInterface="com.slack.sgp.intellij.SkateProjectService"
                 serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
