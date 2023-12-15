@@ -27,6 +27,7 @@ internal const val DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME = "slack.api.sc
 @VisibleForTesting internal const val DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX = "Translator.kt"
 @VisibleForTesting internal const val DEFAULT_TRANSLATOR_ENUM_IDENTIFIER = "name"
 internal const val DEFAULT_PROJECT_GEN_CLI_COMMAND = "./slackw generate-project"
+internal const val DEFAULT_CODE_OWNER_FILE_PATH = "config/code-ownership/code_ownership.csv"
 
 /** Manages user-specific settings for the Skate plugin */
 @Service(Service.Level.PROJECT)
@@ -117,6 +118,18 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.tracingEndpoint = value
     }
 
+  var isCodeOwnerEnabled: Boolean
+    get() = state.isCodeOwnerEnabled
+    set(value) {
+      state.isCodeOwnerEnabled = value
+    }
+
+  var codeOwnerFilePath: String?
+    get() = state.codeOwnerFilePath ?: DEFAULT_CODE_OWNER_FILE_PATH
+    set(value) {
+      state.codeOwnerFilePath = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -131,5 +144,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var featureFlagFilePattern by string()
     var isTracingEnabled by property(true)
     var tracingEndpoint by string()
+    var codeOwnerFilePath by string()
+    var isCodeOwnerEnabled by property(true)
   }
 }
