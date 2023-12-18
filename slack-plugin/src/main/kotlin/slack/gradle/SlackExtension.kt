@@ -21,18 +21,22 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import slack.gradle.agp.PermissionAllowlistConfigurer
+import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.util.booleanProperty
+import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 
 @DslMarker public annotation class SlackExtensionMarker
@@ -696,11 +700,43 @@ constructor(
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
+  /**
+   * Configures the compiler options for Compose. This is a list of strings that will be passed into
+   * the underlying kotlinc invocation. Note that you should _not_ include the plugin prefix, just
+   * the simple key=value options directly.
+   *
+   * **Do**
+   *
+   * ```
+   * compilerOptions.add("reportsDestination=$metricsDir")
+   * ```
+   *
+   * **Don't**
+   *
+   * ```
+   * compilerOptions.add("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$metricsDir")
+   * ```
+   */
+  public val compilerOptions: ListProperty<String> = objects.listProperty<String>()
+
   /** @see [AndroidHandler.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *>? = null
 
   internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
+  }
+
+  /**
+   * Enables compose compiler metrics for this project. Note this should not be enabled by default
+   * and is just for debugging!
+   */
+  @DelicateSlackPluginApi
+  public fun enableCompilerMetricsForDebugging(
+    reportsDestination: File,
+    metricsDestination: File = reportsDestination,
+  ) {
+    compilerOptions.add("reportsDestination=$reportsDestination")
+    compilerOptions.add("metricsDestination=$metricsDestination")
   }
 
   internal fun enable(multiplatform: Boolean) {
@@ -731,6 +767,18 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
       project.configureComposeCompiler(slackProperties, isMultiplatform)
+
+      val options = compilerOptions.getOrElse(emptyList())
+      if (options.isNotEmpty()) {
+        project.tasks.configureKotlinCompilationTask {
+          for (option in options) {
+            compilerOptions.freeCompilerArgs.addAll(
+              "-P",
+              "$COMPOSE_COMPILER_OPTION_PREFIX:$option",
+            )
+          }
+        }
+      }
     }
   }
 }
