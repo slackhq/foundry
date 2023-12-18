@@ -29,7 +29,7 @@ wire = "4.9.3"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "4.2.0" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.0.0" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

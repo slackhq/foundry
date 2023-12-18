@@ -104,7 +104,7 @@ internal class StandardProjectConfigurations(
   private val kotlinCompilerArgs =
     mutableListOf<String>()
       .apply {
-        @Suppress("UNCHECKED_CAST") addAll(BuildConfig.KOTLIN_COMPILER_ARGS as List<String>)
+        addAll(BuildConfig.KOTLIN_COMPILER_ARGS)
         // Left as a toe-hold for any future dynamic arguments
       }
       .distinct()
@@ -913,8 +913,7 @@ internal class StandardProjectConfigurations(
             jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
-            @Suppress("UNCHECKED_CAST")
-            freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS as List<String>)
+            freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS)
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files
