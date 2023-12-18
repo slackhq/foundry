@@ -26,6 +26,8 @@ import slack.gradle.util.configureKotlinCompilationTask
 
 private const val COMPOSE_COMPILER_GOOGLE_GROUP = "androidx.compose.compiler"
 private const val COMPOSE_COMPILER_JB_GROUP = "org.jetbrains.compose.compiler"
+internal const val COMPOSE_COMPILER_OPTION_PREFIX =
+  "plugin:androidx.compose.compiler.plugins.kotlin"
 
 /**
  * The compose compiler has an extremely irritating version checking mechanism that requires a bunch
@@ -80,7 +82,7 @@ internal fun Project.configureComposeCompiler(
           freeCompilerArgs.addAll(
             "-Xskip-prerelease-check",
             "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
+            "$COMPOSE_COMPILER_OPTION_PREFIX:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
           )
         }
       }
