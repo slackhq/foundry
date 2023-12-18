@@ -15,7 +15,7 @@
  */
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import dev.bmac.gradle.intellij.GenerateBlockMapTask
 import dev.bmac.gradle.intellij.PluginUploader
@@ -185,9 +185,9 @@ subprojects {
       configure<BuildConfigExtension> {
         buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
         // Using Any here due to https://github.com/gmazzo/gradle-buildconfig-plugin/issues/9
-        buildConfigField("kotlin.Any", "KOTLIN_COMPILER_ARGS",
+        buildConfigField("kotlin.collections.List<String>", "KOTLIN_COMPILER_ARGS",
                          "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})")
-        buildConfigField("kotlin.Any", "KOTLIN_JVM_COMPILER_ARGS",
+        buildConfigField("kotlin.collections.List<String>", "KOTLIN_JVM_COMPILER_ARGS",
                          "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})")
       }
     }
