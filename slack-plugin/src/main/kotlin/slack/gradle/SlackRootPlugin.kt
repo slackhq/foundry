@@ -230,14 +230,14 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
         MissingIdentifiersAggregatorTask.register(project)
       }
       project.configure<DependencyAnalysisExtension> {
-        issues { all { onAny { ignoreKtx(true) } } }
         abi {
           exclusions {
             ignoreGeneratedCode()
             ignoreInternalPackages()
           }
         }
-        dependencies {
+        structure {
+          ignoreKtx(true)
           bundle("androidx-camera") {
             primary("androidx.camera:camera-camera2")
             includeGroup("androidx.camera")
