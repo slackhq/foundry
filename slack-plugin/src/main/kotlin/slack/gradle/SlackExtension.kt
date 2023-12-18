@@ -703,7 +703,7 @@ constructor(
   /**
    * Configures the compiler options for Compose. This is a list of strings that will be passed into
    * the underlying kotlinc invocation. Note that you should _not_ include the plugin prefix, just
-   * the simple args directly.
+   * the simple key=value options directly.
    *
    * **Do**
    *
