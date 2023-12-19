@@ -700,24 +700,31 @@ constructor(
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
+  private val compilerOptions: ListProperty<String> = objects.listProperty<String>()
+
   /**
    * Configures the compiler options for Compose. This is a list of strings that will be passed into
    * the underlying kotlinc invocation. Note that you should _not_ include the plugin prefix, just
-   * the simple key=value options directly.
+   * the simple [key]/[value] options directly.
    *
    * **Do**
    *
    * ```
-   * compilerOptions.add("reportsDestination=$metricsDir")
+   * compilerOption("reportsDestination", metricsDir)
    * ```
    *
    * **Don't**
    *
    * ```
-   * compilerOptions.add("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$metricsDir")
+   * compilerOption("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination", metricsDir)
    * ```
    */
-  public val compilerOptions: ListProperty<String> = objects.listProperty<String>()
+  public fun compilerOption(key: String, value: String) {
+    compilerOptions.addAll(
+      "-P",
+      "$COMPOSE_COMPILER_OPTION_PREFIX:$key=$value",
+    )
+  }
 
   /** @see [AndroidHandler.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *>? = null
@@ -735,8 +742,8 @@ constructor(
     reportsDestination: File,
     metricsDestination: File = reportsDestination,
   ) {
-    compilerOptions.add("reportsDestination=$reportsDestination")
-    compilerOptions.add("metricsDestination=$metricsDestination")
+    compilerOption("reportsDestination", reportsDestination.canonicalPath.toString())
+    compilerOption("metricsDestination", metricsDestination.canonicalPath.toString())
   }
 
   internal fun enable(multiplatform: Boolean) {
@@ -768,16 +775,8 @@ constructor(
       }
       project.configureComposeCompiler(slackProperties, isMultiplatform)
 
-      val options = compilerOptions.getOrElse(emptyList())
-      if (options.isNotEmpty()) {
-        project.tasks.configureKotlinCompilationTask {
-          for (option in options) {
-            compilerOptions.freeCompilerArgs.addAll(
-              "-P",
-              "$COMPOSE_COMPILER_OPTION_PREFIX:$option",
-            )
-          }
-        }
+      project.tasks.configureKotlinCompilationTask {
+        compilerOptions.freeCompilerArgs.addAll(this@ComposeHandler.compilerOptions)
       }
     }
   }
