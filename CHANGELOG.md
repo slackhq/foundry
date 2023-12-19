@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.14.1
+------
+
+_2023-12-18_
+
+- Expose `compilerOption()` API in Compose DSL for compiler arg configuration.
+- Update to DAGP `1.28.0` + migrate off deprecated APIs.
+- Update Okio to `3.7.0`.
+- Update AgpHandler 8.3 to `8.3.0-alpha18`.
+- Build against KSP `1.9.21-1.0.16`.
+
 0.14.0
 ------
 
