@@ -461,13 +461,7 @@ constructor(
    * Enables Compose for this project and applies any version catalog bundle dependencies defined by
    * [SlackProperties.defaultComposeAndroidBundleAlias].
    */
-  public fun compose(multiplatform: Boolean = false) {
-    compose(multiplatform) {
-      // No further configuration right now
-    }
-  }
-
-  private fun compose(multiplatform: Boolean, action: Action<ComposeHandler>) {
+  public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
     composeHandler.enable(multiplatform = multiplatform)
     action.execute(composeHandler)
   }

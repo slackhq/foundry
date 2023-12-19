@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.14.2
+------
+
+_2023-12-18_
+
+- Make `compose()` DSL function with Action parameter public.
+
 0.14.1
 ------
 
