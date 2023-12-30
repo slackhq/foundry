@@ -20,10 +20,12 @@ import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import com.diffplug.spotless.LineEnding
 import java.util.Locale
 import java.util.Optional
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.provider.Provider
 import slack.gradle.tasks.CoreBootstrapTask
 import slack.stats.ModuleStatsTasks
@@ -34,7 +36,9 @@ import slack.stats.ModuleStatsTasks
  *
  * The goal of separating this from [SlackRootPlugin] is project isolation.
  */
-internal class SlackBasePlugin : Plugin<Project> {
+internal class SlackBasePlugin @Inject constructor(
+  private val buildFeatures: BuildFeatures
+) : Plugin<Project> {
   override fun apply(target: Project) {
     val slackProperties = SlackProperties(target)
 
@@ -73,11 +77,15 @@ internal class SlackBasePlugin : Plugin<Project> {
     }
 
     // Everything in here applies to all projects
-    target.configureSpotless(slackProperties)
     target.configureClasspath(slackProperties)
-    val scanApi = ScanApi(target)
-    if (scanApi.isAvailable) {
-      scanApi.addTestParallelization(target)
+    if (!this.buildFeatures.isolatedProjects.requested.get()) {
+      // TODO https://github.com/diffplug/spotless/issues/1979
+      target.configureSpotless(slackProperties)
+      // TODO not clear how to access the build scan API from a non-root project
+      val scanApi = ScanApi(target)
+      if (scanApi.isAvailable) {
+        scanApi.addTestParallelization(target)
+      }
     }
   }
 

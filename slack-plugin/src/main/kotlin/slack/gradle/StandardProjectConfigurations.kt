@@ -70,7 +70,6 @@ import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
-import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 import slack.unittest.UnitTests
@@ -562,7 +561,7 @@ internal class StandardProjectConfigurations(
           testOptions {
             animationsDisabled = true
 
-            if (booleanProperty("orchestrator")) {
+            if (slackProperties.useOrchestrator) {
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
