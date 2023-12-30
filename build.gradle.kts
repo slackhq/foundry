@@ -102,13 +102,13 @@ allprojects {
       targetExclude("**/spotless.kt", "**/Aliases.kt")
     }
     kotlinGradle {
-      target("src/**/*.kts")
+      target("*.kts", "src/**/*.kts")
       ktfmt(ktfmtVersion).googleStyle()
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile(
         rootProject.file("spotless/spotless.kt"),
-        "(import|plugins|buildscript|dependencies|pluginManagement)"
+        "(import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)"
       )
     }
   }
@@ -185,10 +185,16 @@ subprojects {
       configure<BuildConfigExtension> {
         buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
         // Using Any here due to https://github.com/gmazzo/gradle-buildconfig-plugin/issues/9
-        buildConfigField("kotlin.collections.List<String>", "KOTLIN_COMPILER_ARGS",
-                         "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})")
-        buildConfigField("kotlin.collections.List<String>", "KOTLIN_JVM_COMPILER_ARGS",
-                         "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})")
+        buildConfigField(
+          "kotlin.collections.List<String>",
+          "KOTLIN_COMPILER_ARGS",
+          "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})"
+        )
+        buildConfigField(
+          "kotlin.collections.List<String>",
+          "KOTLIN_JVM_COMPILER_ARGS",
+          "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})"
+        )
       }
     }
   }
@@ -283,10 +289,9 @@ subprojects {
           localDirectory.set(layout.projectDirectory.dir("src").asFile)
           val relPath = rootProject.projectDir.toPath().relativize(projectDir.toPath())
           remoteUrl.set(
-            providers.gradleProperty("POM_SCM_URL")
-              .map { scmUrl ->
-                URI("$scmUrl/tree/main/$relPath/src").toURL()
-              }
+            providers.gradleProperty("POM_SCM_URL").map { scmUrl ->
+              URI("$scmUrl/tree/main/$relPath/src").toURL()
+            }
           )
           remoteLineSuffix.set("#L")
         }
