@@ -20,11 +20,9 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import java.io.File
-import java.util.Properties
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.inject.Inject
 import kotlin.streams.asSequence
 import okhttp3.OkHttpClient
 import okio.buffer
@@ -34,7 +32,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -48,10 +45,8 @@ import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
 import slack.gradle.util.JsonTools
 import slack.gradle.util.LocalProperties
-import slack.gradle.util.StartParameterProperties
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
-import slack.gradle.util.createPropertiesProvider
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.shutdown
 import slack.gradle.util.sneakyNull
@@ -260,10 +255,10 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   /**
    * Abstraction for loading a [Map] provider that handles caching automatically per root project.
    * This way properties are only ever parsed at most once per root project. The goal for this is to
-   * build on top of [LocalProperties] and provide a more convenient API for accessing properties from
-   * multiple sources in a configuration-caching-compatible way. Start parameters are special because
-   * they come from [StartParameter.projectProperties] and are intended to supersede any other
-   * property values.
+   * build on top of [LocalProperties] and provide a more convenient API for accessing properties
+   * from multiple sources in a configuration-caching-compatible way. Start parameters are special
+   * because they come from [StartParameter.projectProperties] and are intended to supersede any
+   * other property values.
    */
   internal fun globalStartParameterProperty(key: String): Provider<String> {
     return parameters.startParameterProperties.map { sneakyNull(it[key]) }

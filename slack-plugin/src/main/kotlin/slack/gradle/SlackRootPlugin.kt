@@ -80,23 +80,26 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     }
 
     val startParameters = project.gradle.startParameter.projectProperties
-    val startParameterProperties = project.providers.of(StartParameterProperties::class.java) {
-      parameters.properties.setDisallowChanges(startParameters)
-    }
-    val localProperties = project.createPropertiesProvider("local.properties")
-      .map { it.mapKeys { it.key.toString() }
-        .mapValues { it.value.toString() }}
+    val startParameterProperties =
+      project.providers.of(StartParameterProperties::class.java) {
+        parameters.properties.setDisallowChanges(startParameters)
+      }
+    val localProperties =
+      project.createPropertiesProvider("local.properties").map {
+        it.mapKeys { it.key.toString() }.mapValues { it.value.toString() }
+      }
     val startParameterProperty: (String) -> Provider<String> = { key ->
       startParameterProperties.map { sneakyNull(it[key]) }
     }
     val globalLocalProperty: (String) -> Provider<String> = { key ->
       localProperties.map { sneakyNull(it[key]) }
     }
-    val slackProperties = SlackProperties(
-      project,
-      startParameterProperty = startParameterProperty,
-      globalLocalProperty = globalLocalProperty,
-    )
+    val slackProperties =
+      SlackProperties(
+        project,
+        startParameterProperty = startParameterProperty,
+        globalLocalProperty = globalLocalProperty,
+      )
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals

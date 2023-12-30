@@ -19,16 +19,12 @@ package slack.gradle.util
 
 import java.util.Properties
 import kotlin.contracts.contract
-import org.gradle.StartParameter
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
-import org.gradle.api.provider.ValueSourceSpec
-import slack.gradle.slackTools
-import slack.gradle.slackToolsProvider
 
 // Gradle's map {} APIs sometimes are interpreted by Kotlin to be non-null only but legally allow
 // null returns. This
@@ -99,31 +95,34 @@ private fun Project.localPropertiesProvider(
   cacheKey: String,
   filePath: String,
 ): Provider<String> {
-  val provider =
-    project.getOrCreateExtra(cacheKey) {
-      it.createPropertiesProvider(filePath)
-    }
+  val provider = project.getOrCreateExtra(cacheKey) { it.createPropertiesProvider(filePath) }
   return provider.map { it.getProperty(key) }
 }
 
 internal fun Project.createPropertiesProvider(filePath: String): Provider<Properties> {
   return project.providers.of(LocalProperties::class.java) {
-    parameters.propertiesFile.setDisallowChanges(
-      project.layout.projectDirectory.file(filePath)
-    )
+    parameters.propertiesFile.setDisallowChanges(project.layout.projectDirectory.file(filePath))
   }
 }
 
 /** Returns a provider of a property _only_ contained in this project's local.properties. */
 internal fun Project.localProperty(key: String): Provider<String> {
-  return localPropertiesProvider(key, "slack.properties.provider.local-properties", "local.properties")
+  return localPropertiesProvider(
+    key,
+    "slack.properties.provider.local-properties",
+    "local.properties"
+  )
 }
 
 /** Returns a provider of a property _only_ contained in this project's local gradle.properties. */
 // Local gradle properties are not compatible with configuration caching and thus not accessible
 // from providers.gradleProperty -_-. https://github.com/gradle/gradle/issues/13302
 internal fun Project.localGradleProperty(key: String): Provider<String> {
-  return localPropertiesProvider(key, "slack.properties.provider.local-gradle-properties", "gradle.properties")
+  return localPropertiesProvider(
+    key,
+    "slack.properties.provider.local-gradle-properties",
+    "gradle.properties"
+  )
 }
 
 internal class PropertyResolver(
@@ -145,11 +144,12 @@ internal class PropertyResolver(
    */
   fun safeProperty(
     key: String,
-  ): Provider<String> = startParameterProperty(key) // start parameters
-    .orElse(project.localProperty(key)) // project-local `local.properties`
-    .orElse(project.localGradleProperty(key)) // project-local `gradle.properties`
-    .orElse(globalLocalProperty(key)) // root-project `local.properties`
-    .orElse(project.providers.gradleProperty(key)) // root-project/global `gradle.properties`
+  ): Provider<String> =
+    startParameterProperty(key) // start parameters
+      .orElse(project.localProperty(key)) // project-local `local.properties`
+      .orElse(project.localGradleProperty(key)) // project-local `gradle.properties`
+      .orElse(globalLocalProperty(key)) // root-project `local.properties`
+      .orElse(project.providers.gradleProperty(key)) // root-project/global `gradle.properties`
 
   // TODO rename these scalar types to <type>Value
   internal fun booleanProperty(key: String, defaultValue: Boolean = false): Boolean {
@@ -160,17 +160,11 @@ internal class PropertyResolver(
     return booleanProvider(key, defaultValue).get()
   }
 
-  internal fun booleanProvider(
-    key: String,
-    defaultValue: Boolean = false
-  ): Provider<Boolean> {
+  internal fun booleanProvider(key: String, defaultValue: Boolean = false): Provider<Boolean> {
     return booleanProvider(key, providers.provider { defaultValue })
   }
 
-  internal fun booleanProvider(
-    key: String,
-    defaultValue: Provider<Boolean>
-  ): Provider<Boolean> {
+  internal fun booleanProvider(key: String, defaultValue: Provider<Boolean>): Provider<Boolean> {
     return booleanProvider(key).orElse(defaultValue)
   }
 
@@ -214,10 +208,7 @@ internal class PropertyResolver(
     return optionalStringProvider(key, null)
   }
 
-  internal fun optionalStringProvider(
-    key: String,
-    defaultValue: String? = null
-  ): Provider<String> {
+  internal fun optionalStringProvider(key: String, defaultValue: String? = null): Provider<String> {
     return safeProperty(key).let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
   }
 }

@@ -36,9 +36,8 @@ import slack.stats.ModuleStatsTasks
  *
  * The goal of separating this from [SlackRootPlugin] is project isolation.
  */
-internal class SlackBasePlugin @Inject constructor(
-  private val buildFeatures: BuildFeatures
-) : Plugin<Project> {
+internal class SlackBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
+  Plugin<Project> {
   override fun apply(target: Project) {
     val slackProperties = SlackProperties(target)
 

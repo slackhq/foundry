@@ -27,16 +27,18 @@ import slack.gradle.util.sneakyNull
  *
  * Order attempted as described by [PropertyResolver.safeProperty].
  */
-public class SlackProperties internal constructor(
+public class SlackProperties
+internal constructor(
   private val project: Project,
   startParameterProperty: (String) -> Provider<String>,
   globalLocalProperty: (String) -> Provider<String>,
 ) {
-  private val resolver = PropertyResolver(
-    project,
-    startParameterProperty,
-    globalLocalProperty,
-  )
+  private val resolver =
+    PropertyResolver(
+      project,
+      startParameterProperty,
+      globalLocalProperty,
+    )
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
@@ -64,9 +66,7 @@ public class SlackProperties internal constructor(
       blankIsNull && it.isBlank()
     }
 
-  internal val versions: SlackVersions by lazy {
-    SlackVersions(project.getVersionsCatalog())
-  }
+  internal val versions: SlackVersions by lazy { SlackVersions(project.getVersionsCatalog()) }
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
@@ -387,9 +387,7 @@ public class SlackProperties internal constructor(
   public val ciLintVariants: String?
     get() = optionalStringProperty("slack.ci-lint.variants")
 
-  /**
-   * Flag for enabling test orchestrator.
-   */
+  /** Flag for enabling test orchestrator. */
   public val useOrchestrator: Boolean
     get() = booleanProperty("orchestrator")
 
@@ -492,7 +490,8 @@ public class SlackProperties internal constructor(
         .let(TestRetryPluginType::valueOf)
 
   public val testRetryFailOnPassedAfterRetry: Provider<Boolean>
-    get() = resolver.booleanProvider("slack.test.retry.failOnPassedAfterRetry", defaultValue = false)
+    get() =
+      resolver.booleanProvider("slack.test.retry.failOnPassedAfterRetry", defaultValue = false)
 
   public val testRetryMaxFailures: Provider<Int>
     get() = resolver.intProvider("slack.test.retry.maxFailures", defaultValue = 20)
@@ -638,19 +637,19 @@ public class SlackProperties internal constructor(
 
     private const val CACHED_PROVIDER_EXT_NAME = "slack.properties.provider"
 
-    public operator fun invoke(project: Project, slackTools: Provider<SlackTools>? = project.slackToolsProvider()): SlackProperties {
+    public operator fun invoke(
+      project: Project,
+      slackTools: Provider<SlackTools>? = project.slackToolsProvider()
+    ): SlackProperties {
       return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
         SlackProperties(
           project = p,
           startParameterProperty = { key ->
-            slackTools?.flatMap { tools ->
-              tools.globalStartParameterProperty(key)
-            } ?: p.provider { null }
+            slackTools?.flatMap { tools -> tools.globalStartParameterProperty(key) }
+              ?: p.provider { null }
           },
           globalLocalProperty = { key ->
-            slackTools?.flatMap { tools ->
-              tools.globalLocalProperty(key)
-            } ?: p.provider { null }
+            slackTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
           }
         )
       }
