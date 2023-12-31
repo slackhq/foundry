@@ -50,17 +50,21 @@ internal class Publisher<T : Named>(
   private val externalName = "${declarableName}Elements"
 
   /** The plugin will expose dependencies on this configuration, which extends from the declared dependencies. */
-  private val external: NamedDomainObjectProvider<out Configuration> =
-    // TODO need to maybeCreate this to avoid exceptions if already made
-    project.configurations.consumable(externalName) {
-      // This attribute is identical to what is set on the internal/resolvable configuration
-      attributes {
-        attribute(
-          attr.attribute,
-          project.objects.named(attr.attribute.type, attr.attributeName)
-        )
+  private val external: NamedDomainObjectProvider<out Configuration> = run {
+    if (project.configurations.findByName(externalName) != null) {
+      project.configurations.named(externalName)
+    } else {
+      project.configurations.consumable(externalName) {
+        // This attribute is identical to what is set on the internal/resolvable configuration
+        attributes {
+          attribute(
+            attr.attribute,
+            project.objects.named(attr.attribute.type, attr.attributeName)
+          )
+        }
       }
     }
+  }
 
   /** Teach Gradle which thing produces the artifact associated with the external/consumable configuration. */
   fun publish(output: Provider<RegularFile>) {
