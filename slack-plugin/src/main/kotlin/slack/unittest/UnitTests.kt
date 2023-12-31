@@ -19,16 +19,20 @@ import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import kotlin.math.max
 import kotlin.math.roundToInt
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.retry
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.capitalizeUS
 import slack.gradle.ciUnitTestAndroidVariant
 import slack.gradle.configureEach
 import slack.gradle.isActionsCi
 import slack.gradle.isCi
+import slack.gradle.tasks.SimpleFileProducerTask
+import slack.gradle.tasks.SimpleFilesConsumerTask
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.synchronousEnvProperty
 
@@ -61,11 +65,21 @@ internal object UnitTests {
     return max((Runtime.getRuntime().availableProcessors() * multiplier).roundToInt(), 1)
   }
 
-  fun configureRootProject(project: Project): TaskProvider<Task> =
-    project.tasks.register(GLOBAL_CI_UNIT_TEST_TASK_NAME) {
-      group = LifecycleBasePlugin.VERIFICATION_GROUP
-      description = "Global lifecycle task to run all ciUnitTest tasks."
-    }
+  fun configureRootProject(project: Project, slackProperties: SlackProperties) {
+    val resolver = Resolver.interProjectResolver(
+        project,
+        SgpArtifacts.Kind.SKIPPY_UNIT_TESTS
+    )
+    resolver.addSubprojectDependencies(slackProperties)
+    SimpleFilesConsumerTask.register(
+      project = project,
+      name = GLOBAL_CI_UNIT_TEST_TASK_NAME,
+      group = LifecycleBasePlugin.VERIFICATION_GROUP,
+      description = "Global lifecycle task to run all ciUnitTest tasks.",
+      inputFiles = resolver.artifactView(),
+      outputFilePath = "skippy/ciUnitTest/testsRun.txt"
+    )
+  }
 
   fun configureSubproject(
     project: Project,
@@ -91,9 +105,12 @@ internal object UnitTests {
       }
     }
 
-    val globalTask =
+    val unitTestsPublisher: Publisher<SgpArtifacts>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
+        Publisher.interProjectPublisher(
+          project,
+          SgpArtifacts.Kind.SKIPPY_UNIT_TESTS
+        )
       } else {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)
@@ -103,23 +120,41 @@ internal object UnitTests {
         } else {
           project.logger.debug(log)
         }
+        val skippedTask =
+          SimpleFileProducerTask.register(
+            project,
+            name = "skipped${CI_UNIT_TEST_TASK_NAME.capitalizeUS()}",
+            description = "Lifecycle task to run unit tests for ${project.path} (skipped).",
+            input = taskPath,
+            outputFilePath = "skippy/ciUnitTest/skipped.txt",
+          )
+        Publisher.interProjectPublisher(
+          project,
+          SgpArtifacts.Kind.SKIPPY_AVOIDED_TASKS
+        ).publish(skippedTask.flatMap { it.output })
         null
       }
 
     when (pluginId) {
       "com.android.application",
       "com.android.library" -> {
-        createAndroidCiUnitTestTask(project, globalTask)
+        createAndroidCiUnitTestTask(project, unitTestsPublisher)
       }
       else -> {
         // Standard JVM projects like kotlin-jvm, java-library, etc
         project.logger.debug("$LOG Creating CI unit test tasks")
         val ciUnitTest =
-          project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
-            group = LifecycleBasePlugin.VERIFICATION_GROUP
+          SimpleFileProducerTask.register(
+            project,
+            name = CI_UNIT_TEST_TASK_NAME,
+            group = LifecycleBasePlugin.VERIFICATION_GROUP,
+            description = "Lifecycle task to run unit tests for ${project.path}.",
+            input = "${project.path}:$CI_UNIT_TEST_TASK_NAME",
+            outputFilePath = "skippy/ciUnitTest/testsRun.txt",
+          ) {
             dependsOn("test")
           }
-        globalTask?.configure { dependsOn(ciUnitTest) }
+        unitTestsPublisher?.publish(ciUnitTest.flatMap { it.output })
         project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
           group = LifecycleBasePlugin.VERIFICATION_GROUP
           dependsOn("testClasses")
@@ -130,19 +165,25 @@ internal object UnitTests {
     configureTestTasks(project, slackProperties)
   }
 
-  private fun createAndroidCiUnitTestTask(project: Project, globalTask: TaskProvider<*>?) {
+  private fun createAndroidCiUnitTestTask(project: Project, unitTestsPublisher: Publisher<SgpArtifacts>?) {
     val variant = project.ciUnitTestAndroidVariant()
     val variantUnitTestTaskName = "test${variant}UnitTest"
     val variantCompileUnitTestTaskName = "compile${variant}UnitTestSources"
     project.logger.debug("$LOG Creating CI unit test tasks for variant '$variant'")
     val ciUnitTest =
-      project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
-        group = LifecycleBasePlugin.VERIFICATION_GROUP
+      SimpleFileProducerTask.register(
+        project = project,
+        name = CI_UNIT_TEST_TASK_NAME,
+        group = LifecycleBasePlugin.VERIFICATION_GROUP,
+        description = "Lifecycle task to run unit tests for ${project.path}.",
+        input = "${project.path}:$CI_UNIT_TEST_TASK_NAME",
+        outputFilePath = "skippy/ciUnitTest/testsRun.txt",
+      ) {
         // Even if the task isn't created yet, we can do this by name alone and it will resolve at
         // task configuration time.
         dependsOn(variantUnitTestTaskName)
       }
-    globalTask?.configure { dependsOn(ciUnitTest) }
+    unitTestsPublisher?.publish(ciUnitTest.flatMap { it.output })
     project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
       group = LifecycleBasePlugin.VERIFICATION_GROUP
       // Even if the task isn't created yet, we can do this by name alone and it will resolve at

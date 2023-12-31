@@ -1,9 +1,14 @@
 package slack.gradle.tasks
 
+import java.io.File
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -11,6 +16,10 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.language.base.plugins.LifecycleBasePlugin
+import slack.gradle.register
+import slack.unittest.UnitTests
 
 @CacheableTask
 internal abstract class SimpleFileProducerTask : DefaultTask() {
@@ -24,6 +33,26 @@ internal abstract class SimpleFileProducerTask : DefaultTask() {
     fun writeText() {
         val outputFile = output.get().asFile
         outputFile.writeText(input.get())
+    }
+
+    companion object {
+        fun register(
+            project: Project,
+            name: String,
+            description: String,
+            input: String,
+            outputFilePath: String,
+            group: String = "slack",
+            action: Action<SimpleFileProducerTask> = Action {},
+        ): TaskProvider<SimpleFileProducerTask> {
+            return project.tasks.register<SimpleFileProducerTask>(name) {
+                this.group = group
+                this.description = description
+                this.input.set(input)
+                output.set(project.layout.buildDirectory.file(outputFilePath))
+                action.execute(this)
+            }
+        }
     }
 }
 
@@ -40,5 +69,25 @@ internal abstract class SimpleFilesConsumerTask : DefaultTask() {
     fun mergeFiles() {
         val outputFile = output.get().asFile
         outputFile.writeText(inputFiles.files.map { it.readText() }.sorted().joinToString("\n"))
+    }
+
+    companion object {
+        fun register(
+            project: Project,
+            name: String,
+            description: String,
+            inputFiles: Provider<Set<File>>,
+            outputFilePath: String,
+            group: String = "slack",
+            action: Action<SimpleFilesConsumerTask> = Action {},
+        ): TaskProvider<SimpleFilesConsumerTask> {
+            return project.tasks.register<SimpleFilesConsumerTask>(name) {
+                this.group = group
+                this.description = description
+                this.inputFiles.setFrom(inputFiles)
+                output.set(project.layout.buildDirectory.file(outputFilePath))
+                action.execute(this)
+            }
+        }
     }
 }
