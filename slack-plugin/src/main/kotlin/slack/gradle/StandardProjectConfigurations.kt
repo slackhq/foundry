@@ -71,6 +71,7 @@ import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.tasks.SimpleFileProducerTask
 import slack.gradle.tasks.publishWith
+import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
@@ -593,12 +594,12 @@ internal class StandardProjectConfigurations(
                 //
                 // Note that we can't configure this to _just_ be enabled for robolectric projects
                 // based on dependencies unfortunately, as the task graph is already wired by the
-                // time
-                // dependencies start getting resolved.
+                // time dependencies start getting resolved.
                 //
-                slackTools.globalConfig.updateRobolectricJarsTask?.let {
+                slackProperties.versions.robolectric?.let {
                   logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-                  test.dependsOn(it)
+                  // Depending on the root project task by name alone is ok for Project Isolation
+                  test.dependsOn(UpdateRobolectricJarsTask.NAME)
                 }
 
                 // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric

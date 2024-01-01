@@ -42,6 +42,7 @@ import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
+import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import slack.gradle.util.JsonTools
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsData
@@ -92,6 +93,7 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     } else {
       project.logger.debug("Skippy is disabled")
     }
+
     SlackTools.register(
       project = project,
       logThermals = logThermals,
@@ -145,6 +147,11 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     UnitTests.configureRootProject(project, slackProperties)
     ModuleStatsTasks.configureRoot(project, slackProperties)
     ComputeAffectedProjectsTask.register(project, slackProperties)
+    // Register robolectric jar downloads if requested
+    slackProperties.versions.robolectric?.let {
+      UpdateRobolectricJarsTask.register(project, slackProperties)
+    }
+
     val scanApi = ScanApi(project)
     if (slackProperties.applyCommonBuildTags) {
       project.configureBuildScanMetadata(scanApi)
