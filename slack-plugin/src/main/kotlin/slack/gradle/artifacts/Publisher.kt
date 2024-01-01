@@ -63,6 +63,7 @@ internal class Publisher<T : Named>(
       project: Project,
       artifact: SgpArtifacts.Kind,
     ): Publisher<SgpArtifacts> {
+      project.logger.debug("Creating publisher for $artifact")
       return Publisher(
         project,
         artifact.declarableName,

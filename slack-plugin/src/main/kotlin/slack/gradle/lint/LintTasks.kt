@@ -442,6 +442,7 @@ internal object LintTasks {
     project: Project,
     action: Action<SimpleFileProducerTask> = Action {},
   ): TaskProvider<SimpleFileProducerTask> {
+    project.logger.debug("Creating ciLint task: ${project.path}:$CI_LINT_TASK_NAME")
     val task =
       SimpleFileProducerTask.registerOrConfigure(
         project,

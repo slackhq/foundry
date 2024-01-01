@@ -67,9 +67,8 @@ internal object UnitTests {
     return max((Runtime.getRuntime().availableProcessors() * multiplier).roundToInt(), 1)
   }
 
-  fun configureRootProject(project: Project, slackProperties: SlackProperties) {
+  fun configureRootProject(project: Project) {
     val resolver = Resolver.interProjectResolver(project, SgpArtifacts.Kind.SKIPPY_UNIT_TESTS)
-    resolver.addSubprojectDependencies(slackProperties)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
       name = GLOBAL_CI_UNIT_TEST_TASK_NAME,

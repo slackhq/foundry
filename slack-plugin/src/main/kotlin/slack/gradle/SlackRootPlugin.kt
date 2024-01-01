@@ -144,7 +144,7 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     LintTasks.configureRootProject(project)
     DetektTasks.configureRootProject(project, slackProperties)
     project.configureMisc(slackProperties)
-    UnitTests.configureRootProject(project, slackProperties)
+    UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
     ComputeAffectedProjectsTask.register(project, slackProperties)
     // Register robolectric jar downloads if requested
