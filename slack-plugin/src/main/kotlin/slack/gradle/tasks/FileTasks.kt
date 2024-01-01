@@ -5,7 +5,6 @@ import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -17,9 +16,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.language.base.plugins.LifecycleBasePlugin
-import slack.gradle.register
-import slack.unittest.UnitTests
+import slack.gradle.registerOrConfigure
 
 @CacheableTask
 internal abstract class SimpleFileProducerTask : DefaultTask() {
@@ -36,16 +33,16 @@ internal abstract class SimpleFileProducerTask : DefaultTask() {
     }
 
     companion object {
-        fun register(
+        fun registerOrConfigure(
             project: Project,
             name: String,
             description: String,
-            input: String,
-            outputFilePath: String,
+            outputFilePath: String = "lifecycleFiles/$name/producedTask.txt",
+            input: String = "${project.path}:$name",
             group: String = "slack",
             action: Action<SimpleFileProducerTask> = Action {},
         ): TaskProvider<SimpleFileProducerTask> {
-            return project.tasks.register<SimpleFileProducerTask>(name) {
+            return project.tasks.registerOrConfigure<SimpleFileProducerTask>(name) {
                 this.group = group
                 this.description = description
                 this.input.set(input)
@@ -72,19 +69,19 @@ internal abstract class SimpleFilesConsumerTask : DefaultTask() {
     }
 
     companion object {
-        fun register(
+        fun registerOrConfigure(
             project: Project,
             name: String,
             description: String,
             inputFiles: Provider<Set<File>>,
-            outputFilePath: String,
+            outputFilePath: String = "lifecycleFiles/$name/consumedTasks.txt",
             group: String = "slack",
             action: Action<SimpleFilesConsumerTask> = Action {},
         ): TaskProvider<SimpleFilesConsumerTask> {
-            return project.tasks.register<SimpleFilesConsumerTask>(name) {
+            return project.tasks.registerOrConfigure<SimpleFilesConsumerTask>(name) {
                 this.group = group
                 this.description = description
-                this.inputFiles.setFrom(inputFiles)
+                this.inputFiles.from(inputFiles)
                 output.set(project.layout.buildDirectory.file(outputFilePath))
                 action.execute(this)
             }

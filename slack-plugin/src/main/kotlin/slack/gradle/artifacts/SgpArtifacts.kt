@@ -15,6 +15,7 @@ internal interface SgpArtifacts : Named {
     val artifactName: String,
   ) {
     SKIPPY_UNIT_TESTS("skippyUnitTests", "skippy-unit-tests"),
+    SKIPPY_LINT("skippyLint", "skippy-lint"),
     SKIPPY_AVOIDED_TASKS("skippyAvoidedTasks", "skippy-avoided-tasks"),
   }
 }
