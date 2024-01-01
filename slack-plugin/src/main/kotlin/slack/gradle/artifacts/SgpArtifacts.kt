@@ -21,5 +21,6 @@ internal interface SgpArtifacts : Named {
     SKIPPY_DETEKT("skippyDetekt", "skippy-detekt"),
     ANDROID_TEST_APK_DIRS("androidTestApkDirs", "android-test-apk-dirs"),
     DAGP_MISSING_IDENTIFIERS("dagpMissingIdentifiers", "dagp-missing-identifiers"),
+    MOD_STATS_STATS_FILES("modStatsFiles", "mod-stats-files"),
   }
 }
