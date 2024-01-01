@@ -43,6 +43,8 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifacts
 import slack.gradle.convertProjectPathToAccessor
 import slack.gradle.property
 import slack.gradle.util.mapToBoolean
@@ -459,7 +461,9 @@ internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
     const val NAME = "aggregateMissingIdentifiers"
 
     fun register(rootProject: Project): TaskProvider<MissingIdentifiersAggregatorTask> {
+      val resolver = Resolver.interProjectResolver(rootProject, SgpArtifacts.Kind.DAGP_MISSING_IDENTIFIERS)
       return rootProject.tasks.register(NAME, MissingIdentifiersAggregatorTask::class.java) {
+        inputFiles.from(resolver.artifactView())
         outputFile.set(
           rootProject.layout.buildDirectory.file("rake/aggregated_missing_identifiers.txt")
         )

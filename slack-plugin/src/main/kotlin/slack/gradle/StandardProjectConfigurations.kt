@@ -57,14 +57,11 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.utils.named
-import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.SgpArtifacts
-import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
@@ -73,7 +70,6 @@ import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.tasks.SimpleFileProducerTask
-import slack.gradle.tasks.publish
 import slack.gradle.tasks.publishWith
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
@@ -236,13 +232,8 @@ internal class StandardProjectConfigurations(
               configure<DependencyAnalysisSubExtension> {
                 registerPostProcessingTask(rakeDependencies)
               }
-              val aggregator =
-                project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
-                  MissingIdentifiersAggregatorTask.NAME
-                )
-              aggregator.configure {
-                inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
-              }
+              val publisher = Publisher.interProjectPublisher(project, SgpArtifacts.Kind.DAGP_MISSING_IDENTIFIERS)
+              publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
         }
