@@ -15,6 +15,7 @@
  */
 package slack.unittest
 
+import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import kotlin.math.max
 import kotlin.math.roundToInt
 import org.gradle.api.Project
@@ -36,7 +37,6 @@ import slack.gradle.tasks.SimpleFilesConsumerTask
 import slack.gradle.tasks.publish
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.synchronousEnvProperty
-import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 
 /**
  * This code creates a task named "ciUnitTest" in the project it is applied to, which depends on the
@@ -68,10 +68,7 @@ internal object UnitTests {
   }
 
   fun configureRootProject(project: Project, slackProperties: SlackProperties) {
-    val resolver = Resolver.interProjectResolver(
-        project,
-        SgpArtifacts.Kind.SKIPPY_UNIT_TESTS
-    )
+    val resolver = Resolver.interProjectResolver(project, SgpArtifacts.Kind.SKIPPY_UNIT_TESTS)
     resolver.addSubprojectDependencies(slackProperties)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
@@ -108,10 +105,7 @@ internal object UnitTests {
 
     val unitTestsPublisher: Publisher<SgpArtifacts>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(
-          project,
-          SgpArtifacts.Kind.SKIPPY_UNIT_TESTS
-        )
+        Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_UNIT_TESTS)
       } else {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)
@@ -145,7 +139,10 @@ internal object UnitTests {
     configureTestTasks(project, slackProperties)
   }
 
-  private fun createAndroidCiUnitTestTask(project: Project, unitTestsPublisher: Publisher<SgpArtifacts>?) {
+  private fun createAndroidCiUnitTestTask(
+    project: Project,
+    unitTestsPublisher: Publisher<SgpArtifacts>?
+  ) {
     val variant = project.ciUnitTestAndroidVariant()
     val variantUnitTestTaskName = "test${variant}UnitTest"
     val variantCompileUnitTestTaskName = "compile${variant}UnitTestSources"

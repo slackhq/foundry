@@ -215,9 +215,7 @@ internal object LintTasks {
     }
 
     log("Creating ciLint task")
-    val ciLint = createCiLintTask(project) {
-      dependsOn(lintTask)
-    }
+    val ciLint = createCiLintTask(project) { dependsOn(lintTask) }
 
     // For Android projects, we can run lint configuration last using `DslLifecycle.finalizeDsl`;
     // however, we need to run it using `Project.afterEvaluate` for non-Android projects.
@@ -243,14 +241,14 @@ internal object LintTasks {
     slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
 
     if (affectedProjects != null && path !in affectedProjects) {
-        val taskPath = "${path}:$CI_LINT_TASK_NAME"
-        val log = "Skipping $taskPath because it is not affected."
-        onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
-        if (slackProperties.debug) {
-          log(log)
-        } else {
-          log(log)
-        }
+      val taskPath = "${path}:$CI_LINT_TASK_NAME"
+      val log = "Skipping $taskPath because it is not affected."
+      onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
+      if (slackProperties.debug) {
+        log(log)
+      } else {
+        log(log)
+      }
       SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
     } else {
       val publisher = Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_LINT)
@@ -444,13 +442,14 @@ internal object LintTasks {
     project: Project,
     action: Action<SimpleFileProducerTask> = Action {},
   ): TaskProvider<SimpleFileProducerTask> {
-    val task = SimpleFileProducerTask.registerOrConfigure(
-      project,
-      CI_LINT_TASK_NAME,
-      group = LifecycleBasePlugin.VERIFICATION_GROUP,
-      description = "Lifecycle task to run all lint tasks on this project.",
-      action = action
-    )
+    val task =
+      SimpleFileProducerTask.registerOrConfigure(
+        project,
+        CI_LINT_TASK_NAME,
+        group = LifecycleBasePlugin.VERIFICATION_GROUP,
+        description = "Lifecycle task to run all lint tasks on this project.",
+        action = action
+      )
     return task
   }
 }

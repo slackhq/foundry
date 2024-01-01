@@ -140,14 +140,15 @@ internal object DetektTasks {
           Spec<Detekt> { it.name == DetektPlugin.DETEKT_TASK_NAME }
         }
       val matchingTasks = project.tasks.withType(Detekt::class.java).matching(taskSpec)
-      val ciDetekt = SimpleFileProducerTask.registerOrConfigure(
-        project,
-        CI_DETEKT_TASK_NAME,
-        description = "Lifecycle task to run detekt for ${project.path}.",
-        group = LifecycleBasePlugin.VERIFICATION_GROUP,
-      ) {
-        dependsOn(matchingTasks)
-      }
+      val ciDetekt =
+        SimpleFileProducerTask.registerOrConfigure(
+          project,
+          CI_DETEKT_TASK_NAME,
+          description = "Lifecycle task to run detekt for ${project.path}.",
+          group = LifecycleBasePlugin.VERIFICATION_GROUP,
+        ) {
+          dependsOn(matchingTasks)
+        }
       publisher?.publish(ciDetekt)
     }
   }

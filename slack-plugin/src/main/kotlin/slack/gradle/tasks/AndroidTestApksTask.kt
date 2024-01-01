@@ -60,9 +60,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
       .writeText(
         androidTestApkDirs
           .asSequence()
-          .flatMap {
-            it.toPath().walk()
-          }
+          .flatMap { it.toPath().walk() }
           .filter { it.isRegularFile() && it.extension == "apk" }
           .joinToString("\n") { apk -> "- test: ${apk.absolutePathString()}" }
       )
@@ -72,10 +70,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
     public const val NAME: String = "aggregateAndroidTestApks"
 
     internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
-      val resolver = Resolver.interProjectResolver(
-        project,
-        SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS
-      )
+      val resolver = Resolver.interProjectResolver(project, SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS)
       return project.tasks.register<AndroidTestApksTask>(NAME) {
         androidTestApkDirs.from(resolver.artifactView())
         outputFile.setDisallowChanges(

@@ -326,9 +326,8 @@ internal inline fun <reified T : Any> ServiceRegistry.get(): T = this[T::class.j
 internal inline fun <reified T : Task> TaskContainer.registerOrConfigure(
   taskName: String,
   crossinline configureAction: T.() -> Unit
-): TaskProvider<T> = when (taskName) {
-  in names -> named(taskName) as TaskProvider<T>
-  else -> register(taskName, T::class.java)
-}.apply {
-  configure { configureAction() }
-}
+): TaskProvider<T> =
+  when (taskName) {
+    in names -> named(taskName) as TaskProvider<T>
+    else -> register(taskName, T::class.java)
+  }.apply { configure { configureAction() } }

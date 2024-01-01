@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package slack.gradle.tasks
 
 import java.io.File
@@ -21,80 +36,77 @@ import slack.gradle.registerOrConfigure
 
 @CacheableTask
 internal abstract class SimpleFileProducerTask : DefaultTask() {
-    @get:Input
-    abstract val input: Property<String>
+  @get:Input abstract val input: Property<String>
 
-    @get:OutputFile
-    abstract val output: RegularFileProperty
+  @get:OutputFile abstract val output: RegularFileProperty
 
-    @TaskAction
-    fun writeText() {
-        val outputFile = output.get().asFile
-        outputFile.writeText(input.get())
+  @TaskAction
+  fun writeText() {
+    val outputFile = output.get().asFile
+    outputFile.writeText(input.get())
+  }
+
+  companion object {
+    fun registerOrConfigure(
+      project: Project,
+      name: String,
+      description: String,
+      outputFilePath: String = "artifactMetadata/$name/produced.txt",
+      input: String = "${project.path}:$name",
+      group: String = "slack",
+      action: Action<SimpleFileProducerTask> = Action {},
+    ): TaskProvider<SimpleFileProducerTask> {
+      return project.tasks.registerOrConfigure<SimpleFileProducerTask>(name) {
+        this.group = group
+        this.description = description
+        this.input.set(input)
+        output.set(project.layout.buildDirectory.file(outputFilePath))
+        action.execute(this)
+      }
     }
-
-    companion object {
-        fun registerOrConfigure(
-            project: Project,
-            name: String,
-            description: String,
-            outputFilePath: String = "artifactMetadata/$name/produced.txt",
-            input: String = "${project.path}:$name",
-            group: String = "slack",
-            action: Action<SimpleFileProducerTask> = Action {},
-        ): TaskProvider<SimpleFileProducerTask> {
-            return project.tasks.registerOrConfigure<SimpleFileProducerTask>(name) {
-                this.group = group
-                this.description = description
-                this.input.set(input)
-                output.set(project.layout.buildDirectory.file(outputFilePath))
-                action.execute(this)
-            }
-        }
-    }
+  }
 }
 
 @CacheableTask
 internal abstract class SimpleFilesConsumerTask : DefaultTask() {
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    @get:InputFiles
-    abstract val inputFiles: ConfigurableFileCollection
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  @get:InputFiles
+  abstract val inputFiles: ConfigurableFileCollection
 
-    @get:OutputFile
-    abstract val output: RegularFileProperty
+  @get:OutputFile abstract val output: RegularFileProperty
 
-    @TaskAction
-    fun mergeFiles() {
-        val outputFile = output.get().asFile
-        outputFile.writeText(inputFiles.files.map { it.readText() }.sorted().joinToString("\n"))
+  @TaskAction
+  fun mergeFiles() {
+    val outputFile = output.get().asFile
+    outputFile.writeText(inputFiles.files.map { it.readText() }.sorted().joinToString("\n"))
+  }
+
+  companion object {
+    fun registerOrConfigure(
+      project: Project,
+      name: String,
+      description: String,
+      inputFiles: Provider<Set<File>>,
+      outputFilePath: String = "artifactMetadata/$name/resolved.txt",
+      group: String = "slack",
+      action: Action<SimpleFilesConsumerTask> = Action {},
+    ): TaskProvider<SimpleFilesConsumerTask> {
+      return project.tasks.registerOrConfigure<SimpleFilesConsumerTask>(name) {
+        this.group = group
+        this.description = description
+        this.inputFiles.from(inputFiles)
+        output.set(project.layout.buildDirectory.file(outputFilePath))
+        action.execute(this)
+      }
     }
-
-    companion object {
-        fun registerOrConfigure(
-            project: Project,
-            name: String,
-            description: String,
-            inputFiles: Provider<Set<File>>,
-            outputFilePath: String = "artifactMetadata/$name/resolved.txt",
-            group: String = "slack",
-            action: Action<SimpleFilesConsumerTask> = Action {},
-        ): TaskProvider<SimpleFilesConsumerTask> {
-            return project.tasks.registerOrConfigure<SimpleFilesConsumerTask>(name) {
-                this.group = group
-                this.description = description
-                this.inputFiles.from(inputFiles)
-                output.set(project.layout.buildDirectory.file(outputFilePath))
-                action.execute(this)
-            }
-        }
-    }
+  }
 }
 
 internal fun Publisher<*>.publish(provider: TaskProvider<SimpleFileProducerTask>) {
-    publish(provider.flatMap { it.output })
+  publish(provider.flatMap { it.output })
 }
 
 /** Inverse of the above [Publisher.publish] available for fluent calls. */
 internal fun TaskProvider<SimpleFileProducerTask>.publishWith(publisher: Publisher<*>) {
-    publisher.publish(this)
+  publisher.publish(this)
 }

@@ -30,7 +30,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -44,7 +43,6 @@ import slack.gradle.SlackProperties
 import slack.gradle.artifacts.Resolver
 import slack.gradle.artifacts.SgpArtifacts
 import slack.gradle.property
-import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.setDisallowChanges
 
@@ -76,8 +74,8 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
     project.objects.property<Boolean>().convention(true)
 
   /**
-   * Consumed artifacts of project paths that produce androidTest APKs. Each file will just have one line
-   * that contains a project path.
+   * Consumed artifacts of project paths that produce androidTest APKs. Each file will just have one
+   * line that contains a project path.
    */
   @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:Input
@@ -118,8 +116,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
       } else {
         1
       }
-    val androidTestProjects =
-      androidTestProjectInputs.map { it.readText().trim() }.toSet()
+    val androidTestProjects = androidTestProjectInputs.map { it.readText().trim() }.toSet()
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug.get(),
@@ -190,10 +187,11 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
         GradleDependencyGraphFactory.create(rootProject, configurationsToLook).serializableGraph()
       }
 
-      val androidTestApksResolver = Resolver.interProjectResolver(
-        rootProject,
-        SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT,
-      )
+      val androidTestApksResolver =
+        Resolver.interProjectResolver(
+          rootProject,
+          SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT,
+        )
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(extension.debug)
