@@ -16,9 +16,7 @@
 package slack.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.toolchain.JvmVendorSpec
-import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 
 /** Registry of global configuration info. */
 public class GlobalConfig

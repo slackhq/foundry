@@ -233,7 +233,8 @@ internal class StandardProjectConfigurations(
               configure<DependencyAnalysisSubExtension> {
                 registerPostProcessingTask(rakeDependencies)
               }
-              val publisher = Publisher.interProjectPublisher(project, SgpArtifacts.Kind.DAGP_MISSING_IDENTIFIERS)
+              val publisher =
+                Publisher.interProjectPublisher(project, SgpArtifacts.Kind.DAGP_MISSING_IDENTIFIERS)
               publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
@@ -447,16 +448,12 @@ internal class StandardProjectConfigurations(
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
     // Contribute these libraries to Fladle if they opt into it
-    val androidTestApksPublisher = Publisher.interProjectPublisher(
-      project,
-      SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS
-    )
+    val androidTestApksPublisher =
+      Publisher.interProjectPublisher(project, SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
-    val skippyAndroidTestProjectPublisher = Publisher.interProjectPublisher(
-      project,
-      SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT
-    )
+    val skippyAndroidTestProjectPublisher =
+      Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -503,15 +500,17 @@ internal class StandardProjectConfigurations(
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
-              // Note this intentionally just uses the same task each time as they always produce the same output
+              // Note this intentionally just uses the same task each time as they always produce
+              // the same output
               SimpleFileProducerTask.registerOrConfigure(
-                project,
-                name = "androidTestProjectMetadata",
-                description =
-                  "Produces a metadata artifact indicating this project path produces an androidTest APK.",
-                input = projectPath,
-                group = "skippy"
-              ).publishWith(skippyAndroidTestProjectPublisher)
+                  project,
+                  name = "androidTestProjectMetadata",
+                  description =
+                    "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                  input = projectPath,
+                  group = "skippy"
+                )
+                .publishWith(skippyAndroidTestProjectPublisher)
               if (isLibraryVariant) {
                 (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
                   apkArtifactsDir ->

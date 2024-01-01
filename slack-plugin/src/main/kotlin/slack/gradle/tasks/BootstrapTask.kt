@@ -48,7 +48,6 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.jvm.toolchain.JvmVendorSpec
-import org.gradle.language.base.plugins.LifecycleBasePlugin
 import oshi.SystemInfo
 import slack.cli.AppleSiliconCompat
 import slack.cli.AppleSiliconCompat.isMacOS
