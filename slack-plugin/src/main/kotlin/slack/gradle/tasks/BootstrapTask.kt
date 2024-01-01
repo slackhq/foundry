@@ -323,23 +323,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       return project.gradle.startParameter.taskNames.any { it == NAME }
     }
 
-    internal fun configureSubprojectBootstrapTasks(project: Project) {
-      if (!isBootstrapEnabled(project)) return
-      val rootTask = project.rootProject.tasks.named(NAME, CoreBootstrapTask::class.java)
-      // Clever trick to make this finalized by all bootstrap tasks and all other tasks depend on
-      // this, so bootstrap always runs first.
-      project.tasks.configureEach {
-        val task = this
-        if (name == NAME) return@configureEach
-        if (name == LifecycleBasePlugin.CLEAN_TASK_NAME) return@configureEach
-        if (this is BootstrapTask) {
-          rootTask.configure { finalizedBy(task) }
-        } else {
-          dependsOn(rootTask)
-        }
-      }
-    }
-
     public fun register(
       project: Project,
       jvmVendor: JvmVendorSpec?
