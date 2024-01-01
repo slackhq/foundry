@@ -61,12 +61,19 @@ internal class Resolver<T : Named>(
     fun interProjectResolver(
       project: Project,
       artifact: SgpArtifacts.Kind,
+      addDependencies: Boolean = true,
     ): Resolver<SgpArtifacts> {
-      return Resolver(
+      project.logger.debug("Creating resolver for $artifact")
+      val resolver = Resolver(
         project,
         artifact.declarableName,
         Attr(SgpArtifacts.SGP_ARTIFACTS_ATTRIBUTE, artifact.artifactName)
       )
+      if (addDependencies) {
+        project.logger.debug("Adding subproject dependencies to $artifact via ${artifact.declarableName}")
+        resolver.addSubprojectDependencies()
+      }
+      return resolver
     }
   }
 
@@ -97,10 +104,16 @@ internal class Resolver<T : Named>(
       }
     }
 
-  fun addSubprojectDependencies(slackProperties: SlackProperties) {
+  fun addSubprojectDependencies() {
     project.dependencies.apply {
       for (subproject in project.subprojects) {
-        if (subproject.path == slackProperties.platformProjectPath) continue
+        // Ignore subprojects that don't have a build file. Gradle treats these as projects but we don't.
+        // Accessing the projectDir _should_ be project-isolation-safe according to
+        // https://gradle.github.io/configuration-cache/#build_logic_constraints
+        val projectDir = subproject.projectDir
+        if (!File(projectDir, "build.gradle.kts").exists() && !File(projectDir, "build.gradle").exists()) {
+          continue
+        }
         add(declarable.name, project.project(subproject.path))
       }
     }
