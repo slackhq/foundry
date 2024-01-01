@@ -16,6 +16,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import slack.gradle.artifacts.Publisher
 import slack.gradle.registerOrConfigure
 
 @CacheableTask
@@ -37,7 +38,7 @@ internal abstract class SimpleFileProducerTask : DefaultTask() {
             project: Project,
             name: String,
             description: String,
-            outputFilePath: String = "lifecycleFiles/$name/producedTask.txt",
+            outputFilePath: String = "artifactMetadata/$name/produced.txt",
             input: String = "${project.path}:$name",
             group: String = "slack",
             action: Action<SimpleFileProducerTask> = Action {},
@@ -74,7 +75,7 @@ internal abstract class SimpleFilesConsumerTask : DefaultTask() {
             name: String,
             description: String,
             inputFiles: Provider<Set<File>>,
-            outputFilePath: String = "lifecycleFiles/$name/consumedTasks.txt",
+            outputFilePath: String = "artifactMetadata/$name/resolved.txt",
             group: String = "slack",
             action: Action<SimpleFilesConsumerTask> = Action {},
         ): TaskProvider<SimpleFilesConsumerTask> {
@@ -87,4 +88,13 @@ internal abstract class SimpleFilesConsumerTask : DefaultTask() {
             }
         }
     }
+}
+
+internal fun Publisher<*>.publish(provider: TaskProvider<SimpleFileProducerTask>) {
+    publish(provider.flatMap { it.output })
+}
+
+/** Inverse of the above [Publisher.publish] available for fluent calls. */
+internal fun TaskProvider<SimpleFileProducerTask>.publishWith(publisher: Publisher<*>) {
+    publisher.publish(this)
 }

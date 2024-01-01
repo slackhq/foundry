@@ -17,5 +17,6 @@ internal interface SgpArtifacts : Named {
     SKIPPY_UNIT_TESTS("skippyUnitTests", "skippy-unit-tests"),
     SKIPPY_LINT("skippyLint", "skippy-lint"),
     SKIPPY_AVOIDED_TASKS("skippyAvoidedTasks", "skippy-avoided-tasks"),
+    SKIPPY_ANDROID_TEST_PROJECT("skippyAndroidTestProject", "skippy-android-test-project"),
   }
 }

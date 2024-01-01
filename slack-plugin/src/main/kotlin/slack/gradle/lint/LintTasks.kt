@@ -47,6 +47,7 @@ import slack.gradle.getByType
 import slack.gradle.multiplatformExtension
 import slack.gradle.tasks.SimpleFileProducerTask
 import slack.gradle.tasks.SimpleFilesConsumerTask
+import slack.gradle.tasks.publish
 
 /**
  * Common configuration for Android lint in projects.
@@ -253,7 +254,7 @@ internal object LintTasks {
       SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
     } else {
       val publisher = Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_LINT)
-      publisher.publish(ciLint.flatMap { it.output })
+      publisher.publish(ciLint)
     }
 
     afterEvaluate { addSourceSetsForAndroidMultiplatformAfterEvaluate() }

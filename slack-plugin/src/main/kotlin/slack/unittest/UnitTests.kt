@@ -33,6 +33,7 @@ import slack.gradle.isActionsCi
 import slack.gradle.isCi
 import slack.gradle.tasks.SimpleFileProducerTask
 import slack.gradle.tasks.SimpleFilesConsumerTask
+import slack.gradle.tasks.publish
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.synchronousEnvProperty
 import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
@@ -133,7 +134,7 @@ internal object UnitTests {
         // Standard JVM projects like kotlin-jvm, java-library, etc
         project.logger.debug("$LOG Creating CI unit test tasks")
         val ciUnitTest = registerCiUnitTest(project, "test")
-        unitTestsPublisher?.publish(ciUnitTest.flatMap { it.output })
+        unitTestsPublisher?.publish(ciUnitTest)
         project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
           group = LifecycleBasePlugin.VERIFICATION_GROUP
           dependsOn("testClasses")
@@ -150,7 +151,7 @@ internal object UnitTests {
     val variantCompileUnitTestTaskName = "compile${variant}UnitTestSources"
     project.logger.debug("$LOG Creating CI unit test tasks for variant '$variant'")
     val ciUnitTest = registerCiUnitTest(project, variantUnitTestTaskName)
-    unitTestsPublisher?.publish(ciUnitTest.flatMap { it.output })
+    unitTestsPublisher?.publish(ciUnitTest)
     project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
       group = LifecycleBasePlugin.VERIFICATION_GROUP
       // Even if the task isn't created yet, we can do this by name alone and it will resolve at

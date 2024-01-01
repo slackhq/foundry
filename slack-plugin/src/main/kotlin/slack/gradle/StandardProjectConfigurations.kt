@@ -62,6 +62,8 @@ import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.SgpArtifacts
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
@@ -70,6 +72,9 @@ import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
+import slack.gradle.tasks.SimpleFileProducerTask
+import slack.gradle.tasks.publish
+import slack.gradle.tasks.publishWith
 import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
@@ -449,16 +454,15 @@ internal class StandardProjectConfigurations(
     slackProperties: SlackProperties,
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
-    val computeAffectedProjectsTask =
-      project.rootProject.tasks.named(
-        ComputeAffectedProjectsTask.NAME,
-        ComputeAffectedProjectsTask::class.java
-      )
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksAggregator =
       project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
     val projectPath = project.path
     val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
+    val skippyAndroidTestProjectPublisher = Publisher.interProjectPublisher(
+      project,
+      SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT
+    )
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -505,7 +509,15 @@ internal class StandardProjectConfigurations(
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
-              computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
+              // Note this intentionally just uses the same task each time as they always produce the same output
+              SimpleFileProducerTask.registerOrConfigure(
+                project,
+                name = "androidTestProjectMetadata",
+                description =
+                  "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                input = projectPath,
+                group = "skippy"
+              ).publishWith(skippyAndroidTestProjectPublisher)
               if (isLibraryVariant) {
                 (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
                   apkArtifactsDir ->

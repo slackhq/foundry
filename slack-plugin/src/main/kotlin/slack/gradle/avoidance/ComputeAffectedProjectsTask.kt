@@ -27,17 +27,22 @@ import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifacts
 import slack.gradle.property
 import slack.gradle.setProperty
 import slack.gradle.util.SgpLogger
@@ -70,9 +75,13 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   public val computeInParallel: Property<Boolean> =
     project.objects.property<Boolean>().convention(true)
 
+  /**
+   * Consumed artifacts of project paths that produce androidTest APKs. Each file will just have one line
+   * that contains a project path.
+   */
+  @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:Input
-  public val androidTestProjects: SetProperty<String> =
-    project.objects.setProperty<String>().convention(emptySet())
+  public abstract val androidTestProjectInputs: ConfigurableFileCollection
 
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
@@ -109,13 +118,15 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
       } else {
         1
       }
+    val androidTestProjects =
+      androidTestProjectInputs.map { it.readText().trim() }.toSet()
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug.get(),
           logger = SgpLogger.gradle(logger),
           mergeOutputs = mergeOutputs.get(),
           outputsDir = outputsDir.get().asFile.toOkioPath(),
-          androidTestProjects = androidTestProjects.get(),
+          androidTestProjects = androidTestProjects,
           rootDir = rootDirPath,
           parallelism = parallelism,
           fs = FileSystem.SYSTEM,
@@ -179,6 +190,11 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
         GradleDependencyGraphFactory.create(rootProject, configurationsToLook).serializableGraph()
       }
 
+      val androidTestApksResolver = Resolver.interProjectResolver(
+        rootProject,
+        SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT,
+      )
+
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(extension.debug)
         mergeOutputs.setDisallowChanges(extension.mergeOutputs)
@@ -187,6 +203,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
         rootDir.setDisallowChanges(project.layout.projectDirectory)
         dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
         outputsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy"))
+        androidTestProjectInputs.from(androidTestApksResolver.artifactView())
         // Overrides of includes/neverSkippable patterns should be done in the consuming project
         // directly
       }
