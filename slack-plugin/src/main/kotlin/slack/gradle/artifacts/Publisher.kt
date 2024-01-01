@@ -4,6 +4,7 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
@@ -68,6 +69,13 @@ internal class Publisher<T : Named>(
 
   /** Teach Gradle which thing produces the artifact associated with the external/consumable configuration. */
   fun publish(output: Provider<RegularFile>) {
+    external.configure {
+      outgoing.artifact(output)
+    }
+  }
+
+  /** Teach Gradle which thing produces the artifact associated with the external/consumable configuration. */
+  fun publishDirs(output: Provider<Directory>) {
     external.configure {
       outgoing.artifact(output)
     }

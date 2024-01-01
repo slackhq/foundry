@@ -15,6 +15,11 @@
  */
 package slack.gradle.tasks
 
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.extension
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.walk
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -25,6 +30,8 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifacts
 import slack.gradle.register
 import slack.gradle.util.setDisallowChanges
 
@@ -34,13 +41,6 @@ import slack.gradle.util.setDisallowChanges
  *
  * Not cacheable because this outputs absolute paths.
  */
-// TODO in the future, Gradle technically has a more "correct" mechanism for
-//  exposing information like this via "Outgoing Variants". This API is not remotely easy to grok
-//  so let's save implementing that for a day if/when we have multiple app targets in the Android
-//  repo that need to only run dependent libraries' test APKs.
-//  The Jacoco Report Aggregation Plugin is one such example of a plugin that contributes such
-//  metadata: https://docs.gradle.org/current/userguide/jacoco_plugin.html#sec:outgoing_variants
-//  Full docs: https://docs.gradle.org/current/userguide/cross_project_publications.html
 public abstract class AndroidTestApksTask : DefaultTask() {
   @get:PathSensitive(RELATIVE)
   @get:InputFiles
@@ -52,6 +52,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
     group = "slack"
   }
 
+  @OptIn(ExperimentalPathApi::class)
   @TaskAction
   public fun writeFiles() {
     outputFile.asFile
@@ -59,9 +60,11 @@ public abstract class AndroidTestApksTask : DefaultTask() {
       .writeText(
         androidTestApkDirs
           .asSequence()
-          .flatMap { it.walk() }
-          .filter { it.isFile && it.extension == "apk" }
-          .joinToString("\n") { apk -> "- test: ${apk.absolutePath}" }
+          .flatMap {
+            it.toPath().walk()
+          }
+          .filter { it.isRegularFile() && it.extension == "apk" }
+          .joinToString("\n") { apk -> "- test: ${apk.absolutePathString()}" }
       )
   }
 
@@ -69,7 +72,12 @@ public abstract class AndroidTestApksTask : DefaultTask() {
     public const val NAME: String = "aggregateAndroidTestApks"
 
     internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
+      val resolver = Resolver.interProjectResolver(
+        project,
+        SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS
+      )
       return project.tasks.register<AndroidTestApksTask>(NAME) {
+        androidTestApkDirs.from(resolver.artifactView())
         outputFile.setDisallowChanges(
           project.layout.buildDirectory.file("slack/androidTestAggregator/aggregatedTestApks.txt")
         )

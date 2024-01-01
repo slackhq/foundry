@@ -455,8 +455,10 @@ internal class StandardProjectConfigurations(
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
     // Contribute these libraries to Fladle if they opt into it
-    val androidTestApksAggregator =
-      project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
+    val androidTestApksPublisher = Publisher.interProjectPublisher(
+      project,
+      SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS
+    )
     val projectPath = project.path
     val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
     val skippyAndroidTestProjectPublisher = Publisher.interProjectPublisher(
@@ -521,8 +523,8 @@ internal class StandardProjectConfigurations(
               if (isLibraryVariant) {
                 (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
                   apkArtifactsDir ->
-                  // Wire this up to the aggregator
-                  androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+                  // Wire this up to the aggregator. No need for an intermediate task here.
+                  androidTestApksPublisher.publishDirs(apkArtifactsDir)
                 }
               }
             } else {

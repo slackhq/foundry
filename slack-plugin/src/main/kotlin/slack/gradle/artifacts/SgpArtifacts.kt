@@ -18,5 +18,6 @@ internal interface SgpArtifacts : Named {
     SKIPPY_LINT("skippyLint", "skippy-lint"),
     SKIPPY_AVOIDED_TASKS("skippyAvoidedTasks", "skippy-avoided-tasks"),
     SKIPPY_ANDROID_TEST_PROJECT("skippyAndroidTestProject", "skippy-android-test-project"),
+    ANDROID_TEST_APK_DIRS("androidTestApkDirs", "android-test-apk-dirs"),
   }
 }
