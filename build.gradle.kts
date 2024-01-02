@@ -80,7 +80,6 @@ val externalFiles = listOf(
   "MemoizedSequence",
   "Publisher",
   "Resolver",
-  "Attr",
 ).map { "src/**/$it.kt" }
 
 allprojects {

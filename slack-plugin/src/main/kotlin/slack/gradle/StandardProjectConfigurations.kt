@@ -61,7 +61,7 @@ import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.artifacts.Publisher
-import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
@@ -234,7 +234,7 @@ internal class StandardProjectConfigurations(
                 registerPostProcessingTask(rakeDependencies)
               }
               val publisher =
-                Publisher.interProjectPublisher(project, SgpArtifacts.Kind.DAGP_MISSING_IDENTIFIERS)
+                Publisher.interProjectPublisher(project, SgpArtifact.DAGP_MISSING_IDENTIFIERS)
               publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
@@ -449,11 +449,11 @@ internal class StandardProjectConfigurations(
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
-      Publisher.interProjectPublisher(project, SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS)
+      Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
     val skippyAndroidTestProjectPublisher =
-      Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT)
+      Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {

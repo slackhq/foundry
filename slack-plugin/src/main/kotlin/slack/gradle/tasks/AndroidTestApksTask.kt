@@ -31,7 +31,7 @@ import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import slack.gradle.artifacts.Resolver
-import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.register
 import slack.gradle.util.setDisallowChanges
 
@@ -70,7 +70,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
     public const val NAME: String = "aggregateAndroidTestApks"
 
     internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
-      val resolver = Resolver.interProjectResolver(project, SgpArtifacts.Kind.ANDROID_TEST_APK_DIRS)
+      val resolver = Resolver.interProjectResolver(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
       return project.tasks.register<AndroidTestApksTask>(NAME) {
         androidTestApkDirs.from(resolver.artifactView())
         outputFile.setDisallowChanges(

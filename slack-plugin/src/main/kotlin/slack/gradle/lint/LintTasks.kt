@@ -40,7 +40,7 @@ import slack.gradle.androidExtension
 import slack.gradle.androidExtensionNullable
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.Resolver
-import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.avoidance.SkippyArtifacts
 import slack.gradle.capitalizeUS
 import slack.gradle.getByType
@@ -65,7 +65,7 @@ internal object LintTasks {
   }
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, SgpArtifacts.Kind.SKIPPY_LINT)
+    val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_LINT)
     SimpleFilesConsumerTask.registerOrConfigure(
       project,
       GLOBAL_CI_LINT_TASK_NAME,
@@ -251,7 +251,7 @@ internal object LintTasks {
       }
       SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
     } else {
-      val publisher = Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_LINT)
+      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_LINT)
       publisher.publish(ciLint)
     }
 

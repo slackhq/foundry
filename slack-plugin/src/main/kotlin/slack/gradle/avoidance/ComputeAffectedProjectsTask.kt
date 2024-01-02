@@ -42,7 +42,7 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
 import slack.gradle.artifacts.Resolver
-import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.property
 import slack.gradle.util.SgpLogger
 import slack.gradle.util.setDisallowChanges
@@ -191,7 +191,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
       val androidTestApksResolver =
         Resolver.interProjectResolver(
           rootProject,
-          SgpArtifacts.Kind.SKIPPY_ANDROID_TEST_PROJECT,
+          SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT,
         )
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {

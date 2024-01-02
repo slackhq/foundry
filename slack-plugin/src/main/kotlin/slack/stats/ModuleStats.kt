@@ -57,7 +57,7 @@ import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.Resolver
-import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.capitalizeUS
 import slack.gradle.configure
 import slack.gradle.convertProjectPathToAccessor
@@ -89,7 +89,7 @@ public object ModuleStatsTasks {
     if (!slackProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
     val resolver =
-      Resolver.interProjectResolver(rootProject, SgpArtifacts.Kind.MOD_STATS_STATS_FILES)
+      Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
       projectPathsToAccessors.setDisallowChanges(
@@ -159,7 +159,7 @@ public object ModuleStatsTasks {
         }
 
       val publisher =
-        Publisher.interProjectPublisher(project, SgpArtifacts.Kind.MOD_STATS_STATS_FILES)
+        Publisher.interProjectPublisher(project, SgpArtifact.MOD_STATS_STATS_FILES)
       publisher.publish(task.flatMap { it.outputFile })
       task
     }

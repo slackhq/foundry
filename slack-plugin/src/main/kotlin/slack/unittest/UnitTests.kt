@@ -26,7 +26,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.Resolver
-import slack.gradle.artifacts.SgpArtifacts
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.avoidance.SkippyArtifacts
 import slack.gradle.ciUnitTestAndroidVariant
 import slack.gradle.configureEach
@@ -68,7 +68,7 @@ internal object UnitTests {
   }
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, SgpArtifacts.Kind.SKIPPY_UNIT_TESTS)
+    val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_UNIT_TESTS)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
       name = GLOBAL_CI_UNIT_TEST_TASK_NAME,
@@ -102,9 +102,9 @@ internal object UnitTests {
       }
     }
 
-    val unitTestsPublisher: Publisher<SgpArtifacts>? =
+    val unitTestsPublisher: Publisher<SgpArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, SgpArtifacts.Kind.SKIPPY_UNIT_TESTS)
+        Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_UNIT_TESTS)
       } else {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)
@@ -140,7 +140,7 @@ internal object UnitTests {
 
   private fun createAndroidCiUnitTestTask(
     project: Project,
-    unitTestsPublisher: Publisher<SgpArtifacts>?
+    unitTestsPublisher: Publisher<SgpArtifact>?
   ) {
     val variant = project.ciUnitTestAndroidVariant()
     val variantUnitTestTaskName = "test${variant}UnitTest"
