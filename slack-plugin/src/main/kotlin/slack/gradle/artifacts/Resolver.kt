@@ -83,7 +83,7 @@ internal class Resolver<T : Named>(
 
   // Following the naming pattern established by the Java Library plugin. See
   // https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-  private val internalName = "${declarableName}ArtifactsClasspath"
+  private val internalName = "${declarableName}Classpath"
 
   /** Dependencies are declared on this configuration */
   val declarable: Configuration = project.configurations.dependencyScope(declarableName).get()
