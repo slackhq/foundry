@@ -88,8 +88,7 @@ public object ModuleStatsTasks {
   internal fun configureRoot(rootProject: Project, slackProperties: SlackProperties) {
     if (!slackProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
-    val resolver =
-      Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
+    val resolver = Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
       projectPathsToAccessors.setDisallowChanges(
@@ -158,8 +157,7 @@ public object ModuleStatsTasks {
           )
         }
 
-      val publisher =
-        Publisher.interProjectPublisher(project, SgpArtifact.MOD_STATS_STATS_FILES)
+      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.MOD_STATS_STATS_FILES)
       publisher.publish(task.flatMap { it.outputFile })
       task
     }
