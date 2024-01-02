@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2024. Tony Robalik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,9 @@ import org.gradle.api.attributes.Attribute
 /**
  * Teach Gradle how custom configurations relate to each other, and the artifacts they provide and
  * consume.
+ *
+ * @see <a
+ *   href="https://github.com/autonomousapps/dependency-analysis-gradle-plugin/blob/08c8765157925bbcdfd8f63d8d37fe041561ddb4/src/main/kotlin/com/autonomousapps/internal/artifacts/Attr.kt">Attr.kt</a>
  */
 internal class Attr<T : Named>(
   val attribute: Attribute<T>,

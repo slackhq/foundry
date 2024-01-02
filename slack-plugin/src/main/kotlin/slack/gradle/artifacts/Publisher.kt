@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2024. Tony Robalik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,6 +47,8 @@ import org.gradle.api.provider.Provider
  * @see <a
  *   href="https://dev.to/autonomousapps/configuration-roles-and-the-blogging-industrial-complex-21mn">Gradle
  *   configuration roles</a>
+ * @see <a
+ *   href="https://github.com/autonomousapps/dependency-analysis-gradle-plugin/blob/08c8765157925bbcdfd8f63d8d37fe041561ddb4/src/main/kotlin/com/autonomousapps/internal/artifacts/Publisher.kt">Publisher.kt</a>
  */
 internal class Publisher<T : Named>(
   project: Project,
