@@ -15,9 +15,11 @@
  */
 package slack.gradle.artifacts
 
+import java.io.Serializable
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
@@ -49,9 +51,11 @@ import org.gradle.api.provider.Provider
  * @see <a
  *   href="https://github.com/autonomousapps/dependency-analysis-gradle-plugin/blob/08c8765157925bbcdfd8f63d8d37fe041561ddb4/src/main/kotlin/com/autonomousapps/internal/artifacts/Publisher.kt">Publisher.kt</a>
  */
-internal class Publisher<T : ShareableArtifact<T>>(
+internal class Publisher<T : Serializable>(
   project: Project,
+  attr: Attribute<T>,
   artifact: T,
+  declarableName: String,
 ) {
 
   companion object {
@@ -59,14 +63,28 @@ internal class Publisher<T : ShareableArtifact<T>>(
      * Convenience function for creating a [Publisher] for inter-project publishing of
      * [SgpArtifact].
      */
+    fun interProjectPublisher(
+      project: Project,
+      sgpArtifact: SgpArtifact
+    ) = interProjectPublisher(
+      project,
+      sgpArtifact.attribute,
+      sgpArtifact,
+      sgpArtifact.declarableName,
+    )
+
     fun <T : ShareableArtifact<T>> interProjectPublisher(
       project: Project,
+      attr: Attribute<T>,
       artifact: T,
+      declarableName: String,
     ): Publisher<T> {
       project.logger.debug("Creating publisher for $artifact")
       return Publisher(
         project,
+        attr,
         artifact,
+        declarableName,
       )
     }
   }
@@ -74,7 +92,7 @@ internal class Publisher<T : ShareableArtifact<T>>(
   // Following the naming pattern established by the Java Library plugin.
   // See
   // https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-  private val externalName = "${artifact.declarableName}Elements"
+  private val externalName = "${declarableName}Elements"
 
   /**
    * The plugin will expose dependencies on this configuration, which extends from the declared
@@ -87,8 +105,7 @@ internal class Publisher<T : ShareableArtifact<T>>(
       project.configurations.consumable(externalName) {
         // This attribute is identical to what is set on the internal/resolvable configuration
         attributes {
-          // TODO keep using Named?
-          attribute(artifact.attribute, artifact)
+          attribute(attr, artifact)
         }
       }
     }

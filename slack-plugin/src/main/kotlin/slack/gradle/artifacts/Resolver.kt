@@ -16,10 +16,12 @@
 package slack.gradle.artifacts
 
 import java.io.File
+import java.io.Serializable
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.provider.Provider
 
 /**
@@ -49,29 +51,41 @@ import org.gradle.api.provider.Provider
  * @see <a
  *   href="https://github.com/autonomousapps/dependency-analysis-gradle-plugin/blob/08c8765157925bbcdfd8f63d8d37fe041561ddb4/src/main/kotlin/com/autonomousapps/internal/artifacts/Resolver.kt">Resolver.kt</a>
  */
-internal class Resolver<T : ShareableArtifact<T>>(
+internal class Resolver<T : Serializable>(
   project: Project,
+  private val attr: Attribute<T>,
   private val artifact: T,
+  declarableName: String,
 ) {
 
   internal companion object {
     /**
      * Convenience function for creating a [Resolver] for inter-project resolving of [SgpArtifact].
      */
-    fun <T : ShareableArtifact<T>> interProjectResolver(
+    fun interProjectResolver(
       project: Project,
+      artifact: SgpArtifact,
+      addDependencies: Boolean = true,
+    ) = interProjectResolver(project, artifact.attribute, artifact, artifact.declarableName, addDependencies)
+
+    fun <T : Serializable> interProjectResolver(
+      project: Project,
+      attr: Attribute<T>,
       artifact: T,
+      declarableName: String,
       addDependencies: Boolean = true,
     ): Resolver<T> {
       project.logger.debug("Creating resolver for $artifact")
       val resolver =
         Resolver(
           project,
+          attr,
           artifact,
+          declarableName,
         )
       if (addDependencies) {
         project.logger.debug(
-          "Adding subproject dependencies to $artifact via ${artifact.declarableName}"
+          "Adding subproject dependencies to $artifact via $declarableName"
         )
         resolver.addSubprojectDependencies(project)
       }
@@ -81,10 +95,10 @@ internal class Resolver<T : ShareableArtifact<T>>(
 
   // Following the naming pattern established by the Java Library plugin. See
   // https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-  private val internalName = "${artifact.declarableName}Classpath"
+  private val internalName = "${declarableName}Classpath"
 
   /** Dependencies are declared on this configuration */
-  val declarable: Configuration = project.configurations.dependencyScope(artifact.declarableName).get()
+  val declarable: Configuration = project.configurations.dependencyScope(declarableName).get()
 
   /**
    * The plugin will resolve dependencies against this internal configuration, which extends from
@@ -95,11 +109,11 @@ internal class Resolver<T : ShareableArtifact<T>>(
       extendsFrom(declarable)
       // This attribute is identical to what is set on the external/consumable configuration
       attributes {
-        attribute(artifact.attribute, artifact)
+        attribute(attr, artifact)
       }
     }
 
-  fun artifactView(): Provider<Set<File>> = artifactView(internal, artifact)
+  fun artifactView(): Provider<Set<File>> = artifactView(internal, attr, artifact)
 
   fun addSubprojectDependencies(project: Project) {
     project.dependencies.apply {
@@ -122,22 +136,21 @@ internal class Resolver<T : ShareableArtifact<T>>(
 }
 
 // Extracted to a function to make it harder to accidentally capture non-serializable values
-private fun <T : ShareableArtifact<T>> artifactView(
+private fun <T : Serializable> artifactView(
   provider: NamedDomainObjectProvider<out Configuration>,
+  attr: Attribute<T>,
   artifact: T
 ): Provider<Set<File>> {
   return provider.flatMap { configuration ->
     configuration.incoming
-      .artifactView { attributes { attribute(artifact.attribute, artifact) } }
+      .artifactView { attributes { attribute(attr, artifact) } }
       .artifacts
       .resolvedArtifacts
       .map { resolvedArtifactResults ->
         resolvedArtifactResults.mapNotNullTo(mutableSetOf()) {
           // Inexplicably, Gradle sometimes gives us random files that don't match the attribute we
           // asked for. As a result, we need to add our own filter for the attribute.
-          // We also have to match on the Named.name value, because values created by
-          // ObjectFactory.named() don't implement equals() otherwise.
-          if (it.variant.attributes.getAttribute(artifact.attribute) == artifact) {
+          if (it.variant.attributes.getAttribute(attr) == artifact) {
             it.file
           } else {
             null
