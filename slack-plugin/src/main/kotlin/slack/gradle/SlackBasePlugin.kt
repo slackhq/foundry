@@ -75,7 +75,7 @@ internal class SlackBasePlugin @Inject constructor(private val buildFeatures: Bu
 
     // Everything in here applies to all projects
     target.configureClasspath(slackProperties)
-    if (!this.buildFeatures.isolatedProjects.requested.get()) {
+    if (!this.buildFeatures.isolatedProjects.requested.getOrElse(false)) {
       // TODO https://github.com/diffplug/spotless/issues/1979
       target.configureSpotless(slackProperties)
       // TODO not clear how to access the build scan API from a non-root project
