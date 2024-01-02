@@ -57,12 +57,11 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.utils.named
-import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
-import slack.gradle.avoidance.ComputeAffectedProjectsTask
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
@@ -70,6 +69,9 @@ import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
+import slack.gradle.tasks.SimpleFileProducerTask
+import slack.gradle.tasks.publishWith
+import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 import slack.unittest.UnitTests
@@ -230,13 +232,9 @@ internal class StandardProjectConfigurations(
               configure<DependencyAnalysisSubExtension> {
                 registerPostProcessingTask(rakeDependencies)
               }
-              val aggregator =
-                project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
-                  MissingIdentifiersAggregatorTask.NAME
-                )
-              aggregator.configure {
-                inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
-              }
+              val publisher =
+                Publisher.interProjectPublisher(project, SgpArtifact.DAGP_MISSING_IDENTIFIERS)
+              publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
         }
@@ -448,16 +446,13 @@ internal class StandardProjectConfigurations(
     slackProperties: SlackProperties,
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
-    val computeAffectedProjectsTask =
-      project.rootProject.tasks.named(
-        ComputeAffectedProjectsTask.NAME,
-        ComputeAffectedProjectsTask::class.java
-      )
     // Contribute these libraries to Fladle if they opt into it
-    val androidTestApksAggregator =
-      project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
+    val androidTestApksPublisher =
+      Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
+    val skippyAndroidTestProjectPublisher =
+      Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -504,12 +499,22 @@ internal class StandardProjectConfigurations(
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
-              computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
+              // Note this intentionally just uses the same task each time as they always produce
+              // the same output
+              SimpleFileProducerTask.registerOrConfigure(
+                  project,
+                  name = "androidTestProjectMetadata",
+                  description =
+                    "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                  input = projectPath,
+                  group = "skippy"
+                )
+                .publishWith(skippyAndroidTestProjectPublisher)
               if (isLibraryVariant) {
                 (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
                   apkArtifactsDir ->
-                  // Wire this up to the aggregator
-                  androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+                  // Wire this up to the aggregator. No need for an intermediate task here.
+                  androidTestApksPublisher.publishDirs(apkArtifactsDir)
                 }
               }
             } else {
@@ -587,12 +592,12 @@ internal class StandardProjectConfigurations(
                 //
                 // Note that we can't configure this to _just_ be enabled for robolectric projects
                 // based on dependencies unfortunately, as the task graph is already wired by the
-                // time
-                // dependencies start getting resolved.
+                // time dependencies start getting resolved.
                 //
-                slackTools.globalConfig.updateRobolectricJarsTask?.let {
+                slackProperties.versions.robolectric?.let {
                   logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-                  test.dependsOn(it)
+                  // Depending on the root project task by name alone is ok for Project Isolation
+                  test.dependsOn(UpdateRobolectricJarsTask.NAME)
                 }
 
                 // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric

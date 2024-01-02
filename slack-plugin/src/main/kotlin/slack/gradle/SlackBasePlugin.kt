@@ -27,7 +27,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.provider.Provider
-import slack.gradle.tasks.CoreBootstrapTask
 import slack.stats.ModuleStatsTasks
 
 /**
@@ -46,7 +45,6 @@ internal class SlackBasePlugin @Inject constructor(private val buildFeatures: Bu
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       val slackTools = target.slackTools()
       StandardProjectConfigurations(slackProperties, versionCatalog, slackTools).applyTo(target)
-      CoreBootstrapTask.configureSubprojectBootstrapTasks(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
