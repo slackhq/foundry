@@ -78,10 +78,15 @@ internal abstract class SimpleFilesConsumerTask : DefaultTask() {
   @TaskAction
   fun mergeFiles() {
     val outputFile = output.get().asFile
-    outputFile.writeText(inputFiles.files.map {
-      logger.debug("Merging file: $it")
-      it.readText()
-    }.sorted().joinToString("\n"))
+    outputFile.writeText(
+      inputFiles.files
+        .map {
+          logger.debug("Merging file: $it")
+          it.readText()
+        }
+        .sorted()
+        .joinToString("\n")
+    )
   }
 
   companion object {

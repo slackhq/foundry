@@ -63,13 +63,16 @@ internal class Resolver<T : Named>(
       addDependencies: Boolean = true,
     ): Resolver<SgpArtifacts> {
       project.logger.debug("Creating resolver for $artifact")
-      val resolver = Resolver(
-        project,
-        artifact.declarableName,
-        Attr(SgpArtifacts.SGP_ARTIFACTS_ATTRIBUTE, artifact.artifactName),
-      )
+      val resolver =
+        Resolver(
+          project,
+          artifact.declarableName,
+          Attr(SgpArtifacts.SGP_ARTIFACTS_ATTRIBUTE, artifact.artifactName),
+        )
       if (addDependencies) {
-        project.logger.debug("Adding subproject dependencies to $artifact via ${artifact.declarableName}")
+        project.logger.debug(
+          "Adding subproject dependencies to $artifact via ${artifact.declarableName}"
+        )
         resolver.addSubprojectDependencies(project)
       }
       return resolver
@@ -103,11 +106,15 @@ internal class Resolver<T : Named>(
   fun addSubprojectDependencies(project: Project) {
     project.dependencies.apply {
       for (subproject in project.subprojects) {
-        // Ignore subprojects that don't have a build file. Gradle treats these as projects but we don't.
+        // Ignore subprojects that don't have a build file. Gradle treats these as projects but we
+        // don't.
         // Accessing the projectDir _should_ be project-isolation-safe according to
         // https://gradle.github.io/configuration-cache/#build_logic_constraints
         val projectDir = subproject.projectDir
-        if (!File(projectDir, "build.gradle.kts").exists() && !File(projectDir, "build.gradle").exists()) {
+        if (
+          !File(projectDir, "build.gradle.kts").exists() &&
+            !File(projectDir, "build.gradle").exists()
+        ) {
           continue
         }
         add(declarable.name, project.project(subproject.path))
@@ -119,16 +126,12 @@ internal class Resolver<T : Named>(
 // Extracted to a function to make it harder to accidentally capture non-serializable values
 private fun <T : Named> artifactView(
   provider: NamedDomainObjectProvider<out Configuration>,
-    attr: Attr<T>,
-    attrValue: T,
+  attr: Attr<T>,
+  attrValue: T,
 ): Provider<Set<File>> {
   return provider.flatMap { configuration ->
     configuration.incoming
-      .artifactView {
-        attributes {
-          attribute(attr.attribute, attrValue)
-        }
-      }
+      .artifactView { attributes { attribute(attr.attribute, attrValue) } }
       .artifacts
       .resolvedArtifacts
       .map { resolvedArtifactResults ->
