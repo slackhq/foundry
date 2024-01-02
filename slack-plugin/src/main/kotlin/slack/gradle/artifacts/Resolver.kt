@@ -21,7 +21,6 @@ import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.provider.Provider
-import slack.gradle.SlackProperties
 
 /**
  * Used for resolving custom artifacts in an aggregating project (often the "root" project), from
@@ -49,9 +48,9 @@ import slack.gradle.SlackProperties
  *   configuration roles</a>
  */
 internal class Resolver<T : Named>(
-  private val project: Project,
+  project: Project,
   declarableName: String,
-  attr: Attr<T>,
+  private val attr: Attr<T>,
 ) {
 
   internal companion object {
@@ -67,19 +66,21 @@ internal class Resolver<T : Named>(
       val resolver = Resolver(
         project,
         artifact.declarableName,
-        Attr(SgpArtifacts.SGP_ARTIFACTS_ATTRIBUTE, artifact.artifactName)
+        Attr(SgpArtifacts.SGP_ARTIFACTS_ATTRIBUTE, artifact.artifactName),
       )
       if (addDependencies) {
         project.logger.debug("Adding subproject dependencies to $artifact via ${artifact.declarableName}")
-        resolver.addSubprojectDependencies()
+        resolver.addSubprojectDependencies(project)
       }
       return resolver
     }
   }
 
+  private val attrValue = project.objects.named(attr.attribute.type, attr.attributeName)
+
   // Following the naming pattern established by the Java Library plugin. See
   // https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-  private val internalName = "${declarableName}Classpath"
+  private val internalName = "${declarableName}ArtifactsClasspath"
 
   /** Dependencies are declared on this configuration */
   val declarable: Configuration = project.configurations.dependencyScope(declarableName).get()
@@ -97,14 +98,9 @@ internal class Resolver<T : Named>(
       }
     }
 
-  fun artifactView(): Provider<Set<File>> =
-    internal.flatMap { configuration ->
-      configuration.incoming.artifacts.resolvedArtifacts.map { resolvedArtifactResults ->
-        resolvedArtifactResults.mapTo(mutableSetOf()) { it.file }
-      }
-    }
+  fun artifactView(): Provider<Set<File>> = artifactView(internal, attr, attrValue)
 
-  fun addSubprojectDependencies() {
+  fun addSubprojectDependencies(project: Project) {
     project.dependencies.apply {
       for (subproject in project.subprojects) {
         // Ignore subprojects that don't have a build file. Gradle treats these as projects but we don't.
@@ -117,5 +113,36 @@ internal class Resolver<T : Named>(
         add(declarable.name, project.project(subproject.path))
       }
     }
+  }
+}
+
+// Extracted to a function to make it harder to accidentally capture non-serializable values
+private fun <T : Named> artifactView(
+  provider: NamedDomainObjectProvider<out Configuration>,
+    attr: Attr<T>,
+    attrValue: T,
+): Provider<Set<File>> {
+  return provider.flatMap { configuration ->
+    configuration.incoming
+      .artifactView {
+        attributes {
+          attribute(attr.attribute, attrValue)
+        }
+      }
+      .artifacts
+      .resolvedArtifacts
+      .map { resolvedArtifactResults ->
+        resolvedArtifactResults.mapNotNullTo(mutableSetOf()) {
+          // Inexplicably, Gradle sometimes gives us random files that don't match the attribute we
+          // asked for. As a result, we need to add our own filter for the attribute.
+          // We also have to match on the Named.name value, because values created by
+          // ObjectFactory.named() don't implement equals() otherwise.
+          if (it.variant.attributes.getAttribute(attr.attribute)?.name == attrValue.name) {
+            it.file
+          } else {
+            null
+          }
+        }
+      }
   }
 }
