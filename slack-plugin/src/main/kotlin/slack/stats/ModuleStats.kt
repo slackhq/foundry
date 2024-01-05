@@ -55,6 +55,9 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.capitalizeUS
 import slack.gradle.configure
 import slack.gradle.convertProjectPathToAccessor
@@ -85,8 +88,19 @@ public object ModuleStatsTasks {
   internal fun configureRoot(rootProject: Project, slackProperties: SlackProperties) {
     if (!slackProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
+    val resolver = Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
+      projectPathsToAccessors.setDisallowChanges(
+        rootProject.provider {
+          rootProject.subprojects.associate { subproject ->
+            val regularPath = subproject.path
+            val projectAccessor = convertProjectPathToAccessor(regularPath)
+            projectAccessor to regularPath
+          }
+        }
+      )
+      statsFiles.from(resolver.artifactView())
       outputFile.setDisallowChanges(
         rootProject.layout.buildDirectory.file("reports/slack/moduleStats.json")
       )
@@ -143,14 +157,8 @@ public object ModuleStatsTasks {
           )
         }
 
-      val aggregatorTask =
-        project.rootProject.tasks.named(AGGREGATOR_NAME, ModuleStatsAggregatorTask::class.java)
-      val regularPath = project.path
-      val projectAccessor = convertProjectPathToAccessor(regularPath)
-      aggregatorTask.configure {
-        projectPathsToAccessors.put(projectAccessor, regularPath)
-        statsFiles.from(task.map { it.outputFile })
-      }
+      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.MOD_STATS_STATS_FILES)
+      publisher.publish(task.flatMap { it.outputFile })
       task
     }
 
