@@ -35,7 +35,6 @@ import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
-import slack.gradle.util.booleanProperty
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 
@@ -157,7 +156,7 @@ constructor(
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
         }
-        if (project.booleanProperty("moshix.generateProguardRules", defaultValue = true)) {
+        if (slackProperties.moshixGenerateProguardRules) {
           markKspNeeded("Moshi IR code gen")
         }
       }

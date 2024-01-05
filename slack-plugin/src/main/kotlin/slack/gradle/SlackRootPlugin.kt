@@ -44,11 +44,14 @@ import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import slack.gradle.util.JsonTools
+import slack.gradle.util.StartParameterProperties
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsData
+import slack.gradle.util.createPropertiesProvider
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
 import slack.gradle.util.setDisallowChanges
+import slack.gradle.util.sneakyNull
 import slack.stats.ModuleStatsTasks
 import slack.unittest.UnitTests
 
@@ -77,7 +80,27 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
         .trimIndent()
     }
 
-    val slackProperties = SlackProperties(project)
+    val startParameters = project.gradle.startParameter.projectProperties
+    val startParameterProperties =
+      project.providers.of(StartParameterProperties::class.java) {
+        parameters.properties.setDisallowChanges(startParameters)
+      }
+    val localProperties =
+      project.createPropertiesProvider("local.properties").map {
+        it.mapKeys { it.key.toString() }.mapValues { it.value.toString() }
+      }
+    val startParameterProperty: (String) -> Provider<String> = { key ->
+      startParameterProperties.map { sneakyNull(it[key]) }
+    }
+    val globalLocalProperty: (String) -> Provider<String> = { key ->
+      localProperties.map { sneakyNull(it[key]) }
+    }
+    val slackProperties =
+      SlackProperties(
+        project,
+        startParameterProperty = startParameterProperty,
+        globalLocalProperty = globalLocalProperty,
+      )
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals
@@ -100,7 +123,9 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
       enableSkippyDiagnostics = enableSkippy,
       logVerbosely = slackProperties.verboseLogging,
       thermalsLogJsonFileProvider = thermalsLogJsonFile,
-      buildFeatures.configurationCache.requested,
+      isConfigurationCacheRequested = buildFeatures.configurationCache.requested,
+      startParameterProperties = startParameterProperties,
+      globalLocalProperties = localProperties,
     )
     configureRootProject(project, slackProperties, thermalsLogJsonFile)
   }
