@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.15.0
+------
+
+_2024-01-02_
+
+- **Enhancement**: We've reworked the internals of SGP significantly to make it more compatible with Gradle Project Isolation. This affects Skippy, ModScore, AndroidTest APK aggregation, DAGP missing identifiers, and property resolution (specifically command line properties and `local.properties`). Note that this work is ongoing as project isolation is incubating, but the changes in this release should be non-functional in nature.
+- Build against Kotlin `1.9.22`.
+- Build against KSP `1.9.22-1.0.16`.
+- Build against AGP `8.2.1`.
+- Build against AGP `8.3.0-beta01` in AgpHandler83.
+- Build against maven-publish `0.26.0`.
+- Update to Guava `33.0.0-jre`.
+- Update to Oshi `6.4.10`.
+- Update to kotlin-cli-util `2.6.0`.
+
 0.14.2
 ------
 
