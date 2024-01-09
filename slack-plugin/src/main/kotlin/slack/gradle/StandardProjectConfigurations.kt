@@ -120,6 +120,7 @@ internal class StandardProjectConfigurations(
         slackProperties,
         versionCatalog
       )
+    setUpSubprojectArtifactPublishing(project)
     project.applyCommonConfigurations(slackProperties)
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
@@ -127,11 +128,29 @@ internal class StandardProjectConfigurations(
     project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
   }
 
-  private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
-    // Always enable publishing of skipped skippy tasks, even if projects don't eventually publish
-    // any artifacts to it.
-    Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_AVOIDED_TASKS)
+  private fun setUpSubprojectArtifactPublishing(project: Project) {
+    /*
+     * Always enable publishing of all SgpArtifacts, even if we never end up publishing artifacts
+     * This sucks but I don't see any other way to do this due to how tightly locked down Gradle's
+     * inter-project access APIs are in project isolation.
+     *
+     * Ideally, we would only add project dependencies when they are definitely able to contribute
+     * artifacts to that configuration, but that's not possible when:
+     * - Root projects can't reach into subprojects to ask about their configuration
+     * - Subprojects can't reach into root projects to add dependencies conditionally
+     * - There doesn't seem to be a way to depend on a certain project's configuration if that
+     *   configuration doesn't exist. This sorta makes sense, but for the purpose of inter-project
+     *   artifacts I wish it was possible to depend on a configuration that may not exist and just
+     *   treat it as an empty config that publishes no artifacts.
+     *
+     * But we unfortunately cannot do that right now. We can revisit if they ever make this easier.
+     */
+    for (artifact in SgpArtifact::class.sealedSubclasses) {
+      Publisher.interProjectPublisher(project, artifact.objectInstance!!)
+    }
+  }
 
+  private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
     if (globalProperties.autoApplySortDependencies) {
       if (project.buildFile.exists()) {
         val sortDependenciesIgnoreSet =
