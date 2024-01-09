@@ -55,6 +55,7 @@ internal class Resolver<T : Serializable>(
   private val attr: Attribute<T>,
   private val artifact: T,
   declarableName: String,
+  category: String,
 ) {
 
   internal companion object {
@@ -71,6 +72,7 @@ internal class Resolver<T : Serializable>(
         artifact.attribute,
         artifact,
         artifact.declarableName,
+        artifact.category,
         addDependencies
       )
 
@@ -79,16 +81,11 @@ internal class Resolver<T : Serializable>(
       attr: Attribute<T>,
       artifact: T,
       declarableName: String,
+      category: String,
       addDependencies: Boolean = true,
     ): Resolver<T> {
       project.logger.debug("Creating resolver for $artifact")
-      val resolver =
-        Resolver(
-          project,
-          attr,
-          artifact,
-          declarableName,
-        )
+      val resolver = Resolver(project, attr, artifact, declarableName, category)
       if (addDependencies) {
         project.logger.debug("Adding subproject dependencies to $artifact via $declarableName")
         resolver.addSubprojectDependencies(project)
@@ -112,7 +109,10 @@ internal class Resolver<T : Serializable>(
     project.configurations.resolvable(internalName) {
       extendsFrom(declarable)
       // This attribute is identical to what is set on the external/consumable configuration
-      attributes { attribute(attr, artifact) }
+      attributes {
+        attribute(attr, artifact)
+        addCommonAttributes(project, category)
+      }
     }
 
   fun artifactView(): Provider<Set<File>> = artifactView(internal, attr, artifact)
@@ -145,7 +145,12 @@ private fun <T : Serializable> artifactView(
 ): Provider<Set<File>> {
   return provider.flatMap { configuration ->
     configuration.incoming
-      .artifactView { attributes { attribute(attr, artifact) } }
+      .artifactView {
+        // Enable lenient configuration to allow for missing artifacts, such as projects that
+        // contribute nothing
+        lenient(true)
+        attributes { attribute(attr, artifact) }
+      }
       .artifacts
       .resolvedArtifacts
       .map { resolvedArtifactResults ->

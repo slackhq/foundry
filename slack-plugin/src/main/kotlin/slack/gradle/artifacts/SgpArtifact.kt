@@ -19,6 +19,7 @@ import org.gradle.api.attributes.Attribute
 
 internal sealed class SgpArtifact(
   override val declarableName: String,
+  val category: String,
 ) : ShareableArtifact<SgpArtifact> {
   final override val attribute: Attribute<SgpArtifact>
     get() = SGP_ARTIFACTS_ATTRIBUTE
@@ -29,35 +30,35 @@ internal sealed class SgpArtifact(
       Attribute.of("sgp.internal.artifacts", SgpArtifact::class.java)
   }
 
-  data object SKIPPY_UNIT_TESTS : SgpArtifact("skippyUnitTests") {
+  data object SKIPPY_UNIT_TESTS : SgpArtifact("skippyUnitTests", "skippy") {
     private fun readResolve(): Any = SKIPPY_UNIT_TESTS
   }
 
-  data object SKIPPY_LINT : SgpArtifact("skippyLint") {
+  data object SKIPPY_LINT : SgpArtifact("skippyLint", "skippy") {
     private fun readResolve(): Any = SKIPPY_LINT
   }
 
-  data object SKIPPY_AVOIDED_TASKS : SgpArtifact("skippyAvoidedTasks") {
+  data object SKIPPY_AVOIDED_TASKS : SgpArtifact("skippyAvoidedTasks", "skippy") {
     private fun readResolve(): Any = SKIPPY_AVOIDED_TASKS
   }
 
-  data object SKIPPY_ANDROID_TEST_PROJECT : SgpArtifact("skippyAndroidTestProject") {
+  data object SKIPPY_ANDROID_TEST_PROJECT : SgpArtifact("skippyAndroidTestProject", "skippy") {
     private fun readResolve(): Any = SKIPPY_ANDROID_TEST_PROJECT
   }
 
-  data object SKIPPY_DETEKT : SgpArtifact("skippyDetekt") {
+  data object SKIPPY_DETEKT : SgpArtifact("skippyDetekt", "skippy") {
     private fun readResolve(): Any = SKIPPY_DETEKT
   }
 
-  data object ANDROID_TEST_APK_DIRS : SgpArtifact("androidTestApkDirs") {
+  data object ANDROID_TEST_APK_DIRS : SgpArtifact("androidTestApkDirs", "androidTest") {
     private fun readResolve(): Any = ANDROID_TEST_APK_DIRS
   }
 
-  data object DAGP_MISSING_IDENTIFIERS : SgpArtifact("dagpMissingIdentifiers") {
+  data object DAGP_MISSING_IDENTIFIERS : SgpArtifact("dagpMissingIdentifiers", "dependencyRake") {
     private fun readResolve(): Any = DAGP_MISSING_IDENTIFIERS
   }
 
-  data object MOD_STATS_STATS_FILES : SgpArtifact("modStatsFiles") {
+  data object MOD_STATS_STATS_FILES : SgpArtifact("modStatsFiles", "modscore") {
     private fun readResolve(): Any = MOD_STATS_STATS_FILES
   }
 }

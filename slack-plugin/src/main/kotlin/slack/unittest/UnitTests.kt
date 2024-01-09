@@ -86,10 +86,15 @@ internal object UnitTests {
     onProjectSkipped: (String, String) -> Unit,
   ) {
     // Projects can opt out of creating the task with this property.
-    val enabled = slackProperties.ciUnitTestEnabled
+    // android test projects don't support unit tests
+    val enabled = slackProperties.ciUnitTestEnabled && pluginId != "com.android.test"
     if (!enabled) {
       project.logger.debug("$LOG Skipping creation of \"$CI_UNIT_TEST_TASK_NAME\" task")
       return
+    }
+
+    slackProperties.versions.bundles.commonTest.ifPresent {
+      project.dependencies.add("testImplementation", it)
     }
 
     if (
@@ -175,7 +180,8 @@ internal object UnitTests {
        */
 
       // helps when tests leak memory
-      setForkEvery(slackProperties.unitTestForkEvery)
+      // Suppression is because the property syntax uses a deprecated Gradle API
+      @Suppress("UsePropertyAccessSyntax") setForkEvery(slackProperties.unitTestForkEvery)
 
       // Cap JVM args per test
       minHeapSize = "128m"

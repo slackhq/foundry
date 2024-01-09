@@ -18,6 +18,7 @@ package slack.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.util.PropertyResolver
 import slack.gradle.util.getOrCreateExtra
 import slack.gradle.util.sneakyNull
@@ -581,6 +582,15 @@ internal constructor(
    */
   public val applyCommonBuildTags: Boolean
     get() = resolver.booleanProperty("sgp.ge.apply-common-build-tags", defaultValue = true)
+
+  /**
+   * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
+   * as a failsafe while we try different approaches to allow lenient resolution.
+   *
+   * @see StandardProjectConfigurations.setUpSubprojectArtifactPublishing
+   */
+  public val eagerlyConfigureArtifactPublishing: Boolean
+    get() = resolver.booleanProperty("sgp.artifacts.configure-eagerly", defaultValue = false)
 
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>

@@ -56,6 +56,7 @@ internal class Publisher<T : Serializable>(
   attr: Attribute<T>,
   artifact: T,
   declarableName: String,
+  category: String,
 ) {
 
   companion object {
@@ -69,6 +70,7 @@ internal class Publisher<T : Serializable>(
         sgpArtifact.attribute,
         sgpArtifact,
         sgpArtifact.declarableName,
+        sgpArtifact.category,
       )
 
     fun <T : ShareableArtifact<T>> interProjectPublisher(
@@ -76,6 +78,7 @@ internal class Publisher<T : Serializable>(
       attr: Attribute<T>,
       artifact: T,
       declarableName: String,
+      category: String,
     ): Publisher<T> {
       project.logger.debug("Creating publisher for $artifact")
       return Publisher(
@@ -83,6 +86,7 @@ internal class Publisher<T : Serializable>(
         attr,
         artifact,
         declarableName,
+        category,
       )
     }
   }
@@ -102,7 +106,10 @@ internal class Publisher<T : Serializable>(
     } else {
       project.configurations.consumable(externalName) {
         // This attribute is identical to what is set on the internal/resolvable configuration
-        attributes { attribute(attr, artifact) }
+        attributes {
+          attribute(attr, artifact)
+          addCommonAttributes(project, category)
+        }
       }
     }
   }

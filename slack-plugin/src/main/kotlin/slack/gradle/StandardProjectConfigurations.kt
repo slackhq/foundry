@@ -38,6 +38,7 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -120,11 +121,37 @@ internal class StandardProjectConfigurations(
         slackProperties,
         versionCatalog
       )
+    if (slackProperties.eagerlyConfigureArtifactPublishing) {
+      setUpSubprojectArtifactPublishing(project)
+    }
     project.applyCommonConfigurations(slackProperties)
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
     project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
     project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
+  }
+
+  /**
+   * Always enables publishing of all SgpArtifacts, even if we never end up publishing artifacts
+   * This sucks but I don't see any other way to do this due to how tightly locked down Gradle's
+   * inter-project access APIs are in project isolation.
+   *
+   * Ideally, we would only add project dependencies when they are definitely able to contribute
+   * artifacts to that configuration, but that's not possible when:
+   * 1. Root projects can't reach into subprojects to ask about their configuration
+   * 2. Subprojects can't reach into root projects to add dependencies conditionally
+   * 3. There doesn't seem to be a way to depend on a certain project's configuration if that
+   *    configuration doesn't exist. This sorta makes sense, but for the purpose of inter-project
+   *    artifacts I wish it was possible to depend on a configuration that may not exist and just
+   *    treat it as an empty config that publishes no artifacts.
+   *
+   * It _seems_ like #3 is possible via [ArtifactView.ViewConfiguration.lenient], so this function
+   * is behind a flag just as a failsafe.
+   */
+  private fun setUpSubprojectArtifactPublishing(project: Project) {
+    for (artifact in SgpArtifact::class.sealedSubclasses) {
+      Publisher.interProjectPublisher(project, artifact.objectInstance!!)
+    }
   }
 
   private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
@@ -178,20 +205,15 @@ internal class StandardProjectConfigurations(
         dependencies.add("implementation", it)
       }
 
+      UnitTests.configureSubproject(
+        project,
+        pluginId,
+        slackProperties,
+        slackTools.globalConfig.affectedProjects,
+        slackTools::logAvoidedTask
+      )
+
       if (pluginId != "com.android.test") {
-        // Configure tests
-        UnitTests.configureSubproject(
-          project,
-          pluginId,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask
-        )
-
-        slackProperties.versions.bundles.commonTest.ifPresent {
-          dependencies.add("testImplementation", it)
-        }
-
         // Configure dependencyAnalysis
         // TODO move up once DAGP supports com.android.test projects
         //  https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
@@ -597,7 +619,7 @@ internal class StandardProjectConfigurations(
                 slackProperties.versions.robolectric?.let {
                   logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
                   // Depending on the root project task by name alone is ok for Project Isolation
-                  test.dependsOn(UpdateRobolectricJarsTask.NAME)
+                  test.dependsOn(":${UpdateRobolectricJarsTask.NAME}")
                 }
 
                 // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
