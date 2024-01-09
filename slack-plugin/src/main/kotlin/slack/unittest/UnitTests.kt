@@ -85,11 +85,21 @@ internal object UnitTests {
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) {
+    // Always run this, even if we do nothing else with the project. This is important for
+    // skippy's artifact reading so we can depend on this project even if it doesn't
+    // publish any artifacts
+    val publisher = Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_UNIT_TESTS)
+
     // Projects can opt out of creating the task with this property.
-    val enabled = slackProperties.ciUnitTestEnabled
+    // android test projects don't support unit tests
+    val enabled = slackProperties.ciUnitTestEnabled && pluginId != "com.android.test"
     if (!enabled) {
       project.logger.debug("$LOG Skipping creation of \"$CI_UNIT_TEST_TASK_NAME\" task")
       return
+    }
+
+    slackProperties.versions.bundles.commonTest.ifPresent {
+      project.dependencies.add("testImplementation", it)
     }
 
     if (
@@ -104,7 +114,7 @@ internal object UnitTests {
 
     val unitTestsPublisher: Publisher<SgpArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_UNIT_TESTS)
+        publisher
       } else {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)

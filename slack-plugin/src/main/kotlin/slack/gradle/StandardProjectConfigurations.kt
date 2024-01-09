@@ -178,20 +178,15 @@ internal class StandardProjectConfigurations(
         dependencies.add("implementation", it)
       }
 
+      UnitTests.configureSubproject(
+        project,
+        pluginId,
+        slackProperties,
+        slackTools.globalConfig.affectedProjects,
+        slackTools::logAvoidedTask
+      )
+
       if (pluginId != "com.android.test") {
-        // Configure tests
-        UnitTests.configureSubproject(
-          project,
-          pluginId,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask
-        )
-
-        slackProperties.versions.bundles.commonTest.ifPresent {
-          dependencies.add("testImplementation", it)
-        }
-
         // Configure dependencyAnalysis
         // TODO move up once DAGP supports com.android.test projects
         //  https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
