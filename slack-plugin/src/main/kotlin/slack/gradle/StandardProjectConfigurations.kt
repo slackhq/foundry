@@ -38,6 +38,7 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -120,7 +121,9 @@ internal class StandardProjectConfigurations(
         slackProperties,
         versionCatalog
       )
-    setUpSubprojectArtifactPublishing(project)
+    if (slackProperties.eagerlyConfigureArtifactPublishing) {
+      setUpSubprojectArtifactPublishing(project)
+    }
     project.applyCommonConfigurations(slackProperties)
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
@@ -128,23 +131,24 @@ internal class StandardProjectConfigurations(
     project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
   }
 
+  /**
+   * Always enables publishing of all SgpArtifacts, even if we never end up publishing artifacts
+   * This sucks but I don't see any other way to do this due to how tightly locked down Gradle's
+   * inter-project access APIs are in project isolation.
+   *
+   * Ideally, we would only add project dependencies when they are definitely able to contribute
+   * artifacts to that configuration, but that's not possible when:
+   * 1. Root projects can't reach into subprojects to ask about their configuration
+   * 2. Subprojects can't reach into root projects to add dependencies conditionally
+   * 3. There doesn't seem to be a way to depend on a certain project's configuration if that
+   *    configuration doesn't exist. This sorta makes sense, but for the purpose of inter-project
+   *    artifacts I wish it was possible to depend on a configuration that may not exist and just
+   *    treat it as an empty config that publishes no artifacts.
+   *
+   * It _seems_ like #3 is possible via [ArtifactView.ViewConfiguration.lenient], so this function
+   * is behind a flag just as a failsafe.
+   */
   private fun setUpSubprojectArtifactPublishing(project: Project) {
-    /*
-     * Always enable publishing of all SgpArtifacts, even if we never end up publishing artifacts
-     * This sucks but I don't see any other way to do this due to how tightly locked down Gradle's
-     * inter-project access APIs are in project isolation.
-     *
-     * Ideally, we would only add project dependencies when they are definitely able to contribute
-     * artifacts to that configuration, but that's not possible when:
-     * - Root projects can't reach into subprojects to ask about their configuration
-     * - Subprojects can't reach into root projects to add dependencies conditionally
-     * - There doesn't seem to be a way to depend on a certain project's configuration if that
-     *   configuration doesn't exist. This sorta makes sense, but for the purpose of inter-project
-     *   artifacts I wish it was possible to depend on a configuration that may not exist and just
-     *   treat it as an empty config that publishes no artifacts.
-     *
-     * But we unfortunately cannot do that right now. We can revisit if they ever make this easier.
-     */
     for (artifact in SgpArtifact::class.sealedSubclasses) {
       Publisher.interProjectPublisher(project, artifact.objectInstance!!)
     }
