@@ -180,7 +180,8 @@ internal object UnitTests {
        */
 
       // helps when tests leak memory
-      setForkEvery(slackProperties.unitTestForkEvery)
+      // Suppression is because the property syntax uses a deprecated Gradle API
+      @Suppress("UsePropertyAccessSyntax") setForkEvery(slackProperties.unitTestForkEvery)
 
       // Cap JVM args per test
       minHeapSize = "128m"
