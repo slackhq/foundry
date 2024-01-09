@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.15.1
+------
+
+_2024-01-09_
+
+- Misc small fixes to the new artifact publishing internals released in 0.15.0.
+
 0.15.0
 ------
 
