@@ -615,7 +615,7 @@ internal class StandardProjectConfigurations(
                 slackProperties.versions.robolectric?.let {
                   logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
                   // Depending on the root project task by name alone is ok for Project Isolation
-                  test.dependsOn(UpdateRobolectricJarsTask.NAME)
+                  test.dependsOn(":${UpdateRobolectricJarsTask.NAME}")
                 }
 
                 // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
