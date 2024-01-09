@@ -145,7 +145,12 @@ private fun <T : Serializable> artifactView(
 ): Provider<Set<File>> {
   return provider.flatMap { configuration ->
     configuration.incoming
-      .artifactView { attributes { attribute(attr, artifact) } }
+      .artifactView {
+        // Enable lenient configuration to allow for missing artifacts, such as projects that
+        // contribute nothing
+        lenient(true)
+        attributes { attribute(attr, artifact) }
+      }
       .artifacts
       .resolvedArtifacts
       .map { resolvedArtifactResults ->
