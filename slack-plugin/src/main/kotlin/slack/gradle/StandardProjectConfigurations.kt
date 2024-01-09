@@ -128,6 +128,10 @@ internal class StandardProjectConfigurations(
   }
 
   private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
+    // Always enable publishing of skipped skippy tasks, even if projects don't eventually publish
+    // any artifacts to it.
+    Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_AVOIDED_TASKS)
+
     if (globalProperties.autoApplySortDependencies) {
       if (project.buildFile.exists()) {
         val sortDependenciesIgnoreSet =

@@ -81,6 +81,12 @@ internal object LintTasks {
     onProjectSkipped: (String, String) -> Unit,
   ) {
     project.log("Configuring lint tasks for project ${project.path}")
+
+    // Always run this, even if we do nothing else with the project. This is important for
+    // skippy's artifact reading so we can depend on this project even if it doesn't
+    // publish any artifacts (such as in com.android.test projects).
+    val publisher = Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_LINT)
+
     // Projects can opt out of creating the task with this property.
     val enabled = slackProperties.ciLintEnabled
     if (!enabled) {
@@ -95,14 +101,16 @@ internal object LintTasks {
             project.configureAndroidProjectForLint(
               slackProperties,
               affectedProjects,
-              onProjectSkipped
+              onProjectSkipped,
+              publisher
             )
           is TestPlugin -> {
             if (slackProperties.enableLintInAndroidTestProjects) {
               project.configureAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
+                publisher
               )
             }
           }
@@ -114,7 +122,8 @@ internal object LintTasks {
               project.configureNonAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
+                publisher
               )
             }
           // Only configure non-Android multiplatform projects via KotlinBasePlugin.
@@ -129,7 +138,8 @@ internal object LintTasks {
               project.configureNonAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
+                publisher
               )
             }
         }
@@ -142,6 +152,7 @@ internal object LintTasks {
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
+    unitTestPublisher: Publisher<SgpArtifact>,
   ) =
     androidExtension.finalizeDsl { extension ->
       log("Applying ciLint to Android project")
@@ -182,7 +193,8 @@ internal object LintTasks {
         slackProperties,
         affectedProjects,
         onProjectSkipped,
-        slackProperties.requireAndroidSdkProperties()
+        unitTestPublisher,
+        slackProperties.requireAndroidSdkProperties(),
       )
     }
 
@@ -191,6 +203,7 @@ internal object LintTasks {
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
+    unitTestPublisher: Publisher<SgpArtifact>,
   ) = afterEvaluate {
     // The lint plugin expects certain configurations and source sets which are only added by
     // the Java and Android plugins. If this is a multiplatform project targeting JVM, we'll
@@ -224,7 +237,8 @@ internal object LintTasks {
       ciLint,
       slackProperties,
       affectedProjects,
-      onProjectSkipped
+      onProjectSkipped,
+      unitTestPublisher
     )
   }
 
@@ -234,6 +248,7 @@ internal object LintTasks {
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
+    unitTestPublisher: Publisher<SgpArtifact>,
     androidSdkVersions: SlackProperties.AndroidSdkProperties? = null,
   ) {
     val isMultiplatform = multiplatformExtension != null
@@ -251,8 +266,7 @@ internal object LintTasks {
       }
       SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
     } else {
-      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_LINT)
-      publisher.publish(ciLint)
+      unitTestPublisher.publish(ciLint)
     }
 
     afterEvaluate { addSourceSetsForAndroidMultiplatformAfterEvaluate() }
