@@ -67,9 +67,7 @@ class CodeOwnerWidget(project: Project) :
     // We don't worry if it's null as that may be expected
     // and will lead to the widget displaying "none" owners.
     currentSelectedFile = event.newFile
-    if (myStatusBar != null) {
-      myStatusBar.updateWidget(ID())
-    }
+    myStatusBar?.updateWidget(ID())
   }
 
   override fun getTooltipText() = "Click to show in code_ownership csv"
