@@ -125,10 +125,21 @@ internal fun Project.localGradleProperty(key: String): Provider<String> {
   )
 }
 
-internal class PropertyResolver(
+private fun Project.emptyStringProvider(): (String) -> Provider<String> = { provider { null } }
+
+/**
+ * A property resolver that handles multiple property sources.
+ *
+ * @property project The project to resolve properties for.
+ * @property startParameterProperty A provider of a property _only_ contained in the project's start
+ *   parameters.
+ * @property globalLocalProperty A provider of a property _only_ contained in the root project's
+ *   `local.properties`.
+ */
+public class PropertyResolver(
   private val project: Project,
-  private val startParameterProperty: (String) -> Provider<String>,
-  private val globalLocalProperty: (String) -> Provider<String>,
+  private val startParameterProperty: (String) -> Provider<String> = project.emptyStringProvider(),
+  private val globalLocalProperty: (String) -> Provider<String> = project.emptyStringProvider(),
 ) {
 
   private val providers = project.providers
@@ -142,7 +153,7 @@ internal class PropertyResolver(
    * - root-project `local.properties`
    * - root-project/global `gradle.properties`
    */
-  fun safeProperty(
+  public fun safeProperty(
     key: String,
   ): Provider<String> =
     startParameterProperty(key) // start parameters
