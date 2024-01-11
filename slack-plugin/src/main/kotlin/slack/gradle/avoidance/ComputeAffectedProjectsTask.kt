@@ -16,10 +16,10 @@
 package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
-import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
 import com.slack.sgp.common.SgpLogger
 import com.slack.skippy.AffectedProjectsComputer
 import com.slack.skippy.SkippyRunner
+import java.io.ObjectInputStream
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -30,11 +30,13 @@ import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -44,8 +46,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.Option
 import slack.gradle.SlackProperties
-import slack.gradle.artifacts.Resolver
-import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.property
 import slack.gradle.util.JsonTools
 import slack.gradle.util.gradle
@@ -78,13 +78,9 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   public val computeInParallel: Property<Boolean> =
     project.objects.property<Boolean>().convention(true)
 
-  /**
-   * Consumed artifacts of project paths that produce androidTest APKs. Each file will just have one
-   * line that contains a project path.
-   */
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  @get:InputFiles
-  public abstract val androidTestProjectInputs: ConfigurableFileCollection
+  @get:PathSensitive(PathSensitivity.NONE)
+  @get:InputFile
+  public abstract val androidTestProjectPathsFile: RegularFileProperty
 
   /**
    * A relative (to the repo root) path to a changed_files.txt that contains a newline-delimited
@@ -93,6 +89,11 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   @get:Option(option = "changed-files", description = "A relative file path to changed_files.txt.")
   @get:Input
   public abstract val changedFiles: Property<String>
+
+  /** A serialized dependency graph. */
+  @get:PathSensitive(PathSensitivity.NONE)
+  @get:InputFile
+  public abstract val serializedDependencyGraph: RegularFileProperty
 
   /** Output dir for skippy outputs. */
   @get:OutputDirectory public abstract val outputsDir: DirectoryProperty
@@ -103,8 +104,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
 
   /** Root repo directory. Used to compute relative paths and not considered an input. */
   @get:Internal internal abstract val rootDir: DirectoryProperty
-
-  @get:Input internal abstract val dependencyGraph: Property<DependencyGraph.SerializableGraph>
 
   init {
     group = "slack"
@@ -121,7 +120,12 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
       } else {
         1
       }
-    val androidTestProjects = androidTestProjectInputs.map { it.readText().trim() }.toSet()
+    val androidTestProjects =
+      androidTestProjectPathsFile.asFile.get().readLines().map { it.trim() }.toSet()
+    val dependencyGraph =
+      ObjectInputStream(serializedDependencyGraph.asFile.get().inputStream()).use {
+        it.readObject() as DependencyGraph.SerializableGraph
+      }
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug.get(),
@@ -133,7 +137,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
           moshi = JsonTools.MOSHI,
           parallelism = parallelism,
           fs = FileSystem.SYSTEM,
-          dependencyGraph = dependencyGraph.get(),
+          dependencyGraph = dependencyGraph,
           changedFilesPath = rootDirPath.resolve(changedFiles.get()),
           originalConfigMap =
             configs.map(SkippyGradleConfig::asSkippyConfig).associateBy { it.tool },
@@ -154,50 +158,16 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   }
 
   internal companion object {
-    internal const val NAME = "computeAffectedProjects"
-    private val DEFAULT_CONFIGURATIONS =
-      setOf(
-        "androidTestImplementation",
-        "annotationProcessor",
-        "api",
-        "compileOnly",
-        "debugApi",
-        "debugImplementation",
-        "implementation",
-        "kapt",
-        "kotlinCompilerPluginClasspath",
-        "ksp",
-        "releaseApi",
-        "releaseImplementation",
-        "testImplementation",
-      )
+    private const val NAME = "computeAffectedProjects"
 
     fun register(
       rootProject: Project,
-      slackProperties: SlackProperties
+      slackProperties: SlackProperties,
+      dependencyGraphProvider: Provider<RegularFile>,
+      androidTestProjectPathsProvider: Provider<RegularFile>,
     ): TaskProvider<ComputeAffectedProjectsTask> {
       val extension =
         rootProject.extensions.create("skippy", SkippyExtension::class.java, slackProperties)
-      val configurationsToLook by lazy {
-        val providedConfigs = slackProperties.affectedProjectConfigurations
-        providedConfigs?.splitToSequence(',')?.toSet()?.let { providedConfigSet ->
-          if (slackProperties.buildUponDefaultAffectedProjectConfigurations) {
-            DEFAULT_CONFIGURATIONS + providedConfigSet
-          } else {
-            providedConfigSet
-          }
-        } ?: DEFAULT_CONFIGURATIONS
-      }
-
-      val moduleGraph by lazy {
-        GradleDependencyGraphFactory.create(rootProject, configurationsToLook).serializableGraph()
-      }
-
-      val androidTestApksResolver =
-        Resolver.interProjectResolver(
-          rootProject,
-          SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT,
-        )
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(extension.debug)
@@ -205,11 +175,9 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
         computeInParallel.setDisallowChanges(extension.computeInParallel)
         configs.addAll(extension.configs)
         rootDir.setDisallowChanges(project.layout.projectDirectory)
-        dependencyGraph.setDisallowChanges(rootProject.provider { moduleGraph })
+        serializedDependencyGraph.setDisallowChanges(dependencyGraphProvider)
         outputsDir.setDisallowChanges(project.layout.buildDirectory.dir("skippy"))
-        androidTestProjectInputs.from(androidTestApksResolver.artifactView())
-        // Overrides of includes/neverSkippable patterns should be done in the consuming project
-        // directly
+        androidTestProjectPathsFile.setDisallowChanges(androidTestProjectPathsProvider)
       }
     }
   }
