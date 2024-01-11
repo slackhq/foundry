@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.util
+package com.slack.sgp.common
 
 import okio.FileSystem
 import okio.Path
 
-internal fun Path.prepareForGradleOutput(fs: FileSystem) = apply {
+public fun Path.prepareForGradleOutput(fs: FileSystem): Path = apply {
   if (fs.exists(this)) fs.delete(this)
   parent?.let(fs::createDirectories)
 }
 
-internal fun Path.readLines(fs: FileSystem): List<String> {
+public fun Path.readLines(fs: FileSystem): List<String> {
   return fs.read(this) {
     val lines = mutableListOf<String>()
     while (!exhausted()) {
@@ -33,7 +33,7 @@ internal fun Path.readLines(fs: FileSystem): List<String> {
   }
 }
 
-internal fun Path.writeLines(lines: Iterable<String>, fs: FileSystem) {
+public fun Path.writeLines(lines: Iterable<String>, fs: FileSystem) {
   fs.write(this) {
     lines.forEach { line ->
       writeUtf8(line)
@@ -42,6 +42,6 @@ internal fun Path.writeLines(lines: Iterable<String>, fs: FileSystem) {
   }
 }
 
-internal fun Path.writeText(text: String, fs: FileSystem) {
+public fun Path.writeText(text: String, fs: FileSystem) {
   fs.write(this) { writeUtf8(text) }
 }

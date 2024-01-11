@@ -13,9 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+package com.slack.skippy
 
 import com.jraska.module.graph.DependencyGraph
+import com.slack.sgp.common.SgpLogger
+import com.slack.sgp.common.flatMapToSet
+import com.slack.sgp.common.flip
+import com.slack.sgp.common.parallelMapNotNull
+import com.slack.sgp.common.readLines
+import com.slack.sgp.common.writeLines
+import com.slack.sgp.common.writeText
+import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
+import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.measureTimedValue
@@ -25,23 +34,15 @@ import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
-import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
-import slack.gradle.util.JsonTools
-import slack.gradle.util.SgpLogger
-import slack.gradle.util.flatMapToSet
-import slack.gradle.util.flip
-import slack.gradle.util.parallelMapNotNull
-import slack.gradle.util.readLines
-import slack.gradle.util.writeLines
-import slack.gradle.util.writeText
 
-internal class SkippyRunner(
+public class SkippyRunner(
   private val outputsDir: Path,
   private val androidTestProjects: Set<String> = emptySet(),
   private val rootDir: Path,
   private val dependencyGraph: DependencyGraph.SerializableGraph,
   private val changedFilesPath: Path,
   private val originalConfigMap: Map<String, SkippyConfig>,
+  private val moshi: Moshi,
   private val parallelism: Int = originalConfigMap.size,
   private val fs: FileSystem = FileSystem.SYSTEM,
   private val debug: Boolean = false,
@@ -53,7 +54,7 @@ internal class SkippyRunner(
     check(fs.exists(changedFilesPath)) { "changedFilesPath does not exist: $changedFilesPath" }
   }
 
-  internal suspend fun run(context: CoroutineContext) {
+  public suspend fun run(context: CoroutineContext) {
     outputsDir.apply {
       if (fs.exists(this)) {
         fs.deleteRecursively(this)
@@ -201,9 +202,7 @@ internal class SkippyRunner(
       }
     return logTimedValue(tool, "SkippyRunner computation") {
       // Write the config to a diagnostic file
-      diagnostics.write("config.json") {
-        JsonTools.MOSHI.adapter<SkippyConfig>().indent("  ").toJson(config)
-      }
+      diagnostics.write("config.json") { moshi.adapter<SkippyConfig>().indent("  ").toJson(config) }
 
       val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
         AffectedProjectsComputer(
@@ -249,7 +248,7 @@ internal class SkippyRunner(
   }
 
   private fun log(tool: String, message: String) {
-    val withPrefix = "${LOG_PREFIX}[$tool] $message"
+    val withPrefix = "$LOG_PREFIX[$tool] $message"
     // counter-intuitive to read but lifecycle is preferable when actively debugging, whereas
     // debug() only logs quietly unless --debug is used
     if (debug) {
@@ -274,7 +273,7 @@ internal class SkippyRunner(
     }
   }
 
-  companion object {
+  internal companion object {
     private const val LOG_PREFIX = "[Skippy]"
 
     /** Returns a deep set of all dependencies for the given [project], including transitive. */

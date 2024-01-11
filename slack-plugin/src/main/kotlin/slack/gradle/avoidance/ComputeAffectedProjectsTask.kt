@@ -17,6 +17,9 @@ package slack.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
+import com.slack.sgp.common.SgpLogger
+import com.slack.skippy.AffectedProjectsComputer
+import com.slack.skippy.SkippyRunner
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +47,8 @@ import slack.gradle.SlackProperties
 import slack.gradle.artifacts.Resolver
 import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.property
-import slack.gradle.util.SgpLogger
+import slack.gradle.util.JsonTools
+import slack.gradle.util.gradle
 import slack.gradle.util.setDisallowChanges
 
 /**
@@ -126,6 +130,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
           outputsDir = outputsDir.get().asFile.toOkioPath(),
           androidTestProjects = androidTestProjects,
           rootDir = rootDirPath,
+          moshi = JsonTools.MOSHI,
           parallelism = parallelism,
           fs = FileSystem.SYSTEM,
           dependencyGraph = dependencyGraph.get(),

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+package com.slack.skippy
 
-import java.util.SortedSet
+public fun interface DiagnosticWriter {
+  public fun write(name: String, content: () -> String)
 
-internal data class AffectedProjectsResult(
-  val affectedProjects: SortedSet<String>,
-  val focusProjects: SortedSet<String>,
-  val affectedAndroidTestProjects: SortedSet<String>,
-)
+  public object NoOp : DiagnosticWriter {
+    override fun write(name: String, content: () -> String) {}
+  }
+}

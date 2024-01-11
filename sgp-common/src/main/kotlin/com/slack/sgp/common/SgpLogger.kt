@@ -13,34 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.util
-
-import org.gradle.api.logging.Logger
+package com.slack.sgp.common
 
 /** A simple logging abstraction for use in SGP. */
-internal interface SgpLogger {
-  fun debug(message: String)
+public interface SgpLogger {
+  public fun debug(message: String)
 
-  fun info(message: String)
+  public fun info(message: String)
 
-  fun lifecycle(message: String)
+  public fun lifecycle(message: String)
 
-  fun warn(message: String)
+  public fun warn(message: String)
 
-  fun warn(message: String, error: Throwable)
+  public fun warn(message: String, error: Throwable)
 
-  fun error(message: String)
+  public fun error(message: String)
 
-  fun error(message: String, error: Throwable)
+  public fun error(message: String, error: Throwable)
 
-  companion object {
-    fun gradle(logger: Logger): SgpLogger = GradleSgpLogger(logger)
+  public companion object {
 
-    fun noop(): SgpLogger = NoopSgpLogger
+    public fun noop(): SgpLogger = NoopSgpLogger
 
-    fun system(): SgpLogger = SystemSgpLogger
+    public fun system(): SgpLogger = SystemSgpLogger
 
-    fun prefix(prefix: String, delegate: SgpLogger): SgpLogger = PrefixSgpLogger(prefix, delegate)
+    public fun prefix(prefix: String, delegate: SgpLogger): SgpLogger =
+      PrefixSgpLogger(prefix, delegate)
   }
 }
 
@@ -127,36 +125,5 @@ private object SystemSgpLogger : SgpLogger {
   override fun error(message: String, error: Throwable) {
     System.err.println(message)
     error.printStackTrace(System.err)
-  }
-}
-
-/** A Gradle [Logger]-based [SgpLogger]. */
-private class GradleSgpLogger(private val delegate: Logger) : SgpLogger {
-  override fun debug(message: String) {
-    delegate.debug(message)
-  }
-
-  override fun info(message: String) {
-    delegate.info(message)
-  }
-
-  override fun lifecycle(message: String) {
-    delegate.lifecycle(message)
-  }
-
-  override fun warn(message: String) {
-    delegate.warn(message)
-  }
-
-  override fun warn(message: String, error: Throwable) {
-    delegate.warn(message, error)
-  }
-
-  override fun error(message: String) {
-    delegate.error(message)
-  }
-
-  override fun error(message: String, error: Throwable) {
-    delegate.error(message, error)
   }
 }

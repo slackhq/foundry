@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+package com.slack.skippy
 
 import com.google.common.truth.Truth.assertThat
+import com.slack.sgp.common.SgpLogger
+import com.slack.skippy.AffectedProjectsComputer.Companion.anyNeverSkip
+import com.slack.skippy.AffectedProjectsComputer.Companion.anyNeverSkipDebug
+import com.slack.skippy.AffectedProjectsComputer.Companion.filterExcludes
+import com.slack.skippy.AffectedProjectsComputer.Companion.filterIncludes
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 import org.junit.Before
 import org.junit.Test
-import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkip
-import slack.gradle.avoidance.AffectedProjectsComputer.Companion.anyNeverSkipDebug
-import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterExcludes
-import slack.gradle.avoidance.AffectedProjectsComputer.Companion.filterIncludes
-import slack.gradle.util.SgpLogger
 
 class AffectedProjectsComputerTest {
 

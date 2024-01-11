@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+package com.slack.skippy
 
+import com.slack.sgp.common.SgpLogger
+import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
-import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
-import slack.gradle.util.SgpLogger
 
 /**
  * This is a program compute the set of Gradle projects that are affected by a set of changed files
@@ -79,7 +79,7 @@ import slack.gradle.util.SgpLogger
  * @property debug Debugging flag. If enabled, extra diagnostics and logging is performed.
  * @property logger A logger to use for logging.
  */
-internal class AffectedProjectsComputer(
+public class AffectedProjectsComputer(
   private val rootDirPath: Path,
   private val dependencyMetadata: DependencyMetadata,
   private val changedFilePaths: List<Path>,
@@ -90,7 +90,7 @@ internal class AffectedProjectsComputer(
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
   private val logger: SgpLogger = SgpLogger.noop(),
 ) {
-  fun compute(): AffectedProjectsResult? {
+  public fun compute(): AffectedProjectsResult? {
     return logTimedValue("full computation of ${config.tool}") { computeImpl() }
   }
 
@@ -285,7 +285,7 @@ internal class AffectedProjectsComputer(
     }
   }
 
-  companion object {
+  internal companion object {
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
     fun filterIncludes(filePaths: List<Path>, includePatterns: Collection<String>) =
       filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }

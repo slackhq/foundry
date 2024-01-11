@@ -182,6 +182,8 @@ include(
   ":agp-handlers:agp-handler-82",
   ":agp-handlers:agp-handler-83",
   ":agp-handlers:agp-handler-api",
+  ":skippy",
+  ":sgp-common",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
   ":slack-plugin",

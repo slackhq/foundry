@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+package com.slack.skippy
 
 import com.google.common.truth.Truth.assertThat
 import com.jraska.module.graph.DependencyGraph
+import com.slack.sgp.common.SgpLogger
+import com.slack.sgp.common.readLines
+import com.slack.sgp.common.writeLines
+import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import okio.Path
 import okio.fakefilesystem.FakeFileSystem
 import org.junit.Before
 import org.junit.Test
-import slack.gradle.avoidance.SkippyConfig.Companion.GLOBAL_TOOL
-import slack.gradle.util.SgpLogger
-import slack.gradle.util.readLines
-import slack.gradle.util.writeLines
 
 class SkippyRunnerTest {
 
@@ -58,6 +59,7 @@ class SkippyRunnerTest {
         dependencyGraph = dependencyGraph.serializableGraph(),
         changedFilesPath = changedFilesPath,
         originalConfigMap = configs.associateBy { it.tool },
+        moshi = Moshi.Builder().build(),
         debug = true,
         logger = SgpLogger.system(),
         mergeOutputs = true,
