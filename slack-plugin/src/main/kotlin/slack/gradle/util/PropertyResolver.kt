@@ -21,7 +21,8 @@ public class PropertyResolver(
   private val providers = project.providers
 
   /**
-   * A "safe" property access mechanism that handles multiple property sources.
+   * Returns a "safe" property [Provider] mechanism that handles multiple property sources in a
+   * hierarchical fashion.
    *
    * This checks in the following order of priority
    * - project-local `local.properties`
@@ -29,7 +30,7 @@ public class PropertyResolver(
    * - root-project `local.properties`
    * - root-project/global `gradle.properties`
    */
-  public fun safeProperty(
+  public fun providerFor(
     key: String,
   ): Provider<String> =
     startParameterProperty(key) // start parameters
@@ -38,65 +39,64 @@ public class PropertyResolver(
       .orElse(globalLocalProperty(key)) // root-project `local.properties`
       .orElse(project.providers.gradleProperty(key)) // root-project/global `gradle.properties`
 
-  // TODO rename these scalar types to <type>Value
-  internal fun booleanProperty(key: String, defaultValue: Boolean = false): Boolean {
+  public fun booleanValue(key: String, defaultValue: Boolean = false): Boolean {
     return booleanProvider(key, defaultValue).get()
   }
 
-  internal fun booleanProperty(key: String, defaultValue: Provider<Boolean>): Boolean {
+  public fun booleanValue(key: String, defaultValue: Provider<Boolean>): Boolean {
     return booleanProvider(key, defaultValue).get()
   }
 
-  internal fun booleanProvider(key: String, defaultValue: Boolean = false): Provider<Boolean> {
+  public fun booleanProvider(key: String, defaultValue: Boolean = false): Provider<Boolean> {
     return booleanProvider(key, providers.provider { defaultValue })
   }
 
-  internal fun booleanProvider(key: String, defaultValue: Provider<Boolean>): Provider<Boolean> {
+  public fun booleanProvider(key: String, defaultValue: Provider<Boolean>): Provider<Boolean> {
     return booleanProvider(key).orElse(defaultValue)
   }
 
-  internal fun booleanProvider(
+  public fun booleanProvider(
     key: String,
   ): Provider<Boolean> {
-    return safeProperty(key).mapToBoolean()
+    return providerFor(key).mapToBoolean()
   }
 
-  internal fun intProperty(key: String, defaultValue: Int = -1): Int {
+  public fun intValue(key: String, defaultValue: Int = -1): Int {
     return intProvider(key, defaultValue).get()
   }
 
-  internal fun intProperty(key: String, defaultValue: Provider<Int>): Int {
+  public fun intValue(key: String, defaultValue: Provider<Int>): Int {
     return intProvider(key, defaultValue).get()
   }
 
-  internal fun intProvider(key: String, defaultValue: Int = -1): Provider<Int> {
+  public fun intProvider(key: String, defaultValue: Int = -1): Provider<Int> {
     return intProvider(key, providers.provider { defaultValue })
   }
 
-  internal fun intProvider(key: String, defaultValue: Provider<Int>): Provider<Int> {
-    return safeProperty(key).mapToInt().orElse(defaultValue)
+  public fun intProvider(key: String, defaultValue: Provider<Int>): Provider<Int> {
+    return providerFor(key).mapToInt().orElse(defaultValue)
   }
 
-  internal fun stringProperty(key: String): String {
-    return optionalStringProperty(key)
-      ?: error("No property for $key found and no default value was provided.")
+  public fun stringValue(key: String): String {
+    return optionalStringValue(key)
+      ?: error("No property for '$key' found and no default value was provided.")
   }
 
-  internal fun stringProperty(key: String, defaultValue: String): String {
-    return optionalStringProperty(key, defaultValue)
-      ?: error("No property for $key found and no default value was provided.")
+  public fun stringValue(key: String, defaultValue: String): String {
+    return optionalStringValue(key, defaultValue)
+      ?: error("No property for '$key' found and no default value was provided.")
   }
 
-  internal fun optionalStringProperty(key: String, defaultValue: String? = null): String? {
-    return safeProperty(key).orNull ?: defaultValue
+  public fun optionalStringValue(key: String, defaultValue: String? = null): String? {
+    return providerFor(key).orNull ?: defaultValue
   }
 
-  internal fun optionalStringProvider(key: String): Provider<String> {
+  public fun optionalStringProvider(key: String): Provider<String> {
     return optionalStringProvider(key, null)
   }
 
-  internal fun optionalStringProvider(key: String, defaultValue: String? = null): Provider<String> {
-    return safeProperty(key).let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
+  public fun optionalStringProvider(key: String, defaultValue: String? = null): Provider<String> {
+    return providerFor(key).let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
   }
 }
 
