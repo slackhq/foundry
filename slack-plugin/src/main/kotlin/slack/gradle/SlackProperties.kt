@@ -26,7 +26,7 @@ import slack.gradle.util.sneakyNull
 /**
  * (Mostly Gradle) properties for configuration of SlackPlugin.
  *
- * Order attempted as described by [PropertyResolver.safeProperty].
+ * Order attempted as described by [PropertyResolver.providerFor].
  */
 public class SlackProperties
 internal constructor(
@@ -46,10 +46,10 @@ internal constructor(
   private fun fileProperty(key: String): File? = optionalStringProperty(key)?.let(project::file)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
-    resolver.intProperty(key, defaultValue = defaultValue)
+    resolver.intValue(key, defaultValue = defaultValue)
 
   private fun booleanProperty(key: String, defaultValue: Boolean = false): Boolean =
-    resolver.booleanProperty(key, defaultValue = defaultValue)
+    resolver.booleanValue(key, defaultValue = defaultValue)
 
   private fun stringProperty(key: String): String =
     optionalStringProperty(key)
@@ -63,7 +63,7 @@ internal constructor(
     defaultValue: String? = null,
     blankIsNull: Boolean = false
   ): String? =
-    resolver.optionalStringProperty(key, defaultValue = defaultValue)?.takeUnless {
+    resolver.optionalStringValue(key, defaultValue = defaultValue)?.takeUnless {
       blankIsNull && it.isBlank()
     }
 
@@ -249,7 +249,7 @@ internal constructor(
    * alternative to running gradle with `--info` or `--debug`.
    */
   public val verboseLogging: Boolean
-    get() = resolver.booleanProperty("sgp.logging.verbose")
+    get() = resolver.booleanValue("sgp.logging.verbose")
 
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
@@ -562,7 +562,7 @@ internal constructor(
 
   /** Global boolean that controls whether mod score is enabled on this project. */
   public val modScoreGlobalEnabled: Boolean
-    get() = resolver.booleanProperty("slack.gradle.config.modscore.enabled")
+    get() = resolver.booleanValue("slack.gradle.config.modscore.enabled")
 
   /**
    * Per-project boolean that allows for excluding this project from mod score.
@@ -570,18 +570,18 @@ internal constructor(
    * Note this should only be applied to projects that cannot be depended on.
    */
   public val modScoreIgnore: Boolean
-    get() = resolver.booleanProperty("slack.gradle.config.modscore.ignore")
+    get() = resolver.booleanValue("slack.gradle.config.modscore.ignore")
 
   /** Experimental flag to enable logging thermal throttling on macOS devices. */
   public val logThermals: Boolean
-    get() = resolver.booleanProperty("slack.log-thermals", defaultValue = false)
+    get() = resolver.booleanValue("slack.log-thermals", defaultValue = false)
 
   /**
    * Enables applying common build tags. We are likely to remove these in favor of Gradle's
    * first-party plugin.
    */
   public val applyCommonBuildTags: Boolean
-    get() = resolver.booleanProperty("sgp.ge.apply-common-build-tags", defaultValue = true)
+    get() = resolver.booleanValue("sgp.ge.apply-common-build-tags", defaultValue = true)
 
   /**
    * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
@@ -590,7 +590,7 @@ internal constructor(
    * @see StandardProjectConfigurations.setUpSubprojectArtifactPublishing
    */
   public val eagerlyConfigureArtifactPublishing: Boolean
-    get() = resolver.booleanProperty("sgp.artifacts.configure-eagerly", defaultValue = false)
+    get() = resolver.booleanValue("sgp.artifacts.configure-eagerly", defaultValue = false)
 
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
