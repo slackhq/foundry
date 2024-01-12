@@ -441,6 +441,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0152" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.15.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0151" class="md-nav__link">
     <span class="md-ellipsis">
       0.15.1
@@ -1468,6 +1477,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0152" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.15.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0151" class="md-nav__link">
     <span class="md-ellipsis">
       0.15.1
@@ -2419,6 +2437,49 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h2 id="0152">0.15.2<a class="headerlink" href="#0152" title="Permanent link">&para;</a></h2>
+<p><em>2024-01-11</em></p>
+<ul>
+<li><strong>New</strong>: Promote <code>PropertyResolver</code> to public API.</li>
+<li><strong>New</strong>: Skippy logic is now distributed as a separate, non-gradle-specific artifact under <code>com.slack.gradle:skippy</code>. This also includes a CLI that can be run as an alternative to the gradle task. Note this requires serialized dependency graph and androidTest projects to be pre-computed. THe config must be in a static JSON file. See the docs on <code>ComputeAffectedProjectsCli</code>.</li>
+</ul>
+<p><div class="highlight"><pre><span></span><code>Usage: compute-affected-projects-cli [&lt;options&gt;]
+
+  Computes affected projects and writes output files to an output directory.
+
+Options:
+  --debug                    Enable debug logging.
+  --merge-outputs            Merge outputs from all configs into a single
+                             /merged dir.
+  --config=&lt;path&gt;            Path to a config file that contains a mapping of
+                             tool names to SkippyConfig objects.
+  --parallel                 Compute affected projects in parallel.
+  --changed-files=&lt;path&gt;     A relative (to the repo root) path to a
+                             changed_files.txt that contains a
+                             newline-delimited list of changed files. This is
+                             usually computed from a GitHub PR&#39;s changed files.
+  -o, --outputs-dir=&lt;path&gt;   Output directory for skippy outputs.
+  --root-dir=&lt;path&gt;          Root repo directory. Used to compute relative
+                             paths.
+  --dependency-graph=&lt;path&gt;  Path to a serialized dependency graph file.
+  --android-test-project-paths=&lt;path&gt;
+                             Path to a file that contains a newline-delimited
+                             list of project paths that produce androidTest
+                             APKs.
+  -h, --help                 Show this message and exit
+</code></pre></div>
+- <strong>Enhancement</strong>: Split out separate cacheable <code>generateDependencyGraph</code> and <code>generateAndroidTestProjects</code> tasks from <code>ComputeAffectedProjectsTask</code>. This allows for more fine-grained caching and parallelization.</p>
+<p>An example flow of the last two bullets can look like so:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Generate the dependency graph and androidTest projects</span>
+./gradlew<span class="w"> </span>generateDependencyGraph<span class="w"> </span>generateAndroidTestProjectPaths
+
+<span class="c1"># Run the CLI, such as from a `*.main.kts` file that imports it.</span>
+./skippy-runner.main.kts<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--changed-files<span class="w"> </span>changed_files.txt<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--dependency-graph<span class="w"> </span>slack/dependencyGraph/serializedGraph.bin<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--android-test-project-paths<span class="w"> </span>slack/androidTestProjectPaths/paths.txt<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>...
+</code></pre></div>
 <h2 id="0151">0.15.1<a class="headerlink" href="#0151" title="Permanent link">&para;</a></h2>
 <p><em>2024-01-09</em></p>
 <ul>

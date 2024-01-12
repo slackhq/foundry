@@ -1,0 +1,249 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.slack.skippy</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            slack-gradle-plugin
+                    </a>            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":skippy:dokkaHtmlPartial/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="skippy::com.slack.skippy////PointingToDeclaration//1145510528">
+  <div class="breadcrumbs"><a href="../index.html">skippy</a><span class="delimiter">/</span><span class="current">com.slack.skippy</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-886956532%2FClasslikes%2F1145510528" anchor-label="AffectedProjectsComputer" id="-886956532%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-affected-projects-computer/index.html"><span>Affected</span><wbr><span>Projects</span><wbr><span><span>Computer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-886956532%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-affected-projects-computer/index.html">AffectedProjectsComputer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rootDirPath<span class="token operator">: </span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span><span class="token punctuation">, </span></span><span class="parameter ">dependencyMetadata<span class="token operator">: </span><a href="-dependency-metadata/index.html">DependencyMetadata</a><span class="token punctuation">, </span></span><span class="parameter ">changedFilePaths<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">diagnostics<span class="token operator">: </span><a href="-diagnostic-writer/index.html">DiagnosticWriter</a><span class="token operator"> = </span>DiagnosticWriter.NoOp<span class="token punctuation">, </span></span><span class="parameter ">config<span class="token operator">: </span><a href="-skippy-config/index.html">SkippyConfig</a><span class="token operator"> = </span>SkippyConfig(GLOBAL_TOOL, buildUponDefaults = true)<span class="token punctuation">, </span></span><span class="parameter ">androidTestProjects<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter ">debug<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">fileSystem<span class="token operator">: </span><span data-unresolved-link="okio/FileSystem///PointingToDeclaration/">FileSystem</span><span class="token operator"> = </span>FileSystem.SYSTEM<span class="token punctuation">, </span></span><span class="parameter ">logger<span class="token operator">: </span><a href="../../sgp-common/com.slack.sgp.common/-sgp-logger/index.html">SgpLogger</a><span class="token operator"> = </span>SgpLogger.noop()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">This is a program compute the set of Gradle projects that are affected by a set of changed files (<a href="../../skippy/com.slack.skippy/-affected-projects-computer/changed-file-paths.html">changedFilePaths</a>).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="833414837%2FClasslikes%2F1145510528" anchor-label="AffectedProjectsDefaults" id="833414837%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-affected-projects-defaults/index.html"><span>Affected</span><wbr><span>Projects</span><wbr><span><span>Defaults</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="833414837%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-affected-projects-defaults/index.html">AffectedProjectsDefaults</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1177007926%2FClasslikes%2F1145510528" anchor-label="AffectedProjectsResult" id="-1177007926%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-affected-projects-result/index.html"><span>Affected</span><wbr><span>Projects</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1177007926%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-affected-projects-result/index.html">AffectedProjectsResult</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>affectedProjects<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedSet.html">SortedSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>focusProjects<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedSet.html">SortedSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>affectedAndroidTestProjects<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedSet.html">SortedSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1855987738%2FClasslikes%2F1145510528" anchor-label="ComputeAffectedProjectsCli" id="1855987738%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-compute-affected-projects-cli/index.html"><span>Compute</span><wbr><span>Affected</span><wbr><span>Projects</span><wbr><span><span>Cli</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1855987738%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-compute-affected-projects-cli/index.html">ComputeAffectedProjectsCli</a> : <span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">CliktCommand</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1631316261%2FClasslikes%2F1145510528" anchor-label="DependencyMetadata" id="-1631316261%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-dependency-metadata/index.html"><span>Dependency</span><wbr><span><span>Metadata</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1631316261%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-dependency-metadata/index.html">DependencyMetadata</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>projectsToDependents<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyMap()<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>projectsToDependencies<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyMap()</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-970000261%2FClasslikes%2F1145510528" anchor-label="DiagnosticWriter" id="-970000261%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diagnostic-writer/index.html"><span>Diagnostic</span><wbr><span><span>Writer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-970000261%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-diagnostic-writer/index.html">DiagnosticWriter</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2061493286%2FClasslikes%2F1145510528" anchor-label="SimpleSkippyOutput" id="-2061493286%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-simple-skippy-output/index.html"><span>Simple</span><wbr><span>Skippy</span><wbr><span><span>Output</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2061493286%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-simple-skippy-output/index.html">SimpleSkippyOutput</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>subDir<span class="token operator">: </span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span></span></span><span class="token punctuation">)</span> : <a href="-skippy-output/index.html">SkippyOutput</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="606124619%2FClasslikes%2F1145510528" anchor-label="SkippyConfig" id="606124619%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skippy-config/index.html"><span>Skippy</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="606124619%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="com.squareup.moshi/JsonClass///PointingToDeclaration/"><span class="token annotation builtin">JsonClass</span></span><span class="token punctuation">(</span><span>generateAdapter<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-skippy-config/index.html">SkippyConfig</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>tool<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>buildUponDefaults<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="com.squareup.moshi/Json///PointingToDeclaration/"><span class="token annotation builtin">Json</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"includePatterns"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>_includePatterns<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="com.squareup.moshi/Json///PointingToDeclaration/"><span class="token annotation builtin">Json</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"excludePatterns"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>_excludePatterns<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="com.squareup.moshi/Json///PointingToDeclaration/"><span class="token annotation builtin">Json</span></span><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"neverSkipPatterns"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>_neverSkipPatterns<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Represents a Skippy configuration for a specific <a href="-skippy-config/tool.html">tool</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1257621868%2FClasslikes%2F1145510528" anchor-label="SkippyOutput" id="1257621868%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skippy-output/index.html"><span>Skippy</span><wbr><span><span>Output</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1257621868%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-skippy-output/index.html">SkippyOutput</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="392889885%2FClasslikes%2F1145510528" anchor-label="SkippyRunner" id="392889885%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skippy-runner/index.html"><span>Skippy</span><wbr><span><span>Runner</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="392889885%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-skippy-runner/index.html">SkippyRunner</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">outputsDir<span class="token operator">: </span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span><span class="token punctuation">, </span></span><span class="parameter ">androidTestProjects<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter ">rootDir<span class="token operator">: </span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span><span class="token punctuation">, </span></span><span class="parameter ">dependencyGraph<span class="token operator">: </span><span data-unresolved-link="com.jraska.module.graph/DependencyGraph.SerializableGraph///PointingToDeclaration/">DependencyGraph.SerializableGraph</span><span class="token punctuation">, </span></span><span class="parameter ">changedFilesPath<span class="token operator">: </span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span><span class="token punctuation">, </span></span><span class="parameter ">originalConfigMap<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-skippy-config/index.html">SkippyConfig</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">moshi<span class="token operator">: </span><span data-unresolved-link="com.squareup.moshi/Moshi///PointingToDeclaration/">Moshi</span><span class="token punctuation">, </span></span><span class="parameter ">parallelism<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>originalConfigMap.size<span class="token punctuation">, </span></span><span class="parameter ">fs<span class="token operator">: </span><span data-unresolved-link="okio/FileSystem///PointingToDeclaration/">FileSystem</span><span class="token operator"> = </span>FileSystem.SYSTEM<span class="token punctuation">, </span></span><span class="parameter ">debug<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">logger<span class="token operator">: </span><a href="../../sgp-common/com.slack.sgp.common/-sgp-logger/index.html">SgpLogger</a><span class="token operator"> = </span>SgpLogger.noop()<span class="token punctuation">, </span></span><span class="parameter ">mergeOutputs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="748520876%2FClasslikes%2F1145510528" anchor-label="WritableSkippyOutput" id="748520876%2FClasslikes%2F1145510528" data-filterable-set=":skippy:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":skippy:dokkaHtmlPartial/main" data-filterable-set=":skippy:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-writable-skippy-output/index.html"><span>Writable</span><wbr><span>Skippy</span><wbr><span><span>Output</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="748520876%2FClasslikes%2F1145510528"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":skippy:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-writable-skippy-output/index.html">WritableSkippyOutput</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tool<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">outputDir<span class="token operator">: </span><span data-unresolved-link="okio/Path///PointingToDeclaration/">Path</span><span class="token punctuation">, </span></span><span class="parameter ">fs<span class="token operator">: </span><span data-unresolved-link="okio/FileSystem///PointingToDeclaration/">FileSystem</span></span></span><span class="token punctuation">)</span> : <a href="-skippy-output/index.html">SkippyOutput</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
