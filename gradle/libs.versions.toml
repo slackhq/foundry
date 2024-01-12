@@ -81,7 +81,7 @@ gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", versi
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
 guava = "com.google.guava:guava:33.0.0-jre"
-kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.1"
+kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.2"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
