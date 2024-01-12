@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.util
+package com.slack.sgp.common
 
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
@@ -25,7 +25,7 @@ import kotlinx.coroutines.sync.Semaphore
 /**
  * Applies a given [mapper] function in parallel over this [Iterable] with a given [parallelism].
  */
-internal suspend inline fun <A, B> Iterable<A>.parallelMap(
+public suspend inline fun <A, B> Iterable<A>.parallelMap(
   parallelism: Int,
   start: CoroutineStart = CoroutineStart.DEFAULT,
   crossinline mapper: suspend (A) -> B
@@ -48,7 +48,7 @@ internal suspend inline fun <A, B> Iterable<A>.parallelMap(
  * Applies a given [mapper] function in parallel over this [Iterable] with a given [parallelism],
  * filtering out null [B]s.
  */
-internal suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
+public suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
   parallelism: Int,
   start: CoroutineStart = CoroutineStart.DEFAULT,
   crossinline mapper: suspend (A) -> B?
@@ -72,7 +72,7 @@ internal suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
  * Iterates this [Iterable] with a given [parallelism], passing the value for each emission to the
  * given [action].
  */
-internal suspend inline fun <A> Iterable<A>.parallelForEach(
+public suspend inline fun <A> Iterable<A>.parallelForEach(
   parallelism: Int,
   start: CoroutineStart = CoroutineStart.DEFAULT,
   crossinline action: suspend (A) -> Unit

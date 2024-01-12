@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+plugins {
+  kotlin("jvm")
+  alias(libs.plugins.mavenPublish)
+}
 
-public class DependencyMetadata(
-  public val projectsToDependents: Map<String, Set<String>> = emptyMap(),
-  public val projectsToDependencies: Map<String, Set<String>> = emptyMap(),
-)
+dependencies {
+  api(platform(libs.coroutines.bom))
+  api(libs.okio)
+
+  implementation(libs.coroutines.core)
+}

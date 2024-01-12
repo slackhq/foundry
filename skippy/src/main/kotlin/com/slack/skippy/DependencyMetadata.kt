@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.avoidance
+package com.slack.skippy
 
-internal fun interface DiagnosticWriter {
-  fun write(name: String, content: () -> String)
-
-  object NoOp : DiagnosticWriter {
-    override fun write(name: String, content: () -> String) {}
-  }
-}
+public class DependencyMetadata(
+  public val projectsToDependents: Map<String, Set<String>> = emptyMap(),
+  public val projectsToDependencies: Map<String, Set<String>> = emptyMap(),
+)

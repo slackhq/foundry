@@ -33,6 +33,8 @@ import slack.cli.AppleSiliconCompat
 import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
+import slack.gradle.avoidance.GenerateAndroidTestProjectPathsTask
+import slack.gradle.avoidance.GenerateDependencyGraphTask
 import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
@@ -171,7 +173,14 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     project.configureMisc(slackProperties)
     UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
-    ComputeAffectedProjectsTask.register(project, slackProperties)
+    val generateDependencyGraphTask = GenerateDependencyGraphTask.register(project, slackProperties)
+    val generateAndroidTestProjectsTask = GenerateAndroidTestProjectPathsTask.register(project)
+    ComputeAffectedProjectsTask.register(
+      rootProject = project,
+      slackProperties = slackProperties,
+      dependencyGraphProvider = generateDependencyGraphTask.flatMap { it.outputFile },
+      androidTestProjectPathsProvider = generateAndroidTestProjectsTask.flatMap { it.outputFile },
+    )
     // Register robolectric jar downloads if requested
     slackProperties.versions.robolectric?.let {
       UpdateRobolectricJarsTask.register(project, slackProperties)

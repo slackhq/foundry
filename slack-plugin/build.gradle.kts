@@ -87,6 +87,8 @@ dependencies {
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
+  implementation(projects.sgpCommon)
+  implementation(projects.skippy)
 
   compileOnly(platform(libs.kotlin.bom))
   compileOnly(gradleApi())
