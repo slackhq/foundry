@@ -84,7 +84,7 @@ public class AffectedProjectsComputer(
   private val dependencyMetadata: DependencyMetadata,
   private val changedFilePaths: List<Path>,
   private val diagnostics: DiagnosticWriter = DiagnosticWriter.NoOp,
-  private val config: SkippyConfig = SkippyConfig(GLOBAL_TOOL),
+  private val config: SkippyConfig = SkippyConfig(GLOBAL_TOOL, buildUponDefaults = true),
   private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,

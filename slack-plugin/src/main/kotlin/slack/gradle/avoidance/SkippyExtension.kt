@@ -89,6 +89,12 @@ constructor(private val name: String, objects: ObjectFactory) : Named {
   }
 
   internal fun asSkippyConfig(): SkippyConfig {
-    return SkippyConfig(name, includePatterns.get(), excludePatterns.get(), neverSkipPatterns.get())
+    return SkippyConfig(
+      tool = name,
+      buildUponDefaults = false,
+      _includePatterns = includePatterns.get(),
+      _excludePatterns = excludePatterns.get(),
+      _neverSkipPatterns = neverSkipPatterns.get()
+    )
   }
 }

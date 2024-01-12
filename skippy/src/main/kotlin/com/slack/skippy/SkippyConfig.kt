@@ -15,11 +15,13 @@
  */
 package com.slack.skippy
 
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
  * Represents a Skippy configuration for a specific [tool].
  *
+ * @property buildUponDefaults Whether to build upon the default Skippy configuration.
  * @property includePatterns A set of glob patterns for files to include in computing affected
  *   projects. This should usually be source files, build files, gradle.properties files, and other
  *   projects that affect builds.
@@ -35,19 +37,35 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 public data class SkippyConfig(
   public val tool: String,
-  public val includePatterns: Set<String> = AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS,
-  public val excludePatterns: Set<String> = emptySet(),
-  public val neverSkipPatterns: Set<String> = AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS,
+  public val buildUponDefaults: Boolean = false,
+  @Json(name = "includePatterns") internal val _includePatterns: Set<String> = emptySet(),
+  @Json(name = "excludePatterns") internal val _excludePatterns: Set<String> = emptySet(),
+  @Json(name = "neverSkipPatterns") internal val _neverSkipPatterns: Set<String> = emptySet(),
 ) {
-  public companion object {
-    public const val GLOBAL_TOOL: String = "global"
+
+  public val includePatterns: Set<String> = buildSet {
+    addAll(_includePatterns)
+    if (buildUponDefaults) {
+      addAll(AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS)
+    }
+  }
+  public val excludePatterns: Set<String> = _excludePatterns
+  public val neverSkipPatterns: Set<String> = buildSet {
+    addAll(_neverSkipPatterns)
+    if (buildUponDefaults) {
+      addAll(AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS)
+    }
   }
 
   public fun overlayWith(other: SkippyConfig): SkippyConfig {
     return copy(
-      includePatterns = includePatterns + other.includePatterns,
-      excludePatterns = excludePatterns + other.excludePatterns,
-      neverSkipPatterns = neverSkipPatterns + other.neverSkipPatterns,
+      _includePatterns = includePatterns + other.includePatterns,
+      _excludePatterns = excludePatterns + other.excludePatterns,
+      _neverSkipPatterns = neverSkipPatterns + other.neverSkipPatterns,
     )
+  }
+
+  public companion object {
+    public const val GLOBAL_TOOL: String = "global"
   }
 }

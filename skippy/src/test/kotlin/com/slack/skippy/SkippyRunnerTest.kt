@@ -48,7 +48,7 @@ class SkippyRunnerTest {
   private fun runSkippy(
     dependencyGraph: DependencyGraph,
     changedFilePaths: List<String>,
-    configs: List<SkippyConfig> = listOf(SkippyConfig(GLOBAL_TOOL)),
+    configs: List<SkippyConfig> = listOf(SkippyConfig(GLOBAL_TOOL, buildUponDefaults = true)),
   ): Unit = runTest {
     val changedFilesPath = rootDirPath / "changed_files.txt"
     changedFilesPath.writeLines(changedFilePaths, fs)
@@ -86,7 +86,7 @@ class SkippyRunnerTest {
     runSkippy(
       dependencyGraph = DependencyGraph.createSingular(":foo"),
       changedFilePaths = emptyList(),
-      configs = listOf(SkippyConfig(GLOBAL_TOOL), SkippyConfig("lint"))
+      configs = listOf(SkippyConfig(GLOBAL_TOOL, buildUponDefaults = true), SkippyConfig("lint"))
     )
 
     assertThat(fs.exists(rootDirPath.resolve("build/skippy/outputs/merged/affected_projects.txt")))
@@ -107,7 +107,7 @@ class SkippyRunnerTest {
     runSkippy(
       dependencyGraph = DependencyGraph.createSingular(":$projectName"),
       changedFilePaths = listOf("$projectName/src/main/kotlin/com/example/Example.kt"),
-      configs = listOf(SkippyConfig(GLOBAL_TOOL), SkippyConfig("lint"))
+      configs = listOf(SkippyConfig(GLOBAL_TOOL, buildUponDefaults = true), SkippyConfig("lint"))
     )
 
     // Both lint and merged should have the same affected projects
@@ -139,10 +139,10 @@ class SkippyRunnerTest {
       changedFilePaths = listOf("$barProject/lint-baseline.xml"),
       configs =
         listOf(
-          SkippyConfig(GLOBAL_TOOL),
+          SkippyConfig(GLOBAL_TOOL, buildUponDefaults = true),
           SkippyConfig("unitTest"),
           SkippyConfig("lint").let {
-            it.copy(includePatterns = it.includePatterns + "**/lint-baseline.xml")
+            it.copy(_includePatterns = it.includePatterns + "**/lint-baseline.xml")
           },
         )
     )
