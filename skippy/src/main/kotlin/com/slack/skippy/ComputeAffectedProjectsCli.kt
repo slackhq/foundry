@@ -87,7 +87,7 @@ public class ComputeAffectedProjectsCli :
         "-o",
         help = "Output directory for skippy outputs.",
       )
-      .path(mustExist = false, canBeFile = false, mustBeReadable = true)
+      .path(canBeFile = false)
       .required()
 
   private val rootDir by
@@ -95,11 +95,10 @@ public class ComputeAffectedProjectsCli :
         "--root-dir",
         help = "Root repo directory. Used to compute relative paths.",
       )
-      .path(mustExist = true, canBeDir = true, canBeFile = false, mustBeReadable = true)
+      .path(mustExist = true, canBeFile = false, mustBeReadable = true)
       .required()
 
-  // TODO extract a precursor task to generate
-  private val cachedDependencyGraph by
+  private val serializedDependencyGraph by
     option(
         "--dependency-graph",
         help = "Path to a serialized dependency graph file.",
@@ -107,8 +106,7 @@ public class ComputeAffectedProjectsCli :
       .path(mustExist = true, canBeDir = false, mustBeReadable = true)
       .required()
 
-  // TODO extract a precursor task to generate
-  private val cachedAndroidTestProjectPaths by
+  private val androidTestProjectPaths by
     option(
         "--android-test-project-paths",
         help =
@@ -123,18 +121,19 @@ public class ComputeAffectedProjectsCli :
   override fun run() {
     val moshi = Moshi.Builder().build()
     val dependencyGraph =
-      ObjectInputStream(cachedDependencyGraph.inputStream()).use {
+      ObjectInputStream(serializedDependencyGraph.inputStream()).use {
         it.readObject() as DependencyGraph.SerializableGraph
       }
     val rootDirPath = rootDir.toOkioPath()
-    val configs = moshi.adapter<Map<String, SkippyConfig>>().fromJson(config.readText())!!
+    val configs =
+      moshi.adapter<List<SkippyConfig>>().fromJson(config.readText())!!.associateBy { it.tool }
     val parallelism =
       if (computeInParallel && configs.size > 1) {
         configs.size
       } else {
         1
       }
-    val androidTestProjects = cachedAndroidTestProjectPaths.readLines().toSet()
+    val androidTestProjects = androidTestProjectPaths.readLines().toSet()
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug,
