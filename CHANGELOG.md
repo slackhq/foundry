@@ -1,6 +1,56 @@
 Changelog
 =========
 
+0.15.2
+------
+
+_2024-01-11_
+
+- **New**: Promote `PropertyResolver` to public API.
+- **New**: Skippy logic is now distributed as a separate, non-gradle-specific artifact under `com.slack.gradle:skippy`. This also includes a CLI that can be run as an alternative to the gradle task. Note this requires serialized dependency graph and androidTest projects to be pre-computed. THe config must be in a static JSON file. See the docs on `ComputeAffectedProjectsCli`.
+
+  ```
+  Usage: compute-affected-projects-cli [<options>]
+
+    Computes affected projects and writes output files to an output directory.
+
+  Options:
+    --debug                    Enable debug logging.
+    --merge-outputs            Merge outputs from all configs into a single
+                               /merged dir.
+    --config=<path>            Path to a config file that contains a mapping of
+                               tool names to SkippyConfig objects.
+    --parallel                 Compute affected projects in parallel.
+    --changed-files=<path>     A relative (to the repo root) path to a
+                               changed_files.txt that contains a
+                               newline-delimited list of changed files. This is
+                               usually computed from a GitHub PR's changed files.
+    -o, --outputs-dir=<path>   Output directory for skippy outputs.
+    --root-dir=<path>          Root repo directory. Used to compute relative
+                               paths.
+    --dependency-graph=<path>  Path to a serialized dependency graph file.
+    --android-test-project-paths=<path>
+                               Path to a file that contains a newline-delimited
+                               list of project paths that produce androidTest
+                               APKs.
+    -h, --help                 Show this message and exit
+  ```
+- **Enhancement**: Split out separate cacheable `generateDependencyGraph` and `generateAndroidTestProjects` tasks from `ComputeAffectedProjectsTask`. This allows for more fine-grained caching and parallelization.
+
+An example flow of the last two bullets can look like so:
+
+```bash
+# Generate the dependency graph and androidTest projects
+./gradlew generateDependencyGraph generateAndroidTestProjectPaths
+
+# Run the CLI, such as from a `*.main.kts` file that imports it.
+./skippy-runner.main.kts \
+    --changed-files changed_files.txt \
+    --dependency-graph slack/dependencyGraph/serializedGraph.bin \
+    --android-test-project-paths slack/androidTestProjectPaths/paths.txt \
+    ...
+```
+
 0.15.1
 ------
 
