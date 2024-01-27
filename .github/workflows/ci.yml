@@ -40,7 +40,7 @@ jobs:
 
       - name: Build and run tests
         id: gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: check --no-configuration-cache
 
