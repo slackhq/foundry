@@ -43,7 +43,7 @@ jobs:
 
       - name: Build and run tests
         id: gradle
-        run: check
+        run: ./gradlew check
 
       - name: Print build scan url
         if: always()
