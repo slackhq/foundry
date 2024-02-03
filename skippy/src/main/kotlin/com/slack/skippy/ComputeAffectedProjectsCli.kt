@@ -50,10 +50,7 @@ public class ComputeAffectedProjectsCli :
     option("--debug", help = "Enable debug logging.").flag(default = false)
 
   private val mergeOutputs: Boolean by
-    option(
-        "--merge-outputs",
-        help = "Merge outputs from all configs into a single /merged dir.",
-      )
+    option("--merge-outputs", help = "Merge outputs from all configs into a single /merged dir.")
       .flag("--no-merge-outputs", default = true)
 
   private val config: Path by
@@ -66,10 +63,7 @@ public class ComputeAffectedProjectsCli :
       .required()
 
   private val computeInParallel: Boolean by
-    option(
-        "--parallel",
-        help = "Compute affected projects in parallel.",
-      )
+    option("--parallel", help = "Compute affected projects in parallel.")
       .flag("--no-parallel", default = true)
 
   private val changedFiles: Path by
@@ -82,27 +76,17 @@ public class ComputeAffectedProjectsCli :
       .required()
 
   private val outputsDir by
-    option(
-        "--outputs-dir",
-        "-o",
-        help = "Output directory for skippy outputs.",
-      )
+    option("--outputs-dir", "-o", help = "Output directory for skippy outputs.")
       .path(canBeFile = false)
       .required()
 
   private val rootDir by
-    option(
-        "--root-dir",
-        help = "Root repo directory. Used to compute relative paths.",
-      )
+    option("--root-dir", help = "Root repo directory. Used to compute relative paths.")
       .path(mustExist = true, canBeFile = false, mustBeReadable = true)
       .required()
 
   private val serializedDependencyGraph by
-    option(
-        "--dependency-graph",
-        help = "Path to a serialized dependency graph file.",
-      )
+    option("--dependency-graph", help = "Path to a serialized dependency graph file.")
       .path(mustExist = true, canBeDir = false, mustBeReadable = true)
       .required()
 
