@@ -54,7 +54,7 @@ public class ComputeAffectedProjectsCli :
         "--merge-outputs",
         help = "Merge outputs from all configs into a single /merged dir.",
       )
-      .flag(default = true)
+      .flag("--no-merge-outputs", default = true)
 
   private val config: Path by
     option(
@@ -70,7 +70,7 @@ public class ComputeAffectedProjectsCli :
         "--parallel",
         help = "Compute affected projects in parallel.",
       )
-      .flag(default = true)
+      .flag("--no-parallel", default = true)
 
   private val changedFiles: Path by
     option(
