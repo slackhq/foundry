@@ -51,7 +51,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
   override fun apply(
     file: PsiFile,
     annotationResult: List<FeatureFlagSymbol>,
-    holder: AnnotationHolder
+    holder: AnnotationHolder,
   ) {
     for (symbol in annotationResult) {
       val message = "Open at: ${symbol.url}"
@@ -70,10 +70,7 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
   }
 }
 
-class UrlIntentionAction(
-  private val message: String,
-  private val url: String,
-) : IntentionAction {
+class UrlIntentionAction(private val message: String, private val url: String) : IntentionAction {
 
   private val startTimestamp = Instant.now()
   private val skateSpanBuilder = SkateSpanBuilder()
@@ -100,7 +97,7 @@ class UrlIntentionAction(
       .createPluginUsageTraceAndSendTrace(
         "feature_flag_annotator",
         startTimestamp,
-        skateSpanBuilder.getKeyValueList()
+        skateSpanBuilder.getKeyValueList(),
       )
   }
 }

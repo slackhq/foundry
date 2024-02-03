@@ -85,7 +85,7 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
     public fun register(
       project: Project,
       name: String,
-      configuration: Configuration
+      configuration: Configuration,
     ): TaskProvider<CheckDependencyVersionsTask> {
       return project.tasks.register<CheckDependencyVersionsTask>(
         "check${name.capitalizeUS()}Versions"

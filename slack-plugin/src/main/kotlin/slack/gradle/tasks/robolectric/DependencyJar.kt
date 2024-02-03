@@ -22,7 +22,7 @@ internal data class DependencyJar(
   val groupId: String,
   val artifactId: String,
   val version: String,
-  val classifier: String? = null
+  val classifier: String? = null,
 ) : Serializable {
   val name: String = "$artifactId-$version.jar"
 }

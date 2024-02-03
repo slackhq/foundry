@@ -28,7 +28,7 @@ import kotlinx.coroutines.sync.Semaphore
 public suspend inline fun <A, B> Iterable<A>.parallelMap(
   parallelism: Int,
   start: CoroutineStart = CoroutineStart.DEFAULT,
-  crossinline mapper: suspend (A) -> B
+  crossinline mapper: suspend (A) -> B,
 ): List<B> = coroutineScope {
   val semaphore = Semaphore(parallelism)
   map {
@@ -51,7 +51,7 @@ public suspend inline fun <A, B> Iterable<A>.parallelMap(
 public suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
   parallelism: Int,
   start: CoroutineStart = CoroutineStart.DEFAULT,
-  crossinline mapper: suspend (A) -> B?
+  crossinline mapper: suspend (A) -> B?,
 ): List<B> = coroutineScope {
   val semaphore = Semaphore(parallelism)
   map {
@@ -75,7 +75,7 @@ public suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
 public suspend inline fun <A> Iterable<A>.parallelForEach(
   parallelism: Int,
   start: CoroutineStart = CoroutineStart.DEFAULT,
-  crossinline action: suspend (A) -> Unit
+  crossinline action: suspend (A) -> Unit,
 ): Unit = coroutineScope {
   val semaphore = Semaphore(parallelism)
   forEach {

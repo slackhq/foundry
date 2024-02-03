@@ -32,5 +32,5 @@ internal abstract class KtfmtDownloadTask :
     addExecPrefix = true,
     urlTemplate = { version ->
       "https://repo1.maven.org/maven2/com/facebook/ktfmt/$version/ktfmt-$version-jar-with-dependencies.jar"
-    }
+    },
   )

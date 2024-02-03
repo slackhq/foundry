@@ -67,7 +67,7 @@ internal abstract class GenerateDependencyGraphTask : DefaultTask() {
 
     fun register(
       rootProject: Project,
-      slackProperties: SlackProperties
+      slackProperties: SlackProperties,
     ): TaskProvider<GenerateDependencyGraphTask> {
       val configurationsToLook by lazy {
         val providedConfigs = slackProperties.affectedProjectConfigurations

@@ -133,13 +133,7 @@ internal object ThermlogParser {
           prevAvailableCpus != null &&
           prevSpeedLimit != null
       ) {
-        logs +=
-          ThermLog(
-            prevCurrentTime,
-            prevCurrentScheduler,
-            prevAvailableCpus,
-            prevSpeedLimit,
-          )
+        logs += ThermLog(prevCurrentTime, prevCurrentScheduler, prevAvailableCpus, prevSpeedLimit)
       }
     }
 

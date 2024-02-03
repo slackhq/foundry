@@ -111,7 +111,7 @@ object TranslatorHelper {
         destinationModel,
         element,
         importDirectives,
-        TextRange.create(element.startOffset, destinationModelRef.endOffset)
+        TextRange.create(element.startOffset, destinationModelRef.endOffset),
       )
     } else {
       return null
@@ -150,7 +150,7 @@ object TranslatorHelper {
   private fun getModelClass(
     importDirectives: List<KtImportDirective>,
     destinationModel: String,
-    element: KtNamedFunction
+    element: KtNamedFunction,
   ): PsiClass? {
     val destinationModelTopMostParent = getTopMostParent(destinationModel)
     val destinationModelImport =
@@ -169,7 +169,7 @@ object TranslatorHelper {
 
   private fun List<KtImportDirective>.findImport(
     modelTopMostParent: String?,
-    model: String
+    model: String,
   ): KtImportDirective? {
     return firstOrNull {
       val id = it.importedName?.identifier
@@ -181,7 +181,7 @@ object TranslatorHelper {
     modelClass: PsiClass,
     sourceModel: String,
     destinationModel: String,
-    project: Project
+    project: Project,
   ): String {
     val lineSeparator = System.lineSeparator()
     val whenBlock =
@@ -196,7 +196,7 @@ object TranslatorHelper {
     modelClass: PsiClass,
     lineSeparator: String,
     sourceModel: String,
-    destinationModel: String
+    destinationModel: String,
   ): String {
     return modelClass.fields.reversed().joinToString(lineSeparator) {
       if (it.name != UNKNOWN_ENUM_VALUE) "$sourceModel.${it.name} -> $destinationModel.${it.name}"
@@ -208,7 +208,7 @@ object TranslatorHelper {
     modelClass: PsiClass,
     lineSeparator: String,
     destinationModel: String,
-    project: Project
+    project: Project,
   ): String {
 
     val settings = project.service<SkatePluginSettings>()
@@ -259,7 +259,7 @@ object TranslatorHelper {
 
   private fun Array<out PsiAnnotation>.findAnnotation(
     prefix: String,
-    predicate: (PsiElement) -> Boolean
+    predicate: (PsiElement) -> Boolean,
   ): PsiAnnotation? {
     return firstOrNull {
       val element = it.findChild(predicate)

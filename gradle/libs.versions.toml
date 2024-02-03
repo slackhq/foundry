@@ -36,6 +36,7 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij = { id = "org.jetbrains.intellij", version = "1.16.0" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }

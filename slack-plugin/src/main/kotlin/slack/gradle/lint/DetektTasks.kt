@@ -44,10 +44,7 @@ internal object DetektTasks {
   private const val CI_DETEKT_TASK_NAME = "ciDetekt"
   private const val LOG = "SlackDetekt:"
 
-  fun configureRootProject(
-    project: Project,
-    slackProperties: SlackProperties,
-  ) {
+  fun configureRootProject(project: Project, slackProperties: SlackProperties) {
     // Add detekt download task
     slackProperties.versions.detekt?.let { detektVersion ->
       project.tasks.register<DetektDownloadTask>("updateDetekt") {

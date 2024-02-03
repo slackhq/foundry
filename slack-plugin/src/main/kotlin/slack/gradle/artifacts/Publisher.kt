@@ -81,13 +81,7 @@ internal class Publisher<T : Serializable>(
       category: String,
     ): Publisher<T> {
       project.logger.debug("Creating publisher for $artifact")
-      return Publisher(
-        project,
-        attr,
-        artifact,
-        declarableName,
-        category,
-      )
+      return Publisher(project, attr, artifact, declarableName, category)
     }
   }
 

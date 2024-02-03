@@ -264,7 +264,7 @@ internal fun convertProjectPathToAccessor(projectPath: String): String {
  */
 internal inline fun <reified T : Task> Project.namedLazy(
   targetName: String,
-  crossinline action: (TaskProvider<T>) -> Unit
+  crossinline action: (TaskProvider<T>) -> Unit,
 ) {
   try {
     action(tasks.named(targetName, T::class.java))

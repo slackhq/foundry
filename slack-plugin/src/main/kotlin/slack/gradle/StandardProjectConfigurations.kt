@@ -119,7 +119,7 @@ internal class StandardProjectConfigurations(
         SlackExtension::class.java,
         globalProperties,
         slackProperties,
-        versionCatalog
+        versionCatalog,
       )
     if (slackProperties.eagerlyConfigureArtifactPublishing) {
       setUpSubprojectArtifactPublishing(project)
@@ -210,7 +210,7 @@ internal class StandardProjectConfigurations(
         pluginId,
         slackProperties,
         slackTools.globalConfig.affectedProjects,
-        slackTools::logAvoidedTask
+        slackTools::logAvoidedTask,
       )
 
       if (pluginId != "com.android.test") {
@@ -453,7 +453,7 @@ internal class StandardProjectConfigurations(
             logger.lifecycle("Enabling error-prone auto-patching on ${project.path}:$name")
             errorproneArgs.addAll(
               "-XepPatchChecks:${ERROR_PRONE_CHECKS.joinToString(",")}",
-              "-XepPatchLocation:IN_PLACE"
+              "-XepPatchLocation:IN_PLACE",
             )
           }
         }
@@ -529,7 +529,7 @@ internal class StandardProjectConfigurations(
                   description =
                     "Produces a metadata artifact indicating this project path produces an androidTest APK.",
                   input = projectPath,
-                  group = "skippy"
+                  group = "skippy",
                 )
                 .publishWith(skippyAndroidTestProjectPublisher)
               if (isLibraryVariant) {
@@ -709,7 +709,7 @@ internal class StandardProjectConfigurations(
               "LICENSE_*",
               // We don't know where this comes from but it's 5MB
               // https://slack-pde.slack.com/archives/C8EER3C04/p1621353426001500
-              "annotated-jdk/**"
+              "annotated-jdk/**",
             )
           jniLibs.pickFirsts +=
             setOf(
@@ -733,7 +733,7 @@ internal class StandardProjectConfigurations(
 
         PermissionChecks.configure(
           project = project,
-          allowListActionGetter = { slackExtension.androidHandler.appHandler.allowlistAction }
+          allowListActionGetter = { slackExtension.androidHandler.appHandler.allowlistAction },
         ) { taskName, file, allowListProvider ->
           tasks.register<CheckManifestPermissionsTask>(taskName) {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -844,7 +844,7 @@ internal class StandardProjectConfigurations(
                       // Skip dashes and underscores. We could camelcase but it looks weird in a
                       // package name
                       '-',
-                      '_', -> null
+                      '_' -> null
                       // Use the project path as the real dot namespacing
                       ':' -> '.'
                       else -> it
@@ -1116,7 +1116,7 @@ internal object KotlinArgConfigs {
     override val args =
       setOf(
         "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "-opt-in=kotlinx.coroutines.FlowPreview"
+        "-opt-in=kotlinx.coroutines.FlowPreview",
       )
   }
 }
@@ -1270,7 +1270,7 @@ internal object AptOptionsConfigs {
         // https://dagger.dev/dev-guide/compiler-options.html#fastinit-mode
         "dagger.fastInit" to "enabled",
         // https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
-        "dagger.ignoreProvisionKeyWildcards" to "ENABLED"
+        "dagger.ignoreProvisionKeyWildcards" to "ENABLED",
       )
   }
 

@@ -33,5 +33,5 @@ internal abstract class DetektDownloadTask :
     addExecPrefix = true,
     urlTemplate = { version ->
       "https://github.com/detekt/detekt/releases/download/v$version/detekt-cli-$version-all.jar"
-    }
+    },
   )

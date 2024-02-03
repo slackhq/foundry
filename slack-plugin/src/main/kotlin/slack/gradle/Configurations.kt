@@ -52,7 +52,7 @@ internal object Configurations {
         COMPILE_ONLY,
         "androidTestUtil",
         "lintChecks",
-        "lintRelease"
+        "lintRelease",
       )
   }
 }

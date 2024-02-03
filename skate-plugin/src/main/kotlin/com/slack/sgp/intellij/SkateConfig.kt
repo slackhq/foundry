@@ -25,7 +25,7 @@ class SkateConfig(private val project: Project) :
   BoundSearchableConfigurable(
     displayName = SkateBundle.message("skate.configuration.title"),
     helpTopic = SkateBundle.message("skate.configuration.title"),
-    _id = "com.slack.skate.config"
+    _id = "com.slack.skate.config",
   ) {
   private val settings = project.service<SkatePluginSettings>()
 

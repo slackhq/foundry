@@ -65,7 +65,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
     public fun register(
       project: Project,
       name: String,
-      configuration: Configuration
+      configuration: Configuration,
     ): TaskProvider<PrintFossaDependencies> {
       return project.tasks.register<PrintFossaDependencies>(
         "print${name.capitalizeUS()}FossaDependencies"

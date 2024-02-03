@@ -32,7 +32,7 @@ class AuthConfig :
   BoundSearchableConfigurable(
     displayName = AuthBundle.message("artifactoryAuth.configuration.title"),
     helpTopic = AuthBundle.message("artifactoryAuth.configuration.title"),
-    _id = "com.slack.intellij.artifactory"
+    _id = "com.slack.intellij.artifactory",
   ) {
   private val settings =
     ApplicationManager.getApplication().getService(AuthPluginSettings::class.java)

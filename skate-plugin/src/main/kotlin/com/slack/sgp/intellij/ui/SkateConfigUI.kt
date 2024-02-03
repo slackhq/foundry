@@ -49,14 +49,14 @@ internal class SkateConfigUI(
         checkBox(SkateBundle.message("skate.configuration.enableWhatsNew.description"))
           .bindSelected(
             getter = { settings.isWhatsNewEnabled },
-            setter = { settings.isWhatsNewEnabled = it }
+            setter = { settings.isWhatsNewEnabled = it },
           )
       }
       row(SkateBundle.message("skate.configuration.choosePath.title")) {
         textFieldWithBrowseButton(
             SkateBundle.message("skate.configuration.choosePath.dialog.title"),
             project,
-            FileChoosing.singleMdFileChooserDescriptor()
+            FileChoosing.singleMdFileChooserDescriptor(),
           )
           .bindText(
             getter = {
@@ -71,7 +71,7 @@ internal class SkateConfigUI(
               } else {
                 settings.whatsNewFilePath = ""
               }
-            }
+            },
           )
           .enabled(settings.isWhatsNewEnabled)
       }
@@ -84,7 +84,7 @@ internal class SkateConfigUI(
         checkBox(SkateBundle.message("skate.configuration.enableProjectGenMenuAction.description"))
           .bindSelected(
             getter = { settings.isProjectGenMenuActionEnabled },
-            setter = { settings.isProjectGenMenuActionEnabled = it }
+            setter = { settings.isProjectGenMenuActionEnabled = it },
           )
       }
     }
@@ -99,7 +99,7 @@ internal class SkateConfigUI(
           checkBox(SkateBundle.message("skate.configuration.enableFeatureFlagLinking.description"))
             .bindSelected(
               getter = { settings.isLinkifiedFeatureFlagsEnabled },
-              setter = { settings.isLinkifiedFeatureFlagsEnabled = it }
+              setter = { settings.isLinkifiedFeatureFlagsEnabled = it },
             )
       }
 
@@ -124,7 +124,7 @@ internal class SkateConfigUI(
         getter = { settings.featureFlagBaseUrl },
         setter = { settings.featureFlagBaseUrl = it },
         errorMessageKey = "skate.configuration.featureFlagFieldEmpty.error",
-        enabledCondition = linkifiedFeatureFlagsCheckBox.selected
+        enabledCondition = linkifiedFeatureFlagsCheckBox.selected,
       )
     }
   }
@@ -138,7 +138,7 @@ internal class SkateConfigUI(
           checkBox(SkateBundle.message("skate.configuration.enableTracing.description"))
             .bindSelected(
               getter = { settings.isTracingEnabled },
-              setter = { settings.isTracingEnabled = it }
+              setter = { settings.isTracingEnabled = it },
             )
       }
       bindAndValidateTextFieldRow(
@@ -160,7 +160,7 @@ internal class SkateConfigUI(
           checkBox(SkateBundle.message("skate.configuration.codeOwner.enabledDescription"))
             .bindSelected(
               getter = { settings.isCodeOwnerEnabled },
-              setter = { settings.isCodeOwnerEnabled = it }
+              setter = { settings.isCodeOwnerEnabled = it },
             )
       }
       bindAndValidateTextFieldRow(

@@ -29,7 +29,7 @@ internal data class LanguageStats(
   @Json(name = "nFiles") val files: Int,
   val code: Int,
   val comment: Int,
-  val blank: Int
+  val blank: Int,
 ) {
 
   val total: Int
@@ -44,7 +44,7 @@ internal data class LanguageStats(
       files + other.files,
       code + other.code,
       comment + other.comment,
-      blank + other.blank
+      blank + other.blank,
     )
   }
 }

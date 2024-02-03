@@ -51,7 +51,7 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
   private fun runAnnotator(
     enabled: Boolean,
     fileName: String,
-    filePattern: String
+    filePattern: String,
   ): List<FeatureFlagSymbol> {
     project.service<SkatePluginSettings>().isLinkifiedFeatureFlagsEnabled = enabled
     project.service<SkatePluginSettings>().featureFlagBaseUrl = "test.com?q="

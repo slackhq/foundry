@@ -33,5 +33,5 @@ internal abstract class GjfDownloadTask :
     addExecPrefix = true,
     urlTemplate = { version ->
       "https://github.com/google/google-java-format/releases/download/v$version/google-java-format-$version-all-deps.jar"
-    }
+    },
   )

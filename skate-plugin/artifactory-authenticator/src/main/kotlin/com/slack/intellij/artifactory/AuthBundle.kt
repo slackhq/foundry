@@ -23,8 +23,6 @@ private const val BUNDLE_NAME = "messages.artifactoryAuthenticator"
 
 object AuthBundle : DynamicBundle(BUNDLE_NAME) {
   @Nls
-  fun message(
-    @PropertyKey(resourceBundle = BUNDLE_NAME) key: String,
-    vararg params: Any,
-  ): String = getMessage(key, *params)
+  fun message(@PropertyKey(resourceBundle = BUNDLE_NAME) key: String, vararg params: Any): String =
+    getMessage(key, *params)
 }

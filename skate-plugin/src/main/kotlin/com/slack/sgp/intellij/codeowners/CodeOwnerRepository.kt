@@ -42,7 +42,7 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
       } catch (fileNotFoundException: FileNotFoundException) {
         logger.error(
           "FileNotFoundException caught parsing code ownership file",
-          fileNotFoundException
+          fileNotFoundException,
         )
       }
       logger.debug("Code ownership lines read into codeOwnershipMap: ${codeOwnershipMap.keys.size}")

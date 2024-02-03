@@ -95,14 +95,14 @@ internal object LintTasks {
             project.configureAndroidProjectForLint(
               slackProperties,
               affectedProjects,
-              onProjectSkipped
+              onProjectSkipped,
             )
           is TestPlugin -> {
             if (slackProperties.enableLintInAndroidTestProjects) {
               project.configureAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
               )
             }
           }
@@ -114,7 +114,7 @@ internal object LintTasks {
               project.configureNonAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
               )
             }
           // Only configure non-Android multiplatform projects via KotlinBasePlugin.
@@ -129,7 +129,7 @@ internal object LintTasks {
               project.configureNonAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
               )
             }
         }
@@ -182,7 +182,7 @@ internal object LintTasks {
         slackProperties,
         affectedProjects,
         onProjectSkipped,
-        slackProperties.requireAndroidSdkProperties()
+        slackProperties.requireAndroidSdkProperties(),
       )
     }
 
@@ -224,7 +224,7 @@ internal object LintTasks {
       ciLint,
       slackProperties,
       affectedProjects,
-      onProjectSkipped
+      onProjectSkipped,
     )
   }
 
@@ -449,7 +449,7 @@ internal object LintTasks {
         CI_LINT_TASK_NAME,
         group = LifecycleBasePlugin.VERIFICATION_GROUP,
         description = "Lifecycle task to run all lint tasks on this project.",
-        action = action
+        action = action,
       )
     return task
   }

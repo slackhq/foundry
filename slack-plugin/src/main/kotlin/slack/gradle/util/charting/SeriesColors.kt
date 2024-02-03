@@ -15,9 +15,7 @@
  */
 package slack.gradle.util.charting
 
-internal data class SeriesColors(
-  val colors: List<Color>,
-) : ChartProperty {
+internal data class SeriesColors(val colors: List<Color>) : ChartProperty {
   override val key: String = "chco"
 
   override val value: String
