@@ -38,7 +38,7 @@ class StandardProjectConfigurationsTest {
         "androidTestCompileOnly",
         "androidTestInternalDebugCompileOnly",
         "androidTestInternalDebugImplementation",
-        "kaptInternalDebug"
+        "kaptInternalDebug",
       )
 
     for (name in validNames) {

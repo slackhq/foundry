@@ -35,23 +35,12 @@ import slack.gradle.setProperty
 @UntrackedTask(because = "This is run on-demand")
 public abstract class InstallCommitHooksTask
 @Inject
-constructor(
-  layout: ProjectLayout,
-  objects: ObjectFactory,
-) : DefaultTask() {
+constructor(layout: ProjectLayout, objects: ObjectFactory) : DefaultTask() {
   @get:Input
   public val names: SetProperty<String> =
     objects
       .setProperty<String>()
-      .convention(
-        setOf(
-          "post-checkout",
-          "post-commit",
-          "post-merge",
-          "pre-commit",
-          "pre-push",
-        )
-      )
+      .convention(setOf("post-checkout", "post-commit", "post-merge", "pre-commit", "pre-push"))
 
   @get:OutputDirectory
   public val outputHooksDir: DirectoryProperty =

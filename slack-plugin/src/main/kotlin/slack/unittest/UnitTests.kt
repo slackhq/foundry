@@ -145,7 +145,7 @@ internal object UnitTests {
 
   private fun createAndroidCiUnitTestTask(
     project: Project,
-    unitTestsPublisher: Publisher<SgpArtifact>?
+    unitTestsPublisher: Publisher<SgpArtifact>?,
   ) {
     val variant = project.ciUnitTestAndroidVariant()
     val variantUnitTestTaskName = "test${variant}UnitTest"

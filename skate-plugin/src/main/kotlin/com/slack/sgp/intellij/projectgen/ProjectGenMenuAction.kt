@@ -31,7 +31,7 @@ class ProjectGenMenuAction
 @JvmOverloads
 constructor(
   private val terminalViewWrapper: (Project) -> TerminalViewWrapper = ::RealTerminalViewWrapper,
-  private val offline: Boolean = false
+  private val offline: Boolean = false,
 ) : AnAction() {
 
   private val skateSpanBuilder = SkateSpanBuilder()
@@ -60,7 +60,7 @@ constructor(
       .createPluginUsageTraceAndSendTrace(
         "project_generator",
         startTimestamp,
-        skateSpanBuilder.getKeyValueList()
+        skateSpanBuilder.getKeyValueList(),
       )
   }
 

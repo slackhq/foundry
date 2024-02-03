@@ -6,14 +6,14 @@ bugsnagGradle = "8.1.0"
 compose-jb = "1.5.12"
 coroutines = "1.7.3"
 dependencyAnalysisPlugin = "1.29.0"
-detekt = "1.23.4"
+detekt = "1.23.5"
 dokka = "1.9.10"
 errorproneGradle = "3.0.1"
 jdk = "20"
 jna = "5.14.0"
 kotlin = "1.9.22"
 ksp = "1.9.22-1.0.17"
-ktfmt = "0.46"
+ktfmt = "0.47"
 mavenPublish = "0.27.0"
 moshi = "1.15.1"
 moshix = "0.25.1"
@@ -36,6 +36,7 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij = { id = "org.jetbrains.intellij", version = "1.16.0" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }

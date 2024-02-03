@@ -35,18 +35,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
-buildscript {
-  dependencies {
-    // We have to declare this here in order for kotlin-facets to be generated in iml files
-    // https://youtrack.jetbrains.com/issue/KT-36331
-    classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
-    classpath(kotlin("sam-with-receiver", libs.versions.kotlin.get()))
-    classpath(libs.markdown)
-  }
-}
-
 plugins {
   alias(libs.plugins.kotlin.jvm) apply false
+  alias(libs.plugins.kotlin.sam)
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
@@ -76,13 +67,7 @@ tasks.withType<Detekt>().configureEach {
 val ktfmtVersion = libs.versions.ktfmt.get()
 
 val externalFiles =
-  listOf(
-      "SkateErrorHandler",
-      "MemoizedSequence",
-      "Publisher",
-      "Resolver",
-    )
-    .map { "src/**/$it.kt" }
+  listOf("SkateErrorHandler", "MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
 
 allprojects {
   apply(plugin = "com.diffplug.spotless")
@@ -115,7 +100,7 @@ allprojects {
       endWithNewline()
       licenseHeaderFile(
         rootProject.file("spotless/spotless.kt"),
-        "(import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)"
+        "(import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)",
       )
     }
   }
@@ -195,12 +180,12 @@ subprojects {
         buildConfigField(
           "kotlin.collections.List<String>",
           "KOTLIN_COMPILER_ARGS",
-          "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})"
+          "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})",
         )
         buildConfigField(
           "kotlin.collections.List<String>",
           "KOTLIN_JVM_COMPILER_ARGS",
-          "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})"
+          "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})",
         )
       }
     }
@@ -326,7 +311,7 @@ subprojects {
         val description: String,
         val version: String,
         val sinceBuild: String,
-        val urlSuffix: String
+        val urlSuffix: String,
       )
 
       val pluginDetails =

@@ -60,10 +60,7 @@ class ThermlogParserTest {
     val log = ThermlogParser.parse(INCOMPLETE_EXAMPLE)
     check(log is ThermalsData)
     assertThat(log.wasThrottled).isFalse()
-    assertThat(log.logs)
-      .containsExactly(
-        thermLog("2021-07-07 12:32:50 -0400", 100, 8, 100),
-      )
+    assertThat(log.logs).containsExactly(thermLog("2021-07-07 12:32:50 -0400", 100, 8, 100))
   }
 
   @Test
@@ -114,13 +111,13 @@ class ThermlogParserTest {
     rawString: String,
     schedulerLimit: Int,
     availableCpus: Int,
-    cpuLimit: Int
+    cpuLimit: Int,
   ): ThermLog {
     return ThermLog(
       LocalDateTime.parse(rawString, ThermlogParser.TIMESTAMP_PATTERN),
       schedulerLimit,
       availableCpus,
-      cpuLimit
+      cpuLimit,
     )
   }
 }

@@ -207,7 +207,7 @@ public class AffectedProjectsComputer(
     return AffectedProjectsResult(
       allAffectedProjects,
       allRequiredProjects,
-      affectedAndroidTestProjects
+      affectedAndroidTestProjects,
     )
   }
 
@@ -232,10 +232,7 @@ public class AffectedProjectsComputer(
    * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
    * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
    */
-  private fun Path.findNearestProjectDir(
-    repoRoot: Path,
-    cache: MutableMap<Path, Path?>,
-  ): Path? {
+  private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path?>): Path? {
     val currentDir =
       when {
         !exists() -> {
@@ -267,7 +264,7 @@ public class AffectedProjectsComputer(
     repoRoot: Path,
     originalPath: Path,
     currentDir: Path?,
-    cache: MutableMap<Path, Path?>
+    cache: MutableMap<Path, Path?>,
   ): Path? {
     if (currentDir == null || currentDir == repoRoot) {
       error("Could not find build.gradle(.kts) for $originalPath")
@@ -307,7 +304,7 @@ public class AffectedProjectsComputer(
      */
     fun anyNeverSkipDebug(
       filePaths: List<Path>,
-      neverSkipPathMatchers: List<PathMatcher>
+      neverSkipPathMatchers: List<PathMatcher>,
     ): Map<Path, PathMatcher?> =
       filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
   }

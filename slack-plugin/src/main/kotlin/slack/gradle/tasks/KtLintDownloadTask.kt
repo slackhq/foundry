@@ -32,5 +32,5 @@ internal abstract class KtLintDownloadTask :
     addExecPrefix = false,
     urlTemplate = { version ->
       "https://github.com/pinterest/ktlint/releases/download/$version/ktlint"
-    }
+    },
   )

@@ -73,7 +73,7 @@ class SkateTraceReporter(private val project: Project, private val offline: Bool
     spanDataMap: List<KeyValue>,
     ideVersion: String = ApplicationInfo.getInstance().fullVersion,
     skatePluginVersion: String? =
-      PluginManagerCore.getPlugin(PluginId.getId("com.slack.intellij.skate"))?.version
+      PluginManagerCore.getPlugin(PluginId.getId("com.slack.intellij.skate"))?.version,
   ): ListOfSpans? {
     if (spanDataMap.isEmpty() || skatePluginVersion.isNullOrBlank()) {
       return null
@@ -92,7 +92,7 @@ class SkateTraceReporter(private val project: Project, private val offline: Bool
           Duration.between(startTimestamp, Instant.now())
             .toMillis()
             .toDuration(DurationUnit.MILLISECONDS)
-            .inWholeMicroseconds
+            .inWholeMicroseconds,
       ) {
         "skate_version" tagTo skatePluginVersion
         "ide_version" tagTo ideVersion

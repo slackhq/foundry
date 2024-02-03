@@ -49,7 +49,7 @@ class CodeOwnerWidget(project: Project) :
         override fun selectionChanged(event: FileEditorManagerEvent) {
           this@CodeOwnerWidget.selectionChanged(event)
         }
-      }
+      },
     )
   }
 

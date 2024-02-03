@@ -32,7 +32,7 @@ internal abstract class SortDependenciesDownloadTask :
     addExecPrefix = true,
     urlTemplate = { version ->
       "https://repo1.maven.org/maven2/com/squareup/sort-gradle-dependencies-app/$version/sort-gradle-dependencies-app-$version-all.jar"
-    }
+    },
   ) {
   init {
     description = "Downloads the Sort Dependencies binary from maven central."

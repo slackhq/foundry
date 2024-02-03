@@ -31,14 +31,14 @@ private constructor(
   public val micro: Int,
   public val patch: Int,
   public val qualifier: String?,
-  private val scheme: AbstractScheme
+  private val scheme: AbstractScheme,
 ) : Comparable<VersionNumber> {
 
   public constructor(
     major: Int,
     minor: Int,
     micro: Int,
-    qualifier: String?
+    qualifier: String?,
   ) : this(major, minor, micro, 0, qualifier, DEFAULT_SCHEME)
 
   public constructor(
@@ -46,7 +46,7 @@ private constructor(
     minor: Int,
     micro: Int,
     patch: Int,
-    qualifier: String?
+    qualifier: String?,
   ) : this(major, minor, micro, patch, qualifier, PATCH_SCHEME)
 
   public val baseVersion: VersionNumber
@@ -186,7 +186,7 @@ private constructor(
         versionNumber.major,
         versionNumber.minor,
         versionNumber.micro,
-        if (versionNumber.qualifier == null) "" else "-" + versionNumber.qualifier
+        if (versionNumber.qualifier == null) "" else "-" + versionNumber.qualifier,
       )
     }
 
@@ -203,7 +203,7 @@ private constructor(
         versionNumber.minor,
         versionNumber.micro,
         versionNumber.patch,
-        if (versionNumber.qualifier == null) "" else "-" + versionNumber.qualifier
+        if (versionNumber.qualifier == null) "" else "-" + versionNumber.qualifier,
       )
     }
 

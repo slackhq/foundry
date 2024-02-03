@@ -30,10 +30,6 @@ class FeatureFlagExtractorTest : BaseFeatureFlagTest() {
     val featureFlags = FeatureFlagExtractor.extractFeatureFlags(psiFile)
     val flagUrls = featureFlags.map { it.url }
     assertThat(flagUrls)
-      .containsExactly(
-        "test.com?q=test_flag_one",
-        "test.com?q=flag_two",
-        "test.com?q=flag_three",
-      )
+      .containsExactly("test.com?q=test_flag_one", "test.com?q=flag_two", "test.com?q=flag_three")
   }
 }

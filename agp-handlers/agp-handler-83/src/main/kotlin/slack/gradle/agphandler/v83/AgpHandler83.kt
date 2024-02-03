@@ -32,7 +32,7 @@ public class AgpHandler83 private constructor(override val agpVersion: AndroidPl
     SdkLocator.getSdkDirectory(
       projectRootDir,
       NoOpIssueReporter,
-      SdkLocationSourceSet(projectRootDir, providers)
+      SdkLocationSourceSet(projectRootDir, providers),
     )
 
   @AutoService(AgpHandler.Factory::class)

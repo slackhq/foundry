@@ -165,11 +165,7 @@ public class SkippyRunner(
             outputs.flatMapToSet { it.outputFocusFile.readLines(fs) }.toSortedSet()
           }
           val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
-            listOf(
-                mergedAffectedProjects,
-                mergedAffectedAndroidTestProjects,
-                mergedFocusProjects,
-              )
+            listOf(mergedAffectedProjects, mergedAffectedAndroidTestProjects, mergedFocusProjects)
               .awaitAll()
           mergedOutput.affectedProjectsFile.writeLines(affectedProjects, fs)
           mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects, fs)
@@ -229,18 +225,18 @@ public class SkippyRunner(
       // Generate affected_android_test_projects.txt
       log(
         tool,
-        "writing affected androidTest projects to: ${skippyOutputs.affectedAndroidTestProjectsFile}"
+        "writing affected androidTest projects to: ${skippyOutputs.affectedAndroidTestProjectsFile}",
       )
       skippyOutputs.affectedAndroidTestProjectsFile.writeLines(
         affectedAndroidTestProjects.sorted(),
-        fs
+        fs,
       )
 
       // Generate .focus settings file
       log(tool, "writing focus settings to: ${skippyOutputs.outputFocusFile}")
       skippyOutputs.outputFocusFile.writeText(
         focusProjects.joinToString("\n") { "include(\"$it\")" },
-        fs
+        fs,
       )
 
       skippyOutputs.delegate

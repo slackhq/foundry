@@ -15,10 +15,7 @@
  */
 package slack.gradle.util.charting
 
-internal data class ChartFill(
-  val type: FillType,
-  val color: Color,
-) : ChartProperty {
+internal data class ChartFill(val type: FillType, val color: Color) : ChartProperty {
   override val key: String = "chf"
 
   override val value: String

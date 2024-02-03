@@ -39,10 +39,8 @@ internal object PermissionChecks {
 
   abstract class DefaultPermissionAllowlistConfigurer
   @Inject
-  constructor(
-    objects: ObjectFactory,
-    variant: ApplicationVariant,
-  ) : PermissionAllowlistConfigurer, VariantConfiguration by DefaultVariantConfiguration(variant) {
+  constructor(objects: ObjectFactory, variant: ApplicationVariant) :
+    PermissionAllowlistConfigurer, VariantConfiguration by DefaultVariantConfiguration(variant) {
     override val allowListFile: RegularFileProperty = objects.fileProperty()
   }
 
@@ -63,7 +61,7 @@ internal object PermissionChecks {
     allowListActionGetter: () -> Action<PermissionAllowlistConfigurer>?,
     createTask:
       (
-        taskName: String, file: Provider<RegularFile>, allowListProvider: Provider<Set<String>>
+        taskName: String, file: Provider<RegularFile>, allowListProvider: Provider<Set<String>>,
       ) -> TaskProvider<out CheckManifestPermissionsTask>,
   ) {
     project.configure<ApplicationAndroidComponentsExtension> {
@@ -93,7 +91,7 @@ internal object PermissionChecks {
               .use(checkPermissionsAllowlist)
               .wiredWithFiles(
                 taskInput = CheckManifestPermissionsTask::inputFile,
-                taskOutput = CheckManifestPermissionsTask::outputFile
+                taskOutput = CheckManifestPermissionsTask::outputFile,
               )
               .toTransform(SingleArtifact.MERGED_MANIFEST)
           }

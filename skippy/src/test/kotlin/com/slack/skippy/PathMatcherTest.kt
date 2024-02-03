@@ -36,9 +36,7 @@ class PathMatcherTest {
     assertMatchesAll(value)
   }
 
-  private fun String.assertMatchesAll(
-    vararg values: String,
-  ) {
+  private fun String.assertMatchesAll(vararg values: String) {
     val pathMatcher = toPathMatcher()
     for (value in values) {
       // Test both Path and String matchers
@@ -51,9 +49,7 @@ class PathMatcherTest {
     assertDoesNotMatchAll(value)
   }
 
-  private fun String.assertDoesNotMatchAll(
-    vararg values: String,
-  ) {
+  private fun String.assertDoesNotMatchAll(vararg values: String) {
     val pathMatcher = toPathMatcher()
     for (value in values) {
       // Test both Path and String matchers

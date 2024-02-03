@@ -73,7 +73,7 @@ internal class Resolver<T : Serializable>(
         artifact,
         artifact.declarableName,
         artifact.category,
-        addDependencies
+        addDependencies,
       )
 
     fun <T : Serializable> interProjectResolver(
@@ -141,7 +141,7 @@ internal class Resolver<T : Serializable>(
 private fun <T : Serializable> artifactView(
   provider: NamedDomainObjectProvider<out Configuration>,
   attr: Attribute<T>,
-  artifact: T
+  artifact: T,
 ): Provider<Set<File>> {
   return provider.flatMap { configuration ->
     configuration.incoming

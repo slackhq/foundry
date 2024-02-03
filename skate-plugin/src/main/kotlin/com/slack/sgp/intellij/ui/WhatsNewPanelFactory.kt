@@ -53,7 +53,7 @@ class WhatsNewPanelFactory : DumbAware {
     toolWindow: ToolWindow,
     project: Project,
     changeLogContent: ChangelogParser.PresentedChangelog,
-    parentDisposable: Disposable
+    parentDisposable: Disposable,
   ) {
 
     val toolWindowContent = WhatsNewPanelContent(project, changeLogContent, parentDisposable)
@@ -75,7 +75,7 @@ class WhatsNewPanelFactory : DumbAware {
   private class WhatsNewPanelContent(
     project: Project,
     changeLogContent: ChangelogParser.PresentedChangelog,
-    parentDisposable: Disposable
+    parentDisposable: Disposable,
   ) {
 
     private val logger = logger<WhatsNewPanelContent>()
@@ -91,7 +91,7 @@ class WhatsNewPanelFactory : DumbAware {
     private fun createWhatsNewPanel(
       project: Project,
       changeLogContent: ChangelogParser.PresentedChangelog,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
     ): JComponent {
       // to take in the parsed Changelog:
       val changelogJournal = project.service<ChangelogJournal>()

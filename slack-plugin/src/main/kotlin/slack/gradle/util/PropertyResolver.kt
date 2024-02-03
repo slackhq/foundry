@@ -45,9 +45,7 @@ public class PropertyResolver(
    * - root-project `local.properties`
    * - root-project/global `gradle.properties`
    */
-  public fun providerFor(
-    key: String,
-  ): Provider<String> =
+  public fun providerFor(key: String): Provider<String> =
     startParameterProperty(key) // start parameters
       .orElse(project.localProperty(key)) // project-local `local.properties`
       .orElse(project.localGradleProperty(key)) // project-local `gradle.properties`
@@ -70,9 +68,7 @@ public class PropertyResolver(
     return booleanProvider(key).orElse(defaultValue)
   }
 
-  public fun booleanProvider(
-    key: String,
-  ): Provider<Boolean> {
+  public fun booleanProvider(key: String): Provider<Boolean> {
     return providerFor(key).mapToBoolean()
   }
 

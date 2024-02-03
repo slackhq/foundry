@@ -32,7 +32,7 @@ private val Long.mb: String
 internal class ProgressResponseBody
 internal constructor(
   private val responseBody: ResponseBody,
-  private val progressListener: ProgressListener
+  private val progressListener: ProgressListener,
 ) : ResponseBody() {
 
   private val bufferedSource: BufferedSource by lazy { source(responseBody.source()).buffer() }
@@ -76,7 +76,7 @@ internal class ProgressReportingInterceptor(private val progressListener: Progre
 /** A [ProgressListener] that logs progress to a [ProgressLogger]. */
 internal class ProgressLoggerProgressListener(
   private val name: String,
-  private val progressLogger: ProgressLogger
+  private val progressLogger: ProgressLogger,
 ) : ProgressListener {
   private var firstUpdate = true
 

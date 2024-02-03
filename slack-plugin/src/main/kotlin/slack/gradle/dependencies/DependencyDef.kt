@@ -23,7 +23,7 @@ public data class DependencyDef(
   val comments: String? = null,
   val ext: String? = null,
   val gradleProperty: String,
-  val isBomManaged: Boolean = false
+  val isBomManaged: Boolean = false,
 ) {
   val coordinates: Map<String, String> =
     mutableMapOf<String, String>().apply {

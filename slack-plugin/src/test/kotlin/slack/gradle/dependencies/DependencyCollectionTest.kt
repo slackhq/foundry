@@ -29,48 +29,48 @@ class DependencyCollectionTest {
           DependencyDef(
             group = "com.davemorrissey.labs",
             artifact = "subsampling-scale-image-view-androidx",
-            gradleProperty = "slack.dependencies.subsampling-scale-image-view-androidx"
+            gradleProperty = "slack.dependencies.subsampling-scale-image-view-androidx",
           ),
           DependencyDef(
             group = "com.example",
             artifact = "something",
-            gradleProperty = "slack.dependencies.somethingelse"
+            gradleProperty = "slack.dependencies.somethingelse",
           ),
           DependencyDef(
             group = "com.example.labs",
             artifact = "another-example",
-            gradleProperty = "slack.dependencies.another-example"
+            gradleProperty = "slack.dependencies.another-example",
           ),
           DependencyDef(
             group = "com.google.guava",
             artifact = "guava",
-            gradleProperty = "slack.dependencies.pomegranate"
+            gradleProperty = "slack.dependencies.pomegranate",
           ),
           DependencyDef(
             group = "com.google.guava",
             artifact = "listenablefuture",
-            gradleProperty = "slack.dependencies.pomegranate"
+            gradleProperty = "slack.dependencies.pomegranate",
           ),
           DependencyDef(
             group = "com.android.tools.lint",
             artifact = "lint",
-            gradleProperty = "slack.dependencies.somethingelse"
+            gradleProperty = "slack.dependencies.somethingelse",
           ),
           DependencyDef(
             group = "com.android.tools.lint",
             artifact = "lint-api",
-            gradleProperty = "slack.dependencies.samplegroup"
+            gradleProperty = "slack.dependencies.samplegroup",
           ),
           DependencyDef(
             group = "com.android.tools",
             artifact = "testutils",
-            gradleProperty = "slack.dependencies.samplegroup"
+            gradleProperty = "slack.dependencies.samplegroup",
           ),
           DependencyDef(
             group = "com.android.tools.build",
             artifact = "gradle",
-            gradleProperty = "slack.dependencies.agp"
-          )
+            gradleProperty = "slack.dependencies.agp",
+          ),
         )
       )
   }
@@ -90,7 +90,7 @@ class DependencyCollectionTest {
           "com.android.tools.lint:lint" to "slack.dependencies.somethingelse",
           "com.android.tools.lint:lint-api" to "slack.dependencies.samplegroup",
           "com.android.tools:testutils" to "slack.dependencies.samplegroup",
-          "com.android.tools.build:gradle" to "slack.dependencies.agp"
+          "com.android.tools.build:gradle" to "slack.dependencies.agp",
         )
       )
   }
@@ -111,7 +111,7 @@ class DependencyCollectionTest {
           "com.android.tools.lint:lint" to "TestDependencies.SampleGroup.lint",
           "com.android.tools.lint:lint-api" to "TestDependencies.SampleGroup.lintApi",
           "com.android.tools:testutils" to "TestDependencies.SampleGroup.testUtils",
-          "com.android.tools.build:gradle" to "TestDependencies.SampleSet.android"
+          "com.android.tools.build:gradle" to "TestDependencies.SampleSet.android",
         )
       )
   }

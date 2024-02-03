@@ -48,7 +48,7 @@ class AffectedProjectsComputerTest {
 
   private fun createComputer(
     dependencyMetadata: DependencyMetadata,
-    changedFilePaths: List<String>
+    changedFilePaths: List<String>,
   ) =
     AffectedProjectsComputer(
       fileSystem = fileSystem,
@@ -195,15 +195,8 @@ class AffectedProjectsComputerTest {
 
   @Test
   fun excludeFilters() {
-    val patterns =
-      setOf(
-        "**/baz/**",
-      )
-    val testInputs =
-      mapOf(
-        "foo/bar/baz/Example.kt" to false,
-        "foo/bar/AndroidManifest.xml" to true,
-      )
+    val patterns = setOf("**/baz/**")
+    val testInputs = mapOf("foo/bar/baz/Example.kt" to false, "foo/bar/AndroidManifest.xml" to true)
     assertThat(filterExcludes(testInputs.keys.map { it.toPath() }, patterns))
       .containsExactlyElementsIn(testInputs.filterValues { it }.keys.map { it.toPath() })
   }
@@ -212,37 +205,17 @@ class AffectedProjectsComputerTest {
   fun getAllDependencies() {
     val projectsToDependencies =
       mapOf(
-        ":test" to
-          setOf(
-            ":lib1",
-            ":lib2",
-            ":lib3",
-          ),
+        ":test" to setOf(":lib1", ":lib2", ":lib3"),
         // Transitive dep on lib4
-        ":lib1" to
-          setOf(
-            ":lib4",
-          ),
+        ":lib1" to setOf(":lib4"),
         // Recursive dep on test
-        ":lib2" to
-          setOf(
-            ":test",
-          ),
+        ":lib2" to setOf(":test"),
         // Recursive dep on lib1
-        ":lib4" to
-          setOf(
-            ":lib1",
-          ),
+        ":lib4" to setOf(":lib1"),
         // Unused projects
-        ":lib5" to
-          setOf(
-            ":lib6",
-          ),
+        ":lib5" to setOf(":lib6"),
         // Unused project depends on used one.
-        ":lib7" to
-          setOf(
-            ":lib1",
-          ),
+        ":lib7" to setOf(":lib1"),
       )
 
     val allRequiredProjects = SkippyRunner.getAllDependencies(":test", projectsToDependencies)
