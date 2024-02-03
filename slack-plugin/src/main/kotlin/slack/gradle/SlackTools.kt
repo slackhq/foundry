@@ -118,7 +118,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     extensions = buildMap {
       ServiceLoader.load(
           SlackToolsExtension::class.java,
-          SlackToolsExtension::class.java.classLoader
+          SlackToolsExtension::class.java.classLoader,
         )
         .stream()
         .asSequence()

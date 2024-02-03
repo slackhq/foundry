@@ -47,7 +47,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
+  versionCatalog: VersionCatalog,
 ) {
   internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
   internal val featuresHandler =
@@ -300,7 +300,7 @@ constructor(
           if (featuresHandler.moshiHandler.sealedMetadataReflect.getOrElse(false)) {
             dependencies.add(
               "implementation",
-              SlackDependencies.Moshi.MoshiX.Sealed.metadataReflect
+              SlackDependencies.Moshi.MoshiX.Sealed.metadataReflect,
             )
           }
         }
@@ -326,7 +326,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
+  versionCatalog: VersionCatalog,
 ) {
   // Dagger features
   internal val daggerHandler = objects.newInstance<DaggerHandler>()
@@ -408,7 +408,7 @@ constructor(
   public fun dagger(
     enableComponents: Boolean = false,
     projectHasJavaInjections: Boolean = false,
-    action: Action<DaggerHandler>? = null
+    action: Action<DaggerHandler>? = null,
   ) {
     check(enableComponents || projectHasJavaInjections) {
       "This function should not be called with both enableComponents and projectHasJavaInjections set to false. Either remove these parameters or call a more appropriate non-delicate dagger() overload."
@@ -437,7 +437,7 @@ constructor(
     codegen: Boolean,
     adapters: Boolean = false,
     kotlinReflect: Boolean = false,
-    action: Action<MoshiHandler> = Action {}
+    action: Action<MoshiHandler> = Action {},
   ) {
     action.execute(moshiHandler)
     moshiHandler.moshi.setDisallowChanges(true)
@@ -494,10 +494,7 @@ public abstract class MoshiHandler {
    * @param adapters Enables moshix-adapters.
    * @param metadataReflect Enables metadata-reflect. Should only be used in unit tests or CLIs!
    */
-  public fun moshix(
-    adapters: Boolean,
-    metadataReflect: Boolean = false,
-  ) {
+  public fun moshix(adapters: Boolean, metadataReflect: Boolean = false) {
     moshixAdapters.setDisallowChanges(adapters)
     moshixMetadataReflect.setDisallowChanges(metadataReflect)
   }
@@ -514,7 +511,7 @@ public abstract class MoshiHandler {
   public fun sealed(
     codegen: Boolean,
     kotlinReflect: Boolean = false,
-    metadataReflect: Boolean = false
+    metadataReflect: Boolean = false,
   ) {
     sealed.setDisallowChanges(true)
     sealedCodegen.setDisallowChanges(codegen)
@@ -679,7 +676,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
+  versionCatalog: VersionCatalog,
 ) {
 
   private val composeBundleAlias =
@@ -713,10 +710,7 @@ constructor(
    * ```
    */
   public fun compilerOption(key: String, value: String) {
-    compilerOptions.addAll(
-      "-P",
-      "$COMPOSE_COMPILER_OPTION_PREFIX:$key=$value",
-    )
+    compilerOptions.addAll("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$key=$value")
   }
 
   /** @see [AndroidHandler.androidExtension] */
@@ -778,10 +772,7 @@ constructor(
 @SlackExtensionMarker
 public abstract class AndroidHandler
 @Inject
-constructor(
-  objects: ObjectFactory,
-  private val slackProperties: SlackProperties,
-) {
+constructor(objects: ObjectFactory, private val slackProperties: SlackProperties) {
   internal val libraryHandler = objects.newInstance<SlackAndroidLibraryExtension>()
   internal val appHandler = objects.newInstance<SlackAndroidAppExtension>()
 
@@ -853,7 +844,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
    */
   public fun androidTest(
     excludeFromFladle: Boolean = false,
-    allowedVariants: Iterable<String>? = null
+    allowedVariants: Iterable<String>? = null,
   ) {
     androidTest.setDisallowChanges(true)
     androidTestExcludeFromFladle.setDisallowChanges(excludeFromFladle)

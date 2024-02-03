@@ -72,14 +72,7 @@ import slack.gradle.util.setDisallowChanges
 public object ModuleStatsTasks {
   public const val AGGREGATOR_NAME: String = "aggregateModuleStats"
 
-  private val MAIN_SRC_DIRS =
-    listOf(
-      "main",
-      "commonMain",
-      "internal",
-      "debug",
-      "internalDebug",
-    )
+  private val MAIN_SRC_DIRS = listOf("main", "commonMain", "internal", "debug", "internalDebug")
 
   // Option to disable inclusion of generated code, which is helpful for testing
   private fun Project.includeGenerated() =
@@ -339,7 +332,7 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
           if ("model" !in subproject || "model" !in dependency) {
             throw RuntimeException(
               "Cycle from $subproject to $dependency. Please modularize this better!",
-              e
+              e,
             )
           }
         }
@@ -424,7 +417,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
       JsonTools.MOSHI.adapter<ModuleStats>()
         .toJson(
           sink,
-          ModuleStats(modulePath.get(), sources, generatedSources, tags.get(), dependencies)
+          ModuleStats(modulePath.get(), sources, generatedSources, tags.get(), dependencies),
         )
     }
   }
@@ -461,7 +454,7 @@ public data class ModuleScore(
   val moduleName: String,
   val score: Long,
   val weights: Weights,
-  val includesGenerated: Boolean
+  val includesGenerated: Boolean,
 )
 
 private fun Int.percentOf(other: Int): Double {
@@ -479,7 +472,7 @@ private fun Map<String, LanguageStats>.jvmCode(): LanguageStats {
 
 private fun ModuleStats.weighted(
   globalStats: Map<String, LanguageStats>,
-  centrality: Double
+  centrality: Double,
 ): Weights {
   return Weights(
     percentOfTotalCode = totalSource.jvmCode().total.percentOf(globalStats.jvmCode().total),
@@ -492,7 +485,7 @@ private fun ModuleStats.weighted(
     loc = source.jvmCode().total,
     locGenerated = generated.jvmCode().total,
     tags = tags,
-    modulePath = modulePath
+    modulePath = modulePath,
   )
 }
 
@@ -508,7 +501,7 @@ public data class Weights(
   val loc: Int,
   val locGenerated: Int,
   val tags: Set<String>,
-  val modulePath: String
+  val modulePath: String,
 ) {
   public fun score(): Long {
     // Base score is their centrality
@@ -588,7 +581,7 @@ internal data class ModuleStats(
   val source: Map<String, LanguageStats>,
   val generated: Map<String, LanguageStats>,
   val tags: Set<String>,
-  val deps: Set<String>
+  val deps: Set<String>,
 ) {
   val totalSource
     get() = source.mergeWith(generated)

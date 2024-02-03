@@ -189,7 +189,7 @@ internal class SlackBasePlugin @Inject constructor(private val buildFeatures: Bu
     configuration: Configuration,
     isTestProject: Boolean,
     hamcrestDepOptional: Optional<Provider<MinimalExternalModuleDependency>>,
-    checkerDepOptional: Optional<Provider<MinimalExternalModuleDependency>>
+    checkerDepOptional: Optional<Provider<MinimalExternalModuleDependency>>,
   ) {
     val configurationName = configuration.name
     val lowercaseName = configurationName.lowercase(Locale.US)

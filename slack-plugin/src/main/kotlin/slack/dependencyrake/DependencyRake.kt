@@ -52,9 +52,7 @@ import slack.gradle.util.mapToBoolean
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
 
 private val PREFERRED_BUNDLE_IDENTIFIERS =
-  mapOf(
-    "com.google.android.play:core" to "com.google.android.play:core-ktx",
-  )
+  mapOf("com.google.android.play:core" to "com.google.android.play:core-ktx")
 
 // These are dependencies we manage directly in SlackExtension or other plugins
 private val MANAGED_DEPENDENCIES =
@@ -97,7 +95,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
               AnalysisMode.UNUSED,
               AnalysisMode.MISUSED,
               AnalysisMode.PLUGINS,
-              AnalysisMode.ABI
+              AnalysisMode.ABI,
             )
           )
       )
@@ -353,7 +351,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   /** Remaps a given [Coordinates] to a known toml lib reference or error if [error] is true. */
   private fun Coordinates.mapIdentifier(
     context: String,
-    missingIdentifiers: MutableSet<String>
+    missingIdentifiers: MutableSet<String>,
   ): Coordinates? {
     return when (this) {
       is ModuleCoordinates -> {
@@ -375,14 +373,14 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
 
   private fun Advice.toDependencyString(
     context: String,
-    missingIdentifiers: MutableSet<String>
+    missingIdentifiers: MutableSet<String>,
   ): String {
     return "${fromConfiguration ?: error("Transitive dep $this")}(${coordinates.toDependencyNotation(context, missingIdentifiers)})"
   }
 
   private fun Coordinates.toDependencyNotation(
     context: String,
-    missingIdentifiers: MutableSet<String>
+    missingIdentifiers: MutableSet<String>,
   ): String? {
     return when (this) {
       is ProjectCoordinates -> "projects.${convertProjectPathToAccessor(identifier)}"

@@ -31,7 +31,7 @@ class AgpHandlerTest {
     val resolved =
       AgpHandlers.resolveFactory(
         factories = sequenceOf(agp80Factory, agp81alphaFactory),
-        testAgpVersion = agp81alpha
+        testAgpVersion = agp81alpha,
       )
     assertThat(resolved).isSameInstanceAs(agp81alphaFactory)
   }
@@ -45,7 +45,7 @@ class AgpHandlerTest {
     val resolved =
       AgpHandlers.resolveFactory(
         factories = sequenceOf(agp80Factory, agp81alphaFactory),
-        testAgpVersion = agp80
+        testAgpVersion = agp80,
       )
     assertThat(resolved).isSameInstanceAs(agp80Factory)
   }

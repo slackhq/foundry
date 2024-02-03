@@ -34,12 +34,7 @@ internal constructor(
   startParameterProperty: (String) -> Provider<String>,
   globalLocalProperty: (String) -> Provider<String>,
 ) {
-  private val resolver =
-    PropertyResolver(
-      project,
-      startParameterProperty,
-      globalLocalProperty,
-    )
+  private val resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty)
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
@@ -61,7 +56,7 @@ internal constructor(
   private fun optionalStringProperty(
     key: String,
     defaultValue: String? = null,
-    blankIsNull: Boolean = false
+    blankIsNull: Boolean = false,
   ): String? =
     resolver.optionalStringValue(key, defaultValue = defaultValue)?.takeUnless {
       blankIsNull && it.isBlank()
@@ -253,10 +248,7 @@ internal constructor(
 
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
-    get() =
-      booleanProperty(
-        "slack.test.verboseLogging",
-      ) || verboseLogging
+    get() = booleanProperty("slack.test.verboseLogging") || verboseLogging
 
   /**
    * Flag to enable kapt in tests. By default these are disabled due to this undesirable (but
@@ -617,7 +609,7 @@ internal constructor(
   internal data class AndroidSdkProperties(
     val compileSdk: String,
     val minSdk: Int,
-    val targetSdk: Int
+    val targetSdk: Int,
   )
 
   public val compileSdkVersion: String?
@@ -649,7 +641,7 @@ internal constructor(
 
     public operator fun invoke(
       project: Project,
-      slackTools: Provider<SlackTools>? = project.slackToolsProvider()
+      slackTools: Provider<SlackTools>? = project.slackToolsProvider(),
     ): SlackProperties {
       return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
         SlackProperties(
@@ -660,7 +652,7 @@ internal constructor(
           },
           globalLocalProperty = { key ->
             slackTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
-          }
+          },
         )
       }
     }

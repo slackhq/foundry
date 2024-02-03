@@ -24,7 +24,7 @@ private constructor(
   internal val kotlinDaemonArgs: List<String>,
   internal val errorProneCheckNamesAsErrors: List<String>,
   internal val affectedProjects: Set<String>?,
-  internal val jvmVendor: JvmVendorSpec?
+  internal val jvmVendor: JvmVendorSpec?,
 ) {
 
   internal companion object {
@@ -52,7 +52,7 @@ private constructor(
         jvmVendor =
           globalSlackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull.also {
             project.logger.debug("[SGP] JVM vendor: $it")
-          }
+          },
       )
     }
   }

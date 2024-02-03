@@ -72,7 +72,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
               .map { "" }
               // Only provider the user if this is _not_ running on CI. Composition of properties
               // is still a little weird in Gradle.
-              .orElse(project.providers.environmentVariable("USER"))
+              .orElse(project.providers.environmentVariable("USER")),
         )
 
       val debugVersionCodeProvider: Provider<Int> =

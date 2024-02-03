@@ -30,7 +30,7 @@ class TranslatorAnnotator : Annotator {
       holder
         .newAnnotation(
           HighlightSeverity.WEAK_WARNING,
-          SkateBundle.message("skate.modelTranslator.description")
+          SkateBundle.message("skate.modelTranslator.description"),
         )
         .range(bundle.functionHeaderRange)
         .needsUpdateOnTyping(true)

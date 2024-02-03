@@ -152,7 +152,7 @@ internal abstract class LocTask : DefaultTask() {
         files = 1,
         code = code,
         comment = comment,
-        blank = blank
+        blank = blank,
       )
     }
 
@@ -204,7 +204,7 @@ internal abstract class LocTask : DefaultTask() {
         files = 1,
         code = code,
         comment = comment,
-        blank = blank
+        blank = blank,
       )
     }
   }
@@ -212,7 +212,7 @@ internal abstract class LocTask : DefaultTask() {
   @JsonClass(generateAdapter = true)
   data class LocData(
     val srcs: Map<String, LanguageStats>,
-    val generatedSrcs: Map<String, LanguageStats>
+    val generatedSrcs: Map<String, LanguageStats>,
   ) {
     companion object {
       val EMPTY = LocData(emptyMap(), emptyMap())

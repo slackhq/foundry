@@ -137,7 +137,7 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
   private fun configureRootProject(
     project: Project,
     slackProperties: SlackProperties,
-    thermalsLogJsonFileProvider: Provider<RegularFile>
+    thermalsLogJsonFileProvider: Provider<RegularFile>,
   ) {
 
     // Check enforced JDK version

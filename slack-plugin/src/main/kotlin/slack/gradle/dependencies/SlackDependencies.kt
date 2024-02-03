@@ -95,7 +95,7 @@ internal object SlackDependencies : DependencySet() {
         artifact(
           groupOverride = "dev.zacsweers.autoservice",
           artifact = "auto-service-ksp",
-          gradleProperty = "auto-service-ksp"
+          gradleProperty = "auto-service-ksp",
         )
       // Intentionally public as we use AutoService annotations only in some places
       val annotations: Any by artifact("auto-service-annotations")

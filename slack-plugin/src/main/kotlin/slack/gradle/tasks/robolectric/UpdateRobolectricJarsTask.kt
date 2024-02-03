@@ -97,7 +97,7 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
 
     fun register(
       project: Project,
-      slackProperties: SlackProperties
+      slackProperties: SlackProperties,
     ): TaskProvider<UpdateRobolectricJarsTask> {
       return project.tasks.register<UpdateRobolectricJarsTask>(NAME) {
         val iVersion = slackProperties.robolectricIVersion

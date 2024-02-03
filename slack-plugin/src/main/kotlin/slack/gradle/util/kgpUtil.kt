@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 internal fun TaskContainer.configureKotlinCompilationTask(
   includeKaptGenerateStubsTask: Boolean = false,
   includeKspTask: Boolean = false,
-  action: KotlinCompilationTask<*>.() -> Unit
+  action: KotlinCompilationTask<*>.() -> Unit,
 ) {
   withType(KotlinCompilationTask::class.java)
     // Kapt stub gen is a special case because KGP sets it up to copy compiler args from the

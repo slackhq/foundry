@@ -82,7 +82,7 @@ buildConfig {
   buildConfigField(
     "String",
     "BUGSNAG_KEY",
-    "\"${project.findProperty("SgpIntellijBugsnagKey")?.toString().orEmpty()}\""
+    "\"${project.findProperty("SgpIntellijBugsnagKey")?.toString().orEmpty()}\"",
   )
   buildConfigField("String", "GIT_SHA", provider { "\"${readGitRepoCommit().orEmpty()}\"" })
   useKotlinOutput {

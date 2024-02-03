@@ -15,10 +15,7 @@
  */
 package slack.gradle.util.charting
 
-internal data class AxisStyle(
-  val index: Int,
-  val color: Color,
-) : ChartProperty {
+internal data class AxisStyle(val index: Int, val color: Color) : ChartProperty {
   override val key: String = "chxs"
 
   override val value: String

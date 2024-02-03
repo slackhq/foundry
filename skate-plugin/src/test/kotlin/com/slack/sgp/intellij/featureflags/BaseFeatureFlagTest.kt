@@ -40,10 +40,7 @@ abstract class BaseFeatureFlagTest : LightPlatformCodeInsightFixture4TestCase() 
         }
     """
 
-  protected fun createKotlinFile(
-    name: String,
-    text: String,
-  ): PsiFile {
+  protected fun createKotlinFile(name: String, text: String): PsiFile {
     return myFixture.configureByText(name, text)
   }
 }

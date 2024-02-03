@@ -32,7 +32,7 @@ data class Call(
   @Json(name = "incoming") val incomingFromUser: CallUser? = null,
   @Json(name = "active_participants") val activeParticipants: List<String>,
   val actions: List<Action>? = null,
-  @Json(name = "retry_text") val retryText: RetryText? = null
+  @Json(name = "retry_text") val retryText: RetryText? = null,
 ) {
   @JsonClass(generateAdapter = false)
   enum class Action {

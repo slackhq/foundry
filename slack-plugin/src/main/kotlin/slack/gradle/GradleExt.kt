@@ -157,7 +157,7 @@ internal fun <T, R> Action<T>.liftIntoFunction(into: R.(task: Action<T>) -> Unit
 
 internal inline fun <reified T : Task> TaskContainer.register(
   name: String,
-  configuration: Action<in T>
+  configuration: Action<in T>,
 ): TaskProvider<T> = register(name, T::class.java, configuration)
 
 internal inline fun <reified T : Any> Project.configure(action: Action<T>) {
@@ -192,7 +192,7 @@ internal inline fun <reified T : Task> TaskContainer.providerWithNameOrNull(
 
 internal fun TaskContainer.providerWithNameOrNull(
   name: String,
-  action: Action<Task>
+  action: Action<Task>,
 ): TaskProvider<Task>? {
   return try {
     named(name, action)
@@ -250,7 +250,7 @@ internal val BuildType.ext: ExtraPropertiesExtension
 
 internal fun PluginManager.onFirst(
   pluginIds: Iterable<String>,
-  body: AppliedPlugin.(id: String) -> Unit
+  body: AppliedPlugin.(id: String) -> Unit,
 ) {
   once {
     for (id in pluginIds) {
@@ -325,7 +325,7 @@ internal inline fun <reified T : Any> ServiceRegistry.get(): T = this[T::class.j
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified T : Task> TaskContainer.registerOrConfigure(
   taskName: String,
-  crossinline configureAction: T.() -> Unit
+  crossinline configureAction: T.() -> Unit,
 ): TaskProvider<T> =
   when (taskName) {
     in names -> named(taskName) as TaskProvider<T>

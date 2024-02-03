@@ -236,7 +236,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
         minGradleXmx,
         extraJvmArgs,
         garbageCollector,
-        diagnosticsOutput::appendLine
+        diagnosticsOutput::appendLine,
       )
 
     val properties =
@@ -324,7 +324,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
     public fun register(
       project: Project,
-      jvmVendor: JvmVendorSpec?
+      jvmVendor: JvmVendorSpec?,
     ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
@@ -416,9 +416,7 @@ internal object BootstrapUtils {
     val garbageCollector: Provider<String>,
   ) {
     companion object {
-      fun fromProviders(
-        providers: ProviderFactory,
-      ): DaemonArgsProvider {
+      fun fromProviders(providers: ProviderFactory): DaemonArgsProvider {
         return DaemonArgsProvider(
           customMemoryMultiplier = providers.environmentVariable("BOOTSTRAP_MEMORY_MULTIPLIER"),
           customCoreMultiplier = providers.environmentVariable("BOOTSTRAP_CORE_MULTIPLIER"),
@@ -440,7 +438,7 @@ internal object BootstrapUtils {
     minGradleXmx: Provider<Int>,
     extraJvmArgs: Provider<List<String>>,
     garbageCollector: Provider<String>,
-    diagnostic: (String) -> Unit
+    diagnostic: (String) -> Unit,
   ): DaemonArgs {
 
     fun <T> pickValue(ci: T, local: T): T {
@@ -496,11 +494,7 @@ internal object BootstrapUtils {
     val customGc = garbageCollector.orNull
     when {
       customGc != null && customGc != "default" -> {
-        val args =
-          listOf(
-            "-XX:+$customGc",
-            "-XX:+UnlockExperimentalVMOptions",
-          )
+        val args = listOf("-XX:+$customGc", "-XX:+UnlockExperimentalVMOptions")
         gradleGcArgs += args
         kotlinDaemonGcArgs += args
       }
@@ -511,7 +505,7 @@ internal object BootstrapUtils {
             "-XX:+UseG1GC",
             "-XX:+UnlockExperimentalVMOptions",
             "-XX:G1NewSizePercent=$simplePercent",
-            "-XX:G1MaxNewSizePercent=$simplePercent"
+            "-XX:G1MaxNewSizePercent=$simplePercent",
           )
         gradleGcArgs += args
         kotlinDaemonGcArgs += args
@@ -537,7 +531,7 @@ internal object BootstrapUtils {
           // - Gradle's default is really low
           "-XX:MaxMetaspaceSize=1g",
         ) + extraArgs,
-        maxWorkers
+        maxWorkers,
       )
     val kotlinDaemonArgs =
       KotlinDaemonArgs(listOf("-Xms${kotlinXms}g", "-Xmx${kotlinXmx}g") + kotlinDaemonGcArgs)

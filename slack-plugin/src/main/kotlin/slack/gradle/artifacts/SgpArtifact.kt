@@ -17,10 +17,8 @@ package slack.gradle.artifacts
 
 import org.gradle.api.attributes.Attribute
 
-internal sealed class SgpArtifact(
-  override val declarableName: String,
-  val category: String,
-) : ShareableArtifact<SgpArtifact> {
+internal sealed class SgpArtifact(override val declarableName: String, val category: String) :
+  ShareableArtifact<SgpArtifact> {
   final override val attribute: Attribute<SgpArtifact>
     get() = SGP_ARTIFACTS_ATTRIBUTE
 

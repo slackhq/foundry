@@ -39,7 +39,7 @@ internal const val COMPOSE_COMPILER_OPTION_PREFIX =
  */
 internal fun Project.configureComposeCompiler(
   slackProperties: SlackProperties,
-  isMultiplatform: Boolean
+  isMultiplatform: Boolean,
 ) {
   val kotlinVersion = slackProperties.versions.kotlin
   // Flag to disable Compose's kotlin version check because they're often behind
@@ -82,7 +82,7 @@ internal fun Project.configureComposeCompiler(
           freeCompilerArgs.addAll(
             "-Xskip-prerelease-check",
             "-P",
-            "$COMPOSE_COMPILER_OPTION_PREFIX:suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
+            "$COMPOSE_COMPILER_OPTION_PREFIX:suppressKotlinVersionCompatibilityCheck=$kotlinVersion",
           )
         }
       }

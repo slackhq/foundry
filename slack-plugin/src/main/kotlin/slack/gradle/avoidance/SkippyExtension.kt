@@ -94,7 +94,7 @@ constructor(private val name: String, objects: ObjectFactory) : Named {
       buildUponDefaults = false,
       _includePatterns = includePatterns.get(),
       _excludePatterns = excludePatterns.get(),
-      _neverSkipPatterns = neverSkipPatterns.get()
+      _neverSkipPatterns = neverSkipPatterns.get(),
     )
   }
 }

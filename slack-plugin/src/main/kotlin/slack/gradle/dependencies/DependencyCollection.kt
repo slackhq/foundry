@@ -26,7 +26,7 @@ internal sealed class DependencyNode {
   data class Leaf(
     val key: String,
     val dependency: DependencyDef,
-    val parent: DependencyCollection
+    val parent: DependencyCollection,
   ) : DependencyNode() {
     override fun flatten(): Set<DependencyDef> {
       return setOf(dependency)

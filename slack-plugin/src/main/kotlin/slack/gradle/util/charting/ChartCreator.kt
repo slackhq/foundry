@@ -39,7 +39,7 @@ internal object ChartCreator {
   fun createChartUrl(
     data: List<Int>,
     xRange: IntRange = 1..data.size,
-    yRange: IntRange = 0..(data.maxOrNull() ?: 0)
+    yRange: IntRange = 0..(data.maxOrNull() ?: 0),
   ): String {
     check(data.isNotEmpty()) { "Empty data!" }
     var currentColor = colorForValue(data.first())

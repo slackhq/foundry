@@ -18,5 +18,5 @@ package com.slack.sgp.intellij.codeowners
 data class CodeOwnerInfo(
   val team: String,
   val packagePattern: String,
-  val codeOwnerLineNumber: Int
+  val codeOwnerLineNumber: Int,
 )

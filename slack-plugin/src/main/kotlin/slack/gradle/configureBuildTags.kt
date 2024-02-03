@@ -82,7 +82,7 @@ private fun ScanApi.addCiMetadata(project: Project) {
     if (System.getenv("GITHUB_REPOSITORY") != null && System.getenv("GITHUB_RUN_ID") != null) {
       link(
         "GitHub Actions build",
-        "https://github.com/${System.getenv("GITHUB_REPOSITORY")}/actions/runs/${System.getenv("GITHUB_RUN_ID")}"
+        "https://github.com/${System.getenv("GITHUB_REPOSITORY")}/actions/runs/${System.getenv("GITHUB_RUN_ID")}",
       )
     }
     if (System.getenv("GITHUB_WORKFLOW") != null) {
@@ -91,7 +91,7 @@ private fun ScanApi.addCiMetadata(project: Project) {
       value(workflowNameLabel, workflowName)
       addCustomLinkWithSearchTerms(
         "GitHub workflow build scans",
-        mapOf(workflowNameLabel to workflowName)
+        mapOf(workflowNameLabel to workflowName),
       )
     }
   }
@@ -115,7 +115,7 @@ private fun ScanApi.addGitMetadata(project: Project) {
       value(gitCommitIdLabel, gitCommitId)
       addCustomLinkWithSearchTerms(
         "Git commit id build scans",
-        mapOf(gitCommitIdLabel to gitCommitId)
+        mapOf(gitCommitIdLabel to gitCommitId),
       )
 
       val originUrl =

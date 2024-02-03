@@ -24,7 +24,7 @@ class TestProject(
   private val fileSystem: FileSystem,
   private val rootPath: Path,
   private val gradlePath: String,
-  body: TestProject.() -> Unit
+  body: TestProject.() -> Unit,
 ) {
   private val relativePath = gradlePath.removePrefix(":").replace(":", Path.DIRECTORY_SEPARATOR)
   private val projectPath = rootPath / relativePath
@@ -49,7 +49,7 @@ class TestProject(
 
   fun buildFile(
     isKts: Boolean = false,
-    content: String = "buildscript { repositories { mavenCentral() } }"
+    content: String = "buildscript { repositories { mavenCentral() } }",
   ) {
     buildFile(isKts) { writeUtf8(content) }
   }
