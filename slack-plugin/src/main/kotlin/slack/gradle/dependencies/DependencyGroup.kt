@@ -24,7 +24,7 @@ public abstract class DependencyGroup(
    * Optional bom artifact that controls the versions of this group. If non-null, other dependencies
    * in this group will be controlled by this bom.
    */
-  internal val bomArtifact: String? = null
+  internal val bomArtifact: String? = null,
 ) : DependencyCollection {
 
   /**
@@ -45,20 +45,20 @@ public abstract class DependencyGroup(
 
   internal constructor(
     parent: DependencyGroup,
-    groupSuffix: String = ""
+    groupSuffix: String = "",
   ) : this("${parent.group}$groupSuffix", parent.groupGradleProperty)
 
   internal fun artifact(
     artifact: String? = null,
     groupOverride: String = group,
-    gradleProperty: String? = null
+    gradleProperty: String? = null,
   ): DependencyDelegate {
     val property = gradleProperty ?: groupGradleProperty
     return DependencyDelegate(
       groupOverride,
       artifact,
       gradleProperty = "${DependencyCollection.GRADLE_PROPERTY_PREFIX}$property",
-      isBomManaged = bomArtifact != null
+      isBomManaged = bomArtifact != null,
     )
   }
 
@@ -66,7 +66,7 @@ public abstract class DependencyGroup(
     artifact: String,
     ext: String,
     groupOverride: String = group,
-    gradleProperty: String? = null
+    gradleProperty: String? = null,
   ): DependencyDelegate {
     val property = gradleProperty ?: groupGradleProperty
     return DependencyDelegate(
@@ -74,7 +74,7 @@ public abstract class DependencyGroup(
       artifact = artifact,
       ext = ext,
       gradleProperty = "${DependencyCollection.GRADLE_PROPERTY_PREFIX}$property",
-      isBomManaged = bomArtifact != null
+      isBomManaged = bomArtifact != null,
     )
   }
 }

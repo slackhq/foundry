@@ -89,6 +89,7 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
 
   companion object {
     private const val TAG = "[RobolectricJarsDownloadTask]"
+    internal const val NAME = "updateRobolectricJars"
 
     fun jarsIn(dir: File): Set<File> {
       return dir.listFiles().orEmpty().filterTo(LinkedHashSet()) { it.extension == "jar" }
@@ -96,9 +97,9 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
 
     fun register(
       project: Project,
-      slackProperties: SlackProperties
+      slackProperties: SlackProperties,
     ): TaskProvider<UpdateRobolectricJarsTask> {
-      return project.tasks.register<UpdateRobolectricJarsTask>("updateRobolectricJars") {
+      return project.tasks.register<UpdateRobolectricJarsTask>(NAME) {
         val iVersion = slackProperties.robolectricIVersion
         for (sdkInt in slackProperties.robolectricTestSdks) {
           // Create a new configuration

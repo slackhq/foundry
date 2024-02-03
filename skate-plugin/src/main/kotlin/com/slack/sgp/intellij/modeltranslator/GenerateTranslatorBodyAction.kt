@@ -57,14 +57,14 @@ class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : Inten
       SkateSpanBuilder().apply {
         addSpanTag(
           "event",
-          SkateTracingEvent(SkateTracingEvent.EventType.MODEL_TRANSLATOR_GENERATED)
+          SkateTracingEvent(SkateTracingEvent.EventType.MODEL_TRANSLATOR_GENERATED),
         )
       }
     SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
         "model_translator",
         startTimestamp,
-        skateSpanBuilder.getKeyValueList()
+        skateSpanBuilder.getKeyValueList(),
       )
   }
 

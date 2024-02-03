@@ -20,8 +20,10 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
 import com.squareup.moshi.adapter
 import java.util.Locale
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
@@ -31,6 +33,8 @@ import slack.cli.AppleSiliconCompat
 import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
+import slack.gradle.avoidance.GenerateAndroidTestProjectPathsTask
+import slack.gradle.avoidance.GenerateDependencyGraphTask
 import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
@@ -40,12 +44,16 @@ import slack.gradle.tasks.InstallCommitHooksTask
 import slack.gradle.tasks.KtLintDownloadTask
 import slack.gradle.tasks.KtfmtDownloadTask
 import slack.gradle.tasks.SortDependenciesDownloadTask
+import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import slack.gradle.util.JsonTools
+import slack.gradle.util.StartParameterProperties
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsData
+import slack.gradle.util.createPropertiesProvider
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
 import slack.gradle.util.setDisallowChanges
+import slack.gradle.util.sneakyNull
 import slack.stats.ModuleStatsTasks
 import slack.unittest.UnitTests
 
@@ -53,7 +61,8 @@ import slack.unittest.UnitTests
  * A common entry point for Slack project configuration. This should only be applied once and on the
  * root project, with a full view of the entire project tree.
  */
-internal class SlackRootPlugin : Plugin<Project> {
+internal class SlackRootPlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
+  Plugin<Project> {
 
   override fun apply(project: Project) {
     require(project == project.rootProject) {
@@ -73,7 +82,27 @@ internal class SlackRootPlugin : Plugin<Project> {
         .trimIndent()
     }
 
-    val slackProperties = SlackProperties(project)
+    val startParameters = project.gradle.startParameter.projectProperties
+    val startParameterProperties =
+      project.providers.of(StartParameterProperties::class.java) {
+        parameters.properties.setDisallowChanges(startParameters)
+      }
+    val localProperties =
+      project.createPropertiesProvider("local.properties").map {
+        it.mapKeys { it.key.toString() }.mapValues { it.value.toString() }
+      }
+    val startParameterProperty: (String) -> Provider<String> = { key ->
+      startParameterProperties.map { sneakyNull(it[key]) }
+    }
+    val globalLocalProperty: (String) -> Provider<String> = { key ->
+      localProperties.map { sneakyNull(it[key]) }
+    }
+    val slackProperties =
+      SlackProperties(
+        project,
+        startParameterProperty = startParameterProperty,
+        globalLocalProperty = globalLocalProperty,
+      )
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = slackProperties.logThermals
@@ -89,12 +118,16 @@ internal class SlackRootPlugin : Plugin<Project> {
     } else {
       project.logger.debug("Skippy is disabled")
     }
+
     SlackTools.register(
       project = project,
       logThermals = logThermals,
       enableSkippyDiagnostics = enableSkippy,
       logVerbosely = slackProperties.verboseLogging,
-      thermalsLogJsonFileProvider = thermalsLogJsonFile
+      thermalsLogJsonFileProvider = thermalsLogJsonFile,
+      isConfigurationCacheRequested = buildFeatures.configurationCache.requested,
+      startParameterProperties = startParameterProperties,
+      globalLocalProperties = localProperties,
     )
     configureRootProject(project, slackProperties, thermalsLogJsonFile)
   }
@@ -104,7 +137,7 @@ internal class SlackRootPlugin : Plugin<Project> {
   private fun configureRootProject(
     project: Project,
     slackProperties: SlackProperties,
-    thermalsLogJsonFileProvider: Provider<RegularFile>
+    thermalsLogJsonFileProvider: Provider<RegularFile>,
   ) {
 
     // Check enforced JDK version
@@ -140,12 +173,25 @@ internal class SlackRootPlugin : Plugin<Project> {
     project.configureMisc(slackProperties)
     UnitTests.configureRootProject(project)
     ModuleStatsTasks.configureRoot(project, slackProperties)
-    ComputeAffectedProjectsTask.register(project, slackProperties)
+    val generateDependencyGraphTask = GenerateDependencyGraphTask.register(project, slackProperties)
+    val generateAndroidTestProjectsTask = GenerateAndroidTestProjectPathsTask.register(project)
+    ComputeAffectedProjectsTask.register(
+      rootProject = project,
+      slackProperties = slackProperties,
+      dependencyGraphProvider = generateDependencyGraphTask.flatMap { it.outputFile },
+      androidTestProjectPathsProvider = generateAndroidTestProjectsTask.flatMap { it.outputFile },
+    )
+    // Register robolectric jar downloads if requested
+    slackProperties.versions.robolectric?.let {
+      UpdateRobolectricJarsTask.register(project, slackProperties)
+    }
+
     val scanApi = ScanApi(project)
     if (slackProperties.applyCommonBuildTags) {
       project.configureBuildScanMetadata(scanApi)
     }
     if (scanApi.isAvailable) {
+      buildFeatures.reportTo(scanApi)
       // It's SUPER important to capture this log File instance separately before passing into the
       // background call below, as this is serialized as an input to that lambda. We also cannot use
       // slackTools() in there anymore as it's already been closed (and will be recreated) in the
@@ -225,14 +271,14 @@ internal class SlackRootPlugin : Plugin<Project> {
         MissingIdentifiersAggregatorTask.register(project)
       }
       project.configure<DependencyAnalysisExtension> {
-        issues { all { onAny { ignoreKtx(true) } } }
         abi {
           exclusions {
             ignoreGeneratedCode()
             ignoreInternalPackages()
           }
         }
-        dependencies {
+        structure {
+          ignoreKtx(true)
           bundle("androidx-camera") {
             primary("androidx.camera:camera-camera2")
             includeGroup("androidx.camera")

@@ -48,7 +48,6 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.jvm.toolchain.JvmVendorSpec
-import org.gradle.language.base.plugins.LifecycleBasePlugin
 import oshi.SystemInfo
 import slack.cli.AppleSiliconCompat
 import slack.cli.AppleSiliconCompat.isMacOS
@@ -237,7 +236,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
         minGradleXmx,
         extraJvmArgs,
         garbageCollector,
-        diagnosticsOutput::appendLine
+        diagnosticsOutput::appendLine,
       )
 
     val properties =
@@ -323,26 +322,9 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       return project.gradle.startParameter.taskNames.any { it == NAME }
     }
 
-    internal fun configureSubprojectBootstrapTasks(project: Project) {
-      if (!isBootstrapEnabled(project)) return
-      val rootTask = project.rootProject.tasks.named(NAME, CoreBootstrapTask::class.java)
-      // Clever trick to make this finalized by all bootstrap tasks and all other tasks depend on
-      // this, so bootstrap always runs first.
-      project.tasks.configureEach {
-        val task = this
-        if (name == NAME) return@configureEach
-        if (name == LifecycleBasePlugin.CLEAN_TASK_NAME) return@configureEach
-        if (this is BootstrapTask) {
-          rootTask.configure { finalizedBy(task) }
-        } else {
-          dependsOn(rootTask)
-        }
-      }
-    }
-
     public fun register(
       project: Project,
-      jvmVendor: JvmVendorSpec?
+      jvmVendor: JvmVendorSpec?,
     ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
@@ -434,9 +416,7 @@ internal object BootstrapUtils {
     val garbageCollector: Provider<String>,
   ) {
     companion object {
-      fun fromProviders(
-        providers: ProviderFactory,
-      ): DaemonArgsProvider {
+      fun fromProviders(providers: ProviderFactory): DaemonArgsProvider {
         return DaemonArgsProvider(
           customMemoryMultiplier = providers.environmentVariable("BOOTSTRAP_MEMORY_MULTIPLIER"),
           customCoreMultiplier = providers.environmentVariable("BOOTSTRAP_CORE_MULTIPLIER"),
@@ -458,7 +438,7 @@ internal object BootstrapUtils {
     minGradleXmx: Provider<Int>,
     extraJvmArgs: Provider<List<String>>,
     garbageCollector: Provider<String>,
-    diagnostic: (String) -> Unit
+    diagnostic: (String) -> Unit,
   ): DaemonArgs {
 
     fun <T> pickValue(ci: T, local: T): T {
@@ -514,11 +494,7 @@ internal object BootstrapUtils {
     val customGc = garbageCollector.orNull
     when {
       customGc != null && customGc != "default" -> {
-        val args =
-          listOf(
-            "-XX:+$customGc",
-            "-XX:+UnlockExperimentalVMOptions",
-          )
+        val args = listOf("-XX:+$customGc", "-XX:+UnlockExperimentalVMOptions")
         gradleGcArgs += args
         kotlinDaemonGcArgs += args
       }
@@ -529,7 +505,7 @@ internal object BootstrapUtils {
             "-XX:+UseG1GC",
             "-XX:+UnlockExperimentalVMOptions",
             "-XX:G1NewSizePercent=$simplePercent",
-            "-XX:G1MaxNewSizePercent=$simplePercent"
+            "-XX:G1MaxNewSizePercent=$simplePercent",
           )
         gradleGcArgs += args
         kotlinDaemonGcArgs += args
@@ -555,7 +531,7 @@ internal object BootstrapUtils {
           // - Gradle's default is really low
           "-XX:MaxMetaspaceSize=1g",
         ) + extraArgs,
-        maxWorkers
+        maxWorkers,
       )
     val kotlinDaemonArgs =
       KotlinDaemonArgs(listOf("-Xms${kotlinXms}g", "-Xmx${kotlinXmx}g") + kotlinDaemonGcArgs)

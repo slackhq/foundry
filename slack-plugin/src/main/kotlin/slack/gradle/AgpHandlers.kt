@@ -59,5 +59,5 @@ internal object AgpHandlers {
 
 private data class FactoryData(
   val agpVersion: AndroidPluginVersion,
-  val factory: AgpHandler.Factory
+  val factory: AgpHandler.Factory,
 )

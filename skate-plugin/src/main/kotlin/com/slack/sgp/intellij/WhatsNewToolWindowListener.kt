@@ -52,7 +52,7 @@ class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManag
         .createPluginUsageTraceAndSendTrace(
           WHATS_NEW_PANEL_ID.replace('-', '_'),
           startTimestamp,
-          skateSpanBuilder.getKeyValueList()
+          skateSpanBuilder.getKeyValueList(),
         )
     }
   }

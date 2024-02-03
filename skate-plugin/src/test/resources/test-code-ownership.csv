@@ -1,0 +1,5 @@
+file_filter,team
+app/folder1/.*,Team 1
+app/folder2/.*,Team 1
+app/folder3/.*,Team 2
+app/folder3/subfolder/.*,Team 1

@@ -35,7 +35,7 @@ internal data class DependencyDelegate(
   private val comments: String? = null,
   private val ext: String? = null,
   private val gradleProperty: String? = null,
-  private val isBomManaged: Boolean = false
+  private val isBomManaged: Boolean = false,
 ) : ReadOnlyProperty<DependencyCollection, Any> {
 
   private var _definitionRef: Any = UNINITIALIZED_VALUE
@@ -56,7 +56,7 @@ internal data class DependencyDelegate(
           comments = comments,
           ext = ext,
           gradleProperty = gradleProperty,
-          isBomManaged = isBomManaged
+          isBomManaged = isBomManaged,
         )
     }
     return _definitionRef as DependencyDef

@@ -41,7 +41,7 @@ import slack.gradle.agp.VersionNumber
 internal abstract class BaseDownloadTask(
   private val targetName: String,
   private val addExecPrefix: Boolean = false,
-  private val urlTemplate: (version: String) -> String
+  private val urlTemplate: (version: String) -> String,
 ) : DefaultTask(), BootstrapTask {
   @get:Inject abstract val progressLoggerFactory: ProgressLoggerFactory
 

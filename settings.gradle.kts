@@ -128,10 +128,15 @@ pluginManagement {
     exclusiveContent {
       forRepository(::gradlePluginPortal)
       filter {
+        includeModule("com.github.gmazzo.buildconfig", "plugin")
+        includeModule(
+          "com.github.gmazzo.buildconfig",
+          "com.github.gmazzo.buildconfig.gradle.plugin",
+        )
         includeModule("com.github.ben-manes", "gradle-versions-plugin")
         includeModule(
           "com.github.ben-manes.versions",
-          "com.github.ben-manes.versions.gradle.plugin"
+          "com.github.ben-manes.versions.gradle.plugin",
         )
         includeModule("com.gradle", "gradle-enterprise-gradle-plugin")
         includeModule("com.gradle.enterprise", "com.gradle.enterprise.gradle.plugin")
@@ -142,7 +147,7 @@ pluginManagement {
         includeModule("com.autonomousapps", "plugin-best-practices-plugin")
         includeModule(
           "com.autonomousapps.plugin-best-practices-plugin",
-          "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin"
+          "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin",
         )
         includeModule("org.jetbrains.intellij", "org.jetbrains.intellij.gradle.plugin")
         includeModule("org.jetbrains.intellij.plugins", "gradle-intellij-plugin")
@@ -174,13 +179,15 @@ rootProject.name = "slack-gradle-plugin"
 
 // Please keep these in alphabetical order!
 include(
-  ":agp-handlers:agp-handler-80",
+  ":agp-handlers:agp-handler-82",
   ":agp-handlers:agp-handler-83",
   ":agp-handlers:agp-handler-api",
+  ":skippy",
+  ":sgp-common",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
   ":slack-plugin",
-  ":tracing"
+  ":tracing",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

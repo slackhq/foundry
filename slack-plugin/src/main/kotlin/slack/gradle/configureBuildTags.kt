@@ -19,12 +19,20 @@ import java.io.IOException
 import java.net.URLEncoder
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.testing.Test
 import slack.gradle.util.gitExecProvider
 import slack.gradle.util.gitVersionProvider
 
 private val GITHUB_ORIGIN_REGEX = Regex("(.*)github\\.com[/|:](.*)")
+
+internal fun BuildFeatures.reportTo(scanApi: ScanApi) {
+  scanApi.value("bf-configuration-cache-requested", configurationCache.requested.getOrElse(false))
+  scanApi.value("bf-configuration-cache-active", configurationCache.active.getOrElse(false))
+  scanApi.value("bf-isolated-projects-requested", isolatedProjects.requested.getOrElse(false))
+  scanApi.value("bf-isolated-projects-active", isolatedProjects.active.getOrElse(false))
+}
 
 internal fun Project.configureBuildScanMetadata(scanApi: ScanApi) {
   if (invokedFromIde) {
@@ -55,7 +63,7 @@ private fun ScanApi.tagOs() {
 private fun ScanApi.tagIde(project: Project, isCi: Boolean) {
   if (project.hasProperty("android.injected.invoked.from.ide")) {
     tag("Android Studio")
-    project.findProperty("android.injected.studio.version")?.let {
+    project.findProperty("android.studio.version")?.let {
       value("Android Studio version", it.toString())
     }
   } else if (System.getProperty("idea.version") != null) {
@@ -74,7 +82,7 @@ private fun ScanApi.addCiMetadata(project: Project) {
     if (System.getenv("GITHUB_REPOSITORY") != null && System.getenv("GITHUB_RUN_ID") != null) {
       link(
         "GitHub Actions build",
-        "https://github.com/${System.getenv("GITHUB_REPOSITORY")}/actions/runs/${System.getenv("GITHUB_RUN_ID")}"
+        "https://github.com/${System.getenv("GITHUB_REPOSITORY")}/actions/runs/${System.getenv("GITHUB_RUN_ID")}",
       )
     }
     if (System.getenv("GITHUB_WORKFLOW") != null) {
@@ -83,7 +91,7 @@ private fun ScanApi.addCiMetadata(project: Project) {
       value(workflowNameLabel, workflowName)
       addCustomLinkWithSearchTerms(
         "GitHub workflow build scans",
-        mapOf(workflowNameLabel to workflowName)
+        mapOf(workflowNameLabel to workflowName),
       )
     }
   }
@@ -107,7 +115,7 @@ private fun ScanApi.addGitMetadata(project: Project) {
       value(gitCommitIdLabel, gitCommitId)
       addCustomLinkWithSearchTerms(
         "Git commit id build scans",
-        mapOf(gitCommitIdLabel to gitCommitId)
+        mapOf(gitCommitIdLabel to gitCommitId),
       )
 
       val originUrl =

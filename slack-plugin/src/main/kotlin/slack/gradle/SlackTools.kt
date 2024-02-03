@@ -27,10 +27,12 @@ import kotlin.streams.asSequence
 import okhttp3.OkHttpClient
 import okio.buffer
 import okio.sink
+import org.gradle.StartParameter
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
@@ -42,10 +44,12 @@ import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
 import slack.gradle.util.JsonTools
+import slack.gradle.util.LocalProperties
 import slack.gradle.util.Thermals
 import slack.gradle.util.ThermalsWatcher
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.shutdown
+import slack.gradle.util.sneakyNull
 
 /** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
 public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
@@ -114,7 +118,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     extensions = buildMap {
       ServiceLoader.load(
           SlackToolsExtension::class.java,
-          SlackToolsExtension::class.java.classLoader
+          SlackToolsExtension::class.java.classLoader,
         )
         .stream()
         .asSequence()
@@ -248,6 +252,22 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     runCatching(block).onFailure { t -> logger.error(errorMessage, t) }
   }
 
+  /**
+   * Abstraction for loading a [Map] provider that handles caching automatically per root project.
+   * This way properties are only ever parsed at most once per root project. The goal for this is to
+   * build on top of [LocalProperties] and provide a more convenient API for accessing properties
+   * from multiple sources in a configuration-caching-compatible way. Start parameters are special
+   * because they come from [StartParameter.projectProperties] and are intended to supersede any
+   * other property values.
+   */
+  internal fun globalStartParameterProperty(key: String): Provider<String> {
+    return parameters.startParameterProperties.map { sneakyNull(it[key]) }
+  }
+
+  internal fun globalLocalProperty(key: String): Provider<String> {
+    return parameters.localProperties.map { sneakyNull(it[key]) }
+  }
+
   public companion object {
     public const val SERVICE_NAME: String = "SlackTools"
 
@@ -256,7 +276,10 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       logThermals: Boolean,
       enableSkippyDiagnostics: Boolean,
       logVerbosely: Boolean,
-      thermalsLogJsonFileProvider: Provider<RegularFile>
+      thermalsLogJsonFileProvider: Provider<RegularFile>,
+      isConfigurationCacheRequested: Provider<Boolean>,
+      startParameterProperties: Provider<Map<String, String>>,
+      globalLocalProperties: Provider<Map<String, String>>,
     ): Provider<SlackTools> {
       return project.gradle.sharedServices
         .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
@@ -273,14 +296,14 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
               logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
             }
           )
-          parameters.configurationCacheEnabled.setDisallowChanges(
-            project.provider { project.gradle.startParameter.isConfigurationCacheRequested }
-          )
+          parameters.configurationCacheEnabled.setDisallowChanges(isConfigurationCacheRequested)
           parameters.enableSkippyDiagnostics.setDisallowChanges(enableSkippyDiagnostics)
           parameters.skippyDiagnosticsOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("outputs/logs/skippy-diagnostics.txt")
           )
           parameters.logVerbosely.setDisallowChanges(logVerbosely)
+          parameters.localProperties.setDisallowChanges(globalLocalProperties)
+          parameters.startParameterProperties.setDisallowChanges(startParameterProperties)
         }
         .apply { get().apply { globalConfig = GlobalConfig(project) } }
     }
@@ -299,6 +322,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     /** An output file of skippy diagnostics. */
     public val skippyDiagnosticsOutputFile: RegularFileProperty
     public val logVerbosely: Property<Boolean>
+    public val localProperties: MapProperty<String, String>
+    public val startParameterProperties: MapProperty<String, String>
   }
 }
 

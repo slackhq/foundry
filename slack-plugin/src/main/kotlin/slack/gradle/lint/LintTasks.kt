@@ -27,7 +27,6 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -39,9 +38,16 @@ import org.jetbrains.kotlin.tooling.core.withClosure
 import slack.gradle.SlackProperties
 import slack.gradle.androidExtension
 import slack.gradle.androidExtensionNullable
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifact
+import slack.gradle.avoidance.SkippyArtifacts
 import slack.gradle.capitalizeUS
 import slack.gradle.getByType
 import slack.gradle.multiplatformExtension
+import slack.gradle.tasks.SimpleFileProducerTask
+import slack.gradle.tasks.SimpleFilesConsumerTask
+import slack.gradle.tasks.publish
 
 /**
  * Common configuration for Android lint in projects.
@@ -52,18 +58,21 @@ import slack.gradle.multiplatformExtension
 internal object LintTasks {
   private const val GLOBAL_CI_LINT_TASK_NAME = "globalCiLint"
   private const val CI_LINT_TASK_NAME = "ciLint"
-  private const val COMPILE_CI_LINT_NAME = "compileCiLint"
   private const val LOG = "SlackLints:"
 
   private fun Project.log(message: String) {
     logger.debug("$LOG $message")
   }
 
-  fun configureRootProject(project: Project): TaskProvider<Task> =
-    project.tasks.register(GLOBAL_CI_LINT_TASK_NAME) {
-      group = LifecycleBasePlugin.VERIFICATION_GROUP
-      description = "Global lifecycle task to run all dependent lint tasks."
-    }
+  fun configureRootProject(project: Project) {
+    val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_LINT)
+    SimpleFilesConsumerTask.registerOrConfigure(
+      project,
+      GLOBAL_CI_LINT_TASK_NAME,
+      description = "Global lifecycle task to run all ciUnitTest tasks.",
+      inputFiles = resolver.artifactView(),
+    )
+  }
 
   fun configureSubProject(
     project: Project,
@@ -86,14 +95,14 @@ internal object LintTasks {
             project.configureAndroidProjectForLint(
               slackProperties,
               affectedProjects,
-              onProjectSkipped
+              onProjectSkipped,
             )
           is TestPlugin -> {
             if (slackProperties.enableLintInAndroidTestProjects) {
               project.configureAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
               )
             }
           }
@@ -105,7 +114,7 @@ internal object LintTasks {
               project.configureNonAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
               )
             }
           // Only configure non-Android multiplatform projects via KotlinBasePlugin.
@@ -120,7 +129,7 @@ internal object LintTasks {
               project.configureNonAndroidProjectForLint(
                 slackProperties,
                 affectedProjects,
-                onProjectSkipped
+                onProjectSkipped,
               )
             }
         }
@@ -142,8 +151,7 @@ internal object LintTasks {
       )
 
       log("Creating ciLint task")
-      val ciLintTask =
-        tasks.register(CI_LINT_TASK_NAME) { group = LifecycleBasePlugin.VERIFICATION_GROUP }
+      val ciLintTask = createCiLintTask(project)
 
       val ciLintVariants = slackProperties.ciLintVariants
       if (ciLintVariants != null) {
@@ -174,7 +182,7 @@ internal object LintTasks {
         slackProperties,
         affectedProjects,
         onProjectSkipped,
-        slackProperties.requireAndroidSdkProperties()
+        slackProperties.requireAndroidSdkProperties(),
       )
     }
 
@@ -207,11 +215,7 @@ internal object LintTasks {
     }
 
     log("Creating ciLint task")
-    val ciLint =
-      tasks.register(COMPILE_CI_LINT_NAME) {
-        group = LifecycleBasePlugin.VERIFICATION_GROUP
-        dependsOn(lintTask)
-      }
+    val ciLint = createCiLintTask(project) { dependsOn(lintTask) }
 
     // For Android projects, we can run lint configuration last using `DslLifecycle.finalizeDsl`;
     // however, we need to run it using `Project.afterEvaluate` for non-Android projects.
@@ -220,13 +224,13 @@ internal object LintTasks {
       ciLint,
       slackProperties,
       affectedProjects,
-      onProjectSkipped
+      onProjectSkipped,
     )
   }
 
   private fun Project.configureLint(
     lint: Lint,
-    ciLintTask: TaskProvider<*>,
+    ciLint: TaskProvider<SimpleFileProducerTask>,
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
@@ -236,22 +240,20 @@ internal object LintTasks {
 
     slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
 
-    val globalTask =
-      if (affectedProjects == null || path in affectedProjects) {
-        rootProject.tasks.named(GLOBAL_CI_LINT_TASK_NAME)
+    if (affectedProjects != null && path !in affectedProjects) {
+      val taskPath = "${path}:$CI_LINT_TASK_NAME"
+      val log = "Skipping $taskPath because it is not affected."
+      onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
+      if (slackProperties.debug) {
+        log(log)
       } else {
-        val taskPath = "${path}:$CI_LINT_TASK_NAME"
-        val log = "Skipping $taskPath because it is not affected."
-        onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
-        if (slackProperties.debug) {
-          log(log)
-        } else {
-          log(log)
-        }
-        null
+        log(log)
       }
-
-    globalTask?.configure { dependsOn(ciLintTask) }
+      SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
+    } else {
+      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_LINT)
+      publisher.publish(ciLint)
+    }
 
     afterEvaluate { addSourceSetsForAndroidMultiplatformAfterEvaluate() }
 
@@ -434,5 +436,21 @@ internal object LintTasks {
     disallowChanges.set(this, false)
     block()
     disallowChanges.set(this, true)
+  }
+
+  private fun createCiLintTask(
+    project: Project,
+    action: Action<SimpleFileProducerTask> = Action {},
+  ): TaskProvider<SimpleFileProducerTask> {
+    project.logger.debug("Creating ciLint task: ${project.path}:$CI_LINT_TASK_NAME")
+    val task =
+      SimpleFileProducerTask.registerOrConfigure(
+        project,
+        CI_LINT_TASK_NAME,
+        group = LifecycleBasePlugin.VERIFICATION_GROUP,
+        description = "Lifecycle task to run all lint tasks on this project.",
+        action = action,
+      )
+    return task
   }
 }

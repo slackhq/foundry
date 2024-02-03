@@ -34,5 +34,5 @@ data class TranslatorBundle(
   val destinationModel: String,
   val element: KtNamedFunction,
   val importDirectives: List<KtImportDirective>,
-  val functionHeaderRange: TextRange
+  val functionHeaderRange: TextRange,
 )

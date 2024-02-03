@@ -438,5 +438,5 @@ internal val ERROR_PRONE_CHECKS =
     "UnnecessarySetDefault",
     "UnnecessaryStaticImport",
     "UseBinds",
-    "WildcardImport"
+    "WildcardImport",
   )

@@ -42,12 +42,12 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           Instant.now(),
           traceTags,
           "Studio Giraffe",
-          "0.2.0"
+          "0.2.0",
         )
     val expectedTags =
       mutableListOf(
         KeyValue("service_name", ValueType.STRING, SERVICE_NAME),
-        KeyValue("database", ValueType.STRING, DATABASE_NAME)
+        KeyValue("database", ValueType.STRING, DATABASE_NAME),
       )
 
     val expectedSpanTags =
@@ -74,7 +74,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           Instant.now(),
           newTagBuilder(),
           "Studio Giraffe",
-          "0.2.0"
+          "0.2.0",
         )
     assertThat(listOfSpans).isNull()
   }
@@ -87,7 +87,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           Instant.now(),
           newTagBuilder(),
           "Studio Giraffe",
-          ""
+          "",
         )
     assertThat(listOfSpans).isNull()
   }

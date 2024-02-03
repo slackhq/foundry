@@ -72,7 +72,7 @@ internal data class DefaultSdk(
   private val robolectricVersion: String,
   override val androidCodeName: String,
   private val requiredJavaVersion: Int,
-  private val iVersion: Int
+  private val iVersion: Int,
 ) : Sdk() {
   companion object {
     private const val GROUP_ID = "org.robolectric"

@@ -15,6 +15,7 @@
  */
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import dev.bmac.gradle.intellij.GenerateBlockMapTask
 import dev.bmac.gradle.intellij.PluginUploader
@@ -34,18 +35,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_7
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
-buildscript {
-  dependencies {
-    // We have to declare this here in order for kotlin-facets to be generated in iml files
-    // https://youtrack.jetbrains.com/issue/KT-36331
-    classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
-    classpath(kotlin("sam-with-receiver", libs.versions.kotlin.get()))
-    classpath(libs.markdown)
-  }
-}
-
 plugins {
   alias(libs.plugins.kotlin.jvm) apply false
+  alias(libs.plugins.kotlin.sam)
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
@@ -56,6 +48,7 @@ plugins {
   alias(libs.plugins.sortDependencies) apply false
   alias(libs.plugins.intellij) apply false
   alias(libs.plugins.pluginUploader) apply false
+  alias(libs.plugins.buildConfig) apply false
 }
 
 configure<DetektExtension> {
@@ -73,7 +66,8 @@ tasks.withType<Detekt>().configureEach {
 
 val ktfmtVersion = libs.versions.ktfmt.get()
 
-val externalFiles = listOf("SkateErrorHandler", "MemoizedSequence").map { "src/**/$it.kt" }
+val externalFiles =
+  listOf("SkateErrorHandler", "MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
 
 allprojects {
   apply(plugin = "com.diffplug.spotless")
@@ -100,13 +94,13 @@ allprojects {
       targetExclude("**/spotless.kt", "**/Aliases.kt")
     }
     kotlinGradle {
-      target("src/**/*.kts")
+      target("*.kts", "src/**/*.kts")
       ktfmt(ktfmtVersion).googleStyle()
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile(
         rootProject.file("spotless/spotless.kt"),
-        "(import|plugins|buildscript|dependencies|pluginManagement)"
+        "(import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)",
       )
     }
   }
@@ -167,14 +161,6 @@ data class KotlinBuildConfig(val kotlin: String) {
       // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
       "-Xjspecify-annotations=strict",
     )
-
-  fun asTemplatesMap(): Map<String, String> {
-    return mapOf(
-      "kotlinCompilerArgs" to kotlinCompilerArgs.joinToString(", ") { "\"$it\"" },
-      "kotlinJvmCompilerArgs" to kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" },
-      "kotlinVersion" to kotlin
-    )
-  }
 }
 
 tasks.dokkaHtmlMultiModule {
@@ -186,16 +172,24 @@ val kotlinVersion = libs.versions.kotlin.get()
 val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 
 subprojects {
-  // This is overly magic but necessary in order to plumb this
-  // down to subprojects
-  tasks
-    .withType<Copy>()
-    .matching { it.name == "copyVersionTemplates" }
-    .configureEach {
-      val templatesMap = kotlinBuildConfig.asTemplatesMap()
-      inputs.property("buildversions", templatesMap.hashCode())
-      expand(templatesMap)
+  if (project.path == ":slack-plugin") {
+    project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
+      configure<BuildConfigExtension> {
+        buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
+        // Using Any here due to https://github.com/gmazzo/gradle-buildconfig-plugin/issues/9
+        buildConfigField(
+          "kotlin.collections.List<String>",
+          "KOTLIN_COMPILER_ARGS",
+          "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})",
+        )
+        buildConfigField(
+          "kotlin.collections.List<String>",
+          "KOTLIN_JVM_COMPILER_ARGS",
+          "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})",
+        )
+      }
     }
+  }
 
   pluginManager.withPlugin("java") {
     configure<JavaPluginExtension> {
@@ -283,6 +277,16 @@ subprojects {
               .toURL()
           )
         }
+        sourceLink {
+          localDirectory.set(layout.projectDirectory.dir("src").asFile)
+          val relPath = rootProject.projectDir.toPath().relativize(projectDir.toPath())
+          remoteUrl.set(
+            providers.gradleProperty("POM_SCM_URL").map { scmUrl ->
+              URI("$scmUrl/tree/main/$relPath/src").toURL()
+            }
+          )
+          remoteLineSuffix.set("#L")
+        }
       }
     }
 
@@ -307,7 +311,7 @@ subprojects {
         val description: String,
         val version: String,
         val sinceBuild: String,
-        val urlSuffix: String
+        val urlSuffix: String,
       )
 
       val pluginDetails =
@@ -387,7 +391,7 @@ dependencyAnalysis {
       ignoreGeneratedCode()
     }
   }
-  this.dependencies {
+  structure {
     bundle("agp") {
       primary("com.android.tools.build:gradle")
       includeGroup("com.android.tools.build")

@@ -1,6 +1,213 @@
 Changelog
 =========
 
+0.15.2
+------
+
+_2024-01-11_
+
+- **New**: Promote `PropertyResolver` to public API.
+- **New**: Skippy logic is now distributed as a separate, non-gradle-specific artifact under `com.slack.gradle:skippy`. This also includes a CLI that can be run as an alternative to the gradle task. Note this requires serialized dependency graph and androidTest projects to be pre-computed. THe config must be in a static JSON file. See the docs on `ComputeAffectedProjectsCli`.
+
+  ```
+  Usage: compute-affected-projects-cli [<options>]
+
+    Computes affected projects and writes output files to an output directory.
+
+  Options:
+    --debug                    Enable debug logging.
+    --merge-outputs            Merge outputs from all configs into a single
+                               /merged dir.
+    --config=<path>            Path to a config file that contains a mapping of
+                               tool names to SkippyConfig objects.
+    --parallel                 Compute affected projects in parallel.
+    --changed-files=<path>     A relative (to the repo root) path to a
+                               changed_files.txt that contains a
+                               newline-delimited list of changed files. This is
+                               usually computed from a GitHub PR's changed files.
+    -o, --outputs-dir=<path>   Output directory for skippy outputs.
+    --root-dir=<path>          Root repo directory. Used to compute relative
+                               paths.
+    --dependency-graph=<path>  Path to a serialized dependency graph file.
+    --android-test-project-paths=<path>
+                               Path to a file that contains a newline-delimited
+                               list of project paths that produce androidTest
+                               APKs.
+    -h, --help                 Show this message and exit
+  ```
+- **Enhancement**: Split out separate cacheable `generateDependencyGraph` and `generateAndroidTestProjects` tasks from `ComputeAffectedProjectsTask`. This allows for more fine-grained caching and parallelization.
+
+An example flow of the last two bullets can look like so:
+
+```bash
+# Generate the dependency graph and androidTest projects
+./gradlew generateDependencyGraph generateAndroidTestProjectPaths
+
+# Run the CLI, such as from a `*.main.kts` file that imports it.
+./skippy-runner.main.kts \
+    --changed-files changed_files.txt \
+    --dependency-graph slack/dependencyGraph/serializedGraph.bin \
+    --android-test-project-paths slack/androidTestProjectPaths/paths.txt \
+    ...
+```
+
+0.15.1
+------
+
+_2024-01-09_
+
+- Misc small fixes to the new artifact publishing internals released in 0.15.0.
+
+0.15.0
+------
+
+_2024-01-02_
+
+- **Enhancement**: We've reworked the internals of SGP significantly to make it more compatible with Gradle Project Isolation. This affects Skippy, ModScore, AndroidTest APK aggregation, DAGP missing identifiers, and property resolution (specifically command line properties and `local.properties`). Note that this work is ongoing as project isolation is incubating, but the changes in this release should be non-functional in nature.
+- Build against Kotlin `1.9.22`.
+- Build against KSP `1.9.22-1.0.16`.
+- Build against AGP `8.2.1`.
+- Build against AGP `8.3.0-beta01` in AgpHandler83.
+- Build against maven-publish `0.26.0`.
+- Update to Guava `33.0.0-jre`.
+- Update to Oshi `6.4.10`.
+- Update to kotlin-cli-util `2.6.0`.
+
+0.14.2
+------
+
+_2023-12-18_
+
+- Make `compose()` DSL function with Action parameter public.
+
+0.14.1
+------
+
+_2023-12-18_
+
+- Expose `compilerOption()` API in Compose DSL for compiler arg configuration.
+- Update to DAGP `1.28.0` + migrate off deprecated APIs.
+- Update Okio to `3.7.0`.
+- Update AgpHandler 8.3 to `8.3.0-alpha18`.
+- Build against KSP `1.9.21-1.0.16`.
+
+0.14.0
+------
+
+_2023-12-12_
+
+- Support granular Skippy configuration. Now each tool can be configured independently with both global and per-tool configuration. These are controlled via public `skippy` extension now. These outputs and diagnostics are stored at `build/skippy/{tool}/...`. Merged outputs can be generated as well to `build/skippy/merged`. This allows for creating dynamic pipelines based on the outputs of each tool. The global config is always overlaid onto each tool-specific config.
+
+  ```kotlin
+  skippy {
+    debug.set(true)
+    mergeOutputs.set(true)
+    computeInParallel.set(true)
+    global {
+      applyDefaults()
+      // Glob patterns of files to include in computing
+      includePatterns.addAll(
+        "**/*.pro",
+        "**/src/**/sqldelight/**",
+      )
+      excludePatterns.addAll(".idea/**/*.kt")
+      // Glob patterns of files that, if changed, should result in not skipping anything in the build
+      neverSkipPatterns.addAll(
+        ".buildkite/**",
+        ".github/actions/**",
+        "ci/**",
+        "config/health-score/**",
+        "tooling/scripts/**",
+      )
+    }
+    config("lint") {
+      includePatterns.addAll(
+        // project-local lint.xml files
+        // this doesn't fuuuuully work with skippy because these layer like .gitignore does
+        "**/lint.xml",
+        // Lint baselines
+        "**/lint-baseline.xml",
+      )
+      neverSkipPatterns.addAll(
+        // Global lint config
+        "config/lint/lint.xml",
+        // Houston feature flags, which is an input to our feature flags lints
+        "config/feature-flags/experiments.txt",
+      )
+    }
+    config("detekt") {
+      // Detekt baselines
+      includePatterns.add("**/detekt-baseline.xml")
+      // Global detekt configs
+      neverSkipPatterns.add("config/detekt/*")
+    }
+  }
+  ```
+
+- Update Kotlin language version to `1.9`.
+- Upgrade away from deprecated CC API check.
+- Update to okio `3.6.0`
+- Update to oshi `6.4.9`
+- Update to JNA `5.14.0`
+- Update to kotlin-cli-util `2.5.4`
+- Build against AGP `8.3.0-alpha17` in AgpHandler 8.3 artifact.
+- Build against DAGP `1.27.0`.
+
+0.13.1
+------
+
+_2023-12-05_
+
+- Make `Project.isSyncing` public.
+- Update to new `android.studio.version` property for reporting to build scans.
+- Update to Wire `4.9.3`.
+- Update to RxJava `3.1.8`.
+- Build against Kotlin `1.9.21`.
+- Build against KSP `1.9.21-1.0.15`.
+- Build against MoshiX `0.25.1`.
+- Build against AGP `8.2.0`.
+- Build against SqlDelight `2.0.1`.
+- Build against Redacted Compiler Plugin `1.7.1`.
+- Build against Detekt `1.23.4`.
+- Build against Gradle Doctor `0.9.1`.
+
+0.13.0
+------
+
+_2023-11-30_
+
+- Update to Gradle 8.5. This version requires Gradle 8.5+.
+- Report Gradle 8.5's new `BuildFeatures` to build scans as custom values, starting with configuration cache and isolated projects.
+- Update Guava to `32.1.3-jre`.
+- Update Oshi to `6.4.8`.
+- Build against AGP `8.1.4` (main) and `8.3.0-alpha15` (agp handler 8.3).
+- Build against compose multipaltform `1.5.11`.
+- Include source links in Dokka docs.
+
+0.12.1
+------
+
+_2023-11-21_
+
+- Fix circuit() extension code gen using the wrong configuration.
+
+0.12.0
+------
+
+_2023-11-20_
+
+- **New**: Add a `SlackExtension.circuit()` DSL. This makes it easy to set up [Circuit](https://github.com/slackhq/circuit) in a project. See the DSL docs for more details.
+  ```kotlin
+  slack {
+    features {
+      circuit()
+    }
+  }
+  ```
+- Don't configure `KspTask` subtypes of `KotlinCompile` tasks.
+- Remove `autoValue()` APIs from `SlackExtension`.
+- Fix deprecated forkEvery call.
+
 0.11.7
 ------
 

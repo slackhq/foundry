@@ -1,4 +1,19 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+/*
+ * Copyright (C) 2023 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   kotlin("jvm")
@@ -6,6 +21,7 @@ plugins {
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.bestPracticesPlugin)
   alias(libs.plugins.moshix)
+  alias(libs.plugins.buildConfig)
 }
 
 gradlePlugin {
@@ -23,30 +39,10 @@ gradlePlugin {
   }
 }
 
-sourceSets {
-  main.configure {
-    java.srcDir(
-      project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main")
-    )
-  }
+buildConfig {
+  packageName("slack.gradle.dependencies")
+  useKotlinOutput { internalVisibility = true }
 }
-
-// NOTE: DON'T CHANGE THIS TASK NAME WITHOUT CHANGING IT IN THE ROOT BUILD FILE TOO!
-val copyVersionTemplatesProvider =
-  tasks.register<Copy>("copyVersionTemplates") {
-    from(project.layout.projectDirectory.dir("version-templates"))
-    into(project.layout.buildDirectory.dir("generated/sources/version-templates/kotlin/main"))
-    filteringCharset = "UTF-8"
-
-    doFirst {
-      if (destinationDir.exists()) {
-        // Clear output dir first if anything is present
-        destinationDir.listFiles()?.forEach { it.delete() }
-      }
-    }
-  }
-
-tasks.named<KotlinCompile>("compileKotlin") { dependsOn(copyVersionTemplatesProvider) }
 
 // Copy our hooks into resources for InstallCommitHooks
 tasks.named<ProcessResources>("processResources") {
@@ -56,21 +52,31 @@ tasks.named<ProcessResources>("processResources") {
   }
 }
 
-// Necessary for gradle exec optimizations in gradle 8
-tasks.matching { it.name == "sourcesJar" }.configureEach { dependsOn(copyVersionTemplatesProvider) }
-
 moshi { enableSealed.set(true) }
+
+// This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
+// apply disambiguation rules
+dependencies.constraints {
+  add("implementation", "io.github.pdvrieze.xmlutil:serialization") {
+    attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+  }
+  add("implementation", "io.github.pdvrieze.xmlutil:core") {
+    attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) }
+  }
+}
 
 dependencies {
   api(platform(libs.okhttp.bom))
   api(libs.okhttp)
   // Better I/O
   api(libs.okio)
-  api(projects.agpHandlers.agpHandler80)
+  api(projects.agpHandlers.agpHandler82)
   api(projects.agpHandlers.agpHandler83)
   api(projects.agpHandlers.agpHandlerApi)
 
+  implementation(platform(libs.coroutines.bom))
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
+  implementation(libs.coroutines.core)
   implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
   implementation(libs.guava)
   // Graphing library with Betweenness Centrality algo for modularization score
@@ -81,6 +87,8 @@ dependencies {
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
+  implementation(projects.sgpCommon)
+  implementation(projects.skippy)
 
   compileOnly(platform(libs.kotlin.bom))
   compileOnly(gradleApi())
@@ -111,7 +119,9 @@ dependencies {
   compileOnly(libs.gradlePlugins.wire)
   compileOnly(libs.kotlin.reflect)
 
+  testImplementation(platform(libs.coroutines.bom))
   testImplementation(libs.agp)
+  testImplementation(libs.coroutines.test)
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)

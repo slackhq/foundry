@@ -16,28 +16,22 @@
 package slack.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.toolchain.JvmVendorSpec
-import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 
 /** Registry of global configuration info. */
 public class GlobalConfig
 private constructor(
-  internal val updateRobolectricJarsTask: TaskProvider<UpdateRobolectricJarsTask>?,
   internal val kotlinDaemonArgs: List<String>,
   internal val errorProneCheckNamesAsErrors: List<String>,
   internal val affectedProjects: Set<String>?,
-  internal val jvmVendor: JvmVendorSpec?
+  internal val jvmVendor: JvmVendorSpec?,
 ) {
 
   internal companion object {
     operator fun invoke(project: Project): GlobalConfig {
       check(project == project.rootProject) { "Project is not root project!" }
       val globalSlackProperties = SlackProperties(project)
-      val robolectricJarsDownloadTask =
-        project.createRobolectricJarsDownloadTask(globalSlackProperties)
       return GlobalConfig(
-        updateRobolectricJarsTask = robolectricJarsDownloadTask,
         kotlinDaemonArgs = globalSlackProperties.kotlinDaemonArgs.split(" "),
         errorProneCheckNamesAsErrors =
           globalSlackProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty(),
@@ -58,23 +52,8 @@ private constructor(
         jvmVendor =
           globalSlackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull.also {
             project.logger.debug("[SGP] JVM vendor: $it")
-          }
+          },
       )
     }
   }
-}
-
-private fun Project.createRobolectricJarsDownloadTask(
-  slackProperties: SlackProperties
-): TaskProvider<UpdateRobolectricJarsTask>? {
-  if (slackProperties.versions.robolectric == null) {
-    // Not enabled
-    return null
-  }
-
-  check(isRootProject) {
-    "Robolectric jars task should only be created once on the root project. Tried to apply on $name"
-  }
-
-  return UpdateRobolectricJarsTask.register(this, slackProperties)
 }

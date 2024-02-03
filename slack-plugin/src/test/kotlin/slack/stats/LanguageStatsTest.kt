@@ -141,7 +141,7 @@ class LanguageStatsTest {
     val first =
       mapOf(
         "Kotlin" to LanguageStats(files = 1, code = 4, comment = 5, blank = 4),
-        "Java" to LanguageStats(files = 1, code = 4, comment = 5, blank = 4)
+        "Java" to LanguageStats(files = 1, code = 4, comment = 5, blank = 4),
       )
     val second = mapOf("Kotlin" to LanguageStats(files = 1, code = 4, comment = 5, blank = 4))
 
@@ -150,7 +150,7 @@ class LanguageStatsTest {
       .containsExactlyEntriesIn(
         mapOf(
           "Kotlin" to LanguageStats(files = 2, code = 8, comment = 10, blank = 8),
-          "Java" to LanguageStats(files = 1, code = 4, comment = 5, blank = 4)
+          "Java" to LanguageStats(files = 1, code = 4, comment = 5, blank = 4),
         )
       )
   }

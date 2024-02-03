@@ -24,22 +24,27 @@ import org.gradle.api.file.Directory
 import org.gradle.api.specs.Spec
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.Resolver
+import slack.gradle.artifacts.SgpArtifact
+import slack.gradle.avoidance.SkippyArtifacts
 import slack.gradle.configure
 import slack.gradle.configureEach
 import slack.gradle.isRootProject
 import slack.gradle.register
 import slack.gradle.tasks.DetektDownloadTask
+import slack.gradle.tasks.SimpleFileProducerTask
+import slack.gradle.tasks.SimpleFilesConsumerTask
+import slack.gradle.tasks.publish
 import slack.gradle.util.setDisallowChanges
 import slack.gradle.util.sneakyNull
 
 internal object DetektTasks {
   private const val GLOBAL_CI_DETEKT_TASK_NAME = "globalCiDetekt"
+  private const val CI_DETEKT_TASK_NAME = "ciDetekt"
   private const val LOG = "SlackDetekt:"
 
-  fun configureRootProject(
-    project: Project,
-    slackProperties: SlackProperties,
-  ) {
+  fun configureRootProject(project: Project, slackProperties: SlackProperties) {
     // Add detekt download task
     slackProperties.versions.detekt?.let { detektVersion ->
       project.tasks.register<DetektDownloadTask>("updateDetekt") {
@@ -47,10 +52,13 @@ internal object DetektTasks {
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/detekt"))
       }
 
-      project.tasks.register(GLOBAL_CI_DETEKT_TASK_NAME) {
-        group = LifecycleBasePlugin.VERIFICATION_GROUP
-        description = "Global lifecycle task to run all dependent detekt tasks."
-      }
+      val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_DETEKT)
+      SimpleFilesConsumerTask.registerOrConfigure(
+        project,
+        GLOBAL_CI_DETEKT_TASK_NAME,
+        description = "Global lifecycle task to run all dependent detekt tasks.",
+        inputFiles = resolver.artifactView(),
+      )
     }
   }
 
@@ -89,9 +97,9 @@ internal object DetektTasks {
           }
       }
 
-      val globalTask =
+      val publisher =
         if (affectedProjects == null || project.path in affectedProjects) {
-          project.rootProject.tasks.named(GLOBAL_CI_DETEKT_TASK_NAME)
+          Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_DETEKT)
         } else {
           val log = "$LOG Skipping ${project.path}:detekt because it is not affected."
           if (slackProperties.debug) {
@@ -99,6 +107,7 @@ internal object DetektTasks {
           } else {
             project.logger.debug(log)
           }
+          SkippyArtifacts.publishSkippedTask(project, "detekt")
           null
         }
 
@@ -117,19 +126,27 @@ internal object DetektTasks {
       }
 
       // Wire up to the global task
-      globalTask?.configure {
-        // We use a filter on Detekt tasks because not every project actually makes one!
-        val taskSpec =
-          if (slackProperties.enableFullDetekt) {
-            // Depend on all Detekt tasks with type resolution
-            // The "detekt" task is excluded because it is a plain, non-type-resolution version
-            Spec<Detekt> { it.name != DetektPlugin.DETEKT_TASK_NAME }
-          } else {
-            // Depend _only_ on the "detekt plain" task, which runs without type resolution
-            Spec<Detekt> { it.name == DetektPlugin.DETEKT_TASK_NAME }
-          }
-        dependsOn(project.tasks.withType(Detekt::class.java).matching(taskSpec))
-      }
+      // We use a filter on Detekt tasks because not every project actually makes one!
+      val taskSpec =
+        if (slackProperties.enableFullDetekt) {
+          // Depend on all Detekt tasks with type resolution
+          // The "detekt" task is excluded because it is a plain, non-type-resolution version
+          Spec<Detekt> { it.name != DetektPlugin.DETEKT_TASK_NAME }
+        } else {
+          // Depend _only_ on the "detekt plain" task, which runs without type resolution
+          Spec<Detekt> { it.name == DetektPlugin.DETEKT_TASK_NAME }
+        }
+      val matchingTasks = project.tasks.withType(Detekt::class.java).matching(taskSpec)
+      val ciDetekt =
+        SimpleFileProducerTask.registerOrConfigure(
+          project,
+          CI_DETEKT_TASK_NAME,
+          description = "Lifecycle task to run detekt for ${project.path}.",
+          group = LifecycleBasePlugin.VERIFICATION_GROUP,
+        ) {
+          dependsOn(matchingTasks)
+        }
+      publisher?.publish(ciDetekt)
     }
   }
 }

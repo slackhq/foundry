@@ -22,6 +22,7 @@ import com.google.auto.service.AutoService
 import java.io.File
 import org.gradle.api.provider.ProviderFactory
 import slack.gradle.agp.AgpHandler
+import slack.gradle.agp.computeAndroidPluginVersion
 import slack.gradle.agp.internal.NoOpIssueReporter
 
 public class AgpHandler83 private constructor(override val agpVersion: AndroidPluginVersion) :
@@ -31,18 +32,14 @@ public class AgpHandler83 private constructor(override val agpVersion: AndroidPl
     SdkLocator.getSdkDirectory(
       projectRootDir,
       NoOpIssueReporter,
-      SdkLocationSourceSet(projectRootDir, providers)
+      SdkLocationSourceSet(projectRootDir, providers),
     )
 
   @AutoService(AgpHandler.Factory::class)
   public class Factory : AgpHandler.Factory {
-    override val minVersion: AndroidPluginVersion =
-      AndroidPluginVersion(
-          8,
-          3,
-          0,
-        )
-        .alpha(13)
+    override val minVersion: AndroidPluginVersion by lazy {
+      computeAndroidPluginVersion(AGP_VERSION)
+    }
 
     override val currentVersion: AndroidPluginVersion by lazy { AndroidPluginVersion.getCurrent() }
 

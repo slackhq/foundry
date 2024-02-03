@@ -18,32 +18,33 @@ package slack.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import slack.gradle.util.booleanProperty
-import slack.gradle.util.booleanProvider
+import slack.gradle.artifacts.SgpArtifact
+import slack.gradle.util.PropertyResolver
 import slack.gradle.util.getOrCreateExtra
-import slack.gradle.util.intProperty
-import slack.gradle.util.intProvider
-import slack.gradle.util.optionalStringProperty
-import slack.gradle.util.optionalStringProvider
-import slack.gradle.util.safeProperty
 import slack.gradle.util.sneakyNull
 
 /**
  * (Mostly Gradle) properties for configuration of SlackPlugin.
  *
- * Order attempted as described by [safeProperty].
+ * Order attempted as described by [PropertyResolver.providerFor].
  */
-public class SlackProperties private constructor(private val project: Project) {
+public class SlackProperties
+internal constructor(
+  private val project: Project,
+  startParameterProperty: (String) -> Provider<String>,
+  globalLocalProperty: (String) -> Provider<String>,
+) {
+  private val resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty)
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
   private fun fileProperty(key: String): File? = optionalStringProperty(key)?.let(project::file)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
-    project.intProperty(key, defaultValue = defaultValue)
+    resolver.intValue(key, defaultValue = defaultValue)
 
   private fun booleanProperty(key: String, defaultValue: Boolean = false): Boolean =
-    project.booleanProperty(key, defaultValue = defaultValue)
+    resolver.booleanValue(key, defaultValue = defaultValue)
 
   private fun stringProperty(key: String): String =
     optionalStringProperty(key)
@@ -55,17 +56,13 @@ public class SlackProperties private constructor(private val project: Project) {
   private fun optionalStringProperty(
     key: String,
     defaultValue: String? = null,
-    blankIsNull: Boolean = false
+    blankIsNull: Boolean = false,
   ): String? =
-    project.optionalStringProperty(key, defaultValue = defaultValue)?.takeUnless {
+    resolver.optionalStringValue(key, defaultValue = defaultValue)?.takeUnless {
       blankIsNull && it.isBlank()
     }
 
-  internal val versions: SlackVersions by lazy {
-    project.rootProject.getOrCreateExtra("slack-versions") {
-      SlackVersions(project.rootProject.getVersionsCatalog())
-    }
-  }
+  internal val versions: SlackVersions by lazy { SlackVersions(project.getVersionsCatalog()) }
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
@@ -247,14 +244,11 @@ public class SlackProperties private constructor(private val project: Project) {
    * alternative to running gradle with `--info` or `--debug`.
    */
   public val verboseLogging: Boolean
-    get() = project.booleanProperty("sgp.logging.verbose")
+    get() = resolver.booleanValue("sgp.logging.verbose")
 
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
-    get() =
-      booleanProperty(
-        "slack.test.verboseLogging",
-      ) || verboseLogging
+    get() = booleanProperty("slack.test.verboseLogging") || verboseLogging
 
   /**
    * Flag to enable kapt in tests. By default these are disabled due to this undesirable (but
@@ -305,6 +299,10 @@ public class SlackProperties private constructor(private val project: Project) {
   /** Flag to enable/disable Moshi-IR. */
   public val allowMoshiIr: Boolean
     get() = booleanProperty("slack.allow-moshi-ir")
+
+  /** Flag to enable/disable moshi proguard rule gen. */
+  public val moshixGenerateProguardRules: Boolean
+    get() = booleanProperty("moshix.generateProguardRules", defaultValue = true)
 
   /** Flag to enable/disable Napt. */
   public val allowNapt: Boolean
@@ -381,6 +379,10 @@ public class SlackProperties private constructor(private val project: Project) {
    */
   public val ciLintVariants: String?
     get() = optionalStringProperty("slack.ci-lint.variants")
+
+  /** Flag for enabling test orchestrator. */
+  public val useOrchestrator: Boolean
+    get() = booleanProperty("orchestrator")
 
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
@@ -481,13 +483,14 @@ public class SlackProperties private constructor(private val project: Project) {
         .let(TestRetryPluginType::valueOf)
 
   public val testRetryFailOnPassedAfterRetry: Provider<Boolean>
-    get() = project.booleanProvider("slack.test.retry.failOnPassedAfterRetry", defaultValue = false)
+    get() =
+      resolver.booleanProvider("slack.test.retry.failOnPassedAfterRetry", defaultValue = false)
 
   public val testRetryMaxFailures: Provider<Int>
-    get() = project.intProvider("slack.test.retry.maxFailures", defaultValue = 20)
+    get() = resolver.intProvider("slack.test.retry.maxFailures", defaultValue = 20)
 
   public val testRetryMaxRetries: Provider<Int>
-    get() = project.intProvider("slack.test.retry.maxRetries", defaultValue = 1)
+    get() = resolver.intProvider("slack.test.retry.maxRetries", defaultValue = 1)
 
   /* Detekt configs. */
   /** Detekt config files, evaluated from rootProject.file(...). */
@@ -543,15 +546,15 @@ public class SlackProperties private constructor(private val project: Project) {
 
   /** Global toggle to enable bugsnag. Note this still respects variant filters. */
   public val bugsnagEnabled: Provider<Boolean>
-    get() = project.booleanProvider("slack.gradle.config.bugsnag.enabled")
+    get() = resolver.booleanProvider("slack.gradle.config.bugsnag.enabled")
 
   /** Branch pattern for git branches Bugsnag should be enabled on. */
   public val bugsnagEnabledBranchPattern: Provider<String>
-    get() = project.optionalStringProvider("slack.gradle.config.bugsnag.enabledBranchPattern")
+    get() = resolver.optionalStringProvider("slack.gradle.config.bugsnag.enabledBranchPattern")
 
   /** Global boolean that controls whether mod score is enabled on this project. */
   public val modScoreGlobalEnabled: Boolean
-    get() = project.booleanProperty("slack.gradle.config.modscore.enabled")
+    get() = resolver.booleanValue("slack.gradle.config.modscore.enabled")
 
   /**
    * Per-project boolean that allows for excluding this project from mod score.
@@ -559,23 +562,32 @@ public class SlackProperties private constructor(private val project: Project) {
    * Note this should only be applied to projects that cannot be depended on.
    */
   public val modScoreIgnore: Boolean
-    get() = project.booleanProperty("slack.gradle.config.modscore.ignore")
+    get() = resolver.booleanValue("slack.gradle.config.modscore.ignore")
 
   /** Experimental flag to enable logging thermal throttling on macOS devices. */
   public val logThermals: Boolean
-    get() = project.booleanProperty("slack.log-thermals", defaultValue = false)
+    get() = resolver.booleanValue("slack.log-thermals", defaultValue = false)
 
   /**
    * Enables applying common build tags. We are likely to remove these in favor of Gradle's
    * first-party plugin.
    */
   public val applyCommonBuildTags: Boolean
-    get() = project.booleanProperty("sgp.ge.apply-common-build-tags", defaultValue = true)
+    get() = resolver.booleanValue("sgp.ge.apply-common-build-tags", defaultValue = true)
+
+  /**
+   * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
+   * as a failsafe while we try different approaches to allow lenient resolution.
+   *
+   * @see StandardProjectConfigurations.setUpSubprojectArtifactPublishing
+   */
+  public val eagerlyConfigureArtifactPublishing: Boolean
+    get() = resolver.booleanValue("sgp.artifacts.configure-eagerly", defaultValue = false)
 
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
-      project.optionalStringProvider("sgp.config.jvmVendor").map {
+      resolver.optionalStringProvider("sgp.config.jvmVendor").map {
         if (jvmVendorOptOut) {
           sneakyNull()
         } else {
@@ -597,7 +609,7 @@ public class SlackProperties private constructor(private val project: Project) {
   internal data class AndroidSdkProperties(
     val compileSdk: String,
     val minSdk: Int,
-    val targetSdk: Int
+    val targetSdk: Int,
   )
 
   public val compileSdkVersion: String?
@@ -627,7 +639,22 @@ public class SlackProperties private constructor(private val project: Project) {
 
     private const val CACHED_PROVIDER_EXT_NAME = "slack.properties.provider"
 
-    public operator fun invoke(project: Project): SlackProperties =
-      project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME, ::SlackProperties)
+    public operator fun invoke(
+      project: Project,
+      slackTools: Provider<SlackTools>? = project.slackToolsProvider(),
+    ): SlackProperties {
+      return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
+        SlackProperties(
+          project = p,
+          startParameterProperty = { key ->
+            slackTools?.flatMap { tools -> tools.globalStartParameterProperty(key) }
+              ?: p.provider { null }
+          },
+          globalLocalProperty = { key ->
+            slackTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
+          },
+        )
+      }
+    }
   }
 }

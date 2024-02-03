@@ -20,12 +20,13 @@ import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import com.diffplug.spotless.LineEnding
 import java.util.Locale
 import java.util.Optional
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.provider.Provider
-import slack.gradle.tasks.CoreBootstrapTask
 import slack.stats.ModuleStatsTasks
 
 /**
@@ -34,7 +35,8 @@ import slack.stats.ModuleStatsTasks
  *
  * The goal of separating this from [SlackRootPlugin] is project isolation.
  */
-internal class SlackBasePlugin : Plugin<Project> {
+internal class SlackBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
+  Plugin<Project> {
   override fun apply(target: Project) {
     val slackProperties = SlackProperties(target)
 
@@ -43,7 +45,6 @@ internal class SlackBasePlugin : Plugin<Project> {
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       val slackTools = target.slackTools()
       StandardProjectConfigurations(slackProperties, versionCatalog, slackTools).applyTo(target)
-      CoreBootstrapTask.configureSubprojectBootstrapTasks(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
@@ -73,11 +74,15 @@ internal class SlackBasePlugin : Plugin<Project> {
     }
 
     // Everything in here applies to all projects
-    target.configureSpotless(slackProperties)
     target.configureClasspath(slackProperties)
-    val scanApi = ScanApi(target)
-    if (scanApi.isAvailable) {
-      scanApi.addTestParallelization(target)
+    if (!this.buildFeatures.isolatedProjects.requested.getOrElse(false)) {
+      // TODO https://github.com/diffplug/spotless/issues/1979
+      target.configureSpotless(slackProperties)
+      // TODO not clear how to access the build scan API from a non-root project
+      val scanApi = ScanApi(target)
+      if (scanApi.isAvailable) {
+        scanApi.addTestParallelization(target)
+      }
     }
   }
 
@@ -100,8 +105,8 @@ internal class SlackBasePlugin : Plugin<Project> {
         val ktlintVersion = slackProperties.versions.ktlint
         if (ktlintVersion != null) {
           val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-          kotlin { ktlint(ktlintVersion).userData(ktlintUserData) }
-          kotlinGradle { ktlint(ktlintVersion).userData(ktlintUserData) }
+          kotlin { ktlint(ktlintVersion).editorConfigOverride(ktlintUserData) }
+          kotlinGradle { ktlint(ktlintVersion).editorConfigOverride(ktlintUserData) }
         }
 
         val ktfmtVersion = slackProperties.versions.ktfmt
@@ -184,7 +189,7 @@ internal class SlackBasePlugin : Plugin<Project> {
     configuration: Configuration,
     isTestProject: Boolean,
     hamcrestDepOptional: Optional<Provider<MinimalExternalModuleDependency>>,
-    checkerDepOptional: Optional<Provider<MinimalExternalModuleDependency>>
+    checkerDepOptional: Optional<Provider<MinimalExternalModuleDependency>>,
   ) {
     val configurationName = configuration.name
     val lowercaseName = configurationName.lowercase(Locale.US)

@@ -11,7 +11,14 @@
   "packageRules": [
     {
       "matchManagers": ["pip_requirements"],
-      "automerge": true
+      "groupName": "Docsite Dependencies",
+      "automerge": true,
+      "extends": [
+        "schedule:weekly"
+      ],
+      "additionalReviewers": [
+        "team:android-librarians"
+      ]
     },
     {
       "description": "Automerge non-major updates",

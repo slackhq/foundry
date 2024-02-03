@@ -38,6 +38,7 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -57,20 +58,21 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.utils.named
-import slack.dependencyrake.MissingIdentifiersAggregatorTask
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
-import slack.gradle.avoidance.ComputeAffectedProjectsTask
-import slack.gradle.dependencies.KotlinBuildConfig
+import slack.gradle.artifacts.Publisher
+import slack.gradle.artifacts.SgpArtifact
+import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
 import slack.gradle.tasks.CheckManifestPermissionsTask
-import slack.gradle.util.booleanProperty
+import slack.gradle.tasks.SimpleFileProducerTask
+import slack.gradle.tasks.publishWith
+import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 import slack.unittest.UnitTests
@@ -104,7 +106,7 @@ internal class StandardProjectConfigurations(
   private val kotlinCompilerArgs =
     mutableListOf<String>()
       .apply {
-        addAll(KotlinBuildConfig.kotlinCompilerArgs)
+        addAll(BuildConfig.KOTLIN_COMPILER_ARGS)
         // Left as a toe-hold for any future dynamic arguments
       }
       .distinct()
@@ -117,13 +119,39 @@ internal class StandardProjectConfigurations(
         SlackExtension::class.java,
         globalProperties,
         slackProperties,
-        versionCatalog
+        versionCatalog,
       )
+    if (slackProperties.eagerlyConfigureArtifactPublishing) {
+      setUpSubprojectArtifactPublishing(project)
+    }
     project.applyCommonConfigurations(slackProperties)
     val jdkVersion = project.jdkVersion()
     val jvmTargetVersion = project.jvmTargetVersion()
     project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
     project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
+  }
+
+  /**
+   * Always enables publishing of all SgpArtifacts, even if we never end up publishing artifacts
+   * This sucks but I don't see any other way to do this due to how tightly locked down Gradle's
+   * inter-project access APIs are in project isolation.
+   *
+   * Ideally, we would only add project dependencies when they are definitely able to contribute
+   * artifacts to that configuration, but that's not possible when:
+   * 1. Root projects can't reach into subprojects to ask about their configuration
+   * 2. Subprojects can't reach into root projects to add dependencies conditionally
+   * 3. There doesn't seem to be a way to depend on a certain project's configuration if that
+   *    configuration doesn't exist. This sorta makes sense, but for the purpose of inter-project
+   *    artifacts I wish it was possible to depend on a configuration that may not exist and just
+   *    treat it as an empty config that publishes no artifacts.
+   *
+   * It _seems_ like #3 is possible via [ArtifactView.ViewConfiguration.lenient], so this function
+   * is behind a flag just as a failsafe.
+   */
+  private fun setUpSubprojectArtifactPublishing(project: Project) {
+    for (artifact in SgpArtifact::class.sealedSubclasses) {
+      Publisher.interProjectPublisher(project, artifact.objectInstance!!)
+    }
   }
 
   private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
@@ -177,20 +205,15 @@ internal class StandardProjectConfigurations(
         dependencies.add("implementation", it)
       }
 
+      UnitTests.configureSubproject(
+        project,
+        pluginId,
+        slackProperties,
+        slackTools.globalConfig.affectedProjects,
+        slackTools::logAvoidedTask,
+      )
+
       if (pluginId != "com.android.test") {
-        // Configure tests
-        UnitTests.configureSubproject(
-          project,
-          pluginId,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          slackTools::logAvoidedTask
-        )
-
-        slackProperties.versions.bundles.commonTest.ifPresent {
-          dependencies.add("testImplementation", it)
-        }
-
         // Configure dependencyAnalysis
         // TODO move up once DAGP supports com.android.test projects
         //  https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
@@ -231,13 +254,9 @@ internal class StandardProjectConfigurations(
               configure<DependencyAnalysisSubExtension> {
                 registerPostProcessingTask(rakeDependencies)
               }
-              val aggregator =
-                project.rootProject.tasks.named<MissingIdentifiersAggregatorTask>(
-                  MissingIdentifiersAggregatorTask.NAME
-                )
-              aggregator.configure {
-                inputFiles.from(rakeDependencies.flatMap { it.missingIdentifiersFile })
-              }
+              val publisher =
+                Publisher.interProjectPublisher(project, SgpArtifact.DAGP_MISSING_IDENTIFIERS)
+              publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
         }
@@ -434,7 +453,7 @@ internal class StandardProjectConfigurations(
             logger.lifecycle("Enabling error-prone auto-patching on ${project.path}:$name")
             errorproneArgs.addAll(
               "-XepPatchChecks:${ERROR_PRONE_CHECKS.joinToString(",")}",
-              "-XepPatchLocation:IN_PLACE"
+              "-XepPatchLocation:IN_PLACE",
             )
           }
         }
@@ -449,16 +468,13 @@ internal class StandardProjectConfigurations(
     slackProperties: SlackProperties,
   ) {
     val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
-    val computeAffectedProjectsTask =
-      project.rootProject.tasks.named(
-        ComputeAffectedProjectsTask.NAME,
-        ComputeAffectedProjectsTask::class.java
-      )
     // Contribute these libraries to Fladle if they opt into it
-    val androidTestApksAggregator =
-      project.rootProject.tasks.named(AndroidTestApksTask.NAME, AndroidTestApksTask::class.java)
+    val androidTestApksPublisher =
+      Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
+    val skippyAndroidTestProjectPublisher =
+      Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -505,12 +521,22 @@ internal class StandardProjectConfigurations(
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
-              computeAffectedProjectsTask.configure { androidTestProjects.add(projectPath) }
+              // Note this intentionally just uses the same task each time as they always produce
+              // the same output
+              SimpleFileProducerTask.registerOrConfigure(
+                  project,
+                  name = "androidTestProjectMetadata",
+                  description =
+                    "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                  input = projectPath,
+                  group = "skippy",
+                )
+                .publishWith(skippyAndroidTestProjectPublisher)
               if (isLibraryVariant) {
                 (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
                   apkArtifactsDir ->
-                  // Wire this up to the aggregator
-                  androidTestApksAggregator.configure { androidTestApkDirs.from(apkArtifactsDir) }
+                  // Wire this up to the aggregator. No need for an intermediate task here.
+                  androidTestApksPublisher.publishDirs(apkArtifactsDir)
                 }
               }
             } else {
@@ -562,7 +588,7 @@ internal class StandardProjectConfigurations(
           testOptions {
             animationsDisabled = true
 
-            if (booleanProperty("orchestrator")) {
+            if (slackProperties.useOrchestrator) {
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -588,12 +614,12 @@ internal class StandardProjectConfigurations(
                 //
                 // Note that we can't configure this to _just_ be enabled for robolectric projects
                 // based on dependencies unfortunately, as the task graph is already wired by the
-                // time
-                // dependencies start getting resolved.
+                // time dependencies start getting resolved.
                 //
-                slackTools.globalConfig.updateRobolectricJarsTask?.let {
+                slackProperties.versions.robolectric?.let {
                   logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
-                  test.dependsOn(it)
+                  // Depending on the root project task by name alone is ok for Project Isolation
+                  test.dependsOn(":${UpdateRobolectricJarsTask.NAME}")
                 }
 
                 // Necessary for some OkHttp-using tests to work on JDK 11 in Robolectric
@@ -683,7 +709,7 @@ internal class StandardProjectConfigurations(
               "LICENSE_*",
               // We don't know where this comes from but it's 5MB
               // https://slack-pde.slack.com/archives/C8EER3C04/p1621353426001500
-              "annotated-jdk/**"
+              "annotated-jdk/**",
             )
           jniLibs.pickFirsts +=
             setOf(
@@ -707,7 +733,7 @@ internal class StandardProjectConfigurations(
 
         PermissionChecks.configure(
           project = project,
-          allowListActionGetter = { slackExtension.androidHandler.appHandler.allowlistAction }
+          allowListActionGetter = { slackExtension.androidHandler.appHandler.allowlistAction },
         ) { taskName, file, allowListProvider ->
           tasks.register<CheckManifestPermissionsTask>(taskName) {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -818,7 +844,7 @@ internal class StandardProjectConfigurations(
                       // Skip dashes and underscores. We could camelcase but it looks weird in a
                       // package name
                       '-',
-                      '_', -> null
+                      '_' -> null
                       // Use the project path as the real dot namespacing
                       ':' -> '.'
                       else -> it
@@ -913,7 +939,7 @@ internal class StandardProjectConfigurations(
             jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
-            freeCompilerArgs.addAll(KotlinBuildConfig.kotlinJvmCompilerArgs)
+            freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS)
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files
@@ -1090,7 +1116,7 @@ internal object KotlinArgConfigs {
     override val args =
       setOf(
         "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "-opt-in=kotlinx.coroutines.FlowPreview"
+        "-opt-in=kotlinx.coroutines.FlowPreview",
       )
   }
 }
@@ -1244,7 +1270,7 @@ internal object AptOptionsConfigs {
         // https://dagger.dev/dev-guide/compiler-options.html#fastinit-mode
         "dagger.fastInit" to "enabled",
         // https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
-        "dagger.ignoreProvisionKeyWildcards" to "ENABLED"
+        "dagger.ignoreProvisionKeyWildcards" to "ENABLED",
       )
   }
 

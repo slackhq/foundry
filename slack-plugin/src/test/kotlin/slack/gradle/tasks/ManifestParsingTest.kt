@@ -47,7 +47,7 @@ class ManifestParsingTest {
         "android.permission.BLUETOOTH",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.REQUEST_INSTALL_PACKAGES"
+        "android.permission.REQUEST_INSTALL_PACKAGES",
       )
   }
 }

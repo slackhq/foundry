@@ -56,6 +56,12 @@ internal class ScanApi(project: Project) {
     }
   }
 
+  fun value(name: String, value: Boolean) {
+    if (isAvailable) {
+      requireExtension().value(name, value.toString())
+    }
+  }
+
   fun link(name: String, url: String) {
     if (isAvailable) {
       requireExtension().link(name, url)

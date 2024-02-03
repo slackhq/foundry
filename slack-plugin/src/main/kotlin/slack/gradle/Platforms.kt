@@ -60,7 +60,7 @@ public object Platforms {
 
       // Kotlin updates are handled by the regular shadow build.
       "org.jetbrains.kotlin",
-      "org.jetbrains.kotlinx"
+      "org.jetbrains.kotlinx",
     )
   private val IGNORED_IDENTIFIERS =
     setOf(
@@ -70,7 +70,7 @@ public object Platforms {
       // Calls is rarely updated and usually contains breaking changes.
       "com.slack.android:calls",
       // These aren't reliable for semver checks and only updated ad-hoc
-      "com.slack.data:client-thrifty"
+      "com.slack.data:client-thrifty",
     )
 
   /** Generates a `libs.versions.toml` representation of this [dependencyCollection]. */
@@ -79,7 +79,7 @@ public object Platforms {
     catalogName: String,
     providers: ProviderFactory,
     dependencyCollection: DependencyCollection,
-    logger: Logger
+    logger: Logger,
   ) {
     logger.lifecycle("Generating $catalogName.toml")
     if (targetFile.exists()) {
@@ -164,7 +164,7 @@ public object Platforms {
   public fun rewriteBuildFiles(
     rootProjectDir: File,
     logger: Logger,
-    dependencyCollection: DependencyCollection
+    dependencyCollection: DependencyCollection,
   ) {
     val identifierMap = dependencyCollection.identifierMap()
     val pathMap = identifierMap.entries.associateBy({ it.value }) { it.key }
@@ -213,7 +213,7 @@ public object Platforms {
   /** Applies constraints from a given [catalog]. */
   public fun applyFromCatalog(
     project: Project,
-    catalog: VersionCatalog = project.getVersionsCatalog()
+    catalog: VersionCatalog = project.getVersionsCatalog(),
   ) {
     check(project.pluginManager.hasPlugin("org.gradle.java-platform")) {
       "Must be a java-platform project!"
@@ -281,7 +281,7 @@ public object Platforms {
     providers: ProviderFactory,
     dependencyDef: DependencyDef,
     overridesProvider: Provider<VersionsOutput>,
-    logger: Logger
+    logger: Logger,
   ): String {
     val isOverridable =
       dependencyDef.group !in IGNORED_GROUPS &&
@@ -334,7 +334,7 @@ internal data class Artifact(
   val group: String,
   val available: Available,
   val version: String,
-  val name: String
+  val name: String,
 )
 
 @JsonClass(generateAdapter = true)

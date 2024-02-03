@@ -21,19 +21,21 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import slack.gradle.agp.PermissionAllowlistConfigurer
+import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
-import slack.gradle.util.booleanProperty
+import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 
 @DslMarker public annotation class SlackExtensionMarker
@@ -45,7 +47,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
+  versionCatalog: VersionCatalog,
 ) {
   internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
   internal val featuresHandler =
@@ -86,7 +88,6 @@ constructor(
 
       var kaptRequired = false
       var naptRequired = false
-      val avMoshiEnabled = featuresHandler.avExtensionMoshi.getOrElse(false)
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
       val allowKsp = slackProperties.allowKsp
@@ -155,7 +156,7 @@ constructor(
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
         }
-        if (project.booleanProperty("moshix.generateProguardRules", defaultValue = true)) {
+        if (slackProperties.moshixGenerateProguardRules) {
           markKspNeeded("Moshi IR code gen")
         }
       }
@@ -232,29 +233,8 @@ constructor(
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
         markKspNeeded("Circuit")
-        dependencies.add(aptConfiguration(), "com.slack.circuit:circuit-codegen")
+        dependencies.add("ksp", "com.slack.circuit:circuit-codegen")
         dependencies.add("compileOnly", "com.slack.circuit:circuit-codegen-annotations")
-      }
-
-      if (featuresHandler.autoValue.getOrElse(false)) {
-        markKaptNeeded("AutoValue")
-        dependencies.add("compileOnly", SlackDependencies.Auto.Value.annotations)
-        dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.autovalue)
-        if (avMoshiEnabled) {
-          dependencies.add("implementation", SlackDependencies.Auto.Value.Moshi.runtime)
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.Moshi.extension)
-        }
-        if (featuresHandler.avExtensionParcel.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Auto.Value.Parcel.adapter)
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.Parcel.extension)
-        }
-        if (featuresHandler.avExtensionWith.getOrElse(false)) {
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.with)
-        }
-        if (featuresHandler.avExtensionKotlin.getOrElse(false)) {
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Value.kotlin)
-          configure<KaptExtension> { arguments { arg("avkSrc", project.file("src/main/java")) } }
-        }
       }
 
       if (featuresHandler.autoService.getOrElse(false)) {
@@ -267,12 +247,6 @@ constructor(
           dependencies.add("compileOnly", SlackDependencies.Auto.Service.annotations)
           dependencies.add(aptConfiguration(), SlackDependencies.Auto.Service.autoservice)
         }
-      }
-
-      if (featuresHandler.incap.getOrElse(false)) {
-        markKaptNeeded("Incap")
-        dependencies.add("compileOnly", SlackDependencies.Incap.incap)
-        dependencies.add(aptConfiguration(), SlackDependencies.Incap.processor)
       }
 
       if (featuresHandler.redacted.getOrElse(false)) {
@@ -326,7 +300,7 @@ constructor(
           if (featuresHandler.moshiHandler.sealedMetadataReflect.getOrElse(false)) {
             dependencies.add(
               "implementation",
-              SlackDependencies.Moshi.MoshiX.Sealed.metadataReflect
+              SlackDependencies.Moshi.MoshiX.Sealed.metadataReflect,
             )
           }
         }
@@ -352,7 +326,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
+  versionCatalog: VersionCatalog,
 ) {
   // Dagger features
   internal val daggerHandler = objects.newInstance<DaggerHandler>()
@@ -363,18 +337,8 @@ constructor(
   /** Enables AutoService on this project. */
   internal abstract val autoService: Property<Boolean>
 
-  /** Enables InCap on this project. */
-  internal abstract val incap: Property<Boolean>
-
   /** Enables redacted-compiler-plugin on this project. */
   internal abstract val redacted: Property<Boolean>
-
-  // AutoValue
-  internal abstract val autoValue: Property<Boolean>
-  internal abstract val avExtensionMoshi: Property<Boolean>
-  internal abstract val avExtensionParcel: Property<Boolean>
-  internal abstract val avExtensionWith: Property<Boolean>
-  internal abstract val avExtensionKotlin: Property<Boolean>
 
   // Moshi
   internal val moshiHandler = objects.newInstance<MoshiHandler>()
@@ -444,7 +408,7 @@ constructor(
   public fun dagger(
     enableComponents: Boolean = false,
     projectHasJavaInjections: Boolean = false,
-    action: Action<DaggerHandler>? = null
+    action: Action<DaggerHandler>? = null,
   ) {
     check(enableComponents || projectHasJavaInjections) {
       "This function should not be called with both enableComponents and projectHasJavaInjections set to false. Either remove these parameters or call a more appropriate non-delicate dagger() overload."
@@ -461,44 +425,6 @@ constructor(
   }
 
   /**
-   * Enables AutoValue for this project.
-   *
-   * @param moshi Enables auto-value-moshi
-   * @param parcel Enables auto-value-parcel
-   * @param with Enables auto-value-with
-   */
-  @OptIn(DelicateSlackPluginApi::class)
-  public fun autoValue(
-    moshi: Boolean = false,
-    parcel: Boolean = false,
-    with: Boolean = false,
-  ) {
-    autoValue(moshi, parcel, with, kotlin = false)
-  }
-
-  /**
-   * Enables AutoValue for this project.
-   *
-   * @param moshi Enables auto-value-moshi
-   * @param parcel Enables auto-value-parcel
-   * @param with Enables auto-value-with
-   * @param kotlin Enables auto-value-kotlin. THIS SHOULD ONLY BE TEMPORARY FOR MIGRATION PURPOSES!
-   */
-  @DelicateSlackPluginApi
-  public fun autoValue(
-    moshi: Boolean = false,
-    parcel: Boolean = false,
-    with: Boolean = false,
-    kotlin: Boolean = false
-  ) {
-    autoValue.setDisallowChanges(true)
-    avExtensionParcel.setDisallowChanges(parcel)
-    avExtensionMoshi.setDisallowChanges(moshi)
-    avExtensionWith.setDisallowChanges(with)
-    avExtensionKotlin.setDisallowChanges(kotlin)
-  }
-
-  /**
    * Enables Moshi for this project.
    *
    * @param codegen Enables codegen.
@@ -511,7 +437,7 @@ constructor(
     codegen: Boolean,
     adapters: Boolean = false,
     kotlinReflect: Boolean = false,
-    action: Action<MoshiHandler> = Action {}
+    action: Action<MoshiHandler> = Action {},
   ) {
     action.execute(moshiHandler)
     moshiHandler.moshi.setDisallowChanges(true)
@@ -525,11 +451,6 @@ constructor(
     autoService.setDisallowChanges(true)
   }
 
-  /** Enables InCap on this project. */
-  public fun incap() {
-    incap.setDisallowChanges(true)
-  }
-
   /** Enables redacted-compiler-plugin on this project. */
   public fun redacted() {
     redacted.setDisallowChanges(true)
@@ -539,13 +460,7 @@ constructor(
    * Enables Compose for this project and applies any version catalog bundle dependencies defined by
    * [SlackProperties.defaultComposeAndroidBundleAlias].
    */
-  public fun compose(multiplatform: Boolean = false) {
-    compose(multiplatform) {
-      // No further configuration right now
-    }
-  }
-
-  private fun compose(multiplatform: Boolean, action: Action<ComposeHandler>) {
+  public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
     composeHandler.enable(multiplatform = multiplatform)
     action.execute(composeHandler)
   }
@@ -579,10 +494,7 @@ public abstract class MoshiHandler {
    * @param adapters Enables moshix-adapters.
    * @param metadataReflect Enables metadata-reflect. Should only be used in unit tests or CLIs!
    */
-  public fun moshix(
-    adapters: Boolean,
-    metadataReflect: Boolean = false,
-  ) {
+  public fun moshix(adapters: Boolean, metadataReflect: Boolean = false) {
     moshixAdapters.setDisallowChanges(adapters)
     moshixMetadataReflect.setDisallowChanges(metadataReflect)
   }
@@ -599,7 +511,7 @@ public abstract class MoshiHandler {
   public fun sealed(
     codegen: Boolean,
     kotlinReflect: Boolean = false,
-    metadataReflect: Boolean = false
+    metadataReflect: Boolean = false,
   ) {
     sealed.setDisallowChanges(true)
     sealedCodegen.setDisallowChanges(codegen)
@@ -764,7 +676,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
-  versionCatalog: VersionCatalog
+  versionCatalog: VersionCatalog,
 ) {
 
   private val composeBundleAlias =
@@ -778,11 +690,47 @@ constructor(
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
+  private val compilerOptions: ListProperty<String> = objects.listProperty<String>()
+
+  /**
+   * Configures the compiler options for Compose. This is a list of strings that will be passed into
+   * the underlying kotlinc invocation. Note that you should _not_ include the plugin prefix, just
+   * the simple [key]/[value] options directly.
+   *
+   * **Do**
+   *
+   * ```
+   * compilerOption("reportsDestination", metricsDir)
+   * ```
+   *
+   * **Don't**
+   *
+   * ```
+   * compilerOption("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination", metricsDir)
+   * ```
+   */
+  public fun compilerOption(key: String, value: String) {
+    compilerOptions.addAll("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$key=$value")
+  }
+
   /** @see [AndroidHandler.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *>? = null
 
   internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension
+  }
+
+  /**
+   * Enables compose compiler metrics for this project. Note this should not be enabled by default
+   * and is just for debugging!
+   */
+  @DelicateSlackPluginApi
+  public fun enableCompilerMetricsForDebugging(
+    reportsDestination: File,
+    metricsDestination: File = reportsDestination,
+  ) {
+    compilerOption("reportsDestination", reportsDestination.canonicalPath.toString())
+    compilerOption("metricsDestination", metricsDestination.canonicalPath.toString())
   }
 
   internal fun enable(multiplatform: Boolean) {
@@ -813,6 +761,10 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
       project.configureComposeCompiler(slackProperties, isMultiplatform)
+
+      project.tasks.configureKotlinCompilationTask {
+        compilerOptions.freeCompilerArgs.addAll(this@ComposeHandler.compilerOptions)
+      }
     }
   }
 }
@@ -820,10 +772,7 @@ constructor(
 @SlackExtensionMarker
 public abstract class AndroidHandler
 @Inject
-constructor(
-  objects: ObjectFactory,
-  private val slackProperties: SlackProperties,
-) {
+constructor(objects: ObjectFactory, private val slackProperties: SlackProperties) {
   internal val libraryHandler = objects.newInstance<SlackAndroidLibraryExtension>()
   internal val appHandler = objects.newInstance<SlackAndroidAppExtension>()
 
@@ -895,7 +844,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
    */
   public fun androidTest(
     excludeFromFladle: Boolean = false,
-    allowedVariants: Iterable<String>? = null
+    allowedVariants: Iterable<String>? = null,
   ) {
     androidTest.setDisallowChanges(true)
     androidTestExcludeFromFladle.setDisallowChanges(excludeFromFladle)
