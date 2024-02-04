@@ -35,7 +35,7 @@ val aggregatedApksProvider = rootProject.tasks
 
 tasks
   .withType<YamlConfigWriterTask>()
-  .matching { it.name == "writeConfigProps${fladleTarget}" }
+  .named { it == "writeConfigProps${fladleTarget}" }
   .configureEach { additionalTestApks.value(testInputsProvider) }
 ```
 
