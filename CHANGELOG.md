@@ -1,6 +1,24 @@
 Changelog
 =========
 
+0.15.3
+------
+
+_2024-02-03_
+
+- Support Gradle 8.6.
+- Use new lazier `TaskCollection.named(Spec)` APIs where appropriate.
+- Update to Moshi `1.15.1`.
+- Update to kotlin-cli-util `2.6.3`.
+- Update to oshi `6.4.11`.
+- Build against AGP `8.2.2`.
+- Build against Kotlin `1.9.22`.
+- Build against KSP `1.9.22-1.0.17`.
+- Build against Detekt `1.23.5`.
+- Build against Compose Multiplatform `1.5.12`.
+- Build against DAGP `1.29.0`.
+- Build against Spotless `6.25.0`.
+
 0.15.2
 ------
 
