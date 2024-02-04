@@ -131,12 +131,12 @@ internal object DetektTasks {
         if (slackProperties.enableFullDetekt) {
           // Depend on all Detekt tasks with type resolution
           // The "detekt" task is excluded because it is a plain, non-type-resolution version
-          Spec<Detekt> { it.name != DetektPlugin.DETEKT_TASK_NAME }
+          Spec<String> { it != DetektPlugin.DETEKT_TASK_NAME }
         } else {
           // Depend _only_ on the "detekt plain" task, which runs without type resolution
-          Spec<Detekt> { it.name == DetektPlugin.DETEKT_TASK_NAME }
+          Spec<String> { it == DetektPlugin.DETEKT_TASK_NAME }
         }
-      val matchingTasks = project.tasks.withType(Detekt::class.java).matching(taskSpec)
+      val matchingTasks = project.tasks.withType(Detekt::class.java).named(taskSpec)
       val ciDetekt =
         SimpleFileProducerTask.registerOrConfigure(
           project,

@@ -479,7 +479,7 @@ private fun Project.configureSlackRootBuildscript(jvmVendor: JvmVendorSpec?) {
 private fun Project.configureMisc(slackProperties: SlackProperties) {
   tasks
     .withType(Delete::class.java)
-    .matching { it.name == "clean" }
+    .named { it == "clean" }
     .configureEach {
       group = "build"
       delete(rootProject.layout.buildDirectory)
