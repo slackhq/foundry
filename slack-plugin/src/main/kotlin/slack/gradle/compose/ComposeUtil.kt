@@ -104,7 +104,7 @@ internal fun Project.configureComposeCompiler(
     // version we don't want, so we force all the compiler plugin classpaths to exclude the one
     // we're _not_ using here.
     configurations
-      .matching { it.name.startsWith("kotlinCompilerPluginClasspath") }
+      .named { it.startsWith("kotlinCompilerPluginClasspath") }
       .configureEach {
         val group =
           if (slackProperties.forceAndroidXComposeCompilerForComposeMultiplatform) {

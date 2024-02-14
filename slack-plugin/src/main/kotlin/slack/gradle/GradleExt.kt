@@ -320,7 +320,7 @@ internal inline fun <reified E : Any> ObjectFactory.domainObjectSet(): DomainObj
 internal inline fun <reified T : Any> Project.serviceOf(): T =
   (this as ProjectInternal).services.get()
 
-internal inline fun <reified T : Any> ServiceRegistry.get(): T = this[T::class.java]!!
+internal inline fun <reified T : Any> ServiceRegistry.get(): T = this[T::class.java]
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified T : Task> TaskContainer.registerOrConfigure(
