@@ -24,7 +24,7 @@ plugins {
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
-  id("org.jetbrains.compose") version "1.5.12"
+  alias(libs.plugins.compose)
 }
 
 group = "com.slack.intellij"
@@ -99,19 +99,18 @@ dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.tracing)
   implementation(libs.gradlePlugins.compose)
-  implementation(compose.ui)
-  implementation(compose.foundation)
+  implementation(libs.circuit)
+  implementation(libs.kotlin.poet)
+  implementation(projects.tracing)
+
   implementation(compose.animation)
+  implementation(compose.desktop.currentOs)
+  implementation(compose.foundation)
   implementation(compose.material3)
   implementation(compose.material)
-  implementation(compose.desktop.currentOs)
-  implementation("com.squareup:kotlinpoet:1.16.0")
-  implementation("com.slack.circuit:circuit-foundation:0.19.1")
-
+  implementation(compose.ui)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-
 }

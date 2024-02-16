@@ -3,6 +3,7 @@ agp = "8.2.2"
 agpAlpha = "8.3.0-rc01"
 anvil = "2.4.9-1-8"
 bugsnagGradle = "8.1.0"
+circuit = "0.19.1"
 compose-jb = "1.5.12"
 coroutines = "1.7.3"
 dependencyAnalysisPlugin = "1.29.0"
@@ -12,6 +13,7 @@ errorproneGradle = "3.0.1"
 jdk = "21"
 jna = "5.14.0"
 kotlin = "1.9.22"
+kotlinPoet = "1.16.0"
 ksp = "1.9.22-1.0.17"
 ktfmt = "0.47"
 mavenPublish = "0.27.0"
@@ -30,6 +32,7 @@ wire = "4.9.3"
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.0.0" }
+compose = { id = "org.jetbrains.compose", version = "1.5.12"}
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
@@ -55,6 +58,7 @@ autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.1"
 clikt = "com.github.ajalt.clikt:clikt:4.2.2"
 commonsText = "org.apache.commons:commons-text:1.11.0"
+circuit = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit"}
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
@@ -84,6 +88,7 @@ gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.
 guava = "com.google.guava:guava:33.0.0-jre"
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet"}
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
