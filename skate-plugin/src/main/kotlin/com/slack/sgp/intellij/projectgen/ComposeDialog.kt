@@ -22,22 +22,6 @@ abstract class ComposeDialog(val project: Project?) : DialogWrapper(project) {
         }
     }
 
-    override fun doCancelAction() {
-        super.doCancelAction()
-        deleteProjectLock()
-    }
-
-    override fun doOKAction() {
-        super.doOKAction()
-        deleteProjectLock()
-    }
-
-    private fun deleteProjectLock() {
-        val projectLockFile = File(project?.basePath + "/.projectgenlock")
-        if (projectLockFile.exists()) {
-            projectLockFile.delete()
-        }
-    }
 
     override fun createActions(): Array<Action> = emptyArray()
 
