@@ -96,20 +96,19 @@ buildConfig {
 
 
 dependencies {
-  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
-  implementation(libs.okhttp)
-  implementation(libs.okhttp.loggingInterceptor)
-  implementation(libs.gradlePlugins.compose)
-  implementation(libs.circuit)
-  implementation(libs.kotlin.poet)
-  implementation(projects.tracing)
-
   implementation(compose.animation)
   implementation(compose.desktop.currentOs)
   implementation(compose.foundation)
-  implementation(compose.material3)
   implementation(compose.material)
+  implementation(compose.material3)
   implementation(compose.ui)
+  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.circuit)
+  implementation(libs.gradlePlugins.compose)
+  implementation(libs.kotlin.poet)
+  implementation(libs.okhttp)
+  implementation(libs.okhttp.loggingInterceptor)
+  implementation(projects.tracing)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)

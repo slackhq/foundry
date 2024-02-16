@@ -9,22 +9,22 @@ import javax.swing.Action
 import javax.swing.JComponent
 
 abstract class ComposeDialog(val project: Project?) : DialogWrapper(project) {
-    init {
-        init()
+  init {
+    init()
+  }
+
+  override fun createCenterPanel(): JComponent {
+    return ComposePanel().apply {
+      setBounds(0, 0, 600, 800)
+      setContent {
+        dialogContent()
+      }
     }
-
-    override fun createCenterPanel(): JComponent {
-        return ComposePanel().apply {
-            setBounds(0, 0, 600, 800)
-            setContent {
-                dialogContent()
-            }
-        }
-    }
+  }
 
 
-    override fun createActions(): Array<Action> = emptyArray()
+  override fun createActions(): Array<Action> = emptyArray()
 
-    @Composable
-    abstract fun dialogContent()
+  @Composable
+  abstract fun dialogContent()
 }
