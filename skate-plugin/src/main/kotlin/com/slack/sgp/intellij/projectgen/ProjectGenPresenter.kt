@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
+import org.apache.commons.io.FileExistsException
 import slack.tooling.projectgen.*
 import slack.tooling.projectgen.CheckboxElement
 import slack.tooling.projectgen.ComposeFeature
@@ -118,21 +119,29 @@ internal class ProjectGenPresenter(private val rootDir: String, private val onDi
     daggerRuntimeOnly.isVisible = dagger.isChecked
 
     var showDoneDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
     return ProjectGenScreen.State(
       uiElements = uiElements,
       showDoneDialog = showDoneDialog,
+      showErrorDialog = showErrorDialog,
       canGenerate = path.value.isNotBlank() && packageName.value.isNotBlank(),
     ) { event ->
       when (event) {
         ProjectGenScreen.Event.Quit -> onDismissDialog()
         ProjectGenScreen.Event.Reset -> {
           showDoneDialog = false
+          showErrorDialog = false
           resetElements()
         }
         ProjectGenScreen.Event.Generate -> {
-          generate()
-          showDoneDialog = true
+          try {
+            generate()
+            showDoneDialog = true
+          } catch (e: FileExistsException) {
+            showDoneDialog = false
+            showErrorDialog = true
+          }
         }
       }
     }
@@ -222,7 +231,10 @@ internal class ProjectGenPresenter(private val rootDir: String, private val onDi
     val readMeFile = ReadMeFile()
 
     val project = Project(path, buildFile, readMeFile, features)
-
-    project.writeTo(rootDir)
+    if (project.checkValidPath(rootDir)) {
+      project.writeTo(rootDir)
+    } else {
+      throw FileExistsException()
+    }
   }
 }

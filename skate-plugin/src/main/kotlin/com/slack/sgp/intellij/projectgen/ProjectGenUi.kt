@@ -43,7 +43,15 @@ private const val INDENT_SIZE = 16 // dp
 @Composable
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
   if (state.showDoneDialog) {
-    DoneDialog(
+    StatusDialog(
+      text = "Done! Don't forget to re-sync Android Studio!",
+      onQuit = { state.eventSink(ProjectGenScreen.Event.Quit) },
+      onDismiss = { state.eventSink(ProjectGenScreen.Event.Reset) },
+    )
+  }
+  if (state.showErrorDialog) {
+    StatusDialog(
+      text = "Failed to generate projects since project already exists",
       onQuit = { state.eventSink(ProjectGenScreen.Event.Quit) },
       onDismiss = { state.eventSink(ProjectGenScreen.Event.Reset) },
     )
@@ -141,7 +149,7 @@ private fun PreviewFeature() {
 }
 
 @Composable
-private fun DoneDialog(onQuit: () -> Unit, onDismiss: () -> Unit) {
+private fun StatusDialog(text: String, onQuit: () -> Unit, onDismiss: () -> Unit) {
   // No M3 AlertDialog in compose-jb yet
   // https://github.com/JetBrains/compose-multiplatform/issues/2037
   @Suppress("ComposeM2Api")
@@ -149,6 +157,7 @@ private fun DoneDialog(onQuit: () -> Unit, onDismiss: () -> Unit) {
     onDismissRequest = { onDismiss() },
     confirmButton = { Button(onClick = { onQuit() }) { Text("Quit") } },
     dismissButton = { Button(onClick = { onDismiss() }) { Text("Dismiss") } },
-    text = { Text("Done! Don't forget to re-sync Android Studio!") }
+    text = { Text(text) }
   ))
 }
+

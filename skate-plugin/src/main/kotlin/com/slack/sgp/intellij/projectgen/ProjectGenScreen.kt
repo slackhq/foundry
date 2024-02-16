@@ -11,6 +11,7 @@ internal object ProjectGenScreen : Screen {
       val uiElements: SnapshotStateList<UiElement>,
     // TODO make this a "next page" instead?
       val showDoneDialog: Boolean,
+      val showErrorDialog: Boolean,
       val canGenerate: Boolean,
       val eventSink: (Event) -> Unit,
   ) : CircuitUiState

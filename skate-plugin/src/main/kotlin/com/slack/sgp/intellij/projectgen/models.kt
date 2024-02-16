@@ -10,10 +10,14 @@ internal data class Project(
   val readMeFile: ReadMeFile,
   val features: List<Feature>,
 ) {
+
+  fun checkValidPath(rootDir: File): Boolean {
+    val projectDir = rootDir.resolve(path.removePrefix(":").replace(":", "/"))
+    return !projectDir.exists()
+  }
   fun writeTo(rootDir: File) {
     val projectDir =
       rootDir.resolve(path.removePrefix(":").replace(":", "/")).apply {
-        check(!exists()) { "Project already exists at $this" }
         mkdirs()
       }
     buildFile.buildFileSpec(features).writeTo(projectDir)
