@@ -40,11 +40,13 @@ class ProjectGenWindow(private val currentProject: Project?) : ComposeDialog(cur
 
   override fun doCancelAction() {
     super.doCancelAction()
+    // Remove projectlock file when exit application
     deleteProjectLock()
   }
 
   override fun doOKAction() {
     super.doOKAction()
+    // Remove projectlock file when exit application
     deleteProjectLock()
   }
 
