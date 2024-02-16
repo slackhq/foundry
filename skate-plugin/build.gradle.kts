@@ -29,9 +29,7 @@ plugins {
 
 group = "com.slack.intellij"
 
-repositories {
-  mavenCentral()
-}
+repositories { mavenCentral() }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -93,7 +91,6 @@ buildConfig {
     internalVisibility = true
   }
 }
-
 
 dependencies {
   implementation(compose.animation)
