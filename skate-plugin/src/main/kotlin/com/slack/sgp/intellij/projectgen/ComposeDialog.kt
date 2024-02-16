@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.awt.ComposePanel
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import java.io.File
 import javax.swing.Action
 import javax.swing.JComponent
 
-abstract class ComposeDialog(project: Project?) : DialogWrapper(project) {
+abstract class ComposeDialog(val project: Project?) : DialogWrapper(project) {
     init {
         init()
     }
@@ -18,6 +19,23 @@ abstract class ComposeDialog(project: Project?) : DialogWrapper(project) {
             setContent {
                 dialogContent()
             }
+        }
+    }
+
+    override fun doCancelAction() {
+        super.doCancelAction()
+        deleteProjectLock()
+    }
+
+    override fun doOKAction() {
+        super.doOKAction()
+        deleteProjectLock()
+    }
+
+    private fun deleteProjectLock() {
+        val projectLockFile = File(project?.basePath + "/.projectgenlock")
+        if (projectLockFile.exists()) {
+            projectLockFile.delete()
         }
     }
 

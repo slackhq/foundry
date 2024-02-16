@@ -26,6 +26,7 @@ import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Paths
 import java.time.Instant
@@ -41,7 +42,6 @@ constructor(
   private val startTimestamp = Instant.now()
 
   override fun actionPerformed(e: AnActionEvent) {
-    logger<ProjectGenMenuAction>().info("IN hererere")
     ProjectGenWindow(e.project).show()
   }
 
@@ -54,13 +54,14 @@ constructor(
       )
   }
 
-  class ProjectGenWindow(val currentProject: Project?) : ComposeDialog(currentProject) {
+  class ProjectGenWindow(private val currentProject: Project?) : ComposeDialog(currentProject) {
     init {
       title = "Project Generator"
     }
 
     @Composable
     override fun dialogContent() {
+
       logger<ProjectGenMenuAction>().info(currentProject?.basePath)
       val rootDir = remember {
         val path = currentProject?.basePath
@@ -68,6 +69,8 @@ constructor(
         check(Paths.get(path).toFile().isDirectory) { "Must pass a valid directory" }
         path
       }
+      File(rootDir + "/.projectgenlock").createNewFile()
+
       val circuit = remember {
         Circuit.Builder()
           .addPresenterFactory { _, _, _ -> ProjectGenPresenter(rootDir, ::doOKAction) }

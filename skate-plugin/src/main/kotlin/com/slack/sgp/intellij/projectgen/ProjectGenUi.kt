@@ -18,11 +18,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -151,6 +149,6 @@ private fun DoneDialog(onQuit: () -> Unit, onDismiss: () -> Unit) {
     onDismissRequest = { onDismiss() },
     confirmButton = { Button(onClick = { onQuit() }) { Text("Quit") } },
     dismissButton = { Button(onClick = { onDismiss() }) { Text("Dismiss") } },
-    text = { Text("Done! Don't forget to re-sync Android Studio!") },
+    text = { Text("Done! Don't forget to re-sync Android Studio!") }
   ))
 }
