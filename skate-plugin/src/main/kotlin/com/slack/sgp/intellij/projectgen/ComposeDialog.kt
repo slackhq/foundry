@@ -34,6 +34,7 @@ abstract class ComposeDialog(val project: Project?) : DialogWrapper(project) {
     }
   }
 
+  /* Disable default OK and Cancel action button in Dialog window. */
   override fun createActions(): Array<Action> = emptyArray()
 
   @Composable abstract fun dialogContent()
