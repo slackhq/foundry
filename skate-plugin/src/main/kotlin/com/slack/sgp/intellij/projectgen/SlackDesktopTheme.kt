@@ -10,8 +10,6 @@ private val FONT_FAMILY = FontFamily.Default
 
 @Composable
 fun SlackDesktopTheme(
-  // Note: isSystemInDarkTheme() isn't actually implemented in desktop yet:
-  // https://github.com/JetBrains/compose-jb/issues/169
   useDarkMode: Boolean = !JBColor.isBright(),
   content: @Composable () -> Unit,
 ) {
