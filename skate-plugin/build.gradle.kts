@@ -24,11 +24,14 @@ plugins {
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
+  id("org.jetbrains.compose") version "1.5.12"
 }
 
 group = "com.slack.intellij"
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+}
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -91,12 +94,24 @@ buildConfig {
   }
 }
 
+
 dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
   implementation(projects.tracing)
+  implementation(libs.gradlePlugins.compose)
+  implementation(compose.ui)
+  implementation(compose.foundation)
+  implementation(compose.animation)
+  implementation(compose.material3)
+  implementation(compose.material)
+  implementation(compose.desktop.currentOs)
+  implementation("com.squareup:kotlinpoet:1.16.0")
+  implementation("com.slack.circuit:circuit-foundation:0.19.1")
+
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
 }
