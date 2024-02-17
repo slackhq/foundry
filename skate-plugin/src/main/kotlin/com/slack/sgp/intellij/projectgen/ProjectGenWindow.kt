@@ -17,21 +17,33 @@ package com.slack.sgp.intellij.projectgen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.awt.ComposePanel
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogWrapper
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Paths
+import javax.swing.Action
+import javax.swing.JComponent
 
-class ProjectGenWindow(private val currentProject: Project?) : ComposeDialog(currentProject) {
+class ProjectGenWindow(private val currentProject: Project?) : DialogWrapper(currentProject) {
   init {
+    init()
     title = "Project Generator"
   }
 
+  override fun createCenterPanel(): JComponent {
+    return ComposePanel().apply {
+      setBounds(0, 0, 600, 800)
+      setContent { dialogContent() }
+    }
+  }
+
   @Composable
-  override fun dialogContent() {
+  fun dialogContent() {
     val rootDir = remember {
       val path =
         currentProject?.basePath
@@ -57,6 +69,9 @@ class ProjectGenWindow(private val currentProject: Project?) : ComposeDialog(cur
     SlackDesktopTheme() { CircuitContent(ProjectGenScreen, circuit = circuit) }
   }
 
+  /* Disable default OK and Cancel action button in Dialog window. */
+  override fun createActions(): Array<Action> = emptyArray()
+
   override fun doCancelAction() {
     super.doCancelAction()
     // Remove projectlock file when exit application
@@ -70,7 +85,7 @@ class ProjectGenWindow(private val currentProject: Project?) : ComposeDialog(cur
   }
 
   private fun deleteProjectLock() {
-    val projectLockFile = File(project?.basePath + "/.projectgenlock")
+    val projectLockFile = File(currentProject?.basePath + "/.projectgenlock")
     if (projectLockFile.exists()) {
       projectLockFile.delete()
     }
