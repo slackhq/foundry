@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.15.4
+------
+
+_2024-02-19_
+
+- Remove `-Xproper-ieee754-comparisons` arg, as it's enabled by default and removed entirely in K2.
+- Small fixes around skippy + add inverse options to boolean options.
+- Update Okio to `3.8.0`.
+- Update Oshi to `6.4.12`.
+- Update coroutines to `1.8.0`.
+- Build against DAGP `1.30.0`.
+- Build against AGP `8.3.0-rc01`.
+
 0.15.3
 ------
 
