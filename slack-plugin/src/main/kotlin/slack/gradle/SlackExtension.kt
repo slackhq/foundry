@@ -191,7 +191,7 @@ constructor(
           )
         }
 
-        if (daggerConfig.enableAnvil) {
+        if (daggerConfig.enableAnvil && !slackProperties.disableAnvilForK2Testing) {
           pluginManager.apply("com.squareup.anvil")
           configure<AnvilExtension> {
             generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)

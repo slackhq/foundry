@@ -584,6 +584,13 @@ internal constructor(
   public val eagerlyConfigureArtifactPublishing: Boolean
     get() = resolver.booleanValue("sgp.artifacts.configure-eagerly", defaultValue = false)
 
+  /**
+   * Force-disables Anvil regardless of `SlackExtension.dagger()` settings, useful for K2 testing
+   * where Anvil is unsuspported
+   */
+  public val disableAnvilForK2Testing: Boolean
+    get() = resolver.booleanValue("sgp.anvil.forceDisable", defaultValue = false)
+
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
