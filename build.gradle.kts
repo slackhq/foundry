@@ -127,7 +127,6 @@ data class KotlinBuildConfig(val kotlin: String) {
    */
   val kotlinCompilerArgs: List<String> =
     listOf(
-      "-Xproper-ieee754-comparisons",
       // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
       // => T & Any)
       "-Xenhance-type-parameter-types-to-def-not-null",
