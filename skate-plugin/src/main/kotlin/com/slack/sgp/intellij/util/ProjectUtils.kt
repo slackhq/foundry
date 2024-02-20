@@ -29,6 +29,4 @@ fun Project.isTracingEnabled(): Boolean = settings().isTracingEnabled
 
 fun Project.isProjectGenMenuActionEnabled(): Boolean = settings().isProjectGenMenuActionEnabled
 
-fun Project.projectGenRunCommand(): String = settings().projectGenRunCommand
-
 fun Project.tracingEndpoint(): String? = settings().tracingEndpoint

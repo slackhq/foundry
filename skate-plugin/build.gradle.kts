@@ -24,6 +24,7 @@ plugins {
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
+  alias(libs.plugins.compose)
 }
 
 group = "com.slack.intellij"
@@ -92,7 +93,16 @@ buildConfig {
 }
 
 dependencies {
+  implementation(compose.animation)
+  implementation(compose.desktop.currentOs)
+  implementation(compose.foundation)
+  implementation(compose.material)
+  implementation(compose.material3)
+  implementation(compose.ui)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.circuit)
+  implementation(libs.gradlePlugins.compose)
+  implementation(libs.kotlin.poet)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
   implementation(projects.tracing)
