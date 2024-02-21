@@ -32,7 +32,7 @@ import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
 
-class ProjectGenWindow(private val currentProject: Project?, private val e: AnActionEvent) :
+class ProjectGenWindow(private val currentProject: Project?, private val event: AnActionEvent) :
   DialogWrapper(currentProject) {
   init {
     init()
@@ -65,7 +65,11 @@ class ProjectGenWindow(private val currentProject: Project?, private val e: AnAc
     val circuit = remember {
       Circuit.Builder()
         .addPresenterFactory { _, _, _ ->
-          ProjectGenPresenter(rootDir = rootDir, onDismissDialog = ::doOKAction, onSync = ::dismissDialogAndSync)
+          ProjectGenPresenter(
+            rootDir = rootDir,
+            onDismissDialog = ::doOKAction,
+            onSync = ::dismissDialogAndSync,
+          )
         }
         .addUiFactory { _, _ ->
           ui<ProjectGenScreen.State> { state, modifier -> ProjectGen(state, modifier) }
@@ -94,7 +98,7 @@ class ProjectGenWindow(private val currentProject: Project?, private val e: AnAc
     doOKAction()
     val am: ActionManager = ActionManager.getInstance()
     val sync: AnAction = am.getAction("Android.SyncProject")
-    sync.actionPerformed(e)
+    sync.actionPerformed(event)
   }
 
   private fun deleteProjectLock() {
