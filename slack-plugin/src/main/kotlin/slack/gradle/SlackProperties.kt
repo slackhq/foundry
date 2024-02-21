@@ -16,8 +16,10 @@
 package slack.gradle
 
 import java.io.File
+import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import slack.gradle.anvil.AnvilMode
 import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.util.PropertyResolver
 import slack.gradle.util.getOrCreateExtra
@@ -312,10 +314,6 @@ internal constructor(
   public val allowDaggerKsp: Boolean
     get() = booleanProperty("slack.ksp.allow-dagger")
 
-  /** Flag to enable/disable Anvil KSP. Requires [allowDaggerKsp]. */
-  public val allowAnvilKsp: Boolean
-    get() = booleanProperty("slack.ksp.allow-anvil")
-
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
     get() = optionalStringProperty("slack.disabledVariants")
@@ -586,10 +584,20 @@ internal constructor(
 
   /**
    * Force-disables Anvil regardless of `SlackExtension.dagger()` settings, useful for K2 testing
-   * where Anvil is unsuspported
+   * where Anvil is unsupported.
    */
   public val disableAnvilForK2Testing: Boolean
     get() = resolver.booleanValue("sgp.anvil.forceDisable", defaultValue = false)
+
+  /**
+   * Defines the [AnvilMode] to use with this compilation. See the docs on that class for more
+   * details.
+   */
+  public val anvilMode: AnvilMode
+    get() =
+      resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1.name).let {
+        AnvilMode.valueOf(it.lowercase(Locale.US))
+      }
 
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>

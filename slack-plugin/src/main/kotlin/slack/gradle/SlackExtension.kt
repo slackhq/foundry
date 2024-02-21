@@ -32,6 +32,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import slack.gradle.agp.PermissionAllowlistConfigurer
+import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
@@ -94,7 +95,8 @@ constructor(
       val allowMoshiIr = slackProperties.allowMoshiIr
       val allowNapt = slackProperties.allowNapt
       val allowDaggerKsp = slackProperties.allowNapt
-      val allowAnvilKsp = allowDaggerKsp && slackProperties.allowAnvilKsp
+      val anvilMode = slackProperties.anvilMode
+      val allowKspComponentGen = allowDaggerKsp && anvilMode.useKspComponentGen
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
@@ -191,11 +193,32 @@ constructor(
           )
         }
 
-        if (daggerConfig.enableAnvil && !slackProperties.disableAnvilForK2Testing) {
-          pluginManager.apply("com.squareup.anvil")
-          configure<AnvilExtension> {
-            generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
-            generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
+        if (daggerConfig.enableAnvil) {
+          if (slackProperties.disableAnvilForK2Testing) {
+            pluginManager.apply("com.squareup.anvil")
+            configure<AnvilExtension> {
+              generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
+              generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
+              // TODO eventually specify the backend here based on anvilMode
+              //  backend.setDisallowChanges(anvilMode.useKspFactoryGen ||
+              // anvilMode.useKspComponentGen)
+            }
+
+            if (anvilMode == AnvilMode.K1) {
+              val generatorProjects =
+                buildSet<Any> {
+                  addAll(
+                    slackProperties.anvilGeneratorProjects
+                      ?.splitToSequence(";")
+                      ?.map(::project)
+                      .orEmpty()
+                  )
+                  addAll(featuresHandler.daggerHandler.anvilGenerators)
+                }
+              for (generator in generatorProjects) {
+                dependencies.add("anvil", generator)
+              }
+            }
           }
 
           val runtimeProjects =
@@ -204,24 +227,10 @@ constructor(
           for (runtimeProject in runtimeProjects) {
             dependencies.add("implementation", project(runtimeProject))
           }
-
-          val generatorProjects =
-            buildSet<Any> {
-              addAll(
-                slackProperties.anvilGeneratorProjects
-                  ?.splitToSequence(";")
-                  ?.map(::project)
-                  .orEmpty()
-              )
-              addAll(featuresHandler.daggerHandler.anvilGenerators)
-            }
-          for (generator in generatorProjects) {
-            dependencies.add("anvil", generator)
-          }
         }
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowAnvilKsp)) {
+          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowKspComponentGen)) {
             markKspNeeded("Dagger compiler")
             dependencies.add("ksp", SlackDependencies.Dagger.compiler)
           } else {
