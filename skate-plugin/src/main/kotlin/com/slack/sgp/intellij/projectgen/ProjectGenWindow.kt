@@ -18,6 +18,9 @@ package com.slack.sgp.intellij.projectgen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposePanel
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.slack.circuit.foundation.Circuit
@@ -29,7 +32,8 @@ import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
 
-class ProjectGenWindow(private val currentProject: Project?) : DialogWrapper(currentProject) {
+class ProjectGenWindow(private val currentProject: Project?, private val e: AnActionEvent) :
+  DialogWrapper(currentProject) {
   init {
     init()
     title = "Project Generator"
@@ -60,7 +64,9 @@ class ProjectGenWindow(private val currentProject: Project?) : DialogWrapper(cur
 
     val circuit = remember {
       Circuit.Builder()
-        .addPresenterFactory { _, _, _ -> ProjectGenPresenter(rootDir, ::doOKAction) }
+        .addPresenterFactory { _, _, _ ->
+          ProjectGenPresenter(rootDir = rootDir, onDismissDialog = ::doOKAction, onSync = ::dismissDialogAndSync)
+        }
         .addUiFactory { _, _ ->
           ui<ProjectGenScreen.State> { state, modifier -> ProjectGen(state, modifier) }
         }
@@ -82,6 +88,13 @@ class ProjectGenWindow(private val currentProject: Project?) : DialogWrapper(cur
     super.doOKAction()
     // Remove projectlock file when exit application
     deleteProjectLock()
+  }
+
+  private fun dismissDialogAndSync() {
+    doOKAction()
+    val am: ActionManager = ActionManager.getInstance()
+    val sync: AnAction = am.getAction("Android.SyncProject")
+    sync.actionPerformed(e)
   }
 
   private fun deleteProjectLock() {

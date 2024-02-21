@@ -35,7 +35,7 @@ class ProjectGenMenuAction @JvmOverloads constructor(private val offline: Boolea
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
     if (!currentProject.isProjectGenMenuActionEnabled()) return
-    ProjectGenWindow(currentProject).show()
+    ProjectGenWindow(currentProject, e).show()
 
     if (currentProject.isTracingEnabled()) {
       sendUsageTrace(currentProject)
