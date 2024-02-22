@@ -59,16 +59,18 @@ private const val INDENT_SIZE = 16 // dp
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
   if (state.showDoneDialog) {
     StatusDialog(
-      text = "Done! Don't forget to re-sync Android Studio!",
+      text = "Project generated successfully!",
+      confirmButtonText = "Close and Sync",
       onQuit = { state.eventSink(ProjectGenScreen.Event.Quit) },
-      onDismiss = { state.eventSink(ProjectGenScreen.Event.Reset) },
+      onConfirm = { state.eventSink(ProjectGenScreen.Event.Sync) },
     )
   }
   if (state.showErrorDialog) {
     StatusDialog(
       text = "Failed to generate projects since project already exists",
+      confirmButtonText = "Reset",
       onQuit = { state.eventSink(ProjectGenScreen.Event.Quit) },
-      onDismiss = { state.eventSink(ProjectGenScreen.Event.Reset) },
+      onConfirm = { state.eventSink(ProjectGenScreen.Event.Reset) },
     )
   }
   val scrollState = rememberScrollState(0)
@@ -103,7 +105,6 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
             }
             is TextElement -> {
               Column(Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)) {
-                // TODO Add validation?
                 TextField(
                   element.value,
                   label = { Text(element.label) },
@@ -113,6 +114,10 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                       ?: VisualTransformation.None,
                   readOnly = element.readOnly,
                   enabled = element.enabled,
+                  singleLine = true,
+                  isError =
+                    element.value.isNotEmpty() &&
+                      !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*")),
                 )
                 element.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
               }
@@ -164,14 +169,19 @@ private fun PreviewFeature() {
 }
 
 @Composable
-private fun StatusDialog(text: String, onQuit: () -> Unit, onDismiss: () -> Unit) {
+private fun StatusDialog(
+  text: String,
+  confirmButtonText: String,
+  onQuit: () -> Unit,
+  onConfirm: () -> Unit,
+) {
   // No M3 AlertDialog in compose-jb yet
   // https://github.com/JetBrains/compose-multiplatform/issues/2037
   @Suppress("ComposeM2Api")
   (AlertDialog(
-    onDismissRequest = { onDismiss() },
-    confirmButton = { Button(onClick = { onQuit() }) { Text("Quit") } },
-    dismissButton = { Button(onClick = { onDismiss() }) { Text("Dismiss") } },
+    onDismissRequest = { onQuit() },
+    confirmButton = { Button(onClick = { onConfirm() }) { Text(confirmButtonText) } },
+    dismissButton = { Button(onClick = { onQuit() }) { Text("Close") } },
     text = { Text(text) },
   ))
 }

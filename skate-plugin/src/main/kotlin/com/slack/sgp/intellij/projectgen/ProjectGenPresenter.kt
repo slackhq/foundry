@@ -36,6 +36,7 @@ import slack.tooling.projectgen.TextElement
 internal class ProjectGenPresenter(
   private val rootDir: String,
   private val onDismissDialog: () -> Unit,
+  private val onSync: () -> Unit,
 ) : Presenter<ProjectGenScreen.State> {
   private val path =
     TextElement(
@@ -145,6 +146,7 @@ internal class ProjectGenPresenter(
     ) { event ->
       when (event) {
         ProjectGenScreen.Event.Quit -> onDismissDialog()
+        ProjectGenScreen.Event.Sync -> onSync()
         ProjectGenScreen.Event.Reset -> {
           showDoneDialog = false
           showErrorDialog = false

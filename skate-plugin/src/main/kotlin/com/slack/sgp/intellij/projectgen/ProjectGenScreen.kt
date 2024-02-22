@@ -34,6 +34,8 @@ internal object ProjectGenScreen : Screen {
   sealed interface Event : CircuitUiEvent {
     object Generate : Event
 
+    object Sync : Event
+
     object Quit : Event
 
     object Reset : Event
