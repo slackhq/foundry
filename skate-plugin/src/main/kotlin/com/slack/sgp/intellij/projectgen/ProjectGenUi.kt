@@ -60,7 +60,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
   if (state.showDoneDialog) {
     StatusDialog(
       text = "Project generated successfully!",
-      confirmButtonText = "Quit and Sync",
+      confirmButtonText = "Close and Sync",
       onQuit = { state.eventSink(ProjectGenScreen.Event.Quit) },
       onConfirm = { state.eventSink(ProjectGenScreen.Event.Sync) },
     )
@@ -181,7 +181,7 @@ private fun StatusDialog(
   (AlertDialog(
     onDismissRequest = { onQuit() },
     confirmButton = { Button(onClick = { onConfirm() }) { Text(confirmButtonText) } },
-    dismissButton = { Button(onClick = { onQuit() }) { Text("Quit") } },
+    dismissButton = { Button(onClick = { onQuit() }) { Text("Close") } },
     text = { Text(text) },
   ))
 }
