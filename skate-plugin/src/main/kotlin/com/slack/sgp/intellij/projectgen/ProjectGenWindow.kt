@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij.projectgen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposePanel
 import com.intellij.openapi.actionSystem.ActionManager
@@ -32,6 +33,7 @@ import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
 
+@Stable
 class ProjectGenWindow(private val currentProject: Project?, private val event: AnActionEvent) :
   DialogWrapper(currentProject) {
   init {
@@ -42,12 +44,12 @@ class ProjectGenWindow(private val currentProject: Project?, private val event: 
   override fun createCenterPanel(): JComponent {
     return ComposePanel().apply {
       setBounds(0, 0, 600, 800)
-      setContent { dialogContent() }
+      setContent { DialogContent() }
     }
   }
 
   @Composable
-  fun dialogContent() {
+  fun DialogContent() {
     val rootDir = remember {
       val path =
         currentProject?.basePath
