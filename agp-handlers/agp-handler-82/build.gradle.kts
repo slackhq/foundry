@@ -18,6 +18,7 @@ plugins {
   alias(libs.plugins.ksp)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.buildConfig)
+  alias(libs.plugins.lint)
 }
 
 buildConfig {
@@ -31,6 +32,8 @@ buildConfig {
 
 dependencies {
   ksp(libs.autoService.ksp)
+
+  lintChecks(libs.gradleLints)
 
   api(projects.agpHandlers.agpHandlerApi)
 

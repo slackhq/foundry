@@ -25,11 +25,15 @@ plugins {
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.compose)
+  alias(libs.plugins.lint)
 }
 
 group = "com.slack.intellij"
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+  google()
+}
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -93,6 +97,7 @@ buildConfig {
 }
 
 dependencies {
+  lintChecks(libs.composeLints)
   implementation(compose.animation)
   implementation(compose.desktop.currentOs)
   implementation(compose.foundation)

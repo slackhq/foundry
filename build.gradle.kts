@@ -49,6 +49,7 @@ plugins {
   alias(libs.plugins.intellij) apply false
   alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig) apply false
+  alias(libs.plugins.lint) apply false
 }
 
 configure<DetektExtension> {
