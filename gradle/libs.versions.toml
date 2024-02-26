@@ -20,7 +20,7 @@ mavenPublish = "0.27.0"
 moshi = "1.15.1"
 moshix = "0.25.1"
 nullawayGradle = "1.3.0"
-okhttp = "5.0.0-alpha.10"
+okhttp = "5.0.0-alpha.12"
 okio = "3.8.0"
 retrofit = "2.9.0"
 sortDependencies = "0.6"
@@ -31,7 +31,7 @@ wire = "4.9.3"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.0.0" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.3.5" }
 compose = { id = "org.jetbrains.compose", version = "1.5.12"}
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
@@ -71,7 +71,7 @@ gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.9.1"
-gradlePlugins-enterprise = "com.gradle:gradle-enterprise-gradle-plugin:3.12.2"
+gradlePlugins-enterprise = "com.gradle:gradle-enterprise-gradle-plugin:3.16.2"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = "com.jraska.module.graph.assertion:plugin:2.3.1"
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -81,7 +81,7 @@ gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", ve
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
 gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.7.1"
-gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
+gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.5.8"
 gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
