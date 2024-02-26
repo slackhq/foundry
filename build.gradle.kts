@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.build.api.dsl.Lint
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.github.gmazzo.buildconfig.BuildConfigExtension
@@ -49,6 +50,7 @@ plugins {
   alias(libs.plugins.intellij) apply false
   alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig) apply false
+  alias(libs.plugins.lint) apply false
 }
 
 configure<DetektExtension> {
@@ -380,6 +382,15 @@ subprojects {
         }
       }
     }
+  }
+
+  pluginManager.withPlugin("com.android.lint") {
+    configure<Lint> {
+      lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
+      baseline = project.layout.projectDirectory.file("lint-baseline.xml").asFile
+    }
+    project.dependencies.add("lintChecks", libs.slackLints.checks)
+    project.dependencies.add("implementation", libs.slackLints.annotations)
   }
 }
 

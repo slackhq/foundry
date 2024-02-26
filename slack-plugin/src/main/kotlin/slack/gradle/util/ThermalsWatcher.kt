@@ -260,7 +260,7 @@ public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
 
 @JsonClass(generateAdapter = true)
 public data class ThermLog(
-  public val timestamp: LocalDateTime,
+  @Suppress("MoshiUsageNonMoshiClassPlatform") public val timestamp: LocalDateTime,
   public val schedulerLimit: Int,
   public val availableCpus: Int,
   public val speedLimit: Int,
@@ -354,8 +354,8 @@ internal class AppleSiliconThermals(
         return null
       }
     // Raw value in this case is 0-4, which we use as the ordinal of our enums for convenience
-    return if (rawValue in 0..ThermalState.values().size) {
-      ThermalState.values()[rawValue]
+    return if (rawValue in 0..ThermalState.entries.size) {
+      ThermalState.entries[rawValue]
     } else {
       null
     }

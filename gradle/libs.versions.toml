@@ -20,9 +20,10 @@ mavenPublish = "0.27.0"
 moshi = "1.15.1"
 moshix = "0.25.1"
 nullawayGradle = "1.3.0"
-okhttp = "5.0.0-alpha.10"
+okhttp = "5.0.0-alpha.12"
 okio = "3.8.0"
 retrofit = "2.9.0"
+slack-lint = "0.7.0"
 sortDependencies = "0.6"
 spotless = "6.25.0"
 sqldelight = "2.0.1"
@@ -31,7 +32,7 @@ wire = "4.9.3"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.0.0" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.3.5" }
 compose = { id = "org.jetbrains.compose", version = "1.5.12"}
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
@@ -58,18 +59,20 @@ autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.1"
 clikt = "com.github.ajalt.clikt:clikt:4.2.2"
 commonsText = "org.apache.commons:commons-text:1.11.0"
+composeLints = "com.slack.lint.compose:compose-lint-checks:1.3.1"
 circuit = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit"}
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
+gradleLints = "androidx.lint:lint-gradle:1.0.0-alpha01"
 gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
 gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.9.1"
-gradlePlugins-enterprise = "com.gradle:gradle-enterprise-gradle-plugin:3.12.2"
+gradlePlugins-enterprise = "com.gradle:gradle-enterprise-gradle-plugin:3.16.2"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = "com.jraska.module.graph.assertion:plugin:2.3.1"
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -79,7 +82,7 @@ gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", ve
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
 gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.7.1"
-gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.4.0"
+gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.5.8"
 gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
@@ -106,4 +109,6 @@ oshi = "com.github.oshi:oshi-core:6.4.13"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.8"
+slackLints-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slack-lint" }
+slackLints-annotations = { module = "com.slack.lint:slack-lint-annotations", version.ref = "slack-lint" }
 truth = "com.google.truth:truth:1.4.1"

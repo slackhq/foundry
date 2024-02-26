@@ -16,9 +16,11 @@
 plugins {
   kotlin("jvm")
   alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.lint)
 }
 
 dependencies {
+  lintChecks(libs.gradleLints)
   implementation(libs.guava)
 
   compileOnly(gradleApi())

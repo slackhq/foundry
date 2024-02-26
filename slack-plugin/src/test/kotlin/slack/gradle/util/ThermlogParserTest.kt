@@ -20,6 +20,7 @@ import java.time.LocalDateTime
 import org.junit.Assert.fail
 import org.junit.Test
 
+@Suppress("ExceptionMessage")
 class ThermlogParserTest {
 
   @Test
