@@ -35,6 +35,7 @@
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
         <annotator language="kotlin" implementationClass="com.slack.sgp.intellij.modeltranslator.TranslatorAnnotator"/>
         <externalAnnotator language="kotlin" implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
+        <projectIndexingHistoryListener implementation="com.slack.sgp.intellij.buildmetricscollector.IndexHistoryListener"/>
     </extensions>
 
     <applicationListeners>

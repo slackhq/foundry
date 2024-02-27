@@ -30,6 +30,18 @@ class SkateSpanBuilder {
     keyValueList.apply { key tagTo value.type.name }
   }
 
+  fun addSpanTags(tags: Map<String, Any>) {
+    tags.forEach { (key, value) ->
+      when (value) {
+        is String -> keyValueList.apply { key tagTo value}
+        is Double -> keyValueList.apply { key tagTo value}
+        is Long -> keyValueList.apply { key tagTo value}
+        is Boolean -> keyValueList.apply { key tagTo value}
+        else -> throw IllegalArgumentException("Unsupported value type for key: ${key}")
+      }
+    }
+  }
+
   fun getKeyValueList(): List<KeyValue> {
     return keyValueList.toList()
   }
@@ -41,6 +53,7 @@ class SkateTracingEvent(val type: EventType) {
     HOUSTON_FEATURE_FLAG_URL_CLICKED,
     SKATE_WHATS_NEW_PANEL_OPENED,
     SKATE_WHATS_NEW_PANEL_CLOSED,
-    MODEL_TRANSLATOR_GENERATED
+    MODEL_TRANSLATOR_GENERATED,
+    INDEXING,
   }
 }
