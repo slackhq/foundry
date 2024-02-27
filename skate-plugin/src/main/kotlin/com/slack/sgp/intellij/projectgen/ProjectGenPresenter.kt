@@ -104,6 +104,8 @@ internal class ProjectGenPresenter(
       indentLevel = 1,
     )
 
+  private val circuit = CheckboxElement(false, name = "Circuit", hint = "Enables Circuit")
+
   private val compose = CheckboxElement(false, name = "Compose", hint = "Enables Jetpack Compose.")
 
   private val uiElements =
@@ -123,6 +125,7 @@ internal class ProjectGenPresenter(
       dagger,
       daggerRuntimeOnly,
       compose,
+      circuit,
     )
 
   @Composable
@@ -176,6 +179,7 @@ internal class ProjectGenPresenter(
     daggerRuntimeOnly.reset()
     robolectric.reset()
     compose.reset()
+    circuit.reset()
   }
 
   private fun generate() {
@@ -201,6 +205,7 @@ internal class ProjectGenPresenter(
       robolectric = robolectric.isChecked,
       compose = compose.isChecked,
       androidTest = androidTest.isChecked,
+      circuit = circuit.isChecked,
     )
   }
 
@@ -217,6 +222,7 @@ internal class ProjectGenPresenter(
     robolectric: Boolean,
     compose: Boolean,
     androidTest: Boolean,
+    circuit: Boolean,
   ) {
     val features = mutableListOf<Feature>()
     val androidLibraryEnabled =
@@ -243,6 +249,10 @@ internal class ProjectGenPresenter(
 
     if (robolectric) {
       features += RobolectricFeature
+    }
+
+    if (circuit) {
+      features += CircuitFeature
     }
 
     val buildFile = BuildFile(emptyList())
