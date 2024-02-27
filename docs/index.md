@@ -20,6 +20,7 @@ The `slack.base` plugin offers common configuration for all projects implementin
 wide spectrum of Android, Kotlin, and Java configurations.
 
 This includes a whole host of things!
+
 - Common Android configuration (single variant libraries, disabling unused features, compose, etc).
 - Common Kotlin configuration (freeCompilerArgs, JVM target, etc).
 - Common Java configuration (toolchains, release versions, etc).
@@ -166,9 +167,9 @@ SGP expects there to be a `libs` version catalog.
 
 The following versions are required to be set the above catalog.
 Their docs can be found in `SlackVersions.kt`.
-- `jdk`
 
 For Android projects, some extra definitions need to be defined
+
 - `libs.versions.toml` libraries
     - `google-coreLibraryDesugaring` - the core library desugaring libraries to use with L8.
 - `gradle.properties` properties
@@ -177,6 +178,7 @@ For Android projects, some extra definitions need to be defined
     - `slack.minSdkVersion`
 
 The following plugins are applied by default but can be disabled if you don't need them.
+
 - Gradle's test retry – `slack.auto-apply.test-retry`
     - By default, this uses the [Gradle test-retry plugin](https://github.com/gradle/test-retry-gradle-plugin), but can be configured to use the Gradle Enterprise plugin's implementation instead by setting the `slack.test.retry.pluginType` property to `GE`.
 - Spotless – `slack.auto-apply.spotless`
