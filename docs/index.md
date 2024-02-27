@@ -167,7 +167,6 @@ SGP expects there to be a `libs` version catalog.
 
 The following versions are required to be set the above catalog.
 Their docs can be found in `SlackVersions.kt`.
-- `jdk`
 
 For Android projects, some extra definitions need to be defined
 
