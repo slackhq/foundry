@@ -26,11 +26,13 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -108,8 +110,8 @@ internal class JvmProjectSpec(builder: Builder) {
   }
 
   fun writeTo(path: Path, fs: FileSystem = FileSystem.SYSTEM) {
-    fs.createDirectories(path)
-    fs.write(path.resolve("BUILD.bazel")) { writeUtf8(toString()) }
+    path.parent?.let(fs::createDirectories)
+    fs.write(path) { writeUtf8(toString()) }
   }
 
   private fun depsString(name: String, deps: Collection<Dep>): String {
@@ -165,6 +167,8 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val exportedDeps: SetProperty<ResolvedArtifactResult>
   @get:Input abstract val testDeps: SetProperty<ResolvedArtifactResult>
 
+  @get:OutputFile abstract val outputFile: RegularFileProperty
+
   init {
     group = "bazel"
     description = "Generates a Bazel BUILD file for a Kotlin JVM project"
@@ -183,7 +187,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         testDeps.forEach { addTestDep(it) }
       }
       .build()
-      .writeTo(projectDir.get().asFile.toOkioPath())
+      .writeTo(outputFile.asFile.get().toOkioPath())
   }
 
   private fun SetProperty<ResolvedArtifactResult>.mapDeps(): SortedSet<Dep> {
@@ -240,6 +244,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
         testDeps.set(resolvedDependenciesFrom(testConfiguration))
+        outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
       }
     }
   }
