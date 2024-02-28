@@ -137,6 +137,10 @@ internal class JvmProjectSpec(builder: Builder) {
       exportedDeps.add(dep)
     }
 
+    fun addTestDep(dep: Dep) {
+      testDeps.add(dep)
+    }
+
     fun addSrcGlob(glob: String) {
       srcGlobs.add(glob)
     }
@@ -159,6 +163,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
 
   @get:Input abstract val deps: SetProperty<ResolvedArtifactResult>
   @get:Input abstract val exportedDeps: SetProperty<ResolvedArtifactResult>
+  @get:Input abstract val testDeps: SetProperty<ResolvedArtifactResult>
 
   init {
     group = "bazel"
@@ -167,13 +172,15 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
 
   @TaskAction
   fun generate() {
-    val depsIdentifiers = deps.mapDeps()
-    val exportedDepsIdentifiers = exportedDeps.mapDeps()
+    val deps = deps.mapDeps()
+    val exportedDeps = exportedDeps.mapDeps()
+    val testDeps = testDeps.mapDeps()
 
     JvmProjectSpec.Builder(name.get())
       .apply {
-        depsIdentifiers.forEach { addDep(it) }
-        exportedDepsIdentifiers.forEach { addExportedDep(it) }
+        deps.forEach { addDep(it) }
+        exportedDeps.forEach { addExportedDep(it) }
+        testDeps.forEach { addTestDep(it) }
       }
       .build()
       .writeTo(projectDir.get().asFile.toOkioPath())
@@ -225,12 +232,14 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
       project: Project,
       depsConfiguration: Configuration,
       exportedDepsConfiguration: Configuration,
+      testConfiguration: Configuration,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
         name.set(project.name)
         projectDir.set(project.layout.projectDirectory)
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
+        testDeps.set(resolvedDependenciesFrom(testConfiguration))
       }
     }
   }

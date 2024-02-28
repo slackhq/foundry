@@ -266,7 +266,8 @@ internal class StandardProjectConfigurations(
       if (pluginId == "org.jetbrains.kotlin.jvm") {
         val implementationConfig = configurations.getByName("implementation")
         val apiConfig = configurations.getByName("implementation")
-        JvmProjectBazelTask.register(project, implementationConfig, apiConfig)
+        val testConfig = configurations.getByName("testImplementation")
+        JvmProjectBazelTask.register(project, implementationConfig, apiConfig, testConfig)
       }
     }
 
