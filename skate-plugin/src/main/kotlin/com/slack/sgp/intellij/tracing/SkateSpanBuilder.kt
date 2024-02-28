@@ -23,20 +23,20 @@ class SkateSpanBuilder {
   private val keyValueList: TagBuilder = newTagBuilder()
 
   fun addSpanTag(key: String, value: String) {
-    keyValueList.apply { key tagTo value }
+    keyValueList.apply { key.lowercase() tagTo value }
   }
 
   fun addSpanTag(key: String, event: SkateTracingEvent) {
-    keyValueList.apply { key tagTo event.name }
+    keyValueList.apply { key.lowercase() tagTo event.name }
   }
 
   fun addSpanTags(tags: Map<String, Any>) {
     tags.forEach { (key, value) ->
       when (value) {
-        is String -> keyValueList.apply { key tagTo value }
-        is Double -> keyValueList.apply { key tagTo value }
-        is Long -> keyValueList.apply { key tagTo value }
-        is Boolean -> keyValueList.apply { key tagTo value }
+        is String -> keyValueList.apply { key.lowercase() tagTo value }
+        is Double -> keyValueList.apply { key.lowercase() tagTo value }
+        is Long -> keyValueList.apply { key.lowercase() tagTo value }
+        is Boolean -> keyValueList.apply { key.lowercase() tagTo value }
         else -> throw IllegalArgumentException("Unsupported value type for key: ${key}")
       }
     }
