@@ -35,6 +35,7 @@ import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.avoidance.GenerateAndroidTestProjectPathsTask
 import slack.gradle.avoidance.GenerateDependencyGraphTask
+import slack.gradle.bazel.GenerateMavenDependenciesTask
 import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
@@ -409,6 +410,10 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     }
 
     AndroidTestApksTask.register(project)
+
+    if (slackProperties.enableBazelGen) {
+      GenerateMavenDependenciesTask.register(project)
+    }
   }
 
   private fun isStable(version: String): Boolean {
