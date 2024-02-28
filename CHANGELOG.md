@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.15.7
+------
+
+_2024-02-28_
+
+- Fix inverted logic for disabled anvil mode in K2/KSP testing.
+
 0.15.6
 ------
 
