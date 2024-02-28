@@ -35,7 +35,7 @@
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
         <annotator language="kotlin" implementationClass="com.slack.sgp.intellij.modeltranslator.TranslatorAnnotator"/>
         <externalAnnotator language="kotlin" implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
-        <projectIndexingHistoryListener implementation="com.slack.sgp.intellij.buildmetricscollector.IndexHistoryListener"/>
+        <projectIndexingHistoryListener implementation="com.slack.sgp.intellij.idemetrics.IndexingListener"/>
     </extensions>
 
     <applicationListeners>
@@ -46,6 +46,8 @@
         <listener
                 class="com.slack.sgp.intellij.WhatsNewToolWindowListener"
                 topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
+<!--        <listener class="com.slack.sgp.intellij.idemetrics.GradleListener"-->
+<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
     </projectListeners>
 
     <actions>
