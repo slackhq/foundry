@@ -46,8 +46,6 @@
         <listener
                 class="com.slack.sgp.intellij.WhatsNewToolWindowListener"
                 topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
-<!--        <listener class="com.slack.sgp.intellij.idemetrics.GradleListener"-->
-<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
     </projectListeners>
 
     <actions>
