@@ -1,33 +1,29 @@
-@file:Suppress("UnstableApiUsage")
 
 package com.slack.sgp.intellij.buildmetricscollector
 
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistory
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistoryListener
 import com.intellij.util.indexing.diagnostic.dto.toMillis
+import com.slack.sgp.intellij.tracing.IndexingEvent
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
-import com.slack.sgp.intellij.tracing.SkateTracingEvent
-import com.intellij.openapi.diagnostic.logger
+import com.slack.sgp.intellij.util.isTracingEnabled
+
+@Suppress("UnstableApiUsage")
 class IndexHistoryListener : ProjectIndexingHistoryListener {
 
-  override fun onStartedIndexing(projectIndexingHistory: ProjectIndexingHistory) {
-    logger<IndexHistoryListener>().info("IN HERERER STARTING INDEXING")
-    super.onStartedIndexing(projectIndexingHistory)
-  }
-
   override fun onFinishedIndexing(projectIndexingHistory: ProjectIndexingHistory) {
-    logger<IndexHistoryListener>().info("IN HERERER INDEXING DONEEE")
     val project = projectIndexingHistory.project
-
+    if (!project.isTracingEnabled()) return
     val skateSpanBuilder = SkateSpanBuilder()
     val tags: MutableMap<String, Any> = mutableMapOf()
     tags.apply {
-      projectIndexingHistory.indexingReason?.let { put("indexing_reason", it) }
-      put("event", SkateTracingEvent.EventType.INDEXING)
-      put("updating_time", projectIndexingHistory.times.totalUpdatingTime.toMillis())
-      put("scan_files_duration", projectIndexingHistory.times.scanFilesDuration.toMillis())
-      put("indexing_duration", projectIndexingHistory.times.indexingDuration.toMillis())
+      projectIndexingHistory.indexingReason?.let { put(IndexingEvent.INDEXING_REASON.name, it) }
+      put(IndexingEvent.UPDATING_TIME.name, projectIndexingHistory.times.totalUpdatingTime.toMillis())
+      put(IndexingEvent.SCAN_FILES_DURATION.name, projectIndexingHistory.times.scanFilesDuration.toMillis())
+      put(IndexingEvent.INDEXING_DURATION.name, projectIndexingHistory.times.indexingDuration.toMillis())
+      put(IndexingEvent.IS_INTERRUPTED.name, projectIndexingHistory.times.wasInterrupted)
+      put(IndexingEvent.SCANNING_TYPE.name, projectIndexingHistory.times.scanningType.name)
     }
     skateSpanBuilder.addSpanTags(tags)
     SkateTraceReporter(project)

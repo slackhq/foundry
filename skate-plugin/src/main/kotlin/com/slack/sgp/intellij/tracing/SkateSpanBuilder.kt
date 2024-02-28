@@ -26,10 +26,9 @@ class SkateSpanBuilder {
     keyValueList.apply { key tagTo value }
   }
 
-  fun addSpanTag(key: String, value: SkateTracingEvent) {
-    keyValueList.apply { key tagTo value.type.name }
+  fun addSpanTag(key: String, event: SkateTracingEvent) {
+    keyValueList.apply { key tagTo event.name }
   }
-
   fun addSpanTags(tags: Map<String, Any>) {
     tags.forEach { (key, value) ->
       when (value) {
@@ -47,13 +46,32 @@ class SkateSpanBuilder {
   }
 }
 
-class SkateTracingEvent(val type: EventType) {
-  enum class EventType {
-    PROJECT_GEN_OPENED,
-    HOUSTON_FEATURE_FLAG_URL_CLICKED,
-    SKATE_WHATS_NEW_PANEL_OPENED,
-    SKATE_WHATS_NEW_PANEL_CLOSED,
-    MODEL_TRANSLATOR_GENERATED,
-    INDEXING,
-  }
+interface SkateTracingEvent {
+  val name: String
+}
+
+enum class ProjectGenEvent : SkateTracingEvent {
+  PROJECT_GEN_OPENED
+}
+
+enum class WhatsNewEvent : SkateTracingEvent {
+  WHATS_NEW_PANEL_OPENED,
+  WHATS_NEW_PANEL_CLOSED
+}
+
+enum class HoustonFeatureFlagEvent : SkateTracingEvent {
+  HOUSTON_FEATURE_FLAG_URL_CLICKED
+}
+
+enum class ModelTranslatorEvent : SkateTracingEvent {
+  MODEL_TRANSLATOR_GENERATED
+}
+
+enum class IndexingEvent : SkateTracingEvent {
+  INDEXING_REASON,
+  UPDATING_TIME,
+  SCAN_FILES_DURATION,
+  INDEXING_DURATION,
+  IS_INTERRUPTED,
+  SCANNING_TYPE,
 }

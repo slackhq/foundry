@@ -23,10 +23,9 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import com.slack.sgp.intellij.tracing.HoustonFeatureFlagEvent
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
-import com.slack.sgp.intellij.tracing.SkateTracingEvent
-import com.slack.sgp.intellij.tracing.SkateTracingEvent.EventType.HOUSTON_FEATURE_FLAG_URL_CLICKED
 import com.slack.sgp.intellij.util.featureFlagFilePattern
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
@@ -83,7 +82,7 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
-    skateSpanBuilder.addSpanTag("event", SkateTracingEvent(HOUSTON_FEATURE_FLAG_URL_CLICKED))
+    skateSpanBuilder.addSpanTag("event", HoustonFeatureFlagEvent.HOUSTON_FEATURE_FLAG_URL_CLICKED)
     sendUsageTrace(project, project.isTracingEnabled())
   }
 

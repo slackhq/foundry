@@ -23,9 +23,9 @@ import com.intellij.psi.PsiFile
 import com.slack.sgp.intellij.SkateBundle
 import com.slack.sgp.intellij.modeltranslator.helper.TranslatorHelper
 import com.slack.sgp.intellij.modeltranslator.model.TranslatorBundle
+import com.slack.sgp.intellij.tracing.ModelTranslatorEvent
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
-import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
@@ -57,7 +57,7 @@ class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : Inten
       SkateSpanBuilder().apply {
         addSpanTag(
           "event",
-          SkateTracingEvent(SkateTracingEvent.EventType.MODEL_TRANSLATOR_GENERATED),
+          ModelTranslatorEvent.MODEL_TRANSLATOR_GENERATED,
         )
       }
     SkateTraceReporter(project)
