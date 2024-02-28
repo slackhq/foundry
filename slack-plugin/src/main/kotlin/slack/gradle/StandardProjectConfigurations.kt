@@ -63,6 +63,7 @@ import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.SgpArtifact
+import slack.gradle.bazel.JvmProjectBazelTask
 import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.lint.DetektTasks
@@ -260,6 +261,12 @@ internal class StandardProjectConfigurations(
             }
           }
         }
+      }
+
+      if (pluginId == "org.jetbrains.kotlin.jvm") {
+        val implementationConfig = configurations.getByName("implementation")
+        val apiConfig = configurations.getByName("implementation")
+        JvmProjectBazelTask.register(project, implementationConfig, apiConfig)
       }
     }
 
