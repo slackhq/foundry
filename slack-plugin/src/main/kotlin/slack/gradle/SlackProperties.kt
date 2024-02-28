@@ -612,6 +612,10 @@ internal constructor(
         AnvilMode.valueOf(it.uppercase(Locale.US))
       }
 
+  /** Enables bazel file generation tasks */
+  public val enableBazelGen: Boolean
+    get() = resolver.booleanValue("sgp.bazel.enable", defaultValue = false)
+
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
