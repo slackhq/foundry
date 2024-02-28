@@ -88,6 +88,7 @@ dependencies {
   implementation(libs.kotlinCliUtil)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
+  implementation(libs.pendant.starlark)
   implementation(libs.rxjava)
   implementation(projects.sgpCommon)
   implementation(projects.skippy)
