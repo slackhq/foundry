@@ -1,7 +1,7 @@
 package slack.gradle.bazel
 
 /** A Bazel dependency. */
-internal interface Dep {
+internal sealed interface Dep {
   /**
    * A remote dependency, e.g. `@maven//path:target`.
    *
@@ -25,4 +25,6 @@ internal interface Dep {
       return "//$path"
     }
   }
+
+  companion object COMPARATOR : Comparator<Dep> by compareBy(Dep::toString)
 }
