@@ -609,7 +609,7 @@ internal constructor(
   public val anvilMode: AnvilMode
     get() =
       resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1.name).let {
-        AnvilMode.valueOf(it.lowercase(Locale.US))
+        AnvilMode.valueOf(it.uppercase(Locale.US))
       }
 
   /** Defines a required vendor for JDK toolchains. */
