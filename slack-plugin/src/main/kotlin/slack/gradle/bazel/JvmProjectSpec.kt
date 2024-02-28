@@ -157,7 +157,7 @@ internal class JvmProjectSpec(builder: Builder) {
 
 @UntrackedTask(because = "Generates a Bazel BUILD file for a Kotlin JVM project")
 internal abstract class JvmProjectBazelTask : DefaultTask() {
-  @get:Input abstract val name: Property<String>
+  @get:Input abstract val targetName: Property<String>
 
   @get:InputFile
   @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -180,7 +180,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
     val exportedDeps = exportedDeps.mapDeps()
     val testDeps = testDeps.mapDeps()
 
-    JvmProjectSpec.Builder(name.get())
+    JvmProjectSpec.Builder(targetName.get())
       .apply {
         deps.forEach { addDep(it) }
         exportedDeps.forEach { addExportedDep(it) }
@@ -239,7 +239,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
       testConfiguration: Configuration,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
-        name.set(project.name)
+        targetName.set(project.name)
         projectDir.set(project.layout.projectDirectory)
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
