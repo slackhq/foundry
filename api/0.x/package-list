@@ -11,6 +11,7 @@ module:skippy
 com.slack.skippy
 module:slack-plugin
 slack.gradle
+slack.gradle.anvil
 slack.gradle.avoidance
 slack.gradle.dependencies
 slack.gradle.tasks

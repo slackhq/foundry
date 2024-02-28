@@ -916,15 +916,17 @@ a discussions post or vote for existing suggestions.</p>
 <h3 id="common-project-configuration">Common project configuration<a class="headerlink" href="#common-project-configuration" title="Permanent link">&para;</a></h3>
 <p>The <code>slack.base</code> plugin offers common configuration for all projects implementing it, covering a
 wide spectrum of Android, Kotlin, and Java configurations.</p>
-<p>This includes a whole host of things!
-- Common Android configuration (single variant libraries, disabling unused features, compose, etc).
-- Common Kotlin configuration (freeCompilerArgs, JVM target, etc).
-- Common Java configuration (toolchains, release versions, etc).
-- Common annotation processors.
-- SlackExtension (see next section).
-- Formatting (via Spotless).
-- Platforms and BOM dependencies (see &ldquo;Platform plugins&rdquo; section below).
-- Common lint checks (both on Android and plain JVM projects).</p>
+<p>This includes a whole host of things!</p>
+<ul>
+<li>Common Android configuration (single variant libraries, disabling unused features, compose, etc).</li>
+<li>Common Kotlin configuration (freeCompilerArgs, JVM target, etc).</li>
+<li>Common Java configuration (toolchains, release versions, etc).</li>
+<li>Common annotation processors.</li>
+<li>SlackExtension (see next section).</li>
+<li>Formatting (via Spotless).</li>
+<li>Platforms and BOM dependencies (see &ldquo;Platform plugins&rdquo; section below).</li>
+<li>Common lint checks (both on Android and plain JVM projects).</li>
+</ul>
 <p>Full docs can be found in the <a href="architecture">architecture</a> docs.</p>
 <h3 id="feature-dsl">Feature DSL<a class="headerlink" href="#feature-dsl" title="Permanent link">&para;</a></h3>
 <p>To ease use and configuration of common features in projects, we expose a <code>slack</code> DSL in projects
@@ -1025,22 +1027,31 @@ generated baselines from each subproject into a single global baseline.</p>
 <h2 id="usage-requirements">Usage requirements<a class="headerlink" href="#usage-requirements" title="Permanent link">&para;</a></h2>
 <p>SGP expects there to be a <code>libs</code> version catalog.</p>
 <p>The following versions are required to be set the above catalog.
-Their docs can be found in <code>SlackVersions.kt</code>.
-- <code>jdk</code></p>
-<p>For Android projects, some extra definitions need to be defined
-- <code>libs.versions.toml</code> libraries
-    - <code>google-coreLibraryDesugaring</code> - the core library desugaring libraries to use with L8.
-- <code>gradle.properties</code> properties
-    - <code>slack.compileSdkVersion</code>
-    - <code>slack.targetSdkVersion</code>
-    - <code>slack.minSdkVersion</code></p>
-<p>The following plugins are applied by default but can be disabled if you don&rsquo;t need them.
-- Gradle&rsquo;s test retry – <code>slack.auto-apply.test-retry</code>
-    - By default, this uses the <a href="https://github.com/gradle/test-retry-gradle-plugin">Gradle test-retry plugin</a>, but can be configured to use the Gradle Enterprise plugin&rsquo;s implementation instead by setting the <code>slack.test.retry.pluginType</code> property to <code>GE</code>.
-- Spotless – <code>slack.auto-apply.spotless</code>
-- Detekt – <code>slack.auto-apply.detekt</code>
-- NullAway – <code>slack.auto-apply.nullaway</code>
-- Android Cache Fix – <code>slack.auto-apply.cache-fix</code></p>
+Their docs can be found in <code>SlackVersions.kt</code>.</p>
+<p>For Android projects, some extra definitions need to be defined</p>
+<ul>
+<li><code>libs.versions.toml</code> libraries<ul>
+<li><code>google-coreLibraryDesugaring</code> - the core library desugaring libraries to use with L8.</li>
+</ul>
+</li>
+<li><code>gradle.properties</code> properties<ul>
+<li><code>slack.compileSdkVersion</code></li>
+<li><code>slack.targetSdkVersion</code></li>
+<li><code>slack.minSdkVersion</code></li>
+</ul>
+</li>
+</ul>
+<p>The following plugins are applied by default but can be disabled if you don&rsquo;t need them.</p>
+<ul>
+<li>Gradle&rsquo;s test retry – <code>slack.auto-apply.test-retry</code><ul>
+<li>By default, this uses the <a href="https://github.com/gradle/test-retry-gradle-plugin">Gradle test-retry plugin</a>, but can be configured to use the Gradle Enterprise plugin&rsquo;s implementation instead by setting the <code>slack.test.retry.pluginType</code> property to <code>GE</code>.</li>
+</ul>
+</li>
+<li>Spotless – <code>slack.auto-apply.spotless</code></li>
+<li>Detekt – <code>slack.auto-apply.detekt</code></li>
+<li>NullAway – <code>slack.auto-apply.nullaway</code></li>
+<li>Android Cache Fix – <code>slack.auto-apply.cache-fix</code></li>
+</ul>
 <h2 id="commit-hooks">Commit hooks<a class="headerlink" href="#commit-hooks" title="Permanent link">&para;</a></h2>
 <p>The <code>installCommitHooks</code> task can install commit hooks for formatting kotlin and java files. They expect binaries to be in <code>&lt;root&gt;/config/git/hooks</code> and it&rsquo;s highly recommended to enable git-lfs for these objects. These binaries can be downloaded via the <code>updateKtfmt</code>, <code>updateGjf</code>, etc tasks.</p>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
