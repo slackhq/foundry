@@ -154,6 +154,19 @@ internal constructor(
     get() = booleanProperty("slack.compose.android.enableLiveLiterals", false)
 
   /**
+   * Common compose compiler options.
+   *
+   * Format is a comma-separated list of key-value pairs, e.g. "key1=value1,key2=value2". Keys
+   * should be the simple name of the compose compiler option, no prefixes needed.
+   */
+  public val composeCommonCompilerOptions: Provider<List<String>>
+    get() =
+      resolver
+        .providerFor("sgp.compose.commonCompilerOptions")
+        .map { value -> value.split(",").map { it.trim() } }
+        .orElse(emptyList())
+
+  /**
    * If true, uses the AndroidX compose compiler [SlackVersions.composeCompiler] for Compose
    * Multiplatform compilations rather than the Jetbrains one. This can be useful in testing where
    * AndroidX's compiler is farther ahead.
