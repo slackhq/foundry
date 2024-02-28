@@ -262,13 +262,6 @@ internal class StandardProjectConfigurations(
           }
         }
       }
-
-      if (pluginId == "org.jetbrains.kotlin.jvm") {
-        val implementationConfig = configurations.getByName("implementation")
-        val apiConfig = configurations.getByName("implementation")
-        val testConfig = configurations.getByName("testImplementation")
-        JvmProjectBazelTask.register(project, implementationConfig, apiConfig, testConfig)
-      }
     }
 
     // TODO always configure compileOptions here
@@ -293,6 +286,15 @@ internal class StandardProjectConfigurations(
             "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
           ) + JvmArgsStrongEncapsulation
         )
+      }
+    }
+
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+      if (slackProperties.enableBazelGen) {
+        val implementationConfig = configurations.getByName("implementation")
+        val apiConfig = configurations.getByName("implementation")
+        val testConfig = configurations.getByName("testImplementation")
+        JvmProjectBazelTask.register(project, implementationConfig, apiConfig, testConfig)
       }
     }
   }
