@@ -25,8 +25,7 @@ import com.slack.sgp.intellij.util.isProjectGenMenuActionEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
-class ProjectGenMenuAction @JvmOverloads constructor(private val offline: Boolean = false) :
-  AnAction() {
+class ProjectGenMenuAction : AnAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val currentProject: Project = e.project ?: return
@@ -42,7 +41,7 @@ class ProjectGenMenuAction @JvmOverloads constructor(private val offline: Boolea
   fun sendUsageTrace(project: Project, startTimestamp: Instant) {
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.addSpanTag("event", ProjectGenEvent.PROJECT_GEN_OPENED)
-    SkateTraceReporter(project, offline)
+    SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
         "project_generator",
         startTimestamp,
