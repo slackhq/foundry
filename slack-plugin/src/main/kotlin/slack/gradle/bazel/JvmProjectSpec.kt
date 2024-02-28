@@ -71,7 +71,7 @@ internal class JvmProjectSpec(builder: Builder) {
          ],
      )
 
-     kt_jvm_library(
+     kt_jvm_test(
          name = "ditto_test",
          srcs = glob(["src/test/**/*.kt"]),
          visibility = ["//visibility:private"],
