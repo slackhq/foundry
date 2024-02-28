@@ -4,7 +4,7 @@ agpAlpha = "8.3.0-rc02"
 anvil = "2.4.9-1-8"
 bugsnagGradle = "8.1.0"
 circuit = "0.19.1"
-compose-jb = "1.5.12"
+compose-jb = "1.6.0"
 coroutines = "1.8.0"
 dependencyAnalysisPlugin = "1.30.0"
 detekt = "1.23.5"
@@ -33,7 +33,7 @@ wire = "4.9.3"
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.3.5" }
-compose = { id = "org.jetbrains.compose", version = "1.5.12"}
+compose = { id = "org.jetbrains.compose", version.ref = "compose-jb"}
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

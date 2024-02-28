@@ -35,7 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -86,7 +86,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
           if (!element.isVisible) continue
           when (element) {
             DividerElement -> {
-              Divider()
+              HorizontalDivider()
             }
             is SectionElement -> {
               Column {
