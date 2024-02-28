@@ -37,9 +37,9 @@ internal sealed interface Dep : Comparable<Dep> {
    *
    * @param path the path to the local dependency, e.g. `path/to/local/dependency1`
    */
-  data class Local(val path: String) : Dep {
+  data class Local(val path: String, val target: String = "") : Dep {
     override fun toString(): String {
-      return "//$path"
+      return "//$path${if (target.isNotEmpty()) ":$target" else ""}"
     }
   }
 
