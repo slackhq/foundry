@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.15.6
+------
+
+_2024-02-28_
+
+- Fix `AnvilMode` casing in detection.
+
 0.15.5
 ------
 
