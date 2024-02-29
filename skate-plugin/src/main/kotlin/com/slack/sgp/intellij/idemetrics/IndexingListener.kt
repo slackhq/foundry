@@ -48,6 +48,7 @@ class IndexingListener : ProjectIndexingHistoryListener {
       )
       put(IndexingEvent.IS_INTERRUPTED.name, projectIndexingHistory.times.wasInterrupted)
       put(IndexingEvent.SCANNING_TYPE.name, projectIndexingHistory.times.scanningType.name)
+      put("event", IndexingEvent.INDEXING_COMPLETED.name)
     }
     skateSpanBuilder.addSpanTags(tags)
     SkateTraceReporter(project)

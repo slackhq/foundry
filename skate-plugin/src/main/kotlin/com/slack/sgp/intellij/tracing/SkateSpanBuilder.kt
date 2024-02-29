@@ -75,4 +75,5 @@ enum class IndexingEvent : SkateTracingEvent {
   INDEXING_DURATION,
   IS_INTERRUPTED,
   SCANNING_TYPE,
+  INDEXING_COMPLETED,
 }
