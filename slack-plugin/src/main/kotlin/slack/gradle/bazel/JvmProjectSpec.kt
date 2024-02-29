@@ -115,9 +115,7 @@ internal class JvmProjectSpec(builder: Builder) {
   private fun depsString(name: String, deps: Collection<Dep>): String {
     return if (deps.isNotEmpty()) {
       "$name = " +
-        deps.joinToString(separator = ",\n", prefix = "[\n", postfix = "\n]") {
-          "        \"$it\""
-        } +
+        deps.joinToString(separator = ",\n", prefix = "[\n", postfix = "]") { "        \"$it\"" } +
         ","
     } else {
       ""
