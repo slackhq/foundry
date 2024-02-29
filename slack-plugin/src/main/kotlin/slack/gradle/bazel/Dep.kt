@@ -54,3 +54,13 @@ internal sealed interface Dep : Comparable<Dep> {
     }
   }
 }
+
+internal fun Collection<Dep>.depsString(name: String): String {
+  return if (isNotEmpty()) {
+    "$name = " +
+      joinToString(separator = ",\n", prefix = "[\n", postfix = "]") { "        \"$it\"" } +
+      ","
+  } else {
+    ""
+  }
+}

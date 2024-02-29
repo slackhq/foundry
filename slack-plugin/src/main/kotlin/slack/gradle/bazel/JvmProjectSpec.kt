@@ -46,18 +46,19 @@ internal class JvmProjectSpec(builder: Builder) {
    */
   val name: String = builder.name
   // Deps
-  val deps: List<Dep> = builder.deps
-  val exportedDeps: List<Dep> = builder.exportedDeps
-  val testDeps: List<Dep> = builder.testDeps + Dep.Target("${name}_lib")
+  val deps: List<Dep> = builder.deps.toList()
+  val exportedDeps: List<Dep> = builder.exportedDeps.toList()
+  val testDeps: List<Dep> = (builder.testDeps + Dep.Target("${name}_lib")).toList()
   // Source globs
-  val srcGlobs: List<String> = builder.srcGlobs
-  val testSrcGlobs: List<String> = builder.testSrcGlobs
+  val srcGlobs: List<String> = builder.srcGlobs.toList()
+  val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
+  val compilerPlugins = builder.compilerPlugins.toList()
 
   override fun toString(): String {
     val compositeTestDeps = (deps + exportedDeps + testDeps).toSortedSet()
-    val deps = depsString("deps", deps)
-    val exportedDeps = depsString("exportedDeps", exportedDeps)
-    val testDeps = depsString("deps", compositeTestDeps)
+    val deps = deps.depsString("deps")
+    val exportedDeps = exportedDeps.depsString("exportedDeps")
+    val testDeps = compositeTestDeps.depsString("deps")
 
     /*
      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
@@ -86,8 +87,16 @@ internal class JvmProjectSpec(builder: Builder) {
      )
     */
 
+    val kotlinImports = buildList {
+      add("kt_jvm_library")
+      add("kt_jvm_test")
+      if (compilerPlugins.isNotEmpty()) {
+        add("kt_compiler_plugin")
+      }
+    }
+
     return """
-      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
+      load("@rules_kotlin//kotlin:jvm.bzl", ${kotlinImports.joinToString(", ") { "\"$it\"" }})
 
       kt_jvm_library(
           name = "${name}_lib",
@@ -112,42 +121,25 @@ internal class JvmProjectSpec(builder: Builder) {
     fs.write(path) { writeUtf8(this@JvmProjectSpec.toString()) }
   }
 
-  private fun depsString(name: String, deps: Collection<Dep>): String {
-    return if (deps.isNotEmpty()) {
-      "$name = " +
-        deps.joinToString(separator = ",\n", prefix = "[\n", postfix = "]") { "        \"$it\"" } +
-        ","
-    } else {
-      ""
-    }
-  }
-
   class Builder(val name: String) {
     val deps = mutableListOf<Dep>()
     val exportedDeps = mutableListOf<Dep>()
     val testDeps = mutableListOf<Dep>()
     val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
     val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
+    val compilerPlugins = mutableListOf<CompilerPluginSpec>()
 
-    fun addDep(dep: Dep) {
-      deps.add(dep)
-    }
+    fun addDep(dep: Dep) = apply { deps.add(dep) }
 
-    fun addExportedDep(dep: Dep) {
-      exportedDeps.add(dep)
-    }
+    fun addExportedDep(dep: Dep) = apply { exportedDeps.add(dep) }
 
-    fun addTestDep(dep: Dep) {
-      testDeps.add(dep)
-    }
+    fun addTestDep(dep: Dep) = apply { testDeps.add(dep) }
 
-    fun addSrcGlob(glob: String) {
-      srcGlobs.add(glob)
-    }
+    fun addSrcGlob(glob: String) = apply { srcGlobs.add(glob) }
 
-    fun addTestSrcGlob(glob: String) {
-      testSrcGlobs.add(glob)
-    }
+    fun addTestSrcGlob(glob: String) = apply { testSrcGlobs.add(glob) }
+
+    fun addCompilerPlugin(plugin: CompilerPluginSpec) = apply { compilerPlugins.add(plugin) }
 
     fun build(): JvmProjectSpec = JvmProjectSpec(this)
   }
@@ -162,6 +154,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val deps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val exportedDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val testDeps: SetProperty<ComponentArtifactIdentifier>
+  @get:Input abstract val compilerPlugins: SetProperty<CompilerPlugin>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -181,6 +174,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         deps.forEach { addDep(it) }
         exportedDeps.forEach { addExportedDep(it) }
         testDeps.forEach { addTestDep(it) }
+        this@JvmProjectBazelTask.compilerPlugins.get().forEach { addCompilerPlugin(it.spec) }
       }
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())
