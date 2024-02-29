@@ -16,25 +16,23 @@
 package slack.gradle.bazel
 
 import com.android.build.gradle.internal.publishing.AndroidArtifacts
+import java.io.File
 import java.util.SortedSet
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolvableConfiguration
+import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
-import org.gradle.api.artifacts.result.ResolvedArtifactResult
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
@@ -111,13 +109,15 @@ internal class JvmProjectSpec(builder: Builder) {
 
   fun writeTo(path: Path, fs: FileSystem = FileSystem.SYSTEM) {
     path.parent?.let(fs::createDirectories)
-    fs.write(path) { writeUtf8(toString()) }
+    fs.write(path) { writeUtf8(this@JvmProjectSpec.toString()) }
   }
 
   private fun depsString(name: String, deps: Collection<Dep>): String {
     return if (deps.isNotEmpty()) {
       "$name = " +
-        deps.joinToString(separator = ",\n", prefix = "[", postfix = "]") { "        \"$it\"" } +
+        deps.joinToString(separator = ",\n", prefix = "[\n", postfix = "\n]") {
+          "        \"$it\""
+        } +
         ","
     } else {
       ""
@@ -159,13 +159,11 @@ internal class JvmProjectSpec(builder: Builder) {
 internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val targetName: Property<String>
 
-  @get:InputFile
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  abstract val projectDir: DirectoryProperty
+  @get:Input abstract val projectDir: Property<File>
 
-  @get:Input abstract val deps: SetProperty<ResolvedArtifactResult>
-  @get:Input abstract val exportedDeps: SetProperty<ResolvedArtifactResult>
-  @get:Input abstract val testDeps: SetProperty<ResolvedArtifactResult>
+  @get:Input abstract val deps: SetProperty<ComponentArtifactIdentifier>
+  @get:Input abstract val exportedDeps: SetProperty<ComponentArtifactIdentifier>
+  @get:Input abstract val testDeps: SetProperty<ComponentArtifactIdentifier>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -190,57 +188,60 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
       .writeTo(outputFile.asFile.get().toOkioPath())
   }
 
-  private fun SetProperty<ResolvedArtifactResult>.mapDeps(): SortedSet<Dep> {
+  private fun SetProperty<ComponentArtifactIdentifier>.mapDeps(): SortedSet<Dep> {
     return map { result ->
-        result
-          .asSequence()
-          .map { it.id }
-          .map { component ->
-            when (component) {
-              is ModuleComponentArtifactIdentifier -> {
-                val componentId = component.componentIdentifier
-                val identifier = "${componentId.group}:${componentId.module}"
+        result.asSequence().mapNotNull { component ->
+          when (component) {
+            is ModuleComponentArtifactIdentifier -> {
+              val componentId = component.componentIdentifier
+              val identifier = "${componentId.group}:${componentId.module}"
 
-                // Map to lower underscore format for maven sourcing
-                val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
-                Dep.Remote(source = "maven", path = "", target = target)
-              }
-              is ProjectComponentIdentifier -> {
-                // Map to "path/to/local/dependency1" format
-                Dep.Local(component.projectPath.removePrefix(":").replace(":", "/"))
-              }
-              else -> error("Unknown component type: $component")
+              // Map to lower underscore format for maven sourcing
+              val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
+              Dep.Remote(source = "maven", path = "", target = target)
+            }
+            is ProjectComponentIdentifier -> {
+              // Map to "path/to/local/dependency1" format
+              Dep.Local(component.projectPath.removePrefix(":").replace(":", "/"))
+            }
+            else -> {
+              System.err.println("Unknown component type: $component (${component.javaClass})")
+              null
             }
           }
+        }
       }
       .get()
       .toSortedSet()
   }
 
   protected fun resolvedDependenciesFrom(
-    configuration: Configuration
-  ): Provider<Set<ResolvedArtifactResult>> {
-    return configuration.incoming
-      .artifactView {
-        attributes {
-          attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.AAR_OR_JAR.type)
+    provider: NamedDomainObjectProvider<ResolvableConfiguration>
+  ): Provider<List<ComponentArtifactIdentifier>> {
+    return provider.flatMap { configuration ->
+      configuration.incoming
+        .artifactView {
+          attributes {
+            attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.AAR_OR_JAR.type)
+          }
+          lenient(true)
         }
-        lenient(true)
-      }
-      .artifacts
-      .resolvedArtifacts
+        .artifacts
+        .resolvedArtifacts
+        .map { it.map { it.id } }
+    }
   }
 
   companion object {
     fun register(
       project: Project,
-      depsConfiguration: Configuration,
-      exportedDepsConfiguration: Configuration,
-      testConfiguration: Configuration,
+      depsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
+      exportedDepsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
+      testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
         targetName.set(project.name)
-        projectDir.set(project.layout.projectDirectory)
+        projectDir.set(project.layout.projectDirectory.asFile)
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
         testDeps.set(resolvedDependenciesFrom(testConfiguration))

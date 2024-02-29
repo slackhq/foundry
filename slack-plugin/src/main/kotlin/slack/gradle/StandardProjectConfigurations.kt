@@ -61,6 +61,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
+import slack.gradle.Configurations.wrapInResolvable
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.bazel.JvmProjectBazelTask
@@ -291,10 +292,14 @@ internal class StandardProjectConfigurations(
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
       if (slackProperties.enableBazelGen) {
-        val implementationConfig = configurations.getByName("implementation")
-        val apiConfig = configurations.getByName("implementation")
-        val testConfig = configurations.getByName("testImplementation")
-        JvmProjectBazelTask.register(project, implementationConfig, apiConfig, testConfig)
+        // Have to wrap all the configurations in resolvable ones that extend them
+        // in order to read their dependencies
+        JvmProjectBazelTask.register(
+          project,
+          configurations.getByName("runtimeElements").wrapInResolvable(project),
+          configurations.getByName("apiElements").wrapInResolvable(project),
+          configurations.getByName("testRuntimeClasspath").wrapInResolvable(project),
+        )
       }
     }
   }

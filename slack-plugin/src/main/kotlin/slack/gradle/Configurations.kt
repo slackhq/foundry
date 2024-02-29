@@ -15,6 +15,11 @@
  */
 package slack.gradle
 
+import org.gradle.api.NamedDomainObjectProvider
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolvableConfiguration
+
 internal object Configurations {
 
   // The "(?i)" makes the regex case-insensitive
@@ -54,5 +59,13 @@ internal object Configurations {
         "lintChecks",
         "lintRelease",
       )
+  }
+
+  fun Configuration.wrapInResolvable(
+    project: Project
+  ): NamedDomainObjectProvider<ResolvableConfiguration> {
+    val newConfig = project.configurations.resolvable("resolvable${name.capitalizeUS()}")
+    newConfig.configure { extendsFrom(this@wrapInResolvable) }
+    return newConfig
   }
 }
