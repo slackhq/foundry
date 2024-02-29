@@ -36,7 +36,7 @@ internal abstract class GenerateMavenDependenciesTask : DefaultTask() {
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
   init {
-    group = "slack"
+    group = "bazel"
     description = "Generate maven dependencies for Bazel"
   }
 
