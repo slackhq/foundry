@@ -24,6 +24,7 @@ kt_compiler_plugin(
     deps = list["@com_github_jetbrains_kotlin//:parcelize-compiler-plugin"],
 )
  */
+// TODO add support for options
 internal class CompilerPluginSpec(builder: Builder) {
   val name = builder.name
   val id = builder.id
@@ -66,9 +67,17 @@ internal enum class CompilerPlugin(val spec: CompilerPluginSpec) {
       )
       .build()
   ),
+  MOSHIX(
+    CompilerPluginSpec.Builder(name = "moshix_plugin", id = "dev.zacsweers.moshix.compiler")
+      .addDep(Dep.Remote.fromMavenIdentifier("dev.zacsweers.moshix:moshi-compiler-plugin"))
+      .build()
+  ),
+  REDACTED(
+    CompilerPluginSpec.Builder(name = "redacted_plugin", id = "dev.zacsweers.redacted.compiler")
+      .addDep(Dep.Remote.fromMavenIdentifier("dev.zacsweers.redacted:redacted-compiler-plugin"))
+      .build()
+  ),
   // TODO
-  //  moshi-ir
-  //  redacted
   //  compose
   //  anvil
   //  KSP?
