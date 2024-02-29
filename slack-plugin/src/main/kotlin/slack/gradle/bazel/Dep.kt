@@ -30,6 +30,14 @@ internal sealed interface Dep : Comparable<Dep> {
     override fun toString(): String {
       return "@$source//$path:$target"
     }
+
+    companion object {
+      fun fromMavenIdentifier(identifier: String): Remote {
+        // Map to lower underscore format for maven sourcing
+        val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
+        return Remote(path = "maven", target = target)
+      }
+    }
   }
 
   /**

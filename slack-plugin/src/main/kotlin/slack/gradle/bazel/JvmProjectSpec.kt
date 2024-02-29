@@ -36,6 +36,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
+import slack.gradle.SlackExtension
 import slack.gradle.register
 
 /** A spec for a plain kotlin jvm project. */
@@ -95,6 +96,13 @@ internal class JvmProjectSpec(builder: Builder) {
       }
     }
 
+    val compilerPluginsString =
+      if (compilerPlugins.isNotEmpty()) {
+        compilerPlugins.joinToString("\n\n") { "$it" }
+      } else {
+        ""
+      }
+
     return """
       load("@rules_kotlin//kotlin:jvm.bzl", ${kotlinImports.joinToString(", ") { "\"$it\"" }})
 
@@ -112,6 +120,8 @@ internal class JvmProjectSpec(builder: Builder) {
           visibility = ["//visibility:private"],
           $testDeps
       )
+
+      $compilerPluginsString
     """
       .trimIndent()
   }
@@ -155,6 +165,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val exportedDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val testDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val compilerPlugins: SetProperty<CompilerPlugin>
+  @get:Input abstract val slackExtension: Property<SlackExtension>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -168,13 +179,27 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
     val deps = deps.mapDeps()
     val exportedDeps = exportedDeps.mapDeps()
     val testDeps = testDeps.mapDeps()
+    val slackExtension = slackExtension.get()
+
+    // Only moshix and redacted are supported in JVM projects
+    val compilerPlugins =
+      compilerPlugins.get().map { it.spec } +
+        buildList {
+          // TODO we technically could choose IR or KSP for this, but for now assume IR
+          if (slackExtension.featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)) {
+            add(CompilerPlugin.MOSHIX.spec)
+          }
+          if (slackExtension.featuresHandler.redacted.getOrElse(false)) {
+            add(CompilerPlugin.REDACTED.spec)
+          }
+        }
 
     JvmProjectSpec.Builder(targetName.get())
       .apply {
         deps.forEach { addDep(it) }
         exportedDeps.forEach { addExportedDep(it) }
         testDeps.forEach { addTestDep(it) }
-        this@JvmProjectBazelTask.compilerPlugins.get().forEach { addCompilerPlugin(it.spec) }
+        compilerPlugins.distinctBy { it.id }.forEach { addCompilerPlugin(it) }
       }
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())
@@ -187,10 +212,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
             is ModuleComponentArtifactIdentifier -> {
               val componentId = component.componentIdentifier
               val identifier = "${componentId.group}:${componentId.module}"
-
-              // Map to lower underscore format for maven sourcing
-              val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
-              Dep.Remote(source = "maven", path = "", target = target)
+              Dep.Remote.fromMavenIdentifier(identifier)
             }
             is ProjectComponentIdentifier -> {
               // Map to "path/to/local/dependency1" format
@@ -230,6 +252,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
       depsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       exportedDepsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
+      slackExtension: SlackExtension,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
         targetName.set(project.name)
@@ -237,6 +260,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
         testDeps.set(resolvedDependenciesFrom(testConfiguration))
+        this.slackExtension.set(slackExtension)
         outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
       }
     }
