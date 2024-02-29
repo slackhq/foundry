@@ -79,10 +79,11 @@ internal abstract class GenerateMavenDependenciesTask : DefaultTask() {
       ]
 
       FORCED_MAVEN_ARTIFACTS = [
-          ${forcedMavenArtifacts.joinToString(",\n") { "\"$it\"" }},
+          ${if (forcedMavenArtifacts.isEmpty()) "" else forcedMavenArtifacts.joinToString(",\n") { "\"$it\"" }},
       ]
       """
           .trimIndent()
+          .trimStart() // Trim start for buildifier
       )
   }
 
