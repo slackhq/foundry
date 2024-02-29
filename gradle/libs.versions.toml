@@ -12,6 +12,7 @@ dokka = "1.9.10"
 errorproneGradle = "3.0.1"
 jdk = "21"
 jna = "5.14.0"
+kaml = "0.57.0"
 kotlin = "1.9.22"
 kotlinPoet = "1.16.0"
 ksp = "1.9.22-1.0.17"
@@ -41,6 +42,7 @@ intellij = { id = "org.jetbrains.intellij", version = "1.17.0" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
@@ -89,6 +91,7 @@ gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", versi
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
 guava = "com.google.guava:guava:33.0.0-jre"
+kaml = {module = "com.charleskorn.kaml:kaml", version.ref = "kaml"}
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet"}

@@ -15,12 +15,16 @@
  */
 package com.slack.sgp.intellij.codeowners
 
+import com.charleskorn.kaml.Yaml
 import com.intellij.openapi.diagnostic.logger
+import com.slack.sgp.intellij.codeowners.model.CodeOwnersFile
+import java.io.File
 import java.io.FileNotFoundException
+import kotlin.text.Charsets.UTF_8
 
 /**
- * CodeOwnerRepository is responsible for reading and caching the code owners info from the csv
- * specific via CodeOwnerFileHelper.getCodeOwnershipCsv(project). Invalid file formats or rows will
+ * CodeOwnerRepository is responsible for reading and caching the code owners info from the yaml
+ * specific via CodeOwnerFileHelper.getCodeOwnershipFile(project). Invalid file formats or rows will
  * be ignored.
  */
 class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
@@ -29,15 +33,32 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
   private val logger = logger<CodeOwnerRepository>()
 
   init {
-    val codeOwnershipFile = codeOwnerFileFetcher.getCodeOwnershipCsv()
+    val codeOwnershipFile = codeOwnerFileFetcher.getCodeOwnershipFile()
     if (codeOwnershipFile != null) {
       try {
-        codeOwnershipMap =
+        // Construct map of contents -> index (line number) for fast access later. This is needed
+        // for looking up line numbers in the ownership file.
+        val codeOwnershipLineMap =
           codeOwnershipFile
             .readLines()
-            .asSequence()
-            .mapIndexed { index, line -> parseCodeOwnerLineInfo(index, line) }
-            .filterNotNull()
+            .mapIndexed { index, line -> line.trimStart(' ', '-') to index }
+            .toMap()
+
+        // Marshal yaml
+        val ownershipFile = marshalCodeOwnershipYaml(codeOwnershipFile)
+
+        // Work through ownershipFile.ownership list by creating CodeOwnerInfo objects, flattening
+        // then and turning that into a map of packagePattern -> CodeOwnerInfo for fast access
+        // later.
+        codeOwnershipMap =
+          ownershipFile.ownership
+            .map { codeOwner ->
+              codeOwner.paths.map { path ->
+                // Lookup line in ownership file (0 if not found) and construct CodeOwnerInfo
+                CodeOwnerInfo(codeOwner.name, path, codeOwnershipLineMap[path] ?: 0)
+              }
+            }
+            .flatten()
             .associateBy { codeOwnerInfo -> codeOwnerInfo.packagePattern }
       } catch (fileNotFoundException: FileNotFoundException) {
         logger.error(
@@ -55,12 +76,8 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
       .map { codeOwnershipMap[it]!! }
   }
 
-  private fun parseCodeOwnerLineInfo(index: Int, line: String): CodeOwnerInfo? {
-    val splitLine = line.split(",")
-    return if (splitLine.size == 2) {
-      CodeOwnerInfo(team = splitLine[1], packagePattern = splitLine[0], codeOwnerLineNumber = index)
-    } else {
-      null
-    }
+  private fun marshalCodeOwnershipYaml(file: File): CodeOwnersFile {
+    val fileContents = file.readText(charset = UTF_8)
+    return Yaml.default.decodeFromString(CodeOwnersFile.serializer(), fileContents)
   }
 }

@@ -18,6 +18,16 @@ package com.slack.sgp.intellij.codeowners
 import com.google.common.truth.Truth.assertThat
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
+private const val TEAM_1 = "Team 1"
+private const val TEAM_2 = "Team 2"
+private const val FOLDER_2_PATTERN = "app/folder2/.*"
+private const val FOLDER_3_PATTERN = "app/folder3/.*"
+private const val FOLDER_3_GRANULAR_PATTERN = "app/folder3/subfolder/.*"
+private const val TEST_OWNERSHIP_YAML_FILE = "src/test/resources/test-code-ownership.yaml"
+
+/**
+ * Unit test for [CodeOwnerRepository]. Note that IntelliJ OpenFileDescriptor line focus is 0-based.
+ */
 class CodeOwnerRepositoryTest : BasePlatformTestCase() {
 
   fun testMissingFile() {
@@ -27,12 +37,23 @@ class CodeOwnerRepositoryTest : BasePlatformTestCase() {
 
   fun testSingleMatchingResult() {
     val underTest = createCodeOwnerRepository()
-    assertThat(underTest.getCodeOwnership("app/folder2/subfolder/foo.kt").size).isEqualTo(1)
+    val result = underTest.getCodeOwnership("app/folder2/subfolder/foo.kt")
+    assertThat(result.size).isEqualTo(1)
+    assertThat(result[0].packagePattern).isEqualTo(FOLDER_2_PATTERN)
+    assertThat(result[0].codeOwnerLineNumber).isEqualTo(14)
+    assertThat(result[0].team).isEqualTo(TEAM_1)
   }
 
   fun testMultipleMatchingResult() {
     val underTest = createCodeOwnerRepository()
-    assertThat(underTest.getCodeOwnership("app/folder3/subfolder/foo.kt").size).isEqualTo(2)
+    val result = underTest.getCodeOwnership("app/folder3/subfolder/foo.kt")
+    assertThat(result.size).isEqualTo(2)
+    assertThat(result[0].packagePattern).isEqualTo(FOLDER_3_GRANULAR_PATTERN)
+    assertThat(result[0].codeOwnerLineNumber).isEqualTo(15)
+    assertThat(result[0].team).isEqualTo(TEAM_1)
+    assertThat(result[1].packagePattern).isEqualTo(FOLDER_3_PATTERN)
+    assertThat(result[1].codeOwnerLineNumber).isEqualTo(18)
+    assertThat(result[1].team).isEqualTo(TEAM_2)
   }
 
   fun testNoResult() {
@@ -42,7 +63,7 @@ class CodeOwnerRepositoryTest : BasePlatformTestCase() {
 
   private fun createCodeOwnerRepository(
     codeOwnerFileFetcher: CodeOwnerFileFetcher =
-      FakeCodeOwnerFileFetcherImpl("src/test/resources/test-code-ownership.csv")
+      FakeCodeOwnerFileFetcherImpl(TEST_OWNERSHIP_YAML_FILE)
   ): CodeOwnerRepository {
     return CodeOwnerRepository(codeOwnerFileFetcher)
   }
