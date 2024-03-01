@@ -29,7 +29,7 @@ We're sending analytics for almost all Skate features to track user usage. To se
 2. Use `SkateSpanBuilder` to create the span for event you want to track
 3. Make call to `SkateTraceReporter` to send up the traces
 
-## Publishing
-Run `publish-skate` Github Action to publish to the configured repository.
-
+## Releasing
+1. Add `change-notes.md` file under `skate-plugin/` and merge it to `main`
+2. Run `publish-skate` Github Action.
 Behind the scene the action's running`./gradlew :skate-plugin:uploadPluginToArtifactory`
