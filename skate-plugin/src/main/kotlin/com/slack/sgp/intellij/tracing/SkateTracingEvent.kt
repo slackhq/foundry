@@ -15,33 +15,33 @@
  */
 package com.slack.sgp.intellij.tracing
 
-interface SkateTracingEvent {
+sealed interface SkateTracingEvent {
   val name: String
-}
 
-enum class ProjectGenEvent : SkateTracingEvent {
-  PROJECT_GEN_OPENED
-}
+  enum class ProjectGen : SkateTracingEvent {
+    DIALOG_OPENED
+  }
 
-enum class WhatsNewEvent : SkateTracingEvent {
-  WHATS_NEW_PANEL_OPENED,
-  WHATS_NEW_PANEL_CLOSED
-}
+  enum class WhatsNew : SkateTracingEvent {
+    PANEL_OPENED,
+    PANEL_CLOSED
+  }
 
-enum class HoustonFeatureFlagEvent : SkateTracingEvent {
-  HOUSTON_FEATURE_FLAG_URL_CLICKED
-}
+  enum class HoustonFeatureFlag : SkateTracingEvent {
+    HOUSTON_FEATURE_FLAG_URL_CLICKED
+  }
 
-enum class ModelTranslatorEvent : SkateTracingEvent {
-  MODEL_TRANSLATOR_GENERATED
-}
+  enum class ModelTranslator : SkateTracingEvent {
+    MODEL_TRANSLATOR_GENERATED
+  }
 
-enum class IndexingEvent : SkateTracingEvent {
-  INDEXING_REASON,
-  UPDATING_TIME,
-  SCAN_FILES_DURATION,
-  INDEXING_DURATION,
-  WAS_INTERRUPTED,
-  SCANNING_TYPE,
-  INDEXING_COMPLETED,
+  enum class Indexing : SkateTracingEvent {
+    INDEXING_REASON,
+    UPDATING_TIME,
+    SCAN_FILES_DURATION,
+    INDEXING_DURATION,
+    WAS_INTERRUPTED,
+    SCANNING_TYPE,
+    INDEXING_COMPLETED,
+  }
 }

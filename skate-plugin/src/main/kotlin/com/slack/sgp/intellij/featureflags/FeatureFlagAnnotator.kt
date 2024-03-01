@@ -23,9 +23,9 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
-import com.slack.sgp.intellij.tracing.HoustonFeatureFlagEvent
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.featureFlagFilePattern
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
@@ -73,6 +73,8 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   private val startTimestamp = Instant.now()
   private val skateSpanBuilder = SkateSpanBuilder()
+  private lateinit var currentProject: Project
+  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(currentProject) }
 
   override fun getText(): String = message
 
@@ -82,21 +84,24 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
-    skateSpanBuilder.addTag("event", HoustonFeatureFlagEvent.HOUSTON_FEATURE_FLAG_URL_CLICKED)
-    sendUsageTrace(project, project.isTracingEnabled())
+    currentProject = project
+    skateSpanBuilder.addTag(
+      "event",
+      SkateTracingEvent.HoustonFeatureFlag.HOUSTON_FEATURE_FLAG_URL_CLICKED,
+    )
+    sendUsageTrace()
   }
 
   override fun startInWriteAction(): Boolean {
     return false
   }
 
-  fun sendUsageTrace(project: Project, isTracingEnabled: Boolean) {
-    if (!isTracingEnabled) return
-    SkateTraceReporter(project)
-      .createPluginUsageTraceAndSendTrace(
-        "feature_flag_annotator",
-        startTimestamp,
-        skateSpanBuilder.getKeyValueList(),
-      )
+  fun sendUsageTrace() {
+    if (!currentProject.isTracingEnabled()) return
+    skateTraceReporter.createPluginUsageTraceAndSendTrace(
+      "feature_flag_annotator",
+      startTimestamp,
+      skateSpanBuilder.getKeyValueList(),
+    )
   }
 }

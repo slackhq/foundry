@@ -37,7 +37,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.apache.http.HttpException
 
-class SkateTraceReporter(private val project: Project) : TraceReporter {
+class SkateTraceReporter(val project: Project) : TraceReporter {
 
   private val delegate by lazy {
     val okHttpClient = lazy { OkHttpClient.Builder().build() }

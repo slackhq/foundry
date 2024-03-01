@@ -15,46 +15,55 @@
  */
 package com.slack.sgp.intellij.idemetrics
 
+import com.intellij.openapi.project.Project
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistory
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistoryListener
 import com.intellij.util.indexing.diagnostic.dto.toMillis
-import com.slack.sgp.intellij.tracing.IndexingEvent
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isTracingEnabled
 
 @Suppress("UnstableApiUsage")
 class IndexingListener : ProjectIndexingHistoryListener {
+  private lateinit var currentProject: Project
+  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(currentProject) }
+
   override fun onFinishedIndexing(projectIndexingHistory: ProjectIndexingHistory) {
-    val project = projectIndexingHistory.project
-    if (!project.isTracingEnabled()) return
+    currentProject = projectIndexingHistory.project
+    if (!currentProject.isTracingEnabled()) return
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.apply {
       projectIndexingHistory.indexingReason?.let {
-        addTag(IndexingEvent.INDEXING_REASON.name.take(200), it)
+        addTag(SkateTracingEvent.Indexing.INDEXING_REASON.name, it.take(200))
       }
       addTag(
-        IndexingEvent.UPDATING_TIME.name,
+        SkateTracingEvent.Indexing.UPDATING_TIME.name,
         projectIndexingHistory.times.totalUpdatingTime.toMillis(),
       )
       addTag(
-        IndexingEvent.SCAN_FILES_DURATION.name,
+        SkateTracingEvent.Indexing.SCAN_FILES_DURATION.name,
         projectIndexingHistory.times.scanFilesDuration.toMillis(),
       )
       addTag(
-        IndexingEvent.INDEXING_DURATION.name,
+        SkateTracingEvent.Indexing.INDEXING_DURATION.name,
         projectIndexingHistory.times.indexingDuration.toMillis(),
       )
-      addTag(IndexingEvent.WAS_INTERRUPTED.name, projectIndexingHistory.times.wasInterrupted)
-      addTag(IndexingEvent.SCANNING_TYPE.name, projectIndexingHistory.times.scanningType.name)
-      addTag("event", IndexingEvent.INDEXING_COMPLETED.name)
-    }
-    SkateTraceReporter(project)
-      .createPluginUsageTraceAndSendTrace(
-        "indexing",
-        projectIndexingHistory.times.updatingStart.toInstant(),
-        skateSpanBuilder.getKeyValueList(),
+      addTag(
+        SkateTracingEvent.Indexing.WAS_INTERRUPTED.name,
+        projectIndexingHistory.times.wasInterrupted,
       )
+      addTag(
+        SkateTracingEvent.Indexing.SCANNING_TYPE.name,
+        projectIndexingHistory.times.scanningType.name,
+      )
+      addTag("event", SkateTracingEvent.Indexing.INDEXING_COMPLETED.name)
+    }
+    skateTraceReporter.createPluginUsageTraceAndSendTrace(
+      "indexing",
+      projectIndexingHistory.times.updatingStart.toInstant(),
+      skateSpanBuilder.getKeyValueList(),
+    )
   }
 
   override fun onStartedIndexing(projectIndexingHistory: ProjectIndexingHistory) {}

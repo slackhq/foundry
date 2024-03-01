@@ -18,34 +18,35 @@ package com.slack.sgp.intellij.projectgen
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
-import com.slack.sgp.intellij.tracing.ProjectGenEvent
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isProjectGenMenuActionEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
 class ProjectGenMenuAction : AnAction() {
+  private lateinit var currentProject: Project
+  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(currentProject) }
 
   override fun actionPerformed(e: AnActionEvent) {
-    val currentProject: Project = e.project ?: return
+    currentProject = e.project ?: return
     if (!currentProject.isProjectGenMenuActionEnabled()) return
     val startTimestamp = Instant.now()
     ProjectGenWindow(currentProject, e).show()
 
     if (currentProject.isTracingEnabled()) {
-      sendUsageTrace(currentProject, startTimestamp)
+      sendUsageTrace(startTimestamp)
     }
   }
 
-  fun sendUsageTrace(project: Project, startTimestamp: Instant) {
+  fun sendUsageTrace(startTimestamp: Instant) {
     val skateSpanBuilder = SkateSpanBuilder()
-    skateSpanBuilder.addTag("event", ProjectGenEvent.PROJECT_GEN_OPENED)
-    SkateTraceReporter(project)
-      .createPluginUsageTraceAndSendTrace(
-        "project_generator",
-        startTimestamp,
-        skateSpanBuilder.getKeyValueList(),
-      )
+    skateSpanBuilder.addTag("event", SkateTracingEvent.ProjectGen.DIALOG_OPENED)
+    skateTraceReporter.createPluginUsageTraceAndSendTrace(
+      "project_generator",
+      startTimestamp,
+      skateSpanBuilder.getKeyValueList(),
+    )
   }
 }
