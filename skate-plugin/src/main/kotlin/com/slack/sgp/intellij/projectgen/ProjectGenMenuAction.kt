@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isProjectGenMenuActionEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
@@ -27,7 +28,9 @@ import java.time.Instant
 
 class ProjectGenMenuAction : AnAction() {
   private lateinit var currentProject: Project
-  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(currentProject) }
+  private val skateTraceReporter: SkateTraceReporter by lazy {
+    SkateTraceService.get(currentProject)
+  }
 
   override fun actionPerformed(e: AnActionEvent) {
     currentProject = e.project ?: return

@@ -25,13 +25,16 @@ import com.slack.sgp.intellij.modeltranslator.helper.TranslatorHelper
 import com.slack.sgp.intellij.modeltranslator.model.TranslatorBundle
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
 class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : IntentionAction {
   private lateinit var currentProject: Project
-  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(currentProject) }
+  private val skateTraceReporter: SkateTraceReporter by lazy {
+    SkateTraceService.get(currentProject)
+  }
 
   override fun getText() = SkateBundle.message("skate.modelTranslator.description")
 

@@ -21,6 +21,7 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.slack.sgp.intellij.SkateProjectServiceImpl.Companion.WHATS_NEW_PANEL_ID
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
@@ -29,7 +30,7 @@ import java.time.Instant
 class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManagerListener {
   //  Initial state of screen should be hidden
   private var wasVisible = false
-  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(project) }
+  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceService.get(project) }
 
   override fun stateChanged(toolWindowManager: ToolWindowManager) {
     val startTimestamp = Instant.now()

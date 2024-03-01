@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
+import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.featureFlagFilePattern
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
@@ -74,7 +75,9 @@ class UrlIntentionAction(private val message: String, private val url: String) :
   private val startTimestamp = Instant.now()
   private val skateSpanBuilder = SkateSpanBuilder()
   private lateinit var currentProject: Project
-  private val skateTraceReporter: SkateTraceReporter by lazy { SkateTraceReporter(currentProject) }
+  private val skateTraceReporter: SkateTraceReporter by lazy {
+    SkateTraceService.get(currentProject)
+  }
 
   override fun getText(): String = message
 
