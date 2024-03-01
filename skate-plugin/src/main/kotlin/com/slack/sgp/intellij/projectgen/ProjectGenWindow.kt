@@ -42,6 +42,7 @@ class ProjectGenWindow(private val currentProject: Project?, private val event: 
   }
 
   override fun createCenterPanel(): JComponent {
+    setSize(600, 800)
     return ComposePanel().apply {
       setBounds(0, 0, 600, 800)
       setContent { DialogContent() }
