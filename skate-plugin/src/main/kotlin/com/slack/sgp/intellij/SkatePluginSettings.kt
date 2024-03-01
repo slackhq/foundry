@@ -26,7 +26,6 @@ import org.jetbrains.annotations.VisibleForTesting
 internal const val DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME = "slack.api.schemas"
 @VisibleForTesting internal const val DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX = "Translator.kt"
 @VisibleForTesting internal const val DEFAULT_TRANSLATOR_ENUM_IDENTIFIER = "name"
-internal const val DEFAULT_CODE_OWNER_FILE_PATH = "config/code-ownership/code_ownership.csv"
 
 /** Manages user-specific settings for the Skate plugin */
 @Service(Service.Level.PROJECT)
@@ -118,7 +117,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     }
 
   var codeOwnerFilePath: String?
-    get() = state.codeOwnerFilePath ?: DEFAULT_CODE_OWNER_FILE_PATH
+    get() = state.codeOwnerFilePath
     set(value) {
       state.codeOwnerFilePath = value
     }

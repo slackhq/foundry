@@ -194,7 +194,7 @@ constructor(
         }
 
         if (daggerConfig.enableAnvil) {
-          if (slackProperties.disableAnvilForK2Testing) {
+          if (!slackProperties.disableAnvilForK2Testing) {
             pluginManager.apply("com.squareup.anvil")
             configure<AnvilExtension> {
               generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
@@ -699,7 +699,8 @@ constructor(
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
-  private val compilerOptions: ListProperty<String> = objects.listProperty<String>()
+  private val compilerOptions: ListProperty<String> =
+    objects.listProperty<String>().convention(slackProperties.composeCommonCompilerOptions)
 
   /**
    * Configures the compiler options for Compose. This is a list of strings that will be passed into

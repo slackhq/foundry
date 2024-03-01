@@ -1,0 +1,19 @@
+excluded_directories:
+  - .git
+
+included_extensions:
+  - .kt
+  - .kts
+  - .java
+  - .xml
+  - .json
+
+ownership:
+  - name: Team 1
+    paths:
+      - app/folder1/.*
+      - app/folder2/.*
+      - app/folder3/subfolder/.*
+  - name: Team 2
+    paths:
+      - app/folder3/.*

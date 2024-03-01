@@ -21,6 +21,7 @@ import kotlin.io.path.readText
 plugins {
   java
   alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
@@ -107,6 +108,7 @@ dependencies {
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   implementation(libs.circuit)
   implementation(libs.gradlePlugins.compose)
+  implementation(libs.kaml)
   implementation(libs.kotlin.poet)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)

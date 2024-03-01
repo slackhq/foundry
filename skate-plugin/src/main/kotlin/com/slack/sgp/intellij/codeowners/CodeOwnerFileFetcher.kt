@@ -24,28 +24,28 @@ import java.io.File
 import java.nio.file.Path
 
 /**
- * CodeOwnerFileFetcher is the interface for fetching the code owner csv file. It's structured like
- * this so we can provide test/fake instances for use in unit tests.
+ * CodeOwnerFileFetcher is the interface for fetching the code owner yaml file. It's structured like
+ * this so that we can provide test/fake instances for use in unit tests.
  */
 interface CodeOwnerFileFetcher {
-  fun getCodeOwnershipCsv(): File?
+  fun getCodeOwnershipFile(): File?
 }
 
 class CodeOwnerFileFetcherImpl(private val project: Project) : CodeOwnerFileFetcher {
 
   private val logger = logger<CodeOwnerFileFetcherImpl>()
 
-  override fun getCodeOwnershipCsv(): File? {
+  override fun getCodeOwnershipFile(): File? {
     val settings = project.service<SkatePluginSettings>()
     val fs = LocalFileSystem.getInstance()
-    val path = Path.of(project.basePath ?: "", settings.codeOwnerFilePath)
-    logger.debug("getCodeOwnershipCsv path location: $path")
+    val path = Path.of(project.basePath ?: "", settings.codeOwnerFilePath ?: "")
+    logger.debug("getCodeOwnershipFile path location: $path")
     return fs.findFileByNioFile(path)?.toNioPath()?.toFile()
   }
 }
 
 class FakeCodeOwnerFileFetcherImpl(private val path: String) : CodeOwnerFileFetcher {
-  override fun getCodeOwnershipCsv(): File? {
+  override fun getCodeOwnershipFile(): File? {
     val fs = LocalFileSystem.getInstance()
     return fs.findFileByNioFile(Path.of(path))?.toNioPath()?.toFile()
   }

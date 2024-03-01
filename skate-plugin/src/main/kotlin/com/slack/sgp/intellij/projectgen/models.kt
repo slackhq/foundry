@@ -289,6 +289,12 @@ internal object ComposeFeature : Feature, SlackFeatureVisitor {
   }
 }
 
+internal object CircuitFeature : Feature, SlackFeatureVisitor {
+  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+    builder.addStatement("circuit()")
+  }
+}
+
 internal class ReadMeFile {
   fun writeTo(projectDir: File) {
     val projectName = projectDir.name

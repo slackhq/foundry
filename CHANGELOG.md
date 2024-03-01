@@ -1,6 +1,31 @@
 Changelog
 =========
 
+0.15.7
+------
+
+_2024-02-28_
+
+- Fix inverted logic for disabled anvil mode in K2/KSP testing.
+
+0.15.6
+------
+
+_2024-02-28_
+
+- Fix `AnvilMode` casing in detection.
+
+0.15.5
+------
+
+_2024-02-27_
+
+- Broaden anvil KSP support controls.
+- Update oshi to `6.4.13`.
+- Add `sgp.compose.commonCompilerOptions` property for common compose compiler options.
+- Build against Compose Multiplatform `1.6.0`.
+- Fix mkdocs lists on the main page.
+
 0.15.4
 ------
 
