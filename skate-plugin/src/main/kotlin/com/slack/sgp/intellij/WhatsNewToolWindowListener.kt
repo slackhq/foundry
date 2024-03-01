@@ -42,9 +42,9 @@ class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManag
 
     if (visibilityChanged) {
       if (isVisible) {
-        skateSpanBuilder.addSpanTag("event", WhatsNewEvent.WHATS_NEW_PANEL_OPENED)
+        skateSpanBuilder.addTag("event", WhatsNewEvent.WHATS_NEW_PANEL_OPENED)
       } else {
-        skateSpanBuilder.addSpanTag("event", WhatsNewEvent.WHATS_NEW_PANEL_CLOSED)
+        skateSpanBuilder.addTag("event", WhatsNewEvent.WHATS_NEW_PANEL_CLOSED)
       }
       SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(

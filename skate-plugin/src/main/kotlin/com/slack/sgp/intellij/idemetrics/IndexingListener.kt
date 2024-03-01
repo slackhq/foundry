@@ -29,28 +29,26 @@ class IndexingListener : ProjectIndexingHistoryListener {
     val project = projectIndexingHistory.project
     if (!project.isTracingEnabled()) return
     val skateSpanBuilder = SkateSpanBuilder()
-    val tags: MutableMap<String, Any> = mutableMapOf()
-    tags.apply {
+    skateSpanBuilder.apply {
       projectIndexingHistory.indexingReason?.let {
-        put(IndexingEvent.INDEXING_REASON.name.take(200), it)
+        addTag(IndexingEvent.INDEXING_REASON.name.take(200), it)
       }
-      put(
+      addTag(
         IndexingEvent.UPDATING_TIME.name,
         projectIndexingHistory.times.totalUpdatingTime.toMillis(),
       )
-      put(
+      addTag(
         IndexingEvent.SCAN_FILES_DURATION.name,
         projectIndexingHistory.times.scanFilesDuration.toMillis(),
       )
-      put(
+      addTag(
         IndexingEvent.INDEXING_DURATION.name,
         projectIndexingHistory.times.indexingDuration.toMillis(),
       )
-      put(IndexingEvent.IS_INTERRUPTED.name, projectIndexingHistory.times.wasInterrupted)
-      put(IndexingEvent.SCANNING_TYPE.name, projectIndexingHistory.times.scanningType.name)
-      put("event", IndexingEvent.INDEXING_COMPLETED.name)
+      addTag(IndexingEvent.WAS_INTERRUPTED.name, projectIndexingHistory.times.wasInterrupted)
+      addTag(IndexingEvent.SCANNING_TYPE.name, projectIndexingHistory.times.scanningType.name)
+      addTag("event", IndexingEvent.INDEXING_COMPLETED.name)
     }
-    skateSpanBuilder.addSpanTags(tags)
     SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
         "indexing",

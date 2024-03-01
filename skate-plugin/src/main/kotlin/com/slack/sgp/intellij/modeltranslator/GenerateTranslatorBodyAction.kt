@@ -54,9 +54,7 @@ class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : Inten
 
   private fun sendUsageTrace(project: Project, startTimestamp: Instant) {
     val skateSpanBuilder =
-      SkateSpanBuilder().apply {
-        addSpanTag("event", ModelTranslatorEvent.MODEL_TRANSLATOR_GENERATED)
-      }
+      SkateSpanBuilder().apply { addTag("event", ModelTranslatorEvent.MODEL_TRANSLATOR_GENERATED) }
     SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
         "model_translator",

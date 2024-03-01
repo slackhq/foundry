@@ -40,7 +40,7 @@ class ProjectGenMenuAction : AnAction() {
 
   fun sendUsageTrace(project: Project, startTimestamp: Instant) {
     val skateSpanBuilder = SkateSpanBuilder()
-    skateSpanBuilder.addSpanTag("event", ProjectGenEvent.PROJECT_GEN_OPENED)
+    skateSpanBuilder.addTag("event", ProjectGenEvent.PROJECT_GEN_OPENED)
     SkateTraceReporter(project)
       .createPluginUsageTraceAndSendTrace(
         "project_generator",

@@ -82,7 +82,7 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
-    skateSpanBuilder.addSpanTag("event", HoustonFeatureFlagEvent.HOUSTON_FEATURE_FLAG_URL_CLICKED)
+    skateSpanBuilder.addTag("event", HoustonFeatureFlagEvent.HOUSTON_FEATURE_FLAG_URL_CLICKED)
     sendUsageTrace(project, project.isTracingEnabled())
   }
 

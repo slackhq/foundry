@@ -22,58 +22,23 @@ import com.slack.sgp.tracing.model.newTagBuilder
 class SkateSpanBuilder {
   private val keyValueList: TagBuilder = newTagBuilder()
 
-  fun addSpanTag(key: String, value: String) {
+  fun addTag(key: String, value: String) {
     keyValueList.apply { key.lowercase() tagTo value }
   }
 
-  fun addSpanTag(key: String, event: SkateTracingEvent) {
+  fun addTag(key: String, event: SkateTracingEvent) {
     keyValueList.apply { key.lowercase() tagTo event.name }
   }
 
-  fun addSpanTags(tags: Map<String, Any>) {
-    tags.forEach { (key, value) ->
-      when (value) {
-        is String -> keyValueList.apply { key.lowercase() tagTo value }
-        is Double -> keyValueList.apply { key.lowercase() tagTo value }
-        is Long -> keyValueList.apply { key.lowercase() tagTo value }
-        is Boolean -> keyValueList.apply { key.lowercase() tagTo value }
-        else -> throw IllegalArgumentException("Unsupported value type for key: ${key}")
-      }
-    }
+  fun addTag(key: String, value: Long) {
+    keyValueList.apply { key.lowercase() tagTo value }
+  }
+
+  fun addTag(key: String, value: Boolean) {
+    keyValueList.apply { key.lowercase() tagTo value }
   }
 
   fun getKeyValueList(): List<KeyValue> {
     return keyValueList.toList()
   }
-}
-
-interface SkateTracingEvent {
-  val name: String
-}
-
-enum class ProjectGenEvent : SkateTracingEvent {
-  PROJECT_GEN_OPENED
-}
-
-enum class WhatsNewEvent : SkateTracingEvent {
-  WHATS_NEW_PANEL_OPENED,
-  WHATS_NEW_PANEL_CLOSED
-}
-
-enum class HoustonFeatureFlagEvent : SkateTracingEvent {
-  HOUSTON_FEATURE_FLAG_URL_CLICKED
-}
-
-enum class ModelTranslatorEvent : SkateTracingEvent {
-  MODEL_TRANSLATOR_GENERATED
-}
-
-enum class IndexingEvent : SkateTracingEvent {
-  INDEXING_REASON,
-  UPDATING_TIME,
-  SCAN_FILES_DURATION,
-  INDEXING_DURATION,
-  IS_INTERRUPTED,
-  SCANNING_TYPE,
-  INDEXING_COMPLETED,
 }
