@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.featureFlagFilePattern
@@ -74,10 +73,6 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   private val startTimestamp = Instant.now()
   private val skateSpanBuilder = SkateSpanBuilder()
-  private lateinit var currentProject: Project
-  private val skateTraceReporter: SkateTraceReporter by lazy {
-    SkateTraceService.get(currentProject)
-  }
 
   override fun getText(): String = message
 
@@ -87,24 +82,24 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     BrowserUtil.browse(URI(url))
-    currentProject = project
     skateSpanBuilder.addTag(
       "event",
       SkateTracingEvent.HoustonFeatureFlag.HOUSTON_FEATURE_FLAG_URL_CLICKED,
     )
-    sendUsageTrace()
+    sendUsageTrace(project)
   }
 
   override fun startInWriteAction(): Boolean {
     return false
   }
 
-  fun sendUsageTrace() {
-    if (!currentProject.isTracingEnabled()) return
-    skateTraceReporter.createPluginUsageTraceAndSendTrace(
-      "feature_flag_annotator",
-      startTimestamp,
-      skateSpanBuilder.getKeyValueList(),
-    )
+  fun sendUsageTrace(project: Project) {
+    if (!project.isTracingEnabled()) return
+    SkateTraceService.get(project)
+      .createPluginUsageTraceAndSendTrace(
+        "feature_flag_annotator",
+        startTimestamp,
+        skateSpanBuilder.getKeyValueList(),
+      )
   }
 }

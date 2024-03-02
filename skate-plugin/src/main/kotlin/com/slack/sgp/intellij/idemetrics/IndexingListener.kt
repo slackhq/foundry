@@ -15,25 +15,18 @@
  */
 package com.slack.sgp.intellij.idemetrics
 
-import com.intellij.openapi.project.Project
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistory
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistoryListener
 import com.intellij.util.indexing.diagnostic.dto.toMillis
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.isTracingEnabled
 
 @Suppress("UnstableApiUsage")
 class IndexingListener : ProjectIndexingHistoryListener {
-  private lateinit var currentProject: Project
-  private val skateTraceReporter: SkateTraceReporter by lazy {
-    SkateTraceService.get(currentProject)
-  }
-
   override fun onFinishedIndexing(projectIndexingHistory: ProjectIndexingHistory) {
-    currentProject = projectIndexingHistory.project
+    val currentProject = projectIndexingHistory.project
     if (!currentProject.isTracingEnabled()) return
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.apply {
@@ -62,11 +55,12 @@ class IndexingListener : ProjectIndexingHistoryListener {
       )
       addTag("event", SkateTracingEvent.Indexing.INDEXING_COMPLETED.name)
     }
-    skateTraceReporter.createPluginUsageTraceAndSendTrace(
-      "indexing",
-      projectIndexingHistory.times.updatingStart.toInstant(),
-      skateSpanBuilder.getKeyValueList(),
-    )
+    SkateTraceService.get(currentProject)
+      .createPluginUsageTraceAndSendTrace(
+        "indexing",
+        projectIndexingHistory.times.updatingStart.toInstant(),
+        skateSpanBuilder.getKeyValueList(),
+      )
   }
 
   override fun onStartedIndexing(projectIndexingHistory: ProjectIndexingHistory) {}

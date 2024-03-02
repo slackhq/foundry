@@ -19,15 +19,16 @@ import com.intellij.openapi.project.Project
 
 object SkateTraceService {
   private var currentProject: Project? = null
-  private val traceReporter: SkateTraceReporter by lazy {
-    SkateTraceReporter(
-      currentProject
-        ?: throw IllegalArgumentException("Project cannot be null before creating trace reports")
-    )
-  }
+  private var traceReporter: SkateTraceReporter? = null
 
   fun get(project: Project): SkateTraceReporter {
-    currentProject = currentProject ?: project
-    return traceReporter
+    if (currentProject == null || currentProject?.name != project.name) {
+      currentProject = project
+      traceReporter =
+        SkateTraceReporter(
+          currentProject ?: throw IllegalArgumentException("Project cannot be null")
+        )
+    }
+    return traceReporter ?: throw IllegalStateException("TraceReporter should not be null")
   }
 }
