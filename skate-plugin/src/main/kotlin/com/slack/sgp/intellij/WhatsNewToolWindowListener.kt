@@ -20,8 +20,8 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.slack.sgp.intellij.SkateProjectServiceImpl.Companion.WHATS_NEW_PANEL_ID
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
+import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
@@ -46,7 +46,8 @@ class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManag
       } else {
         skateSpanBuilder.addTag("event", SkateTracingEvent.WhatsNew.PANEL_CLOSED)
       }
-      SkateTraceService.get(project)
+      project
+        .getTraceReporter()
         .createPluginUsageTraceAndSendTrace(
           WHATS_NEW_PANEL_ID.replace('-', '_'),
           startTimestamp,

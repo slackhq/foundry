@@ -19,8 +19,8 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
+import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isProjectGenMenuActionEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
@@ -40,7 +40,8 @@ class ProjectGenMenuAction : AnAction() {
   fun sendUsageTrace(project: Project, startTimestamp: Instant) {
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.addTag("event", SkateTracingEvent.ProjectGen.DIALOG_OPENED)
-    SkateTraceService.get(project)
+    project
+      .getTraceReporter()
       .createPluginUsageTraceAndSendTrace(
         "project_generator",
         startTimestamp,

@@ -24,9 +24,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.featureFlagFilePattern
+import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isLinkifiedFeatureFlagsEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.net.URI
@@ -95,7 +95,8 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   fun sendUsageTrace(project: Project) {
     if (!project.isTracingEnabled()) return
-    SkateTraceService.get(project)
+    project
+      .getTraceReporter()
       .createPluginUsageTraceAndSendTrace(
         "feature_flag_annotator",
         startTimestamp,

@@ -19,8 +19,8 @@ import com.intellij.util.indexing.diagnostic.ProjectIndexingHistory
 import com.intellij.util.indexing.diagnostic.ProjectIndexingHistoryListener
 import com.intellij.util.indexing.diagnostic.dto.toMillis
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceService
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
+import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isTracingEnabled
 
 @Suppress("UnstableApiUsage")
@@ -55,7 +55,8 @@ class IndexingListener : ProjectIndexingHistoryListener {
       )
       addTag("event", SkateTracingEvent.Indexing.INDEXING_COMPLETED.name)
     }
-    SkateTraceService.get(currentProject)
+    currentProject
+      .getTraceReporter()
       .createPluginUsageTraceAndSendTrace(
         "indexing",
         projectIndexingHistory.times.updatingStart.toInstant(),
