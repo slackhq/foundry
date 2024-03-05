@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.15.8
+------
+
+_2024-03-04_
+
+- **Fix**: Check for `com.android.test` in `Project.isAndroid` checks. This resolves a case where we accidentally set the `JavaCompile.options.release` property in those projects.
+
 0.15.7
 ------
 
