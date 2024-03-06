@@ -31,16 +31,24 @@ interface CodeOwnerFileFetcher {
   fun getCodeOwnershipFile(): File?
 }
 
-class CodeOwnerFileFetcherImpl(private val project: Project) : CodeOwnerFileFetcher {
+class CodeOwnerFileFetcherImpl(
+  private val project: Project,
+  private val basePath: String = project.basePath ?: "",
+) : CodeOwnerFileFetcher {
 
   private val logger = logger<CodeOwnerFileFetcherImpl>()
 
   override fun getCodeOwnershipFile(): File? {
+    // get file path from settings if it's present
     val settings = project.service<SkatePluginSettings>()
-    val fs = LocalFileSystem.getInstance()
-    val path = Path.of(project.basePath ?: "", settings.codeOwnerFilePath ?: "")
-    logger.debug("getCodeOwnershipFile path location: $path")
-    return fs.findFileByNioFile(path)?.toNioPath()?.toFile()
+    val filePathSetting = settings.codeOwnerFilePath
+    // build full path and find file if file path setting is present
+    return filePathSetting?.let {
+      val fs = LocalFileSystem.getInstance()
+      val path = Path.of(basePath, filePathSetting)
+      logger.debug("getCodeOwnershipFile path location: $path")
+      fs.findFileByNioFile(path)?.toNioPath()?.toFile()
+    }
   }
 }
 
