@@ -18,6 +18,8 @@ package com.slack.sgp.intellij.util
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.SkatePluginSettings
+import com.slack.sgp.intellij.SkateProjectService
+import com.slack.sgp.intellij.tracing.SkateTraceReporter
 
 fun Project.settings(): SkatePluginSettings = service<SkatePluginSettings>()
 
@@ -30,3 +32,5 @@ fun Project.isTracingEnabled(): Boolean = settings().isTracingEnabled
 fun Project.isProjectGenMenuActionEnabled(): Boolean = settings().isProjectGenMenuActionEnabled
 
 fun Project.tracingEndpoint(): String? = settings().tracingEndpoint
+
+fun Project.getTraceReporter(): SkateTraceReporter = service<SkateProjectService>().traceReporter

@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij
 
 import com.google.common.truth.Truth.assertThat
+import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.tracing.SkateTraceReporter.Companion.DATABASE_NAME
@@ -26,6 +27,13 @@ import com.slack.sgp.tracing.model.newTagBuilder
 import java.time.Instant
 
 class SkateTraceReporterTest : BasePlatformTestCase() {
+
+  override fun setUp() {
+    super.setUp()
+    val settings = project.service<SkatePluginSettings>()
+    settings.isTracingEnabled = false
+  }
+
   fun testSpanCreatedWithCorrectTags() {
     val traceTags =
       newTagBuilder().apply {
@@ -36,7 +44,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
       }
 
     val listOfSpans =
-      SkateTraceReporter(project, offline = true)
+      SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(
           "fake_span_name",
           Instant.now(),
@@ -68,7 +76,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
 
   fun testSpanNotCreatedWhenSpanDataIsEmpty() {
     val listOfSpans =
-      SkateTraceReporter(project, offline = true)
+      SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(
           "fake_span_name",
           Instant.now(),
@@ -81,7 +89,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
 
   fun testSpanNotCreatedWhenIdeVersionEmpty() {
     val listOfSpans =
-      SkateTraceReporter(project, offline = true)
+      SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(
           "fake_span_name",
           Instant.now(),

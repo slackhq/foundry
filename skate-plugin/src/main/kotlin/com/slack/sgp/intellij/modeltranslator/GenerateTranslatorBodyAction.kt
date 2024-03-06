@@ -24,8 +24,8 @@ import com.slack.sgp.intellij.SkateBundle
 import com.slack.sgp.intellij.modeltranslator.helper.TranslatorHelper
 import com.slack.sgp.intellij.modeltranslator.model.TranslatorBundle
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
+import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isTracingEnabled
 import java.time.Instant
 
@@ -40,7 +40,6 @@ class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : Inten
 
   override fun invoke(project: Project, editor: Editor?, psiFile: PsiFile?) {
     val startTimestamp = Instant.now()
-
     val body = TranslatorHelper.generateBody(bundle)
     if (body != null) {
       bundle.element.bodyBlockExpression?.replace(body) ?: LOG.warn("Body block expression is null")
@@ -55,12 +54,10 @@ class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : Inten
   private fun sendUsageTrace(project: Project, startTimestamp: Instant) {
     val skateSpanBuilder =
       SkateSpanBuilder().apply {
-        addSpanTag(
-          "event",
-          SkateTracingEvent(SkateTracingEvent.EventType.MODEL_TRANSLATOR_GENERATED),
-        )
+        addTag("event", SkateTracingEvent.ModelTranslator.MODEL_TRANSLATOR_GENERATED)
       }
-    SkateTraceReporter(project)
+    project
+      .getTraceReporter()
       .createPluginUsageTraceAndSendTrace(
         "model_translator",
         startTimestamp,
