@@ -6,3 +6,4 @@
   * New `circuit` option added to the UI.
   * Added option to `Sync` with Studio upon successful project generation.
 * Code owner file parser now supports the new YAML format.
+* Begin tracking IDE indexing time via tracing.
