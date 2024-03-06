@@ -292,6 +292,13 @@ internal constructor(
     get() = booleanProperty("sgp.lint.ignoreTestSources", false)
 
   /**
+   * Flag to control which agp version should be used for lint. Optional. Value should be a version
+   * key in `libs.versions.toml`,
+   */
+  public val lintVersionOverride: String?
+    get() = optionalStringProperty("sgp.lint.agpVersion")
+
+  /**
    * Flag to indicate whether this project is a test library (such as test utils, test fixtures,
    * etc).
    */
