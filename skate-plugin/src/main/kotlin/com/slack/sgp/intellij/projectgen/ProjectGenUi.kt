@@ -32,14 +32,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -47,6 +39,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import org.jetbrains.jewel.foundation.theme.JewelTheme
+import org.jetbrains.jewel.foundation.theme.LocalContentColor
+import org.jetbrains.jewel.ui.Orientation
+import org.jetbrains.jewel.ui.Outline
+import org.jetbrains.jewel.ui.component.Checkbox
+import org.jetbrains.jewel.ui.component.DefaultButton
+import org.jetbrains.jewel.ui.component.Divider
+import org.jetbrains.jewel.ui.component.Text
+import org.jetbrains.jewel.ui.component.TextField
+import org.jetbrains.jewel.ui.component.Typography
 import slack.tooling.projectgen.CheckboxElement
 import slack.tooling.projectgen.DividerElement
 import slack.tooling.projectgen.SectionElement
@@ -54,7 +57,6 @@ import slack.tooling.projectgen.TextElement
 
 private const val INDENT_SIZE = 16 // dp
 
-// @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
   if (state.showDoneDialog) {
@@ -74,8 +76,8 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
     )
   }
   val scrollState = rememberScrollState(0)
-  Box(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
+  Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+    CompositionLocalProvider(LocalContentColor provides JewelTheme.globalColors.infoContent) {
       Column(
         Modifier.padding(16.dp)
           .verticalScroll(scrollState)
@@ -86,12 +88,12 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
           if (!element.isVisible) continue
           when (element) {
             DividerElement -> {
-              HorizontalDivider()
+              Divider(Orientation.Horizontal)
             }
             is SectionElement -> {
               Column {
-                Text(element.title, style = MaterialTheme.typography.titleLarge)
-                Text(element.description, style = MaterialTheme.typography.bodySmall)
+                Text(element.title /* style = Typography.h0TextStyle() */)
+                Text(element.description /* style = Typography.h4TextStyle() */)
               }
             }
             is CheckboxElement -> {
@@ -105,26 +107,28 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
             }
             is TextElement -> {
               Column(Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)) {
+                val isError =
+                  element.value.isNotEmpty() &&
+                    !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*"))
+                Text(text = element.label, style = Typography.labelTextStyle())
                 TextField(
-                  element.value,
-                  label = { Text(element.label) },
+                  value = element.value,
                   onValueChange = { newValue -> element.value = newValue },
+                  readOnly = element.readOnly,
+                  enabled = element.enabled,
                   visualTransformation =
                     element.prefixTransformation?.let(::PrefixTransformation)
                       ?: VisualTransformation.None,
-                  readOnly = element.readOnly,
-                  enabled = element.enabled,
-                  singleLine = true,
-                  isError =
-                    element.value.isNotEmpty() &&
-                      !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*")),
+                  //                  singleLine = true,
+                  outline = if (isError) Outline.Error else Outline.None,
+                  //                element.description?.let { Text(it, style =
+                  // MaterialTheme.typography.bodySmall) }
                 )
-                element.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
               }
             }
           }
         }
-        Button(
+        DefaultButton(
           modifier = Modifier.fillMaxWidth(),
           enabled = state.canGenerate,
           onClick = { state.eventSink(ProjectGenScreen.Event.Generate) },
@@ -152,7 +156,7 @@ private fun Feature(
     Checkbox(checked = enabled, onCheckedChange = onEnabledChange)
     Column {
       Text(name)
-      Text(text = hint, style = MaterialTheme.typography.bodySmall)
+      Text(text = hint /* style = Typography.h4TextStyle() */)
     }
   }
 }
@@ -177,11 +181,13 @@ private fun StatusDialog(
 ) {
   // No M3 AlertDialog in compose-jb yet
   // https://github.com/JetBrains/compose-multiplatform/issues/2037
-  @Suppress("ComposeM2Api")
-  (AlertDialog(
-    onDismissRequest = { onQuit() },
-    confirmButton = { Button(onClick = { onConfirm() }) { Text(confirmButtonText) } },
-    dismissButton = { Button(onClick = { onQuit() }) { Text("Close") } },
-    text = { Text(text) },
-  ))
+  Popup(onDismissRequest = { onQuit() }) {
+    Column {
+      Text(text)
+      Row {
+        DefaultButton(onClick = { onConfirm() }) { Text(confirmButtonText) }
+        DefaultButton(onClick = { onQuit() }) { Text("Close") }
+      }
+    }
+  }
 }
