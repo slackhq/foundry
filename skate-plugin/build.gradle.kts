@@ -34,6 +34,8 @@ group = "com.slack.intellij"
 repositories {
   mavenCentral()
   google()
+  maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -43,6 +45,8 @@ intellij {
   plugins.add("org.jetbrains.plugins.terminal")
   plugins.add("org.jetbrains.kotlin")
 }
+
+kotlin { compilerOptions { optIn.add("kotlin.RequiresOptIn") } }
 
 fun isGitHash(hash: String): Boolean {
   if (hash.length != 40) {
@@ -99,20 +103,26 @@ buildConfig {
 
 dependencies {
   lintChecks(libs.composeLints)
-  implementation(compose.animation)
-  implementation(compose.desktop.currentOs)
-  implementation(compose.foundation)
-  implementation(compose.material)
-  implementation(compose.material3)
-  implementation(compose.ui)
+
+  // Do not bring in Material (we use Jewel) and Coroutines (the IDE has its own)
+  implementation(compose.desktop.currentOs) {
+    exclude(group = "org.jetbrains.compose.material")
+    exclude(group = "org.jetbrains.kotlinx")
+  }
+  //  implementation(compose.animation)
+  //  implementation(compose.foundation)
+  //  implementation(compose.material)
+  //  implementation(compose.material3)
+  //  implementation(compose.ui)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
-  implementation(libs.circuit)
-  implementation(libs.gradlePlugins.compose)
+  implementation(libs.circuit.foundation) { exclude(group = "org.jetbrains.kotlinx") }
+  implementation(libs.jewel.bridge232)
+  //  implementation(libs.gradlePlugins.compose)
   implementation(libs.kaml)
   implementation(libs.kotlin.poet)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.tracing)
+  implementation(projects.tracing) { exclude(group = "org.jetbrains.kotlinx") }
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
