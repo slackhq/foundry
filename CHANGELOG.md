@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.15.9
+------
+
+_2024-03-08_
+
+- **New**: Add property to override lint version from version catalogs.
+- **Fix**: Fix application of common compose options.
+
 0.15.8
 ------
 
