@@ -720,7 +720,7 @@ constructor(
    * ```
    */
   public fun compilerOption(key: String, value: String) {
-    compilerOptions.addAll("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$key=$value")
+    compilerOptions.addAll("$key=$value")
   }
 
   /** @see [AndroidHandler.androidExtension] */
@@ -773,7 +773,11 @@ constructor(
       project.configureComposeCompiler(slackProperties, isMultiplatform)
 
       project.tasks.configureKotlinCompilationTask {
-        compilerOptions.freeCompilerArgs.addAll(this@ComposeHandler.compilerOptions)
+        compilerOptions.freeCompilerArgs.addAll(
+          this@ComposeHandler.compilerOptions.map { options ->
+            options.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+          }
+        )
       }
     }
   }
