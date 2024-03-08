@@ -32,7 +32,7 @@ import org.jetbrains.intellij.tasks.BuildPluginTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
@@ -213,7 +213,7 @@ subprojects {
       compilerOptions {
         val kotlinVersion =
           if (isIntelliJPlugin) {
-            KOTLIN_1_6
+            KOTLIN_1_8
           } else {
             KOTLIN_1_9
           }
@@ -300,7 +300,7 @@ subprojects {
   if (isIntelliJPlugin) {
     project.pluginManager.withPlugin("org.jetbrains.intellij") {
       configure<IntelliJPluginExtension> {
-        version.set("2022.2.5")
+        version.set("2023.2.1")
         type.set("IC")
         // Don't assign untilBuild to sinceBuild
         updateSinceUntilBuild.set(false)
