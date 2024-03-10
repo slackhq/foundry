@@ -35,7 +35,7 @@ class CodeOwnerWidgetFactory : StatusBarWidgetFactory {
   override fun isAvailable(project: Project): Boolean {
     val isSettingEnabled = project.getService(SkatePluginSettings::class.java).isCodeOwnerEnabled
     val isEnabled =
-      isSettingEnabled && CodeOwnerFileFetcherImpl(project).getCodeOwnershipCsv() != null
+      isSettingEnabled && CodeOwnerFileFetcherImpl(project).getCodeOwnershipFile() != null
     logger.debug("CodeOwnerWidgetFactory.isAvailable result: $isEnabled")
     return isEnabled
   }

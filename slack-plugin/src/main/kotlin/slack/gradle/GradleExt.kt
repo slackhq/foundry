@@ -17,8 +17,6 @@
 
 package slack.gradle
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.internal.dsl.BuildType
 import com.android.builder.model.AndroidProject
 import java.util.concurrent.atomic.AtomicBoolean
@@ -58,6 +56,7 @@ import org.gradle.internal.service.ServiceRegistry
 private const val IS_ANDROID = "slack.project.ext.isAndroid"
 private const val IS_ANDROID_APPLICATION = "slack.project.ext.isAndroidApplication"
 private const val IS_ANDROID_LIBRARY = "slack.project.ext.isAndroidLibrary"
+private const val IS_ANDROID_TEST = "slack.project.ext.isAndroidTest"
 private const val IS_USING_KAPT = "slack.project.ext.isUsingKapt"
 private const val IS_USING_KSP = "slack.project.ext.isUsingKsp"
 private const val IS_USING_MOSHI_IR = "slack.project.ext.isUsingMoshiIr"
@@ -122,17 +121,22 @@ internal val Project.isUsingMoshiGradle: Boolean
 
 internal val Project.isAndroidApplication: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_APPLICATION) { plugins.hasPlugin(AppPlugin::class.java) }
+    return getOrComputeExt(IS_ANDROID_APPLICATION) { plugins.hasPlugin("com.android.application") }
   }
 
 internal val Project.isAndroidLibrary: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin(LibraryPlugin::class.java) }
+    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin("com.android.library") }
+  }
+
+internal val Project.isAndroidTest: Boolean
+  get() {
+    return getOrComputeExt(IS_ANDROID_TEST) { plugins.hasPlugin("com.android.test") }
   }
 
 internal val Project.isAndroid: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID) { isAndroidApplication || isAndroidLibrary }
+    return getOrComputeExt(IS_ANDROID) { isAndroidApplication || isAndroidLibrary || isAndroidTest }
   }
 
 internal fun <T : Any> Project.getOrComputeExt(key: String, valueCalculator: () -> T): T {

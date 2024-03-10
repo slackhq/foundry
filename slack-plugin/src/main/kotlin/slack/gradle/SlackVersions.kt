@@ -76,6 +76,8 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   val robolectric: String?
     get() = getOptionalValue("robolectric").orElse(null)
 
+  fun lookupVersion(key: String) = getOptionalValue(key)
+
   val bundles = Bundles()
 
   inner class Bundles {

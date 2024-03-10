@@ -369,7 +369,7 @@ subprojects {
           pluginId.set(pluginDetails.pluginId)
           version.set(pluginDetails.version)
           pluginDescription.set(pluginDetails.description)
-          //  changeNotes.set(file("change-notes.txt").readText())
+          changeNotes.set(file("change-notes.html").readText())
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
             // Sip the username and token together to create an appropriate encoded auth header

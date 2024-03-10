@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.codeowners
+package com.slack.sgp.intellij.codeowners.model
 
-/** Represents a single code owner file line's info. */
-data class CodeOwnerInfo(
-  val team: String,
-  val packagePattern: String,
-  /** The line in the owners file this should focus to. Note: 0-based. */
-  val codeOwnerLineNumber: Int,
-)
+import kotlinx.serialization.Serializable
+
+@Serializable data class CodeOwner(val name: String, val paths: List<String>)

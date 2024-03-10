@@ -18,29 +18,28 @@ package com.slack.sgp.intellij.tracing
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.model.TagBuilder
 import com.slack.sgp.tracing.model.newTagBuilder
+import java.util.*
 
 class SkateSpanBuilder {
   private val keyValueList: TagBuilder = newTagBuilder()
 
-  fun addSpanTag(key: String, value: String) {
-    keyValueList.apply { key tagTo value }
+  fun addTag(key: String, value: String) {
+    keyValueList.apply { key.lowercase(Locale.US) tagTo value }
   }
 
-  fun addSpanTag(key: String, value: SkateTracingEvent) {
-    keyValueList.apply { key tagTo value.type.name }
+  fun addTag(key: String, event: SkateTracingEvent) {
+    keyValueList.apply { key.lowercase(Locale.US) tagTo event.name }
+  }
+
+  fun addTag(key: String, value: Long) {
+    keyValueList.apply { key.lowercase(Locale.US) tagTo value }
+  }
+
+  fun addTag(key: String, value: Boolean) {
+    keyValueList.apply { key.lowercase(Locale.US) tagTo value }
   }
 
   fun getKeyValueList(): List<KeyValue> {
     return keyValueList.toList()
-  }
-}
-
-class SkateTracingEvent(val type: EventType) {
-  enum class EventType {
-    PROJECT_GEN_OPENED,
-    HOUSTON_FEATURE_FLAG_URL_CLICKED,
-    SKATE_WHATS_NEW_PANEL_OPENED,
-    SKATE_WHATS_NEW_PANEL_CLOSED,
-    MODEL_TRANSLATOR_GENERATED
   }
 }
