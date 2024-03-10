@@ -32,6 +32,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
@@ -46,6 +47,8 @@ internal class JvmProjectSpec(builder: Builder) {
    * multiple targets.
    */
   val name: String = builder.name
+  /** The source for rules to import. */
+  val ruleSource: String = builder.ruleSource
   // Deps
   val deps: List<Dep> = builder.deps.toList()
   val exportedDeps: List<Dep> = builder.exportedDeps.toList()
@@ -104,7 +107,7 @@ internal class JvmProjectSpec(builder: Builder) {
       }
 
     return """
-      load("@rules_kotlin//kotlin:jvm.bzl", ${kotlinImports.joinToString(", ") { "\"$it\"" }})
+      load("$ruleSource", ${kotlinImports.joinToString(", ") { "\"$it\"" }})
 
       kt_jvm_library(
           name = "${name}_lib",
@@ -132,12 +135,15 @@ internal class JvmProjectSpec(builder: Builder) {
   }
 
   class Builder(val name: String) {
+    var ruleSource = "@rules_kotlin//kotlin:jvm.bzl"
     val deps = mutableListOf<Dep>()
     val exportedDeps = mutableListOf<Dep>()
     val testDeps = mutableListOf<Dep>()
     val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
     val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
     val compilerPlugins = mutableListOf<CompilerPluginSpec>()
+
+    fun ruleSource(source: String) = apply { ruleSource = source }
 
     fun addDep(dep: Dep) = apply { deps.add(dep) }
 
@@ -158,6 +164,7 @@ internal class JvmProjectSpec(builder: Builder) {
 @UntrackedTask(because = "Generates a Bazel BUILD file for a Kotlin JVM project")
 internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val targetName: Property<String>
+  @get:Optional @get:Input abstract val ruleSource: Property<String>
 
   @get:Input abstract val projectDir: Property<File>
 
@@ -196,6 +203,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
 
     JvmProjectSpec.Builder(targetName.get())
       .apply {
+        this@JvmProjectBazelTask.ruleSource.orNull?.let(::ruleSource)
         deps.forEach { addDep(it) }
         exportedDeps.forEach { addExportedDep(it) }
         testDeps.forEach { addTestDep(it) }
