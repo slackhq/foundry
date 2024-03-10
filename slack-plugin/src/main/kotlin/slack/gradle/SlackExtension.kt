@@ -17,8 +17,13 @@
 
 package slack.gradle
 
+import app.cash.sqldelight.gradle.SqlDelightExtension
+import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
+import com.google.devtools.ksp.gradle.KspAATask
+import com.google.devtools.ksp.gradle.KspExtension
+import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import java.io.File
@@ -31,6 +36,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
@@ -174,6 +180,7 @@ constructor(
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
       val daggerConfig = featuresHandler.daggerHandler.computeConfig()
+      val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspComponentGen
       if (daggerConfig != null) {
         dependencies.add("implementation", SlackDependencies.Dagger.dagger)
         dependencies.add("implementation", SlackDependencies.javaxInject)
@@ -199,9 +206,48 @@ constructor(
             configure<AnvilExtension> {
               generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
               generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
-              // TODO eventually specify the backend here based on anvilMode
-              //  backend.setDisallowChanges(anvilMode.useKspFactoryGen ||
-              // anvilMode.useKspComponentGen)
+              useKspBackend.setDisallowChanges(useAnyKspAnvilMode)
+              useKspComponentMergingBackend.setDisallowChanges(anvilMode.useKspComponentGen)
+            }
+
+            if (useAnyKspAnvilMode) {
+              // TODO eventually just rely on anvil upstream
+              pluginManager.apply("com.google.devtools.ksp")
+              project.dependencies.add("ksp", "com.squareup.anvil:compiler")
+              configure<KspExtension> {
+                arg("generate-dagger-factories", daggerConfig.anvilFactories.toString())
+                arg("generate-dagger-factories-only", daggerConfig.anvilFactoriesOnly.toString())
+              }
+
+              // TODO make KSP depend on sqldelight tasks
+              //  KSP is supposed to do this automatically in android projects per
+              //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
+              //  let's make this optional
+              if (pluginManager.hasPlugin("app.cash.sqldelight")) {
+                afterEvaluate {
+                  val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
+                  val sourceSet = if (isAndroidLibrary) "Release" else "Main"
+                  val sourceSetKspName = if (isAndroidLibrary) "Release" else ""
+                  for (dbName in dbNames) {
+                    val sqlDelightTask =
+                      tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
+                    val kspTaskProvider = tasks.named("ksp${sourceSetKspName}Kotlin")
+                    val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
+                    kspTaskProvider.configure {
+                      when (this) {
+                        is KspTaskJvm -> {
+                          source(outputProvider)
+                          dependsOn(sqlDelightTask)
+                        }
+                        is KspAATask -> {
+                          kspConfig.javaSourceRoots.from(outputProvider)
+                          dependsOn(sqlDelightTask)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
 
             if (anvilMode == AnvilMode.K1) {
@@ -323,6 +369,9 @@ constructor(
           !daggerConfig.alwaysEnableAnvilComponentMerging
       ) {
         configure<AnvilExtension> { disableComponentMerging.setDisallowChanges(true) }
+        if (useAnyKspAnvilMode) {
+          configure<KspExtension> { arg("disable-component-merging", "true") }
+        }
       }
     }
   }
