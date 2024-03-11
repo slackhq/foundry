@@ -37,11 +37,12 @@ sealed interface SkateTracingEvent {
 
   enum class Indexing : SkateTracingEvent {
     INDEXING_REASON,
+    DUMB_MODE_WITHOUT_PAUSE_DURATION,
+    PAUSED_DURATION,
     UPDATING_TIME,
-    SCAN_FILES_DURATION,
-    INDEXING_DURATION,
     WAS_INTERRUPTED,
     SCANNING_TYPE,
     INDEXING_COMPLETED,
+    DUMB_INDEXING_COMPLETED,
   }
 }
