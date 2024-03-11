@@ -211,11 +211,14 @@ constructor(
             }
 
             if (useAnyKspAnvilMode) {
+              // Workaround early application for https://github.com/google/ksp/issues/1789
+              pluginManager.apply("com.google.devtools.ksp")
               // TODO make KSP depend on sqldelight tasks
               //  KSP is supposed to do this automatically in android projects per
               //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
               //  let's make this optional
               if (pluginManager.hasPlugin("app.cash.sqldelight")) {
+                // necessary in order to wait for tasks to exist
                 afterEvaluate {
                   val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
                   val sourceSet =
