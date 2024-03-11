@@ -218,25 +218,36 @@ constructor(
               if (pluginManager.hasPlugin("app.cash.sqldelight")) {
                 afterEvaluate {
                   val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
-                  val sourceSet = if (isAndroidLibrary) "Release" else "Main"
-                  val sourceSetKspName = if (isAndroidLibrary) "Release" else ""
+                  val sourceSet =
+                    when {
+                      isKotlinMultiplatform -> "CommonMain"
+                      isAndroidLibrary -> "Release"
+                      else -> "Main"
+                    }
+                  val sourceSetKspName =
+                    when {
+                      isKotlinMultiplatform -> "CommonMainMetadata"
+                      isAndroidLibrary -> "Release"
+                      else -> ""
+                    }
                   for (dbName in dbNames) {
                     val sqlDelightTask =
                       tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
-                    val kspTaskProvider = tasks.named("ksp${sourceSetKspName}Kotlin")
                     val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
-                    kspTaskProvider.configure {
-                      when (this) {
-                        is KspTaskJvm -> {
-                          source(outputProvider)
-                          dependsOn(sqlDelightTask)
-                        }
-                        is KspAATask -> {
-                          kspConfig.javaSourceRoots.from(outputProvider)
-                          dependsOn(sqlDelightTask)
+                    tasks
+                      .named { it == "ksp${sourceSetKspName}Kotlin" }
+                      .configureEach {
+                        when (this) {
+                          is KspTaskJvm -> {
+                            source(outputProvider)
+                            dependsOn(sqlDelightTask)
+                          }
+                          is KspAATask -> {
+                            kspConfig.javaSourceRoots.from(outputProvider)
+                            dependsOn(sqlDelightTask)
+                          }
                         }
                       }
-                    }
                   }
                 }
               }
