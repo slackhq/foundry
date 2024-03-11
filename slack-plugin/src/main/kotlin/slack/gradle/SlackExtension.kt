@@ -211,14 +211,6 @@ constructor(
             }
 
             if (useAnyKspAnvilMode) {
-              // TODO eventually just rely on anvil upstream
-              pluginManager.apply("com.google.devtools.ksp")
-              project.dependencies.add("ksp", "com.squareup.anvil:compiler")
-              configure<KspExtension> {
-                arg("generate-dagger-factories", daggerConfig.anvilFactories.toString())
-                arg("generate-dagger-factories-only", daggerConfig.anvilFactoriesOnly.toString())
-              }
-
               // TODO make KSP depend on sqldelight tasks
               //  KSP is supposed to do this automatically in android projects per
               //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
