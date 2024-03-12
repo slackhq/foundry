@@ -340,7 +340,7 @@ internal constructor(
 
   /** Flag to connect ViewBinding sources to KSP. */
   public val kspConnectViewBinding: Boolean
-    get() = booleanProperty("sgp.ksp.connect.sqldelight")
+    get() = booleanProperty("sgp.ksp.connect.viewBinding")
 
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
