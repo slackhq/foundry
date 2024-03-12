@@ -21,9 +21,8 @@ import app.cash.sqldelight.gradle.SqlDelightExtension
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
-import com.google.devtools.ksp.gradle.KspAATask
+import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspExtension
-import com.google.devtools.ksp.gradle.KspTaskJvm
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import java.io.File
@@ -42,6 +41,7 @@ import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.util.addKspSource
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 
@@ -213,44 +213,60 @@ constructor(
             if (useAnyKspAnvilMode) {
               // Workaround early application for https://github.com/google/ksp/issues/1789
               pluginManager.apply("com.google.devtools.ksp")
-              // TODO make KSP depend on sqldelight tasks
-              //  KSP is supposed to do this automatically in android projects per
+
+              // Make KSP depend on sqldelight and viewbinding tasks
+              // This is opt-in as it's better for build performance to skip this linking if
+              // possible
+              // TODO KSP is supposed to do this automatically in android projects per
               //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
               //  let's make this optional
-              if (pluginManager.hasPlugin("app.cash.sqldelight")) {
-                // necessary in order to wait for tasks to exist
+              // afterEvaluate is necessary in order to wait for tasks to exist
+              if (slackProperties.kspConnectSqlDelight || slackProperties.kspConnectViewBinding) {
                 afterEvaluate {
-                  val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
-                  val sourceSet =
-                    when {
-                      isKotlinMultiplatform -> "CommonMain"
-                      isAndroidLibrary -> "Release"
-                      else -> "Main"
-                    }
-                  val sourceSetKspName =
-                    when {
-                      isKotlinMultiplatform -> "CommonMainMetadata"
-                      isAndroidLibrary -> "Release"
-                      else -> ""
-                    }
-                  for (dbName in dbNames) {
-                    val sqlDelightTask =
-                      tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
-                    val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
-                    tasks
-                      .named { it == "ksp${sourceSetKspName}Kotlin" }
-                      .configureEach {
-                        when (this) {
-                          is KspTaskJvm -> {
-                            source(outputProvider)
-                            dependsOn(sqlDelightTask)
-                          }
-                          is KspAATask -> {
-                            kspConfig.javaSourceRoots.from(outputProvider)
-                            dependsOn(sqlDelightTask)
-                          }
-                        }
+                  if (
+                    slackProperties.kspConnectSqlDelight &&
+                      pluginManager.hasPlugin("app.cash.sqldelight")
+                  ) {
+                    val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
+                    val sourceSet =
+                      when {
+                        isKotlinMultiplatform -> "CommonMain"
+                        isAndroidLibrary -> "Release"
+                        else -> "Main"
                       }
+                    val sourceSetKspName =
+                      when {
+                        isKotlinMultiplatform -> "CommonMainMetadata"
+                        isAndroidLibrary -> "Release"
+                        else -> ""
+                      }
+                    for (dbName in dbNames) {
+                      val sqlDelightTask =
+                        tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
+                      val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
+                      project.addKspSource(
+                        "ksp${sourceSetKspName}Kotlin",
+                        sqlDelightTask,
+                        outputProvider,
+                      )
+                    }
+                  }
+
+                  // If using viewbinding, need to wire those up too
+                  if (
+                    slackProperties.kspConnectViewBinding &&
+                      isAndroidLibrary &&
+                      !slackProperties.libraryWithVariants &&
+                      androidHandler.isViewBindingEnabled
+                  ) {
+                    val databindingTask =
+                      tasks.named<DataBindingGenBaseClassesTask>("dataBindingGenBaseClassesRelease")
+                    val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
+                    project.addKspSource(
+                      "kspReleaseKotlin",
+                      databindingTask,
+                      databindingOutputProvider,
+                    )
                   }
                 }
               }
@@ -854,6 +870,9 @@ constructor(objects: ObjectFactory, private val slackProperties: SlackProperties
       field = value
       featuresHandler.setAndroidExtension(value)
     }
+
+  internal val isViewBindingEnabled: Boolean
+    get() = androidExtension?.buildFeatures?.viewBinding == true
 
   internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
     this.androidExtension = androidExtension

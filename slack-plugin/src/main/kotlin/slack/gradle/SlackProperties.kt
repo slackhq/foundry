@@ -334,6 +334,14 @@ internal constructor(
   public val allowDaggerKsp: Boolean
     get() = booleanProperty("slack.ksp.allow-dagger")
 
+  /** Flag to connect SqlDelight sources to KSP. */
+  public val kspConnectSqlDelight: Boolean
+    get() = booleanProperty("sgp.ksp.connect.sqldelight")
+
+  /** Flag to connect ViewBinding sources to KSP. */
+  public val kspConnectViewBinding: Boolean
+    get() = booleanProperty("sgp.ksp.connect.sqldelight")
+
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
     get() = optionalStringProperty("slack.disabledVariants")
