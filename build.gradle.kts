@@ -234,7 +234,7 @@ subprojects {
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
         // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-        freeCompilerArgs.add("-Xjdk-release=$${javaVersion.target}")
+        freeCompilerArgs.add("-Xjdk-release=${javaVersion.target}")
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
