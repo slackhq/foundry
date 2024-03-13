@@ -276,7 +276,7 @@ constructor(
               }
             }
 
-            if (anvilMode == AnvilMode.K1) {
+            if (anvilMode == AnvilMode.K1_EMBEDDED) {
               val generatorProjects =
                 buildSet<Any> {
                   addAll(

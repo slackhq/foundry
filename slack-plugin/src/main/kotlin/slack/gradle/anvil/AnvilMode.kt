@@ -25,16 +25,28 @@ public enum class AnvilMode(
    * - `AnalysisHandlerExtension`
    * - KAPT3 component gen
    */
-  K1(false, false, null),
+  K1_EMBEDDED(false, false, null),
   /**
-   * Anvil support for K2. Same as [K1] but it forces Anvil-integrated kotlin compilations to
-   * language version 1.9.
+   * Anvil support for K1.
+   * - KSP factory gen
+   * - KAPT component gen
+   */
+  K1_KAPT(true, false, null),
+  /**
+   * Anvil support for K1.
+   * - KSP factory gen
+   * - KSP component gen
+   */
+  K1_KSP(true, true, null),
+  /**
+   * Anvil support for K2. Same as [K1_EMBEDDED] but it forces Anvil-integrated kotlin compilations
+   * to language version 1.9.
    */
   K2_COMPAT(false, false, "1.9"),
   /**
    * Anvil support for K2.
    * - KSP factory gen
-   * - KAPT4 component gen
+   * - KAPT component gen
    */
   K2_KAPT(true, false, null),
   /**

@@ -623,7 +623,7 @@ internal constructor(
    */
   public val anvilMode: AnvilMode
     get() =
-      resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1.name).let {
+      resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1_EMBEDDED.name).let {
         AnvilMode.valueOf(it.uppercase(Locale.US))
       }
 
