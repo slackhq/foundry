@@ -372,7 +372,10 @@ subprojects {
           pluginId.set(pluginDetails.pluginId)
           version.set(pluginDetails.version)
           pluginDescription.set(pluginDetails.description)
-          changeNotes.set(file("change-notes.html").readText())
+          val changeNotesFile = file("change-notes.html")
+          if (changeNotesFile.exists()) {
+            changeNotes.set(changeNotesFile.readText())
+          }
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
             // Sip the username and token together to create an appropriate encoded auth header
