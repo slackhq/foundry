@@ -203,16 +203,20 @@ constructor(
         if (daggerConfig.enableAnvil) {
           if (!slackProperties.disableAnvilForK2Testing) {
             pluginManager.apply("com.squareup.anvil")
-            configure<AnvilExtension> {
+            val anvilExtension = extensions.getByType<AnvilExtension>()
+            anvilExtension.apply {
               generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
               generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
-              useKspBackend.setDisallowChanges(useAnyKspAnvilMode)
-              useKspComponentMergingBackend.setDisallowChanges(anvilMode.useKspComponentGen)
             }
 
             if (useAnyKspAnvilMode) {
               // Workaround early application for https://github.com/google/ksp/issues/1789
               pluginManager.apply("com.google.devtools.ksp")
+              anvilExtension.useKsp(
+                project = project,
+                contributesAndFactoryGeneration = true,
+                componentMerging = anvilMode.useKspComponentGen,
+              )
 
               // Make KSP depend on sqldelight and viewbinding tasks
               // This is opt-in as it's better for build performance to skip this linking if
