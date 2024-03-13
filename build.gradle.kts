@@ -229,9 +229,12 @@ subprojects {
         } else {
           allWarningsAsErrors.set(true)
         }
-        jvmTarget.set(JvmTarget.JVM_17)
+        val javaVersion = JvmTarget.JVM_17
+        jvmTarget.set(javaVersion)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+        // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+        freeCompilerArgs.add("-Xjdk-release=$${javaVersion.target}")
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
