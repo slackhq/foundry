@@ -17,6 +17,7 @@ import com.jetbrains.plugin.structure.base.utils.exists
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
+import org.jetbrains.compose.ComposeExtension
 
 plugins {
   java
@@ -94,6 +95,19 @@ buildConfig {
   useKotlinOutput {
     topLevelConstants = true
     internalVisibility = true
+  }
+}
+
+configure<ComposeExtension> {
+  val kotlinVersion = libs.versions.kotlin.get()
+  // Flag to disable Compose's kotlin version check because they're often behind
+  // Or ahead
+  // Or if they're the same, do nothing
+  // It's basically just very noisy.
+  kotlinCompilerPlugin.set(libs.compose.compilerJb.map { it.toString() })
+  val suppressComposeKotlinVersion = kotlinVersion != libs.versions.compose.jb.kotlinVersion.get()
+  if (suppressComposeKotlinVersion) {
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
   }
 }
 
