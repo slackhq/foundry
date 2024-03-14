@@ -229,9 +229,12 @@ subprojects {
         } else {
           allWarningsAsErrors.set(true)
         }
-        jvmTarget.set(JvmTarget.JVM_17)
+        val javaVersion = JvmTarget.JVM_17
+        jvmTarget.set(javaVersion)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+        // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+        freeCompilerArgs.add("-Xjdk-release=${javaVersion.target}")
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
@@ -369,7 +372,10 @@ subprojects {
           pluginId.set(pluginDetails.pluginId)
           version.set(pluginDetails.version)
           pluginDescription.set(pluginDetails.description)
-          changeNotes.set(file("change-notes.html").readText())
+          val changeNotesFile = file("change-notes.html")
+          if (changeNotesFile.exists()) {
+            changeNotes.set(changeNotesFile.readText())
+          }
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
             // Sip the username and token together to create an appropriate encoded auth header
