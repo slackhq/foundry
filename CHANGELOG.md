@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.16.1
+------
+
+_2024-03-14_
+
+- Only apply `-Xjdk-release` on jvm compilations (not android).
+
 0.16.0
 ------
 
