@@ -334,6 +334,14 @@ internal constructor(
   public val allowDaggerKsp: Boolean
     get() = booleanProperty("slack.ksp.allow-dagger")
 
+  /** Flag to connect SqlDelight sources to KSP. */
+  public val kspConnectSqlDelight: Boolean
+    get() = booleanProperty("sgp.ksp.connect.sqldelight")
+
+  /** Flag to connect ViewBinding sources to KSP. */
+  public val kspConnectViewBinding: Boolean
+    get() = booleanProperty("sgp.ksp.connect.viewbinding")
+
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
     get() = optionalStringProperty("slack.disabledVariants")
@@ -615,7 +623,7 @@ internal constructor(
    */
   public val anvilMode: AnvilMode
     get() =
-      resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1.name).let {
+      resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1_EMBEDDED.name).let {
         AnvilMode.valueOf(it.uppercase(Locale.US))
       }
 

@@ -63,6 +63,7 @@ private const val IS_USING_MOSHI_IR = "slack.project.ext.isUsingMoshiIr"
 private const val IS_KOTLIN = "slack.project.ext.isKotlin"
 private const val IS_KOTLIN_ANDROID = "slack.project.ext.isKotlinAndroid"
 private const val IS_KOTLIN_JVM = "slack.project.ext.isKotlinJvm"
+private const val IS_KOTLIN_MULTIPLATFORM = "slack.project.ext.isKotlinMultiplatform"
 private const val IS_JAVA_LIBRARY = "slack.project.ext.isJavaLibrary"
 private const val IS_JAVA = "slack.project.ext.isJava"
 
@@ -95,6 +96,13 @@ internal val Project.isKotlinJvm: Boolean
   get() {
     return getOrComputeExt(IS_KOTLIN_JVM) {
       project.pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
+    }
+  }
+
+internal val Project.isKotlinMultiplatform: Boolean
+  get() {
+    return getOrComputeExt(IS_KOTLIN_MULTIPLATFORM) {
+      project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
     }
   }
 
