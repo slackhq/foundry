@@ -940,11 +940,12 @@ internal class StandardProjectConfigurations(
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
             freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS)
+            // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+            freeCompilerArgs.add("-Xjdk-release=$actualJvmTarget")
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files
-            val pathProvider = project.provider { project.path.replace(":", "-") }
-            moduleName.set(pathProvider)
+            moduleName.set(project.path.replace(":", "-"))
           }
         }
       }
