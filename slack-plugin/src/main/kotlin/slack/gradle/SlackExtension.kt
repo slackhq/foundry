@@ -213,7 +213,6 @@ constructor(
               // Workaround early application for https://github.com/google/ksp/issues/1789
               pluginManager.apply("com.google.devtools.ksp")
               anvilExtension.useKsp(
-                project = project,
                 contributesAndFactoryGeneration = true,
                 componentMerging = anvilMode.useKspComponentGen,
               )
