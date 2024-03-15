@@ -82,4 +82,7 @@ internal enum class CompilerPlugin(val spec: CompilerPluginSpec) {
   //  anvil
   //  KSP?
   //  KAPT?
+  //  wire?
+  //  sqldelight?
+  //  buildconfig?
 }

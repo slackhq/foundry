@@ -93,6 +93,7 @@ gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradl
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
+grazlePlugin = "com.grab.grazel:grazel-gradle-plugin:0.2.0"
 guava = "com.google.guava:guava:33.0.0-jre"
 kaml = {module = "com.charleskorn.kaml:kaml", version.ref = "kaml"}
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
@@ -112,7 +113,6 @@ okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 oshi = "com.github.oshi:oshi-core:6.5.0"
-pendant-starlark = { module = "io.morfly.pendant:pendant-starlark", version.ref = "pendant" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.8"

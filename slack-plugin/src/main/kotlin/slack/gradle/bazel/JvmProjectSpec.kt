@@ -16,6 +16,10 @@
 package slack.gradle.bazel
 
 import com.android.build.gradle.internal.publishing.AndroidArtifacts
+import com.grab.grazel.bazel.rules.KotlinProjectType
+import com.grab.grazel.bazel.starlark.BazelDependency
+import com.grab.grazel.bazel.starlark.asString
+import com.grab.grazel.bazel.starlark.statements
 import java.io.File
 import java.util.SortedSet
 import okio.FileSystem
@@ -60,9 +64,6 @@ internal class JvmProjectSpec(builder: Builder) {
 
   override fun toString(): String {
     val compositeTestDeps = (deps + exportedDeps + testDeps).toSortedSet()
-    val deps = deps.depsString("deps")
-    val exportedDeps = exportedDeps.depsString("exportedDeps")
-    val testDeps = compositeTestDeps.depsString("deps")
 
     /*
      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
@@ -91,14 +92,6 @@ internal class JvmProjectSpec(builder: Builder) {
      )
     */
 
-    val kotlinImports = buildList {
-      add("kt_jvm_library")
-      add("kt_jvm_test")
-      if (compilerPlugins.isNotEmpty()) {
-        add("kt_compiler_plugin")
-      }
-    }
-
     val compilerPluginsString =
       if (compilerPlugins.isNotEmpty()) {
         compilerPlugins.joinToString("\n\n") { "$it" }
@@ -106,27 +99,27 @@ internal class JvmProjectSpec(builder: Builder) {
         ""
       }
 
-    return """
-      load("$ruleSource", ${kotlinImports.joinToString(", ") { "\"$it\"" }})
-
-      kt_jvm_library(
+    // TODO compiler plugins
+    return statements {
+        slackKtLibrary(
           name = "${name}_lib",
-          srcs = glob(${srcGlobs.joinToString(separator = ",", prefix = "[", postfix = "]", transform = {"\"$it\""})}),
-          visibility = ["//visibility:public"],
-          $deps
-          $exportedDeps
-      )
+          kotlinProjectType = KotlinProjectType.Jvm,
+          srcsGlob = srcGlobs,
+          visibility = Visibility.Public,
+          deps = deps.sorted().map { BazelDependency.StringDependency(it.toString()) },
+          exportedDeps =
+            exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
+        )
 
-      kt_jvm_test(
+        slackKtTest(
           name = "${name}_test",
-          srcs = glob(${testSrcGlobs.joinToString(separator = ",", prefix = "[", postfix = "]", transform = {"\"$it\""})}),
-          visibility = ["//visibility:private"],
-          $testDeps
-      )
-
-      $compilerPluginsString
-    """
-      .trimIndent()
+          kotlinProjectType = KotlinProjectType.Jvm,
+          srcsGlob = testSrcGlobs,
+          visibility = Visibility.Private,
+          deps = compositeTestDeps.map { BazelDependency.StringDependency(it.toString()) },
+        )
+      }
+      .asString()
   }
 
   fun writeTo(path: Path, fs: FileSystem = FileSystem.SYSTEM) {
@@ -141,7 +134,7 @@ internal class JvmProjectSpec(builder: Builder) {
     val testDeps = mutableListOf<Dep>()
     val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
     val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
-    val compilerPlugins = mutableListOf<CompilerPluginSpec>()
+    val compilerPlugins = mutableListOf<Dep>()
 
     fun ruleSource(source: String) = apply { ruleSource = source }
 
@@ -155,7 +148,7 @@ internal class JvmProjectSpec(builder: Builder) {
 
     fun addTestSrcGlob(glob: String) = apply { testSrcGlobs.add(glob) }
 
-    fun addCompilerPlugin(plugin: CompilerPluginSpec) = apply { compilerPlugins.add(plugin) }
+    fun addCompilerPlugin(plugin: Dep) = apply { compilerPlugins.add(plugin) }
 
     fun build(): JvmProjectSpec = JvmProjectSpec(this)
   }
