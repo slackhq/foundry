@@ -93,7 +93,7 @@ gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradl
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
-grazlePlugin = "com.grab.grazel:grazel-gradle-plugin:0.2.0"
+grazelPlugin = "com.grab.grazel:grazel-gradle-plugin:0.4.1-alpha.23"
 guava = "com.google.guava:guava:33.0.0-jre"
 kaml = {module = "com.charleskorn.kaml:kaml", version.ref = "kaml"}
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
