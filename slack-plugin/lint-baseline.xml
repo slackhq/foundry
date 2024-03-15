@@ -30,7 +30,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/slack/gradle/GradleExt.kt"
-            line="22"
+            line="20"
             column="1"/>
     </issue>
 
@@ -64,6 +64,17 @@
         <location
             file="src/main/kotlin/slack/gradle/lint/LintTasks.kt"
             line="25"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Android Gradle Plugin APIs"
+        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/SlackExtension.kt"
+            line="24"
             column="1"/>
     </issue>
 
