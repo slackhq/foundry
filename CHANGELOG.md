@@ -1,6 +1,20 @@
 Changelog
 =========
 
+0.16.0
+------
+
+_2024-03-14_
+
+- **New**: Add support for Anvil's new KSP support via Anvil `2.5.0-beta04`.
+- Incorporate Kotlin's `-Xjdk-release` option alongside `jvmTarget`.
+- Fix configuration cache when setting kotlin compilation module name.
+- Update Okio to `3.9.0`.
+- Update Oshi to `6.5.0`.
+- Build against Kotlin `1.9.23`.
+- Build against KSP `1.9.23-1.0.19`.
+- Build against Compose Multiplatform `1.6.1`.
+
 0.15.9
 ------
 
