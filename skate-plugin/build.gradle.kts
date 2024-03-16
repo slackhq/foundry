@@ -114,7 +114,7 @@ configure<ComposeExtension> {
 dependencies {
   lintChecks(libs.composeLints)
   implementation(compose.animation)
-  implementation(compose.desktop.currentOs)
+  implementation(compose.desktop.macos_arm64)
   implementation(compose.foundation)
   implementation(compose.material)
   implementation(compose.material3)
