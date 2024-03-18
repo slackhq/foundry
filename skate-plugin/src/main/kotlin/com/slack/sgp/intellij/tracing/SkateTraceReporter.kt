@@ -35,6 +35,7 @@ import kotlin.time.toDuration
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.ByteString
 import org.apache.http.HttpException
 
 class SkateTraceReporter(val project: Project) : TraceReporter {
@@ -69,7 +70,7 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
     spanName: String,
     startTimestamp: Instant,
     spanDataMap: List<KeyValue>,
-    parentId: String? = null,
+    parentId: ByteString = ByteString.EMPTY,
     ideVersion: String = ApplicationInfo.getInstance().fullVersion,
     skatePluginVersion: String? =
       PluginManagerCore.getPlugin(PluginId.getId("com.slack.intellij.skate"))?.version,
@@ -81,9 +82,6 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
       newTagBuilder().apply {
         "service_name" tagTo SERVICE_NAME
         "database" tagTo DATABASE_NAME
-        if (parentId != null) {
-          "parent_id" tagTo parentId
-        }
       }
     val span =
       buildSpan(
@@ -95,6 +93,7 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
             .toMillis()
             .toDuration(DurationUnit.MILLISECONDS)
             .inWholeMicroseconds,
+        parentId = parentId
       ) {
         "skate_version" tagTo skatePluginVersion
         "ide_version" tagTo ideVersion
