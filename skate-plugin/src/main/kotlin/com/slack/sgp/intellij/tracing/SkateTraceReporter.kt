@@ -93,7 +93,7 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
             .toMillis()
             .toDuration(DurationUnit.MILLISECONDS)
             .inWholeMicroseconds,
-        parentId = parentId
+        parentId = parentId,
       ) {
         "skate_version" tagTo skatePluginVersion
         "ide_version" tagTo ideVersion

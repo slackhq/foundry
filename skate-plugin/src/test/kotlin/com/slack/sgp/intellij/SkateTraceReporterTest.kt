@@ -24,8 +24,8 @@ import com.slack.sgp.intellij.tracing.SkateTraceReporter.Companion.SERVICE_NAME
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.ValueType
 import com.slack.sgp.tracing.model.newTagBuilder
-import okio.ByteString
 import java.time.Instant
+import okio.ByteString
 
 class SkateTraceReporterTest : BasePlatformTestCase() {
 
