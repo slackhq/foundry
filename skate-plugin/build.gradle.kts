@@ -43,6 +43,7 @@ intellij {
   plugins.add("org.intellij.plugins.markdown")
   plugins.add("org.jetbrains.plugins.terminal")
   plugins.add("org.jetbrains.kotlin")
+  plugins.add("org.jetbrains.android")
 }
 
 fun isGitHash(hash: String): Boolean {

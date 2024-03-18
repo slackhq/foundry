@@ -44,4 +44,9 @@ sealed interface SkateTracingEvent {
     SCANNING_TYPE,
     INDEXING_COMPLETED,
   }
+
+  enum class GradleSync : SkateTracingEvent {
+    GRADLE_SYNC_STARTED,
+    GRADLE_SYNC_SUCCEDDED
+  }
 }
