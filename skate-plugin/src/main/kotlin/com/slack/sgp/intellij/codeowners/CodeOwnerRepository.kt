@@ -16,6 +16,7 @@
 package com.slack.sgp.intellij.codeowners
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.intellij.openapi.diagnostic.logger
 import com.slack.sgp.intellij.codeowners.model.CodeOwnersFile
 import java.io.File
@@ -78,6 +79,7 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
 
   private fun marshalCodeOwnershipYaml(file: File): CodeOwnersFile {
     val fileContents = file.readText(charset = UTF_8)
-    return Yaml.default.decodeFromString(CodeOwnersFile.serializer(), fileContents)
+    return Yaml(configuration = YamlConfiguration(strictMode = false))
+      .decodeFromString(CodeOwnersFile.serializer(), fileContents)
   }
 }
