@@ -52,7 +52,7 @@ class CodeOwnerRepositoryTest : BasePlatformTestCase() {
     assertThat(result[0].codeOwnerLineNumber).isEqualTo(15)
     assertThat(result[0].team).isEqualTo(TEAM_1)
     assertThat(result[1].packagePattern).isEqualTo(FOLDER_3_PATTERN)
-    assertThat(result[1].codeOwnerLineNumber).isEqualTo(18)
+    assertThat(result[1].codeOwnerLineNumber).isEqualTo(19)
     assertThat(result[1].team).isEqualTo(TEAM_2)
   }
 
