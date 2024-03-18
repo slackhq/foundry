@@ -16,7 +16,6 @@
 package slack.gradle.bazel
 
 import com.android.build.gradle.internal.publishing.AndroidArtifacts
-import com.grab.grazel.bazel.rules.KotlinProjectType
 import com.grab.grazel.bazel.starlark.BazelDependency
 import com.grab.grazel.bazel.starlark.asString
 import com.grab.grazel.bazel.starlark.statements
@@ -63,7 +62,7 @@ internal class JvmProjectSpec(builder: Builder) {
   val compilerPlugins = builder.compilerPlugins.toList()
 
   override fun toString(): String {
-    val compositeTestDeps = (deps + exportedDeps + testDeps).toSortedSet()
+    val compositeTestDeps = (deps + exportedDeps + testDeps + compilerPlugins).toSortedSet()
 
     /*
      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
@@ -92,21 +91,16 @@ internal class JvmProjectSpec(builder: Builder) {
      )
     */
 
-    val compilerPluginsString =
-      if (compilerPlugins.isNotEmpty()) {
-        compilerPlugins.joinToString("\n\n") { "$it" }
-      } else {
-        ""
-      }
-
-    // TODO compiler plugins
     return statements {
         slackKtLibrary(
           name = "${name}_lib",
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
-          deps = deps.sorted().map { BazelDependency.StringDependency(it.toString()) },
+          deps =
+            (deps + compilerPlugins).sorted().map {
+              BazelDependency.StringDependency(it.toString())
+            },
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
         )
@@ -164,8 +158,12 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val deps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val exportedDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val testDeps: SetProperty<ComponentArtifactIdentifier>
-  @get:Input abstract val compilerPlugins: SetProperty<CompilerPlugin>
-  @get:Input abstract val slackExtension: Property<SlackExtension>
+  @get:Input abstract val compilerPlugins: SetProperty<Dep>
+
+  // Compiler plugins
+  @get:Optional @get:Input abstract val moshix: Property<Boolean>
+  @get:Optional @get:Input abstract val redacted: Property<Boolean>
+  @get:Optional @get:Input abstract val parcelize: Property<Boolean>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -179,20 +177,21 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
     val deps = deps.mapDeps()
     val exportedDeps = exportedDeps.mapDeps()
     val testDeps = testDeps.mapDeps()
-    val slackExtension = slackExtension.get()
 
     // Only moshix and redacted are supported in JVM projects
-    val compilerPlugins =
-      compilerPlugins.get().map { it.spec } +
-        buildList {
-          // TODO we technically could choose IR or KSP for this, but for now assume IR
-          if (slackExtension.featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)) {
-            add(CompilerPlugin.MOSHIX.spec)
-          }
-          if (slackExtension.featuresHandler.redacted.getOrElse(false)) {
-            add(CompilerPlugin.REDACTED.spec)
-          }
-        }
+    val compilerPlugins = compilerPlugins.get()
+    buildSet {
+      // TODO we technically could choose IR or KSP for this, but for now assume IR
+      if (moshix.getOrElse(false)) {
+        add(CompilerPluginDeps.moshix)
+      }
+      if (redacted.getOrElse(false)) {
+        add(CompilerPluginDeps.redacted)
+      }
+      if (parcelize.getOrElse(false)) {
+        add(CompilerPluginDeps.parcelize)
+      }
+    }
 
     JvmProjectSpec.Builder(targetName.get())
       .apply {
@@ -200,7 +199,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         deps.forEach { addDep(it) }
         exportedDeps.forEach { addExportedDep(it) }
         testDeps.forEach { addTestDep(it) }
-        compilerPlugins.distinctBy { it.id }.forEach { addCompilerPlugin(it) }
+        compilerPlugins.forEach { addCompilerPlugin(it) }
       }
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())
@@ -261,8 +260,9 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
         testDeps.set(resolvedDependenciesFrom(testConfiguration))
-        this.slackExtension.set(slackExtension)
         outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
+        moshix.set(slackExtension.featuresHandler.moshiHandler.moshiCodegen)
+        redacted.set(slackExtension.featuresHandler.redacted)
       }
     }
   }

@@ -1,6 +1,5 @@
 package slack.gradle.bazel
 
-import com.grab.grazel.bazel.rules.KotlinProjectType
 import com.grab.grazel.bazel.rules.rule
 import com.grab.grazel.bazel.starlark.Assignee
 import com.grab.grazel.bazel.starlark.BazelDependency
@@ -11,6 +10,11 @@ import com.grab.grazel.bazel.starlark.glob
 import com.grab.grazel.bazel.starlark.load
 import com.grab.grazel.bazel.starlark.quote
 
+internal enum class KotlinProjectType {
+  Android,
+  Jvm
+}
+
 internal enum class Visibility(val rule: String) {
   Public("//visibility:public"),
   Private("//visibility:private"),
@@ -18,7 +22,7 @@ internal enum class Visibility(val rule: String) {
 
 internal fun StatementsBuilder.loadKtRules(kotlinProjectType: KotlinProjectType) {
   when (kotlinProjectType) {
-    is KotlinProjectType.Android -> load("//bazel/macros:module.bzl", "kt_android_library")
+    KotlinProjectType.Android -> load("//bazel/macros:module.bzl", "kt_android_library")
     KotlinProjectType.Jvm -> load("//bazel/macros:module.bzl", "kt_jvm_library")
   }
 }
@@ -45,39 +49,34 @@ internal fun StatementsBuilder.slackKtLibrary(
   val ruleName =
     when (kotlinProjectType) {
       KotlinProjectType.Jvm -> "kt_jvm_library"
-      is KotlinProjectType.Android ->
-        if (kotlinProjectType.hasDatabinding) {
-          "kt_db_android_library"
-        } else {
-          "kt_android_library"
-        }
+      KotlinProjectType.Android -> "kt_android_library"
     }
 
   rule(ruleName) {
-    "name" eq name.quote()
-    srcs.notEmpty { "srcs" eq srcs.map(String::quote) }
-    srcsGlob.notEmpty { "srcs" eq glob(srcsGlob.map(String::quote)) }
-    "visibility" eq array(visibility.rule.quote())
-    deps.notEmpty { "deps" eq array(deps.map(BazelDependency::toString).map(String::quote)) }
+    "name" `=` name.quote
+    srcs.notEmpty { "srcs" `=` srcs.map(String::quote) }
+    srcsGlob.notEmpty { "srcs" `=` glob(srcsGlob.map(String::quote)) }
+    "visibility" `=` array(visibility.rule.quote)
+    deps.notEmpty { "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote)) }
     exportedDeps.notEmpty {
-      "exportedDeps" eq array(exportedDeps.map(BazelDependency::toString).map(String::quote))
+      "exportedDeps" `=` array(exportedDeps.map(BazelDependency::toString).map(String::quote))
     }
     resourceFiles.notEmpty {
-      "resource_files" eq
+      "resource_files" `=`
         resourceFiles.joinToString(separator = " + ", transform = Assignee::asString)
     }
-    resources.notEmpty { "resource_files" eq glob(resources.quote) }
-    packageName?.let { "custom_package" eq packageName.quote() }
-    manifest?.let { "manifest" eq manifest.quote() }
+    resources.notEmpty { "resource_files" `=` glob(resources.quote) }
+    packageName?.let { "custom_package" `=` packageName.quote }
+    manifest?.let { "manifest" `=` manifest.quote }
     plugins.notEmpty {
-      "plugins" eq array(plugins.map(BazelDependency::toString).map(String::quote))
+      "plugins" `=` array(plugins.map(BazelDependency::toString).map(String::quote))
     }
     assetsDir?.let {
-      "assets" eq glob(assetsGlob.quote)
-      "assets_dir" eq assetsDir.quote()
+      "assets" `=` glob(assetsGlob.quote)
+      "assets_dir" `=` assetsDir.quote
     }
 
-    tags.notEmpty { "tags" eq array(tags.map(String::quote)) }
+    tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
   }
 }
 
@@ -94,18 +93,18 @@ internal fun StatementsBuilder.slackKtTest(
 ) {
   loadKtRules(kotlinProjectType)
   rule("kt_jvm_test") {
-    "name" eq name.quote()
-    srcs.notEmpty { "srcs" eq srcs.map(String::quote) }
-    srcsGlob.notEmpty { "srcs" eq glob(srcsGlob.map(String::quote)) }
-    "visibility" eq array(visibility.rule.quote())
-    deps.notEmpty { "deps" eq array(deps.map(BazelDependency::toString).map(String::quote)) }
+    "name" `=` name.quote
+    srcs.notEmpty { "srcs" `=` srcs.map(String::quote) }
+    srcsGlob.notEmpty { "srcs" `=` glob(srcsGlob.map(String::quote)) }
+    "visibility" `=` array(visibility.rule.quote)
+    deps.notEmpty { "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote)) }
     associates.notEmpty {
-      "associates" eq array(associates.map(BazelDependency::toString).map(String::quote))
+      "associates" `=` array(associates.map(BazelDependency::toString).map(String::quote))
     }
     plugins.notEmpty {
-      "plugins" eq array(plugins.map(BazelDependency::toString).map(String::quote))
+      "plugins" `=` array(plugins.map(BazelDependency::toString).map(String::quote))
     }
-    tags.notEmpty { "tags" eq array(tags.map(String::quote)) }
+    tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
   }
 }
 

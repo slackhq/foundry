@@ -300,6 +300,7 @@ internal class StandardProjectConfigurations(
           configurations.getByName("runtimeElements").wrapInResolvable(project),
           configurations.getByName("apiElements").wrapInResolvable(project),
           configurations.getByName("testRuntimeClasspath").wrapInResolvable(project),
+          slackExtension,
         )
       }
     }
