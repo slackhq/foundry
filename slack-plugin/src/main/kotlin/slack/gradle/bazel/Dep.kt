@@ -35,7 +35,7 @@ internal sealed interface Dep : Comparable<Dep> {
       fun fromMavenIdentifier(identifier: String): Remote {
         // Map to lower underscore format for maven sourcing
         val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
-        return Remote(path = "maven", target = target)
+        return Remote(source = "maven", target = target)
       }
     }
   }

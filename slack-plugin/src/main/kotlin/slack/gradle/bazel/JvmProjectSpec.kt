@@ -15,7 +15,6 @@
  */
 package slack.gradle.bazel
 
-import com.android.build.gradle.internal.publishing.AndroidArtifacts
 import com.grab.grazel.bazel.starlark.BazelDependency
 import com.grab.grazel.bazel.starlark.asString
 import com.grab.grazel.bazel.starlark.statements
@@ -40,6 +39,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
+import org.gradle.internal.component.local.model.PublishArtifactLocalArtifactMetadata
 import slack.gradle.SlackExtension
 import slack.gradle.register
 
@@ -55,7 +55,7 @@ internal class JvmProjectSpec(builder: Builder) {
   // Deps
   val deps: List<Dep> = builder.deps.toList()
   val exportedDeps: List<Dep> = builder.exportedDeps.toList()
-  val testDeps: List<Dep> = (builder.testDeps + Dep.Target("${name}_lib")).toList()
+  val testDeps: List<Dep> = (builder.testDeps + Dep.Target("lib")).toList()
   // Source globs
   val srcGlobs: List<String> = builder.srcGlobs.toList()
   val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
@@ -93,7 +93,7 @@ internal class JvmProjectSpec(builder: Builder) {
 
     return statements {
         slackKtLibrary(
-          name = "${name}_lib",
+          name = "lib",
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
@@ -106,10 +106,10 @@ internal class JvmProjectSpec(builder: Builder) {
         )
 
         slackKtTest(
-          name = "${name}_test",
+          name = "test",
+          associates = listOf(BazelDependency.StringDependency(":lib")),
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = testSrcGlobs,
-          visibility = Visibility.Private,
           deps = compositeTestDeps.map { BazelDependency.StringDependency(it.toString()) },
         )
       }
@@ -214,9 +214,14 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
               val identifier = "${componentId.group}:${componentId.module}"
               Dep.Remote.fromMavenIdentifier(identifier)
             }
-            is ProjectComponentIdentifier -> {
+            is PublishArtifactLocalArtifactMetadata -> {
+              val projectIdentifier = component.componentIdentifier
+              check(projectIdentifier is ProjectComponentIdentifier)
               // Map to "path/to/local/dependency1" format
-              Dep.Local(component.projectPath.removePrefix(":").replace(":", "/"))
+              Dep.Local(
+                projectIdentifier.projectPath.removePrefix(":").replace(":", "/"),
+                target = "lib",
+              )
             }
             else -> {
               System.err.println("Unknown component type: $component (${component.javaClass})")
@@ -233,16 +238,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
     provider: NamedDomainObjectProvider<ResolvableConfiguration>
   ): Provider<List<ComponentArtifactIdentifier>> {
     return provider.flatMap { configuration ->
-      configuration.incoming
-        .artifactView {
-          attributes {
-            attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.AAR_OR_JAR.type)
-          }
-          lenient(true)
-        }
-        .artifacts
-        .resolvedArtifacts
-        .map { it.map { it.id } }
+      configuration.incoming.artifacts.resolvedArtifacts.map { it.map { it.id } }
     }
   }
 

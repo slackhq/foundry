@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package slack.gradle.bazel
 
 import com.grab.grazel.bazel.rules.rule
@@ -23,7 +38,7 @@ internal enum class Visibility(val rule: String) {
 internal fun StatementsBuilder.loadKtRules(kotlinProjectType: KotlinProjectType) {
   when (kotlinProjectType) {
     KotlinProjectType.Android -> load("//bazel/macros:module.bzl", "kt_android_library")
-    KotlinProjectType.Jvm -> load("//bazel/macros:module.bzl", "kt_jvm_library")
+    KotlinProjectType.Jvm -> load("//bazel/macros:module.bzl", "kt_jvm_library", "kt_jvm_test")
   }
 }
 
@@ -59,7 +74,7 @@ internal fun StatementsBuilder.slackKtLibrary(
     "visibility" `=` array(visibility.rule.quote)
     deps.notEmpty { "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote)) }
     exportedDeps.notEmpty {
-      "exportedDeps" `=` array(exportedDeps.map(BazelDependency::toString).map(String::quote))
+      "exports" `=` array(exportedDeps.map(BazelDependency::toString).map(String::quote))
     }
     resourceFiles.notEmpty {
       "resource_files" `=`
@@ -85,7 +100,6 @@ internal fun StatementsBuilder.slackKtTest(
   kotlinProjectType: KotlinProjectType = KotlinProjectType.Jvm,
   srcs: List<String> = emptyList(),
   srcsGlob: List<String> = emptyList(),
-  visibility: Visibility = Visibility.Public,
   associates: List<BazelDependency> = emptyList(),
   deps: List<BazelDependency> = emptyList(),
   plugins: List<BazelDependency> = emptyList(),
@@ -96,7 +110,6 @@ internal fun StatementsBuilder.slackKtTest(
     "name" `=` name.quote
     srcs.notEmpty { "srcs" `=` srcs.map(String::quote) }
     srcsGlob.notEmpty { "srcs" `=` glob(srcsGlob.map(String::quote)) }
-    "visibility" `=` array(visibility.rule.quote)
     deps.notEmpty { "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote)) }
     associates.notEmpty {
       "associates" `=` array(associates.map(BazelDependency::toString).map(String::quote))
