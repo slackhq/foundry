@@ -53,6 +53,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
@@ -919,7 +920,8 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      project.kotlinExtension.apply {
+      val kotlinExtension = project.kotlinExtension
+      kotlinExtension.apply {
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
@@ -928,6 +930,8 @@ internal class StandardProjectConfigurations(
           }
         }
       }
+
+      val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
 
       tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
         // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
@@ -955,12 +959,15 @@ internal class StandardProjectConfigurations(
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
             freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS)
-            // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-            freeCompilerArgs.add("-Xjdk-release=$actualJvmTarget")
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files
             moduleName.set(project.path.replace(":", "-"))
+
+            if (!isKotlinAndroid) {
+              // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+              freeCompilerArgs.add("-Xjdk-release=$actualJvmTarget")
+            }
           }
         }
       }

@@ -1,10 +1,10 @@
 [versions]
 agp = "8.2.2"
 agpAlpha = "8.3.0"
-anvil = "2.4.9-1-8"
+anvil = "2.5.0-beta04"
 bugsnagGradle = "8.1.0"
 circuit = "0.19.1"
-compose-jb = "1.6.0"
+compose-jb = "1.6.1"
 compose-jb-compiler = "1.5.10.1"
 compose-jb-kotlinVersion = "1.9.23"
 coroutines = "1.8.0"
@@ -94,7 +94,7 @@ gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", versi
 gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
 grazelPlugin = "com.grab.grazel:grazel-gradle-plugin:0.4.1-alpha.23"
-guava = "com.google.guava:guava:33.0.0-jre"
+guava = "com.google.guava:guava:33.1.0-jre"
 kaml = {module = "com.charleskorn.kaml:kaml", version.ref = "kaml"}
 kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
