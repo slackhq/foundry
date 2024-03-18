@@ -55,14 +55,22 @@ internal class JvmProjectSpec(builder: Builder) {
   // Deps
   val deps: List<Dep> = builder.deps.toList()
   val exportedDeps: List<Dep> = builder.exportedDeps.toList()
-  val testDeps: List<Dep> = (builder.testDeps + Dep.Target("lib")).toList()
+  val testDeps: List<Dep> = builder.testDeps.toList()
   // Source globs
   val srcGlobs: List<String> = builder.srcGlobs.toList()
   val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
   val compilerPlugins = builder.compilerPlugins.toList()
 
   override fun toString(): String {
-    val compositeTestDeps = (deps + exportedDeps + testDeps + compilerPlugins).toSortedSet()
+    val compositeTestDeps =
+      buildSet {
+          add(Dep.Target("lib"))
+          addAll(deps)
+          addAll(exportedDeps)
+          addAll(testDeps)
+          addAll(compilerPlugins)
+        }
+        .toSortedSet()
 
     /*
      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
