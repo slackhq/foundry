@@ -1,6 +1,6 @@
 [versions]
-agp = "8.2.2"
-agpAlpha = "8.3.1"
+agp = "8.3.1"
+agpAlpha = "8.4.0-alpha13"
 anvil = "2.5.0-beta04"
 bugsnagGradle = "8.1.0"
 circuit = "0.20.0"
@@ -43,6 +43,7 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij = { id = "org.jetbrains.intellij", version = "1.17.0" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
