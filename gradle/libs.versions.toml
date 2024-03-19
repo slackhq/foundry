@@ -1,9 +1,9 @@
 [versions]
-agp = "8.2.2"
-agpAlpha = "8.3.0"
+agp = "8.3.1"
+agpAlpha = "8.4.0-alpha13"
 anvil = "2.5.0-beta04"
 bugsnagGradle = "8.1.0"
-circuit = "0.19.1"
+circuit = "0.20.0"
 compose-jb = "1.6.1"
 compose-jb-compiler = "1.5.10.1"
 compose-jb-kotlinVersion = "1.9.23"
@@ -31,7 +31,7 @@ sortDependencies = "0.6"
 spotless = "6.25.0"
 sqldelight = "2.0.1"
 versionsPlugin = "0.47.0"
-wire = "4.9.3"
+wire = "4.9.8"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
@@ -43,6 +43,7 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij = { id = "org.jetbrains.intellij", version = "1.17.0" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
