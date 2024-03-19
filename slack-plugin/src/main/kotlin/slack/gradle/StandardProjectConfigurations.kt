@@ -497,7 +497,7 @@ internal class StandardProjectConfigurations(
                 (builder as HasUnitTestBuilder).enableUnitTest = false
               }
               if (builder is HasAndroidTestBuilder) {
-                builder.enableAndroidTest = false
+                builder.androidTest.enable = false
               }
             }
           }
@@ -678,7 +678,7 @@ internal class StandardProjectConfigurations(
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) ?: true
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
-          builder.enableAndroidTest = variantEnabled
+          builder.androidTest.enable = variantEnabled
         }
 
         onVariants(selector().withBuildType("release")) { variant ->
@@ -817,7 +817,7 @@ internal class StandardProjectConfigurations(
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) ?: true
-          builder.enableAndroidTest = variantEnabled
+          builder.androidTest.enable = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly
             if (slackProperties.strictMode && slackProperties.strictValidateAndroidTestManifest) {
