@@ -31,12 +31,11 @@ class GradleSyncSubscriber : GradleSyncListener {
 
   override fun syncStarted(project: Project) {
     super.syncStarted(project)
-    val startTimestamp = Instant.now()
     if (!project.isTracingEnabled()) return
     parentId = makeId()
     sendTrace(
       project,
-      startTimestamp,
+      Instant.now(),
       SkateTracingEvent.GradleSync.GRADLE_SYNC_STARTED,
       spanId = parentId,
       parentId = ByteString.EMPTY,
@@ -45,11 +44,10 @@ class GradleSyncSubscriber : GradleSyncListener {
 
   override fun syncSucceeded(project: Project) {
     super.syncSucceeded(project)
-    val startTimestamp = Instant.now()
     if (!project.isTracingEnabled()) return
     sendTrace(
       project,
-      startTimestamp,
+      Instant.now(),
       SkateTracingEvent.GradleSync.GRADLE_SYNC_SUCCEDDED,
       spanId = makeId(),
       parentId = parentId,
