@@ -148,10 +148,7 @@ configure<ComposeExtension> {
 
 // Tell lint to only resolve the jvm attrs for our compose deps
 configurations
-  .named {
-    println("Controlling ${it}")
-    it.endsWith("ForLint")
-  }
+  .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
 dependencies {
