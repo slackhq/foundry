@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle
+package slack.gradle.agp
 
 import com.android.build.api.AndroidPluginVersion
 import java.util.ServiceLoader
-import org.jetbrains.annotations.VisibleForTesting
-import slack.gradle.agp.AgpHandler
 
-internal object AgpHandlers {
+public object AgpHandlers {
 
   private fun loadFactories(): Sequence<AgpHandler.Factory> {
-    return ServiceLoader.load(AgpHandler.Factory::class.java).asSequence()
+    return ServiceLoader.load(AgpHandler.Factory::class.java).asSequence() +
+      AgpHandler.Factory.Default
   }
 
   /**
    * Load [factories][AgpHandler.Factory] and pick the highest compatible version (by
    * [AgpHandler.Factory.minVersion])
    */
-  @VisibleForTesting
-  fun resolveFactory(
+  public fun resolveFactory(
     factories: Sequence<AgpHandler.Factory> = loadFactories(),
     testAgpVersion: AndroidPluginVersion? = null,
   ): AgpHandler.Factory {
@@ -52,9 +50,7 @@ internal object AgpHandlers {
     return targetFactory
   }
 
-  fun createHandler(): AgpHandler {
-    return resolveFactory().create()
-  }
+  public fun createHandler(): AgpHandler = resolveFactory().create()
 }
 
 private data class FactoryData(

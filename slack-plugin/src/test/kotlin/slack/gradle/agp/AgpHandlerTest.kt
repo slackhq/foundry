@@ -18,7 +18,6 @@ package slack.gradle.agp
 import com.android.build.api.AndroidPluginVersion
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import slack.gradle.AgpHandlers
 
 class AgpHandlerTest {
 

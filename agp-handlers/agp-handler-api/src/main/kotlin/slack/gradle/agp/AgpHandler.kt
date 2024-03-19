@@ -16,18 +16,11 @@
 package slack.gradle.agp
 
 import com.android.build.api.AndroidPluginVersion
-import java.io.File
-import org.gradle.api.provider.ProviderFactory
-
-private val NUMBER_REGEX = Regex("d")
 
 /** An interface for handling different AGP versions via (mostly) version-agnostic APIs. */
 public interface AgpHandler {
   /** The current AGP version. */
   public val agpVersion: AndroidPluginVersion
-
-  /** Returns the Android SDK directory. This API changed in AGP 8.3.0-alpha05. */
-  public fun getAndroidSdkDirectory(projectRootDir: File, providers: ProviderFactory): File
 
   /**
    * A basic factory interface for creating [AgpHandler] instances. These should be implemented and
@@ -42,6 +35,22 @@ public interface AgpHandler {
     public val currentVersion: AndroidPluginVersion
 
     public fun create(): AgpHandler
+
+    public object Default : Factory {
+      override val minVersion: AndroidPluginVersion by lazy { AndroidPluginVersion.getCurrent() }
+
+      override val currentVersion: AndroidPluginVersion by lazy {
+        AndroidPluginVersion.getCurrent()
+      }
+
+      override fun create(): AgpHandler =
+        object : AgpHandler {
+          override val agpVersion: AndroidPluginVersion
+            get() = currentVersion
+
+          override fun toString(): String = "DefaultAgpHandler"
+        }
+    }
   }
 }
 

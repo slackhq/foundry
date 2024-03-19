@@ -43,6 +43,7 @@ import slack.cli.AppleSiliconCompat
 import slack.gradle.SlackTools.Companion.SERVICE_NAME
 import slack.gradle.SlackTools.Parameters
 import slack.gradle.agp.AgpHandler
+import slack.gradle.agp.AgpHandlers
 import slack.gradle.util.JsonTools
 import slack.gradle.util.LocalProperties
 import slack.gradle.util.Thermals
