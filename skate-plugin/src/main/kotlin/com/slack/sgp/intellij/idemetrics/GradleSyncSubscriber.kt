@@ -42,6 +42,18 @@ class GradleSyncSubscriber : GradleSyncListener {
     )
   }
 
+  override fun syncSkipped(project: Project) {
+    super.syncSkipped(project)
+    if (!project.isTracingEnabled()) return
+    sendTrace(
+      project,
+      Instant.now(),
+      SkateTracingEvent.GradleSync.GRADLE_SYNC_SKIPPED,
+      spanId = makeId(),
+      parentId = parentId,
+    )
+  }
+
   override fun syncSucceeded(project: Project) {
     super.syncSucceeded(project)
     if (!project.isTracingEnabled()) return
