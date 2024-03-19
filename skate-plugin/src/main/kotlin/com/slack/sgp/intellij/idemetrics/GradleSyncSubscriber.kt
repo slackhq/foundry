@@ -21,7 +21,7 @@ import com.slack.sgp.intellij.tracing.SkateSpanBuilder
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
 import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isTracingEnabled
-import com.slack.sgp.tracing.helper.UUIDGenerator
+import com.slack.sgp.tracing.model.makeId
 import java.time.Instant
 import okio.ByteString
 
@@ -30,21 +30,39 @@ class GradleSyncSubscriber : GradleSyncListener {
   private var parentId: ByteString = ByteString.EMPTY
 
   override fun syncStarted(project: Project) {
-    val startTimestamp = Instant.now()
     super.syncStarted(project)
+    val startTimestamp = Instant.now()
     if (!project.isTracingEnabled()) return
-    parentId = UUIDGenerator().generateUUIDWith32Characters()
-    sendTrace(project, startTimestamp, SkateTracingEvent.GradleSync.GRADLE_SYNC_STARTED)
+    parentId = makeId()
+    sendTrace(
+      project,
+      startTimestamp,
+      SkateTracingEvent.GradleSync.GRADLE_SYNC_STARTED,
+      spanId = parentId,
+      parentId = ByteString.EMPTY,
+    )
   }
 
   override fun syncSucceeded(project: Project) {
-    val startTimestamp = Instant.now()
     super.syncSucceeded(project)
+    val startTimestamp = Instant.now()
     if (!project.isTracingEnabled()) return
-    sendTrace(project, startTimestamp, SkateTracingEvent.GradleSync.GRADLE_SYNC_SUCCEDDED)
+    sendTrace(
+      project,
+      startTimestamp,
+      SkateTracingEvent.GradleSync.GRADLE_SYNC_SUCCEDDED,
+      spanId = makeId(),
+      parentId = parentId,
+    )
   }
 
-  fun sendTrace(project: Project, startTimestamp: Instant, event: SkateTracingEvent) {
+  fun sendTrace(
+    project: Project,
+    startTimestamp: Instant,
+    event: SkateTracingEvent,
+    spanId: ByteString,
+    parentId: ByteString,
+  ) {
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.addTag("event", event)
     project
@@ -53,6 +71,7 @@ class GradleSyncSubscriber : GradleSyncListener {
         "gradle_sync",
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
+        spanId,
         parentId,
       )
   }

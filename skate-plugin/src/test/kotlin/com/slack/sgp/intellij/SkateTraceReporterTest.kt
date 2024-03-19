@@ -50,7 +50,8 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           "fake_span_name",
           Instant.now(),
           traceTags,
-          ByteString.EMPTY,
+          traceId = ByteString.EMPTY,
+          parentId = ByteString.EMPTY,
           "Studio Giraffe",
           "0.2.0",
         )
@@ -84,6 +85,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           Instant.now(),
           newTagBuilder(),
           ByteString.EMPTY,
+          ByteString.EMPTY,
           "Studio Giraffe",
           "0.2.0",
         )
@@ -97,6 +99,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           "fake_span_name",
           Instant.now(),
           newTagBuilder(),
+          ByteString.EMPTY,
           ByteString.EMPTY,
           "Studio Giraffe",
           "",
