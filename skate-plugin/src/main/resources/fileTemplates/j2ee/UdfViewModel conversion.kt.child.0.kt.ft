@@ -1,0 +1,36 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}
+
+#end
+#parse("File Header.java")
+import androidx.lifecycle.ViewModel
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import slack.coreui.di.presenter.ViewModelKey
+import slack.coreui.viewmodel.UdfViewModel
+import slack.di.UserScope
+import slack.foundation.coroutines.CloseableCoroutineScope
+import slack.foundation.coroutines.SlackDispatchers
+
+@ContributesMultibinding(UserScope::class, boundType = ViewModel::class)
+@ViewModelKey(${NAME}ViewModel::class)
+class ${NAME}ViewModel
+@Inject
+constructor(
+  slackDispatchers: SlackDispatchers
+) :
+  UdfViewModel<${NAME}Screen.State>(CloseableCoroutineScope.newMainScope(slackDispatchers)),
+  ${NAME}Screen.Events {
+
+  private val state = MutableStateFlow(${NAME}Screen.State(events = this))
+  private var tapCounter = 0
+  
+  override fun state(): StateFlow<${NAME}Screen.State> = state
+  
+  override fun userTappedText() {
+    tapCounter++
+    state.update { it.copy(message = tapCounter.toString()) }
+  }
+}

@@ -1,0 +1,47 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME}
+
+#end
+#parse("File Header.java")
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.slack.circuit.runtime.Navigator
+import com.slack.circuit.runtime.presenter.Presenter
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import slack.di.UserScope
+import slack.libraries.foundation.compose.rememberStableCoroutineScope
+
+/** 
+ * TODO (remove): This Circuit [Presenter] was generated without UI or [CircuitInject], and can be
+ * used with legacy views via `by circuitState()` in your Fragment or Activity.
+ */
+class ${NAME}Presenter
+@AssistedInject
+constructor(
+  @Assisted private val screen: ${NAME}Screen,
+  @Assisted private val navigator: Navigator,
+) : Presenter<${NAME}Screen.State> {
+
+  @Composable
+  override fun present(): ${NAME}Screen.State {
+    val scope = rememberStableCoroutineScope()
+    var tapCounter by rememberSaveable { mutableIntStateOf(0) }
+    
+    return ${NAME}Screen.State(
+      message = tapCounter.toString()
+    ) { event ->
+      when (event) {
+        is ${NAME}Screen.Event.UserTappedText -> tapCounter++
+      }
+    }
+  }
+
+  @AssistedFactory
+  interface Factory {
+    fun create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter
+  }
+}

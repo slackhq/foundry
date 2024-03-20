@@ -55,6 +55,9 @@
                 description="Create new Slack subproject through Desktop Slack Project Generator app">
             <add-to-group group-id="NewGroup" anchor="last"/>
         </action>
+        <action id="com.slack.sgp.intellij.circuitfeature.CreateCircuitFeature" class="com.slack.sgp.intellij.circuitfeature.CreateCircuitFeature">
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewGroup1"/>
+        </action>
     </actions>
 
 </idea-plugin>
