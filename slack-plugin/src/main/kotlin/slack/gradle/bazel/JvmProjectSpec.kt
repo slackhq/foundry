@@ -60,12 +60,19 @@ internal class JvmProjectSpec(builder: Builder) {
   val srcGlobs: List<String> = builder.srcGlobs.toList()
   val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
   val compilerPlugins = builder.compilerPlugins.toList()
+  val kspProcessors = builder.kspProcessors.toList()
 
   override fun toString(): String {
+    val kspTargets = kspProcessors.associateBy { it.name }
+    val depsWithCodeGen = buildSet {
+      addAll(kspTargets.keys.sorted().map { Dep.Target(it) })
+      addAll(deps)
+    }
+
     val compositeTestDeps =
       buildSet {
           add(Dep.Target("lib"))
-          addAll(deps)
+          addAll(depsWithCodeGen)
           addAll(exportedDeps)
           addAll(testDeps)
           addAll(compilerPlugins)
@@ -99,20 +106,26 @@ internal class JvmProjectSpec(builder: Builder) {
      )
     */
 
+    // Write statements in roughly the order of operations for readability
     return statements {
+        for (processor in kspProcessors) {
+          writeKspRule(processor)
+        }
+
         slackKtLibrary(
           name = "lib",
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
           deps =
-            (deps + compilerPlugins).sorted().map {
+            (depsWithCodeGen + compilerPlugins).sorted().map {
               BazelDependency.StringDependency(it.toString())
             },
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
         )
 
+        // TODO only generate if there are actually matching test sources?
         slackKtTest(
           name = "test",
           associates = listOf(BazelDependency.StringDependency(":lib")),
@@ -137,6 +150,7 @@ internal class JvmProjectSpec(builder: Builder) {
     val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
     val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
     val compilerPlugins = mutableListOf<Dep>()
+    val kspProcessors = mutableListOf<KspProcessor>()
 
     fun ruleSource(source: String) = apply { ruleSource = source }
 
@@ -152,6 +166,8 @@ internal class JvmProjectSpec(builder: Builder) {
 
     fun addCompilerPlugin(plugin: Dep) = apply { compilerPlugins.add(plugin) }
 
+    fun addKspProcessor(processor: KspProcessor) = apply { kspProcessors.add(processor) }
+
     fun build(): JvmProjectSpec = JvmProjectSpec(this)
   }
 }
@@ -166,12 +182,16 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val deps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val exportedDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val testDeps: SetProperty<ComponentArtifactIdentifier>
+  @get:Input abstract val kspDeps: SetProperty<ComponentArtifactIdentifier>
+  @get:Input abstract val kaptDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input abstract val compilerPlugins: SetProperty<Dep>
+  @get:Input abstract val kspProcessors: SetProperty<KspProcessor>
 
-  // Compiler plugins
+  // Features
   @get:Optional @get:Input abstract val moshix: Property<Boolean>
   @get:Optional @get:Input abstract val redacted: Property<Boolean>
   @get:Optional @get:Input abstract val parcelize: Property<Boolean>
+  @get:Optional @get:Input abstract val autoService: Property<Boolean>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
@@ -187,19 +207,40 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
     val testDeps = testDeps.mapDeps()
 
     // Only moshix and redacted are supported in JVM projects
-    val compilerPlugins = compilerPlugins.get()
-    buildSet {
+    val compilerPlugins = compilerPlugins.get().toMutableList()
+
+    val kspProcessors = kspProcessors.get().toMutableList()
+
+    if (moshix.getOrElse(false)) {
       // TODO we technically could choose IR or KSP for this, but for now assume IR
-      if (moshix.getOrElse(false)) {
-        add(CompilerPluginDeps.moshix)
+      compilerPlugins.add(CompilerPluginDeps.moshix)
+      kspProcessors.add(KspProcessors.moshiProguardRuleGen)
+    }
+    if (redacted.getOrElse(false)) {
+      compilerPlugins.add(CompilerPluginDeps.redacted)
+    }
+    if (parcelize.getOrElse(false)) {
+      compilerPlugins.add(CompilerPluginDeps.parcelize)
+    }
+    if (autoService.getOrElse(false)) {
+      kspProcessors.add(KspProcessors.autoService)
+    }
+
+    // TODO make this pluggable and single-pass
+    val mappedKspDeps = kspDeps.mapDeps()
+    when {
+      mappedKspDeps.any { "guinness" in it.toString() } -> {
+        logger.lifecycle("[KSP] Adding guinness compiler")
+        kspProcessors += KspProcessors.guinness
       }
-      if (redacted.getOrElse(false)) {
-        add(CompilerPluginDeps.redacted)
-      }
-      if (parcelize.getOrElse(false)) {
-        add(CompilerPluginDeps.parcelize)
+      mappedKspDeps.any { "feature-flag/compiler" in it.toString() } -> {
+        logger.lifecycle("[KSP] Adding feature flag compiler")
+        kspProcessors += KspProcessors.featureFlag
       }
     }
+    val allKspDeps = mappedKspDeps.map { it.toString() }
+
+    // TODO kapt
 
     JvmProjectSpec.Builder(targetName.get())
       .apply {
@@ -208,6 +249,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         exportedDeps.forEach { addExportedDep(it) }
         testDeps.forEach { addTestDep(it) }
         compilerPlugins.forEach { addCompilerPlugin(it) }
+        kspProcessors.forEach { addKspProcessor(it.withAddedDeps(allKspDeps)) }
       }
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())
@@ -256,6 +298,8 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
       depsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       exportedDepsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
+      kspConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
+      kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
@@ -264,9 +308,13 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
         deps.set(resolvedDependenciesFrom(depsConfiguration))
         exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
         testDeps.set(resolvedDependenciesFrom(testConfiguration))
+        kspConfiguration?.let { kspDeps.set(resolvedDependenciesFrom(it)) }
+        kaptConfiguration?.let { kaptDeps.set(resolvedDependenciesFrom(it)) }
         outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
         moshix.set(slackExtension.featuresHandler.moshiHandler.moshiCodegen)
         redacted.set(slackExtension.featuresHandler.redacted)
+        parcelize.set(project.pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.parcelize"))
+        autoService.set(slackExtension.featuresHandler.autoService)
       }
     }
   }

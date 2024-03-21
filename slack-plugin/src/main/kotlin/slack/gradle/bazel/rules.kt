@@ -24,6 +24,7 @@ import com.grab.grazel.bazel.starlark.asString
 import com.grab.grazel.bazel.starlark.glob
 import com.grab.grazel.bazel.starlark.load
 import com.grab.grazel.bazel.starlark.quote
+import java.io.Serializable
 
 internal enum class KotlinProjectType {
   Android,
@@ -121,8 +122,97 @@ internal fun StatementsBuilder.slackKtTest(
   }
 }
 
+internal data class KspProcessor(
+  val name: String,
+  val processorProviderClass: String,
+  val deps: Set<String>,
+) : Serializable {
+  fun withAddedDeps(deps: List<String>) = copy(deps = this.deps + deps)
+}
+
+internal fun StatementsBuilder.writeKspRule(processor: KspProcessor) {
+  return kspProcessor(
+    processor.name,
+    processor.processorProviderClass,
+    processor.deps.map(BazelDependency::StringDependency),
+  )
+}
+
+internal fun StatementsBuilder.kspProcessor(
+  name: String,
+  processorProviderClass: String,
+  deps: List<BazelDependency>,
+) {
+  load("@rules_kotlin//kotlin:core.bzl", "kt_ksp_plugin")
+  rule("kt_ksp_plugin") {
+    "name" `=` name.quote
+    "processor_class" `=` processorProviderClass.quote
+    "visibility" `=` array(Visibility.Private.rule.quote)
+    "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote))
+  }
+}
+
 internal object CompilerPluginDeps {
-  val moshix = BazelDependency.StringDependency("//third_party:moshix")
-  val redacted = BazelDependency.StringDependency("//third_party:redacted")
-  val parcelize = BazelDependency.StringDependency("//third_party:parcelize")
+  val moshix = Dep.Local("//third_party", target = "moshix")
+  val redacted = Dep.Local("//third_party", target = "redacted")
+  val parcelize = Dep.Local("//third_party", target = "parcelize")
+}
+
+internal object KspProcessors {
+  val moshiProguardRuleGen =
+    KspProcessor(
+      name = "moshix_proguard_rulegen",
+      processorProviderClass =
+        "dev.zacsweers.moshix.proguardgen.MoshiProguardGenSymbolProcessor\$Provider",
+      deps =
+        setOf(
+          "@maven//:com_squareup_kotlinpoet_jvm",
+          "@maven//:com_squareup_kotlinpoet_ksp",
+          "@maven//:com_squareup_moshi_moshi",
+          "@maven//:com_squareup_moshi_moshi_kotlin_codegen",
+          "@maven//:dev_zacsweers_moshix_moshi_proguard_rule_gen",
+        ),
+    )
+  val autoService =
+    KspProcessor(
+      name = "autoservice",
+      processorProviderClass = "dev.zacsweers.autoservice.ksp.AutoServiceSymbolProcessor\$Provider",
+      deps =
+        setOf(
+          "@maven//:com_google_auto_service_auto_service_annotations",
+          "@maven//:dev_zacsweers_autoservice_auto_service_ksp",
+        ),
+    )
+
+  // TODO expose a way to add custom mappings
+  val featureFlag =
+    KspProcessor(
+      name = "feature_flag_compiler",
+      processorProviderClass =
+        "slack.features.annotation.codegen.FeatureFlagSymbolProcessor\$Provider",
+      deps =
+        setOf(
+          "@maven//:com_squareup_anvil_annotations",
+          "@maven//:com_squareup_kotlinpoet_jvm",
+          "@maven//:com_squareup_kotlinpoet_ksp",
+          "//libraries/foundation/feature-flag:lib",
+          "//libraries/foundation/slack-di:lib",
+        ),
+    )
+
+  val guinness =
+    KspProcessor(
+      name = "guinness_compiler",
+      processorProviderClass = "slack.guinness.compiler.GuinnessSymbolProcessorProvider",
+      deps =
+        setOf(
+          "@maven//:com_squareup_anvil_annotations",
+          "@maven//:com_google_dagger",
+          "@maven//:com_squareup_retrofit",
+          "@maven//:com_squareup_kotlinpoet_jvm",
+          "@maven//:com_squareup_kotlinpoet_ksp",
+          "@maven//:slack_internal_vulcan_guinness",
+          "@maven//:slack_internal_vulcan_guinness_compiler",
+        ),
+    )
 }

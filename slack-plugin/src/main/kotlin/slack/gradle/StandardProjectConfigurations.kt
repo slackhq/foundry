@@ -293,15 +293,31 @@ internal class StandardProjectConfigurations(
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
       if (slackProperties.enableBazelGen) {
-        // Have to wrap all the configurations in resolvable ones that extend them
-        // in order to read their dependencies
-        JvmProjectBazelTask.register(
-          project,
-          configurations.getByName("runtimeElements").wrapInResolvable(project),
-          configurations.getByName("apiElements").wrapInResolvable(project),
-          configurations.getByName("testRuntimeClasspath").wrapInResolvable(project),
-          slackExtension,
-        )
+        afterEvaluate {
+          val kaptConfig =
+            if (pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")) {
+              configurations.getByName("kapt").wrapInResolvable(project)
+            } else {
+              null
+            }
+          val kspConfig =
+            if (pluginManager.hasPlugin("com.google.devtools.ksp")) {
+              configurations.getByName("ksp").wrapInResolvable(project)
+            } else {
+              null
+            }
+          // Have to wrap all the configurations in resolvable ones that extend them
+          // in order to read their dependencies
+          JvmProjectBazelTask.register(
+            project,
+            configurations.getByName("runtimeElements").wrapInResolvable(project),
+            configurations.getByName("apiElements").wrapInResolvable(project),
+            configurations.getByName("testRuntimeClasspath").wrapInResolvable(project),
+            kspConfig,
+            kaptConfig,
+            slackExtension,
+          )
+        }
       }
     }
   }
