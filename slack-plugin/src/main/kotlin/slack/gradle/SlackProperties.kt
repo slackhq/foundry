@@ -16,8 +16,10 @@
 package slack.gradle
 
 import java.io.File
+import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import slack.gradle.anvil.AnvilMode
 import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.util.PropertyResolver
 import slack.gradle.util.getOrCreateExtra
@@ -152,6 +154,19 @@ internal constructor(
     get() = booleanProperty("slack.compose.android.enableLiveLiterals", false)
 
   /**
+   * Common compose compiler options.
+   *
+   * Format is a comma-separated list of key-value pairs, e.g. "key1=value1,key2=value2". Keys
+   * should be the simple name of the compose compiler option, no prefixes needed.
+   */
+  public val composeCommonCompilerOptions: Provider<List<String>>
+    get() =
+      resolver
+        .providerFor("sgp.compose.commonCompilerOptions")
+        .map { value -> value.split(",").map { it.trim() } }
+        .orElse(emptyList())
+
+  /**
    * If true, uses the AndroidX compose compiler [SlackVersions.composeCompiler] for Compose
    * Multiplatform compilations rather than the Jetbrains one. This can be useful in testing where
    * AndroidX's compiler is farther ahead.
@@ -277,6 +292,13 @@ internal constructor(
     get() = booleanProperty("sgp.lint.ignoreTestSources", false)
 
   /**
+   * Flag to control which agp version should be used for lint. Optional. Value should be a version
+   * key in `libs.versions.toml`,
+   */
+  public val lintVersionOverride: String?
+    get() = optionalStringProperty("sgp.lint.agpVersion")
+
+  /**
    * Flag to indicate whether this project is a test library (such as test utils, test fixtures,
    * etc).
    */
@@ -312,9 +334,13 @@ internal constructor(
   public val allowDaggerKsp: Boolean
     get() = booleanProperty("slack.ksp.allow-dagger")
 
-  /** Flag to enable/disable Anvil KSP. Requires [allowDaggerKsp]. */
-  public val allowAnvilKsp: Boolean
-    get() = booleanProperty("slack.ksp.allow-anvil")
+  /** Flag to connect SqlDelight sources to KSP. */
+  public val kspConnectSqlDelight: Boolean
+    get() = booleanProperty("sgp.ksp.connect.sqldelight")
+
+  /** Flag to connect ViewBinding sources to KSP. */
+  public val kspConnectViewBinding: Boolean
+    get() = booleanProperty("sgp.ksp.connect.viewbinding")
 
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
@@ -583,6 +609,23 @@ internal constructor(
    */
   public val eagerlyConfigureArtifactPublishing: Boolean
     get() = resolver.booleanValue("sgp.artifacts.configure-eagerly", defaultValue = false)
+
+  /**
+   * Force-disables Anvil regardless of `SlackExtension.dagger()` settings, useful for K2 testing
+   * where Anvil is unsupported.
+   */
+  public val disableAnvilForK2Testing: Boolean
+    get() = resolver.booleanValue("sgp.anvil.forceDisable", defaultValue = false)
+
+  /**
+   * Defines the [AnvilMode] to use with this compilation. See the docs on that class for more
+   * details.
+   */
+  public val anvilMode: AnvilMode
+    get() =
+      resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1_EMBEDDED.name).let {
+        AnvilMode.valueOf(it.uppercase(Locale.US))
+      }
 
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>

@@ -181,8 +181,8 @@ private constructor(
 
   private class DefaultScheme : AbstractScheme(3) {
     override fun format(versionNumber: VersionNumber): String {
-      return String.format(
-        VERSION_TEMPLATE,
+      return VERSION_TEMPLATE.format(
+        Locale.US,
         versionNumber.major,
         versionNumber.minor,
         versionNumber.micro,
@@ -197,8 +197,8 @@ private constructor(
 
   private class SchemeWithPatchVersion : AbstractScheme(4) {
     override fun format(versionNumber: VersionNumber): String {
-      return String.format(
-        VERSION_TEMPLATE,
+      return VERSION_TEMPLATE.format(
+        Locale.US,
         versionNumber.major,
         versionNumber.minor,
         versionNumber.micro,

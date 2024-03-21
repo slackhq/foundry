@@ -1,6 +1,80 @@
 Changelog
 =========
 
+0.16.1
+------
+
+_2024-03-14_
+
+- Only apply `-Xjdk-release` on jvm compilations (not android).
+
+0.16.0
+------
+
+_2024-03-14_
+
+- **New**: Add support for Anvil's new KSP support via Anvil `2.5.0-beta04`.
+- Incorporate Kotlin's `-Xjdk-release` option alongside `jvmTarget`.
+- Fix configuration cache when setting kotlin compilation module name.
+- Update Okio to `3.9.0`.
+- Update Oshi to `6.5.0`.
+- Build against Kotlin `1.9.23`.
+- Build against KSP `1.9.23-1.0.19`.
+- Build against Compose Multiplatform `1.6.1`.
+
+0.15.9
+------
+
+_2024-03-08_
+
+- **New**: Add property to override lint version from version catalogs.
+- **Fix**: Fix application of common compose options.
+
+0.15.8
+------
+
+_2024-03-04_
+
+- **Fix**: Check for `com.android.test` in `Project.isAndroid` checks. This resolves a case where we accidentally set the `JavaCompile.options.release` property in those projects.
+
+0.15.7
+------
+
+_2024-02-28_
+
+- Fix inverted logic for disabled anvil mode in K2/KSP testing.
+
+0.15.6
+------
+
+_2024-02-28_
+
+- Fix `AnvilMode` casing in detection.
+
+0.15.5
+------
+
+_2024-02-27_
+
+- Broaden anvil KSP support controls.
+- Update oshi to `6.4.13`.
+- Add `sgp.compose.commonCompilerOptions` property for common compose compiler options.
+- Build against Compose Multiplatform `1.6.0`.
+- Fix mkdocs lists on the main page.
+
+0.15.4
+------
+
+_2024-02-19_
+
+- Remove `-Xproper-ieee754-comparisons` arg, as it's enabled by default and removed entirely in K2.
+- Small fixes around skippy + add inverse options to boolean options.
+- Update Okio to `3.8.0`.
+- Update Oshi to `6.4.12`.
+- Update coroutines to `1.8.0`.
+- Build against DAGP `1.30.0`.
+- Build against AGP `8.3.0-rc01`.
+
 0.15.3
 ------
 

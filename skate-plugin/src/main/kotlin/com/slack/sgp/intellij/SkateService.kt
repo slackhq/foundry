@@ -22,10 +22,13 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
+import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.ui.WhatsNewPanelFactory
 import java.util.function.Supplier
 
 interface SkateProjectService {
+  val traceReporter: SkateTraceReporter
+
   fun showWhatsNewWindow()
 }
 
@@ -34,6 +37,9 @@ interface SkateProjectService {
  * New UI of the Skate Plugin
  */
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
+
+  override val traceReporter: SkateTraceReporter by lazy { SkateTraceReporter(project) }
+
   override fun showWhatsNewWindow() {
 
     val settings = project.service<SkatePluginSettings>()

@@ -17,8 +17,12 @@
 
 package slack.gradle
 
+import app.cash.sqldelight.gradle.SqlDelightExtension
+import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
+import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import java.io.File
@@ -31,10 +35,13 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
+import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
+import slack.gradle.util.addKspSource
 import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 
@@ -61,14 +68,14 @@ constructor(
    * this instance. Ideally we could eventually remove this if/when AGP finally makes these
    * properties lazy.
    */
-  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
     set(value) {
       field = value
       androidHandler.setAndroidExtension(value)
       featuresHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>) {
     this.androidExtension = androidExtension
   }
 
@@ -94,7 +101,8 @@ constructor(
       val allowMoshiIr = slackProperties.allowMoshiIr
       val allowNapt = slackProperties.allowNapt
       val allowDaggerKsp = slackProperties.allowNapt
-      val allowAnvilKsp = allowDaggerKsp && slackProperties.allowAnvilKsp
+      val anvilMode = slackProperties.anvilMode
+      val allowKspComponentGen = allowDaggerKsp && anvilMode.useKspComponentGen
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
@@ -172,6 +180,7 @@ constructor(
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
       val daggerConfig = featuresHandler.daggerHandler.computeConfig()
+      val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspComponentGen
       if (daggerConfig != null) {
         dependencies.add("implementation", SlackDependencies.Dagger.dagger)
         dependencies.add("implementation", SlackDependencies.javaxInject)
@@ -192,10 +201,95 @@ constructor(
         }
 
         if (daggerConfig.enableAnvil) {
-          pluginManager.apply("com.squareup.anvil")
-          configure<AnvilExtension> {
-            generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
-            generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
+          if (!slackProperties.disableAnvilForK2Testing) {
+            pluginManager.apply("com.squareup.anvil")
+            val anvilExtension = extensions.getByType<AnvilExtension>()
+            anvilExtension.apply {
+              generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
+              generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
+            }
+
+            if (useAnyKspAnvilMode) {
+              // Workaround early application for https://github.com/google/ksp/issues/1789
+              pluginManager.apply("com.google.devtools.ksp")
+              anvilExtension.useKsp(
+                contributesAndFactoryGeneration = true,
+                componentMerging = anvilMode.useKspComponentGen,
+              )
+
+              // Make KSP depend on sqldelight and viewbinding tasks
+              // This is opt-in as it's better for build performance to skip this linking if
+              // possible
+              // TODO KSP is supposed to do this automatically in android projects per
+              //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
+              //  let's make this optional
+              // afterEvaluate is necessary in order to wait for tasks to exist
+              if (slackProperties.kspConnectSqlDelight || slackProperties.kspConnectViewBinding) {
+                afterEvaluate {
+                  if (
+                    slackProperties.kspConnectSqlDelight &&
+                      pluginManager.hasPlugin("app.cash.sqldelight")
+                  ) {
+                    val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
+                    val sourceSet =
+                      when {
+                        isKotlinMultiplatform -> "CommonMain"
+                        isAndroidLibrary -> "Release"
+                        else -> "Main"
+                      }
+                    val sourceSetKspName =
+                      when {
+                        isKotlinMultiplatform -> "CommonMainMetadata"
+                        isAndroidLibrary -> "Release"
+                        else -> ""
+                      }
+                    for (dbName in dbNames) {
+                      val sqlDelightTask =
+                        tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
+                      val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
+                      project.addKspSource(
+                        "ksp${sourceSetKspName}Kotlin",
+                        sqlDelightTask,
+                        outputProvider,
+                      )
+                    }
+                  }
+
+                  // If using viewbinding, need to wire those up too
+                  if (
+                    slackProperties.kspConnectViewBinding &&
+                      isAndroidLibrary &&
+                      !slackProperties.libraryWithVariants &&
+                      androidHandler.isViewBindingEnabled
+                  ) {
+                    val databindingTask =
+                      tasks.named<DataBindingGenBaseClassesTask>("dataBindingGenBaseClassesRelease")
+                    val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
+                    project.addKspSource(
+                      "kspReleaseKotlin",
+                      databindingTask,
+                      databindingOutputProvider,
+                    )
+                  }
+                }
+              }
+            }
+
+            if (anvilMode == AnvilMode.K1_EMBEDDED) {
+              val generatorProjects =
+                buildSet<Any> {
+                  addAll(
+                    slackProperties.anvilGeneratorProjects
+                      ?.splitToSequence(";")
+                      ?.map(::project)
+                      .orEmpty()
+                  )
+                  addAll(featuresHandler.daggerHandler.anvilGenerators)
+                }
+              for (generator in generatorProjects) {
+                dependencies.add("anvil", generator)
+              }
+            }
           }
 
           val runtimeProjects =
@@ -204,24 +298,10 @@ constructor(
           for (runtimeProject in runtimeProjects) {
             dependencies.add("implementation", project(runtimeProject))
           }
-
-          val generatorProjects =
-            buildSet<Any> {
-              addAll(
-                slackProperties.anvilGeneratorProjects
-                  ?.splitToSequence(";")
-                  ?.map(::project)
-                  .orEmpty()
-              )
-              addAll(featuresHandler.daggerHandler.anvilGenerators)
-            }
-          for (generator in generatorProjects) {
-            dependencies.add("anvil", generator)
-          }
         }
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowAnvilKsp)) {
+          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowKspComponentGen)) {
             markKspNeeded("Dagger compiler")
             dependencies.add("ksp", SlackDependencies.Dagger.compiler)
           } else {
@@ -314,6 +394,9 @@ constructor(
           !daggerConfig.alwaysEnableAnvilComponentMerging
       ) {
         configure<AnvilExtension> { disableComponentMerging.setDisallowChanges(true) }
+        if (useAnyKspAnvilMode) {
+          configure<KspExtension> { arg("disable-component-merging", "true") }
+        }
       }
     }
   }
@@ -348,13 +431,13 @@ constructor(
     objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
 
   /** @see [SlackExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
     set(value) {
       field = value
       composeHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -690,7 +773,8 @@ constructor(
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
-  private val compilerOptions: ListProperty<String> = objects.listProperty<String>()
+  private val compilerOptions: ListProperty<String> =
+    objects.listProperty<String>().convention(slackProperties.composeCommonCompilerOptions)
 
   /**
    * Configures the compiler options for Compose. This is a list of strings that will be passed into
@@ -710,13 +794,13 @@ constructor(
    * ```
    */
   public fun compilerOption(key: String, value: String) {
-    compilerOptions.addAll("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$key=$value")
+    compilerOptions.addAll("$key=$value")
   }
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -763,7 +847,11 @@ constructor(
       project.configureComposeCompiler(slackProperties, isMultiplatform)
 
       project.tasks.configureKotlinCompilationTask {
-        compilerOptions.freeCompilerArgs.addAll(this@ComposeHandler.compilerOptions)
+        compilerOptions.freeCompilerArgs.addAll(
+          this@ComposeHandler.compilerOptions.map { options ->
+            options.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+          }
+        )
       }
     }
   }
@@ -780,13 +868,16 @@ constructor(objects: ObjectFactory, private val slackProperties: SlackProperties
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [SlackExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
     set(value) {
       field = value
       featuresHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
+  internal val isViewBindingEnabled: Boolean
+    get() = androidExtension?.buildFeatures?.viewBinding == true
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 
@@ -830,9 +921,9 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val robolectric: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *>? = null
+  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
     this.androidExtension = androidExtension
   }
 

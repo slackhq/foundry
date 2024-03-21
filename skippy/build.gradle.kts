@@ -17,6 +17,7 @@ plugins {
   kotlin("jvm")
   alias(libs.plugins.moshix)
   alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.lint)
 }
 
 dependencies {

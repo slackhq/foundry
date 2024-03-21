@@ -317,7 +317,7 @@ private fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
 }
 
 /**
- * Represents a changed project as computed by [ComputeAffectedProjectsTask.changedFiles].
+ * Represents a changed project as computed by `ComputeAffectedProjectsTask.changedFiles`.
  *
  * @property path The [Path] to the project directory.
  * @property gradlePath The Gradle project path (e.g. `:app`).

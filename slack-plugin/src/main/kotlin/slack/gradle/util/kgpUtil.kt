@@ -35,11 +35,14 @@ internal fun TaskContainer.configureKotlinCompilationTask(
   includeKspTask: Boolean = false,
   action: KotlinCompilationTask<*>.() -> Unit,
 ) {
-  withType(KotlinCompilationTask::class.java)
+  withType(KotlinCompilationTask::class.java).configureEach {
     // Kapt stub gen is a special case because KGP sets it up to copy compiler args from the
     // standard kotlin compilation, which can lead to duplicates. SOOOO we skip configuration of
     // it here. Callers to this _can_ opt in to including it, but they must be explicit.
-    .matching { includeKaptGenerateStubsTask || it !is KaptGenerateStubsTask }
-    .matching { includeKspTask || it !is KspTask }
-    .configureEach { action() }
+    if (includeKaptGenerateStubsTask || this !is KaptGenerateStubsTask) {
+      if (includeKspTask || this !is KspTask) {
+        action()
+      }
+    }
+  }
 }

@@ -53,6 +53,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
@@ -496,7 +497,7 @@ internal class StandardProjectConfigurations(
                 (builder as HasUnitTestBuilder).enableUnitTest = false
               }
               if (builder is HasAndroidTestBuilder) {
-                builder.enableAndroidTest = false
+                builder.androidTest.enable = false
               }
             }
           }
@@ -677,7 +678,7 @@ internal class StandardProjectConfigurations(
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) ?: true
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
-          builder.enableAndroidTest = variantEnabled
+          builder.androidTest.enable = variantEnabled
         }
 
         onVariants(selector().withBuildType("release")) { variant ->
@@ -816,7 +817,7 @@ internal class StandardProjectConfigurations(
             androidTestEnabled &&
               slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) ?: true
-          builder.enableAndroidTest = variantEnabled
+          builder.androidTest.enable = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly
             if (slackProperties.strictMode && slackProperties.strictValidateAndroidTestManifest) {
@@ -904,7 +905,8 @@ internal class StandardProjectConfigurations(
     }
 
     plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      project.kotlinExtension.apply {
+      val kotlinExtension = project.kotlinExtension
+      kotlinExtension.apply {
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         if (jdkVersion != null) {
           jvmToolchain {
@@ -913,6 +915,8 @@ internal class StandardProjectConfigurations(
           }
         }
       }
+
+      val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
 
       tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
         // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
@@ -943,8 +947,12 @@ internal class StandardProjectConfigurations(
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files
-            val pathProvider = project.provider { project.path.replace(":", "-") }
-            moduleName.set(pathProvider)
+            moduleName.set(project.path.replace(":", "-"))
+
+            if (!isKotlinAndroid) {
+              // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+              freeCompilerArgs.add("-Xjdk-release=$actualJvmTarget")
+            }
           }
         }
       }

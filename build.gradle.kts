@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.build.api.dsl.Lint
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.github.gmazzo.buildconfig.BuildConfigExtension
@@ -33,10 +34,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_7
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 plugins {
   alias(libs.plugins.kotlin.jvm) apply false
+  alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.sam)
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
@@ -49,6 +53,8 @@ plugins {
   alias(libs.plugins.intellij) apply false
   alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig) apply false
+  alias(libs.plugins.lint) apply false
+  alias(libs.plugins.wire) apply false
 }
 
 configure<DetektExtension> {
@@ -127,7 +133,6 @@ data class KotlinBuildConfig(val kotlin: String) {
    */
   val kotlinCompilerArgs: List<String> =
     listOf(
-      "-Xproper-ieee754-comparisons",
       // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
       // => T & Any)
       "-Xenhance-type-parameter-types-to-def-not-null",
@@ -209,6 +214,19 @@ subprojects {
       if (!isIntelliJPlugin) {
         explicitApi()
       }
+    }
+
+    // Reimplement kotlin-dsl's application of this function for nice DSLs
+    if (!isIntelliJPlugin) {
+      apply(plugin = "kotlin-sam-with-receiver")
+      configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
+    }
+
+    apply(plugin = "com.squareup.sort-dependencies")
+  }
+
+  plugins.withType<KotlinBasePlugin>().configureEach {
+    tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
         val kotlinVersion =
           if (isIntelliJPlugin) {
@@ -228,9 +246,12 @@ subprojects {
         } else {
           allWarningsAsErrors.set(true)
         }
-        jvmTarget.set(JvmTarget.JVM_17)
+        val javaVersion = JvmTarget.JVM_17
+        jvmTarget.set(javaVersion)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
         freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+        // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+        freeCompilerArgs.add("-Xjdk-release=${javaVersion.target}")
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
@@ -240,14 +261,8 @@ subprojects {
       }
     }
 
-    // Reimplement kotlin-dsl's application of this function for nice DSLs
-    apply(plugin = "kotlin-sam-with-receiver")
-    configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
-
-    apply(plugin = "com.squareup.sort-dependencies")
+    tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
   }
-
-  tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")
@@ -368,7 +383,10 @@ subprojects {
           pluginId.set(pluginDetails.pluginId)
           version.set(pluginDetails.version)
           pluginDescription.set(pluginDetails.description)
-          //  changeNotes.set(file("change-notes.txt").readText())
+          val changeNotesFile = file("change-notes.html")
+          if (changeNotesFile.exists()) {
+            changeNotes.set(changeNotesFile.readText())
+          }
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
             // Sip the username and token together to create an appropriate encoded auth header
@@ -381,6 +399,15 @@ subprojects {
         }
       }
     }
+  }
+
+  pluginManager.withPlugin("com.android.lint") {
+    configure<Lint> {
+      lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
+      baseline = project.layout.projectDirectory.file("lint-baseline.xml").asFile
+    }
+    project.dependencies.add("lintChecks", libs.slackLints.checks)
+    project.dependencies.add("implementation", libs.slackLints.annotations)
   }
 }
 

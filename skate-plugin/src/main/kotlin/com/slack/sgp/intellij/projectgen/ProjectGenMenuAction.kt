@@ -19,52 +19,33 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.slack.sgp.intellij.tracing.SkateSpanBuilder
-import com.slack.sgp.intellij.tracing.SkateTraceReporter
 import com.slack.sgp.intellij.tracing.SkateTracingEvent
-import com.slack.sgp.intellij.tracing.SkateTracingEvent.EventType.PROJECT_GEN_OPENED
+import com.slack.sgp.intellij.util.getTraceReporter
 import com.slack.sgp.intellij.util.isProjectGenMenuActionEnabled
 import com.slack.sgp.intellij.util.isTracingEnabled
-import com.slack.sgp.intellij.util.projectGenRunCommand
 import java.time.Instant
 
-class ProjectGenMenuAction
-@JvmOverloads
-constructor(
-  private val terminalViewWrapper: (Project) -> TerminalViewWrapper = ::RealTerminalViewWrapper,
-  private val offline: Boolean = false,
-) : AnAction() {
-
-  private val skateSpanBuilder = SkateSpanBuilder()
-  private val startTimestamp = Instant.now()
-
+class ProjectGenMenuAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
-    val currentProject: Project = e.project ?: return
-    val projectGenRunCommand = currentProject.projectGenRunCommand()
+    val currentProject = e.project ?: return
     if (!currentProject.isProjectGenMenuActionEnabled()) return
-
-    executeProjectGenCommand(projectGenRunCommand, currentProject)
+    val startTimestamp = Instant.now()
+    ProjectGenWindow(currentProject, e).show()
 
     if (currentProject.isTracingEnabled()) {
-      sendUsageTrace(currentProject)
+      sendUsageTrace(currentProject, startTimestamp)
     }
   }
 
-  fun executeProjectGenCommand(command: String, project: Project) {
-    val terminalCommand = TerminalCommand(command, project.basePath, PROJECT_GEN_TAB_NAME)
-    terminalViewWrapper(project).executeCommand(terminalCommand)
-    skateSpanBuilder.addSpanTag("event", SkateTracingEvent(PROJECT_GEN_OPENED))
-  }
-
-  fun sendUsageTrace(project: Project) {
-    SkateTraceReporter(project, offline)
+  fun sendUsageTrace(project: Project, startTimestamp: Instant) {
+    val skateSpanBuilder = SkateSpanBuilder()
+    skateSpanBuilder.addTag("event", SkateTracingEvent.ProjectGen.DIALOG_OPENED)
+    project
+      .getTraceReporter()
       .createPluginUsageTraceAndSendTrace(
         "project_generator",
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
       )
-  }
-
-  companion object {
-    const val PROJECT_GEN_TAB_NAME: String = "ProjectGen"
   }
 }

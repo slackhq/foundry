@@ -135,7 +135,7 @@ internal object LintTasks {
             }
         }
       }
-    project.plugins.all(projectAllAction)
+    project.plugins.configureEach(projectAllAction)
   }
 
   /** Android Lint configuration entry point for Android projects. */
@@ -145,6 +145,11 @@ internal object LintTasks {
     onProjectSkipped: (String, String) -> Unit,
   ) =
     androidExtension.finalizeDsl { extension ->
+      slackProperties.lintVersionOverride?.let {
+        val lintVersion = slackProperties.versions.lookupVersion(it)
+        extension.experimentalProperties["android.experimental.lint.version"] = lintVersion
+      }
+
       log("Applying ciLint to Android project")
 
       log(

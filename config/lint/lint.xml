@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+    We often apply lint rules globally, which sometimes includes IDs not detected in individual
+    projects
+    -->
+    <issue id="UnknownIssueId" severity="ignore"/>
+
+    <!--
+    We don't want to run lint over generated sources because generated code is able to guarantee
+    us a certain degree of correctness. This means we're allowing it to hardcode some things we
+    know are correct, like Butter Knife view IDs rather than fully qualified "R.id.blah".
+    -->
+    <issue id="all">
+        <ignore path="build" />
+    </issue>
+
+<!--    <issue id="ComposeCompositionLocalUsage">-->
+<!--        <option name="allowed-composition-locals"-->
+<!--                value="LocalComposeDarkModeHelper,LocalImageLoader,LocalSKImageLoader,LocalSlackColors,LocalTypography,LocalTraceContext,LocalSKPalettes,LocalSKColorSet,LocalSKThemeColorSet,LocalSKUserThemeEmitter,LocalSlackCompositionLocalsState" />-->
+<!--    </issue>-->
+
+    <issue id="ComposeNamingUppercase,ComposeNamingLowercase">
+        <option name="allowed-composable-function-names" value=".*Presenter"/>
+    </issue>
+
+    <!-- We've migrated to M3, so lint against M2 API use -->
+    <issue id="ComposeM2Api" severity="error" />
+
+    <!-- Serializable is ok in this repo -->
+    <issue id="SerializableUsage" severity="ignore" />
+
+    <!-- This is just for health score and not tracked in this repo -->
+    <issue id="DeprecatedCall" severity="ignore" />
+
+    <!-- These lint checks network requests and is never up-to-date! -->
+    <issue id="GradleDependency,NewerVersionAvailable" severity="ignore" />
+</lint>

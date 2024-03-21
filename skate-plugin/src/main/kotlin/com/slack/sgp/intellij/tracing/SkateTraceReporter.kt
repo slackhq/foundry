@@ -37,8 +37,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.apache.http.HttpException
 
-class SkateTraceReporter(private val project: Project, private val offline: Boolean = false) :
-  TraceReporter {
+class SkateTraceReporter(val project: Project) : TraceReporter {
 
   private val delegate by lazy {
     val okHttpClient = lazy { OkHttpClient.Builder().build() }
@@ -48,13 +47,12 @@ class SkateTraceReporter(private val project: Project, private val offline: Bool
     val loggingClient = lazy {
       okHttpClient.value.newBuilder().addInterceptor(loggingInterceptor).build()
     }
-    if (offline) {
-      NoOpTraceReporter
-    } else {
-      val endPoint =
-        project.tracingEndpoint()
-          ?: throw RuntimeException("Required tracing endpoint to upload analytics")
+    val endPoint = project.tracingEndpoint()
+    if (endPoint != null) {
       SimpleTraceReporter(endPoint, loggingClient)
+    } else {
+      LOG.info("No endpoint set up for tracing")
+      NoOpTraceReporter
     }
   }
 

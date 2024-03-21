@@ -17,9 +17,6 @@
 
 package slack.gradle
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.internal.dsl.BuildType
 import com.android.builder.model.AndroidProject
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.contracts.InvocationKind
@@ -30,16 +27,10 @@ import org.gradle.api.Action
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.UnknownTaskException
-import org.gradle.api.artifacts.ArtifactView
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.attributes.Attribute
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.AppliedPlugin
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -58,12 +49,14 @@ import org.gradle.internal.service.ServiceRegistry
 private const val IS_ANDROID = "slack.project.ext.isAndroid"
 private const val IS_ANDROID_APPLICATION = "slack.project.ext.isAndroidApplication"
 private const val IS_ANDROID_LIBRARY = "slack.project.ext.isAndroidLibrary"
+private const val IS_ANDROID_TEST = "slack.project.ext.isAndroidTest"
 private const val IS_USING_KAPT = "slack.project.ext.isUsingKapt"
 private const val IS_USING_KSP = "slack.project.ext.isUsingKsp"
 private const val IS_USING_MOSHI_IR = "slack.project.ext.isUsingMoshiIr"
 private const val IS_KOTLIN = "slack.project.ext.isKotlin"
 private const val IS_KOTLIN_ANDROID = "slack.project.ext.isKotlinAndroid"
 private const val IS_KOTLIN_JVM = "slack.project.ext.isKotlinJvm"
+private const val IS_KOTLIN_MULTIPLATFORM = "slack.project.ext.isKotlinMultiplatform"
 private const val IS_JAVA_LIBRARY = "slack.project.ext.isJavaLibrary"
 private const val IS_JAVA = "slack.project.ext.isJava"
 
@@ -99,6 +92,13 @@ internal val Project.isKotlinJvm: Boolean
     }
   }
 
+internal val Project.isKotlinMultiplatform: Boolean
+  get() {
+    return getOrComputeExt(IS_KOTLIN_MULTIPLATFORM) {
+      project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
+    }
+  }
+
 internal val Project.isUsingKapt: Boolean
   get() {
     return getOrComputeExt(IS_USING_KAPT) {
@@ -122,17 +122,22 @@ internal val Project.isUsingMoshiGradle: Boolean
 
 internal val Project.isAndroidApplication: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_APPLICATION) { plugins.hasPlugin(AppPlugin::class.java) }
+    return getOrComputeExt(IS_ANDROID_APPLICATION) { plugins.hasPlugin("com.android.application") }
   }
 
 internal val Project.isAndroidLibrary: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin(LibraryPlugin::class.java) }
+    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin("com.android.library") }
+  }
+
+internal val Project.isAndroidTest: Boolean
+  get() {
+    return getOrComputeExt(IS_ANDROID_TEST) { plugins.hasPlugin("com.android.test") }
   }
 
 internal val Project.isAndroid: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID) { isAndroidApplication || isAndroidLibrary }
+    return getOrComputeExt(IS_ANDROID) { isAndroidApplication || isAndroidLibrary || isAndroidTest }
   }
 
 internal fun <T : Any> Project.getOrComputeExt(key: String, valueCalculator: () -> T): T {
@@ -180,48 +185,6 @@ internal inline fun <reified T> ExtensionContainer.getByType(): T {
   return getByType(TypeOf.typeOf(typeOf<T>().javaType))
 }
 
-internal inline fun <reified T : Task> TaskContainer.providerWithNameOrNull(
-  name: String
-): TaskProvider<T>? {
-  return try {
-    named(name, T::class.java)
-  } catch (e: UnknownTaskException) {
-    null
-  }
-}
-
-internal fun TaskContainer.providerWithNameOrNull(
-  name: String,
-  action: Action<Task>,
-): TaskProvider<Task>? {
-  return try {
-    named(name, action)
-  } catch (e: UnknownTaskException) {
-    null
-  }
-}
-
-/**
- * Best-effort tries to apply an [action] on a task with matching [name]. If the task doesn't exist
- * at the time this is called, a [TaskContainer.whenTaskAdded] callback is added to match on the
- * name and execute the action when it's added.
- *
- * This approach has caveats, namely that you won't get an immediate failure or indication if you've
- * requested action on a task that may never be added. This is intended to be similar to the
- * behavior of [PluginManager.withPlugin].
- */
-internal fun TaskContainer.withName(name: String, action: Action<Task>) {
-  try {
-    named(name, action)
-  } catch (e: UnknownTaskException) {
-    whenTaskAdded {
-      if (this@whenTaskAdded.name == name) {
-        action.execute(this)
-      }
-    }
-  }
-}
-
 @Suppress("SpreadOperator")
 public fun <T : Task> TaskProvider<out T>.dependsOn(
   vararg tasks: TaskProvider<out Task>
@@ -233,20 +196,9 @@ public fun <T : Task> TaskProvider<out T>.dependsOn(
   return this
 }
 
-/** Returns an [ArtifactView] of android configuration artifacts. */
-internal fun Configuration.androidArtifactView(): ArtifactView {
-  return incoming.artifactView {
-    attributes { attribute(Attribute.of("artifactType", String::class.java), "android-classes") }
-  }
-}
-
 internal operator fun ExtensionContainer.set(key: String, value: Any) {
   add(key, value)
 }
-
-/** Retrieves the [ext][ExtraPropertiesExtension] extension. */
-internal val BuildType.ext: ExtraPropertiesExtension
-  get() = (this as ExtensionAware).extensions.getByName("ext") as ExtraPropertiesExtension
 
 internal fun PluginManager.onFirst(
   pluginIds: Iterable<String>,

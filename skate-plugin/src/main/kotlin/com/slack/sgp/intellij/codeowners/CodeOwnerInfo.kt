@@ -15,8 +15,10 @@
  */
 package com.slack.sgp.intellij.codeowners
 
+/** Represents a single code owner file line's info. */
 data class CodeOwnerInfo(
   val team: String,
   val packagePattern: String,
+  /** The line in the owners file this should focus to. Note: 0-based. */
   val codeOwnerLineNumber: Int,
 )

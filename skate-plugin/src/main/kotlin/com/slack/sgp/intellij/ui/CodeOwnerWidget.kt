@@ -70,7 +70,7 @@ class CodeOwnerWidget(project: Project) :
     myStatusBar?.updateWidget(ID())
   }
 
-  override fun getTooltipText() = "Click to show in code_ownership csv"
+  override fun getTooltipText() = "Click to show in code_ownership yaml"
 
   override fun getClickConsumer() = null
 
@@ -121,7 +121,7 @@ class CodeOwnerWidget(project: Project) :
   }
 
   private fun goToOwner(ownerInfo: CodeOwnerInfo) {
-    val codeOwnersFile = codeOwnerFileFetcher.getCodeOwnershipCsv()
+    val codeOwnersFile = codeOwnerFileFetcher.getCodeOwnershipFile()
     val virtualFile =
       codeOwnersFile?.toPath()?.let { VirtualFileManager.getInstance().findFileByNioPath(it) }
         ?: return

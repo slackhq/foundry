@@ -15,6 +15,7 @@
  */
 package slack.gradle.tasks
 
+import java.util.Locale
 import okhttp3.Interceptor
 import okhttp3.ResponseBody
 import okio.Buffer
@@ -27,7 +28,7 @@ import org.gradle.internal.logging.progress.ProgressLogger
 private const val ONE_MEGABYTE_IN_BYTES: Double = (1L * 1024L * 1024L).toDouble()
 
 private val Long.mb: String
-  get() = String.format("%.2f", this / ONE_MEGABYTE_IN_BYTES)
+  get() = "%.2f".format(Locale.US, this / ONE_MEGABYTE_IN_BYTES)
 
 internal class ProgressResponseBody
 internal constructor(

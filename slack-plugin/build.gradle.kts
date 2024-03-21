@@ -22,6 +22,7 @@ plugins {
   alias(libs.plugins.bestPracticesPlugin)
   alias(libs.plugins.moshix)
   alias(libs.plugins.buildConfig)
+  alias(libs.plugins.lint)
 }
 
 gradlePlugin {
@@ -66,12 +67,11 @@ dependencies.constraints {
 }
 
 dependencies {
+  lintChecks(libs.gradleLints)
   api(platform(libs.okhttp.bom))
   api(libs.okhttp)
   // Better I/O
   api(libs.okio)
-  api(projects.agpHandlers.agpHandler82)
-  api(projects.agpHandlers.agpHandler83)
   api(projects.agpHandlers.agpHandlerApi)
 
   implementation(platform(libs.coroutines.bom))
