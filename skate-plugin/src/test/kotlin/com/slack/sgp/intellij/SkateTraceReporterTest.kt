@@ -25,6 +25,7 @@ import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.ValueType
 import com.slack.sgp.tracing.model.newTagBuilder
 import java.time.Instant
+import okio.ByteString
 
 class SkateTraceReporterTest : BasePlatformTestCase() {
 
@@ -49,6 +50,8 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           "fake_span_name",
           Instant.now(),
           traceTags,
+          traceId = ByteString.EMPTY,
+          parentId = ByteString.EMPTY,
           "Studio Giraffe",
           "0.2.0",
         )
@@ -81,6 +84,8 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           "fake_span_name",
           Instant.now(),
           newTagBuilder(),
+          ByteString.EMPTY,
+          ByteString.EMPTY,
           "Studio Giraffe",
           "0.2.0",
         )
@@ -94,6 +99,8 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           "fake_span_name",
           Instant.now(),
           newTagBuilder(),
+          ByteString.EMPTY,
+          ByteString.EMPTY,
           "Studio Giraffe",
           "",
         )

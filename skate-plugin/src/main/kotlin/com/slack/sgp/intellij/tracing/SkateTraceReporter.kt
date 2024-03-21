@@ -24,6 +24,7 @@ import com.slack.sgp.intellij.util.tracingEndpoint
 import com.slack.sgp.tracing.KeyValue
 import com.slack.sgp.tracing.ListOfSpans
 import com.slack.sgp.tracing.model.buildSpan
+import com.slack.sgp.tracing.model.makeId
 import com.slack.sgp.tracing.model.newTagBuilder
 import com.slack.sgp.tracing.reporter.SimpleTraceReporter
 import com.slack.sgp.tracing.reporter.TraceReporter
@@ -35,6 +36,7 @@ import kotlin.time.toDuration
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.ByteString
 import org.apache.http.HttpException
 
 class SkateTraceReporter(val project: Project) : TraceReporter {
@@ -69,6 +71,8 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
     spanName: String,
     startTimestamp: Instant,
     spanDataMap: List<KeyValue>,
+    traceId: ByteString = makeId(),
+    parentId: ByteString = ByteString.EMPTY,
     ideVersion: String = ApplicationInfo.getInstance().fullVersion,
     skatePluginVersion: String? =
       PluginManagerCore.getPlugin(PluginId.getId("com.slack.intellij.skate"))?.version,
@@ -91,6 +95,8 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
             .toMillis()
             .toDuration(DurationUnit.MILLISECONDS)
             .inWholeMicroseconds,
+        traceId = traceId,
+        parentId = parentId,
       ) {
         "skate_version" tagTo skatePluginVersion
         "ide_version" tagTo ideVersion
