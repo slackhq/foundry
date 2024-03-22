@@ -8,20 +8,17 @@ import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.fileTemplates.FileTemplateUtil
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import com.slack.sgp.intellij.codeowners.model.CodeOwnersFile
 import com.slack.sgp.intellij.filetemplate.model.FileTemplateSettings
 import com.slack.sgp.intellij.filetemplate.model.TemplateSetting
 import org.jetbrains.kotlin.idea.KotlinFileType
 import java.io.File
 import java.io.FileNotFoundException
-import javax.xml.parsers.DocumentBuilderFactory
 
 class CreateCircuitFeature : CreateFileFromTemplateAction( "Circuit Feature", "Creates new Circuit Feature", KotlinFileType.INSTANCE.icon), DumbAware {
   override fun buildDialog(project: Project, directory: PsiDirectory, builder: CreateFileFromTemplateDialog.Builder) {
@@ -60,7 +57,7 @@ class CreateCircuitFeature : CreateFileFromTemplateAction( "Circuit Feature", "C
 
   private fun fileTemplateSettingParser() : Map<String, TemplateSetting> {
     Thread.currentThread().contextClassLoader = this.javaClass.classLoader
-    val template = Thread.currentThread().contextClassLoader.getResourceAsStream("fileTemplateSettings.yaml")
+    val template = Thread.currentThread().contextClassLoader.getResourceAsStream("fileTemplateSettings")
       ?: throw FileNotFoundException("File template settings file not found")
     val table = Yaml(configuration = YamlConfiguration(strictMode = false)).decodeFromStream<FileTemplateSettings>(template)
     return table.templates.associateBy { it.name }
