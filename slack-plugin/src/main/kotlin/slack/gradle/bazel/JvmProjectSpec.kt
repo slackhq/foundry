@@ -27,6 +27,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.register
 
 /** A spec for a plain kotlin jvm project. */
 internal class JvmProjectSpec(builder: Builder) :
@@ -74,15 +75,17 @@ internal class JvmProjectSpec(builder: Builder) :
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
         )
 
-        // TODO only generate if there are actually matching test sources?
-        slackKtTest(
-          name = CommonJvmProjectSpec.TEST_TARGET,
-          ruleSource = ruleSource,
-          associates = listOf(BazelDependency.StringDependency(":lib")),
-          kotlinProjectType = KotlinProjectType.Jvm,
-          srcsGlob = testSrcGlobs,
-          deps = testDeps,
-        )
+        if (hasTests) {
+          // TODO only generate if there are actually matching test sources?
+          slackKtTest(
+            name = CommonJvmProjectSpec.TEST_TARGET,
+            ruleSource = ruleSource,
+            associates = listOf(BazelDependency.StringDependency(":lib")),
+            kotlinProjectType = KotlinProjectType.Jvm,
+            srcsGlob = testSrcGlobs,
+            deps = testDeps,
+          )
+        }
       }
       .asString()
   }
@@ -91,6 +94,7 @@ internal class JvmProjectSpec(builder: Builder) :
     override var ruleSource = "@rules_kotlin//kotlin:jvm.bzl"
     override val deps = mutableListOf<Dep>()
     override val exportedDeps = mutableListOf<Dep>()
+    override var hasTests: Boolean = false
     override val testDeps = mutableListOf<Dep>()
     override val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
     override val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
@@ -128,20 +132,18 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
       kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
     ) {
-      project.tasks
-        .register("generateBazel", JvmProjectBazelTask::class.java, slackProperties)
-        .configure {
-          configureCommonJvm(
-            project,
-            slackProperties,
-            depsConfiguration,
-            exportedDepsConfiguration,
-            testConfiguration,
-            kspConfiguration,
-            kaptConfiguration,
-            slackExtension,
-          )
-        }
+      project.tasks.register<JvmProjectBazelTask>("generateBazel") {
+        configureCommonJvm(
+          project,
+          slackProperties,
+          depsConfiguration,
+          exportedDepsConfiguration,
+          testConfiguration,
+          kspConfiguration,
+          kaptConfiguration,
+          slackExtension,
+        )
+      }
     }
   }
 }

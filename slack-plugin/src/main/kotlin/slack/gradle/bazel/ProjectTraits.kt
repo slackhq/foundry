@@ -36,6 +36,7 @@ internal interface CommonJvmProjectSpec {
   // Deps
   val deps: List<Dep>
   val exportedDeps: List<Dep>
+  val hasTests: Boolean
   val testDeps: List<Dep>
   // Source globs
   val srcGlobs: List<String>
@@ -82,6 +83,7 @@ internal interface CommonJvmProjectSpec {
     val deps: MutableList<Dep>
     val exportedDeps: MutableList<Dep>
     val testDeps: MutableList<Dep>
+    var hasTests: Boolean
     val srcGlobs: MutableList<String>
     val testSrcGlobs: MutableList<String>
     val compilerPlugins: MutableList<Dep>
@@ -93,7 +95,12 @@ internal interface CommonJvmProjectSpec {
 
     fun addExportedDep(dep: Dep): T = apply { exportedDeps.add(dep) } as T
 
-    fun addTestDep(dep: Dep): T = apply { testDeps.add(dep) } as T
+    fun addTestDep(dep: Dep): T =
+      apply {
+        hasTests = true
+        testDeps.add(dep)
+      }
+        as T
 
     fun addSrcGlob(glob: String): T = apply { srcGlobs.add(glob) } as T
 
@@ -124,6 +131,7 @@ private class CommonJvmProjectSpecImpl(builder: CommonJvmProjectSpec.Builder<*>)
   override val ruleSource: String = builder.ruleSource
   override val deps: List<Dep> = builder.deps.toList()
   override val exportedDeps: List<Dep> = builder.exportedDeps.toList()
+  override val hasTests: Boolean = builder.hasTests
   override val testDeps: List<Dep> = builder.testDeps.toList()
   override val srcGlobs: List<String> = builder.srcGlobs.toList()
   override val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
@@ -139,7 +147,7 @@ internal interface CommonJvmProjectBazelTask : Task {
 
   @get:Input val deps: SetProperty<ComponentArtifactIdentifier>
   @get:Input val exportedDeps: SetProperty<ComponentArtifactIdentifier>
-  @get:Input val testDeps: SetProperty<ComponentArtifactIdentifier>
+  @get:Input @get:Optional val testDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input val kspDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input val kaptDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input val compilerPlugins: SetProperty<Dep>
@@ -156,7 +164,9 @@ internal interface CommonJvmProjectBazelTask : Task {
   fun <B : CommonJvmProjectSpec.Builder<B>> B.applyCommonJvmConfig() = apply {
     val deps = this@CommonJvmProjectBazelTask.deps.mapDeps()
     val exportedDeps = this@CommonJvmProjectBazelTask.exportedDeps.mapDeps()
-    val testDeps = this@CommonJvmProjectBazelTask.testDeps.mapDeps()
+    val testDeps =
+      if (!this@CommonJvmProjectBazelTask.testDeps.isPresent) null
+      else this@CommonJvmProjectBazelTask.testDeps.mapDeps()
 
     // Only moshix and redacted are supported in JVM projects
     val compilerPlugins = this@CommonJvmProjectBazelTask.compilerPlugins.get().toMutableList()
@@ -197,7 +207,12 @@ internal interface CommonJvmProjectBazelTask : Task {
     this@CommonJvmProjectBazelTask.ruleSource.orNull?.let(::ruleSource)
     deps.forEach { addDep(it) }
     exportedDeps.forEach { addExportedDep(it) }
-    testDeps.forEach { addTestDep(it) }
+    if (testDeps == null) {
+      hasTests = false
+    } else {
+      hasTests = true
+      testDeps.forEach { addTestDep(it) }
+    }
     compilerPlugins.forEach { addCompilerPlugin(it) }
     kspProcessors.forEach { addKspProcessor(it.withAddedDeps(allKspDeps)) }
   }
@@ -244,7 +259,7 @@ internal interface CommonJvmProjectBazelTask : Task {
     slackProperties: SlackProperties,
     depsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
     exportedDepsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
-    testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
+    testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
     kspConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
     kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
     slackExtension: SlackExtension,
@@ -254,7 +269,7 @@ internal interface CommonJvmProjectBazelTask : Task {
     projectDir.set(project.layout.projectDirectory.asFile)
     deps.set(resolvedDependenciesFrom(depsConfiguration))
     exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
-    testDeps.set(resolvedDependenciesFrom(testConfiguration))
+    testConfiguration?.let { testDeps.set(resolvedDependenciesFrom(it)) }
     kspConfiguration?.let { kspDeps.set(resolvedDependenciesFrom(it)) }
     kaptConfiguration?.let { kaptDeps.set(resolvedDependenciesFrom(it)) }
     outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
