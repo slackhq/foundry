@@ -44,24 +44,8 @@ import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 
 /** A spec for a plain kotlin jvm project. */
-internal class JvmProjectSpec(builder: Builder) {
-  /**
-   * The name of the project. Usually just the directory name but could be different if there are
-   * multiple targets.
-   */
-  val name: String = builder.name
-  /** The source for rules to import. */
-  val ruleSource: String = builder.ruleSource
-  // Deps
-  val deps: List<Dep> = builder.deps.toList()
-  val exportedDeps: List<Dep> = builder.exportedDeps.toList()
-  val testDeps: List<Dep> = builder.testDeps.toList()
-  // Source globs
-  val srcGlobs: List<String> = builder.srcGlobs.toList()
-  val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
-  val compilerPlugins = builder.compilerPlugins.toList()
-  val kspProcessors = builder.kspProcessors.toList()
-
+internal class JvmProjectSpec(builder: Builder) :
+  CommonJvmProjectSpec by CommonJvmProjectSpec(builder) {
   override fun toString(): String {
     val kspTargets = kspProcessors.associateBy { it.name }
     val depsWithCodeGen = buildSet {
@@ -144,31 +128,15 @@ internal class JvmProjectSpec(builder: Builder) {
     fs.write(path) { writeUtf8(this@JvmProjectSpec.toString()) }
   }
 
-  class Builder(val name: String) {
-    var ruleSource = "@rules_kotlin//kotlin:jvm.bzl"
-    val deps = mutableListOf<Dep>()
-    val exportedDeps = mutableListOf<Dep>()
-    val testDeps = mutableListOf<Dep>()
-    val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
-    val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
-    val compilerPlugins = mutableListOf<Dep>()
-    val kspProcessors = mutableListOf<KspProcessor>()
-
-    fun ruleSource(source: String) = apply { ruleSource = source }
-
-    fun addDep(dep: Dep) = apply { deps.add(dep) }
-
-    fun addExportedDep(dep: Dep) = apply { exportedDeps.add(dep) }
-
-    fun addTestDep(dep: Dep) = apply { testDeps.add(dep) }
-
-    fun addSrcGlob(glob: String) = apply { srcGlobs.add(glob) }
-
-    fun addTestSrcGlob(glob: String) = apply { testSrcGlobs.add(glob) }
-
-    fun addCompilerPlugin(plugin: Dep) = apply { compilerPlugins.add(plugin) }
-
-    fun addKspProcessor(processor: KspProcessor) = apply { kspProcessors.add(processor) }
+  class Builder(override val name: String) : CommonJvmProjectSpec.Builder<Builder> {
+    override var ruleSource = "@rules_kotlin//kotlin:jvm.bzl"
+    override val deps = mutableListOf<Dep>()
+    override val exportedDeps = mutableListOf<Dep>()
+    override val testDeps = mutableListOf<Dep>()
+    override val srcGlobs = mutableListOf("src/main/**/*.kt", "src/main/**/*.java")
+    override val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
+    override val compilerPlugins = mutableListOf<Dep>()
+    override val kspProcessors = mutableListOf<KspProcessor>()
 
     fun build(): JvmProjectSpec = JvmProjectSpec(this)
   }
