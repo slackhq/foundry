@@ -18,8 +18,6 @@ package slack.gradle.bazel
 import com.grab.grazel.bazel.starlark.BazelDependency
 import com.grab.grazel.bazel.starlark.asString
 import com.grab.grazel.bazel.starlark.statements
-import okio.FileSystem
-import okio.Path
 import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectProvider
@@ -34,22 +32,6 @@ import slack.gradle.SlackProperties
 internal class JvmProjectSpec(builder: Builder) :
   CommonJvmProjectSpec by CommonJvmProjectSpec(builder) {
   override fun toString(): String {
-    val kspTargets = kspProcessors.associateBy { it.name }
-    val depsWithCodeGen = buildSet {
-      addAll(kspTargets.keys.sorted().map { Dep.Target(it) })
-      addAll(deps)
-    }
-
-    val compositeTestDeps =
-      buildSet {
-          add(Dep.Target("lib"))
-          addAll(depsWithCodeGen)
-          addAll(exportedDeps)
-          addAll(testDeps)
-          addAll(compilerPlugins)
-        }
-        .toSortedSet()
-
     /*
      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
 
@@ -79,40 +61,30 @@ internal class JvmProjectSpec(builder: Builder) :
 
     // Write statements in roughly the order of operations for readability
     return statements {
-        for (processor in kspProcessors) {
-          writeKspRule(processor)
-        }
+        val (implDeps, testDeps) = writeCommonJvmStatements()
 
         slackKtLibrary(
-          name = "lib",
+          name = CommonJvmProjectSpec.LIB_TARGET,
           ruleSource = ruleSource,
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
-          deps =
-            (depsWithCodeGen + compilerPlugins).sorted().map {
-              BazelDependency.StringDependency(it.toString())
-            },
+          deps = implDeps,
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
         )
 
         // TODO only generate if there are actually matching test sources?
         slackKtTest(
-          name = "test",
+          name = CommonJvmProjectSpec.TEST_TARGET,
           ruleSource = ruleSource,
           associates = listOf(BazelDependency.StringDependency(":lib")),
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = testSrcGlobs,
-          deps = compositeTestDeps.map { BazelDependency.StringDependency(it.toString()) },
+          deps = testDeps,
         )
       }
       .asString()
-  }
-
-  fun writeTo(path: Path, fs: FileSystem = FileSystem.SYSTEM) {
-    path.parent?.let(fs::createDirectories)
-    fs.write(path) { writeUtf8(this@JvmProjectSpec.toString()) }
   }
 
   class Builder(override val name: String) : CommonJvmProjectSpec.Builder<Builder> {

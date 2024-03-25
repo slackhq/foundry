@@ -1,7 +1,11 @@
 package slack.gradle.bazel
 
+import com.grab.grazel.bazel.starlark.BazelDependency
+import com.grab.grazel.bazel.starlark.StatementsBuilder
 import java.io.File
 import java.util.SortedSet
+import okio.FileSystem
+import okio.Path
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -17,6 +21,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
 import org.gradle.internal.component.local.model.PublishArtifactLocalArtifactMetadata
+import org.jetbrains.annotations.CheckReturnValue
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 
@@ -37,6 +42,38 @@ internal interface CommonJvmProjectSpec {
   val testSrcGlobs: List<String>
   val compilerPlugins: List<Dep>
   val kspProcessors: List<KspProcessor>
+
+  @CheckReturnValue
+  fun StatementsBuilder.writeCommonJvmStatements():
+    Pair<List<BazelDependency>, List<BazelDependency>> {
+    val kspTargets = kspProcessors.associateBy { it.name }
+    val depsWithCodeGen = buildSet {
+      addAll(kspTargets.keys.sorted().map { Dep.Target(it) })
+      addAll(deps)
+    }
+
+    val implementationDeps =
+      (depsWithCodeGen + compilerPlugins)
+        .map { BazelDependency.StringDependency(it.toString()) }
+        .sorted()
+
+    val compositeTestDeps =
+      buildSet {
+          add(Dep.Target("lib"))
+          addAll(depsWithCodeGen)
+          addAll(exportedDeps)
+          addAll(testDeps)
+          addAll(compilerPlugins)
+        }
+        .map { BazelDependency.StringDependency(it.toString()) }
+        .sorted()
+
+    for (processor in kspProcessors) {
+      writeKspRule(processor)
+    }
+
+    return implementationDeps to compositeTestDeps
+  }
 
   @Suppress("UNCHECKED_CAST")
   interface Builder<out T : Builder<T>> {
@@ -68,9 +105,17 @@ internal interface CommonJvmProjectSpec {
   }
 
   companion object {
+    const val LIB_TARGET = "lib"
+    const val TEST_TARGET = "test"
+
     operator fun invoke(builder: Builder<*>): CommonJvmProjectSpec =
       CommonJvmProjectSpecImpl(builder)
   }
+}
+
+internal fun CommonJvmProjectSpec.writeTo(path: Path, fs: FileSystem = FileSystem.SYSTEM) {
+  path.parent?.let(fs::createDirectories)
+  fs.write(path) { writeUtf8(this@writeTo.toString()) }
 }
 
 private class CommonJvmProjectSpecImpl(builder: CommonJvmProjectSpec.Builder<*>) :
