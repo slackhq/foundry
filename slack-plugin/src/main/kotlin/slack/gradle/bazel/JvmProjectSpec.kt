@@ -41,7 +41,7 @@ import org.gradle.api.tasks.UntrackedTask
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
 import org.gradle.internal.component.local.model.PublishArtifactLocalArtifactMetadata
 import slack.gradle.SlackExtension
-import slack.gradle.register
+import slack.gradle.SlackProperties
 
 /** A spec for a plain kotlin jvm project. */
 internal class JvmProjectSpec(builder: Builder) {
@@ -114,6 +114,7 @@ internal class JvmProjectSpec(builder: Builder) {
 
         slackKtLibrary(
           name = "lib",
+          ruleSource = ruleSource,
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
@@ -128,6 +129,7 @@ internal class JvmProjectSpec(builder: Builder) {
         // TODO only generate if there are actually matching test sources?
         slackKtTest(
           name = "test",
+          ruleSource = ruleSource,
           associates = listOf(BazelDependency.StringDependency(":lib")),
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = testSrcGlobs,
@@ -175,7 +177,7 @@ internal class JvmProjectSpec(builder: Builder) {
 @UntrackedTask(because = "Generates a Bazel BUILD file for a Kotlin JVM project")
 internal abstract class JvmProjectBazelTask : DefaultTask() {
   @get:Input abstract val targetName: Property<String>
-  @get:Optional @get:Input abstract val ruleSource: Property<String>
+  @get:Input abstract val ruleSource: Property<String>
 
   @get:Input abstract val projectDir: Property<File>
 
@@ -295,6 +297,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
   companion object {
     fun register(
       project: Project,
+      slackProperties: SlackProperties,
       depsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       exportedDepsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
@@ -302,20 +305,23 @@ internal abstract class JvmProjectBazelTask : DefaultTask() {
       kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
     ) {
-      project.tasks.register<JvmProjectBazelTask>("generateBazel") {
-        targetName.set(project.name)
-        projectDir.set(project.layout.projectDirectory.asFile)
-        deps.set(resolvedDependenciesFrom(depsConfiguration))
-        exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
-        testDeps.set(resolvedDependenciesFrom(testConfiguration))
-        kspConfiguration?.let { kspDeps.set(resolvedDependenciesFrom(it)) }
-        kaptConfiguration?.let { kaptDeps.set(resolvedDependenciesFrom(it)) }
-        outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
-        moshix.set(slackExtension.featuresHandler.moshiHandler.moshiCodegen)
-        redacted.set(slackExtension.featuresHandler.redacted)
-        parcelize.set(project.pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.parcelize"))
-        autoService.set(slackExtension.featuresHandler.autoService)
-      }
+      project.tasks
+        .register("generateBazel", JvmProjectBazelTask::class.java, slackProperties)
+        .configure {
+          targetName.set(project.name)
+          ruleSource.set(slackProperties.bazelRuleSource)
+          projectDir.set(project.layout.projectDirectory.asFile)
+          deps.set(resolvedDependenciesFrom(depsConfiguration))
+          exportedDeps.set(resolvedDependenciesFrom(exportedDepsConfiguration))
+          testDeps.set(resolvedDependenciesFrom(testConfiguration))
+          kspConfiguration?.let { kspDeps.set(resolvedDependenciesFrom(it)) }
+          kaptConfiguration?.let { kaptDeps.set(resolvedDependenciesFrom(it)) }
+          outputFile.set(project.layout.projectDirectory.file("BUILD.bazel"))
+          moshix.set(slackExtension.featuresHandler.moshiHandler.moshiCodegen)
+          redacted.set(slackExtension.featuresHandler.redacted)
+          parcelize.set(project.pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.parcelize"))
+          autoService.set(slackExtension.featuresHandler.autoService)
+        }
     }
   }
 }

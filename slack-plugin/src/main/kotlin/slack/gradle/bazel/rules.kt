@@ -36,16 +36,20 @@ internal enum class Visibility(val rule: String) {
   Private("//visibility:private"),
 }
 
-internal fun StatementsBuilder.loadKtRules(kotlinProjectType: KotlinProjectType) {
+internal fun StatementsBuilder.loadKtRules(
+  kotlinProjectType: KotlinProjectType,
+  ruleSource: String,
+) {
   when (kotlinProjectType) {
-    KotlinProjectType.Android -> load("//bazel/macros:module.bzl", "kt_android_library")
-    KotlinProjectType.Jvm -> load("//bazel/macros:module.bzl", "kt_jvm_library", "kt_jvm_test")
+    KotlinProjectType.Android -> load(ruleSource, "kt_android_library")
+    KotlinProjectType.Jvm -> load(ruleSource, "kt_jvm_library", "kt_jvm_test")
   }
 }
 
 // Fork of the built-in ktLibrary that supports exportedDeps
 internal fun StatementsBuilder.slackKtLibrary(
   name: String,
+  ruleSource: String,
   kotlinProjectType: KotlinProjectType = KotlinProjectType.Jvm,
   srcs: List<String> = emptyList(),
   packageName: String? = null,
@@ -61,7 +65,7 @@ internal fun StatementsBuilder.slackKtLibrary(
   assetsDir: String? = null,
   tags: List<String> = emptyList(),
 ) {
-  loadKtRules(kotlinProjectType)
+  loadKtRules(kotlinProjectType, ruleSource)
   val ruleName =
     when (kotlinProjectType) {
       KotlinProjectType.Jvm -> "kt_jvm_library"
@@ -98,6 +102,7 @@ internal fun StatementsBuilder.slackKtLibrary(
 
 internal fun StatementsBuilder.slackKtTest(
   name: String,
+  ruleSource: String,
   kotlinProjectType: KotlinProjectType = KotlinProjectType.Jvm,
   srcs: List<String> = emptyList(),
   srcsGlob: List<String> = emptyList(),
@@ -106,7 +111,7 @@ internal fun StatementsBuilder.slackKtTest(
   plugins: List<BazelDependency> = emptyList(),
   tags: List<String> = emptyList(),
 ) {
-  loadKtRules(kotlinProjectType)
+  loadKtRules(kotlinProjectType, ruleSource)
   rule("kt_jvm_test") {
     "name" `=` name.quote
     srcs.notEmpty { "srcs" `=` srcs.map(String::quote) }

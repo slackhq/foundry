@@ -631,6 +631,10 @@ internal constructor(
   public val enableBazelGen: Boolean
     get() = resolver.booleanValue("sgp.bazel.enable", defaultValue = false)
 
+  /** Source for loaded bzl files. */
+  public val bazelRuleSource: Provider<String>
+    get() = resolver.optionalStringProvider("sgp.bazel.ruleSource", "@rules_kotlin//kotlin:jvm.bzl")
+
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
