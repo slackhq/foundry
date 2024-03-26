@@ -158,9 +158,9 @@ internal fun StatementsBuilder.kspProcessor(
 }
 
 internal object CompilerPluginDeps {
-  val moshix = Dep.Local("//third_party", target = "moshix")
-  val redacted = Dep.Local("//third_party", target = "redacted")
-  val parcelize = Dep.Local("//third_party", target = "parcelize")
+  val moshix = Dep.Local("third_party", target = "moshix")
+  val redacted = Dep.Local("third_party", target = "redacted")
+  val parcelize = Dep.Local("third_party", target = "parcelize")
 }
 
 internal object KspProcessors {

@@ -9,9 +9,13 @@ import okio.Path
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.ArtifactView
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvableConfiguration
 import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -31,6 +35,8 @@ internal interface CommonJvmProjectSpec {
    * multiple targets.
    */
   val name: String
+  /** The path to this project, i.e. `path/to/project` */
+  val path: String
   /** The source for rules to import. */
   val ruleSource: String
   // Deps
@@ -47,26 +53,22 @@ internal interface CommonJvmProjectSpec {
   @CheckReturnValue
   fun StatementsBuilder.writeCommonJvmStatements():
     Pair<List<BazelDependency>, List<BazelDependency>> {
-    val kspTargets = kspProcessors.associateBy { it.name }
-    val depsWithCodeGen = buildSet {
-      addAll(kspTargets.keys.sorted().map { Dep.Target(it) })
-      addAll(deps)
-    }
-
     val implementationDeps =
-      (depsWithCodeGen + compilerPlugins)
-        .map { BazelDependency.StringDependency(it.toString()) }
-        .sorted()
+      (deps + compilerPlugins).map { BazelDependency.StringDependency(it.toString()) }.sorted()
 
+    val compileTarget = Dep.Local(path, LIB_TARGET).toString()
     val compositeTestDeps =
       buildSet {
-          add(Dep.Target("lib"))
-          addAll(depsWithCodeGen)
+          // Ensure we depend on the lib target
+          add(Dep.Target(LIB_TARGET))
+          addAll(deps)
           addAll(exportedDeps)
           addAll(testDeps)
           addAll(compilerPlugins)
         }
         .map { BazelDependency.StringDependency(it.toString()) }
+        // Don't duplicate the compile target
+        .filterNot { it.toString() == compileTarget }
         .sorted()
 
     for (processor in kspProcessors) {
@@ -79,6 +81,7 @@ internal interface CommonJvmProjectSpec {
   @Suppress("UNCHECKED_CAST")
   interface Builder<out T : Builder<T>> {
     val name: String
+    val path: String
     var ruleSource: String
     val deps: MutableList<Dep>
     val exportedDeps: MutableList<Dep>
@@ -128,6 +131,7 @@ internal fun CommonJvmProjectSpec.writeTo(path: Path, fs: FileSystem = FileSyste
 private class CommonJvmProjectSpecImpl(builder: CommonJvmProjectSpec.Builder<*>) :
   CommonJvmProjectSpec {
   override val name: String = builder.name
+  override val path: String = builder.path
   override val ruleSource: String = builder.ruleSource
   override val deps: List<Dep> = builder.deps.toList()
   override val exportedDeps: List<Dep> = builder.exportedDeps.toList()
@@ -140,6 +144,7 @@ private class CommonJvmProjectSpecImpl(builder: CommonJvmProjectSpec.Builder<*>)
 }
 
 internal interface CommonJvmProjectBazelTask : Task {
+  @get:Input val projectPath: Property<String>
   @get:Input val targetName: Property<String>
   @get:Input val ruleSource: Property<String>
 
@@ -192,11 +197,9 @@ internal interface CommonJvmProjectBazelTask : Task {
     val mappedKspDeps = kspDeps.mapDeps()
     when {
       mappedKspDeps.any { "guinness" in it.toString() } -> {
-        logger.lifecycle("[KSP] Adding guinness compiler")
         kspProcessors += KspProcessors.guinness
       }
       mappedKspDeps.any { "feature-flag/compiler" in it.toString() } -> {
-        logger.lifecycle("[KSP] Adding feature flag compiler")
         kspProcessors += KspProcessors.featureFlag
       }
     }
@@ -231,8 +234,8 @@ internal interface CommonJvmProjectBazelTask : Task {
               check(projectIdentifier is ProjectComponentIdentifier)
               // Map to "path/to/local/dependency1" format
               Dep.Local(
-                projectIdentifier.projectPath.removePrefix(":").replace(":", "/"),
-                target = "lib",
+                projectIdentifier.projectPath.removePrefix(":").replace(':', '/'),
+                target = CommonJvmProjectSpec.LIB_TARGET,
               )
             }
             else -> {
@@ -246,13 +249,38 @@ internal interface CommonJvmProjectBazelTask : Task {
       .toSortedSet()
   }
 
-  private fun resolvedDependenciesFrom(
+  private fun resolvedDependenciesFromOld(
     provider: NamedDomainObjectProvider<ResolvableConfiguration>
   ): Provider<List<ComponentArtifactIdentifier>> {
     return provider.flatMap { configuration ->
       configuration.incoming.artifacts.resolvedArtifacts.map { it.map { it.id } }
     }
   }
+
+  private fun resolvedDependenciesFrom(
+    provider: NamedDomainObjectProvider<ResolvableConfiguration>
+  ): Provider<List<ComponentArtifactIdentifier>> {
+    return provider.flatMap { configuration ->
+      configuration.externalResolvedArtifactsFor("jar").map { it.map { it.id } }
+    }
+  }
+
+  private fun Configuration.externalResolvedArtifactsFor(
+    attrValue: String
+  ): Provider<Set<ResolvedArtifactResult>> {
+    return externalArtifactViewFor(attrValue).artifacts.resolvedArtifacts
+  }
+
+  private fun Configuration.externalArtifactViewFor(attrValue: String): ArtifactView =
+    incoming.artifactView {
+      // only give us artifacts that match the requested attribute
+      attributes.attribute(attributeKey, attrValue)
+      // keep going if there is an artifact resolution failure or some dependencies doesn't have
+      // artifacts matching the requested attribute
+      lenient(true)
+      // only give us artifacts from external components ("Modules" vs "Projects")
+      //      componentFilter { it is ModuleComponentIdentifier }
+    }
 
   fun configureCommonJvm(
     project: Project,
@@ -265,6 +293,7 @@ internal interface CommonJvmProjectBazelTask : Task {
     slackExtension: SlackExtension,
   ) {
     targetName.set(project.name)
+    projectPath.set(project.path)
     ruleSource.set(slackProperties.bazelRuleSource)
     projectDir.set(project.layout.projectDirectory.asFile)
     deps.set(resolvedDependenciesFrom(depsConfiguration))
@@ -277,5 +306,9 @@ internal interface CommonJvmProjectBazelTask : Task {
     redacted.set(slackExtension.featuresHandler.redacted)
     parcelize.set(project.pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.parcelize"))
     autoService.set(slackExtension.featuresHandler.autoService)
+  }
+
+  companion object {
+    private val attributeKey = Attribute.of("artifactType", String::class.java)
   }
 }

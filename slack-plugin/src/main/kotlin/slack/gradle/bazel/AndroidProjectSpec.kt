@@ -23,15 +23,23 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvableConfiguration
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 import slack.gradle.register
 
-/** A spec for a plain kotlin jvm project. */
-internal class JvmProjectSpec(builder: Builder) :
+/** A spec for a plain Kotlin Android project. */
+internal class AndroidProjectSpec(builder: Builder) :
   CommonJvmProjectSpec by CommonJvmProjectSpec(builder) {
+
+  val namespace: String = builder.namespace
+  val manifest: String? = builder.manifest
+
   override fun toString(): String {
     /*
      load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
@@ -62,39 +70,39 @@ internal class JvmProjectSpec(builder: Builder) :
 
     // Write statements in roughly the order of operations for readability
     return statements {
-        val (implDeps, testDeps) = writeCommonJvmStatements()
+        val (implDeps, _) = writeCommonJvmStatements()
 
         slackKtLibrary(
           name = CommonJvmProjectSpec.LIB_TARGET,
           ruleSource = ruleSource,
-          kotlinProjectType = KotlinProjectType.Jvm,
+          packageName = namespace,
+          kotlinProjectType = KotlinProjectType.Android,
+          manifest = manifest,
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
           deps = implDeps,
           plugins = kspProcessors.map { BazelDependency.StringDependency(":${it.name}") },
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
+          // TODO
+          //  resources
+          //  assets
+          //  viewbinding
         )
 
-        if (hasTests) {
-          // TODO only generate if there are actually matching test sources?
-          slackKtTest(
-            name = CommonJvmProjectSpec.TEST_TARGET,
-            ruleSource = ruleSource,
-            associates =
-              listOf(BazelDependency.StringDependency(":${CommonJvmProjectSpec.LIB_TARGET}")),
-            kotlinProjectType = KotlinProjectType.Jvm,
-            srcsGlob = testSrcGlobs,
-            plugins = kspProcessors.map { BazelDependency.StringDependency(":${it.name}") },
-            deps = testDeps,
-          )
-        }
+        // TODO android tests
+        //  robolectric
+        //  jvm w/ stub jar
+        //  androidTest
       }
       .asString()
   }
 
-  class Builder(override val name: String, override val path: String) :
+  class Builder(override val name: String, override val path: String, val namespace: String) :
     CommonJvmProjectSpec.Builder<Builder> {
+    var manifest: String? = null
+
+    // Inherited from CommonJvmProjectSpec
     override var ruleSource = "@rules_kotlin//kotlin:jvm.bzl"
     override val deps = mutableListOf<Dep>()
     override val exportedDeps = mutableListOf<Dep>()
@@ -105,12 +113,17 @@ internal class JvmProjectSpec(builder: Builder) :
     override val compilerPlugins = mutableListOf<Dep>()
     override val kspProcessors = mutableListOf<KspProcessor>()
 
-    fun build(): JvmProjectSpec = JvmProjectSpec(this)
+    fun manifest(manifest: String) = apply { this.manifest = manifest }
+
+    fun build(): AndroidProjectSpec = AndroidProjectSpec(this)
   }
 }
 
 @UntrackedTask(because = "Generates a Bazel BUILD file for a Kotlin JVM project")
-internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBazelTask {
+internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjectBazelTask {
+
+  @get:Input abstract val namespace: Property<String>
+  @get:Input @get:Optional abstract val manifest: Property<String>
 
   init {
     group = "bazel"
@@ -119,8 +132,13 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
 
   @TaskAction
   fun generate() {
-    JvmProjectSpec.Builder(targetName.get(), projectPath.get().removePrefix(":").replace(':', '/'))
+    AndroidProjectSpec.Builder(
+        targetName.get(),
+        projectPath.get().removePrefix(":").replace(':', '/'),
+        namespace.get(),
+      )
       .applyCommonJvmConfig()
+      .apply { this@AndroidProjectBazelTask.manifest.orNull?.let(::manifest) }
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())
   }
@@ -131,12 +149,18 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
       slackProperties: SlackProperties,
       depsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
       exportedDepsConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
-      testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>,
+      testConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       kspConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
+      namespace: Provider<String>,
     ) {
-      project.tasks.register<JvmProjectBazelTask>("generateBazel") {
+      // TODO multiple variants?
+      project.tasks.register<AndroidProjectBazelTask>("generateBazel") {
+        this.namespace.set(namespace)
+        if (project.file("src/main/AndroidManifest.xml").exists()) {
+          manifest.set("src/main/AndroidManifest.xml")
+        }
         configureCommonJvm(
           project,
           slackProperties,

@@ -107,7 +107,13 @@ public class PropertyResolver(
   }
 
   public fun optionalStringProvider(key: String, defaultValue: String? = null): Provider<String> {
-    return providerFor(key).let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
+    return providerFor(key).let {
+      if (defaultValue == null) {
+        it
+      } else {
+        it.orElse(defaultValue)
+      }
+    }
   }
 }
 

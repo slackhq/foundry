@@ -18,7 +18,14 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.variant.*
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
+import com.android.build.api.variant.HasAndroidTestBuilder
+import com.android.build.api.variant.HasUnitTest
+import com.android.build.api.variant.HasUnitTestBuilder
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
@@ -65,6 +72,7 @@ import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.Configurations.wrapInResolvable
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.SgpArtifact
+import slack.gradle.bazel.AndroidProjectBazelTask
 import slack.gradle.bazel.JvmProjectBazelTask
 import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
@@ -309,13 +317,17 @@ internal class StandardProjectConfigurations(
           // Have to wrap all the configurations in resolvable ones that extend them
           // in order to read their dependencies
           JvmProjectBazelTask.register(
-            project,
-            configurations.getByName("runtimeElements").wrapInResolvable(project),
-            configurations.getByName("apiElements").wrapInResolvable(project),
-            configurations.getByName("testRuntimeClasspath").wrapInResolvable(project),
-            kspConfig,
-            kaptConfig,
-            slackExtension,
+            project = project,
+            slackProperties = slackProperties,
+            depsConfiguration =
+              configurations.getByName("runtimeElements").wrapInResolvable(project),
+            exportedDepsConfiguration =
+              configurations.getByName("apiElements").wrapInResolvable(project),
+            testConfiguration =
+              configurations.getByName("testRuntimeClasspath").wrapInResolvable(project),
+            kspConfiguration = kspConfig,
+            kaptConfiguration = kaptConfig,
+            slackExtension = slackExtension,
           )
         }
       }
@@ -884,6 +896,45 @@ internal class StandardProjectConfigurations(
                     }
                   }
                   .joinToString("")
+          }
+        }
+
+        onVariants { variant ->
+          if (slackProperties.enableBazelGen && !slackProperties.libraryWithVariants) {
+            // TODO consolidate shared logic
+            val kaptConfig =
+              if (pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")) {
+                configurations.getByName("kapt").wrapInResolvable(project)
+              } else {
+                null
+              }
+            val kspConfig =
+              if (pluginManager.hasPlugin("com.google.devtools.ksp")) {
+                configurations.getByName("ksp").wrapInResolvable(project)
+              } else {
+                null
+              }
+            AndroidProjectBazelTask.register(
+              project = project,
+              slackProperties = slackProperties,
+              // TODO need to also include compile classpath?
+              //
+              // configurations.getByName("releaseRuntimeElements").wrapInResolvable(project),
+              depsConfiguration = variant.compileConfiguration.wrapInResolvable(project),
+              // TODO need releaseApiElements instead?
+              //
+              // configurations.getByName("releaseApiElements").wrapInResolvable(project),
+              exportedDepsConfiguration = variant.runtimeConfiguration.wrapInResolvable(project),
+              testConfiguration =
+                (variant as? HasUnitTest)
+                  ?.unitTest
+                  ?.runtimeConfiguration
+                  ?.wrapInResolvable(project),
+              kspConfiguration = kspConfig,
+              kaptConfiguration = kaptConfig,
+              slackExtension = slackExtension,
+              namespace = variant.namespace,
+            )
           }
         }
       }
