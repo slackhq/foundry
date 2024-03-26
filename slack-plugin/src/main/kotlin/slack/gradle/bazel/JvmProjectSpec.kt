@@ -27,6 +27,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.bazel.Dep.Local.Companion.toBazelPath
 import slack.gradle.register
 
 /** A spec for a plain kotlin jvm project. */
@@ -79,7 +80,7 @@ internal class JvmProjectSpec(builder: Builder) :
         if (hasTests) {
           // TODO only generate if there are actually matching test sources?
           slackKtTest(
-            name = CommonJvmProjectSpec.TEST_TARGET,
+            name = CommonJvmProjectSpec.testName(name),
             ruleSource = ruleSource,
             associates = listOf(BazelDependency.StringDependency(":$name")),
             kotlinProjectType = KotlinProjectType.Jvm,
@@ -118,7 +119,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
 
   @TaskAction
   fun generate() {
-    JvmProjectSpec.Builder(targetName.get(), projectPath.get().removePrefix(":").replace(':', '/'))
+    JvmProjectSpec.Builder(targetName.get(), projectPath.get().toBazelPath())
       .applyCommonJvmConfig()
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())

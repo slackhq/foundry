@@ -17,6 +17,8 @@ package slack.gradle.bazel
 
 import com.grab.grazel.bazel.starlark.BazelDependency
 import com.grab.grazel.bazel.starlark.asString
+import com.grab.grazel.bazel.starlark.glob
+import com.grab.grazel.bazel.starlark.quote
 import com.grab.grazel.bazel.starlark.statements
 import okio.Path.Companion.toOkioPath
 import org.gradle.api.DefaultTask
@@ -25,12 +27,14 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvableConfiguration
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
+import slack.gradle.bazel.Dep.Local.Companion.toBazelPath
 import slack.gradle.register
 
 /** A spec for a plain Kotlin Android project. */
@@ -39,38 +43,23 @@ internal class AndroidProjectSpec(builder: Builder) :
 
   val namespace: String = builder.namespace
   val manifest: String? = builder.manifest
+  val resourceFiles: List<String> = builder.resourceFiles
+  val resourceFilesGlobs: List<String> = builder.resourceFilesGlobs
+  // TODO we may not really need this property exposed here, as the robolectric deps just sorta sit
+  //  in the test deps directly
+  val enableRobolectric: Boolean = builder.enableRobolectric
 
   override fun toString(): String {
-    /*
-     load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library", "kt_jvm_test")
-
-     kt_jvm_library(
-         name = "ditto_lib",
-         srcs = glob(["src/main/**/*.kt"]),
-         visibility = ["//visibility:public"],
-         deps = [
-             "@maven//:androidx_annotation_annotation",
-         ],
-     )
-
-     kt_jvm_test(
-         name = "ditto_test",
-         srcs = glob(["src/test/**/*.kt"]),
-         visibility = ["//visibility:private"],
-         deps = [
-             ":ditto_lib",
-             "@maven//:androidx_annotation_annotation",
-             "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
-             "@maven//:org_jetbrains_kotlin_kotlin_test",
-             "@maven//:junit_junit",
-             "@maven//:com_google_truth_truth",
-         ],
-     )
-    */
-
     // Write statements in roughly the order of operations for readability
     return statements {
-        val (implDeps, _) = writeCommonJvmStatements()
+        val (implDeps, testDeps) = writeCommonJvmStatements()
+        val fullTestDeps = buildList {
+          // Ensure we depend on the lib target
+          // We have to do this because there's no kt_android_local_test that supports associated
+          // compilations
+          add(BazelDependency.StringDependency(Dep.Target(name).toString()))
+          addAll(testDeps)
+        }
 
         slackKtLibrary(
           name = name,
@@ -84,14 +73,26 @@ internal class AndroidProjectSpec(builder: Builder) :
           plugins = kspProcessors.map { BazelDependency.StringDependency(":${it.name}") },
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
+          resources = resourceFiles,
+          resourceFiles = listOf(glob(resourceFilesGlobs.map(String::quote))),
           // TODO
-          //  resources
           //  assets
           //  viewbinding
         )
 
+        if (hasTests) {
+          // TODO there's no kt_android_local_test
+          //  https://github.com/bazelbuild/rules_kotlin/issues/375
+          //          slackKtAndroidLocalTest(
+          //            name = CommonJvmProjectSpec.testName(name),
+          //            associates = listOf(BazelDependency.StringDependency(":$name")),
+          //            srcsGlob = testSrcGlobs,
+          //            plugins = kspProcessors.map {
+          // BazelDependency.StringDependency(":${it.name}") },
+          //            deps = fullTestDeps,
+          //          )
+        }
         // TODO android tests
-        //  robolectric
         //  jvm w/ stub jar
         //  androidTest
       }
@@ -101,6 +102,10 @@ internal class AndroidProjectSpec(builder: Builder) :
   class Builder(override val name: String, override val path: String, val namespace: String) :
     CommonJvmProjectSpec.Builder<Builder> {
     var manifest: String? = null
+    var enableRobolectric: Boolean = false
+    // TODO unclear if bazel supports test-only resources
+    val resourceFiles = mutableListOf<String>()
+    val resourceFilesGlobs = mutableListOf("src/main/res/**")
 
     // Inherited from CommonJvmProjectSpec
     override var ruleSource = "@rules_kotlin//kotlin:jvm.bzl"
@@ -115,6 +120,12 @@ internal class AndroidProjectSpec(builder: Builder) :
 
     fun manifest(manifest: String) = apply { this.manifest = manifest }
 
+    fun enableRobolectric(enable: Boolean) = apply { this.enableRobolectric = enable }
+
+    fun addResourceFile(file: String) = apply { this.resourceFiles += file }
+
+    fun addResourceFilesGlob(glob: String) = apply { this.resourceFilesGlobs += glob }
+
     fun build(): AndroidProjectSpec = AndroidProjectSpec(this)
   }
 }
@@ -124,6 +135,8 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
 
   @get:Input abstract val namespace: Property<String>
   @get:Input @get:Optional abstract val manifest: Property<String>
+  @get:Input @get:Optional abstract val enableRobolectric: Property<Boolean>
+  @get:Input abstract val robolectricCoreDeps: SetProperty<Dep>
 
   init {
     group = "bazel"
@@ -132,13 +145,18 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
 
   @TaskAction
   fun generate() {
-    AndroidProjectSpec.Builder(
-        targetName.get(),
-        projectPath.get().removePrefix(":").replace(':', '/'),
-        namespace.get(),
-      )
+    AndroidProjectSpec.Builder(targetName.get(), projectPath.get().toBazelPath(), namespace.get())
       .applyCommonJvmConfig()
-      .apply { this@AndroidProjectBazelTask.manifest.orNull?.let(::manifest) }
+      .apply {
+        this@AndroidProjectBazelTask.manifest.orNull?.let(::manifest)
+        val robolectricEnabled = this@AndroidProjectBazelTask.enableRobolectric.getOrElse(false)
+        enableRobolectric(robolectricEnabled)
+        if (robolectricEnabled) {
+          for (dep in robolectricCoreDeps.get()) {
+            addTestDep(dep)
+          }
+        }
+      }
       .build()
       .writeTo(outputFile.asFile.get().toOkioPath())
   }
@@ -161,6 +179,14 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
         if (project.file("src/main/AndroidManifest.xml").exists()) {
           manifest.set("src/main/AndroidManifest.xml")
         }
+        // TODO what about android.testOptions.unitTests.isIncludeAndroidResources?
+        enableRobolectric.set(slackExtension.androidHandler.featuresHandler.robolectric)
+        robolectricCoreDeps.addAll(
+          Dep.Remote.fromMavenIdentifier("org.robolectric:annotations"),
+          Dep.Remote.fromMavenIdentifier("org.robolectric:robolectric"),
+          Dep.Remote(source = "robolectric", path = "bazel", target = "android-all"),
+          Dep.Local.fromGradlePath(slackProperties.robolectricCoreProjectPath),
+        )
         configureCommonJvm(
           project,
           slackProperties,

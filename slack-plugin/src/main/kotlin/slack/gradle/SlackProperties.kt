@@ -410,14 +410,17 @@ internal constructor(
   public val useOrchestrator: Boolean
     get() = booleanProperty("orchestrator")
 
+  public val robolectricCoreProject: Project
+    get() = project.project(robolectricCoreProjectPath)
+
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
    *
    * Should be `:path:to:robolectric-core` format
    */
-  public val robolectricCoreProject: Project
-    get() = project.project(stringProperty("slack.location.robolectric-core"))
+  public val robolectricCoreProjectPath: String
+    get() = stringProperty("slack.location.robolectric-core")
 
   /**
    * Gradle path to a platform project to be referenced by other projects.

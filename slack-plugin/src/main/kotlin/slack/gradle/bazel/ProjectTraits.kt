@@ -74,8 +74,6 @@ internal interface CommonJvmProjectSpec {
     val compileTarget = Dep.Local(path).toString()
     val compositeTestDeps =
       buildSet {
-          // Ensure we depend on the lib target
-          add(Dep.Target(name))
           addAll(deps)
           addAll(exportedDeps)
           addAll(testDeps)
@@ -130,7 +128,10 @@ internal interface CommonJvmProjectSpec {
   }
 
   companion object {
-    const val TEST_TARGET = "test"
+    private const val TEST_TARGET = "test"
+
+    /** Some projects are named "test", so we have to disambiguate. */
+    fun testName(projectName: String) = if (projectName == TEST_TARGET) "test_" else TEST_TARGET
 
     operator fun invoke(builder: Builder<*>): CommonJvmProjectSpec =
       CommonJvmProjectSpecImpl(builder)
@@ -246,11 +247,7 @@ internal interface CommonJvmProjectBazelTask : Task {
             is PublishArtifactLocalArtifactMetadata -> {
               val projectIdentifier = component.componentIdentifier
               check(projectIdentifier is ProjectComponentIdentifier)
-              // Map to "path/to/local/dependency1" format
-              Dep.Local(
-                projectIdentifier.projectPath.removePrefix(":").replace(':', '/'),
-                target = "",
-              )
+              Dep.Local.fromGradlePath(projectIdentifier.projectPath)
             }
             else -> {
               System.err.println("Unknown component type: $component (${component.javaClass})")
