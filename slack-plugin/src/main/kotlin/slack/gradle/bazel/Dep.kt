@@ -49,6 +49,12 @@ internal sealed interface Dep : Comparable<Dep> {
     override fun toString(): String {
       return "//$path${if (target.isNotEmpty()) ":$target" else ""}"
     }
+
+    companion object {
+      fun fromGradlePath(path: String) = Local(path.toBazelPath())
+
+      internal fun String.toBazelPath() = removePrefix(":").replace(':', '/')
+    }
   }
 
   /**
