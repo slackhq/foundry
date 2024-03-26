@@ -146,6 +146,28 @@
 
     <issue
         id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/bazel/ProjectTraits.kt"
+            line="41"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.internal.component.local.model.PublishArtifactLocalArtifactMetadata"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/bazel/ProjectTraits.kt"
+            line="42"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
         message="Avoid using internal Android Gradle Plugin APIs"
         errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -173,7 +195,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/slack/gradle/StandardProjectConfigurations.kt"
-            line="26"
+            line="33"
             column="1"/>
     </issue>
 
@@ -184,8 +206,19 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/slack/gradle/StandardProjectConfigurations.kt"
-            line="27"
+            line="34"
             column="1"/>
+    </issue>
+
+    <issue
+        id="ExceptionMessage"
+        message="Please specify a lazyMessage param for check"
+        errorLine1="              check(projectIdentifier is ProjectComponentIdentifier)"
+        errorLine2="              ~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/bazel/ProjectTraits.kt"
+            line="253"
+            column="15"/>
     </issue>
 
     <issue
