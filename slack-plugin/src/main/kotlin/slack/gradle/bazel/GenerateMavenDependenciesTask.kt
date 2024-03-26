@@ -20,6 +20,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -28,12 +30,19 @@ import slack.gradle.findByType
 import slack.gradle.register
 
 @UntrackedTask(because = "This is an on-demand task")
-internal abstract class GenerateMavenDependenciesTask : DefaultTask() {
+public abstract class GenerateMavenDependenciesTask : DefaultTask() {
 
-  @get:Input abstract val mavenArtifacts: ListProperty<String>
-  @get:Input abstract val forcedMavenArtifacts: ListProperty<String>
+  @get:Input public abstract val mavenArtifacts: MapProperty<String, String>
+  @get:Input public abstract val forcedMavenArtifacts: ListProperty<String>
+  @get:Input public abstract val excludedKeys: SetProperty<String>
 
-  @get:OutputFile abstract val outputFile: RegularFileProperty
+  /**
+   * List of module identifiers to extra suffixes we should include. This is useful for KMP
+   * artifacts
+   */
+  @get:Input public abstract val suffixMappings: MapProperty<String, String>
+
+  @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
     group = "bazel"
@@ -41,7 +50,7 @@ internal abstract class GenerateMavenDependenciesTask : DefaultTask() {
   }
 
   @TaskAction
-  fun generate() {
+  public fun generate() {
     /*
     MAVEN_ARTIFACTS = [
         "com.google.code.findbugs:jsr305:3.0.2",
@@ -62,32 +71,77 @@ internal abstract class GenerateMavenDependenciesTask : DefaultTask() {
     FORCED_MAVEN_ARTIFACTS = []
      */
 
+    val suffixMappings = suffixMappings.get()
+    val excludedKeys = excludedKeys.get().map { it.replace('-', '.') }
+    val allArtifacts = mavenArtifacts.get()
+
+    // Mapping of groups to versions
+    val boms =
+      allArtifacts
+        .filterKeys { it.endsWith(".bom") }
+        .values
+        .associate { it.substringBefore(':') to it.substringAfterLast(':') }
+
+    logger.lifecycle("Boms are ${boms}")
+
     val mavenArtifacts =
-      mavenArtifacts
-        .get()
+      allArtifacts
+        .filterKeys { it !in excludedKeys }
+        .values
+        .asSequence()
+        .map {
+          val (group, artifact, version) = it.split(":")
+          val actualVersion =
+            if (version == "null") {
+              boms[group].also {
+                if (it == null) {
+                  logger.lifecycle("Could not find bom for $group")
+                } else {
+                  logger.lifecycle("Found bom for $group")
+                }
+              }
+            } else {
+              version
+            }
+          "$group:$artifact" to actualVersion
+        }
+        .filterNot { it.second == null }
         // Filter out bom artifacts
-        .filterNot { it.contains("-bom:") }
-        .sorted()
+        .filterNot { it.first.endsWith("-bom") }
+        .flatMap { entry ->
+          suffixMappings[entry.first]?.let { suffix ->
+            listOf(entry, "${entry.first}$suffix" to entry.second)
+          } ?: listOf(entry)
+        }
+        .map { "${it.first}:${it.second}" }
+        .toList()
+
     val forcedMavenArtifacts = forcedMavenArtifacts.get()
     outputFile
       .get()
       .asFile
       .writeText(
-        """
-      MAVEN_ARTIFACTS = [
-          ${mavenArtifacts.joinToString(",\n") { "\"$it\"" }},
-      ]
-
-      FORCED_MAVEN_ARTIFACTS = [
-          ${if (forcedMavenArtifacts.isEmpty()) "" else forcedMavenArtifacts.joinToString(",\n") { "\"$it\"" }},
-      ]
-      """
-          .trimIndent()
-          .trimStart() // Trim start for buildifier
+        buildString {
+          appendLine("MAVEN_ARTIFACTS = [")
+          for (artifact in mavenArtifacts) {
+            appendLine("    \"$artifact\",")
+          }
+          appendLine("]")
+          appendLine()
+          if (forcedMavenArtifacts.isEmpty()) {
+            appendLine("FORCED_MAVEN_ARTIFACTS = []")
+          } else {
+            appendLine("FORCED_MAVEN_ARTIFACTS = [")
+            for (artifact in forcedMavenArtifacts) {
+              appendLine("    \"$artifact\",")
+            }
+            appendLine("]")
+          }
+        }
       )
   }
 
-  companion object {
+  internal companion object {
     fun register(project: Project) {
       val catalogExtension =
         project.extensions.findByType<VersionCatalogsExtension>()
@@ -97,8 +151,9 @@ internal abstract class GenerateMavenDependenciesTask : DefaultTask() {
         for (name in catalogExtension.catalogNames) {
           val catalog = catalogExtension.named(name)
           for (alias in catalog.libraryAliases) {
-            mavenArtifacts.add(
-              catalog.findLibrary(alias).get().map { "${it.group}:${it.name}:${it.version}" }
+            mavenArtifacts.put(
+              alias,
+              catalog.findLibrary(alias).get().map { "${it.group}:${it.name}:${it.version}" },
             )
           }
         }
