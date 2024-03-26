@@ -222,10 +222,14 @@ internal interface CommonJvmProjectBazelTask : Task {
 
     // TODO kapt
 
+    val hasTestSources =
+      projectDir.get().resolve("src/test").walkTopDown().any {
+        it.extension == "kt" || it.extension == "java"
+      }
     this@CommonJvmProjectBazelTask.ruleSource.orNull?.let(::ruleSource)
     deps.forEach { addDep(it) }
     exportedDeps.forEach { addExportedDep(it) }
-    if (testDeps == null) {
+    if (!hasTestSources || testDeps == null) {
       hasTests = false
     } else {
       hasTests = true
