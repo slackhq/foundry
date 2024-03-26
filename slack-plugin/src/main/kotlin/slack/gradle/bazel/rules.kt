@@ -127,6 +127,37 @@ internal fun StatementsBuilder.slackKtTest(
   }
 }
 
+internal fun StatementsBuilder.slackKtAndroidLocalTest(
+  name: String,
+  srcs: List<String> = emptyList(),
+  srcsGlob: List<String> = emptyList(),
+  @Suppress("UNUSED_PARAMETER") associates: List<BazelDependency> = emptyList(),
+  deps: List<BazelDependency> = emptyList(),
+  plugins: List<BazelDependency> = emptyList(),
+  customPackage: String? = null,
+  testClass: String? = null,
+  tags: List<String> = emptyList(),
+) {
+  // TODO no kt_android_local_test https://github.com/bazelbuild/rules_kotlin/issues/375
+  load("@rules_android//android:rules.bzl", "android_local_test")
+  rule("android_local_test") {
+    "name" `=` name.quote
+    srcs.notEmpty { "srcs" `=` srcs.map(String::quote) }
+    srcsGlob.notEmpty { "srcs" `=` glob(srcsGlob.map(String::quote)) }
+    deps.notEmpty { "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote)) }
+    // TODO https://github.com/bazelbuild/rules_kotlin/issues/375
+    //    associates.notEmpty {
+    //      "associates" `=` array(associates.map(BazelDependency::toString).map(String::quote))
+    //    }
+    plugins.notEmpty {
+      "plugins" `=` array(plugins.map(BazelDependency::toString).map(String::quote))
+    }
+    tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
+    customPackage?.let { "custom_package" `=` it.quote }
+    testClass?.let { "test_class" `=` it.quote }
+  }
+}
+
 internal data class KspProcessor(
   val name: String,
   val processorProviderClass: String,
@@ -200,8 +231,8 @@ internal object KspProcessors {
           "@maven//:com_squareup_anvil_annotations",
           "@maven//:com_squareup_kotlinpoet_jvm",
           "@maven//:com_squareup_kotlinpoet_ksp",
-          "//libraries/foundation/feature-flag:lib",
-          "//libraries/foundation/slack-di:lib",
+          "//libraries/foundation/feature-flag",
+          "//libraries/foundation/slack-di",
         ),
     )
 
