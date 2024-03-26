@@ -65,7 +65,7 @@ internal class JvmProjectSpec(builder: Builder) :
         val (implDeps, testDeps) = writeCommonJvmStatements()
 
         slackKtLibrary(
-          name = CommonJvmProjectSpec.LIB_TARGET,
+          name = name,
           ruleSource = ruleSource,
           kotlinProjectType = KotlinProjectType.Jvm,
           srcsGlob = srcGlobs,
@@ -81,8 +81,7 @@ internal class JvmProjectSpec(builder: Builder) :
           slackKtTest(
             name = CommonJvmProjectSpec.TEST_TARGET,
             ruleSource = ruleSource,
-            associates =
-              listOf(BazelDependency.StringDependency(":${CommonJvmProjectSpec.LIB_TARGET}")),
+            associates = listOf(BazelDependency.StringDependency(":$name")),
             kotlinProjectType = KotlinProjectType.Jvm,
             srcsGlob = testSrcGlobs,
             plugins = kspProcessors.map { BazelDependency.StringDependency(":${it.name}") },

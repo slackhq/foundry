@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package slack.gradle.bazel
 
 import com.grab.grazel.bazel.starlark.BazelDependency
@@ -56,11 +71,11 @@ internal interface CommonJvmProjectSpec {
     val implementationDeps =
       (deps + compilerPlugins).map { BazelDependency.StringDependency(it.toString()) }.sorted()
 
-    val compileTarget = Dep.Local(path, LIB_TARGET).toString()
+    val compileTarget = Dep.Local(path).toString()
     val compositeTestDeps =
       buildSet {
           // Ensure we depend on the lib target
-          add(Dep.Target(LIB_TARGET))
+          add(Dep.Target(name))
           addAll(deps)
           addAll(exportedDeps)
           addAll(testDeps)
@@ -115,7 +130,6 @@ internal interface CommonJvmProjectSpec {
   }
 
   companion object {
-    const val LIB_TARGET = "lib"
     const val TEST_TARGET = "test"
 
     operator fun invoke(builder: Builder<*>): CommonJvmProjectSpec =
@@ -235,7 +249,7 @@ internal interface CommonJvmProjectBazelTask : Task {
               // Map to "path/to/local/dependency1" format
               Dep.Local(
                 projectIdentifier.projectPath.removePrefix(":").replace(':', '/'),
-                target = CommonJvmProjectSpec.LIB_TARGET,
+                target = "",
               )
             }
             else -> {

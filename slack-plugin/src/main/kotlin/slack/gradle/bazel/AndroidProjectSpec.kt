@@ -73,7 +73,7 @@ internal class AndroidProjectSpec(builder: Builder) :
         val (implDeps, _) = writeCommonJvmStatements()
 
         slackKtLibrary(
-          name = CommonJvmProjectSpec.LIB_TARGET,
+          name = name,
           ruleSource = ruleSource,
           packageName = namespace,
           kotlinProjectType = KotlinProjectType.Android,
