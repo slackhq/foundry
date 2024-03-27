@@ -18,10 +18,10 @@ import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
 import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
-  java
-  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
@@ -45,6 +45,7 @@ intellij {
   plugins.add("org.intellij.plugins.markdown")
   plugins.add("org.jetbrains.plugins.terminal")
   plugins.add("org.jetbrains.kotlin")
+  plugins.add("org.jetbrains.android")
 }
 
 kotlin { compilerOptions { optIn.add("kotlin.RequiresOptIn") } }
@@ -102,6 +103,30 @@ buildConfig {
   }
 }
 
+kotlin {
+  jvm()
+
+  sourceSets {
+    jvmMain {
+      dependencies {
+        implementation(libs.circuit)
+        implementation(libs.jewel.bridge232)
+        implementation(libs.kaml)
+        implementation(libs.kotlin.poet)
+        implementation(libs.okhttp)
+        implementation(libs.okhttp.loggingInterceptor)
+        implementation(projects.tracing)
+      }
+      jvmTest {
+        dependencies {
+          implementation(libs.junit)
+          implementation(libs.truth)
+        }
+      }
+    }
+  }
+}
+
 configure<ComposeExtension> {
   val kotlinVersion = libs.versions.kotlin.get()
   // Flag to disable Compose's kotlin version check because they're often behind
@@ -115,29 +140,21 @@ configure<ComposeExtension> {
   }
 }
 
+// Tell lint to only resolve the jvm attrs for our compose deps
+configurations
+  .named { it.endsWith("ForLint") }
+  .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
+
 dependencies {
   lintChecks(libs.composeLints)
-
   // Do not bring in Material (we use Jewel) and Coroutines (the IDE has its own)
-  implementation(compose.desktop.currentOs) {
-    exclude(group = "org.jetbrains.compose.material")
-    exclude(group = "org.jetbrains.kotlinx")
+  for (dep in listOf(compose.desktop.common, compose.desktop.linux_arm64, compose.desktop.linux_x64, compose.desktop.macos_arm64, compose.desktop.macos_x64, compose.desktop.windows_x64)) {
+    "jvmMainImplementation"(compose.desktop.common) {
+      exclude(group = "org.jetbrains.compose.material")
+      exclude(group = "org.jetbrains.kotlinx")
+    }
   }
-  //  implementation(compose.animation)
-  //  implementation(compose.foundation)
-  //  implementation(compose.material)
-  //  implementation(compose.material3)
-  //  implementation(compose.ui)
-  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
-  implementation(libs.circuit.foundation) { exclude(group = "org.jetbrains.kotlinx") }
-  implementation(libs.jewel.bridge232)
-  //  implementation(libs.gradlePlugins.compose)
-  implementation(libs.kaml)
-  implementation(libs.kotlin.poet)
-  implementation(libs.okhttp)
-  implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.tracing) { exclude(group = "org.jetbrains.kotlinx") }
-
-  testImplementation(libs.junit)
-  testImplementation(libs.truth)
+  "jvmMainImplementation"(libs.circuit.foundation) { exclude(group = "org.jetbrains.kotlinx") }
+  "jvmMainImplementation"(libs.bugsnag) { exclude(group = "org.slf4j") }
+  "jvmMainImplementation"(projects.tracing) { exclude(group = "org.jetbrains.kotlinx") }
 }

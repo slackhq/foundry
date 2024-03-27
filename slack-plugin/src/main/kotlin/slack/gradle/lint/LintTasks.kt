@@ -135,7 +135,7 @@ internal object LintTasks {
             }
         }
       }
-    project.plugins.all(projectAllAction)
+    project.plugins.configureEach(projectAllAction)
   }
 
   /** Android Lint configuration entry point for Android projects. */

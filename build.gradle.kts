@@ -34,10 +34,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 plugins {
   alias(libs.plugins.kotlin.jvm) apply false
+  alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.sam)
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
@@ -51,6 +54,7 @@ plugins {
   alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig) apply false
   alias(libs.plugins.lint) apply false
+  alias(libs.plugins.wire) apply false
 }
 
 configure<DetektExtension> {
@@ -210,6 +214,19 @@ subprojects {
       if (!isIntelliJPlugin) {
         explicitApi()
       }
+    }
+
+    // Reimplement kotlin-dsl's application of this function for nice DSLs
+    if (!isIntelliJPlugin) {
+      apply(plugin = "kotlin-sam-with-receiver")
+      configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
+    }
+
+    apply(plugin = "com.squareup.sort-dependencies")
+  }
+
+  plugins.withType<KotlinBasePlugin>().configureEach {
+    tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
         val kotlinVersion =
           if (isIntelliJPlugin) {
@@ -244,14 +261,8 @@ subprojects {
       }
     }
 
-    // Reimplement kotlin-dsl's application of this function for nice DSLs
-    apply(plugin = "kotlin-sam-with-receiver")
-    configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
-
-    apply(plugin = "com.squareup.sort-dependencies")
+    tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
   }
-
-  tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")

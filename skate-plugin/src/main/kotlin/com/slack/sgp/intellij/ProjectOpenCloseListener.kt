@@ -15,12 +15,15 @@
  */
 package com.slack.sgp.intellij
 
+import com.android.tools.idea.gradle.project.sync.GradleSyncState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
+import com.slack.sgp.intellij.idemetrics.GradleSyncSubscriber
 
 class ProjectOpenCloseListener : ProjectManagerListener {
   override fun projectOpened(project: Project) {
+    GradleSyncState.subscribe(project, GradleSyncSubscriber())
     val service = project.service<SkateProjectService>()
     service.showWhatsNewWindow()
   }

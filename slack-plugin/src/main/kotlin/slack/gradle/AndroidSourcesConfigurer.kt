@@ -15,10 +15,13 @@
  */
 package slack.gradle
 
+import com.android.build.gradle.internal.SdkLocationSourceSet
+import com.android.build.gradle.internal.SdkLocator
 import java.io.File
 import kotlin.system.measureTimeMillis
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
+import slack.gradle.agp.internal.NoOpIssueReporter
 
 /**
  * For Android SDK 30, the real sources are not published until its release. This is annoying when
@@ -35,10 +38,11 @@ internal object AndroidSourcesConfigurer {
 
   fun patchSdkSources(requestedSdkVersion: Int, rootProject: Project, latest: Int) {
     val sdkDir =
-      rootProject
-        .slackTools()
-        .agpHandler
-        .getAndroidSdkDirectory(rootProject.projectDir, rootProject.providers)
+      SdkLocator.getSdkDirectory(
+        rootProject.projectDir,
+        NoOpIssueReporter,
+        SdkLocationSourceSet(rootProject.projectDir, rootProject.providers),
+      )
     patchSdkSources(requestedSdkVersion, sdkDir, rootProject.logger, latest)
   }
 

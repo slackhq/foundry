@@ -21,7 +21,7 @@ import okio.ByteString
 import okio.ByteString.Companion.encodeUtf8
 
 /** Creates a new ID for a span or trace. */
-internal fun makeId(seed: Int? = null): ByteString = random16HexString(seed).encodeUtf8()
+public fun makeId(seed: Int? = null): ByteString = random16HexString(seed).encodeUtf8()
 
 private const val BYTES_FOR_16_HEX_DIGITS = 8
 
