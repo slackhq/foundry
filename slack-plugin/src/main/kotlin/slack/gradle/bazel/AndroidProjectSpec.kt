@@ -49,7 +49,7 @@ internal class AndroidProjectSpec(builder: Builder) :
   override fun toString(): String {
     // Write statements in roughly the order of operations for readability
     return statements {
-        val (implDeps, testDeps) = writeCommonJvmStatements()
+        val (implDeps, testDeps, plugins) = writeCommonJvmStatements()
         val fullTestDeps = buildList {
           // Ensure we depend on the lib target
           // We have to do this because there's no kt_android_local_test that supports associated
@@ -67,7 +67,7 @@ internal class AndroidProjectSpec(builder: Builder) :
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
           deps = implDeps,
-          plugins = compilerPlugins.map { BazelDependency.StringDependency(it.toString()) },
+          plugins = plugins,
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
           resources = resourceFiles,
@@ -82,7 +82,7 @@ internal class AndroidProjectSpec(builder: Builder) :
             name = CommonJvmProjectSpec.testName(name),
             associates = listOf(BazelDependency.StringDependency(":$name")),
             srcsGlob = testSrcGlobs,
-            plugins = compilerPlugins.map { BazelDependency.StringDependency(it.toString()) },
+            plugins = plugins,
             deps = fullTestDeps,
           )
         }

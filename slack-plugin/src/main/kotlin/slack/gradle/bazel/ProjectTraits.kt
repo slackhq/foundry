@@ -88,8 +88,11 @@ internal interface CommonJvmProjectSpec {
     }
 
     val compilerPlugins =
-      compilerPlugins.map { BazelDependency.StringDependency(it.toString()) } +
-        kspProcessors.map { BazelDependency.StringDependency(":${it.name}") }
+      buildList {
+          addAll(compilerPlugins.map { BazelDependency.StringDependency(it.toString()) })
+          addAll(kspProcessors.map { BazelDependency.StringDependency(":${it.name}") })
+        }
+        .sorted()
 
     return JvmRuleDependencies(implementationDeps, compositeTestDeps, compilerPlugins)
   }
