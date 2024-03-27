@@ -66,8 +66,7 @@ internal interface CommonJvmProjectSpec {
   val kspProcessors: List<KspProcessor>
 
   @CheckReturnValue
-  fun StatementsBuilder.writeCommonJvmStatements():
-    Pair<List<BazelDependency>, List<BazelDependency>> {
+  fun StatementsBuilder.writeCommonJvmStatements(): JvmRuleDependencies {
     val implementationDeps =
       (deps + compilerPlugins).map { BazelDependency.StringDependency(it.toString()) }.sorted()
 
@@ -88,7 +87,11 @@ internal interface CommonJvmProjectSpec {
       writeKspRule(processor)
     }
 
-    return implementationDeps to compositeTestDeps
+    val compilerPlugins =
+      compilerPlugins.map { BazelDependency.StringDependency(it.toString()) } +
+        kspProcessors.map { BazelDependency.StringDependency(":${it.name}") }
+
+    return JvmRuleDependencies(implementationDeps, compositeTestDeps, compilerPlugins)
   }
 
   @Suppress("UNCHECKED_CAST")
@@ -126,6 +129,12 @@ internal interface CommonJvmProjectSpec {
 
     fun addKspProcessor(processor: KspProcessor): T = apply { kspProcessors.add(processor) } as T
   }
+
+  data class JvmRuleDependencies(
+    val deps: List<BazelDependency>,
+    val testDeps: List<BazelDependency>,
+    val plugins: List<BazelDependency>,
+  )
 
   companion object {
     private const val TEST_TARGET = "test"

@@ -773,7 +773,7 @@ constructor(
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
-  private val compilerOptions: ListProperty<String> =
+  internal val compilerOptions: ListProperty<String> =
     objects.listProperty<String>().convention(slackProperties.composeCommonCompilerOptions)
 
   /**

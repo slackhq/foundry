@@ -63,7 +63,7 @@ internal class JvmProjectSpec(builder: Builder) :
 
     // Write statements in roughly the order of operations for readability
     return statements {
-        val (implDeps, testDeps) = writeCommonJvmStatements()
+        val (implDeps, testDeps, plugins) = writeCommonJvmStatements()
 
         slackKtLibrary(
           name = name,
@@ -72,7 +72,7 @@ internal class JvmProjectSpec(builder: Builder) :
           srcsGlob = srcGlobs,
           visibility = Visibility.Public,
           deps = implDeps,
-          plugins = kspProcessors.map { BazelDependency.StringDependency(":${it.name}") },
+          plugins = plugins,
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
         )
@@ -85,7 +85,7 @@ internal class JvmProjectSpec(builder: Builder) :
             associates = listOf(BazelDependency.StringDependency(":$name")),
             kotlinProjectType = KotlinProjectType.Jvm,
             srcsGlob = testSrcGlobs,
-            plugins = kspProcessors.map { BazelDependency.StringDependency(":${it.name}") },
+            plugins = plugins,
             deps = testDeps,
           )
         }

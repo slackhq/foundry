@@ -127,11 +127,12 @@ internal fun StatementsBuilder.slackKtTest(
   }
 }
 
+@Suppress("UNREACHABLE_CODE", "UNUSED_PARAMETER")
 internal fun StatementsBuilder.slackKtAndroidLocalTest(
   name: String,
   srcs: List<String> = emptyList(),
   srcsGlob: List<String> = emptyList(),
-  @Suppress("UNUSED_PARAMETER") associates: List<BazelDependency> = emptyList(),
+  associates: List<BazelDependency> = emptyList(),
   deps: List<BazelDependency> = emptyList(),
   plugins: List<BazelDependency> = emptyList(),
   customPackage: String? = null,
@@ -139,6 +140,7 @@ internal fun StatementsBuilder.slackKtAndroidLocalTest(
   tags: List<String> = emptyList(),
 ) {
   // TODO no kt_android_local_test https://github.com/bazelbuild/rules_kotlin/issues/375
+  return
   load("@rules_android//android:rules.bzl", "android_local_test")
   rule("android_local_test") {
     "name" `=` name.quote
@@ -146,9 +148,9 @@ internal fun StatementsBuilder.slackKtAndroidLocalTest(
     srcsGlob.notEmpty { "srcs" `=` glob(srcsGlob.map(String::quote)) }
     deps.notEmpty { "deps" `=` array(deps.map(BazelDependency::toString).map(String::quote)) }
     // TODO https://github.com/bazelbuild/rules_kotlin/issues/375
-    //    associates.notEmpty {
-    //      "associates" `=` array(associates.map(BazelDependency::toString).map(String::quote))
-    //    }
+    associates.notEmpty {
+      "associates" `=` array(associates.map(BazelDependency::toString).map(String::quote))
+    }
     plugins.notEmpty {
       "plugins" `=` array(plugins.map(BazelDependency::toString).map(String::quote))
     }
@@ -189,6 +191,7 @@ internal fun StatementsBuilder.kspProcessor(
 }
 
 internal object CompilerPluginDeps {
+  val compose = Dep.Local("third_party", target = "jetpack_compose_compiler_plugin")
   val moshix = Dep.Local("third_party", target = "moshix")
   val redacted = Dep.Local("third_party", target = "redacted")
   val parcelize = Dep.Local("third_party", target = "parcelize")
