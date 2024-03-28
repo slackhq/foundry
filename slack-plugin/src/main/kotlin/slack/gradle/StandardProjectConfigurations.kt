@@ -655,6 +655,7 @@ internal class StandardProjectConfigurations(
           // and then warns about them ending up in the JavaCompile tasks even though they're
           // not on the classpath. This works around that by clearing out that field before it
           // tries to merge them in with annotationProcessorArtifacts.
+          // https://issuetracker.google.com/issues/331806519
           CACHED_KSP_ARTIFACTS_FIELD.set(this, null)
         }
       }
