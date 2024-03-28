@@ -32,6 +32,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.BuildType
+import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import com.slapin.napt.JvmArgsStrongEncapsulation
@@ -691,6 +692,18 @@ internal class StandardProjectConfigurations(
       }
     }
 
+    pluginManager.withPlugin("com.android.base") {
+      tasks.withType(JavaPreCompileTask::class.java).configureEach {
+        doFirst {
+          // JavaPreCompileTask incorrectly reads annotation processors from the ksp classpath
+          // and then warns about them ending up in the JavaCompile tasks even though they're
+          // not on the classpath. This works around that by clearing out that field before it
+          // tries to merge them in with annotationProcessorArtifacts.
+          CACHED_KSP_ARTIFACTS_FIELD.set(this, null)
+        }
+      }
+    }
+
     pluginManager.withPlugin("com.android.test") {
       configure<TestExtension> {
         slackExtension.setAndroidExtension(this)
@@ -1146,6 +1159,11 @@ internal class StandardProjectConfigurations(
   }
 
   companion object {
+    private val CACHED_KSP_ARTIFACTS_FIELD =
+      JavaPreCompileTask::class.java.getDeclaredField("kspProcessorArtifacts").apply {
+        isAccessible = true
+      }
+
     private val APT_OPTION_CONFIGS: Map<String, AptOptionsConfig> =
       AptOptionsConfigs().associateBy { it.targetDependency }
 
