@@ -15,12 +15,14 @@
  */
 package com.slack.sgp.intellij.projectgen
 
+import androidx.compose.material.DropdownMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.intellij.openapi.diagnostic.logger
 import com.slack.circuit.runtime.presenter.Presenter
 import java.io.File
 import org.apache.commons.io.FileExistsException
@@ -105,6 +107,26 @@ internal class ProjectGenPresenter(
     )
 
   private val circuit = CheckboxElement(false, name = "Circuit", hint = "Enables Circuit")
+  private val circuitFeatureName =
+    TextElement(
+      "",
+      "Circuit Feature Name (optional)",
+      description =
+      "",
+      indentLevel = 3,
+      initialVisibility = false,
+      dependentElements = listOf(circuit),
+    )
+
+  private val circuitFeatureTemplate =
+    DropdownElement(
+      initialVisibility = false,
+      label = "Using templates:",
+      indentLevel = 3,
+      selectedText = "Circuit Presenter and Compose UI",
+      dropdownList = listOf("Circuit Presenter and Compose UI", "Circuit Presenter (without UI)")
+    )
+
 
   private val compose = CheckboxElement(false, name = "Compose", hint = "Enables Jetpack Compose.")
 
@@ -126,6 +148,8 @@ internal class ProjectGenPresenter(
       daggerRuntimeOnly,
       compose,
       circuit,
+      circuitFeatureName,
+      circuitFeatureTemplate
     )
 
   @Composable
@@ -137,6 +161,8 @@ internal class ProjectGenPresenter(
     robolectric.isVisible = android.isChecked
     androidTest.isVisible = android.isChecked
     daggerRuntimeOnly.isVisible = dagger.isChecked
+    circuitFeatureName.isVisible = circuit.isChecked
+    circuitFeatureTemplate.isVisible = circuit.isChecked && circuitFeatureName.value.isNotBlank()
 
     var showDoneDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -180,6 +206,8 @@ internal class ProjectGenPresenter(
     robolectric.reset()
     compose.reset()
     circuit.reset()
+    circuitFeatureTemplate.reset()
+    circuitFeatureName.reset()
   }
 
   private fun generate() {
@@ -206,6 +234,8 @@ internal class ProjectGenPresenter(
       compose = compose.isChecked,
       androidTest = androidTest.isChecked,
       circuit = circuit.isChecked,
+      circuitFeatureName = circuitFeatureName.value,
+      circuitFeatureTemplate = circuitFeatureTemplate.selectedText
     )
   }
 
@@ -223,6 +253,8 @@ internal class ProjectGenPresenter(
     compose: Boolean,
     androidTest: Boolean,
     circuit: Boolean,
+    circuitFeatureName: String,
+    circuitFeatureTemplate: String,
   ) {
     val features = mutableListOf<Feature>()
     val androidLibraryEnabled =
@@ -252,7 +284,10 @@ internal class ProjectGenPresenter(
     }
 
     if (circuit) {
-      features += CircuitFeature
+      features += CircuitFeature(packageName, circuitFeatureName, circuitFeatureTemplate)
+      logger<ProjectGenPresenter>().info("HERERE")
+      logger<ProjectGenPresenter>().info(circuitFeatureName)
+      logger<ProjectGenPresenter>().info(circuitFeatureTemplate)
     }
 
     val buildFile = BuildFile(emptyList())

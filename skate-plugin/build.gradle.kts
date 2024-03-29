@@ -98,6 +98,11 @@ buildConfig {
   }
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+  kotlinOptions {
+    freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+  }
+}
 configure<ComposeExtension> {
   val kotlinVersion = libs.versions.kotlin.get()
   // Flag to disable Compose's kotlin version check because they're often behind

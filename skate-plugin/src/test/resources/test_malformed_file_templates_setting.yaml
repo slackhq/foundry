@@ -1,0 +1,5 @@
+templates:
+  - name: Template1
+
+  - name: Template2
+    file_name_suffix: Test

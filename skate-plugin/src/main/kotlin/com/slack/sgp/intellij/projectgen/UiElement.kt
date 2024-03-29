@@ -21,6 +21,8 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.intellij.openapi.diagnostic.logger
+import com.slack.sgp.intellij.projectgen.ProjectGenPresenter
 
 @Stable
 internal sealed interface UiElement {
@@ -53,6 +55,20 @@ internal class CheckboxElement(
   }
 
   override var isVisible: Boolean by mutableStateOf(isVisible)
+}
+
+internal class DropdownElement(
+  val initialVisibility: Boolean,
+  val label: String,
+  val indentLevel: Int = 0,
+  val dropdownList: List<String>,
+  var selectedText: String,
+) : UiElement {
+  override var isVisible: Boolean by mutableStateOf(initialVisibility)
+  override fun reset() {
+    isVisible = initialVisibility
+  }
+
 }
 
 @Suppress("LongParameterList")

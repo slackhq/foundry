@@ -1,17 +1,17 @@
 templates:
-  - name: Circuit Presenter + Compose UI
+  - name: Circuit Presenter and Compose UI
     file_name_suffix: Screen
 
-  - name: Circuit Presenter + Compose UI.child.0
+  - name: Circuit Presenter and Compose UI.child.0
     file_name_suffix: PresenterTest
 
-  - name: Circuit Presenter + Compose UI.child.1
+  - name: Circuit Presenter and Compose UI.child.1
     file_name_suffix: UiTest
 
-  - name: Circuit Presenter + Compose UI.child.2
+  - name: Circuit Presenter and Compose UI.child.2
     file_name_suffix: Presenter
 
-  - name: Circuit Presenter + Compose UI.child.3
+  - name: Circuit Presenter and Compose UI.child.3
     file_name_suffix: Ui
 
   - name: Circuit Presenter (without UI)

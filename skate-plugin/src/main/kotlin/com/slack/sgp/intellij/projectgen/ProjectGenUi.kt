@@ -33,20 +33,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.intellij.openapi.diagnostic.logger
+import slack.tooling.projectgen.*
 import slack.tooling.projectgen.CheckboxElement
 import slack.tooling.projectgen.DividerElement
 import slack.tooling.projectgen.SectionElement
@@ -55,6 +53,7 @@ import slack.tooling.projectgen.TextElement
 private const val INDENT_SIZE = 16 // dp
 
 // @OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
   if (state.showDoneDialog) {
@@ -120,6 +119,39 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                       !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*")),
                 )
                 element.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+              }
+            }
+            is DropdownElement -> {
+              var expanded by remember { mutableStateOf(false) }
+              Box(Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)) {
+                IconButton(onClick = { expanded = false }) {
+                  Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More"
+                  )
+                }
+
+                ExposedDropdownMenuBox(
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded },
+                ) {
+
+                  logger<ProjectGenPresenter>().info("LINHHHH")
+                  TextField(
+                    value = element.selectedText,
+                    label = { Text(element.label) },
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor()
+                  )
+
+                  ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    element.dropdownList.forEach { item ->
+                      DropdownMenuItem(text = {Text(item)}, onClick = { expanded = false; element.selectedText = item })
+                    }
+                  }
+                }
               }
             }
           }
