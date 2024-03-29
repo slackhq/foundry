@@ -55,7 +55,7 @@
                     class="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
                     text="Slack Subproject"
                     description="Create new Slack subproject">
-                <add-to-group group-id="NewGroup" anchor="first"/>
+                <add-to-group group-id="NewGroup" anchor="after" relative-to-action="Kotlin.NewFile"/>
             </action>
             <action id="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature" class="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature">
                 <add-to-group group-id="NewGroup" anchor="before" relative-to-action="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"/>

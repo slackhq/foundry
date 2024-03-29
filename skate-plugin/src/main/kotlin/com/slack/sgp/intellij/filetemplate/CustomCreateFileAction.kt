@@ -5,6 +5,7 @@ import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.fileTemplates.FileTemplateUtil
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDirectory
@@ -22,14 +23,18 @@ abstract class CustomCreateFileAction(title: String, desc: String, icon: Icon) :
 
   public override fun createFileFromTemplate(name: String, template: FileTemplate, dir: PsiDirectory): PsiFile? {
     val templateSettings = loadTemplateSettings()
+    logger<CustomCreateFileAction>().info("LINHH")
+    logger<CustomCreateFileAction>().info(templateSettings.toString())
     val properties = FileTemplateManager.getInstance(dir.project).defaultProperties.apply {
       setProperty("NAME", name)
     }
     val templates = listOf(template) + getTemplateChildren(dir.project, template)
 
-    return templates.firstNotNullOfOrNull { fileTemplate ->
-      createFileForTemplate(fileTemplate, name, dir, properties, templateSettings)
+    val createdFiles = mutableListOf<PsiFile?>()
+    templates.forEach { fileTemplate ->
+      createdFiles.add(createFileForTemplate(fileTemplate, name, dir, properties, templateSettings))
     }
+    return createdFiles.firstOrNull()
   }
 
   private fun createFileForTemplate(
@@ -46,7 +51,9 @@ abstract class CustomCreateFileAction(title: String, desc: String, icon: Icon) :
 
   private fun getTemplateChildren(project: Project, template: FileTemplate): List<FileTemplate> {
     val allTemplate = FileTemplateManager.getInstance(project).allJ2eeTemplates
-    return allTemplate.filter { it.name.contains("child") and it.name.contains(template.name) }
+    val filtered =  allTemplate.filter { it.name.contains("child") && it.name.contains(template.name) }
+    return filtered
+
   }
 
   private fun loadTemplateSettings(): Map<String, TemplateSetting> {
