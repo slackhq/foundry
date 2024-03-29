@@ -6,7 +6,7 @@ import com.charleskorn.kaml.decodeFromStream
 import java.io.InputStream
 
 
-class FileTemplateFactory(inputStream: InputStream) {
+class SettingsParser(inputStream: InputStream) {
     private var templates: Map<String, TemplateSetting>? = null
 
     init {

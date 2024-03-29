@@ -16,14 +16,11 @@
 package slack.tooling.projectgen
 
 import com.intellij.ide.fileTemplates.FileTemplateManager
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiManager
 import com.slack.sgp.intellij.filetemplate.CreateCircuitFeature
-import com.slack.sgp.intellij.filetemplate.model.FileTemplateFactory
-import com.slack.sgp.intellij.projectgen.ProjectGenPresenter
 import com.squareup.kotlinpoet.FileSpec
 import java.io.File
 
@@ -314,6 +311,7 @@ internal class CircuitFeature(val packageName: String, val circuitFeatureName: S
     val testFolder = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(mainSrcDir)
     val psiDir = testFolder?.let { PsiManager.getInstance(project).findDirectory(it) } as PsiDirectory
     if (template != null) {
+      FileTemplateManager.getInstance(project).defaultProperties.setProperty("PACKAGE_NAME", packageName)
       CreateCircuitFeature().createFileFromTemplate(circuitFeatureName, template, psiDir)
     }
   }
