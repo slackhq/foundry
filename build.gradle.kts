@@ -407,7 +407,13 @@ subprojects {
       baseline = project.layout.projectDirectory.file("lint-baseline.xml").asFile
     }
     project.dependencies.add("lintChecks", libs.slackLints.checks)
-    project.dependencies.add("implementation", libs.slackLints.annotations)
+    val configToAdd =
+      if (pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+        "jvmMainCompileOnly"
+      } else {
+        "compileOnly"
+      }
+    afterEvaluate { project.dependencies.add(configToAdd, libs.slackLints.annotations) }
   }
 }
 

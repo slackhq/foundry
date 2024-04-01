@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.projectgen
+package slack.tooling.projectgen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring.StiffnessMediumLow
@@ -42,19 +42,73 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import slack.tooling.projectgen.CheckboxElement
-import slack.tooling.projectgen.DividerElement
-import slack.tooling.projectgen.SectionElement
-import slack.tooling.projectgen.TextElement
+import com.slack.circuit.foundation.Circuit
+import com.slack.circuit.foundation.CircuitContent
+import com.slack.circuit.runtime.ui.ui
+import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
+import javax.swing.JComponent
+import kotlin.io.path.absolutePathString
 
 private const val INDENT_SIZE = 16 // dp
 
-// @OptIn(ExperimentalMaterial3Api::class)
+object ProjectGenUi {
+  @Stable
+  interface Events {
+    fun doOKAction()
+
+    fun dismissDialogAndSync()
+  }
+
+  fun createPanel(
+    projectPath: Path,
+    isDark: Boolean,
+    width: Int,
+    height: Int,
+    events: Events,
+  ): JComponent {
+    return ComposePanel().apply {
+      setBounds(0, 0, width, height)
+      setContent { DialogContent(projectPath, isDark, events) }
+    }
+  }
+
+  @Composable
+  private fun DialogContent(projectPath: Path, isDark: Boolean, events: Events) {
+    val rootDir = remember {
+      val path = projectPath.toAbsolutePath().normalize().absolutePathString()
+      check(Paths.get(path).toFile().isDirectory) { "Must pass a valid directory" }
+      path
+    }
+    File("$rootDir/.projectgenlock").createNewFile()
+
+    val circuit = remember {
+      Circuit.Builder()
+        .addPresenterFactory { _, _, _ ->
+          ProjectGenPresenter(
+            rootDir = rootDir,
+            onDismissDialog = events::doOKAction,
+            onSync = events::dismissDialogAndSync,
+          )
+        }
+        .addUiFactory { _, _ ->
+          ui<ProjectGenScreen.State> { state, modifier -> ProjectGen(state, modifier) }
+        }
+        .build()
+    }
+    SlackDesktopTheme(isDark) { CircuitContent(ProjectGenScreen, circuit = circuit) }
+  }
+}
+
 @Composable
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
   if (state.showDoneDialog) {
