@@ -35,7 +35,7 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
       addTag(SkateTracingEvent.Indexing.SCANNING_TYPE.name, history.times.scanningType.name)
       addTag(
         SkateTracingEvent.Indexing.UPDATING_TIME.name,
-        history.times.totalUpdatingTime.toMillis()
+        history.times.totalUpdatingTime.toMillis(),
       )
       addTag(SkateTracingEvent.Indexing.WAS_INTERRUPTED.name, history.times.wasInterrupted)
       addTag(
@@ -44,11 +44,11 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
       )
       addTag(
         SkateTracingEvent.Indexing.DUMB_MODE_WITHOUT_PAUSE_DURATION.name,
-        history.times.dumbModeWithoutPausesDuration.toMillis()
+        history.times.dumbModeWithoutPausesDuration.toMillis(),
       )
       addTag(
         SkateTracingEvent.Indexing.PAUSED_DURATION.name,
-        history.times.pausedDuration.toMillis()
+        history.times.pausedDuration.toMillis(),
       )
       addTag("event", SkateTracingEvent.Indexing.INDEXING_COMPLETED.name)
     }
@@ -59,8 +59,8 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
         history.times.updatingStart.toInstant(),
         skateSpanBuilder.getKeyValueList(),
       )
-
   }
+
   override fun onFinishedDumbIndexing(history: ProjectDumbIndexingHistory) {
     val currentProject = history.project
     if (!currentProject.isTracingEnabled()) return
