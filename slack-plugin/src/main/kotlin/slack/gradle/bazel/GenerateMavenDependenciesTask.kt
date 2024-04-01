@@ -15,10 +15,13 @@
  */
 package slack.gradle.bazel
 
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.SetProperty
@@ -30,7 +33,9 @@ import slack.gradle.findByType
 import slack.gradle.register
 
 @UntrackedTask(because = "This is an on-demand task")
-public abstract class GenerateMavenDependenciesTask : DefaultTask() {
+public abstract class GenerateMavenDependenciesTask
+@Inject
+constructor(layout: ProjectLayout, objects: ObjectFactory) : DefaultTask() {
 
   @get:Input public abstract val mavenArtifacts: MapProperty<String, String>
   @get:Input public abstract val forcedMavenArtifacts: ListProperty<String>
@@ -42,7 +47,11 @@ public abstract class GenerateMavenDependenciesTask : DefaultTask() {
    */
   @get:Input public abstract val suffixMappings: MapProperty<String, String>
 
-  @get:OutputFile public abstract val outputFile: RegularFileProperty
+  @get:OutputFile
+  public val outputFile: RegularFileProperty =
+    objects
+      .fileProperty()
+      .convention(layout.projectDirectory.dir("third_party").file("maven_dependencies.bzl"))
 
   init {
     group = "bazel"
@@ -157,9 +166,6 @@ public abstract class GenerateMavenDependenciesTask : DefaultTask() {
             )
           }
         }
-        outputFile.set(
-          project.layout.projectDirectory.dir("third_party").file("maven_dependencies.bzl")
-        )
       }
     }
   }
