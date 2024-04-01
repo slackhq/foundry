@@ -18,6 +18,9 @@ import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
 import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.intellij.tasks.PrepareSandboxTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -48,7 +51,10 @@ intellij {
   plugins.add("org.jetbrains.android")
 }
 
-kotlin { compilerOptions { optIn.add("kotlin.RequiresOptIn") } }
+kotlin {
+  @OptIn(ExperimentalKotlinGradlePluginApi::class)
+  compilerOptions { optIn.add("kotlin.RequiresOptIn") }
+}
 
 fun isGitHash(hash: String): Boolean {
   if (hash.length != 40) {
@@ -115,6 +121,20 @@ kotlin {
         implementation(libs.kotlin.poet)
         implementation(libs.okhttp)
         implementation(libs.okhttp.loggingInterceptor)
+        implementation(libs.okio)
+        for (dep in
+          listOf(
+            compose.desktop.common,
+            compose.desktop.linux_arm64,
+            compose.desktop.linux_x64,
+            compose.desktop.macos_arm64,
+            compose.desktop.macos_x64,
+            compose.desktop.windows_x64,
+          )) {
+          implementation(dep)
+        }
+        implementation(libs.circuit.foundation)
+        implementation(libs.bugsnag)
         implementation(projects.tracing)
       }
       jvmTest {
@@ -126,6 +146,48 @@ kotlin {
     }
   }
 }
+
+// <editor-fold desc="Workarounds for the intellij gradle plugin not really understanding
+// kotlin/multiplatform">
+val jarTask = tasks.named<Jar>("jvmJar")
+
+tasks.withType<PrepareSandboxTask>().configureEach {
+  pluginJar.set(jarTask.flatMap { it.archiveFile })
+}
+
+configurations
+  .named { it == "jvmCompileClasspath" }
+  .configureEach { extendsFrom(configurations.named("compileClasspath").get()) }
+
+configurations
+  .named { it == "jvmCompileOnly" }
+  .configureEach { extendsFrom(configurations.named("compileOnly").get()) }
+
+configurations
+  .named { it == "jvmImplementation" }
+  .configureEach { extendsFrom(configurations.named("implementation").get()) }
+
+configurations
+  .named { it == "jvmTestCompileClasspath" }
+  .configureEach { extendsFrom(configurations.named("testCompileClasspath").get()) }
+
+// So the test sandbox sees everything
+tasks.withType<PrepareSandboxTask>().configureEach {
+  runtimeClasspathFiles.set(configurations.named("jvmRuntimeClasspath"))
+}
+
+// So process resources properly pulls in stuff from the patchPluginXml task
+tasks.withType<ProcessResources>().configureEach {
+  val patchPluginXmlTaskProvider = project.tasks.named<PatchPluginXmlTask>("patchPluginXml")
+
+  from(patchPluginXmlTaskProvider) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    into("META-INF")
+  }
+
+  dependsOn(patchPluginXmlTaskProvider)
+}
+// </editor-fold>
 
 configure<ComposeExtension> {
   val kotlinVersion = libs.versions.kotlin.get()
@@ -145,16 +207,15 @@ configurations
   .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
-dependencies {
-  lintChecks(libs.composeLints)
-  // Do not bring in Material (we use Jewel) and Coroutines (the IDE has its own)
-  for (dep in listOf(compose.desktop.common, compose.desktop.linux_arm64, compose.desktop.linux_x64, compose.desktop.macos_arm64, compose.desktop.macos_x64, compose.desktop.windows_x64)) {
-    "jvmMainImplementation"(compose.desktop.common) {
-      exclude(group = "org.jetbrains.compose.material")
-      exclude(group = "org.jetbrains.kotlinx")
-    }
+configurations
+  .named { it == "jvmRuntimeClasspath" || it == "jvmMainImplementation" }
+  .configureEach {
+    // Do not bring in Material (we use Jewel) and Coroutines (the IDE has its own)
+    exclude(group = "org.jetbrains.compose.material")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
+    exclude(group = "org.slf4j")
   }
-  "jvmMainImplementation"(libs.circuit.foundation) { exclude(group = "org.jetbrains.kotlinx") }
-  "jvmMainImplementation"(libs.bugsnag) { exclude(group = "org.slf4j") }
-  "jvmMainImplementation"(projects.tracing) { exclude(group = "org.jetbrains.kotlinx") }
-}
+
+dependencies { lintChecks(libs.composeLints) }
