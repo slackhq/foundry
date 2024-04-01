@@ -32,7 +32,7 @@ import org.jetbrains.intellij.tasks.BuildPluginTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_6
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -208,16 +208,16 @@ subprojects {
     tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
-  val isIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
+  val isForIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     extensions.configure<KotlinJvmProjectExtension> {
-      if (!isIntelliJPlugin) {
+      if (!isForIntelliJPlugin) {
         explicitApi()
       }
     }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
-    if (!isIntelliJPlugin) {
+    if (!isForIntelliJPlugin) {
       apply(plugin = "kotlin-sam-with-receiver")
       configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
     }
@@ -229,15 +229,15 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
         val kotlinVersion =
-          if (isIntelliJPlugin) {
-            KOTLIN_1_6
+          if (isForIntelliJPlugin) {
+            KOTLIN_1_8
           } else {
             KOTLIN_1_9
           }
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
 
-        if (!isIntelliJPlugin) {
+        if (!isForIntelliJPlugin) {
           // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
           // this sometimes. https://github.com/gradle/gradle/issues/16345
           allWarningsAsErrors.set(false)
@@ -311,7 +311,7 @@ subprojects {
     }
   }
 
-  if (isIntelliJPlugin) {
+  if (isForIntelliJPlugin) {
     project.pluginManager.withPlugin("org.jetbrains.intellij") {
       configure<IntelliJPluginExtension> {
         version.set("2022.2.5")
