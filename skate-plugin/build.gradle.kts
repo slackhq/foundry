@@ -17,6 +17,7 @@ import com.jetbrains.plugin.structure.base.utils.exists
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
@@ -105,6 +106,10 @@ configurations
     exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
     exclude(group = "org.slf4j")
   }
+
+configurations
+  .named { it.endsWith("ForLint") }
+  .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
 dependencies {
   lintChecks(libs.composeLints)
