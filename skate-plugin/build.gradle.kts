@@ -96,6 +96,16 @@ buildConfig {
   }
 }
 
+configurations
+  .named { it == "runtimeClasspath" }
+  .configureEach {
+    // Do not bring Coroutines or slf4j (the IDE has its own)
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
+    exclude(group = "org.slf4j")
+  }
+
 dependencies {
   lintChecks(libs.composeLints)
 

@@ -314,7 +314,7 @@ subprojects {
   if (isForIntelliJPlugin) {
     project.pluginManager.withPlugin("org.jetbrains.intellij") {
       configure<IntelliJPluginExtension> {
-        version.set("2022.2.5")
+        version.set("2023.2.1")
         type.set("IC")
         // Don't assign untilBuild to sinceBuild
         updateSinceUntilBuild.set(false)
