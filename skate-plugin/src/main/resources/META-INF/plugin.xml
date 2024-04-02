@@ -55,6 +55,7 @@
                 text="Slack Subproject"
                 description="Create a new Slack subproject">
             <add-to-group group-id="NewGroup" anchor="last"/>
+            <keyboard-shortcut first-keystroke="control shift P" keymap="$default"/>
         </action>
     </actions>
 
