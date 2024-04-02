@@ -15,10 +15,8 @@
  */
 package slack.tooling.projectgen
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring.StiffnessMediumLow
-import androidx.compose.animation.core.spring
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,13 +27,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,7 +49,6 @@ import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
-import org.jetbrains.jewel.foundation.theme.LocalContentColor
 import org.jetbrains.jewel.ui.Orientation
 import org.jetbrains.jewel.ui.component.Checkbox
 import org.jetbrains.jewel.ui.component.DefaultButton
@@ -70,12 +68,18 @@ object ProjectGenUi {
   fun createPanel(rootDir: String, width: Int, height: Int, events: Events): JComponent {
     return ComposePanel().apply {
       setBounds(0, 0, width, height)
-      setContent { ProjectGenApp(rootDir, events) }
+      setContent {
+        ProjectGenApp(rootDir, events) { content -> SlackDesktopTheme(content = content) }
+      }
     }
   }
 
   @Composable
-  private fun ProjectGenApp(rootDir: String, events: Events) {
+  internal fun ProjectGenApp(
+    rootDir: String,
+    events: Events,
+    render: @Composable (content: @Composable () -> Unit) -> Unit,
+  ) {
     val circuit = remember {
       Circuit.Builder()
         .addPresenterFactory { _, _, _ ->
@@ -90,12 +94,13 @@ object ProjectGenUi {
         }
         .build()
     }
-    SlackDesktopTheme { CircuitContent(ProjectGenScreen, circuit = circuit) }
+    render { CircuitContent(ProjectGenScreen, circuit = circuit) }
   }
 }
 
 private const val INDENT_SIZE = 16 // dp
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
   if (state.showDoneDialog) {
@@ -114,24 +119,19 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
       onConfirm = { state.eventSink(ProjectGenScreen.Event.Reset) },
     )
   }
-  val scrollState = rememberScrollState(0)
   Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
-    CompositionLocalProvider(LocalContentColor provides JewelTheme.globalColors.infoContent) {
-      Column(
-        Modifier.padding(16.dp)
-          .verticalScroll(scrollState)
-          .animateContentSize(spring(stiffness = StiffnessMediumLow)),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-      ) {
-        for (element in state.uiElements) {
-          if (!element.isVisible) continue
+    val listState = rememberLazyListState()
+    Box(Modifier.padding(16.dp)) {
+      LazyColumn(state = listState, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        val visibleItems = state.uiElements.filter { it.isVisible }
+        items(visibleItems) { element ->
           when (element) {
             DividerElement -> {
               Divider(Orientation.Horizontal)
             }
             is SectionElement -> {
-              Column {
-                Text(element.title, style = Typography.h0TextStyle())
+              Column(Modifier.animateItemPlacement()) {
+                Text(element.title, style = Typography.h1TextStyle())
                 Text(element.description)
               }
             }
@@ -140,16 +140,21 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 element.name,
                 element.hint,
                 element.isChecked,
+                modifier = Modifier.animateItemPlacement(),
                 indent = (element.indentLevel * INDENT_SIZE).dp,
                 onEnabledChange = { element.isChecked = it },
               )
             }
             is TextElement -> {
-              Column(Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)) {
-                //                val isError =
-                //                  element.value.isNotEmpty() &&
-                //                    !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*"))
+              Column(
+                Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)
+                  .animateItemPlacement()
+              ) {
+                // val isError =
+                //   element.value.isNotEmpty() &&
+                //     !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*"))
                 Text(text = element.label, style = Typography.h4TextStyle())
+                Spacer(Modifier.height(4.dp))
                 TextField(
                   value = element.value,
                   onValueChange = { newValue -> element.value = newValue },
@@ -161,23 +166,34 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                   //                  singleLine = true,
                   //                  outline = if (isError) Outline.Error else Outline.None,
                 )
-                element.description?.let { Text(it) }
+                element.description?.let {
+                  Spacer(Modifier.height(4.dp))
+                  Text(it)
+                }
               }
             }
           }
         }
+      }
+      // TODO need to buffer this under the above content
+      Box(
+        Modifier.background(JewelTheme.globalColors.paneBackground)
+          .fillMaxWidth()
+          .padding(16.dp)
+          .align(Alignment.BottomCenter),
+        contentAlignment = Alignment.CenterEnd,
+      ) {
         DefaultButton(
-          modifier = Modifier.fillMaxWidth(),
           enabled = state.canGenerate,
           onClick = { state.eventSink(ProjectGenScreen.Event.Generate) },
           content = { Text("Generate") },
         )
       }
-      VerticalScrollbar(
-        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-        adapter = rememberScrollbarAdapter(scrollState),
-      )
     }
+    VerticalScrollbar(
+      modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+      adapter = rememberScrollbarAdapter(listState),
+    )
   }
 }
 
