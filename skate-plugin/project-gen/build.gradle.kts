@@ -40,7 +40,8 @@ kotlin {
         implementation(compose.material)
         implementation(compose.material3)
         implementation(compose.ui)
-        implementation(libs.circuit)
+        implementation(libs.circuit.foundation)
+        implementation(libs.jewel.bridge232)
         implementation(libs.kotlin.poet)
       }
     }

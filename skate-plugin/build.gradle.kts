@@ -33,6 +33,8 @@ group = "com.slack.intellij"
 repositories {
   mavenCentral()
   google()
+  maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -100,6 +102,8 @@ buildConfig {
 configurations
   .named { it == "runtimeClasspath" }
   .configureEach {
+    // Do not bring in Material (we use Jewel)
+    exclude(group = "org.jetbrains.compose.material")
     // Do not bring Coroutines or slf4j (the IDE has its own)
     exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")

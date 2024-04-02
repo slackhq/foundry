@@ -66,10 +66,15 @@ internal class TextElement(
   private val initialVisibility: Boolean = true,
   // List of tags this element depends on
   private val dependentElements: List<CheckboxElement> = emptyList(),
+  val validationRegex: Regex? = null,
 ) : UiElement {
   var value by mutableStateOf(initialValue)
 
   val enabled by derivedStateOf { !readOnly && dependentElements.all { it.isChecked } }
+
+  val isValid by derivedStateOf {
+    validationRegex?.let { value.isNotBlank() && value.matches(it) } != false
+  }
 
   override fun reset() {
     value = initialValue
