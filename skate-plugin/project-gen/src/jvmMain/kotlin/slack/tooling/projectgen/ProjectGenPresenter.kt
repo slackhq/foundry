@@ -139,7 +139,7 @@ internal class ProjectGenPresenter(
       uiElements = uiElements,
       showDoneDialog = showDoneDialog,
       showErrorDialog = showErrorDialog,
-      canGenerate = path.value.isNotBlank() && packageName.value.isNotBlank(),
+      canGenerate = path.isValid && packageName.isValid,
     ) { event ->
       when (event) {
         ProjectGenScreen.Event.Quit -> onDismissDialog()

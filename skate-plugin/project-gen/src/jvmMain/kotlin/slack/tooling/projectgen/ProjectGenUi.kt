@@ -155,23 +155,18 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)
                   .animateItemPlacement()
               ) {
-                val isError =
-                  if (element.validationRegex != null) {
-                    element.value.isNotEmpty() && !element.value.matches(element.validationRegex)
-                  } else {
-                    false
-                  }
                 Text(text = element.label, style = Typography.h4TextStyle())
                 Spacer(Modifier.height(4.dp))
                 TextField(
                   value = element.value,
                   onValueChange = { newValue -> element.value = newValue },
+                  modifier = Modifier.fillMaxWidth(),
                   readOnly = element.readOnly,
                   enabled = element.enabled,
                   visualTransformation =
                     element.prefixTransformation?.let(::PrefixTransformation)
                       ?: VisualTransformation.None,
-                  outline = if (isError) Outline.Error else Outline.None,
+                  outline = if (element.isValid) Outline.None else Outline.Error,
                 )
                 element.description?.let {
                   Spacer(Modifier.height(4.dp))

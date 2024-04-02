@@ -72,6 +72,10 @@ internal class TextElement(
 
   val enabled by derivedStateOf { !readOnly && dependentElements.all { it.isChecked } }
 
+  val isValid by derivedStateOf {
+    validationRegex?.let { value.isNotBlank() && value.matches(it) } != false
+  }
+
   override fun reset() {
     value = initialValue
     isVisible = initialVisibility
