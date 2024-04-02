@@ -20,28 +20,36 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.JBColor
-import java.io.File
 import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
+import kotlin.io.path.absolutePathString
 import slack.tooling.projectgen.ProjectGenUi
 
-class ProjectGenWindow(private val currentProject: Project?, private val event: AnActionEvent) :
+class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent) :
   DialogWrapper(currentProject), ProjectGenUi.Events {
+
+  private val projectPath =
+    (currentProject.basePath?.let(Paths::get) ?: FileSystems.getDefault().getPath("."))
+      .normalize()
+      .also { check(Files.isDirectory(it)) { "Must pass a valid directory" } }
+  private val lockFile: Path
 
   init {
     init()
     title = "Project Generator"
+    lockFile = projectPath.resolve(".projectgenlock")
+    deleteProjectLock()
+    Files.createFile(lockFile)
   }
 
   override fun createCenterPanel(): JComponent {
     setSize(600, 800)
     return ProjectGenUi.createPanel(
-      projectPath =
-        currentProject?.basePath?.let(Paths::get) ?: FileSystems.getDefault().getPath("."),
-      isDark = !JBColor.isBright(),
+      rootDir = projectPath.absolutePathString(),
       width = 600,
       height = 800,
       events = this,
@@ -71,9 +79,6 @@ class ProjectGenWindow(private val currentProject: Project?, private val event: 
   }
 
   private fun deleteProjectLock() {
-    val projectLockFile = File(currentProject?.basePath + "/.projectgenlock")
-    if (projectLockFile.exists()) {
-      projectLockFile.delete()
-    }
+    Files.deleteIfExists(lockFile)
   }
 }

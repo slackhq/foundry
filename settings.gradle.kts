@@ -62,6 +62,9 @@ dependencyResolutionManagement {
       }
     }
 
+    maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+
     exclusiveContent {
       forRepository {
         // For R8/D8 releases
@@ -122,6 +125,9 @@ pluginManagement {
         includeGroupByRegex("org\\.jetbrains.*")
       }
     }
+
+    maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 
     // Gradle's plugin portal proxies jcenter, which we don't want. To avoid this, we specify
     // exactly which dependencies to pull from here.

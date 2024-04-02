@@ -25,21 +25,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -50,16 +44,20 @@ import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
-import java.io.File
-import java.nio.file.Path
-import java.nio.file.Paths
 import javax.swing.JComponent
-import kotlin.io.path.absolutePathString
-
-private const val INDENT_SIZE = 16 // dp
+import org.jetbrains.jewel.foundation.theme.JewelTheme
+import org.jetbrains.jewel.foundation.theme.LocalContentColor
+import org.jetbrains.jewel.ui.Orientation
+import org.jetbrains.jewel.ui.component.Checkbox
+import org.jetbrains.jewel.ui.component.DefaultButton
+import org.jetbrains.jewel.ui.component.Divider
+import org.jetbrains.jewel.ui.component.Text
+import org.jetbrains.jewel.ui.component.TextField
+import org.jetbrains.jewel.ui.component.Typography
 
 object ProjectGenUi {
   @Stable
@@ -69,28 +67,15 @@ object ProjectGenUi {
     fun dismissDialogAndSync()
   }
 
-  fun createPanel(
-    projectPath: Path,
-    isDark: Boolean,
-    width: Int,
-    height: Int,
-    events: Events,
-  ): JComponent {
+  fun createPanel(rootDir: String, width: Int, height: Int, events: Events): JComponent {
     return ComposePanel().apply {
       setBounds(0, 0, width, height)
-      setContent { DialogContent(projectPath, isDark, events) }
+      setContent { ProjectGenApp(rootDir, events) }
     }
   }
 
   @Composable
-  private fun DialogContent(projectPath: Path, isDark: Boolean, events: Events) {
-    val rootDir = remember {
-      val path = projectPath.toAbsolutePath().normalize().absolutePathString()
-      check(Paths.get(path).toFile().isDirectory) { "Must pass a valid directory" }
-      path
-    }
-    File("$rootDir/.projectgenlock").createNewFile()
-
+  private fun ProjectGenApp(rootDir: String, events: Events) {
     val circuit = remember {
       Circuit.Builder()
         .addPresenterFactory { _, _, _ ->
@@ -105,9 +90,11 @@ object ProjectGenUi {
         }
         .build()
     }
-    SlackDesktopTheme(isDark) { CircuitContent(ProjectGenScreen, circuit = circuit) }
+    SlackDesktopTheme { CircuitContent(ProjectGenScreen, circuit = circuit) }
   }
 }
+
+private const val INDENT_SIZE = 16 // dp
 
 @Composable
 internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modifier) {
@@ -128,8 +115,8 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
     )
   }
   val scrollState = rememberScrollState(0)
-  Box(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
+  Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+    CompositionLocalProvider(LocalContentColor provides JewelTheme.globalColors.infoContent) {
       Column(
         Modifier.padding(16.dp)
           .verticalScroll(scrollState)
@@ -140,12 +127,12 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
           if (!element.isVisible) continue
           when (element) {
             DividerElement -> {
-              HorizontalDivider()
+              Divider(Orientation.Horizontal)
             }
             is SectionElement -> {
               Column {
-                Text(element.title, style = MaterialTheme.typography.titleLarge)
-                Text(element.description, style = MaterialTheme.typography.bodySmall)
+                Text(element.title, style = Typography.h0TextStyle())
+                Text(element.description)
               }
             }
             is CheckboxElement -> {
@@ -159,26 +146,27 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
             }
             is TextElement -> {
               Column(Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)) {
+                //                val isError =
+                //                  element.value.isNotEmpty() &&
+                //                    !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*"))
+                Text(text = element.label, style = Typography.h4TextStyle())
                 TextField(
-                  element.value,
-                  label = { Text(element.label) },
+                  value = element.value,
                   onValueChange = { newValue -> element.value = newValue },
+                  readOnly = element.readOnly,
+                  enabled = element.enabled,
                   visualTransformation =
                     element.prefixTransformation?.let(::PrefixTransformation)
                       ?: VisualTransformation.None,
-                  readOnly = element.readOnly,
-                  enabled = element.enabled,
-                  singleLine = true,
-                  isError =
-                    element.value.isNotEmpty() &&
-                      !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*")),
+                  //                  singleLine = true,
+                  //                  outline = if (isError) Outline.Error else Outline.None,
                 )
-                element.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                element.description?.let { Text(it) }
               }
             }
           }
         }
-        Button(
+        DefaultButton(
           modifier = Modifier.fillMaxWidth(),
           enabled = state.canGenerate,
           onClick = { state.eventSink(ProjectGenScreen.Event.Generate) },
@@ -204,9 +192,10 @@ private fun Feature(
 ) {
   Row(modifier.padding(start = indent), verticalAlignment = Alignment.CenterVertically) {
     Checkbox(checked = enabled, onCheckedChange = onEnabledChange)
+    Spacer(Modifier.width(8.dp))
     Column {
-      Text(name)
-      Text(text = hint, style = MaterialTheme.typography.bodySmall)
+      Text(name, style = Typography.h4TextStyle())
+      Text(text = hint)
     }
   }
 }
@@ -231,11 +220,13 @@ private fun StatusDialog(
 ) {
   // No M3 AlertDialog in compose-jb yet
   // https://github.com/JetBrains/compose-multiplatform/issues/2037
-  @Suppress("ComposeM2Api")
-  (AlertDialog(
-    onDismissRequest = { onQuit() },
-    confirmButton = { Button(onClick = { onConfirm() }) { Text(confirmButtonText) } },
-    dismissButton = { Button(onClick = { onQuit() }) { Text("Close") } },
-    text = { Text(text) },
-  ))
+  Popup(onDismissRequest = { onQuit() }) {
+    Column {
+      Text(text)
+      Row {
+        DefaultButton(onClick = { onConfirm() }) { Text(confirmButtonText) }
+        DefaultButton(onClick = { onQuit() }) { Text("Close") }
+      }
+    }
+  }
 }
