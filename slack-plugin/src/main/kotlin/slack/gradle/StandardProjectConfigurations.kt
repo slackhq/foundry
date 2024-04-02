@@ -344,6 +344,8 @@ internal class StandardProjectConfigurations(
     platformProject: String,
   ) {
     configurations.configureEach {
+      if (!isCanBeDeclared) return@configureEach
+
       if (Configurations.isTest(name) && Configurations.isApi(name)) {
         // Don't add dependencies to testApi configurations as these are never used
         // https://youtrack.jetbrains.com/issue/KT-61653
