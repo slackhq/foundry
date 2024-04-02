@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.projectgen
+package slack.tooling.projectgen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,15 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
 import java.io.File
-import org.apache.commons.io.FileExistsException
 import slack.tooling.projectgen.*
-import slack.tooling.projectgen.CheckboxElement
-import slack.tooling.projectgen.ComposeFeature
-import slack.tooling.projectgen.DaggerFeature
-import slack.tooling.projectgen.DividerElement
-import slack.tooling.projectgen.KotlinFeature
-import slack.tooling.projectgen.SectionElement
-import slack.tooling.projectgen.TextElement
 
 internal class ProjectGenPresenter(
   private val rootDir: String,
@@ -41,18 +33,20 @@ internal class ProjectGenPresenter(
   private val path =
     TextElement(
       "",
-      "Path (Required)",
+      "Gradle Path",
       description = "The Gradle-style project path (e.g. ':emoji')",
       prefixTransformation = ":",
+      validationRegex = Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])+"),
     )
 
   private val packageName =
     TextElement(
       "",
-      "Package Name (Required)",
+      "Package Name",
       description =
         "The project package name (must start with 'slack.') This is used for both source packages and android.namespace.",
       prefixTransformation = "slack.",
+      validationRegex = Regex("[A-Za-z0-9.]+"),
     )
 
   private val android =
@@ -110,12 +104,12 @@ internal class ProjectGenPresenter(
 
   private val uiElements =
     mutableStateListOf(
-      SectionElement("Path Details", "Required"),
+      SectionElement("Path Details", "(Required)"),
       TextElement(rootDir, "Project root dir", readOnly = true),
       path,
       packageName,
       DividerElement,
-      SectionElement("Features", "Select all that apply"),
+      SectionElement("Features", "(Select all that apply)"),
       android,
       androidResources,
       androidResourcePrefix,
@@ -145,7 +139,7 @@ internal class ProjectGenPresenter(
       uiElements = uiElements,
       showDoneDialog = showDoneDialog,
       showErrorDialog = showErrorDialog,
-      canGenerate = path.value.isNotBlank() && packageName.value.isNotBlank(),
+      canGenerate = path.isValid && packageName.isValid,
     ) { event ->
       when (event) {
         ProjectGenScreen.Event.Quit -> onDismissDialog()
@@ -156,10 +150,9 @@ internal class ProjectGenPresenter(
           resetElements()
         }
         ProjectGenScreen.Event.Generate -> {
-          try {
-            generate()
+          if (generate()) {
             showDoneDialog = true
-          } catch (e: FileExistsException) {
+          } else {
             showDoneDialog = false
             showErrorDialog = true
           }
@@ -182,8 +175,8 @@ internal class ProjectGenPresenter(
     circuit.reset()
   }
 
-  private fun generate() {
-    generate(
+  private fun generate(): Boolean {
+    return generate(
       rootDir = File(rootDir),
       path = ":${path.value}",
       packageName = "slack.${packageName.value}",
@@ -223,7 +216,7 @@ internal class ProjectGenPresenter(
     compose: Boolean,
     androidTest: Boolean,
     circuit: Boolean,
-  ) {
+  ): Boolean {
     val features = mutableListOf<Feature>()
     val androidLibraryEnabled =
       android && (androidFeatures.isNotEmpty() || androidTest || androidResourcePrefix != null)
@@ -259,10 +252,11 @@ internal class ProjectGenPresenter(
     val readMeFile = ReadMeFile()
 
     val project = Project(path, buildFile, readMeFile, features)
-    if (project.checkValidPath(rootDir)) {
+    return if (project.checkValidPath(rootDir)) {
       project.writeTo(rootDir)
+      true
     } else {
-      throw FileExistsException()
+      false
     }
   }
 }

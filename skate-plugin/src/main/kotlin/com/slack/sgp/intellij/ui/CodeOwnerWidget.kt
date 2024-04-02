@@ -21,8 +21,8 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.vfs.VirtualFile
@@ -47,7 +47,11 @@ class CodeOwnerWidget(project: Project) :
       FileEditorManagerListener.FILE_EDITOR_MANAGER,
       object : FileEditorManagerListener {
         override fun selectionChanged(event: FileEditorManagerEvent) {
-          this@CodeOwnerWidget.selectionChanged(event)
+          // Set the current selected file from the FileEditorManagerEvent.newFile VirtualFile.
+          // We don't worry if it's null as that may be expected
+          // and will lead to the widget displaying "none" owners.
+          currentSelectedFile = event.newFile
+          myStatusBar?.updateWidget(ID())
         }
       },
     )
@@ -62,19 +66,11 @@ class CodeOwnerWidget(project: Project) :
 
   override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 
-  override fun selectionChanged(event: FileEditorManagerEvent) {
-    // Set the current selected file from the FileEditorManagerEvent.newFile VirtualFile.
-    // We don't worry if it's null as that may be expected
-    // and will lead to the widget displaying "none" owners.
-    currentSelectedFile = event.newFile
-    myStatusBar?.updateWidget(ID())
-  }
-
   override fun getTooltipText() = "Click to show in code_ownership yaml"
 
   override fun getClickConsumer() = null
 
-  override fun getPopupStep(): ListPopup? {
+  override fun getPopup(): JBPopup? {
     val owners = getCurrentCodeOwnerInfo()
     return when (owners.size) {
       1 -> {

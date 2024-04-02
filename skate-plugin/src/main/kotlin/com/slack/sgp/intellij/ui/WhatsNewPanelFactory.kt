@@ -27,9 +27,9 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.AlignY
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.util.ui.HtmlPanel
 import com.intellij.util.ui.JBUI
@@ -133,12 +133,7 @@ class WhatsNewPanelFactory : DumbAware {
               }
             }
           panel {
-            row {
-                scrollCell(htmlPanel)
-                  .horizontalAlign(HorizontalAlign.FILL)
-                  .verticalAlign(VerticalAlign.FILL)
-              }
-              .resizableRow()
+            row { scrollCell(htmlPanel).align(AlignX.FILL).align(AlignY.FILL) }.resizableRow()
           }
         }
 

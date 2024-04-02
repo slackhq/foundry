@@ -50,7 +50,7 @@ class AuthConfig :
         textField()
           .enabledIf(checkboxItem.selected)
           .bindText(getter = { settings.url.orEmpty() }, setter = { settings.url = it })
-          .validation { text ->
+          .validationInfo { text ->
             if (text.text.isEmpty()) {
               error("URL cannot be empty")
             } else {

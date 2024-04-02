@@ -44,14 +44,15 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
     return FeatureFlagExtractor.extractFeatureFlags(file)
   }
 
-  override fun doAnnotate(collectedInfo: List<FeatureFlagSymbol>): List<FeatureFlagSymbol> =
+  override fun doAnnotate(collectedInfo: List<FeatureFlagSymbol>?): List<FeatureFlagSymbol>? =
     collectedInfo
 
   override fun apply(
     file: PsiFile,
-    annotationResult: List<FeatureFlagSymbol>,
+    annotationResult: List<FeatureFlagSymbol>?,
     holder: AnnotationHolder,
   ) {
+    if (annotationResult == null) return
     for (symbol in annotationResult) {
       val message = "Open at: ${symbol.url}"
       holder

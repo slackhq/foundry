@@ -15,71 +15,45 @@
  */
 package com.slack.sgp.intellij.projectgen
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.awt.ComposePanel
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.slack.circuit.foundation.Circuit
-import com.slack.circuit.foundation.CircuitContent
-import com.slack.circuit.runtime.ui.ui
-import java.io.File
 import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
+import kotlin.io.path.absolutePathString
+import slack.tooling.projectgen.ProjectGenUi
 
-@Stable
-class ProjectGenWindow(private val currentProject: Project?, private val event: AnActionEvent) :
-  DialogWrapper(currentProject) {
+class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent) :
+  DialogWrapper(currentProject), ProjectGenUi.Events {
+
+  private val projectPath =
+    (currentProject.basePath?.let(Paths::get) ?: FileSystems.getDefault().getPath("."))
+      .normalize()
+      .also { check(Files.isDirectory(it)) { "Must pass a valid directory" } }
+  private val lockFile: Path
+
   init {
     init()
     title = "Project Generator"
+    lockFile = projectPath.resolve(".projectgenlock")
+    deleteProjectLock()
+    Files.createFile(lockFile)
   }
 
   override fun createCenterPanel(): JComponent {
     setSize(600, 800)
-    return ComposePanel().apply {
-      setBounds(0, 0, 600, 800)
-      setContent { DialogContent() }
-    }
-  }
-
-  @Composable
-  fun DialogContent() {
-    val rootDir = remember {
-      val path =
-        currentProject?.basePath
-          ?: FileSystems.getDefault()
-            .getPath(".")
-            .toAbsolutePath()
-            .normalize()
-            .toFile()
-            .absolutePath
-      check(Paths.get(path).toFile().isDirectory) { "Must pass a valid directory" }
-      path
-    }
-    File("$rootDir/.projectgenlock").createNewFile()
-
-    val circuit = remember {
-      Circuit.Builder()
-        .addPresenterFactory { _, _, _ ->
-          ProjectGenPresenter(
-            rootDir = rootDir,
-            onDismissDialog = ::doOKAction,
-            onSync = ::dismissDialogAndSync,
-          )
-        }
-        .addUiFactory { _, _ ->
-          ui<ProjectGenScreen.State> { state, modifier -> ProjectGen(state, modifier) }
-        }
-        .build()
-    }
-    SlackDesktopTheme() { CircuitContent(ProjectGenScreen, circuit = circuit) }
+    return ProjectGenUi.createPanel(
+      rootDir = projectPath.absolutePathString(),
+      width = 600,
+      height = 800,
+      events = this,
+    )
   }
 
   /* Disable default OK and Cancel action button in Dialog window. */
@@ -97,7 +71,7 @@ class ProjectGenWindow(private val currentProject: Project?, private val event: 
     deleteProjectLock()
   }
 
-  private fun dismissDialogAndSync() {
+  override fun dismissDialogAndSync() {
     doOKAction()
     val am: ActionManager = ActionManager.getInstance()
     val sync: AnAction = am.getAction("Android.SyncProject")
@@ -105,9 +79,6 @@ class ProjectGenWindow(private val currentProject: Project?, private val event: 
   }
 
   private fun deleteProjectLock() {
-    val projectLockFile = File(currentProject?.basePath + "/.projectgenlock")
-    if (projectLockFile.exists()) {
-      projectLockFile.delete()
-    }
+    Files.deleteIfExists(lockFile)
   }
 }
