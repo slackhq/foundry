@@ -50,6 +50,7 @@ import com.slack.circuit.runtime.ui.ui
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.Orientation
+import org.jetbrains.jewel.ui.Outline
 import org.jetbrains.jewel.ui.component.Checkbox
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.Divider
@@ -121,8 +122,12 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
   }
   Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
     val listState = rememberLazyListState()
-    Box(Modifier.padding(16.dp)) {
-      LazyColumn(state = listState, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(Modifier.padding(16.dp)) {
+      LazyColumn(
+        modifier = Modifier.weight(1f),
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
         val visibleItems = state.uiElements.filter { it.isVisible }
         items(visibleItems) { element ->
           when (element) {
@@ -150,9 +155,12 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)
                   .animateItemPlacement()
               ) {
-                // val isError =
-                //   element.value.isNotEmpty() &&
-                //     !element.value.matches(Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])*"))
+                val isError =
+                  if (element.validationRegex != null) {
+                    element.value.isNotEmpty() && !element.value.matches(element.validationRegex)
+                  } else {
+                    false
+                  }
                 Text(text = element.label, style = Typography.h4TextStyle())
                 Spacer(Modifier.height(4.dp))
                 TextField(
@@ -163,8 +171,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                   visualTransformation =
                     element.prefixTransformation?.let(::PrefixTransformation)
                       ?: VisualTransformation.None,
-                  //                  singleLine = true,
-                  //                  outline = if (isError) Outline.Error else Outline.None,
+                  outline = if (isError) Outline.Error else Outline.None,
                 )
                 element.description?.let {
                   Spacer(Modifier.height(4.dp))
@@ -175,12 +182,11 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
           }
         }
       }
-      // TODO need to buffer this under the above content
+      Divider(Orientation.Horizontal)
       Box(
         Modifier.background(JewelTheme.globalColors.paneBackground)
           .fillMaxWidth()
-          .padding(16.dp)
-          .align(Alignment.BottomCenter),
+          .padding(top = 16.dp, start = 16.dp, end = 16.dp),
         contentAlignment = Alignment.CenterEnd,
       ) {
         DefaultButton(

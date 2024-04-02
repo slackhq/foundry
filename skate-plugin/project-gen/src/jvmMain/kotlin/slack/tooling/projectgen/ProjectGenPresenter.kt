@@ -36,6 +36,7 @@ internal class ProjectGenPresenter(
       "Path (Required)",
       description = "The Gradle-style project path (e.g. ':emoji')",
       prefixTransformation = ":",
+      validationRegex = Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])+"),
     )
 
   private val packageName =
@@ -45,6 +46,7 @@ internal class ProjectGenPresenter(
       description =
         "The project package name (must start with 'slack.') This is used for both source packages and android.namespace.",
       prefixTransformation = "slack.",
+      validationRegex = Regex("[A-Za-z0-9.]+"),
     )
 
   private val android =

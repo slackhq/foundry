@@ -66,6 +66,7 @@ internal class TextElement(
   private val initialVisibility: Boolean = true,
   // List of tags this element depends on
   private val dependentElements: List<CheckboxElement> = emptyList(),
+  val validationRegex: Regex? = null,
 ) : UiElement {
   var value by mutableStateOf(initialValue)
 
