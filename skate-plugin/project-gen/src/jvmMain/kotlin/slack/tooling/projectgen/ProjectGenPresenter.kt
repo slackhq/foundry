@@ -33,7 +33,7 @@ internal class ProjectGenPresenter(
   private val path =
     TextElement(
       "",
-      "Path (Required)",
+      "Gradle Path",
       description = "The Gradle-style project path (e.g. ':emoji')",
       prefixTransformation = ":",
       validationRegex = Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])+"),
@@ -42,7 +42,7 @@ internal class ProjectGenPresenter(
   private val packageName =
     TextElement(
       "",
-      "Package Name (Required)",
+      "Package Name",
       description =
         "The project package name (must start with 'slack.') This is used for both source packages and android.namespace.",
       prefixTransformation = "slack.",
@@ -104,12 +104,12 @@ internal class ProjectGenPresenter(
 
   private val uiElements =
     mutableStateListOf(
-      SectionElement("Path Details", "Required"),
+      SectionElement("Path Details", "(Required)"),
       TextElement(rootDir, "Project root dir", readOnly = true),
       path,
       packageName,
       DividerElement,
-      SectionElement("Features", "Select all that apply"),
+      SectionElement("Features", "(Select all that apply)"),
       android,
       androidResources,
       androidResourcePrefix,
