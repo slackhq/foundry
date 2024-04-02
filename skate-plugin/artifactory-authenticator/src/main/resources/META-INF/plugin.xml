@@ -15,7 +15,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <pluginRepositoryAuthProvider
                 implementation="com.slack.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
-        <projectConfigurable instance="com.slack.intellij.artifactory.AuthConfig"/>
+        <projectConfigurable
+                displayName="Artifactory Auth"
+                instance="com.slack.intellij.artifactory.AuthConfig"/>
     </extensions>
 
     <!-- Workaround for https://youtrack.jetbrains.com/issue/IDEA-315487 -->

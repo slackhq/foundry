@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.projectgen
+package slack.tooling.projectgen
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
-import com.intellij.ui.JBColor
 
 private val FONT_FAMILY = FontFamily.Default
 
 @Composable
-fun SlackDesktopTheme(useDarkMode: Boolean = !JBColor.isBright(), content: @Composable () -> Unit) {
+fun SlackDesktopTheme(useDarkMode: Boolean, content: @Composable () -> Unit) {
   val typography =
     MaterialTheme.typography.copy(
       displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = FONT_FAMILY),

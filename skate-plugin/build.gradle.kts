@@ -17,16 +17,14 @@ import com.jetbrains.plugin.structure.base.utils.exists
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
-import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
-  alias(libs.plugins.kotlin.multiplatform)
+  alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
-  alias(libs.plugins.compose)
   alias(libs.plugins.lint)
 }
 
@@ -99,60 +97,30 @@ buildConfig {
   }
 }
 
-kotlin {
-  jvm()
-
-  sourceSets {
-    jvmMain {
-      dependencies {
-        implementation(compose.animation)
-        implementation(compose.desktop.common)
-        implementation(compose.desktop.linux_arm64)
-        implementation(compose.desktop.linux_x64)
-        implementation(compose.desktop.macos_arm64)
-        implementation(compose.desktop.macos_x64)
-        implementation(compose.desktop.windows_x64)
-        implementation(compose.foundation)
-        implementation(compose.material)
-        implementation(compose.material3)
-        implementation(compose.ui)
-        implementation(libs.circuit)
-        implementation(libs.gradlePlugins.compose)
-        implementation(libs.kaml)
-        implementation(libs.kotlin.poet)
-        implementation(libs.okhttp)
-        implementation(libs.okhttp.loggingInterceptor)
-        implementation(projects.tracing)
-      }
-      jvmTest {
-        dependencies {
-          implementation(libs.junit)
-          implementation(libs.truth)
-        }
-      }
-    }
+configurations
+  .named { it == "runtimeClasspath" }
+  .configureEach {
+    // Do not bring Coroutines or slf4j (the IDE has its own)
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
+    exclude(group = "org.slf4j")
   }
-}
 
-configure<ComposeExtension> {
-  val kotlinVersion = libs.versions.kotlin.get()
-  // Flag to disable Compose's kotlin version check because they're often behind
-  // Or ahead
-  // Or if they're the same, do nothing
-  // It's basically just very noisy.
-  kotlinCompilerPlugin.set(libs.compose.compilerJb.map { it.toString() })
-  val suppressComposeKotlinVersion = kotlinVersion != libs.versions.compose.jb.kotlinVersion.get()
-  if (suppressComposeKotlinVersion) {
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
-  }
-}
-
-// Tell lint to only resolve the jvm attrs for our compose deps
 configurations
   .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
 dependencies {
   lintChecks(libs.composeLints)
-  "jvmMainImplementation"(libs.bugsnag) { exclude(group = "org.slf4j") }
+
+  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.kaml)
+  implementation(libs.okhttp)
+  implementation(libs.okhttp.loggingInterceptor)
+  implementation(projects.skatePlugin.projectGen)
+  implementation(projects.tracing)
+
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
 }

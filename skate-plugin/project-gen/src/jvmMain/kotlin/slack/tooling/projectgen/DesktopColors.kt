@@ -15,7 +15,7 @@
  */
 @file:Suppress("MagicNumber")
 
-package com.slack.sgp.intellij.projectgen
+package slack.tooling.projectgen
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
