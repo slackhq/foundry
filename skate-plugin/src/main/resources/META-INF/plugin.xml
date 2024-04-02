@@ -50,12 +50,22 @@
     </projectListeners>
 
     <actions>
-        <action id="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
-                class="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
-                text="Slack Subproject"
-                description="Create a new Slack subproject">
-            <add-to-group group-id="NewGroup" anchor="last"/>
-        </action>
+        <group id="SlackGroup">
+            <separator/>
+            <action id="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
+                    class="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
+                    text="Slack Subproject"
+                    description="Create a new Slack subproject">
+                <add-to-group group-id="NewGroup" anchor="after" relative-to-action="Kotlin.NewFile"/>
+            </action>
+            <action id="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature" class="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature">
+                <add-to-group group-id="NewGroup" anchor="before" relative-to-action="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"/>
+            </action>
+            <action id="com.slack.sgp.intellij.filetemplate.UdfViewModelMigrate" class="com.slack.sgp.intellij.filetemplate.UdfViewModelMigrate">
+                <add-to-group group-id="NewGroup" anchor="after" relative-to-action="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature"/>
+            </action>
+            <separator/>
+        </group>
     </actions>
 
 </idea-plugin>
