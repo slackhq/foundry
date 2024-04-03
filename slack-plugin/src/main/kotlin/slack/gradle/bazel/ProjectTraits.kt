@@ -151,8 +151,8 @@ internal interface CommonJvmProjectSpec {
   )
 
   companion object {
-    private const val TEST_TARGET = "test"
-    private const val KSP_TARGET = "_ksp"
+    private const val TEST_TARGET = "test_target"
+    private const val KSP_TARGET = "ksp_target"
 
     /** Some projects are named "test", so we have to disambiguate. */
     fun testName(projectName: String) = if (projectName == TEST_TARGET) "test_" else TEST_TARGET
