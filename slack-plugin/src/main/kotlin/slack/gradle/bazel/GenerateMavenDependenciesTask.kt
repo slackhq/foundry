@@ -91,8 +91,6 @@ constructor(layout: ProjectLayout, objects: ObjectFactory) : DefaultTask() {
         .values
         .associate { it.substringBefore(':') to it.substringAfterLast(':') }
 
-    logger.lifecycle("Boms are ${boms}")
-
     val mavenArtifacts =
       allArtifacts
         .filterKeys { it !in excludedKeys }
@@ -104,9 +102,9 @@ constructor(layout: ProjectLayout, objects: ObjectFactory) : DefaultTask() {
             if (version == "null") {
               boms[group].also {
                 if (it == null) {
-                  logger.lifecycle("Could not find bom for $group")
-                } else {
-                  logger.lifecycle("Found bom for $group")
+                  logger.error(
+                    "Could not find bom for $group and artifact is missing version: $artifact."
+                  )
                 }
               }
             } else {
