@@ -31,7 +31,9 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 import slack.gradle.bazel.Dep.Local.Companion.toBazelPath
@@ -72,6 +74,7 @@ internal class AndroidProjectSpec(builder: Builder) :
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
           resources = resourceFiles,
           resourceFiles = listOf(glob(resourceFilesGlobs.map(String::quote))),
+          kotlincOptions = freeCompilerArgs,
           // TODO
           //  assets
           //  viewbinding
@@ -110,6 +113,7 @@ internal class AndroidProjectSpec(builder: Builder) :
     override val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
     override val compilerPlugins = mutableListOf<Dep>()
     override val kspProcessors = mutableListOf<KspProcessor>()
+    override val freeCompilerArgs = mutableListOf<String>()
 
     fun manifest(manifest: String) = apply { this.manifest = manifest }
 
@@ -166,6 +170,7 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
       kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
       namespace: Provider<String>,
+      kotlinCompilation: TaskProvider<KotlinCompile>,
     ) {
       // TODO multiple variants?
       project.tasks.register<AndroidProjectBazelTask>("generateBazel") {
@@ -192,6 +197,7 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
           kspConfiguration,
           kaptConfiguration,
           slackExtension,
+          kotlinCompilation,
         )
       }
     }

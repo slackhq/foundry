@@ -32,15 +32,18 @@ import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
 import org.gradle.internal.component.local.model.PublishArtifactLocalArtifactMetadata
 import org.jetbrains.annotations.CheckReturnValue
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 
@@ -64,6 +67,7 @@ internal interface CommonJvmProjectSpec {
   val testSrcGlobs: List<String>
   val compilerPlugins: List<Dep>
   val kspProcessors: List<KspProcessor>
+  val freeCompilerArgs: List<String>
 
   @CheckReturnValue
   fun StatementsBuilder.writeCommonJvmStatements(): JvmRuleDependencies {
@@ -83,14 +87,18 @@ internal interface CommonJvmProjectSpec {
         .filterNot { it.toString() == compileTarget }
         .sorted()
 
-    for (processor in kspProcessors) {
-      writeKspRule(processor)
+    // TODO capture ksp options
+    if (kspProcessors.isNotEmpty()) {
+      val allDeps = kspProcessors.flatMapTo(mutableSetOf()) { it.deps }
+      kspProcessor(KSP_TARGET, "ignored", allDeps.map(BazelDependency::StringDependency).sorted())
     }
 
     val compilerPlugins =
       buildList {
           addAll(compilerPlugins.map { BazelDependency.StringDependency(it.toString()) })
-          addAll(kspProcessors.map { BazelDependency.StringDependency(":${it.name}") })
+          if (kspProcessors.isNotEmpty()) {
+            add(BazelDependency.StringDependency(":$KSP_TARGET"))
+          }
         }
         .sorted()
 
@@ -110,6 +118,7 @@ internal interface CommonJvmProjectSpec {
     val testSrcGlobs: MutableList<String>
     val compilerPlugins: MutableList<Dep>
     val kspProcessors: MutableList<KspProcessor>
+    val freeCompilerArgs: MutableList<String>
 
     fun ruleSource(source: String): T = apply { ruleSource = source } as T
 
@@ -131,6 +140,8 @@ internal interface CommonJvmProjectSpec {
     fun addCompilerPlugin(plugin: Dep): T = apply { compilerPlugins.add(plugin) } as T
 
     fun addKspProcessor(processor: KspProcessor): T = apply { kspProcessors.add(processor) } as T
+
+    fun addFreeCompilerArg(arg: String): T = apply { freeCompilerArgs.add(arg) } as T
   }
 
   data class JvmRuleDependencies(
@@ -141,6 +152,7 @@ internal interface CommonJvmProjectSpec {
 
   companion object {
     private const val TEST_TARGET = "test"
+    private const val KSP_TARGET = "_ksp"
 
     /** Some projects are named "test", so we have to disambiguate. */
     fun testName(projectName: String) = if (projectName == TEST_TARGET) "test_" else TEST_TARGET
@@ -168,6 +180,7 @@ private class CommonJvmProjectSpecImpl(builder: CommonJvmProjectSpec.Builder<*>)
   override val testSrcGlobs: List<String> = builder.testSrcGlobs.toList()
   override val compilerPlugins = builder.compilerPlugins.toList()
   override val kspProcessors = builder.kspProcessors.toList()
+  override val freeCompilerArgs = builder.freeCompilerArgs.toList()
 }
 
 internal interface CommonJvmProjectBazelTask : Task {
@@ -184,6 +197,7 @@ internal interface CommonJvmProjectBazelTask : Task {
   @get:Input val kaptDeps: SetProperty<ComponentArtifactIdentifier>
   @get:Input val compilerPlugins: SetProperty<Dep>
   @get:Input val kspProcessors: SetProperty<KspProcessor>
+  @get:Input val freeCompilerArgs: ListProperty<String>
 
   // Features
   @get:Optional @get:Input val moshix: Property<Boolean>
@@ -318,6 +332,7 @@ internal interface CommonJvmProjectBazelTask : Task {
     kspConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
     kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
     slackExtension: SlackExtension,
+    kotlinCompilation: TaskProvider<KotlinCompile>?,
   ) {
     targetName.set(project.name)
     projectPath.set(project.path)
@@ -333,6 +348,9 @@ internal interface CommonJvmProjectBazelTask : Task {
     redacted.set(slackExtension.featuresHandler.redacted)
     parcelize.set(project.pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.parcelize"))
     autoService.set(slackExtension.featuresHandler.autoService)
+    kotlinCompilation?.let {
+      this.freeCompilerArgs.addAll(it.flatMap { it.compilerOptions.freeCompilerArgs })
+    }
   }
 
   companion object {

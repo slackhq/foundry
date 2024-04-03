@@ -59,6 +59,7 @@ internal fun StatementsBuilder.slackKtLibrary(
   exportedDeps: List<BazelDependency> = emptyList(),
   resources: List<String> = emptyList(),
   resourceFiles: List<Assignee> = emptyList(),
+  kotlincOptions: List<String> = emptyList(),
   manifest: String? = null,
   plugins: List<BazelDependency> = emptyList(),
   assetsGlob: List<String> = emptyList(),
@@ -95,6 +96,7 @@ internal fun StatementsBuilder.slackKtLibrary(
       "assets" `=` glob(assetsGlob.quote)
       "assets_dir" `=` assetsDir.quote
     }
+    kotlincOptions.notEmpty { "kt_kotlinc_options" `=` array(kotlincOptions.map(String::quote)) }
 
     tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
   }

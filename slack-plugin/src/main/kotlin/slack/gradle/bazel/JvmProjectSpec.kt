@@ -24,7 +24,9 @@ import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvableConfiguration
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.gradle.SlackExtension
 import slack.gradle.SlackProperties
 import slack.gradle.bazel.Dep.Local.Companion.toBazelPath
@@ -75,6 +77,7 @@ internal class JvmProjectSpec(builder: Builder) :
           plugins = plugins,
           exportedDeps =
             exportedDeps.sorted().map { BazelDependency.StringDependency(it.toString()) },
+          kotlincOptions = freeCompilerArgs,
         )
 
         if (hasTests) {
@@ -104,6 +107,7 @@ internal class JvmProjectSpec(builder: Builder) :
     override val testSrcGlobs = mutableListOf("src/test/**/*.kt", "src/test/**/*.java")
     override val compilerPlugins = mutableListOf<Dep>()
     override val kspProcessors = mutableListOf<KspProcessor>()
+    override val freeCompilerArgs = mutableListOf<String>()
 
     fun build(): JvmProjectSpec = JvmProjectSpec(this)
   }
@@ -135,6 +139,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
       kspConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
+      kotlinCompilation: TaskProvider<KotlinCompile>,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
         configureCommonJvm(
@@ -146,6 +151,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
           kspConfiguration,
           kaptConfiguration,
           slackExtension,
+          kotlinCompilation,
         )
       }
     }

@@ -67,6 +67,7 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import slack.dependencyrake.RakeDependencies
 import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
 import slack.gradle.AptOptionsConfigs.invoke
@@ -329,6 +330,7 @@ internal class StandardProjectConfigurations(
             kspConfiguration = kspConfig,
             kaptConfiguration = kaptConfig,
             slackExtension = slackExtension,
+            kotlinCompilation = tasks.named("compileKotlin", KotlinCompile::class.java),
           )
         }
       }
@@ -930,27 +932,30 @@ internal class StandardProjectConfigurations(
               } else {
                 null
               }
-            AndroidProjectBazelTask.register(
-              project = project,
-              slackProperties = slackProperties,
-              // TODO need to also include compile classpath?
-              //
-              // configurations.getByName("releaseRuntimeElements").wrapInResolvable(project),
-              depsConfiguration = variant.compileConfiguration.wrapInResolvable(project),
-              // TODO need releaseApiElements instead?
-              //
-              // configurations.getByName("releaseApiElements").wrapInResolvable(project),
-              exportedDepsConfiguration = variant.runtimeConfiguration.wrapInResolvable(project),
-              testConfiguration =
-                (variant as? HasUnitTest)
-                  ?.unitTest
-                  ?.runtimeConfiguration
-                  ?.wrapInResolvable(project),
-              kspConfiguration = kspConfig,
-              kaptConfiguration = kaptConfig,
-              slackExtension = slackExtension,
-              namespace = variant.namespace,
-            )
+            afterEvaluate {
+              AndroidProjectBazelTask.register(
+                project = project,
+                slackProperties = slackProperties,
+                // TODO need to also include compile classpath?
+                //
+                // configurations.getByName("releaseRuntimeElements").wrapInResolvable(project),
+                depsConfiguration = variant.compileConfiguration.wrapInResolvable(project),
+                // TODO need releaseApiElements instead?
+                //
+                // configurations.getByName("releaseApiElements").wrapInResolvable(project),
+                exportedDepsConfiguration = variant.runtimeConfiguration.wrapInResolvable(project),
+                testConfiguration =
+                  (variant as? HasUnitTest)
+                    ?.unitTest
+                    ?.runtimeConfiguration
+                    ?.wrapInResolvable(project),
+                kspConfiguration = kspConfig,
+                kaptConfiguration = kaptConfig,
+                slackExtension = slackExtension,
+                namespace = variant.namespace,
+                kotlinCompilation = tasks.named("compileReleaseKotlin", KotlinCompile::class.java),
+              )
+            }
           }
         }
       }
