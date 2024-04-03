@@ -89,6 +89,7 @@ internal class JvmProjectSpec(builder: Builder) :
             kotlinProjectType = KotlinProjectType.Jvm,
             srcsGlob = testSrcGlobs,
             plugins = plugins,
+            kotlincOptions = testFreeCompilerArgs,
             deps = testDeps,
           )
         }
@@ -108,6 +109,7 @@ internal class JvmProjectSpec(builder: Builder) :
     override val compilerPlugins = mutableListOf<Dep>()
     override val kspProcessors = mutableListOf<KspProcessor>()
     override val freeCompilerArgs = mutableListOf<String>()
+    override val testFreeCompilerArgs = mutableListOf<String>()
 
     fun build(): JvmProjectSpec = JvmProjectSpec(this)
   }
@@ -140,6 +142,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
       kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
       slackExtension: SlackExtension,
       kotlinCompilation: TaskProvider<KotlinCompile>,
+      testKotlinCompilation: TaskProvider<KotlinCompile>,
     ) {
       project.tasks.register<JvmProjectBazelTask>("generateBazel") {
         configureCommonJvm(
@@ -152,6 +155,7 @@ internal abstract class JvmProjectBazelTask : DefaultTask(), CommonJvmProjectBaz
           kaptConfiguration,
           slackExtension,
           kotlinCompilation,
+          testKotlinCompilation,
         )
       }
     }

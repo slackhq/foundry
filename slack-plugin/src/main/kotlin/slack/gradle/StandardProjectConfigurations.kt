@@ -331,6 +331,7 @@ internal class StandardProjectConfigurations(
             kaptConfiguration = kaptConfig,
             slackExtension = slackExtension,
             kotlinCompilation = tasks.named("compileKotlin", KotlinCompile::class.java),
+            testKotlinCompilation = tasks.named("compileTestKotlin", KotlinCompile::class.java),
           )
         }
       }
@@ -954,6 +955,9 @@ internal class StandardProjectConfigurations(
                 slackExtension = slackExtension,
                 namespace = variant.namespace,
                 kotlinCompilation = tasks.named("compileReleaseKotlin", KotlinCompile::class.java),
+                // TODO gate on variant.unitTest != null
+                testKotlinCompilation =
+                  tasks.named("compileReleaseUnitTestKotlin", KotlinCompile::class.java),
               )
             }
           }

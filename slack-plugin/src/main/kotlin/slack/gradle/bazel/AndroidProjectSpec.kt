@@ -87,6 +87,7 @@ internal class AndroidProjectSpec(builder: Builder) :
             srcsGlob = testSrcGlobs,
             plugins = plugins,
             deps = fullTestDeps,
+            kotlincOptions = testFreeCompilerArgs,
           )
         }
         // TODO android tests
@@ -114,6 +115,7 @@ internal class AndroidProjectSpec(builder: Builder) :
     override val compilerPlugins = mutableListOf<Dep>()
     override val kspProcessors = mutableListOf<KspProcessor>()
     override val freeCompilerArgs = mutableListOf<String>()
+    override val testFreeCompilerArgs = mutableListOf<String>()
 
     fun manifest(manifest: String) = apply { this.manifest = manifest }
 
@@ -171,6 +173,7 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
       slackExtension: SlackExtension,
       namespace: Provider<String>,
       kotlinCompilation: TaskProvider<KotlinCompile>,
+      testKotlinCompilation: TaskProvider<KotlinCompile>,
     ) {
       // TODO multiple variants?
       project.tasks.register<AndroidProjectBazelTask>("generateBazel") {
@@ -198,6 +201,7 @@ internal abstract class AndroidProjectBazelTask : DefaultTask(), CommonJvmProjec
           kaptConfiguration,
           slackExtension,
           kotlinCompilation,
+          testKotlinCompilation,
         )
       }
     }

@@ -111,6 +111,7 @@ internal fun StatementsBuilder.slackKtTest(
   associates: List<BazelDependency> = emptyList(),
   deps: List<BazelDependency> = emptyList(),
   plugins: List<BazelDependency> = emptyList(),
+  kotlincOptions: List<String> = emptyList(),
   tags: List<String> = emptyList(),
 ) {
   loadKtRules(kotlinProjectType, ruleSource)
@@ -126,6 +127,7 @@ internal fun StatementsBuilder.slackKtTest(
       "plugins" `=` array(plugins.map(BazelDependency::toString).map(String::quote))
     }
     tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
+    kotlincOptions.notEmpty { "kt_kotlinc_options" `=` array(kotlincOptions.map(String::quote)) }
   }
 }
 
@@ -137,6 +139,7 @@ internal fun StatementsBuilder.slackKtAndroidLocalTest(
   associates: List<BazelDependency> = emptyList(),
   deps: List<BazelDependency> = emptyList(),
   plugins: List<BazelDependency> = emptyList(),
+  kotlincOptions: List<String> = emptyList(),
   customPackage: String? = null,
   testClass: String? = null,
   tags: List<String> = emptyList(),
@@ -159,6 +162,7 @@ internal fun StatementsBuilder.slackKtAndroidLocalTest(
     tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
     customPackage?.let { "custom_package" `=` it.quote }
     testClass?.let { "test_class" `=` it.quote }
+    kotlincOptions.notEmpty { "kt_kotlinc_options" `=` array(kotlincOptions.map(String::quote)) }
   }
 }
 

@@ -68,6 +68,7 @@ internal interface CommonJvmProjectSpec {
   val compilerPlugins: List<Dep>
   val kspProcessors: List<KspProcessor>
   val freeCompilerArgs: List<String>
+  val testFreeCompilerArgs: List<String>
 
   @CheckReturnValue
   fun StatementsBuilder.writeCommonJvmStatements(): JvmRuleDependencies {
@@ -119,6 +120,7 @@ internal interface CommonJvmProjectSpec {
     val compilerPlugins: MutableList<Dep>
     val kspProcessors: MutableList<KspProcessor>
     val freeCompilerArgs: MutableList<String>
+    val testFreeCompilerArgs: MutableList<String>
 
     fun ruleSource(source: String): T = apply { ruleSource = source } as T
 
@@ -181,6 +183,7 @@ private class CommonJvmProjectSpecImpl(builder: CommonJvmProjectSpec.Builder<*>)
   override val compilerPlugins = builder.compilerPlugins.toList()
   override val kspProcessors = builder.kspProcessors.toList()
   override val freeCompilerArgs = builder.freeCompilerArgs.toList()
+  override val testFreeCompilerArgs = builder.testFreeCompilerArgs.toList()
 }
 
 internal interface CommonJvmProjectBazelTask : Task {
@@ -198,6 +201,7 @@ internal interface CommonJvmProjectBazelTask : Task {
   @get:Input val compilerPlugins: SetProperty<Dep>
   @get:Input val kspProcessors: SetProperty<KspProcessor>
   @get:Input val freeCompilerArgs: ListProperty<String>
+  @get:Input val testFreeCompilerArgs: ListProperty<String>
 
   // Features
   @get:Optional @get:Input val moshix: Property<Boolean>
@@ -333,6 +337,7 @@ internal interface CommonJvmProjectBazelTask : Task {
     kaptConfiguration: NamedDomainObjectProvider<ResolvableConfiguration>?,
     slackExtension: SlackExtension,
     kotlinCompilation: TaskProvider<KotlinCompile>?,
+    testKotlinCompilation: TaskProvider<KotlinCompile>?,
   ) {
     targetName.set(project.name)
     projectPath.set(project.path)
@@ -350,6 +355,9 @@ internal interface CommonJvmProjectBazelTask : Task {
     autoService.set(slackExtension.featuresHandler.autoService)
     kotlinCompilation?.let {
       this.freeCompilerArgs.addAll(it.flatMap { it.compilerOptions.freeCompilerArgs })
+    }
+    testKotlinCompilation?.let {
+      this.testFreeCompilerArgs.addAll(it.flatMap { it.compilerOptions.freeCompilerArgs })
     }
   }
 
