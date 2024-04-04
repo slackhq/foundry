@@ -57,6 +57,7 @@
                     text="Slack Subproject"
                     description="Create a new Slack subproject">
                 <add-to-group group-id="NewGroup" anchor="after" relative-to-action="Kotlin.NewFile"/>
+                <keyboard-shortcut first-keystroke="control shift P" keymap="$default"/>
             </action>
             <action id="com.slack.sgp.intellij.circuitgenerator.CircuitFeatureGenerator" class="com.slack.sgp.intellij.circuitgenerator.CircuitFeatureGenerator"
                     text="Circuit Feature"
@@ -65,7 +66,7 @@
                 <add-to-group group-id="NewGroup" anchor="before" relative-to-action="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"/>
             </action>
             <action id="com.slack.sgp.intellij.circuitgenerator.UdfViewModelGenerator" class="com.slack.sgp.intellij.circuitgenerator.UdfViewModelGenerator"
-                    text="UDF ViewModel convert"
+                    text="UDF ViewModel Convert"
                     description="Convert to UDF ViewModel"
                     icon="KotlinBaseResourcesIcons.Kotlin">
                 <add-to-group group-id="NewGroup" anchor="after" relative-to-action="com.slack.sgp.intellij.circuitgenerator.CircuitFeatureGenerator"/>
