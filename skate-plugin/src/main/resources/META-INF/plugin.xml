@@ -58,11 +58,17 @@
                     description="Create a new Slack subproject">
                 <add-to-group group-id="NewGroup" anchor="after" relative-to-action="Kotlin.NewFile"/>
             </action>
-            <action id="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature" class="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature">
+            <action id="com.slack.sgp.intellij.circuitgenerator.CircuitFeatureGenerator" class="com.slack.sgp.intellij.circuitgenerator.CircuitFeatureGenerator"
+                    text="Circuit Feature"
+                    description="Create a new Circuit Feature"
+                    icon="KotlinBaseResourcesIcons.Kotlin">
                 <add-to-group group-id="NewGroup" anchor="before" relative-to-action="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"/>
             </action>
-            <action id="com.slack.sgp.intellij.filetemplate.UdfViewModelMigrate" class="com.slack.sgp.intellij.filetemplate.UdfViewModelMigrate">
-                <add-to-group group-id="NewGroup" anchor="after" relative-to-action="com.slack.sgp.intellij.filetemplate.CreateCircuitFeature"/>
+            <action id="com.slack.sgp.intellij.circuitgenerator.UdfViewModelGenerator" class="com.slack.sgp.intellij.circuitgenerator.UdfViewModelGenerator"
+                    text="UDF ViewModel convert"
+                    description="Convert to UDF ViewModel"
+                    icon="KotlinBaseResourcesIcons.Kotlin">
+                <add-to-group group-id="NewGroup" anchor="after" relative-to-action="com.slack.sgp.intellij.circuitgenerator.CircuitFeatureGenerator"/>
             </action>
             <separator/>
         </group>
