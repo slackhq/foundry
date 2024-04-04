@@ -44,6 +44,12 @@ kotlin {
         implementation(libs.kotlin.poet)
       }
     }
+    jvmTest {
+      dependencies {
+        implementation(libs.junit)
+        implementation(libs.truth)
+      }
+    }
   }
 }
 
