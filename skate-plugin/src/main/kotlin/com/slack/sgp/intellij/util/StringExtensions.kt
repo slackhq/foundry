@@ -20,3 +20,11 @@ import com.google.common.base.CaseFormat
 fun String.snakeToCamelCase(): String {
   return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this)
 }
+
+fun String.getJavaPackageName(): String? {
+  val directoryPath =
+    this.substringBeforeLast("/").takeIf { this.substringAfterLast("/").contains(".") } ?: this
+  val pattern = Regex("src/(main/java|main/kotlin)/(.+)")
+  val match = pattern.find(directoryPath) ?: return null
+  return match.groupValues[2].replace("/", ".")
+}
