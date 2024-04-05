@@ -1,9 +1,25 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package slack.tooling.projectgen.circuitgen
 
 import java.io.File
 
 interface CircuitComponent {
   val fileSuffix: String
+
   fun generate(packageName: String?, className: String): String
 
   fun isTestComponent(): Boolean = false
@@ -19,7 +35,7 @@ interface CircuitComponent {
   }
 }
 
-class CircuitScreen: CircuitComponent {
+class CircuitScreen : CircuitComponent {
   override val fileSuffix = "Screen"
 
   override fun generate(packageName: String?, className: String): String {
@@ -31,26 +47,28 @@ class CircuitScreen: CircuitComponent {
       import com.slack.circuit.runtime.CircuitUiState
       import com.slack.circuit.runtime.screen.Screen
       import kotlinx.parcelize.Parcelize
-      
+
       @Parcelize
       class ${className}Screen : Screen {
-      
+
         data class State(
           val message: String = "",
           val eventSink: (Event) -> Unit = {}
         ) : CircuitUiState
-      
+
         @Immutable
         sealed interface Event : CircuitUiEvent {
           data object UserTappedText : Event
         }
       }
-      """.trimIndent()
+      """
+      .trimIndent()
   }
 }
 
-class CircuitPresenter: CircuitComponent {
+class CircuitPresenter : CircuitComponent {
   override val fileSuffix = "Presenter"
+
   override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""
     return """
@@ -68,19 +86,19 @@ class CircuitPresenter: CircuitComponent {
       import dagger.assisted.AssistedInject
       import slack.di.UserScope
       import slack.libraries.foundation.compose.rememberStableCoroutineScope
-      
+
       class ${className}Presenter
       @AssistedInject
       constructor(
         @Assisted private val screen: ${className}Screen,
         @Assisted private val navigator: Navigator,
       ) : Presenter<${className}Screen.State> {
-      
+
         @Composable
         override fun present(): ${className}Screen.State {
           val scope = rememberStableCoroutineScope()
           var tapCounter by rememberSaveable { mutableIntStateOf(0) }
-          
+
           return ${className}Screen.State(
             message = tapCounter.toString()
           ) { event ->
@@ -89,21 +107,23 @@ class CircuitPresenter: CircuitComponent {
             }
           }
         }
-        
+
         @CircuitInject(${className}Screen::class, UserScope::class)
         @AssistedFactory
         interface Factory {
           fun create(screen: ${className}Screen, navigator: Navigator): ${className}Presenter
         }
       }
-      """.trimIndent()
+      """
+      .trimIndent()
   }
 }
 
-class CircuitPresenterTest: CircuitComponent {
+class CircuitPresenterTest : CircuitComponent {
   override val fileSuffix = "PresenterTest"
 
   override fun isTestComponent(): Boolean = true
+
   override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""
     return """
@@ -147,12 +167,14 @@ class CircuitPresenterTest: CircuitComponent {
         }
       }
 
-    """.trimIndent()
+    """
+      .trimIndent()
   }
 }
 
-class CircuitUiFeature: CircuitComponent {
+class CircuitUiFeature : CircuitComponent {
   override val fileSuffix = ""
+
   override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""
     return """
@@ -172,13 +194,16 @@ class CircuitUiFeature: CircuitComponent {
           modifier = modifier.clickable { state.eventSink(${className}Screen.Event.UserTappedText) }
         )
       }
-    """.trimIndent()
+    """
+      .trimIndent()
   }
 }
 
-class CircuitUiTest: CircuitComponent {
+class CircuitUiTest : CircuitComponent {
   override val fileSuffix = "UiTest"
+
   override fun isTestComponent(): Boolean = true
+
   override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""
     return """
@@ -224,12 +249,14 @@ class CircuitUiTest: CircuitComponent {
         }
       }
 
-    """.trimIndent()
+    """
+      .trimIndent()
   }
 }
 
-class CircuitViewModel: CircuitComponent {
+class CircuitViewModel : CircuitComponent {
   override val fileSuffix = "Presenter"
+
   override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""
     return """
@@ -247,7 +274,7 @@ class CircuitViewModel: CircuitComponent {
       import slack.di.UserScope
       import slack.libraries.foundation.compose.rememberStableCoroutineScope
 
-      /** 
+      /**
        * TODO (remove): This Circuit [Presenter] was generated without UI or [CircuitInject], and can be
        * used with legacy views via `by circuitState()` in your Fragment or Activity.
        */
@@ -262,7 +289,7 @@ class CircuitViewModel: CircuitComponent {
         override fun present(): ${className}Screen.State {
           val scope = rememberStableCoroutineScope()
           var tapCounter by rememberSaveable { mutableIntStateOf(0) }
-          
+
           return ${className}Screen.State(
             message = tapCounter.toString()
           ) { event ->
@@ -277,21 +304,26 @@ class CircuitViewModel: CircuitComponent {
           fun create(screen: ${className}Screen, navigator: Navigator): ${className}Presenter
         }
       }
-    """.trimIndent()
+    """
+      .trimIndent()
   }
 }
 
-class FakeCircuitComponent(private val isTest: Boolean): CircuitComponent {
+class FakeCircuitComponent(private val isTest: Boolean) : CircuitComponent {
   override val fileSuffix: String = "Fake"
   var directoryCreated: String? = null
+
   override fun isTestComponent(): Boolean = isTest
-  override fun generate(packageName: String?, className: String): String{
+
+  override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""
     return """
       $packageLine
       class ${className}Fake
-    """.trimIndent()
+    """
+      .trimIndent()
   }
+
   override fun writeToFile(directory: String, packageName: String?, className: String) {
     directoryCreated = directory
   }
