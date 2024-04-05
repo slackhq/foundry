@@ -26,7 +26,8 @@ internal sealed interface Dep : Comparable<Dep> {
    * @param path the path to the dependency, e.g. `path`
    * @param target the target of the dependency, e.g. `target`
    */
-  data class Remote(val source: String = "maven", val path: String = "", val target: String) : Dep {
+  data class Remote(val source: String = "maven-slack", val path: String = "", val target: String) :
+    Dep {
     override fun toString(): String {
       return "@$source//$path:$target"
     }
@@ -35,7 +36,7 @@ internal sealed interface Dep : Comparable<Dep> {
       fun fromMavenIdentifier(identifier: String): Remote {
         // Map to lower underscore format for maven sourcing
         val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
-        return Remote(source = "maven", target = target)
+        return Remote(source = "maven-slack", target = target)
       }
     }
   }
