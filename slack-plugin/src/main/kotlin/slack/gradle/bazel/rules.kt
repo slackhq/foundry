@@ -96,8 +96,7 @@ internal fun StatementsBuilder.slackKtLibrary(
       "assets" `=` glob(assetsGlob.quote)
       "assets_dir" `=` assetsDir.quote
     }
-    kotlincOptions.notEmpty { "kt_kotlinc_options" `=` array(kotlincOptions.map(String::quote)) }
-
+    kotlincOpts(ruleSource, name, kotlincOptions)?.let { "kotlinc_opts" `=` it.quote }
     tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
   }
 }
@@ -115,6 +114,8 @@ internal fun StatementsBuilder.slackKtTest(
   tags: List<String> = emptyList(),
 ) {
   loadKtRules(kotlinProjectType, ruleSource)
+
+  // test rule
   rule("kt_jvm_test") {
     "name" `=` name.quote
     srcs.notEmpty { "srcs" `=` srcs.map(String::quote) }
@@ -127,13 +128,34 @@ internal fun StatementsBuilder.slackKtTest(
       "plugins" `=` array(plugins.map(BazelDependency::toString).map(String::quote))
     }
     tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
-    kotlincOptions.notEmpty { "kt_kotlinc_options" `=` array(kotlincOptions.map(String::quote)) }
+    kotlincOpts(ruleSource, name, kotlincOptions)?.let { "kotlinc_opts" `=` it.quote }
   }
+}
+
+internal fun StatementsBuilder.kotlincOpts(
+  ruleSource: String,
+  compilationTarget: String,
+  options: List<String>,
+): String? {
+  val optInOptions =
+    options.filter { it.startsWith("-opt-in=") }.map { it.removePrefix("-opt-in=") }
+  if (optInOptions.isEmpty()) return null
+  // kt_kotlinc_options strangely does not support free compiler args, so we limit to just opt-in
+  // annotations for now
+  // TODO if it ever gets fixed, apply the rest here. Or revisit creating a manual mapping.
+  val targetName = "${compilationTarget}_kotlinc_opts"
+  load(ruleSource, "kt_kotlinc_options")
+  rule("kt_kotlinc_options") {
+    "name" `=` targetName.quote
+    "x_optin" `=` array(optInOptions.sorted().map(String::quote))
+  }
+  return targetName
 }
 
 @Suppress("UNREACHABLE_CODE", "UNUSED_PARAMETER")
 internal fun StatementsBuilder.slackKtAndroidLocalTest(
   name: String,
+  ruleSource: String,
   srcs: List<String> = emptyList(),
   srcsGlob: List<String> = emptyList(),
   associates: List<BazelDependency> = emptyList(),
@@ -162,7 +184,7 @@ internal fun StatementsBuilder.slackKtAndroidLocalTest(
     tags.notEmpty { "tags" `=` array(tags.map(String::quote)) }
     customPackage?.let { "custom_package" `=` it.quote }
     testClass?.let { "test_class" `=` it.quote }
-    kotlincOptions.notEmpty { "kt_kotlinc_options" `=` array(kotlincOptions.map(String::quote)) }
+    kotlincOpts(ruleSource, name, kotlincOptions)?.let { "kotlinc_opts" `=` ":${it}".quote }
   }
 }
 
@@ -211,11 +233,11 @@ internal object KspProcessors {
         "dev.zacsweers.moshix.proguardgen.MoshiProguardGenSymbolProcessor\$Provider",
       deps =
         setOf(
-          "@maven-slack//:com_squareup_kotlinpoet_jvm",
-          "@maven-slack//:com_squareup_kotlinpoet_ksp",
-          "@maven-slack//:com_squareup_moshi_moshi",
-          "@maven-slack//:com_squareup_moshi_moshi_kotlin_codegen",
-          "@maven-slack//:dev_zacsweers_moshix_moshi_proguard_rule_gen",
+          "@maven_slack//:com_squareup_kotlinpoet_jvm",
+          "@maven_slack//:com_squareup_kotlinpoet_ksp",
+          "@maven_slack//:com_squareup_moshi_moshi",
+          "@maven_slack//:com_squareup_moshi_moshi_kotlin_codegen",
+          "@maven_slack//:dev_zacsweers_moshix_moshi_proguard_rule_gen",
         ),
     )
   val autoService =
@@ -224,8 +246,8 @@ internal object KspProcessors {
       processorProviderClass = "dev.zacsweers.autoservice.ksp.AutoServiceSymbolProcessor\$Provider",
       deps =
         setOf(
-          "@maven-slack//:com_google_auto_service_auto_service_annotations",
-          "@maven-slack//:dev_zacsweers_autoservice_auto_service_ksp",
+          "@maven_slack//:com_google_auto_service_auto_service_annotations",
+          "@maven_slack//:dev_zacsweers_autoservice_auto_service_ksp",
         ),
     )
 
@@ -237,9 +259,9 @@ internal object KspProcessors {
         "slack.features.annotation.codegen.FeatureFlagSymbolProcessor\$Provider",
       deps =
         setOf(
-          "@maven-slack//:com_squareup_anvil_annotations",
-          "@maven-slack//:com_squareup_kotlinpoet_jvm",
-          "@maven-slack//:com_squareup_kotlinpoet_ksp",
+          "@maven_slack//:com_squareup_anvil_annotations",
+          "@maven_slack//:com_squareup_kotlinpoet_jvm",
+          "@maven_slack//:com_squareup_kotlinpoet_ksp",
           "//libraries/foundation/feature-flag",
           "//libraries/foundation/slack-di",
         ),
@@ -251,13 +273,13 @@ internal object KspProcessors {
       processorProviderClass = "slack.guinness.compiler.GuinnessSymbolProcessorProvider",
       deps =
         setOf(
-          "@maven-slack//:com_squareup_anvil_annotations",
-          "@maven-slack//:com_google_dagger",
-          "@maven-slack//:com_squareup_retrofit",
-          "@maven-slack//:com_squareup_kotlinpoet_jvm",
-          "@maven-slack//:com_squareup_kotlinpoet_ksp",
-          "@maven-slack//:slack_internal_vulcan_guinness",
-          "@maven-slack//:slack_internal_vulcan_guinness_compiler",
+          "@maven_slack//:com_squareup_anvil_annotations",
+          "@maven_slack//:com_google_dagger",
+          "@maven_slack//:com_squareup_retrofit",
+          "@maven_slack//:com_squareup_kotlinpoet_jvm",
+          "@maven_slack//:com_squareup_kotlinpoet_ksp",
+          "@maven_slack//:slack_internal_vulcan_guinness",
+          "@maven_slack//:slack_internal_vulcan_guinness_compiler",
         ),
     )
 }

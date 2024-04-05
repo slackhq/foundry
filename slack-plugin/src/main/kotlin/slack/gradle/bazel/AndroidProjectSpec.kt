@@ -83,6 +83,7 @@ internal class AndroidProjectSpec(builder: Builder) :
         if (hasTests) {
           slackKtAndroidLocalTest(
             name = CommonJvmProjectSpec.testName(name),
+            ruleSource = ruleSource,
             associates = listOf(BazelDependency.StringDependency(":$name")),
             srcsGlob = testSrcGlobs,
             plugins = plugins,

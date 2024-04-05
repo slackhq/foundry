@@ -144,6 +144,8 @@ internal interface CommonJvmProjectSpec {
     fun addKspProcessor(processor: KspProcessor): T = apply { kspProcessors.add(processor) } as T
 
     fun addFreeCompilerArg(arg: String): T = apply { freeCompilerArgs.add(arg) } as T
+
+    fun addTestFreeCompilerArg(arg: String): T = apply { testFreeCompilerArgs.add(arg) } as T
   }
 
   data class JvmRuleDependencies(
@@ -217,6 +219,14 @@ internal interface CommonJvmProjectBazelTask : Task {
     val testDeps =
       if (!this@CommonJvmProjectBazelTask.testDeps.isPresent) null
       else this@CommonJvmProjectBazelTask.testDeps.mapDeps()
+
+    for (arg in this@CommonJvmProjectBazelTask.freeCompilerArgs.getOrElse(emptyList())) {
+      addFreeCompilerArg(arg)
+    }
+
+    for (arg in this@CommonJvmProjectBazelTask.testFreeCompilerArgs.getOrElse(emptyList())) {
+      addTestFreeCompilerArg(arg)
+    }
 
     // Only moshix and redacted are supported in JVM projects
     val compilerPlugins = this@CommonJvmProjectBazelTask.compilerPlugins.get().toMutableList()
@@ -354,10 +364,14 @@ internal interface CommonJvmProjectBazelTask : Task {
     parcelize.set(project.pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.parcelize"))
     autoService.set(slackExtension.featuresHandler.autoService)
     kotlinCompilation?.let {
-      this.freeCompilerArgs.addAll(it.flatMap { it.compilerOptions.freeCompilerArgs })
+      this.freeCompilerArgs.addAll(
+        project.provider { it.get().compilerOptions.freeCompilerArgs.get() }
+      )
     }
     testKotlinCompilation?.let {
-      this.testFreeCompilerArgs.addAll(it.flatMap { it.compilerOptions.freeCompilerArgs })
+      this.testFreeCompilerArgs.addAll(
+        project.provider { it.get().compilerOptions.freeCompilerArgs.get() }
+      )
     }
   }
 

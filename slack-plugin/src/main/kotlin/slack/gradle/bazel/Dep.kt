@@ -20,13 +20,13 @@ internal sealed interface Dep : Comparable<Dep> {
   override fun compareTo(other: Dep) = toString().compareTo(other.toString())
 
   /**
-   * A remote dependency, e.g. `@maven-slack//path:target`.
+   * A remote dependency, e.g. `@maven_slack//path:target`.
    *
    * @param source the source of the dependency, e.g. `maven`
    * @param path the path to the dependency, e.g. `path`
    * @param target the target of the dependency, e.g. `target`
    */
-  data class Remote(val source: String = "maven-slack", val path: String = "", val target: String) :
+  data class Remote(val source: String = "maven_slack", val path: String = "", val target: String) :
     Dep {
     override fun toString(): String {
       return "@$source//$path:$target"
@@ -36,7 +36,7 @@ internal sealed interface Dep : Comparable<Dep> {
       fun fromMavenIdentifier(identifier: String): Remote {
         // Map to lower underscore format for maven sourcing
         val target = identifier.replace(".", "_").replace(":", "_").replace("-", "_")
-        return Remote(source = "maven-slack", target = target)
+        return Remote(source = "maven_slack", target = target)
       }
     }
   }
