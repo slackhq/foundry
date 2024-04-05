@@ -3,6 +3,8 @@ package slack.tooling.projectgen
 import org.junit.Test
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertThrows
+import slack.tooling.projectgen.circuitgen.CircuitComponentFactory
+import slack.tooling.projectgen.circuitgen.FakeCircuitComponent
 
 class CircuitComponentFactoryTest {
   @Test

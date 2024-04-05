@@ -28,21 +28,31 @@ import com.intellij.ui.components.dialog
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.toNullableProperty
 import com.slack.sgp.intellij.util.getJavaPackageName
 import java.io.File
-import slack.tooling.projectgen.CircuitComponentFactory
+import slack.tooling.projectgen.circuitgen.CircuitComponentFactory
 
 class CircuitFeatureGenerator : AnAction(), DumbAware {
-  var featureNameField = ""
-  var selectedType = "UI + Presenter"
 
   override fun actionPerformed(event: AnActionEvent) {
+    var featureNameField = ""
+    var selectedType = "UI + Presenter"
     val centerPanel = panel {
-      row("Name") { textField().bindText(::featureNameField) }
+      row("Name") {
+        textField().bindText({ featureNameField }, { featureNameField = it }).validationOnApply {
+          if (it.text.isBlank()) error("Text cannot be empty") else null
+        }
+      }
       row("Template") {
         comboBox(items = listOf("UI + Presenter", "Presenter Only"))
-          .bindItem(::selectedType.toNullableProperty())
+          .bindItem(
+            { selectedType },
+            {
+              if (it != null) {
+                selectedType = it
+              }
+            },
+          )
       }
     }
     val dialog = dialog(title = "New Circuit Feature", panel = centerPanel)

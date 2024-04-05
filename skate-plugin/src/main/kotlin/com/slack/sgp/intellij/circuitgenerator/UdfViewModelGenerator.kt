@@ -28,14 +28,19 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.slack.sgp.intellij.util.getJavaPackageName
 import java.io.File
-import slack.tooling.projectgen.CircuitComponentFactory
+import slack.tooling.projectgen.circuitgen.CircuitComponentFactory
 
 class UdfViewModelGenerator : AnAction(), DumbAware {
 
-  private var featureNameField = ""
-
   override fun actionPerformed(event: AnActionEvent) {
-    val centerPanel = panel { row("Name") { textField().bindText(::featureNameField) } }
+    var featureNameField = ""
+    val centerPanel = panel {
+      row("Name") {
+        textField().bindText({ featureNameField }, { featureNameField = it }).validationOnApply {
+          if (it.text.isBlank()) error("Text cannot be empty") else null
+        }
+      }
+    }
     val dialog = dialog(title = "UDF ViewModel Convert", panel = centerPanel)
     if (dialog.showAndGet()) {
       event.getData(CommonDataKeys.VIRTUAL_FILE)?.let { data ->

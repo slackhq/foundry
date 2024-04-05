@@ -2,6 +2,7 @@ package slack.tooling.projectgen
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import slack.tooling.projectgen.circuitgen.FakeCircuitComponent
 
 class CircuitComponentTest {
   @Test

@@ -1,4 +1,4 @@
-package slack.tooling.projectgen
+package slack.tooling.projectgen.circuitgen
 
 import java.io.File
 
@@ -49,7 +49,7 @@ class CircuitScreen: CircuitComponent {
   }
 }
 
-class CircuitPresenter: CircuitComponent{
+class CircuitPresenter: CircuitComponent {
   override val fileSuffix = "Presenter"
   override fun generate(packageName: String?, className: String): String {
     val packageLine = if (!packageName.isNullOrEmpty()) "package $packageName\n" else ""

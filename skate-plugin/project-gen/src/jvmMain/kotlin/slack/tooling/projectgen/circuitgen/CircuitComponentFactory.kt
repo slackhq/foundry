@@ -1,4 +1,4 @@
-package slack.tooling.projectgen
+package slack.tooling.projectgen.circuitgen
 
 class CircuitComponentFactory {
 
