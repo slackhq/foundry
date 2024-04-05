@@ -20,7 +20,7 @@ internal sealed interface Dep : Comparable<Dep> {
   override fun compareTo(other: Dep) = toString().compareTo(other.toString())
 
   /**
-   * A remote dependency, e.g. `@maven//path:target`.
+   * A remote dependency, e.g. `@maven-slack//path:target`.
    *
    * @param source the source of the dependency, e.g. `maven`
    * @param path the path to the dependency, e.g. `path`

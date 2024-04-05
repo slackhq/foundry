@@ -44,7 +44,7 @@ internal class JvmProjectSpec(builder: Builder) :
          srcs = glob(["src/main/**/*.kt"]),
          visibility = ["//visibility:public"],
          deps = [
-             "@maven//:androidx_annotation_annotation",
+             "@maven-slack//:androidx_annotation_annotation",
          ],
      )
 
@@ -54,11 +54,11 @@ internal class JvmProjectSpec(builder: Builder) :
          visibility = ["//visibility:private"],
          deps = [
              ":ditto_lib",
-             "@maven//:androidx_annotation_annotation",
-             "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
-             "@maven//:org_jetbrains_kotlin_kotlin_test",
-             "@maven//:junit_junit",
-             "@maven//:com_google_truth_truth",
+             "@maven-slack//:androidx_annotation_annotation",
+             "@maven-slack//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
+             "@maven-slack//:org_jetbrains_kotlin_kotlin_test",
+             "@maven-slack//:junit_junit",
+             "@maven-slack//:com_google_truth_truth",
          ],
      )
     */

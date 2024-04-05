@@ -211,11 +211,11 @@ internal object KspProcessors {
         "dev.zacsweers.moshix.proguardgen.MoshiProguardGenSymbolProcessor\$Provider",
       deps =
         setOf(
-          "@maven//:com_squareup_kotlinpoet_jvm",
-          "@maven//:com_squareup_kotlinpoet_ksp",
-          "@maven//:com_squareup_moshi_moshi",
-          "@maven//:com_squareup_moshi_moshi_kotlin_codegen",
-          "@maven//:dev_zacsweers_moshix_moshi_proguard_rule_gen",
+          "@maven-slack//:com_squareup_kotlinpoet_jvm",
+          "@maven-slack//:com_squareup_kotlinpoet_ksp",
+          "@maven-slack//:com_squareup_moshi_moshi",
+          "@maven-slack//:com_squareup_moshi_moshi_kotlin_codegen",
+          "@maven-slack//:dev_zacsweers_moshix_moshi_proguard_rule_gen",
         ),
     )
   val autoService =
@@ -224,8 +224,8 @@ internal object KspProcessors {
       processorProviderClass = "dev.zacsweers.autoservice.ksp.AutoServiceSymbolProcessor\$Provider",
       deps =
         setOf(
-          "@maven//:com_google_auto_service_auto_service_annotations",
-          "@maven//:dev_zacsweers_autoservice_auto_service_ksp",
+          "@maven-slack//:com_google_auto_service_auto_service_annotations",
+          "@maven-slack//:dev_zacsweers_autoservice_auto_service_ksp",
         ),
     )
 
@@ -237,9 +237,9 @@ internal object KspProcessors {
         "slack.features.annotation.codegen.FeatureFlagSymbolProcessor\$Provider",
       deps =
         setOf(
-          "@maven//:com_squareup_anvil_annotations",
-          "@maven//:com_squareup_kotlinpoet_jvm",
-          "@maven//:com_squareup_kotlinpoet_ksp",
+          "@maven-slack//:com_squareup_anvil_annotations",
+          "@maven-slack//:com_squareup_kotlinpoet_jvm",
+          "@maven-slack//:com_squareup_kotlinpoet_ksp",
           "//libraries/foundation/feature-flag",
           "//libraries/foundation/slack-di",
         ),
@@ -251,13 +251,13 @@ internal object KspProcessors {
       processorProviderClass = "slack.guinness.compiler.GuinnessSymbolProcessorProvider",
       deps =
         setOf(
-          "@maven//:com_squareup_anvil_annotations",
-          "@maven//:com_google_dagger",
-          "@maven//:com_squareup_retrofit",
-          "@maven//:com_squareup_kotlinpoet_jvm",
-          "@maven//:com_squareup_kotlinpoet_ksp",
-          "@maven//:slack_internal_vulcan_guinness",
-          "@maven//:slack_internal_vulcan_guinness_compiler",
+          "@maven-slack//:com_squareup_anvil_annotations",
+          "@maven-slack//:com_google_dagger",
+          "@maven-slack//:com_squareup_retrofit",
+          "@maven-slack//:com_squareup_kotlinpoet_jvm",
+          "@maven-slack//:com_squareup_kotlinpoet_ksp",
+          "@maven-slack//:slack_internal_vulcan_guinness",
+          "@maven-slack//:slack_internal_vulcan_guinness_compiler",
         ),
     )
 }
