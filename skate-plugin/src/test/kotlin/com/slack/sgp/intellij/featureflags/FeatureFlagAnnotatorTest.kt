@@ -59,6 +59,6 @@ class FeatureFlagAnnotatorTest : BaseFeatureFlagTest() {
     project.service<SkatePluginSettings>().featureFlagFilePattern = filePattern
     val file = createKotlinFile(fileName, fileContent)
     val flags = FeatureFlagAnnotator().collectInformation(file)
-    return FeatureFlagAnnotator().doAnnotate(flags)
+    return FeatureFlagAnnotator().doAnnotate(flags).orEmpty()
   }
 }

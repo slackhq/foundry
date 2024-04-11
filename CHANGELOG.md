@@ -1,6 +1,20 @@
 Changelog
 =========
 
+0.16.2
+------
+
+_2024-03-28_
+
+- Work around https://issuetracker.google.com/issues/331806519 when using KSP in android projects.
+- Build against AGP `8.3.1`.
+- Build against Detekt `1.23.6`.
+- Build against Gradle `8.7`.
+- Update Retrofit to `2.11.0`.
+- Update Kaml to `0.58.0`.
+- Update Wire to `4.9.8`.
+- Update Guava to `33.1.0-jre`.
+
 0.16.1
 ------
 
