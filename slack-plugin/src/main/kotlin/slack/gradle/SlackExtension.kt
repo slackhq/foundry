@@ -827,7 +827,6 @@ constructor(
       extension.apply {
         buildFeatures { compose = true }
         composeOptions {
-          kotlinCompilerExtensionVersion = composeCompilerVersion
           // Disable live literals by default
           useLiveLiterals = slackProperties.composeEnableLiveLiterals
         }
