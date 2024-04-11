@@ -15,6 +15,11 @@
  */
 package slack.tooling.projectgen.circuitgen
 
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+
 class CircuitComponentFactory {
 
   fun generateCircuitComponents(
@@ -38,11 +43,11 @@ class CircuitComponentFactory {
     }
   }
 
-  fun generateCircuitAndComposeUI(directory: String, packageName: String?, className: String) {
+  fun generateCircuitAndComposeUI(directory: String, packageName: String?, className: String, assistedInject: Boolean) {
     val components =
       listOf(
         CircuitScreen(),
-        CircuitPresenter(),
+        CircuitPresenter(assistedInject),
         CircuitUiFeature(),
         CircuitPresenterTest(),
         CircuitUiTest(),
@@ -50,13 +55,14 @@ class CircuitComponentFactory {
     generateCircuitComponents(directory, packageName, className, components)
   }
 
-  fun generateCircuitPresenter(directory: String, packageName: String?, className: String) {
-    val components = listOf(CircuitScreen(), CircuitPresenter(), CircuitPresenterTest())
+  fun generateCircuitPresenter(directory: String, packageName: String?, className: String, assistedInject: Boolean) {
+    val components = listOf(CircuitScreen(), CircuitPresenter(assistedInject), CircuitPresenterTest())
     generateCircuitComponents(directory, packageName, className, components)
   }
 
-  fun generateUdfViewModel(directory: String, packageName: String?, className: String) {
-    val components = listOf(CircuitScreen(), CircuitViewModel())
+  fun generateUdfViewModel(directory: String, packageName: String?, className: String, assistedInject: Boolean) {
+    val components = listOf(CircuitScreen(), CircuitPresenter(assistedInject, noUi = true))
     generateCircuitComponents(directory, packageName, className, components)
   }
+
 }

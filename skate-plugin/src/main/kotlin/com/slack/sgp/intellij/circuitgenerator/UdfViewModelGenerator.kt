@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.dialog
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.slack.sgp.intellij.util.getJavaPackageName
@@ -34,25 +35,33 @@ class UdfViewModelGenerator : AnAction(), DumbAware {
 
   override fun actionPerformed(event: AnActionEvent) {
     var featureNameField = ""
+    var assistedInject = true
     val centerPanel = panel {
       row("Name") {
         textField().bindText({ featureNameField }, { featureNameField = it }).validationOnApply {
           if (it.text.isBlank()) error("Text cannot be empty") else null
         }
       }
+      row {
+        checkBox("Enable Assisted Injection")
+          .bindSelected(
+            getter = { assistedInject },
+            setter = { assistedInject = it }
+          )
+      }
     }
     val dialog = dialog(title = "UDF ViewModel Convert", panel = centerPanel)
     if (dialog.showAndGet()) {
       event.getData(CommonDataKeys.VIRTUAL_FILE)?.let { data ->
-        createUdfViewModel(featureNameField, data, event.project)
+        createUdfViewModel(featureNameField, assistedInject, data, event.project)
       }
     }
   }
 
-  private fun createUdfViewModel(featureNameField: String, data: VirtualFile, project: Project?) {
+  private fun createUdfViewModel(featureNameField: String, assistedInject: Boolean, data: VirtualFile, project: Project?) {
     val directory = if (data.isDirectory) data.path else data.parent.path
     val packageName = directory.getJavaPackageName()
-    CircuitComponentFactory().generateUdfViewModel(directory, packageName, featureNameField)
+    CircuitComponentFactory().generateUdfViewModel(directory, packageName, featureNameField, assistedInject)
 
     // Refresh local file changes and open new Circuit screen file in editor
     project?.let {
