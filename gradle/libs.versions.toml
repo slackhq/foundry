@@ -78,6 +78,7 @@ gradleLints = "androidx.lint:lint-gradle:1.0.0-alpha01"
 gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
 gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb" }
+gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.9.2"

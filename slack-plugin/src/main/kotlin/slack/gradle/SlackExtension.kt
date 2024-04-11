@@ -39,7 +39,6 @@ import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
-import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.util.addKspSource
 import slack.gradle.util.configureKotlinCompilationTask
@@ -549,7 +548,7 @@ constructor(
   }
 
   internal fun applyTo(project: Project) {
-    composeHandler.applyTo(project, slackProperties)
+    composeHandler.applyTo(project)
     circuitHandler.applyTo(project, slackProperties)
   }
 }
@@ -836,15 +835,15 @@ constructor(
     }
   }
 
-  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+  internal fun applyTo(project: Project) {
     if (enabled.get()) {
+      project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
       val isMultiplatform = multiplatform.get()
       if (isMultiplatform) {
         project.pluginManager.apply("org.jetbrains.compose")
       } else {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
-      project.configureComposeCompiler(slackProperties, isMultiplatform)
 
       project.tasks.configureKotlinCompilationTask {
         compilerOptions.freeCompilerArgs.addAll(

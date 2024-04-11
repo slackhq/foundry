@@ -167,14 +167,6 @@ internal constructor(
         .orElse(emptyList())
 
   /**
-   * If true, uses the AndroidX compose compiler [SlackVersions.composeCompiler] for Compose
-   * Multiplatform compilations rather than the Jetbrains one. This can be useful in testing where
-   * AndroidX's compiler is farther ahead.
-   */
-  public val forceAndroidXComposeCompilerForComposeMultiplatform: Boolean
-    get() = booleanProperty("sgp.compose.multiplatform.forceAndroidXComposeCompiler", false)
-
-  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *
