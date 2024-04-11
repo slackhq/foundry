@@ -1,7 +1,7 @@
 [versions]
 agp = "8.3.2"
 agpAlpha = "8.4.0-rc02"
-anvil = "2.5.0-beta04"
+anvil = "2.5.0-beta05"
 bugsnagGradle = "8.1.0"
 circuit = "0.20.0"
 compose-jb = "1.6.2"
