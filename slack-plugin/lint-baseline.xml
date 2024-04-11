@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.0-alpha13" type="baseline" client="gradle" dependencies="false" name="AGP (8.3.1)" variant="all" version="8.4.0-alpha13">
+<issues format="6" by="lint 8.4.0-alpha13" type="baseline" client="gradle" dependencies="false" name="AGP (8.3.2)" variant="all" version="8.4.0-alpha13">
 
     <issue
         id="InternalGradleApiUsage"
@@ -190,7 +190,18 @@
 
     <issue
         id="ExceptionMessage"
-        message="Please specify a lazyMessage param for check"
+        message="Please specify a `lazyMessage` param for require"
+        errorLine1="            add(&quot;api&quot;, def.coordinates) { version { require(version) } }"
+        errorLine2="                                                    ~~~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/Platforms.kt"
+            line="273"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="ExceptionMessage"
+        message="Please specify a `lazyMessage` param for check"
         errorLine1="    check(logs.isNotEmpty())"
         errorLine2="    ~~~~~">
         <location

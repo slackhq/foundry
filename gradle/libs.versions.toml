@@ -6,8 +6,8 @@ bugsnagGradle = "8.1.0"
 circuit = "0.20.0"
 compose-jb = "1.6.2"
 # https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html#use-a-developer-version-of-compose-multiplatform-compiler
-compose-jb-compiler = "1.5.11-kt-2.0.0-Beta5"
-compose-jb-kotlinVersion = "2.0.0-Beta5"
+compose-jb-compiler = "1.5.11-kt-2.0.0-RC1"
+compose-jb-kotlinVersion = "2.0.0-RC1"
 coroutines = "1.8.0"
 dependencyAnalysisPlugin = "1.31.0"
 detekt = "1.23.6"
@@ -17,13 +17,13 @@ jdk = "21"
 jewel = "0.15.2.2"
 jna = "5.14.0"
 kaml = "0.58.0"
-kotlin = "2.0.0-Beta5"
+kotlin = "2.0.0-RC1"
 kotlinPoet = "1.16.0"
-ksp = "2.0.0-Beta5-1.0.19"
+ksp = "2.0.0-RC1-1.0.20"
 ktfmt = "0.47"
 mavenPublish = "0.28.0"
 moshi = "1.15.1"
-moshix = "0.26.0-alpha02"
+moshix = "0.26.0-alpha03"
 nullawayGradle = "1.3.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.0"
@@ -46,8 +46,9 @@ intellij = { id = "org.jetbrains.intellij", version = "1.17.0" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-plugin-sam = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
@@ -89,7 +90,7 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
-gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.8.0-alpha02"
+gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.8.0-alpha03"
 gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.5.8"
 gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }

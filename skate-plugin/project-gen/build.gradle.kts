@@ -20,6 +20,7 @@ plugins {
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.compose)
+  alias(libs.plugins.kotlin.plugin.compose)
   alias(libs.plugins.lint)
 }
 

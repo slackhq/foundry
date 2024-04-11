@@ -41,7 +41,7 @@ import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 plugins {
   alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.kotlin.multiplatform) apply false
-  alias(libs.plugins.kotlin.sam)
+  alias(libs.plugins.kotlin.plugin.sam)
   alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
