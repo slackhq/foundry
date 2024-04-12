@@ -40,6 +40,7 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
+  plugins.add("com.intellij.java")
   plugins.add("org.intellij.plugins.markdown")
   plugins.add("org.jetbrains.plugins.terminal")
   plugins.add("org.jetbrains.kotlin")
