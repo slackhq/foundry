@@ -32,21 +32,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Shapes
-import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
@@ -200,18 +195,6 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
       modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
       adapter = rememberScrollbarAdapter(listState),
     )
-    Overlay(visible = state.showDoneDialog || state.showErrorDialog)
-  }
-}
-
-@Composable
-fun Overlay(visible: Boolean) {
-  if (visible) {
-    Box(
-      Modifier
-        .fillMaxSize()  // Make the scrim cover the entire parent
-        .background(JewelTheme.globalColors.paneBackground.copy(alpha = 0.2f))  // Semi-transparent black
-    )
   }
 }
 
@@ -254,27 +237,19 @@ private fun StatusDialog(
 ) {
   // No M3 AlertDialog in compose-jb yet
   // https://github.com/JetBrains/compose-multiplatform/issues/2037
-  Popup(
-    alignment = Alignment.Center,
-    onDismissRequest = { onQuit() }) {
+  Popup(alignment = Alignment.Center, onDismissRequest = { onQuit() }) {
     Box(
-      Modifier
-        .width(600.dp)
+      Modifier.width(600.dp)
         .height(100.dp)
         .background(JewelTheme.globalColors.paneBackground)
         .border(1.5.dp, JewelTheme.globalColors.borders.disabled, RoundedCornerShape(8.dp))
     ) {
       Column(
-        Modifier.padding(20.dp)
-          .fillMaxHeight()
-          .fillMaxWidth(),
-        verticalArrangement = Arrangement.SpaceBetween
+        Modifier.padding(20.dp).fillMaxHeight().fillMaxWidth(),
+        verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Text(text)
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.End
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
           DefaultButton(onClick = { onConfirm() }) { Text(confirmButtonText) }
           Spacer(modifier = Modifier.width(8.dp))
           DefaultButton(onClick = { onQuit() }) { Text("Close") }
