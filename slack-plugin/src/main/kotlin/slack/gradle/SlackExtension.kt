@@ -824,8 +824,6 @@ constructor(
       extension.apply {
         buildFeatures { compose = true }
         composeOptions {
-          // TODO temporary, only for 2.0.0-RC1
-          kotlinCompilerExtensionVersion = "1.5.11-dev-k2.0.0-Beta5-b5a216d0ac6"
           // Disable live literals by default
           useLiveLiterals = slackProperties.composeEnableLiveLiterals
         }
@@ -842,8 +840,6 @@ constructor(
         project.pluginManager.apply("org.jetbrains.compose")
       } else {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
-        // TODO temporary just for RC1
-        extension.suppressKotlinVersionCompatibilityCheck.set("2.0.0-RC1")
       }
 
       // Because the Compose Compiler plugin auto applies common options for us, we need to know
@@ -889,7 +885,6 @@ constructor(
       }
 
       if (freeOptions.isNotEmpty()) {
-        project.logger.debug("Free compose options: $freeOptions")
         project.tasks.configureKotlinCompilationTask {
           compilerOptions.freeCompilerArgs.addAll(
             freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
