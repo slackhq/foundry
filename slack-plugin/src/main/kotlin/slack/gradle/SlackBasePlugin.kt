@@ -27,6 +27,8 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.provider.Provider
+import slack.gradle.develocity.NoOpBuildScanAdapter
+import slack.gradle.develocity.findAdapter
 import slack.stats.ModuleStatsTasks
 
 /**
@@ -79,8 +81,8 @@ internal class SlackBasePlugin @Inject constructor(private val buildFeatures: Bu
       // TODO https://github.com/diffplug/spotless/issues/1979
       target.configureSpotless(slackProperties)
       // TODO not clear how to access the build scan API from a non-root project
-      val scanApi = ScanApi(target)
-      if (scanApi.isAvailable) {
+      val scanApi = findAdapter(target)
+      if (scanApi !is NoOpBuildScanAdapter) {
         scanApi.addTestParallelization(target)
       }
     }
