@@ -595,13 +595,6 @@ internal constructor(
     get() = resolver.booleanValue("slack.log-thermals", defaultValue = false)
 
   /**
-   * Enables applying common build tags. We are likely to remove these in favor of Gradle's
-   * first-party plugin.
-   */
-  public val applyCommonBuildTags: Boolean
-    get() = resolver.booleanValue("sgp.ge.apply-common-build-tags", defaultValue = true)
-
-  /**
    * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
    * as a failsafe while we try different approaches to allow lenient resolution.
    *

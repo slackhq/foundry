@@ -35,6 +35,8 @@ import slack.gradle.agp.VersionNumber
 import slack.gradle.avoidance.ComputeAffectedProjectsTask
 import slack.gradle.avoidance.GenerateAndroidTestProjectPathsTask
 import slack.gradle.avoidance.GenerateDependencyGraphTask
+import slack.gradle.develocity.NoOpBuildScanAdapter
+import slack.gradle.develocity.findAdapter
 import slack.gradle.lint.DetektTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.tasks.AndroidTestApksTask
@@ -186,18 +188,15 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
       UpdateRobolectricJarsTask.register(project, slackProperties)
     }
 
-    val scanApi = ScanApi(project)
-    if (slackProperties.applyCommonBuildTags) {
-      project.configureBuildScanMetadata(scanApi)
-    }
-    if (scanApi.isAvailable) {
+    val scanApi = findAdapter(project)
+    if (scanApi !is NoOpBuildScanAdapter) {
       buildFeatures.reportTo(scanApi)
       // It's SUPER important to capture this log File instance separately before passing into the
       // background call below, as this is serialized as an input to that lambda. We also cannot use
       // slackTools() in there anymore as it's already been closed (and will be recreated) in the
       // lambda if we call it there and then be orphaned.
       val thermalsLogJsonFile = thermalsLogJsonFileProvider.get().asFile
-      with(scanApi.requireExtension()) {
+      with(scanApi) {
         buildFinished {
           background {
             var thermals: Thermals? = null

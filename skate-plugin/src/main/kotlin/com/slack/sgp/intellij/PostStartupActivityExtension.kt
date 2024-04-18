@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package com.slack.sgp.intellij
 import com.android.tools.idea.gradle.project.sync.GradleSyncState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManagerListener
+import com.intellij.openapi.startup.ProjectActivity
 import com.slack.sgp.intellij.idemetrics.GradleSyncSubscriber
 
-class ProjectOpenCloseListener : ProjectManagerListener {
-  override fun projectOpened(project: Project) {
+internal class PostStartupActivityExtension : ProjectActivity {
+  override suspend fun execute(project: Project) {
     GradleSyncState.subscribe(project, GradleSyncSubscriber())
     val service = project.service<SkateProjectService>()
     service.showWhatsNewWindow()
