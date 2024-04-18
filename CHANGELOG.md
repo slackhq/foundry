@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.16.3
+------
+
+_2024-04-18_
+
+- Migrate to Develocity (3.17) for build scan reporting. Technically legacy Gradle Enterprise APIs should still work, but we're not intentionally supporting them anymore.
+- Build against Anvil `2.5.0-beta07`.
+- Update commons-text to `1.12.0`.
+- Update oshi to `6.6.0`.
+- Build against DAGP `1.31.0`.
+- Build against Compose Multiplatform `1.6.2`.
+- Build against AGP `8.3.2`.
+- Build against KSP `1.9.23-1.0.20`.
+- Build against SqlDelight `2.0.2`.
+- Update to Wire `4.9.9`.
+- Update to Clikt `4.3.0`.
+
 0.16.2
 ------
 
