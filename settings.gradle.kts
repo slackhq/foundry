@@ -171,7 +171,6 @@ val VERSION_NAME: String by extra.properties
 
 develocity {
   buildScan {
-    publishing { onlyIf { true } }
     termsOfUseUrl.set("https://gradle.com/terms-of-service")
     termsOfUseAgree.set("yes")
 
