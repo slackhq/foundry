@@ -34,3 +34,9 @@ fun Project.isProjectGenMenuActionEnabled(): Boolean = settings().isProjectGenMe
 fun Project.tracingEndpoint(): String? = settings().tracingEndpoint
 
 fun Project.getTraceReporter(): SkateTraceReporter = service<SkateProjectService>().traceReporter
+
+fun Project.isCircuitGeneratorEnabled(): Boolean = settings().isCircuitGeneratorEnabled
+
+fun Project.circuitUiBaseTest(): String? = settings().circuitUiBaseTest
+
+fun Project.circuitPresenterBaseTest(): String? = settings().circuitPresenterBaseTest

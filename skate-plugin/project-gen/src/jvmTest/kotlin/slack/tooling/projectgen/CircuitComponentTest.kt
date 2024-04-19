@@ -16,29 +16,108 @@
 package slack.tooling.projectgen
 
 import com.google.common.truth.Truth.assertThat
+import java.io.StringWriter
 import org.junit.Test
-import slack.tooling.projectgen.circuitgen.FakeCircuitComponent
+import slack.tooling.projectgen.circuitgen.CircuitPresenter
+import slack.tooling.projectgen.circuitgen.CircuitScreen
+import slack.tooling.projectgen.circuitgen.CircuitTest
 
 class CircuitComponentTest {
   @Test
-  fun testGenerateCircuitComponentWithNullPackage() {
-    val component = FakeCircuitComponent(false)
-    val result = component.generate(null, "Foo")
-    val expectedContent = "\nclass FooFake"
-    assertThat(result).isEqualTo(expectedContent)
-  }
-
-  @Test
-  fun testGenerateCircuitComponentWithPackage() {
-    val component = FakeCircuitComponent(false)
-    val result = component.generate("com.example.feature", "Foo")
+  fun testGenerateCircuitScreen() {
+    val component = CircuitScreen()
+    val resultSpec = component.generate("com.example.feature", "Foo")
+    val stringWriter = StringWriter()
+    resultSpec.writeTo(stringWriter)
     val expectedContent =
       """
       package com.example.feature
 
-      class FooFake
+      import androidx.compose.runtime.Immutable
+      import com.slack.circuit.runtime.CircuitUiEvent
+      import com.slack.circuit.runtime.CircuitUiState
+      import com.slack.circuit.runtime.screen.Screen
+      import kotlin.String
+      import kotlin.Unit
+      import kotlinx.parcelize.Parcelize
+
+      @Parcelize
+      public class FooScreen : Screen {
+        public data class State(
+          public val message: String = "",
+          public val eventSink: Event.() -> Unit = {},
+        ) : CircuitUiState
+
+        @Immutable
+        public sealed interface Event : CircuitUiEvent
+      }
+
       """
         .trimIndent()
-    assertThat(result).isEqualTo(expectedContent)
+    assertThat(stringWriter.toString()).isEqualTo(expectedContent)
+  }
+
+  @Test
+  fun testGenerateCircuitPresenterNoAssistedInjection() {
+    val component = CircuitPresenter(false)
+    val resultSpec = component.generate("com.example.feature", "Foo")
+    val stringWriter = StringWriter()
+    resultSpec.writeTo(stringWriter)
+    val expectedContent =
+      """
+      package com.example.feature
+
+      import FooScreen
+      import FooScreen.State
+      import androidx.compose.runtime.Composable
+      import com.slack.circuit.codegen.annotations.CircuitInject
+      import com.slack.circuit.runtime.Navigator
+      import com.slack.circuit.runtime.presenter.Presenter
+      import slack.di.UserScope
+
+      public class FooPresenter(
+        private val screen: FooScreen,
+        private val navigator: Navigator,
+      ) : Presenter<FooScreen.State> {
+        @Composable
+        override fun present(): FooScreen.State {
+          val scope = rememberStableCoroutineScope()
+          return FooScreen.State() { event ->
+          }
+        }
+
+        @CircuitInject(
+          FooScreen::class,
+          UserScope::class,
+        )
+        public interface Factory {
+          public fun create(screen: FooScreen, navigator: Navigator): FooPresenter {
+          }
+        }
+      }
+
+      """
+        .trimIndent()
+    assertThat(stringWriter.toString()).isEqualTo(expectedContent)
+  }
+
+  @Test
+  fun testGenerateTestClass() {
+    val component =
+      CircuitTest(fileSuffix = "UiTest", baseClass = "com.example.test.CustomBaseClass")
+    val resultSpec = component.generate("com.example.feature.test", "Foo")
+    val stringWriter = StringWriter()
+    resultSpec.writeTo(stringWriter)
+    val expectedContent =
+      """
+        package com.example.feature.test
+
+        import com.example.test.CustomBaseClass
+
+        public class FooUiTest : CustomBaseClass()
+
+      """
+        .trimIndent()
+    assertThat(stringWriter.toString()).isEqualTo(expectedContent)
   }
 }

@@ -18,155 +18,101 @@ package com.slack.sgp.intellij.circuitgenerator
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.dialog
-import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
+import com.slack.sgp.intellij.util.circuitPresenterBaseTest
+import com.slack.sgp.intellij.util.circuitUiBaseTest
 import com.slack.sgp.intellij.util.getJavaPackageName
+import com.slack.sgp.intellij.util.isCircuitGeneratorEnabled
+import slack.tooling.projectgen.circuitgen.CircuitComponent
 import java.io.File
-import slack.tooling.projectgen.circuitgen.CircuitComponentFactory
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.exists
-import kotlin.io.path.pathString
-import kotlin.io.path.readText
+import slack.tooling.projectgen.circuitgen.CircuitPresenter
+import slack.tooling.projectgen.circuitgen.CircuitScreen
+import slack.tooling.projectgen.circuitgen.CircuitTest
+import slack.tooling.projectgen.circuitgen.CircuitUiFeature
 
 class CircuitFeatureGenerator : AnAction(), DumbAware {
 
   override fun actionPerformed(event: AnActionEvent) {
-    var featureNameField = ""
-    var selectedType = "UI + Presenter"
+    val currentProject = event.project ?: return
+    if (!currentProject.isCircuitGeneratorEnabled()) return
+    val selectedFile = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+    val selectedDirectory = if (selectedFile.isDirectory) selectedFile.path else selectedFile.parent.path
+    showFeatureDialog(currentProject, selectedDirectory)
+  }
+
+  private fun showFeatureDialog(project: Project, directory: String) {
+    var featureName = ""
+    var uiScreen = true
+    var presenterClass = true
     var assistedInject = true
+    var testClass = true
+
     val centerPanel = panel {
       row("Name") {
-        textField().bindText({ featureNameField }, { featureNameField = it }).validationOnApply {
-          if (it.text.isBlank()) error("Text cannot be empty") else null
-        }
+        textField().bindText({ featureName }, { featureName = it })
+          .validationOnApply { if (it.text.isBlank()) error("Text cannot be empty") else null }
       }
-      row("Template") {
-        comboBox(items = listOf("UI + Presenter", "Presenter Only"))
-          .bindItem(
-            { selectedType },
-            {
-              if (it != null) {
-                selectedType = it
-              }
-            },
-          )
+      row("Class(es) to generate") {
+        panel {
+          row {
+            checkBox("UI Screen").bindSelected({ uiScreen }, { uiScreen = it })
+            checkBox("Presenter").bindSelected({ presenterClass }, { presenterClass = it })
+          }
+        }
       }
       row {
-        checkBox("Enable Assisted Injection")
-          .bindSelected(
-            getter = { assistedInject },
-            setter = { assistedInject = it }
-          )
+        checkBox("Enable Assisted Injection").bindSelected({ assistedInject }, { assistedInject = it })
+      }
+      row {
+        checkBox("Generate Test Class").bindSelected({ testClass }, { testClass = it })
       }
     }
+
     val dialog = dialog(title = "New Circuit Feature", panel = centerPanel)
-    if (dialog.showAndGet()) {
-      event.getData(CommonDataKeys.VIRTUAL_FILE)?.let { data ->
-        createCircuitFeature(featureNameField, selectedType, assistedInject, data, event.project)
+    dialog.showAndGet()
+    collectComponents(uiScreen, presenterClass, assistedInject, testClass, project)
+      .forEach { component ->
+        component.writeToFile(
+          directory,
+          directory.getJavaPackageName(),
+          featureName
+        )
       }
+
+    // Refresh local file changes and open new Circuit screen file in editor
+    val screenFile = "${directory}/${featureName}Screen.kt"
+    LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(screenFile))?.let {
+      FileEditorManager.getInstance(project).openFile(it)
     }
+    LocalFileSystem.getInstance().refresh(true)
+    GradleDependencyManager().addMissingGradleDependency(project, directory)
   }
 
-  private fun createCircuitFeature(
-    featureNameField: String,
-    selectedType: String,
+  private fun collectComponents(
+    uiScreen: Boolean,
+    presenter: Boolean,
     assistedInject: Boolean,
-    data: VirtualFile,
-    project: Project?,
-  ) {
-    val directory = if (data.isDirectory) data.path else data.parent.path
-    val packageName = directory.getJavaPackageName()
-    when (selectedType) {
-      "UI + Presenter" ->
-        CircuitComponentFactory()
-          .generateCircuitAndComposeUI(directory, packageName, featureNameField, assistedInject)
-      "Presenter Only" ->
-        CircuitComponentFactory().generateCircuitPresenter(directory, packageName, featureNameField, assistedInject)
-    }
-
-    project?.let {
-      val circuitScreenPath = File("${directory}/${featureNameField}Screen.kt")
-      logger<CircuitFeatureGenerator>().info(circuitScreenPath.path)
-      LocalFileSystem.getInstance().refreshAndFindFileByIoFile(circuitScreenPath)?.let { file ->
-        FileEditorManager.getInstance(it).openFile(file)
+    generateTest: Boolean,
+    project: Project
+  ): MutableList<CircuitComponent> {
+    return mutableListOf<CircuitComponent>().apply {
+      if (uiScreen) {
+        addAll(listOf(CircuitScreen(), CircuitUiFeature()))
+        if (generateTest) add(CircuitTest(fileSuffix = "UiTest", project.circuitUiBaseTest()))
       }
-      LocalFileSystem.getInstance().refresh(true)
-      addMissingGradleDependency(project.basePath, directory)
-    }
-  }
-  private fun findNearestProjectDirRecursive(
-    repoRoot: Path,
-    currentDir: Path?,
-    cache: MutableMap<Path, Path?>,
-  ): Path? {
-    if (currentDir == null || currentDir == repoRoot) {
-      error("Could not find build.gradle(.kts)")
-    }
-
-    return cache.getOrPut(currentDir) {
-      val hasBuildFile =
-        currentDir.resolve("build.gradle.kts").exists() ||
-          currentDir.resolve("build.gradle").exists()
-      if (hasBuildFile) {
-        if (currentDir.resolve("build.gradle.kts").exists()) {
-          return currentDir.resolve("build.gradle.kts")
-        } else {
-          return currentDir.resolve("build.gradle")
-        }
+      if (presenter) {
+        add(CircuitPresenter(assistedInject))
+        if (generateTest) add(CircuitTest(fileSuffix = "PresenterTest", project.circuitPresenterBaseTest()))
       }
-      findNearestProjectDirRecursive(repoRoot, currentDir.parent, cache)
     }
   }
-  fun addMissingGradleDependency(repoRoot: String?, directory: String) {
-    logger<CircuitFeatureGenerator>().info("In hereeee")
-    logger<CircuitFeatureGenerator>().info(repoRoot)
-    if (repoRoot.isNullOrBlank()) return
-    val gradlePath = findNearestProjectDirRecursive(Paths.get(repoRoot), Paths.get(directory), mutableMapOf())
-    logger<CircuitFeatureGenerator>().info(gradlePath?.pathString)
-    var buildFile = gradlePath?.readText()
-    val pluginBlockPattern = Regex("plugins\\s*\\{([\\s\\S]*?)\\}", RegexOption.DOT_MATCHES_ALL)
-    val slackFeatureBlock = Regex("slack\\s*\\{\\s*feature\\s*\\{\\s*(.*?)\\s*\\}\\s*(?:[^}]*\\})?", RegexOption.DOT_MATCHES_ALL)
-    val parcelizeImport = "  alias(libs.plugins.kotlin.plugin.parcelize)\n"
-    val ciruitImport = "circuit()"
-    logger<CircuitFeatureGenerator>().info("LINHHHH")
-    logger<CircuitFeatureGenerator>().info(buildFile)
-    if (buildFile != null) {
-      if (!buildFile.contains(parcelizeImport)) {
-        val pluginBlockMatch = pluginBlockPattern.find(buildFile)?.groups?.get(1)?.value ?: ""
-        logger<CircuitFeatureGenerator>().info(pluginBlockMatch)
-        val addedPluginBlock = "${pluginBlockMatch}${parcelizeImport}"
-        logger<CircuitFeatureGenerator>().info("inside to replace parcelize")
-        buildFile = pluginBlockMatch.let { buildFile!!.replace(it, addedPluginBlock) }
-        }
 
-      if (!buildFile.contains(ciruitImport)) {
-          val slackFeatureBlockContent = slackFeatureBlock.find(buildFile)?.groups?.get(1)?.value ?: ""
-          logger<CircuitFeatureGenerator>().info(slackFeatureBlockContent)
-          if (slackFeatureBlockContent == "") {
-            buildFile += """
-                slack {
-                  features { circuit() }
-                 }
-              """.trimIndent()
-          } else {
-            val addedCircuit = "$slackFeatureBlockContent\n    circuit()\n"
-            buildFile = buildFile.replace(slackFeatureBlockContent, addedCircuit)
-          }
-          logger<CircuitFeatureGenerator>().info("inside to replace circuit")
-        }
-      Files.writeString(gradlePath, buildFile)
 
-    }
-  }
 }
