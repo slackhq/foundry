@@ -67,8 +67,6 @@ class CircuitComponentTest {
       """
       package com.example.feature
 
-      import FooScreen
-      import FooScreen.State
       import androidx.compose.runtime.Composable
       import com.slack.circuit.codegen.annotations.CircuitInject
       import com.slack.circuit.runtime.Navigator
