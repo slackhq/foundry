@@ -15,6 +15,7 @@
  */
 package com.slack.sgp.intellij.circuitgenerator
 
+import com.android.tools.idea.gradle.dsl.api.GradleBuildModel
 import com.android.tools.idea.gradle.dsl.api.ProjectBuildModel
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
@@ -23,25 +24,24 @@ import junit.framework.TestCase
 
 class GradleDependencyManagementTest : BasePlatformTestCase() {
 
-  fun testAddParcelizeImport() {
+  fun getFakeGradleBuildModel(): GradleBuildModel? {
     val testGradlePath = "src/test/resources/test_build.gradle.kts"
     val gradlePath = Path.of(this.basePath, testGradlePath)
     val gradleFile = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(gradlePath)
-    val gradleBuildModel =
-      gradleFile?.let { ProjectBuildModel.get(project).getModuleBuildModel(it) }
+    gradleFile?.let {
+      return ProjectBuildModel.get(project).getModuleBuildModel(it)
+    }
+    return null
+  }
 
+  fun testAddParcelizeImport() {
+    val gradleBuildModel = getFakeGradleBuildModel()
     val pluginBlocks = GradleDependencyManager().addParcelizeImport(gradleBuildModel, project)
     TestCase.assertTrue("alias(libs.plugins.kotlin.plugin.parcelize)" in pluginBlocks!!.text)
   }
 
   fun testAddCircuitImport() {
-    val testGradlePath = "src/test/resources/test_build.gradle.kts"
-    val gradlePath = Path.of(this.basePath, testGradlePath)
-    val gradleFile = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(gradlePath)
-
-    val gradleBuildModel =
-      gradleFile?.let { ProjectBuildModel.get(project).getModuleBuildModel(it) }
-
+    val gradleBuildModel = getFakeGradleBuildModel()
     val updatedPsi = GradleDependencyManager().addCircuitImport(gradleBuildModel, project)
     TestCase.assertTrue("circuit()" in updatedPsi!!.text)
   }
