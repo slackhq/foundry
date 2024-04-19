@@ -24,7 +24,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 import java.nio.file.Path
-import java.nio.file.Paths
 import kotlin.io.path.exists
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -35,7 +34,7 @@ class GradleDependencyManager {
   fun addMissingGradleDependency(project: Project, directory: String) {
     val repoRoot = project.basePath ?: return
     val gradlePath =
-      findNearestProjectDirRecursive(Paths.get(repoRoot), Paths.get(directory), mutableMapOf())
+      findNearestProjectDirRecursive(Path.of(repoRoot), Path.of(directory), mutableMapOf())
         ?: return
     val gradleFile = VirtualFileManager.getInstance().refreshAndFindFileByNioPath(gradlePath)
     val fileContent = gradlePath.toFile().readText()
