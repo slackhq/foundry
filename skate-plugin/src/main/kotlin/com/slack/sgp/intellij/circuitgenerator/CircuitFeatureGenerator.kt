@@ -62,12 +62,8 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
         }
       }
       row("Class(es) to generate") {
-        panel {
-          row {
-            checkBox("UI Screen").bindSelected({ uiScreen }, { uiScreen = it })
-            checkBox("Presenter").bindSelected({ presenterClass }, { presenterClass = it })
-          }
-        }
+        checkBox("UI Screen").bindSelected({ uiScreen }, { uiScreen = it })
+        checkBox("Presenter").bindSelected({ presenterClass }, { presenterClass = it })
       }
       row {
         checkBox("Enable Assisted Injection")
