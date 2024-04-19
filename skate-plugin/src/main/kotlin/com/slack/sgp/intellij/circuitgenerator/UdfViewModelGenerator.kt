@@ -23,7 +23,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.dialog
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
@@ -55,20 +54,23 @@ class UdfViewModelGenerator : AnAction(), DumbAware {
       }
       row {
         checkBox("Enable Assisted Injection")
-          .bindSelected(
-            getter = { assistedInject },
-            setter = { assistedInject = it }
-          )
+          .bindSelected(getter = { assistedInject }, setter = { assistedInject = it })
       }
     }
     // Create and return the dialog
     return dialog(title = "UDF ViewModel Convert", panel = centerPanel).apply {
       if (showAndGet()) {
-          createUdfViewModel(featureNameField, assistedInject, directory, project)
-        }
+        createUdfViewModel(featureNameField, assistedInject, directory, project)
       }
     }
-  private fun createUdfViewModel(featureName: String, assistedInject: Boolean, directory: String, project: Project) {
+  }
+
+  private fun createUdfViewModel(
+    featureName: String,
+    assistedInject: Boolean,
+    directory: String,
+    project: Project,
+  ) {
     val circuitComponents = listOf(CircuitScreen(), CircuitPresenter(assistedInject, noUi = true))
     circuitComponents.forEach { component ->
       component.writeToFile(directory, directory.getJavaPackageName(), featureName)

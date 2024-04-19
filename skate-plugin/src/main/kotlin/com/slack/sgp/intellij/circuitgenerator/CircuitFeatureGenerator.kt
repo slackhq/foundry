@@ -30,8 +30,8 @@ import com.slack.sgp.intellij.util.circuitPresenterBaseTest
 import com.slack.sgp.intellij.util.circuitUiBaseTest
 import com.slack.sgp.intellij.util.getJavaPackageName
 import com.slack.sgp.intellij.util.isCircuitGeneratorEnabled
-import slack.tooling.projectgen.circuitgen.CircuitComponent
 import java.io.File
+import slack.tooling.projectgen.circuitgen.CircuitComponent
 import slack.tooling.projectgen.circuitgen.CircuitPresenter
 import slack.tooling.projectgen.circuitgen.CircuitScreen
 import slack.tooling.projectgen.circuitgen.CircuitTest
@@ -43,7 +43,8 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
     val currentProject = event.project ?: return
     if (!currentProject.isCircuitGeneratorEnabled()) return
     val selectedFile = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-    val selectedDirectory = if (selectedFile.isDirectory) selectedFile.path else selectedFile.parent.path
+    val selectedDirectory =
+      if (selectedFile.isDirectory) selectedFile.path else selectedFile.parent.path
     showFeatureDialog(currentProject, selectedDirectory)
   }
 
@@ -56,8 +57,9 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
 
     val centerPanel = panel {
       row("Name") {
-        textField().bindText({ featureName }, { featureName = it })
-          .validationOnApply { if (it.text.isBlank()) error("Text cannot be empty") else null }
+        textField().bindText({ featureName }, { featureName = it }).validationOnApply {
+          if (it.text.isBlank()) error("Text cannot be empty") else null
+        }
       }
       row("Class(es) to generate") {
         panel {
@@ -68,23 +70,18 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
         }
       }
       row {
-        checkBox("Enable Assisted Injection").bindSelected({ assistedInject }, { assistedInject = it })
+        checkBox("Enable Assisted Injection")
+          .bindSelected({ assistedInject }, { assistedInject = it })
       }
-      row {
-        checkBox("Generate Test Class").bindSelected({ testClass }, { testClass = it })
-      }
+      row { checkBox("Generate Test Class").bindSelected({ testClass }, { testClass = it }) }
     }
 
     val dialog = dialog(title = "New Circuit Feature", panel = centerPanel)
     dialog.showAndGet()
-    collectComponents(uiScreen, presenterClass, assistedInject, testClass, project)
-      .forEach { component ->
-        component.writeToFile(
-          directory,
-          directory.getJavaPackageName(),
-          featureName
-        )
-      }
+    collectComponents(uiScreen, presenterClass, assistedInject, testClass, project).forEach {
+      component ->
+      component.writeToFile(directory, directory.getJavaPackageName(), featureName)
+    }
 
     // Refresh local file changes and open new Circuit screen file in editor
     val screenFile = "${directory}/${featureName}Screen.kt"
@@ -100,7 +97,7 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
     presenter: Boolean,
     assistedInject: Boolean,
     generateTest: Boolean,
-    project: Project
+    project: Project,
   ): MutableList<CircuitComponent> {
     return mutableListOf<CircuitComponent>().apply {
       if (uiScreen) {
@@ -109,10 +106,9 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
       }
       if (presenter) {
         add(CircuitPresenter(assistedInject))
-        if (generateTest) add(CircuitTest(fileSuffix = "PresenterTest", project.circuitPresenterBaseTest()))
+        if (generateTest)
+          add(CircuitTest(fileSuffix = "PresenterTest", project.circuitPresenterBaseTest()))
       }
     }
   }
-
-
 }

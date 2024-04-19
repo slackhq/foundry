@@ -115,6 +115,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     set(value) {
       state.isCodeOwnerEnabled = value
     }
+
   var codeOwnerFilePath: String?
     get() = state.codeOwnerFilePath
     set(value) {
@@ -127,18 +128,17 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isCircuitGeneratorEnabled = value
     }
 
-  var circuitPresenterBaseTest : String?
+  var circuitPresenterBaseTest: String?
     get() = state.circuitPresenterBaseTest
     set(value) {
       state.circuitPresenterBaseTest = value
     }
 
-  var circuitUiBaseTest : String?
+  var circuitUiBaseTest: String?
     get() = state.circuitUiBaseTest
     set(value) {
       state.circuitUiBaseTest = value
     }
-
 
   class State : BaseState() {
     var whatsNewFilePath by string()
