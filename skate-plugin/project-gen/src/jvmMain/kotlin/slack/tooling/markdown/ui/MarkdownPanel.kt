@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
@@ -39,13 +40,14 @@ import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.Typography
 import org.jetbrains.jewel.ui.component.Typography.labelTextSize
-import org.jetbrains.jewel.ui.component.plus
+import org.jetbrains.jewel.ui.component.minus
 import slack.tooling.projectgen.SlackDesktopTheme
 
 object MarkdownPanel {
   fun createPanel(computeMarkdown: suspend () -> String): JComponent {
     return ComposePanel().apply {
       // Necessary to avoid an NPE in JPanel
+      // This is just a minimum
       preferredSize = Dimension(400, 600)
       setContent {
         SlackDesktopTheme {
@@ -92,9 +94,9 @@ private fun jewelMarkdownColor(
   text: Color = JewelTheme.defaultTextStyle.color,
   codeText: Color = JewelTheme.defaultTextStyle.color,
   linkText: Color = text,
-  codeBackground: Color = JewelTheme.globalColors.paneBackground.copy(alpha = 0.1f),
+  codeBackground: Color = rememberCodeBackground(JewelTheme.globalColors.paneBackground),
   inlineCodeBackground: Color = codeBackground,
-  dividerColor: Color = JewelTheme.globalColors.outlines.focused,
+  dividerColor: Color = JewelTheme.globalColors.borders.normal,
 ): MarkdownColors =
   DefaultMarkdownColors(
     text = text,
@@ -106,16 +108,55 @@ private fun jewelMarkdownColor(
   )
 
 @Composable
+private fun rememberCodeBackground(color: Color, percentage: Float = 30f): Color {
+  val newColor =
+    remember(color, percentage) {
+      val factor = 1 - percentage / 100
+      Color(
+        red = (color.red * factor).coerceIn(0f, 1f),
+        green = (color.green * factor).coerceIn(0f, 1f),
+        blue = (color.blue * factor).coerceIn(0f, 1f),
+        alpha = color.alpha,
+      )
+    }
+  return newColor
+}
+
+@Composable
 private fun jewelMarkdownTypography(
-  h1: TextStyle = Typography.h0TextStyle(),
-  h2: TextStyle = Typography.h1TextStyle(),
-  h3: TextStyle = Typography.h2TextStyle(),
-  h4: TextStyle = Typography.h3TextStyle(),
-  h5: TextStyle = Typography.h4TextStyle(),
+  text: TextStyle = JewelTheme.defaultTextStyle,
+  code: TextStyle =
+    JewelTheme.defaultTextStyle.copy(
+      fontSize = labelTextSize() - 2.sp,
+      fontFamily = FontFamily.Monospace,
+    ),
+  h1: TextStyle =
+    JewelTheme.defaultTextStyle.copy(fontSize = labelTextSize() * 2, fontWeight = FontWeight.Bold),
+  h2: TextStyle =
+    JewelTheme.defaultTextStyle.copy(
+      fontSize = labelTextSize() * 1.5,
+      fontWeight = FontWeight.Bold,
+    ),
+  h3: TextStyle =
+    JewelTheme.defaultTextStyle.copy(
+      fontSize = labelTextSize() * 1.25,
+      fontWeight = FontWeight.Medium,
+    ),
+  h4: TextStyle =
+    JewelTheme.defaultTextStyle.copy(
+      fontSize = labelTextSize() * 1.1,
+      fontWeight = FontWeight.Normal,
+    ),
+  h5: TextStyle =
+    JewelTheme.defaultTextStyle.copy(
+      fontSize = labelTextSize() * 1.05,
+      fontWeight = FontWeight.Normal,
+    ),
   h6: TextStyle =
-    JewelTheme.defaultTextStyle.copy(fontSize = labelTextSize(), fontWeight = FontWeight.Bold),
-  text: TextStyle = JewelTheme.defaultTextStyle.copy(fontSize = labelTextSize() + 2.sp),
-  code: TextStyle = JewelTheme.defaultTextStyle.copy(fontFamily = FontFamily.Monospace),
+    JewelTheme.defaultTextStyle.copy(
+      fontSize = labelTextSize() * 0.95,
+      fontWeight = FontWeight.Normal,
+    ),
   quote: TextStyle = JewelTheme.defaultTextStyle.plus(SpanStyle(fontStyle = FontStyle.Italic)),
   paragraph: TextStyle = text,
   ordered: TextStyle = text,
