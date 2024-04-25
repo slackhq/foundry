@@ -42,6 +42,15 @@ internal class SlackBasePlugin @Inject constructor(private val buildFeatures: Bu
   override fun apply(target: Project) {
     val slackProperties = SlackProperties(target)
 
+    if (slackProperties.relocateBuildDir && !target.isSyncing) {
+      // <root-dir>/../<root-dir-name>-out/<project's relative path>
+      val rootDir = target.rootDir
+      val rootDirName = rootDir.name
+      target.layout.buildDirectory.set(
+        rootDir.resolve("../$rootDirName-out/${target.projectDir.toRelativeString(rootDir)}")
+      )
+    }
+
     if (!target.isRootProject) {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
