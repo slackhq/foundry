@@ -67,13 +67,13 @@ object MarkdownPanel {
       // Necessary to avoid an NPE in JPanel
       // This is just a minimum
       preferredSize = Dimension(400, 600)
-      setContent { SlackDesktopTheme { MarkdownContent(computeMarkdown) } }
+      setContent { SlackDesktopTheme { MarkdownContent(computeMarkdown = computeMarkdown) } }
     }
   }
 }
 
 @Composable
-fun MarkdownContent(computeMarkdown: suspend () -> String) {
+fun MarkdownContent(modifier: Modifier = Modifier, computeMarkdown: suspend () -> String) {
   CompositionLocalProvider(
     LocalMarkdownColors provides jewelMarkdownColor(),
     LocalMarkdownTypography provides jewelMarkdownTypography(),
@@ -81,7 +81,7 @@ fun MarkdownContent(computeMarkdown: suspend () -> String) {
     val markdown by produceState<String?>(null) { value = computeMarkdown() }
     if (markdown == null) {
       Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
       ) {
@@ -90,7 +90,7 @@ fun MarkdownContent(computeMarkdown: suspend () -> String) {
       }
     } else {
       val stateVertical = rememberScrollState(0)
-      Box(Modifier.fillMaxSize()) {
+      Box(modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().verticalScroll(stateVertical).padding(16.dp)) {
           Markdown(
             markdown!!,
