@@ -478,6 +478,22 @@ internal constructor(
   public val buildToolsVersionOverride: String? =
     optionalStringProperty("sgp.android.buildToolsVersionOverride")
 
+  /**
+   * Performance optimization to relocate the entire project build directory to a location outside
+   * the IDE's view. This prevents the IDE from tracking these files and improves IDE performance.
+   */
+  public val relocateBuildDir: Boolean = betaFeature("sgp.perf.relocateBuildDir")
+
+  /** Opt-in for beta SGP features. */
+  public val enableBetaFeatures: Boolean = booleanProperty("sgp.beta", defaultValue = false)
+
+  /**
+   * Shorthand helper for checking features that are in beta or falling back to their specific flag.
+   */
+  private fun betaFeature(key: String): Boolean {
+    return enableBetaFeatures || booleanProperty(key, defaultValue = false)
+  }
+
   /* Controls for auto-applied plugins. */
   public val autoApplyTestRetry: Boolean
     get() = booleanProperty("slack.auto-apply.test-retry", defaultValue = true)
