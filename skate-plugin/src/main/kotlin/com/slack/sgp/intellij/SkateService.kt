@@ -18,7 +18,6 @@ package com.slack.sgp.intellij
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
@@ -63,12 +62,8 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
           stripeTitle = Supplier { "What's New in Slack!" }
           anchor = ToolWindowAnchor.RIGHT
         }
-      // The Disposable is necessary to prevent a substantial memory leak while working with
-      // MarkdownJCEFHtmlPanel
-      val parentDisposable = Disposer.newDisposable()
 
-      WhatsNewPanelFactory()
-        .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
+      WhatsNewPanelFactory().createToolWindowContent(toolWindow, project, parsedChangelog)
 
       toolWindow.show()
     }

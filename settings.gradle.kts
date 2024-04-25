@@ -188,6 +188,7 @@ include(
   ":sgp-common",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
+  ":skate-plugin:compose-playground",
   ":skate-plugin:project-gen",
   ":slack-plugin",
   ":tracing",

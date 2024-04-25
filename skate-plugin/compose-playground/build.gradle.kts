@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
-  alias(libs.plugins.buildConfig)
   alias(libs.plugins.compose)
   alias(libs.plugins.lint)
 }
@@ -42,9 +41,10 @@ kotlin {
         implementation(compose.ui)
         implementation(libs.circuit.foundation)
         implementation(libs.compose.markdown)
-        implementation(libs.jewel.bridge232)
+        implementation(libs.jewel.standalone)
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
+        implementation(projects.skatePlugin.projectGen)
       }
     }
   }

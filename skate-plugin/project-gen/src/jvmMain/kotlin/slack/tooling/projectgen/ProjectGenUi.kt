@@ -71,18 +71,12 @@ object ProjectGenUi {
   fun createPanel(rootDir: String, width: Int, height: Int, events: Events): JComponent {
     return ComposePanel().apply {
       setBounds(0, 0, width, height)
-      setContent {
-        ProjectGenApp(rootDir, events) { content -> SlackDesktopTheme(content = content) }
-      }
+      setContent { SlackDesktopTheme { ProjectGenApp(rootDir, events) } }
     }
   }
 
   @Composable
-  internal fun ProjectGenApp(
-    rootDir: String,
-    events: Events,
-    render: @Composable (content: @Composable () -> Unit) -> Unit,
-  ) {
+  fun ProjectGenApp(rootDir: String, events: Events) {
     val circuit = remember {
       Circuit.Builder()
         .addPresenterFactory { _, _, _ ->
@@ -97,7 +91,7 @@ object ProjectGenUi {
         }
         .build()
     }
-    render { CircuitContent(ProjectGenScreen, circuit = circuit) }
+    CircuitContent(ProjectGenScreen, circuit = circuit)
   }
 }
 
