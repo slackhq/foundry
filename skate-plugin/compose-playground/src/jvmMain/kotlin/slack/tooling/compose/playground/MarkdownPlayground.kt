@@ -83,7 +83,7 @@ private const val MARKDOWN =
   The above was supposed to be a divider.
 
   ~~This is strikethrough with two tildes~~
-  
+
   ~This is strikethrough~
 
   This is an ordered list:
