@@ -15,12 +15,12 @@
  */
 package slack.unittest
 
-import com.gradle.enterprise.gradleplugin.testretry.retry as geRetry
 import kotlin.math.max
 import kotlin.math.roundToInt
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.develocity
 import org.gradle.kotlin.dsl.retry
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.gradle.SlackProperties
@@ -259,7 +259,7 @@ internal object UnitTests {
       } else {
         // TODO eventually expose if GE was enabled in settings via our own settings plugin?
         project.tasks.withType(Test::class.java).configureEach {
-          geRetry {
+          develocity.testRetry {
             failOnPassedAfterRetry.setDisallowChanges(
               slackProperties.testRetryFailOnPassedAfterRetry
             )
