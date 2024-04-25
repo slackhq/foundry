@@ -106,6 +106,7 @@ kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet"}
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jewel-bridge232 = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-232", version.ref = "jewel" }
+jewel-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version = "0.15.2" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
