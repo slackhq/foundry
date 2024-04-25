@@ -112,8 +112,7 @@ fun MarkdownContent(modifier: Modifier = Modifier, computeMarkdown: suspend () -
 private fun jewelMarkdownColor(
   text: Color = JewelTheme.defaultTextStyle.color.takeOrElse { JewelTheme.contentColor },
   linkText: Color = JewelTheme.linkColor,
-  // TODO https://github.com/mikepenz/multiplatform-markdown-renderer/issues/131
-  dividerColor: Color = JewelTheme.globalColors.outlines.focused,
+  dividerColor: Color = JewelTheme.globalColors.borders.normal,
 ): MarkdownColors {
   // TODO https://github.com/mikepenz/multiplatform-markdown-renderer/issues/130
   val (codeText, codeBackground, _, inlineCodeBackground) =
