@@ -46,10 +46,14 @@ import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.compose.LocalMarkdownColors
 import com.mikepenz.markdown.compose.LocalMarkdownTypography
 import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.compose.extendedspans.ExtendedSpans
+import com.mikepenz.markdown.compose.extendedspans.RoundedCornerSpanPainter
+import com.mikepenz.markdown.compose.extendedspans.RoundedCornerSpanPainter.TextPaddingValues
 import com.mikepenz.markdown.model.DefaultMarkdownColors
 import com.mikepenz.markdown.model.DefaultMarkdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
+import com.mikepenz.markdown.model.markdownExtendedSpans
 import java.awt.Dimension
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
@@ -96,6 +100,18 @@ fun MarkdownContent(modifier: Modifier = Modifier, computeMarkdown: suspend () -
             markdown!!,
             colors = LocalMarkdownColors.current,
             typography = LocalMarkdownTypography.current,
+            extendedSpans =
+              markdownExtendedSpans {
+                remember {
+                  // Pad out inline code blocks better
+                  ExtendedSpans(
+                    RoundedCornerSpanPainter(
+                      cornerRadius = 4.sp,
+                      padding = TextPaddingValues(1.sp, 4.sp),
+                    )
+                  )
+                }
+              },
           )
         }
 
@@ -114,12 +130,12 @@ private fun jewelMarkdownColor(
   linkText: Color = JewelTheme.linkColor,
   dividerColor: Color = JewelTheme.globalColors.borders.normal,
 ): MarkdownColors {
-  // TODO https://github.com/mikepenz/multiplatform-markdown-renderer/issues/130
-  val (codeText, codeBackground, _, inlineCodeBackground) =
+  val (codeText, codeBackground, inlineCodeText, inlineCodeBackground) =
     rememberCodeBackground(JewelTheme.globalColors.paneBackground, text)
   return DefaultMarkdownColors(
     text = text,
     codeText = codeText,
+    inlineCodeText = inlineCodeText,
     linkText = linkText,
     codeBackground = codeBackground,
     inlineCodeBackground = inlineCodeBackground,
