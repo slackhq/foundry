@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.16.4
+------
+
+_2024-04-26_
+
+- Add new flag + logic to relocate project build directories [#827](https://github.com/slackhq/slack-gradle-plugin/pull/827).
+- Update to develocity plugin's `retry` extension.
+- Build against redacted compiler plugin `1.8.1`.
+- Update to Kaml `0.59.0`.
+
 0.16.3
 ------
 
