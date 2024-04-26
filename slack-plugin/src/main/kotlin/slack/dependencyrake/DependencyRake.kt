@@ -404,7 +404,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     MISUSED,
 
     /** Remove unused or redundant plugins. */
-    PLUGINS
+    PLUGINS,
   }
 }
 
