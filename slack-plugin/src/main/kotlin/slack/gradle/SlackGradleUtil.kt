@@ -125,7 +125,7 @@ public enum class SupportedLanguagesEnum {
   INTERNAL,
 
   /** Languages included in Beta builds */
-  BETA
+  BETA,
 }
 
 public val Project.fullGitSha: Provider<String>

@@ -84,7 +84,7 @@ public enum class BootstrapPropertiesMode {
   /** Append them to the target gradle.properties file. */
   APPEND,
   /** Overwrite them in the target gradle.properties file. */
-  OVERWRITE
+  OVERWRITE,
 }
 
 private val BYTES_PER_GB = 1024.0.pow(3)

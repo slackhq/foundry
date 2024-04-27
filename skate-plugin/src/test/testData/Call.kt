@@ -39,14 +39,14 @@ data class Call(
     UNKNOWN,
     @Json(name = "join") JOIN,
     @Json(name = "decline") DECLINE,
-    @Json(name = "retry") RETRY
+    @Json(name = "retry") RETRY,
   }
 
   @JsonClass(generateAdapter = false)
   enum class RetryText {
     UNKNOWN,
     @Json(name = "call_back") CALL_BACK,
-    @Json(name = "call_again") CALL_AGAIN
+    @Json(name = "call_again") CALL_AGAIN,
   }
 
   @JsonClass(generateAdapter = false)
@@ -58,7 +58,7 @@ data class Call(
     @Json(name = "active") ACTIVE,
     @Json(name = "ended") ENDED,
     @Json(name = "missed") MISSED,
-    @Json(name = "declined") DECLINED
+    @Json(name = "declined") DECLINED,
   }
 
   @JsonClass(generateAdapter = true)
@@ -69,7 +69,7 @@ data class Call(
       UNKNOWN,
       @Json(name = "complete") COMPLETE,
       @Json(name = "failed") FAILED,
-      @Json(name = "processing") PROCESSING
+      @Json(name = "processing") PROCESSING,
     }
   }
 }
