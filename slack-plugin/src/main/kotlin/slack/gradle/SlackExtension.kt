@@ -867,10 +867,10 @@ constructor(
             extension.enableNonSkippingGroupOptimization.set(v.toBoolean())
           }
           "suppressKotlinVersionCompatibilityCheck" -> {
-            extension.suppressKotlinVersionCompatibilityCheck.set(v)
+            error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
           }
           "experimentalStrongSkipping" -> {
-            extension.enableExperimentalStrongSkippingMode.set(v.toBoolean())
+            extension.enableStrongSkippingMode.set(v.toBoolean())
           }
           "stabilityConfigurationPath" -> {
             extension.stabilityConfigurationFile.set(project.file(v))
