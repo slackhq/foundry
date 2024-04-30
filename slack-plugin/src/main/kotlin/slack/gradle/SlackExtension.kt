@@ -54,11 +54,17 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
+  project: Project,
   versionCatalog: VersionCatalog,
 ) {
   internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
   internal val featuresHandler =
-    objects.newInstance<FeaturesHandler>(globalSlackProperties, slackProperties, versionCatalog)
+    objects.newInstance<FeaturesHandler>(
+      globalSlackProperties,
+      slackProperties,
+      project,
+      versionCatalog,
+    )
 
   /**
    * This is weird! Due to the non-property nature of some AGP DSL features (e.g. buildFeatures and
@@ -409,6 +415,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
+  private val project: Project,
   versionCatalog: VersionCatalog,
 ) {
   // Dagger features
@@ -544,7 +551,7 @@ constructor(
    * [SlackProperties.defaultComposeAndroidBundleAlias].
    */
   public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
-    composeHandler.enable(multiplatform = multiplatform)
+    composeHandler.enable(project = project, multiplatform = multiplatform)
     action.execute(composeHandler)
   }
 
@@ -813,8 +820,9 @@ constructor(
     compilerOption("metricsDestination", metricsDestination.canonicalPath.toString())
   }
 
-  internal fun enable(multiplatform: Boolean) {
+  internal fun enable(project: Project, multiplatform: Boolean) {
     enabled.setDisallowChanges(true)
+    project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     this.multiplatform.setDisallowChanges(multiplatform)
     if (!multiplatform) {
       val extension =
@@ -833,7 +841,6 @@ constructor(
 
   internal fun applyTo(project: Project) {
     if (enabled.get()) {
-      project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
       val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
       val isMultiplatform = multiplatform.get()
       if (isMultiplatform) {

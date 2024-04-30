@@ -121,6 +121,7 @@ internal class StandardProjectConfigurations(
         SlackExtension::class.java,
         globalProperties,
         slackProperties,
+        project,
         versionCatalog,
       )
     if (slackProperties.eagerlyConfigureArtifactPublishing) {
