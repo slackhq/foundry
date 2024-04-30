@@ -29,14 +29,7 @@ class AgpHandlersTest {
   }
 
   private fun assertVersion(version: String) {
-    val versionToCheck =
-      if (version[version.lastIndex - 1] == '0') {
-        // AGP doesn't print the leading zero in their versions here
-        version.substring(0, version.lastIndex - 1) + version[version.lastIndex]
-      } else {
-        version
-      }
     assertThat(computeAndroidPluginVersion(version).toString())
-      .isEqualTo("Android Gradle Plugin version $versionToCheck")
+      .isEqualTo("Android Gradle Plugin version $version")
   }
 }
