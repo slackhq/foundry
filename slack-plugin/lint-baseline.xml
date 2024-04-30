@@ -190,6 +190,17 @@
 
     <issue
         id="ExceptionMessage"
+        message="Please specify a `lazyMessage` param for require"
+        errorLine1="            add(&quot;api&quot;, def.coordinates) { version { require(version) } }"
+        errorLine2="                                                    ~~~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/Platforms.kt"
+            line="273"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="ExceptionMessage"
         message="Please specify a `lazyMessage` param for check"
         errorLine1="    check(logs.isNotEmpty())"
         errorLine2="    ~~~~~">
