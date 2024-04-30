@@ -78,7 +78,7 @@ dependencyResolutionManagement {
       forRepository(::gradlePluginPortal)
       filter {
         includeModule("com.github.ben-manes", "gradle-versions-plugin")
-        includeModule("com.gradle", "gradle-enterprise-gradle-plugin")
+        includeModule("com.gradle", "develocity-gradle-plugin")
         includeModule("org.gradle", "test-retry-gradle-plugin")
         includeModule("gradle.plugin.org.gradle.android", "android-cache-fix-gradle-plugin")
         includeModule("net.ltgt.gradle", "gradle-errorprone-plugin")
@@ -144,8 +144,8 @@ pluginManagement {
           "com.github.ben-manes.versions",
           "com.github.ben-manes.versions.gradle.plugin",
         )
-        includeModule("com.gradle", "gradle-enterprise-gradle-plugin")
-        includeModule("com.gradle.enterprise", "com.gradle.enterprise.gradle.plugin")
+        includeModule("com.gradle", "develocity-gradle-plugin")
+        includeModule("com.gradle.develocity", "com.gradle.develocity.gradle.plugin")
         includeModule("com.diffplug.spotless", "com.diffplug.spotless.gradle.plugin")
         includeModule("io.gitlab.arturbosch.detekt", "io.gitlab.arturbosch.detekt.gradle.plugin")
         includeModule("org.gradle.kotlin.kotlin-dsl", "org.gradle.kotlin.kotlin-dsl.gradle.plugin")
@@ -163,18 +163,16 @@ pluginManagement {
       }
     }
   }
-  plugins { id("com.gradle.enterprise") version "3.14.1" }
 }
 
-plugins { id("com.gradle.enterprise") }
+plugins { id("com.gradle.develocity") version "3.17.2" }
 
 val VERSION_NAME: String by extra.properties
 
-gradleEnterprise {
+develocity {
   buildScan {
-    publishAlways()
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
+    termsOfUseUrl.set("https://gradle.com/terms-of-service")
+    termsOfUseAgree.set("yes")
 
     tag(if (System.getenv("CI").isNullOrBlank()) "Local" else "CI")
     tag(VERSION_NAME)
@@ -190,6 +188,7 @@ include(
   ":sgp-common",
   ":skate-plugin",
   ":skate-plugin:artifactory-authenticator",
+  ":skate-plugin:compose-playground",
   ":skate-plugin:project-gen",
   ":slack-plugin",
   ":tracing",

@@ -24,7 +24,7 @@ sealed interface SkateTracingEvent {
 
   enum class WhatsNew : SkateTracingEvent {
     PANEL_OPENED,
-    PANEL_CLOSED
+    PANEL_CLOSED,
   }
 
   enum class HoustonFeatureFlag : SkateTracingEvent {

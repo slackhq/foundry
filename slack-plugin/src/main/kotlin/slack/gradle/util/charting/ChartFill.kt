@@ -24,6 +24,6 @@ internal data class ChartFill(val type: FillType, val color: Color) : ChartPrope
   enum class FillType(val type: String) {
     TRANSPARENT("a"),
     BACKGROUND("bg"),
-    CHART("c")
+    CHART("c"),
   }
 }

@@ -470,6 +470,22 @@ internal constructor(
   public val buildToolsVersionOverride: String? =
     optionalStringProperty("sgp.android.buildToolsVersionOverride")
 
+  /**
+   * Performance optimization to relocate the entire project build directory to a location outside
+   * the IDE's view. This prevents the IDE from tracking these files and improves IDE performance.
+   */
+  public val relocateBuildDir: Boolean = betaFeature("sgp.perf.relocateBuildDir")
+
+  /** Opt-in for beta SGP features. */
+  public val enableBetaFeatures: Boolean = booleanProperty("sgp.beta", defaultValue = false)
+
+  /**
+   * Shorthand helper for checking features that are in beta or falling back to their specific flag.
+   */
+  private fun betaFeature(key: String): Boolean {
+    return enableBetaFeatures || booleanProperty(key, defaultValue = false)
+  }
+
   /* Controls for auto-applied plugins. */
   public val autoApplyTestRetry: Boolean
     get() = booleanProperty("slack.auto-apply.test-retry", defaultValue = true)
@@ -492,7 +508,7 @@ internal constructor(
   /* Test retry controls. */
   public enum class TestRetryPluginType {
     RETRY_PLUGIN,
-    GE
+    GE,
   }
 
   public val testRetryPluginType: TestRetryPluginType
@@ -514,9 +530,11 @@ internal constructor(
   /** Detekt config files, evaluated from rootProject.file(...). */
   public val detektConfigs: List<String>?
     get() = optionalStringProperty("slack.detekt.configs")?.split(",")
+
   /** Detekt baseline file, evaluated from project.layout.projectDirectory.file(...). */
   public val detektBaselineFileName: String?
     get() = optionalStringProperty("slack.detekt.baseline-file-name", blankIsNull = true)
+
   /** Enables full detekt mode (with type resolution). Off by default due to performance issues. */
   public val enableFullDetekt: Boolean
     get() = booleanProperty("slack.detekt.full")
@@ -585,13 +603,6 @@ internal constructor(
   /** Experimental flag to enable logging thermal throttling on macOS devices. */
   public val logThermals: Boolean
     get() = resolver.booleanValue("slack.log-thermals", defaultValue = false)
-
-  /**
-   * Enables applying common build tags. We are likely to remove these in favor of Gradle's
-   * first-party plugin.
-   */
-  public val applyCommonBuildTags: Boolean
-    get() = resolver.booleanValue("sgp.ge.apply-common-build-tags", defaultValue = true)
 
   /**
    * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
