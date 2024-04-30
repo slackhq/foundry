@@ -143,6 +143,7 @@ private fun jewelMarkdownColor(
   )
 }
 
+@Suppress("ComposeUnstableReceiver")
 private val JewelTheme.Companion.linkColor: Color
   @Composable
   get() {

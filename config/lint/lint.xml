@@ -5,6 +5,10 @@
     projects
     -->
     <issue id="UnknownIssueId" severity="ignore"/>
+    <!--
+    This lint is straight up broken and inactionable.
+    -->
+    <issue id="SimilarGradleDependency" severity="ignore"/>
 
     <!--
     We don't want to run lint over generated sources because generated code is able to guarantee
