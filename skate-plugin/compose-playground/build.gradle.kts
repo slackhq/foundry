@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.compose)
+  alias(libs.plugins.kotlin.plugin.compose)
   alias(libs.plugins.lint)
 }
 
@@ -47,19 +48,6 @@ kotlin {
         implementation(projects.skatePlugin.projectGen)
       }
     }
-  }
-}
-
-configure<ComposeExtension> {
-  val kotlinVersion = libs.versions.kotlin.get()
-  // Flag to disable Compose's kotlin version check because they're often behind
-  // Or ahead
-  // Or if they're the same, do nothing
-  // It's basically just very noisy.
-  kotlinCompilerPlugin.set(libs.compose.compilerJb.map { it.toString() })
-  val suppressComposeKotlinVersion = kotlinVersion != libs.versions.compose.jb.kotlinVersion.get()
-  if (suppressComposeKotlinVersion) {
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
   }
 }
 
