@@ -876,7 +876,7 @@ constructor(
           "suppressKotlinVersionCompatibilityCheck" -> {
             error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
           }
-          "experimentalStrongSkipping" -> {
+          "strongSkipping" -> {
             extension.enableStrongSkippingMode.set(v.toBoolean())
           }
           "stabilityConfigurationPath" -> {
