@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.17.0
+------
+
+_2024-04-30_
+
+- Build against AGP `8.4.0`.
+- Update Clikt to `4.4.0`.
+
 0.16.4
 ------
 
