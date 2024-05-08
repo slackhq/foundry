@@ -16,24 +16,54 @@
 package slack.tooling.projectgen.circuitgen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
+import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_INJECT
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_EVENT
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_STATE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.COMPOSABLE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.IMMUTABLE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.JAVA_INJECT
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.MODIFIER
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.MUTABLE_STATE_FLOW
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.NAVIGATOR
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PARCELIZE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PRESENTER
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.SCREEN_INTERFACE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.SLACK_DISPATCHER
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.STATE_FLOW
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.UDF_VIEW_MODEL
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.VIEW_MODEL
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.VIEW_MODEL_KEY
 import java.io.File
 import java.io.StringWriter
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.pathString
 
 interface CircuitComponent {
   val fileSuffix: String
+  fun screenClassName(featureName: String): String = "${featureName.replace(fileSuffix, "")}Screen"
 
   fun generate(packageName: String, className: String): FileSpec
 
   fun isTestComponent(): Boolean = false
 
-  fun writeToFile(directory: String, packageName: String?, className: String) {
+  fun writeToFile(directory: Path, packageName: String?, className: String) {
     val baseDirectory =
-      if (isTestComponent()) directory.replace("src/main", "src/test") else directory
+      if (isTestComponent()) Path.of(directory.pathString.replace("src/main", "src/test")) else directory
     val fileSpec = generate(packageName.orEmpty(), className)
-    File(baseDirectory).apply { if (!exists()) mkdirs() }
+    Files.createDirectories(baseDirectory)
     val stringWriter = StringWriter()
     fileSpec.writeTo(stringWriter)
     val generatedCode = stringWriter.toString().replace("public ", "")
@@ -45,13 +75,10 @@ class CircuitScreen : CircuitComponent {
   override val fileSuffix = "Screen"
 
   override fun generate(packageName: String, className: String): FileSpec {
-    /*
-    Generate Circuit Screen class, eg:
-
-    @Parcelize
-      class FeatureScreen : Screen {
+    /** Generate Circuit Screen class, eg:
+      @Parcelize
+      class ${NAME}Screen : Screen {
         data class State(
-          val message: String = "",
           val eventSink: Event.() -> Unit = {},
         ) : CircuitUiState
 
@@ -59,32 +86,25 @@ class CircuitScreen : CircuitComponent {
         sealed interface Event : CircuitUiEvent
       }
     */
-    val circuitScreenClass = "${className}Screen"
-    val parcelize = ClassName("kotlinx.parcelize", "Parcelize")
-    val circuitUiEvent = ClassName("com.slack.circuit.runtime", "CircuitUiEvent")
-    val circuitUiState = ClassName("com.slack.circuit.runtime", "CircuitUiState")
-    val screenInterface = ClassName("com.slack.circuit.runtime.screen", "Screen")
+    val screenClassName = ClassName(packageName, screenClassName(className))
+    val eventInterfaceCN = screenClassName.nestedClass("Event")
     val eventInterface =
-      TypeSpec.interfaceBuilder("Event")
-        .addAnnotation(Immutable::class)
+      TypeSpec.interfaceBuilder(eventInterfaceCN.simpleName)
+        .addAnnotation(IMMUTABLE)
         .addModifiers(KModifier.SEALED)
-        .addSuperinterface(circuitUiEvent)
+        .addSuperinterface(CIRCUIT_UI_EVENT)
         .build()
 
-    val eventInterfaceName = eventInterface.name?.let { ClassName("", it) }
     val stateClass =
       TypeSpec.classBuilder("State")
         .addModifiers(KModifier.DATA)
         .primaryConstructor(
           FunSpec.constructorBuilder()
             .addParameter(
-              ParameterSpec.builder("message", String::class).defaultValue("%S", "").build()
-            )
-            .addParameter(
               ParameterSpec.builder(
                   "eventSink",
                   LambdaTypeName.get(
-                    receiver = eventInterfaceName,
+                    receiver = eventInterfaceCN,
                     returnType = Unit::class.asTypeName(),
                   ),
                 )
@@ -93,99 +113,111 @@ class CircuitScreen : CircuitComponent {
             )
             .build()
         )
-        .addProperty(PropertySpec.builder("message", String::class).initializer("message").build())
         .addProperty(
           PropertySpec.builder(
               "eventSink",
               LambdaTypeName.get(
-                receiver = eventInterfaceName,
+                receiver = eventInterfaceCN,
                 returnType = Unit::class.asTypeName(),
               ),
             )
             .initializer("eventSink")
             .build()
         )
-        .addSuperinterface(circuitUiState)
+        .addSuperinterface(CIRCUIT_UI_STATE)
         .build()
-
-    return FileSpec.builder(packageName, circuitScreenClass)
-      .addType(
-        TypeSpec.classBuilder(circuitScreenClass)
-          .addSuperinterface(screenInterface)
-          .addAnnotation(parcelize)
-          .addType(stateClass)
-          .addType(eventInterface)
-          .build()
-      )
+    val typeSpec = TypeSpec.classBuilder(screenClassName)
+      .addSuperinterface(SCREEN_INTERFACE)
+      .addAnnotation(PARCELIZE)
+      .addType(stateClass)
+      .addType(eventInterface)
       .build()
+    return FileSpec.get(packageName, typeSpec)
   }
 }
 
+
 class CircuitPresenter(
-  private val useAssistedInjection: Boolean = true,
+  private val assistedInjection: AssistedInjectionConfig,
+  private val additionalCircuitInject: Set<ClassName> = setOf(),
   private val noUi: Boolean = false,
 ) : CircuitComponent {
   override val fileSuffix = "Presenter"
 
   override fun generate(packageName: String, className: String): FileSpec {
-    /*
-     Generate Circuit Presenter class, eg:
-
-     class FeaturePresenter @AssistedInject constructor(
+    /** Generate Circuit Presenter class, eg:
+     class ${NAME}Presenter @AssistedInject constructor(
        @Assisted
-       private val screen: {Feature}Screen,
+       private val screen: ${NAME}Screen,
        @Assisted
        private val navigator: Navigator,
-     ) : Presenter<ggScreen.State> {
+     ) : Presenter<${NAMEScreen.State> {
        @Composable
        override fun present(): FeatureScreen.State {
-         val scope = rememberStableCoroutineScope()
-         return FeatureScreen.State() { event ->
          }
        }
 
        @AssistedFactory
        @CircuitInject(
-         FeatureScreen::class,
+          ${NAME}Screen::class,
          UserScope::class,
        )
-       interface Factory {
-         fun create(screen: ggScreen, navigator: Navigator): FeaturePresenter {
+       fun interface Factory {
+         fun create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter {
          }
        }
      }
     */
-    val screenClassName = "${className}Screen"
-    val presenterClassName = "${className}Presenter"
+    val screenClass = ClassName(packageName, screenClassName(className))
     val assistedInject = ClassName("dagger.assisted", "AssistedInject")
     val assisted = ClassName("dagger.assisted", "Assisted")
     val assistedFactory = ClassName("dagger.assisted", "AssistedFactory")
+    val addAssistedInjection = assistedInjection.screen || assistedInjection.navigator
 
     val factoryBuilder =
-      TypeSpec.interfaceBuilder("Factory").apply {
-        if (useAssistedInjection) {
+      TypeSpec.funInterfaceBuilder("Factory").apply {
+        if (addAssistedInjection) {
           addAnnotation(assistedFactory)
         }
+        addAnnotation(
+            AnnotationSpec.builder(
+              CIRCUIT_INJECT
+            ).apply {
+              addMember("%T::class", screenClass)
+              additionalCircuitInject.forEach { inject ->
+                addMember("%T::class", inject)
+              }
+            }
+              .build()
+          )
+        addFunction(
+          FunSpec.builder("create")
+            .addModifiers(KModifier.ABSTRACT)
+            .addParameter("screen", screenClass)
+            .addParameter("navigator", NAVIGATOR)
+            .returns(ClassName("", className))
+            .build()
+        )
       }
 
     val constructorBuilder =
       FunSpec.constructorBuilder().apply {
-        if (useAssistedInjection) {
+        if (addAssistedInjection) {
           addAnnotation(assistedInject)
         }
         addParameter(
-          ParameterSpec.builder("screen", ClassName("", screenClassName))
+          ParameterSpec.builder("screen", screenClass)
             .apply {
-              if (useAssistedInjection) {
+              if (assistedInjection.screen) {
                 addAnnotation(assisted)
               }
             }
             .build()
         )
         addParameter(
-          ParameterSpec.builder("navigator", ClassName("com.slack.circuit.runtime", "Navigator"))
+          ParameterSpec.builder("navigator", NAVIGATOR)
             .apply {
-              if (useAssistedInjection) {
+              if (assistedInjection.navigator) {
                 addAnnotation(assisted)
               }
             }
@@ -194,7 +226,7 @@ class CircuitPresenter(
       }
 
     val presenterClass =
-      TypeSpec.classBuilder(presenterClassName).apply {
+      TypeSpec.classBuilder(className).apply {
         if (noUi) {
           addKdoc(
             """
@@ -206,17 +238,17 @@ class CircuitPresenter(
         }
         primaryConstructor(constructorBuilder.build())
           .addSuperinterface(
-            ClassName("com.slack.circuit.runtime.presenter", "Presenter")
-              .parameterizedBy(ClassName(packageName, "${className}Screen.State"))
+          PRESENTER
+              .parameterizedBy(screenClass.nestedClass("State"))
           )
           .addProperty(
-            PropertySpec.builder("screen", ClassName("", "${className}Screen"))
+            PropertySpec.builder("screen", screenClass)
               .addModifiers(KModifier.PRIVATE)
               .initializer("screen")
               .build()
           )
           .addProperty(
-            PropertySpec.builder("navigator", ClassName("com.slack.circuit.runtime", "Navigator"))
+            PropertySpec.builder("navigator", NAVIGATOR)
               .addModifiers(KModifier.PRIVATE)
               .initializer("navigator")
               .build()
@@ -224,72 +256,53 @@ class CircuitPresenter(
           .addFunction(
             FunSpec.builder("present")
               .addModifiers(KModifier.OVERRIDE)
-              .addAnnotation(ClassName("androidx.compose.runtime", "Composable"))
-              .returns(ClassName("", "${className}Screen.State"))
-              .addCode(
-                """
-              val scope = rememberStableCoroutineScope()
-              return ${className}Screen.State() { event ->
-              }
-            """
-                  .trimIndent()
-              )
+              .addAnnotation(COMPOSABLE)
+              .returns(screenClass.nestedClass("State"))
+              .addStatement("TODO(%S)", "Implement me!")
               .build()
           )
           .addType(
             factoryBuilder
-              .addAnnotation(
-                AnnotationSpec.builder(
-                    ClassName("com.slack.circuit.codegen.annotations", "CircuitInject")
-                  )
-                  .addMember("%T::class", ClassName(packageName, "${className}Screen"))
-                  .addMember("%T::class", ClassName("slack.di", "UserScope"))
-                  .build()
-              )
-              .addFunction(
-                FunSpec.builder("create")
-                  .addParameter("screen", ClassName(packageName, "${className}Screen"))
-                  .addParameter("navigator", ClassName("com.slack.circuit.runtime", "Navigator"))
-                  .returns(ClassName("", "${className}Presenter"))
-                  .build()
-              )
               .build()
           )
       }
-
-    return FileSpec.builder(packageName, presenterClassName).addType(presenterClass.build()).build()
+    return FileSpec.builder(packageName, className).addType(presenterClass.build()).build()
   }
 }
 
-class CircuitUiFeature : CircuitComponent {
+class CircuitUiFeature(private val injectClasses: MutableSet<ClassName>) : CircuitComponent {
   override val fileSuffix = ""
 
   override fun generate(packageName: String, className: String): FileSpec {
-    /*
-    @CircuitInject(
-      FeatureScreen::class,
-      UserScope::class,
-    )
-    @Composable
-    fun Feature(state: ggScreen.State, modifier: Modifier = Modifier) {
-    }
+    /** Generate UI class, e.g
+     *   @CircuitInject(
+     *   ${NAME}Screen::class,
+     *     UserScope::class,
+     *   )
+     *   @Composable
+     *   fun ${NAME}(state: FeatureScreen.State, modifier: Modifier = Modifier) {
+     *   }
      */
+    val screenClass = ClassName(packageName, screenClassName(className))
     val uiFunction =
       FunSpec.builder(className)
         .addAnnotation(
           AnnotationSpec.builder(
-              ClassName("com.slack.circuit.codegen.annotations", "CircuitInject")
-            )
-            .addMember("%T::class", ClassName(packageName, "${className}Screen"))
-            .addMember("%T::class", ClassName("slack.di", "UserScope"))
+              CIRCUIT_INJECT
+            ).apply {
+              addMember("%T::class", screenClass)
+              injectClasses.forEach {
+                addMember("%T::class", it)
+            }
+          }
             .build()
         )
         .addAnnotation(Composable::class)
         .addParameter(
-          ParameterSpec.builder("state", ClassName(packageName, "${className}Screen.State")).build()
+          ParameterSpec.builder("state", screenClass.nestedClass("State")).build()
         )
         .addParameter(
-          ParameterSpec.builder("modifier", ClassName("androidx.compose.ui", "Modifier"))
+          ParameterSpec.builder("modifier", MODIFIER)
             .defaultValue("Modifier")
             .build()
         )
@@ -305,9 +318,9 @@ class CircuitTest(override val fileSuffix: String, private val baseClass: String
   override fun isTestComponent(): Boolean = true
 
   override fun generate(packageName: String, className: String): FileSpec {
-    /*
-    class FeaturePresenterTest : BaseClass()
-    */
+    /** Generate test class, e.g:
+     * class FeaturePresenterTest : BaseClass()
+     */
     val testClassSpec =
       TypeSpec.classBuilder("${className}${fileSuffix}")
         .apply {
@@ -317,6 +330,120 @@ class CircuitTest(override val fileSuffix: String, private val baseClass: String
         }
         .build()
 
-    return FileSpec.builder(packageName, "${className}${fileSuffix}").addType(testClassSpec).build()
+    return FileSpec.get(packageName, testClassSpec)
   }
 }
+
+class CircuitViewModelScreen : CircuitComponent {
+  override val fileSuffix = "Screen"
+  override fun generate(packageName: String, className: String): FileSpec {
+    /** Generate ViewModelScreen class
+     *
+     * @Parcelize
+     * class ${NAME}Screen : Screen {
+     *
+     *   data class State(
+     *     val events: Events
+     *   ) : CircuitUiState
+     *
+     *   @Immutable
+     *   interface Events {
+     *   }
+     * }
+     */
+    val screenClassName = ClassName(packageName, screenClassName(className))
+    val eventInterfaceCN = screenClassName.nestedClass("Event")
+    val eventInterface =
+      TypeSpec.interfaceBuilder(eventInterfaceCN.simpleName)
+        .addAnnotation(IMMUTABLE)
+        .build()
+
+    val stateClass =
+      TypeSpec.classBuilder("State")
+        .addModifiers(KModifier.DATA)
+        .primaryConstructor(
+          FunSpec.constructorBuilder()
+            .addParameter(
+              ParameterSpec.builder("events", eventInterfaceCN).build()
+            )
+            .build()
+        )
+        .addProperty(
+          PropertySpec.builder(
+            "events",
+            eventInterfaceCN).initializer("events").build()
+        )
+        .addSuperinterface(CIRCUIT_UI_STATE)
+        .build()
+    val typeSpec = TypeSpec.classBuilder(screenClassName)
+      .addSuperinterface(SCREEN_INTERFACE)
+      .addAnnotation(PARCELIZE)
+      .addType(stateClass)
+      .addType(eventInterface)
+      .build()
+    return FileSpec.get(packageName, typeSpec)
+  }
+}
+
+class CircuitViewModel(private val additionalScope: Set<ClassName> = setOf(),) : CircuitComponent {
+
+  override val fileSuffix = "ViewModel"
+  override fun generate(packageName: String, className: String): FileSpec {
+    /** Generate ViewModel class, e.g:
+     *
+     * @ContributesMultibinding(
+     *   UserScope::class,
+     *   boundType = ViewModel::class,
+     * )
+     * @ViewModelKey(${NAME}ViewModel::class)
+     * class ${NAME}ViewModel @Inject constructor(
+     *   slackDispatchers: SlackDispatchers,
+     * ) : UdfViewModel<${NAME}Screen.State>(CloseableCoroutineScope.newMainScope(slackDispatchers)),
+     *     ${NAME}Screen.Events {
+     *   private val state: MutableStateFlow<${NAME}Screen.State> = MutableStateFlow(${NAME}Screen.State(events = this))
+     *
+     *   override fun state(): StateFlow<${NAME}Screen.State> = state
+     * }
+     *
+     */
+    val viewModel = ClassName(packageName, className)
+    val screenClass = ClassName(packageName, screenClassName(className))
+    val closeableCoroutineScope = ClassName("slack.foundation.coroutines", "CloseableCoroutineScope")
+
+    val stateFun = FunSpec.builder("state")
+      .addModifiers(KModifier.OVERRIDE)
+      .returns(STATE_FLOW.parameterizedBy(screenClass.nestedClass("State")))
+      .addStatement("return state")
+      .build()
+
+    val viewModelClass = TypeSpec.classBuilder(viewModel)
+      .addAnnotation(
+        AnnotationSpec.builder(ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")).apply {
+          additionalScope.forEach { scope ->
+            addMember("%T::class", scope)
+          }
+        }
+          .addMember("boundType = %T::class", VIEW_MODEL)
+          .build()
+      )
+      .addAnnotation(
+        AnnotationSpec.builder(VIEW_MODEL_KEY).addMember("%T::class", viewModel).build()
+      )
+      .primaryConstructor(FunSpec.constructorBuilder().addParameter(ParameterSpec.builder("slackDispatchers", SLACK_DISPATCHER).build()).addAnnotation(JAVA_INJECT).build())
+      .superclass(UDF_VIEW_MODEL.parameterizedBy(screenClass.nestedClass("State")))
+      .addSuperclassConstructorParameter("CloseableCoroutineScope.newMainScope(slackDispatchers)", MemberName("slack.foundation.coroutines", "CloseableCoroutineScope.newMainScope"))
+      .addSuperinterface(screenClass.nestedClass("Events"))
+      .addProperty(PropertySpec.builder("state", MUTABLE_STATE_FLOW.parameterizedBy(screenClass.nestedClass("State"))).initializer("MutableStateFlow(%T(events = this))", screenClass.nestedClass("State")).addModifiers(KModifier.PRIVATE).build())
+      .addFunction(stateFun)
+      .build()
+    return FileSpec.builder(packageName, className)
+      .addImport(closeableCoroutineScope.packageName, closeableCoroutineScope.simpleName)
+      .addType(viewModelClass)
+      .build()
+  }
+}
+
+data class AssistedInjectionConfig(
+  val screen: Boolean = false,
+  val navigator: Boolean = false
+)

@@ -18,9 +18,13 @@ package slack.tooling.projectgen
 import com.google.common.truth.Truth.assertThat
 import java.io.StringWriter
 import org.junit.Test
+import slack.tooling.projectgen.circuitgen.AssistedInjectionConfig
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.APP_SCOPE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.USER_SCOPE
 import slack.tooling.projectgen.circuitgen.CircuitPresenter
 import slack.tooling.projectgen.circuitgen.CircuitScreen
 import slack.tooling.projectgen.circuitgen.CircuitTest
+import slack.tooling.projectgen.circuitgen.CircuitViewModel
 
 class CircuitComponentTest {
   @Test
@@ -59,7 +63,7 @@ class CircuitComponentTest {
 
   @Test
   fun testGenerateCircuitPresenterNoAssistedInjection() {
-    val component = CircuitPresenter(false)
+    val component = CircuitPresenter(AssistedInjectionConfig(), setOf(USER_SCOPE))
     val resultSpec = component.generate("com.example.feature", "Foo")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
@@ -79,23 +83,105 @@ class CircuitComponentTest {
       ) : Presenter<FooScreen.State> {
         @Composable
         override fun present(): FooScreen.State {
-          val scope = rememberStableCoroutineScope()
-          return FooScreen.State() { event ->
-          }
+          TODO("Implement me!")
         }
 
         @CircuitInject(
           FooScreen::class,
           UserScope::class,
         )
-        public interface Factory {
-          public fun create(screen: FooScreen, navigator: Navigator): FooPresenter {
-          }
+        public fun interface Factory {
+          public fun create(screen: FooScreen, navigator: Navigator): FooPresenter
         }
       }
 
       """
         .trimIndent()
+    assertThat(stringWriter.toString()).isEqualTo(expectedContent)
+  }
+
+  @Test
+  fun testGenerateCircuitPresenterWithAssistedInjection() {
+    val component = CircuitPresenter(AssistedInjectionConfig(screen = true, navigator = true), setOf(APP_SCOPE))
+    val resultSpec = component.generate("com.example.feature", "Foo")
+    val stringWriter = StringWriter()
+    resultSpec.writeTo(stringWriter)
+    val expectedContent =
+      """
+      package com.example.feature
+
+      import androidx.compose.runtime.Composable
+      import com.slack.circuit.codegen.annotations.CircuitInject
+      import com.slack.circuit.runtime.Navigator
+      import com.slack.circuit.runtime.presenter.Presenter
+      import dagger.assisted.Assisted
+      import dagger.assisted.AssistedFactory
+      import dagger.assisted.AssistedInject
+      import slack.di.AppScope
+
+      public class FooPresenter @AssistedInject constructor(
+        @Assisted
+        private val screen: FooScreen,
+        @Assisted
+        private val navigator: Navigator,
+      ) : Presenter<FooScreen.State> {
+        @Composable
+        override fun present(): FooScreen.State {
+          TODO("Implement me!")
+        }
+
+        @AssistedFactory
+        @CircuitInject(
+          FooScreen::class,
+          AppScope::class,
+        )
+        public fun interface Factory {
+          public fun create(screen: FooScreen, navigator: Navigator): FooPresenter
+        }
+      }
+
+      """
+        .trimIndent()
+    assertThat(stringWriter.toString()).isEqualTo(expectedContent)
+  }
+
+  @Test
+  fun testGenerateViewModelClass() {
+    val component = CircuitViewModel(additionalScope = setOf(APP_SCOPE))
+    val resultSpec = component.generate("com.example.feature.test", "Foo")
+    val stringWriter = StringWriter()
+    resultSpec.writeTo(stringWriter)
+    val expectedContent =
+      """
+        package com.example.feature.test
+
+        import androidx.lifecycle.ViewModel
+        import com.squareup.anvil.annotations.ContributesMultibinding
+        import javax.inject.Inject
+        import kotlinx.coroutines.flow.MutableStateFlow
+        import kotlinx.coroutines.flow.StateFlow
+        import slack.coreui.di.presenter.ViewModelKey
+        import slack.coreui.viewmodel.UdfViewModel
+        import slack.di.AppScope
+        import slack.foundation.coroutines.CloseableCoroutineScope
+        import slack.foundation.coroutines.SlackDispatchers
+
+        @ContributesMultibinding(
+          AppScope::class,
+          boundType = ViewModel::class,
+        )
+        @ViewModelKey(FooViewModel::class)
+        public class FooViewModel @Inject constructor(
+          slackDispatchers: SlackDispatchers,
+        ) : UdfViewModel<FooScreen.State>(CloseableCoroutineScope.newMainScope(slackDispatchers)),
+            FooScreen.Events {
+          private val state: MutableStateFlow<FooScreen.State> = MutableStateFlow(FooScreen.State(events =
+              this))
+
+          override fun state(): StateFlow<FooScreen.State> = state
+        }
+
+      """.trimIndent()
     assertThat(stringWriter.toString()).isEqualTo(expectedContent)
   }
 

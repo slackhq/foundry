@@ -22,20 +22,11 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.ui.components.dialog
-import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.panel
-import com.slack.sgp.intellij.util.circuitPresenterBaseTest
-import com.slack.sgp.intellij.util.circuitUiBaseTest
-import com.slack.sgp.intellij.util.getJavaPackageName
 import com.slack.sgp.intellij.util.isCircuitGeneratorEnabled
 import java.io.File
-import slack.tooling.projectgen.circuitgen.CircuitComponent
-import slack.tooling.projectgen.circuitgen.CircuitPresenter
-import slack.tooling.projectgen.circuitgen.CircuitScreen
-import slack.tooling.projectgen.circuitgen.CircuitTest
-import slack.tooling.projectgen.circuitgen.CircuitUiFeature
+import java.nio.file.Path
+import slack.tooling.projectgen.circuitgen.FileGenerationListener
+import slack.tooling.projectgen.circuitgen.GenerationMode
 
 class CircuitFeatureGenerator : AnAction(), DumbAware {
 
@@ -46,65 +37,26 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
     val selectedDirectory =
       if (selectedFile.isDirectory) selectedFile.path else selectedFile.parent.path
     showFeatureDialog(currentProject, selectedDirectory)
+    GradleDependencyManager().addMissingGradleDependency(currentProject, selectedDirectory)
   }
 
   private fun showFeatureDialog(project: Project, directory: String) {
-    var featureName = ""
-    var uiScreen = true
-    var presenterClass = true
-    var assistedInject = true
-    var testClass = true
-
-    val centerPanel = panel {
-      row("Name") {
-        textField().bindText({ featureName }, { featureName = it }).validationOnApply {
-          if (it.text.isBlank()) error("Text cannot be empty") else null
+    val listener =
+      object : FileGenerationListener {
+        override fun onFilesGenerated(fileNames: String) {
+          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(fileNames))?.let {
+            FileEditorManager.getInstance(project).openFile(it)
+          }
+          LocalFileSystem.getInstance().refresh(true)
         }
       }
-      row("Class(es) to generate") {
-        checkBox("UI Screen").bindSelected({ uiScreen }, { uiScreen = it })
-        checkBox("Presenter").bindSelected({ presenterClass }, { presenterClass = it })
-      }
-      row {
-        checkBox("Enable Assisted Injection")
-          .bindSelected({ assistedInject }, { assistedInject = it })
-      }
-      row { checkBox("Generate Test Class").bindSelected({ testClass }, { testClass = it }) }
-    }
-
-    val dialog = dialog(title = "New Circuit Feature", panel = centerPanel)
-    dialog.showAndGet()
-    collectComponents(uiScreen, presenterClass, assistedInject, testClass, project).forEach {
-      component ->
-      component.writeToFile(directory, directory.getJavaPackageName(), featureName)
-    }
-
-    // Refresh local file changes and open new Circuit screen file in editor
-    val screenFile = "${directory}/${featureName}Screen.kt"
-    LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(screenFile))?.let {
-      FileEditorManager.getInstance(project).openFile(it)
-    }
-    LocalFileSystem.getInstance().refresh(true)
-    GradleDependencyManager().addMissingGradleDependency(project, directory)
-  }
-
-  private fun collectComponents(
-    uiScreen: Boolean,
-    presenter: Boolean,
-    assistedInject: Boolean,
-    generateTest: Boolean,
-    project: Project,
-  ): MutableList<CircuitComponent> {
-    return mutableListOf<CircuitComponent>().apply {
-      if (uiScreen) {
-        addAll(listOf(CircuitScreen(), CircuitUiFeature()))
-        if (generateTest) add(CircuitTest(fileSuffix = "UiTest", project.circuitUiBaseTest()))
-      }
-      if (presenter) {
-        add(CircuitPresenter(assistedInject))
-        if (generateTest)
-          add(CircuitTest(fileSuffix = "PresenterTest", project.circuitPresenterBaseTest()))
-      }
-    }
+    CircuitGeneratorUi(
+        "Circuit Feature Generator",
+        project,
+        Path.of(directory),
+        listener,
+        GenerationMode.ScreenAndPresenter,
+      )
+      .show()
   }
 }

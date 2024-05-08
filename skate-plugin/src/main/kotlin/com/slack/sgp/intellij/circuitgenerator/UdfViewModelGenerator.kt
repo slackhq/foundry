@@ -21,17 +21,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.ui.components.dialog
-import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.panel
-import com.slack.sgp.intellij.util.getJavaPackageName
 import com.slack.sgp.intellij.util.isCircuitGeneratorEnabled
 import java.io.File
-import slack.tooling.projectgen.circuitgen.CircuitPresenter
-import slack.tooling.projectgen.circuitgen.CircuitScreen
+import java.nio.file.Path
+import slack.tooling.projectgen.circuitgen.FileGenerationListener
+import slack.tooling.projectgen.circuitgen.GenerationMode
 
 class UdfViewModelGenerator : AnAction(), DumbAware {
 
@@ -39,49 +34,29 @@ class UdfViewModelGenerator : AnAction(), DumbAware {
     val currentProject = event.project ?: return
     if (!currentProject.isCircuitGeneratorEnabled()) return
     val selectedFile = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-    val selectedDir = if (selectedFile.isDirectory) selectedFile.path else selectedFile.parent.path
-    createDialog(selectedDir, currentProject)
+    val selectedDirectory =
+      if (selectedFile.isDirectory) selectedFile.path else selectedFile.parent.path
+    showFeatureDialog(currentProject, selectedDirectory)
+    GradleDependencyManager().addMissingGradleDependency(currentProject, selectedDirectory)
   }
 
-  private fun createDialog(directory: String, project: Project): DialogWrapper {
-    var featureNameField = ""
-    var assistedInject = true
-    val centerPanel = panel {
-      row("Name") {
-        textField().bindText({ featureNameField }, { featureNameField = it }).validationOnApply {
-          if (it.text.isBlank()) error("Text cannot be empty") else null
+  private fun showFeatureDialog(project: Project, directory: String) {
+    val listener =
+      object : FileGenerationListener {
+        override fun onFilesGenerated(fileNames: String) {
+          LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(fileNames))?.let {
+            FileEditorManager.getInstance(project).openFile(it)
+          }
+          LocalFileSystem.getInstance().refresh(true)
         }
       }
-      row {
-        checkBox("Enable Assisted Injection")
-          .bindSelected(getter = { assistedInject }, setter = { assistedInject = it })
-      }
-    }
-    // Create and return the dialog
-    return dialog(title = "UDF ViewModel Convert", panel = centerPanel).apply {
-      if (showAndGet()) {
-        createUdfViewModel(featureNameField, assistedInject, directory, project)
-      }
-    }
-  }
-
-  private fun createUdfViewModel(
-    featureName: String,
-    assistedInject: Boolean,
-    directory: String,
-    project: Project,
-  ) {
-    val circuitComponents = listOf(CircuitScreen(), CircuitPresenter(assistedInject, noUi = true))
-    circuitComponents.forEach { component ->
-      component.writeToFile(directory, directory.getJavaPackageName(), featureName)
-    }
-
-    // Refresh local file changes and open new Circuit screen file in editor
-    val circuitScreenPath = File("${directory}/${featureName}Screen.kt")
-    LocalFileSystem.getInstance().refreshAndFindFileByIoFile(circuitScreenPath)?.let { file ->
-      FileEditorManager.getInstance(project).openFile(file)
-    }
-    LocalFileSystem.getInstance().refresh(true)
-    GradleDependencyManager().addMissingGradleDependency(project, directory)
+    CircuitGeneratorUi(
+        "UdfViewModel Convert",
+        project,
+        Path.of(directory),
+        listener,
+        GenerationMode.ViewModel,
+      )
+      .show()
   }
 }

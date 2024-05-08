@@ -17,12 +17,15 @@ package com.slack.sgp.intellij
 
 import com.google.common.truth.Truth.assertThat
 import com.slack.sgp.intellij.util.getJavaPackageName
+import java.nio.file.Path
 import org.junit.Test
 
-class StringExtensionTest {
+class PathExtensionTest {
+
   @Test
   fun testAndroidPackageNameFromFilePath() {
-    val path = "/users/src/repo/features/message/src/main/kotlin/com/features/messages/Feature.kt"
+    val path =
+      Path.of("/users/src/repo/features/message/src/main/kotlin/com/features/messages/Feature.kt")
     val expectedPackage = "com.features.messages"
     val result = path.getJavaPackageName()
     assertThat(result).isEqualTo(expectedPackage)
@@ -30,15 +33,24 @@ class StringExtensionTest {
 
   @Test
   fun testAndroidPackageNameFromDirectoryPath() {
-    val path = "/users/src/repo/features/message/src/main/kotlin/com/features/messages"
+    val path = Path.of("/users/src/repo/features/message/src/main/kotlin/com/features/messages")
     val expectedPackage = "com.features.messages"
     val result = path.getJavaPackageName()
     assertThat(result).isEqualTo(expectedPackage)
   }
 
   @Test
+  fun testAndroidPackageNameFromTestPath() {
+    val path =
+      Path.of("/users/src/repo/features/message/src/test/kotlin/com/features/messages/test")
+    val expectedPackage = "com.features.messages.test"
+    val result = path.getJavaPackageName()
+    assertThat(result).isEqualTo(expectedPackage)
+  }
+
+  @Test
   fun testAndroidPackageNull() {
-    val path = "/users/src/repo/build/WhatsNew.md"
+    val path = Path.of("/users/src/repo/build/WhatsNew.md")
     val result = path.getJavaPackageName()
     assertThat(result).isNull()
   }

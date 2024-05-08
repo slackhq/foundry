@@ -233,7 +233,7 @@ private fun PreviewFeature() {
 }
 
 @Composable
-private fun StatusDialog(
+fun StatusDialog(
   text: String,
   confirmButtonText: String,
   onQuit: () -> Unit,

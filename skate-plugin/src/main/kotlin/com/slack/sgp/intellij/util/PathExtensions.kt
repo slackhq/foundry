@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,17 @@
  */
 package com.slack.sgp.intellij.util
 
-import com.google.common.base.CaseFormat
+import java.nio.file.Path
 
-fun String.snakeToCamelCase(): String {
-  return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this)
+fun Path.getJavaPackageName(): String? {
+  val kotlinPathIndex =
+    (0 until nameCount - 2).find {
+      getName(it).toString() == "src" &&
+        (getName(it + 1).toString() == "main" || getName(it + 1).toString() == "test") &&
+        getName(it + 2).toString() == "kotlin"
+    } ?: return null
+
+  val endIndex = if (getName(nameCount - 1).toString().contains(".")) nameCount - 1 else nameCount
+  val packagePath = subpath(kotlinPathIndex + 3, endIndex)
+  return packagePath.joinToString(".")
 }

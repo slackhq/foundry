@@ -91,7 +91,7 @@ class GradleDependencyManager {
           }
         """
         .trimIndent()
-    gradleBuildModel?.pluginsPsiElement?.let {
+    gradleBuildModel?.psiFile?.let {
       return addExpressionToBlock(it, slackBlock, psiFactory, project)
     }
     return null

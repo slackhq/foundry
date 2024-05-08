@@ -35,7 +35,7 @@ internal object DividerElement : UiElement {
 }
 
 @Immutable
-internal data class SectionElement(val title: String, val description: String) : UiElement {
+internal data class SectionElement(val title: String, val description: String, var indentLevel: Int = 0) : UiElement {
   override var isVisible: Boolean = true
 }
 
@@ -43,7 +43,7 @@ internal class CheckboxElement(
   private val initialValue: Boolean,
   val name: String,
   val hint: String,
-  val indentLevel: Int = 0,
+  var indentLevel: Int = 0,
   isVisible: Boolean = true,
 ) : UiElement {
   var isChecked by mutableStateOf(initialValue)
