@@ -102,7 +102,8 @@ class CircuitComponentTest {
 
   @Test
   fun testGenerateCircuitPresenterWithAssistedInjection() {
-    val component = CircuitPresenter(AssistedInjectionConfig(screen = true, navigator = true), setOf(APP_SCOPE))
+    val component =
+      CircuitPresenter(AssistedInjectionConfig(screen = true, navigator = true), setOf(APP_SCOPE))
     val resultSpec = component.generate("com.example.feature", "Foo")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
@@ -181,7 +182,8 @@ class CircuitComponentTest {
           override fun state(): StateFlow<FooScreen.State> = state
         }
 
-      """.trimIndent()
+      """
+        .trimIndent()
     assertThat(stringWriter.toString()).isEqualTo(expectedContent)
   }
 

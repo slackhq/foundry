@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package slack.tooling.projectgen.circuitgen
 
 import androidx.compose.foundation.background
@@ -24,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
+import java.nio.file.Path
+import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.Orientation
 import org.jetbrains.jewel.ui.component.Checkbox
@@ -37,37 +54,57 @@ import slack.tooling.projectgen.DividerElement
 import slack.tooling.projectgen.SectionElement
 import slack.tooling.projectgen.SlackDesktopTheme
 import slack.tooling.projectgen.TextElement
-import java.nio.file.Path
-import javax.swing.JComponent
 
 class CircuitGenUi {
   @Stable
   interface Events {
     fun doCancelAction()
-
   }
-  fun createPanel(directory: Path, packageName: String?, baseTestClass: Map<String, String?>, events: Events, onFileGenerated: FileGenerationListener, generationMode: GenerationMode): JComponent {
+
+  fun createPanel(
+    directory: Path,
+    packageName: String?,
+    baseTestClass: Map<String, String?>,
+    events: Events,
+    onFileGenerated: FileGenerationListener,
+    generationMode: GenerationMode,
+  ): JComponent {
     return ComposePanel().apply {
       setContent {
-        CircuitGenApp(directory, packageName, baseTestClass, events, onFileGenerated, generationMode) { content -> SlackDesktopTheme(content = content) }
+        CircuitGenApp(
+          directory,
+          packageName,
+          baseTestClass,
+          events,
+          onFileGenerated,
+          generationMode,
+        ) { content ->
+          SlackDesktopTheme(content = content)
+        }
       }
     }
   }
 
   @Composable
-  internal fun CircuitGenApp(directory: Path, packageName: String?, baseTestClass: Map<String, String?>, events: Events, onFileGenerated: FileGenerationListener, generationMode: GenerationMode,
-                             render: @Composable (content: @Composable () -> Unit) -> Unit,
+  internal fun CircuitGenApp(
+    directory: Path,
+    packageName: String?,
+    baseTestClass: Map<String, String?>,
+    events: Events,
+    onFileGenerated: FileGenerationListener,
+    generationMode: GenerationMode,
+    render: @Composable (content: @Composable () -> Unit) -> Unit,
   ) {
     val circuit = remember {
       Circuit.Builder()
-        .addPresenterFactory { _, _, _, ->
+        .addPresenterFactory { _, _, _ ->
           CircuitGenPresenter(
             directory,
             packageName,
             baseTestClass,
             onFileGenerated,
             events::doCancelAction,
-            generationMode
+            generationMode,
           )
         }
         .addUiFactory { _, _ ->
@@ -79,9 +116,8 @@ class CircuitGenUi {
   }
 }
 
-
 @Composable
-internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modifier){
+internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modifier) {
 
   Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
     val listState = rememberLazyListState()
@@ -94,9 +130,7 @@ internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modi
         items(state.uiElements.filter { it.isVisible }) { element ->
           when (element) {
             is TextElement -> {
-              Column(
-                Modifier.padding(start = (element.indentLevel).dp)
-              ) {
+              Column(Modifier.padding(start = (element.indentLevel).dp)) {
                 Text(text = element.label, style = Typography.h4TextStyle())
                 Spacer(Modifier.height(4.dp))
                 TextField(
@@ -107,30 +141,23 @@ internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modi
                 )
               }
             }
-
             is CheckboxElement -> {
               Row(
                 Modifier.padding(start = (element.indentLevel).dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
               ) {
                 Checkbox(checked = element.isChecked, onCheckedChange = { element.isChecked = it })
                 Spacer(Modifier.width(8.dp))
-                Column {
-                  Text(element.name, style = Typography.h4TextStyle())
-                }
+                Column { Text(element.name, style = Typography.h4TextStyle()) }
               }
             }
-
             is SectionElement -> {
-              Row(
-                Modifier.padding(start = (element.indentLevel).dp),
-              )  {
+              Row(Modifier.padding(start = (element.indentLevel).dp)) {
                 Text(element.title, style = Typography.h4TextStyle())
                 Spacer(Modifier.width(8.dp))
                 Text(element.description)
               }
             }
-
             DividerElement -> {
               Divider(Orientation.Horizontal)
             }

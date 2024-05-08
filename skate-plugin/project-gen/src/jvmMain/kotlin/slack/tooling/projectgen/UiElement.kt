@@ -35,7 +35,11 @@ internal object DividerElement : UiElement {
 }
 
 @Immutable
-internal data class SectionElement(val title: String, val description: String, var indentLevel: Int = 0) : UiElement {
+internal data class SectionElement(
+  val title: String,
+  val description: String,
+  var indentLevel: Int = 0,
+) : UiElement {
   override var isVisible: Boolean = true
 }
 
