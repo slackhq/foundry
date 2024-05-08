@@ -30,7 +30,7 @@ class CircuitComponentTest {
   @Test
   fun testGenerateCircuitScreen() {
     val component = CircuitScreen()
-    val resultSpec = component.generate("com.example.feature", "Foo")
+    val resultSpec = component.generate("com.example.feature", "FooScreen")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
     val expectedContent =
@@ -41,14 +41,12 @@ class CircuitComponentTest {
       import com.slack.circuit.runtime.CircuitUiEvent
       import com.slack.circuit.runtime.CircuitUiState
       import com.slack.circuit.runtime.screen.Screen
-      import kotlin.String
       import kotlin.Unit
       import kotlinx.parcelize.Parcelize
 
       @Parcelize
       public class FooScreen : Screen {
         public data class State(
-          public val message: String = "",
           public val eventSink: Event.() -> Unit = {},
         ) : CircuitUiState
 
@@ -64,7 +62,7 @@ class CircuitComponentTest {
   @Test
   fun testGenerateCircuitPresenterNoAssistedInjection() {
     val component = CircuitPresenter(AssistedInjectionConfig(), setOf(USER_SCOPE))
-    val resultSpec = component.generate("com.example.feature", "Foo")
+    val resultSpec = component.generate("com.example.feature", "FooPresenter")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
     val expectedContent =
@@ -104,7 +102,7 @@ class CircuitComponentTest {
   fun testGenerateCircuitPresenterWithAssistedInjection() {
     val component =
       CircuitPresenter(AssistedInjectionConfig(screen = true, navigator = true), setOf(APP_SCOPE))
-    val resultSpec = component.generate("com.example.feature", "Foo")
+    val resultSpec = component.generate("com.example.feature", "FooPresenter")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
     val expectedContent =
@@ -149,7 +147,7 @@ class CircuitComponentTest {
   @Test
   fun testGenerateViewModelClass() {
     val component = CircuitViewModel(additionalScope = setOf(APP_SCOPE))
-    val resultSpec = component.generate("com.example.feature.test", "Foo")
+    val resultSpec = component.generate("com.example.feature.test", "FooViewModel")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
     val expectedContent =
