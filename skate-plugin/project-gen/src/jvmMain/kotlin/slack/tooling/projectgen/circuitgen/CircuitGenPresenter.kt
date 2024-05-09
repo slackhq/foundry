@@ -148,13 +148,12 @@ internal class CircuitGenPresenter(
           if (userScopeInject) add(USER_SCOPE)
           if (appScopeInject) add(APP_SCOPE)
         }
-      val noUi = circuitUi.not()
       components.add(
         CircuitPresenter(
           assistedInjection =
             AssistedInjectionConfig(screen = assistedScreen, navigator = assistedNavigator),
           additionalCircuitInject = additionalCircuitInject,
-          noUi = noUi,
+          ui = circuitUi,
         )
       )
       if (generateTest) {

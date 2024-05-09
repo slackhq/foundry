@@ -49,12 +49,6 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
           LocalFileSystem.getInstance().refresh(true)
         }
       }
-    CircuitGeneratorUi(
-        "Circuit Feature Generator",
-        project,
-        Path.of(selectedDir),
-        listener,
-      )
-      .show()
+    CircuitGeneratorUi("Circuit Feature Generator", project, Path.of(selectedDir), listener).show()
   }
 }

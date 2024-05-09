@@ -44,13 +44,7 @@ class CircuitGeneratorUi(
         "UiTest" to project.circuitUiBaseTest(),
         "PresenterTest" to project.circuitPresenterBaseTest(),
       )
-    return CircuitGenUi()
-      .createPanel(
-        selectedDir,
-        baseTestClass,
-        this,
-        listener,
-      )
+    return CircuitGenUi().createPanel(selectedDir, baseTestClass, this, listener)
   }
 
   /* Disable default OK and Cancel action button in Dialog window. */

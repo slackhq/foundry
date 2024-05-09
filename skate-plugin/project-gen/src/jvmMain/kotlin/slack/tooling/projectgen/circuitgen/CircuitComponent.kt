@@ -31,6 +31,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.name
+import kotlin.io.path.pathString
 import kotlin.io.path.relativeTo
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_INJECT
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_EVENT
@@ -53,14 +54,21 @@ interface CircuitComponent {
   fun isTestComponent(): Boolean = false
 
   fun writeToFile(selectedDir: Path, className: String) {
+    val dir =
+      if (isTestComponent()) Path.of(selectedDir.pathString.replace("src/main", "src/test"))
+      else selectedDir
     val srcDir =
-      generateSequence(selectedDir) { it.parent }
+      generateSequence(dir) { it.parent }
         .takeWhile { it.name != "kotlin" && it.name != "java" }
-        .lastOrNull() ?: selectedDir
-    val packageName = selectedDir.relativeTo(srcDir).toString().replace(File.separatorChar, '.')
+        .lastOrNull() ?: dir
+    val packageName = dir.relativeTo(srcDir).toString().replace(File.separatorChar, '.')
     val fileSpec = generate(packageName, "$className$fileSuffix")
     fileSpec.writeTo(srcDir)
-    val generateFilePath = selectedDir.resolve("$className$fileSuffix.kt")
+    removePublicModifier(dir, className)
+  }
+
+  fun removePublicModifier(dir: Path, className: String) {
+    val generateFilePath = dir.resolve("$className$fileSuffix.kt")
     if (Files.exists(generateFilePath)) {
       val generatedCode = Files.readString(generateFilePath)
       val updatedCode = generatedCode.replace("public ", "")
@@ -132,7 +140,7 @@ class CircuitScreen : CircuitComponent {
 class CircuitPresenter(
   private val assistedInjection: AssistedInjectionConfig,
   private val additionalCircuitInject: List<ClassName> = listOf(),
-  private val noUi: Boolean = false,
+  private val ui: Boolean = true,
 ) : CircuitComponent {
   override val fileSuffix = "Presenter"
 
@@ -206,7 +214,7 @@ class CircuitPresenter(
 
     val presenterClass =
       TypeSpec.classBuilder(className).apply {
-        if (noUi) {
+        if (!ui) {
           addKdoc(
             """
          TODO (remove): This Circuit [Presenter] was generated without UI or [CircuitInject], and can be
@@ -288,7 +296,7 @@ class CircuitTest(override val fileSuffix: String, private val baseClass: String
      * ```
      */
     val testClassSpec =
-      TypeSpec.classBuilder("${className}${fileSuffix}")
+      TypeSpec.classBuilder(className)
         .apply {
           if (baseClass != null) {
             superclass(ClassName.bestGuess(baseClass))
