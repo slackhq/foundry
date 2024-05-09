@@ -22,7 +22,6 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -36,18 +35,11 @@ import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUI
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_STATE
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.COMPOSABLE
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.IMMUTABLE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.JAVA_INJECT
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.MODIFIER
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.MUTABLE_STATE_FLOW
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.NAVIGATOR
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PARCELIZE
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PRESENTER
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.SCREEN_INTERFACE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.SLACK_DISPATCHER
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.STATE_FLOW
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.UDF_VIEW_MODEL
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.VIEW_MODEL
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.VIEW_MODEL_KEY
 import kotlin.io.path.name
 import kotlin.io.path.relativeTo
 
@@ -82,9 +74,11 @@ class CircuitScreen : CircuitComponent {
     /**
      * Generate Circuit Screen class, eg:
      *
+     * ```kotlin
      * @Parcelize class ${NAME}Screen : Screen { data class State( val eventSink: Event.() -> Unit =
      *   {}, ) : CircuitUiState
      * @Immutable sealed interface Event : CircuitUiEvent }
+     * ```
      */
     val screenClassName = ClassName(packageName, screenClassName(className))
     val eventInterfaceCN = screenClassName.nestedClass("Event")
@@ -143,7 +137,10 @@ class CircuitPresenter(
 
   override fun generate(packageName: String, className: String): FileSpec {
     /**
-     * Generate Circuit Presenter class, eg: class ${NAME}Presenter @AssistedInject constructor(
+     * Generate Circuit Presenter class, eg:
+     *
+     * ```kotlin
+     * class ${NAME}Presenter @AssistedInject constructor(
      *
      * @Assisted private val screen: ${NAME}Screen,
      * @Assisted private val navigator: Navigator, ) : Presenter<${NAMEScreen.State> {
@@ -151,6 +148,7 @@ class CircuitPresenter(
      * @AssistedFactory
      * @CircuitInject( ${NAME}Screen::class, UserScope::class, ) fun interface Factory { fun
      *   create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter { } } }
+     *   ```
      */
     val screenClass = ClassName(packageName, screenClassName(className))
     val assistedInject = ClassName("dagger.assisted", "AssistedInject")
@@ -251,9 +249,10 @@ class CircuitUiFeature(private val injectClasses: MutableSet<ClassName>) : Circu
   override fun generate(packageName: String, className: String): FileSpec {
     /**
      * Generate UI class, e.g
-     *
+     * ```kotlin
      * @CircuitInject( ${NAME}Screen::class, UserScope::class, )
      * @Composable fun ${NAME}(state: FeatureScreen.State, modifier: Modifier = Modifier) { }
+     * ```
      */
     val screenClass = ClassName(packageName, screenClassName(className))
     val uiFunction =
@@ -281,7 +280,11 @@ class CircuitTest(override val fileSuffix: String, private val baseClass: String
   override fun isTestComponent(): Boolean = true
 
   override fun generate(packageName: String, className: String): FileSpec {
-    /** Generate test class, e.g: class FeaturePresenterTest : BaseClass() */
+    /** Generate test class, e.g:
+     * ```kotlin
+     * class FeaturePresenterTest : BaseClass()
+     * ```
+     * */
     val testClassSpec =
       TypeSpec.classBuilder("${className}${fileSuffix}")
         .apply {
@@ -292,118 +295,6 @@ class CircuitTest(override val fileSuffix: String, private val baseClass: String
         .build()
 
     return FileSpec.get(packageName, testClassSpec)
-  }
-}
-
-class CircuitViewModelScreen : CircuitComponent {
-  override val fileSuffix = "Screen"
-
-  override fun generate(packageName: String, className: String): FileSpec {
-    /**
-     * Generate ViewModelScreen class
-     *
-     * @Parcelize class ${NAME}Screen : Screen {
-     *
-     *   data class State( val events: Events ) : CircuitUiState
-     *
-     *     @Immutable interface Events { } }
-     */
-    val screenClassName = ClassName(packageName, screenClassName(className))
-    val eventInterfaceCN = screenClassName.nestedClass("Event")
-    val eventInterface =
-      TypeSpec.interfaceBuilder(eventInterfaceCN.simpleName).addAnnotation(IMMUTABLE).build()
-
-    val stateClass =
-      TypeSpec.classBuilder("State")
-        .addModifiers(KModifier.DATA)
-        .primaryConstructor(
-          FunSpec.constructorBuilder()
-            .addParameter(ParameterSpec.builder("events", eventInterfaceCN).build())
-            .build()
-        )
-        .addProperty(PropertySpec.builder("events", eventInterfaceCN).initializer("events").build())
-        .addSuperinterface(CIRCUIT_UI_STATE)
-        .build()
-    val typeSpec =
-      TypeSpec.classBuilder(screenClassName)
-        .addSuperinterface(SCREEN_INTERFACE)
-        .addAnnotation(PARCELIZE)
-        .addType(stateClass)
-        .addType(eventInterface)
-        .build()
-    return FileSpec.get(packageName, typeSpec)
-  }
-}
-
-class CircuitViewModel(private val additionalScope: Set<ClassName> = setOf()) : CircuitComponent {
-
-  override val fileSuffix = "ViewModel"
-
-  override fun generate(packageName: String, className: String): FileSpec {
-    /**
-     * Generate ViewModel class, e.g:
-     *
-     * @ContributesMultibinding( UserScope::class, boundType = ViewModel::class, )
-     * @ViewModelKey(${NAME}ViewModel::class) class ${NAME}ViewModel @Inject constructor(
-     *   slackDispatchers: SlackDispatchers, ) :
-     *   UdfViewModel<${NAME}Screen.State>(CloseableCoroutineScope.newMainScope(slackDispatchers)),
-     *   ${NAME}Screen.Events { private val state: MutableStateFlow<${NAME}Screen.State> =
-     *   MutableStateFlow(${NAME}Screen.State(events = this))
-     *
-     *   override fun state(): StateFlow<${NAME}Screen.State> = state }
-     */
-    val viewModel = ClassName(packageName, className)
-    val screenClass = ClassName(packageName, screenClassName(className))
-    val closeableCoroutineScope =
-      ClassName("slack.foundation.coroutines", "CloseableCoroutineScope")
-
-    val stateFun =
-      FunSpec.builder("state")
-        .addModifiers(KModifier.OVERRIDE)
-        .returns(STATE_FLOW.parameterizedBy(screenClass.nestedClass("State")))
-        .addStatement("return state")
-        .build()
-
-    val viewModelClass =
-      TypeSpec.classBuilder(viewModel)
-        .addAnnotation(
-          AnnotationSpec.builder(
-              ClassName("com.squareup.anvil.annotations", "ContributesMultibinding")
-            )
-            .apply { additionalScope.forEach { scope -> addMember("%T::class", scope) } }
-            .addMember("boundType = %T::class", VIEW_MODEL)
-            .build()
-        )
-        .addAnnotation(
-          AnnotationSpec.builder(VIEW_MODEL_KEY).addMember("%T::class", viewModel).build()
-        )
-        .primaryConstructor(
-          FunSpec.constructorBuilder()
-            .addParameter(ParameterSpec.builder("slackDispatchers", SLACK_DISPATCHER).build())
-            .addAnnotation(JAVA_INJECT)
-            .build()
-        )
-        .superclass(UDF_VIEW_MODEL.parameterizedBy(screenClass.nestedClass("State")))
-        .addSuperclassConstructorParameter(
-          "CloseableCoroutineScope.newMainScope(slackDispatchers)",
-          MemberName("slack.foundation.coroutines", "CloseableCoroutineScope.newMainScope"),
-        )
-        .addSuperinterface(screenClass.nestedClass("Events"))
-        .addProperty(
-          PropertySpec.builder(
-              "state",
-              MUTABLE_STATE_FLOW.parameterizedBy(screenClass.nestedClass("State")),
-            )
-            .initializer("MutableStateFlow(%T(events = this))", screenClass.nestedClass("State"))
-            .addModifiers(KModifier.PRIVATE)
-            .build()
-        )
-        .addFunction(stateFun)
-        .build()
-    return FileSpec.builder(packageName, className)
-      .addImport(closeableCoroutineScope.packageName, closeableCoroutineScope.simpleName)
-      .addType(viewModelClass)
-      .build()
   }
 }
 
