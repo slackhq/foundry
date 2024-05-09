@@ -28,8 +28,7 @@ import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.APP_SC
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.USER_SCOPE
 
 internal class CircuitGenPresenter(
-  private val directory: Path,
-  private val packageName: String?,
+  private val selectedDir: Path,
   private val baseTestClass: Map<String, String?>,
   private val fileGenerationListener: FileGenerationListener,
   private val onDismissDialog: () -> Unit,
@@ -163,10 +162,10 @@ internal class CircuitGenPresenter(
       }
     }
 
-    components.forEach { component -> component.writeToFile(directory, packageName, feature) }
+    components.forEach { component -> component.writeToFile(selectedDir, feature) }
 
     fileGenerationListener.onFilesGenerated(
-      "${directory}/${components.first().screenClassName(feature)}.kt"
+      "${selectedDir}/${components.first().screenClassName(feature)}.kt"
     )
   }
 }

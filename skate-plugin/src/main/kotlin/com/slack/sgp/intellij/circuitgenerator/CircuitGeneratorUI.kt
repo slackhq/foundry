@@ -19,20 +19,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.slack.sgp.intellij.util.circuitPresenterBaseTest
 import com.slack.sgp.intellij.util.circuitUiBaseTest
-import com.slack.sgp.intellij.util.getJavaPackageName
 import java.nio.file.Path
 import javax.swing.Action
 import javax.swing.JComponent
 import slack.tooling.projectgen.circuitgen.CircuitGenUi
 import slack.tooling.projectgen.circuitgen.FileGenerationListener
-import slack.tooling.projectgen.circuitgen.GenerationMode
 
 class CircuitGeneratorUi(
   dialogTitle: String,
   private val project: Project,
-  private val directory: Path,
+  private val selectedDir: Path,
   private val listener: FileGenerationListener,
-  private val generationMode: GenerationMode,
 ) : DialogWrapper(project), CircuitGenUi.Events {
 
   init {
@@ -49,12 +46,10 @@ class CircuitGeneratorUi(
       )
     return CircuitGenUi()
       .createPanel(
-        directory,
-        directory.getJavaPackageName(),
+        selectedDir,
         baseTestClass,
         this,
         listener,
-        generationMode,
       )
   }
 

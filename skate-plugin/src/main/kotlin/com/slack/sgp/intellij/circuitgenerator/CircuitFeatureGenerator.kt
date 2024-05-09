@@ -26,7 +26,6 @@ import com.slack.sgp.intellij.util.isCircuitGeneratorEnabled
 import java.io.File
 import java.nio.file.Path
 import slack.tooling.projectgen.circuitgen.FileGenerationListener
-import slack.tooling.projectgen.circuitgen.GenerationMode
 
 class CircuitFeatureGenerator : AnAction(), DumbAware {
 
@@ -40,7 +39,7 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
     GradleDependencyManager().addMissingGradleDependency(currentProject, selectedDirectory)
   }
 
-  private fun showFeatureDialog(project: Project, directory: String) {
+  private fun showFeatureDialog(project: Project, selectedDir: String) {
     val listener =
       object : FileGenerationListener {
         override fun onFilesGenerated(fileNames: String) {
@@ -53,9 +52,8 @@ class CircuitFeatureGenerator : AnAction(), DumbAware {
     CircuitGeneratorUi(
         "Circuit Feature Generator",
         project,
-        Path.of(directory),
+        Path.of(selectedDir),
         listener,
-        GenerationMode.ScreenAndPresenter,
       )
       .show()
   }

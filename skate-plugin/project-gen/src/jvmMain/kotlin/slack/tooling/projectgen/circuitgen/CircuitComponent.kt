@@ -29,10 +29,8 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import java.io.File
-import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.pathString
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_INJECT
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_EVENT
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_STATE
@@ -50,6 +48,8 @@ import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.STATE_
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.UDF_VIEW_MODEL
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.VIEW_MODEL
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.VIEW_MODEL_KEY
+import kotlin.io.path.name
+import kotlin.io.path.relativeTo
 
 interface CircuitComponent {
   val fileSuffix: String
@@ -60,17 +60,18 @@ interface CircuitComponent {
 
   fun isTestComponent(): Boolean = false
 
-  fun writeToFile(directory: Path, packageName: String?, className: String) {
-
-    val baseDirectory =
-      if (isTestComponent()) Path.of(directory.pathString.replace("src/main", "src/test"))
-      else directory
-    val fileSpec = generate(packageName.orEmpty(), className)
-    Files.createDirectories(baseDirectory)
-    val stringWriter = StringWriter()
-    fileSpec.writeTo(stringWriter)
-    val generatedCode = stringWriter.toString().replace("public ", "")
-    File("${baseDirectory}/${className}${fileSuffix}.kt").writeText(generatedCode)
+  fun writeToFile(selectedDir: Path, className: String) {
+    val srcDir = generateSequence(selectedDir) { it.parent }.takeWhile { it.name != "kotlin" && it.name != "java" }
+      .lastOrNull() ?: selectedDir
+    val packageName = selectedDir.relativeTo(srcDir).toString().replace(File.separatorChar, '.')
+    val fileSpec = generate(packageName, "$className$fileSuffix")
+    fileSpec.writeTo(srcDir)
+    val generateFilePath = selectedDir.resolve("$className$fileSuffix.kt")
+    if (Files.exists(generateFilePath)) {
+      val generatedCode = Files.readString(generateFilePath)
+      val updatedCode = generatedCode.replace("public ", "")
+      Files.writeString(generateFilePath, updatedCode)
+    }
   }
 }
 
