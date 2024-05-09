@@ -131,7 +131,7 @@ internal class CircuitGenPresenter(
 
     if (circuitUi) {
       val additionalCircuitInject =
-        mutableSetOf<ClassName>().apply {
+        mutableListOf<ClassName>().apply {
           if (userScopeInject) add(USER_SCOPE)
           if (appScopeInject) add(APP_SCOPE)
         }
@@ -144,7 +144,7 @@ internal class CircuitGenPresenter(
     if (circuitPresenter) {
       components.add(CircuitScreen())
       val additionalCircuitInject =
-        mutableSetOf<ClassName>().apply {
+        mutableListOf<ClassName>().apply {
           if (userScopeInject) add(USER_SCOPE)
           if (appScopeInject) add(APP_SCOPE)
         }

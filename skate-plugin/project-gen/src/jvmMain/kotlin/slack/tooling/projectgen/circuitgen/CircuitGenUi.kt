@@ -66,15 +66,10 @@ class CircuitGenUi {
     baseTestClass: Map<String, String?>,
     events: Events,
     onFileGenerated: FileGenerationListener,
-   ): JComponent {
+  ): JComponent {
     return ComposePanel().apply {
       setContent {
-        CircuitGenApp(
-          selectedDir,
-          baseTestClass,
-          events,
-          onFileGenerated,
-        ) { content ->
+        CircuitGenApp(selectedDir, baseTestClass, events, onFileGenerated) { content ->
           SlackDesktopTheme(content = content)
         }
       }
@@ -92,12 +87,7 @@ class CircuitGenUi {
     val circuit = remember {
       Circuit.Builder()
         .addPresenterFactory { _, _, _ ->
-          CircuitGenPresenter(
-            selectedDir,
-            baseTestClass,
-            onFileGenerated,
-            events::doCancelAction,
-          )
+          CircuitGenPresenter(selectedDir, baseTestClass, onFileGenerated, events::doCancelAction)
         }
         .addUiFactory { _, _ ->
           ui<CircuitGenScreen.State> { state, modifier -> CircuitGen(state, modifier) }

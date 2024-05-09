@@ -30,6 +30,8 @@ import com.squareup.kotlinpoet.asTypeName
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.name
+import kotlin.io.path.relativeTo
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_INJECT
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_EVENT
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_STATE
@@ -40,8 +42,6 @@ import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.NAVIGA
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PARCELIZE
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PRESENTER
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.SCREEN_INTERFACE
-import kotlin.io.path.name
-import kotlin.io.path.relativeTo
 
 interface CircuitComponent {
   val fileSuffix: String
@@ -53,8 +53,10 @@ interface CircuitComponent {
   fun isTestComponent(): Boolean = false
 
   fun writeToFile(selectedDir: Path, className: String) {
-    val srcDir = generateSequence(selectedDir) { it.parent }.takeWhile { it.name != "kotlin" && it.name != "java" }
-      .lastOrNull() ?: selectedDir
+    val srcDir =
+      generateSequence(selectedDir) { it.parent }
+        .takeWhile { it.name != "kotlin" && it.name != "java" }
+        .lastOrNull() ?: selectedDir
     val packageName = selectedDir.relativeTo(srcDir).toString().replace(File.separatorChar, '.')
     val fileSpec = generate(packageName, "$className$fileSuffix")
     fileSpec.writeTo(srcDir)
@@ -73,7 +75,6 @@ class CircuitScreen : CircuitComponent {
   override fun generate(packageName: String, className: String): FileSpec {
     /**
      * Generate Circuit Screen class, eg:
-     *
      * ```kotlin
      * @Parcelize class ${NAME}Screen : Screen { data class State( val eventSink: Event.() -> Unit =
      *   {}, ) : CircuitUiState
@@ -130,7 +131,7 @@ class CircuitScreen : CircuitComponent {
 
 class CircuitPresenter(
   private val assistedInjection: AssistedInjectionConfig,
-  private val additionalCircuitInject: Set<ClassName> = setOf(),
+  private val additionalCircuitInject: List<ClassName> = listOf(),
   private val noUi: Boolean = false,
 ) : CircuitComponent {
   override val fileSuffix = "Presenter"
@@ -138,7 +139,6 @@ class CircuitPresenter(
   override fun generate(packageName: String, className: String): FileSpec {
     /**
      * Generate Circuit Presenter class, eg:
-     *
      * ```kotlin
      * class ${NAME}Presenter @AssistedInject constructor(
      *
@@ -243,12 +243,13 @@ class CircuitPresenter(
   }
 }
 
-class CircuitUiFeature(private val injectClasses: MutableSet<ClassName>) : CircuitComponent {
+class CircuitUiFeature(private val injectClasses: List<ClassName>) : CircuitComponent {
   override val fileSuffix = ""
 
   override fun generate(packageName: String, className: String): FileSpec {
     /**
      * Generate UI class, e.g
+     *
      * ```kotlin
      * @CircuitInject( ${NAME}Screen::class, UserScope::class, )
      * @Composable fun ${NAME}(state: FeatureScreen.State, modifier: Modifier = Modifier) { }
@@ -280,11 +281,12 @@ class CircuitTest(override val fileSuffix: String, private val baseClass: String
   override fun isTestComponent(): Boolean = true
 
   override fun generate(packageName: String, className: String): FileSpec {
-    /** Generate test class, e.g:
+    /**
+     * Generate test class, e.g:
      * ```kotlin
      * class FeaturePresenterTest : BaseClass()
      * ```
-     * */
+     */
     val testClassSpec =
       TypeSpec.classBuilder("${className}${fileSuffix}")
         .apply {
