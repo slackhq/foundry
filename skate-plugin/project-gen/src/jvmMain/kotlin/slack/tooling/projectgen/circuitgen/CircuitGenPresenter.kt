@@ -33,7 +33,6 @@ internal class CircuitGenPresenter(
   private val baseTestClass: Map<String, String?>,
   private val fileGenerationListener: FileGenerationListener,
   private val onDismissDialog: () -> Unit,
-  private val generationMode: GenerationMode,
 ) : Presenter<CircuitGenScreen.State> {
 
   private val featureName = TextElement("", "Feature Name")
@@ -75,7 +74,7 @@ internal class CircuitGenPresenter(
   private val test =
     CheckboxElement(false, name = "Tests", hint = "Should generate test class", indentLevel = 10)
 
-  private val screenAndPresenterElements =
+  private val uiElements =
     mutableStateListOf(
       featureName,
       DividerElement,
@@ -90,89 +89,36 @@ internal class CircuitGenPresenter(
       appScopeCircuitInject,
       test,
     )
-  private val viewModelElements =
-    mutableStateListOf(
-      featureName,
-      DividerElement,
-      circuitInject,
-      userScopeCircuitInject,
-      appScopeCircuitInject,
-    )
 
   @Composable
   override fun present(): CircuitGenScreen.State {
-    val uiElements =
-      when (generationMode) {
-        GenerationMode.ViewModel -> {
-          circuitInject.indentLevel = 0
-          userScopeCircuitInject.indentLevel = 10
-          appScopeCircuitInject.indentLevel = 10
-          viewModelElements
-        }
-        GenerationMode.ScreenAndPresenter -> {
-          circuitInject.isVisible = circuitPresenter.isChecked
-          assistedInjection.isVisible = circuitPresenter.isChecked
-          assistedScreen.isVisible = circuitPresenter.isChecked
-          assistedNavigator.isVisible = circuitPresenter.isChecked
-          userScopeCircuitInject.isVisible = circuitPresenter.isChecked
-          appScopeCircuitInject.isVisible = circuitPresenter.isChecked
-          screenAndPresenterElements
-        }
-      }
+    circuitInject.isVisible = circuitPresenter.isChecked
+    assistedInjection.isVisible = circuitPresenter.isChecked
+    assistedScreen.isVisible = circuitPresenter.isChecked
+    assistedNavigator.isVisible = circuitPresenter.isChecked
+    userScopeCircuitInject.isVisible = circuitPresenter.isChecked
+    appScopeCircuitInject.isVisible = circuitPresenter.isChecked
 
     return CircuitGenScreen.State(uiElements = uiElements) { event ->
       when (event) {
         CircuitGenScreen.Event.Generate -> {
-          when (generationMode) {
-            GenerationMode.ViewModel -> {
-              generateViewModel(
-                featureName.value,
-                userScopeCircuitInject.isChecked,
-                appScopeCircuitInject.isChecked,
-              )
-            }
-            GenerationMode.ScreenAndPresenter -> {
-              generateScreenAndPresenter(
-                featureName.value,
-                circuitPresenter.isChecked,
-                circuitUi.isChecked,
-                assistedScreen.isChecked,
-                assistedNavigator.isChecked,
-                userScopeCircuitInject.isChecked,
-                appScopeCircuitInject.isChecked,
-                test.isChecked,
-              )
-            }
-          }
+          generateCircuitFeature(
+            featureName.value,
+            circuitPresenter.isChecked,
+            circuitUi.isChecked,
+            assistedScreen.isChecked,
+            assistedNavigator.isChecked,
+            userScopeCircuitInject.isChecked,
+            appScopeCircuitInject.isChecked,
+            test.isChecked,
+          )
           onDismissDialog()
         }
       }
     }
   }
 
-  private fun generateViewModel(
-    feature: String,
-    userScopeInject: Boolean,
-    appScopeInject: Boolean,
-  ) {
-    val additionalScope =
-      mutableSetOf<ClassName>().apply {
-        if (userScopeInject) {
-          add(USER_SCOPE)
-        }
-        if (appScopeInject) {
-          add(APP_SCOPE)
-        }
-      }
-    val components = mutableListOf(CircuitViewModelScreen(), CircuitViewModel(additionalScope))
-    components.forEach { component -> component.writeToFile(directory, packageName, feature) }
-
-    fileGenerationListener.onFilesGenerated(
-      "${directory}/${CircuitViewModelScreen().screenClassName(feature)}.kt"
-    )
-  }
-
-  private fun generateScreenAndPresenter(
+  private fun generateCircuitFeature(
     feature: String,
     circuitPresenter: Boolean,
     circuitUi: Boolean,
@@ -223,12 +169,6 @@ internal class CircuitGenPresenter(
       "${directory}/${components.first().screenClassName(feature)}.kt"
     )
   }
-}
-
-sealed class GenerationMode {
-  object ViewModel : GenerationMode()
-
-  object ScreenAndPresenter : GenerationMode()
 }
 
 interface FileGenerationListener {

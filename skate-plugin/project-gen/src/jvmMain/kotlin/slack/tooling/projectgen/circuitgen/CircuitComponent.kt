@@ -61,6 +61,7 @@ interface CircuitComponent {
   fun isTestComponent(): Boolean = false
 
   fun writeToFile(directory: Path, packageName: String?, className: String) {
+
     val baseDirectory =
       if (isTestComponent()) Path.of(directory.pathString.replace("src/main", "src/test"))
       else directory
