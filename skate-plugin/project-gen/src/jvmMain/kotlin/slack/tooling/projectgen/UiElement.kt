@@ -92,7 +92,8 @@ internal class ExclusiveCheckboxElement(
   private val initialValue: String?,
   val options: List<String>,
   val indentLevel: Int = 0,
-  isVisible: Boolean = true,) : UiElement {
+  isVisible: Boolean = true,
+) : UiElement {
   override var isVisible: Boolean by mutableStateOf(isVisible)
   var selectedCheckbox by mutableStateOf(initialValue)
 }

@@ -18,7 +18,6 @@ package slack.tooling.projectgen.circuitgen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import com.slack.circuit.runtime.presenter.Presenter
-import com.squareup.kotlinpoet.ClassName
 import java.nio.file.Path
 import slack.tooling.projectgen.CheckboxElement
 import slack.tooling.projectgen.DividerElement
@@ -58,7 +57,8 @@ internal class CircuitGenPresenter(
       indentLevel = 30,
     )
   private val circuitInject = SectionElement("Circuit Injection", "(Optional)", indentLevel = 10)
-  private val circuitInjectOptions = ExclusiveCheckboxElement(null, listOf("User Scope", "App Scope"), indentLevel = 30)
+  private val circuitInjectOptions =
+    ExclusiveCheckboxElement(null, listOf("User Scope", "App Scope"), indentLevel = 30)
   private val test =
     CheckboxElement(false, name = "Tests", hint = "Should generate test class", indentLevel = 10)
 
@@ -84,7 +84,6 @@ internal class CircuitGenPresenter(
     assistedScreen.isVisible = circuitPresenter.isChecked
     assistedNavigator.isVisible = circuitPresenter.isChecked
     circuitInjectOptions.isVisible = circuitPresenter.isChecked
-
 
     return CircuitGenScreen.State(uiElements = uiElements) { event ->
       when (event) {
@@ -114,11 +113,12 @@ internal class CircuitGenPresenter(
     generateTest: Boolean,
   ) {
     val components = mutableListOf<CircuitComponent>()
-    val addedCircuitInject = when (circuitInjection) {
-      "User Scope" -> USER_SCOPE
-      "App Scope" -> APP_SCOPE
-      else -> null
-    }
+    val addedCircuitInject =
+      when (circuitInjection) {
+        "User Scope" -> USER_SCOPE
+        "App Scope" -> APP_SCOPE
+        else -> null
+      }
 
     if (circuitUi) {
       components.add(CircuitUiFeature(addedCircuitInject))

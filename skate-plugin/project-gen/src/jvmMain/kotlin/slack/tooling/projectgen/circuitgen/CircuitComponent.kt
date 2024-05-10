@@ -33,16 +33,16 @@ import java.nio.file.Path
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.io.path.relativeTo
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_INJECT
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_EVENT
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.CIRCUIT_UI_STATE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.COMPOSABLE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.IMMUTABLE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.MODIFIER
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.NAVIGATOR
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PARCELIZE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.PRESENTER
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.SCREEN_INTERFACE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.CIRCUIT_INJECT
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.CIRCUIT_UI_EVENT
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.CIRCUIT_UI_STATE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.COMPOSABLE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.IMMUTABLE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.MODIFIER
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.NAVIGATOR
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.PARCELIZE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.PRESENTER
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.SCREEN_INTERFACE
 
 interface CircuitComponent {
   val fileSuffix: String

@@ -147,21 +147,17 @@ internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modi
               Column(Modifier.padding(start = (element.indentLevel).dp)) {
                 element.options.forEach { option ->
                   Row(
-                    Modifier
-                      .fillMaxWidth()
+                    Modifier.fillMaxWidth()
                       .selectable(
                         selected = (option == element.selectedCheckbox),
-                        onClick = { element.selectedCheckbox = option }
+                        onClick = { element.selectedCheckbox = option },
                       )
                   ) {
                     RadioButton(
                       selected = (option == element.selectedCheckbox),
-                      onClick = { element.selectedCheckbox = option }
+                      onClick = { element.selectedCheckbox = option },
                     )
-                    Text(
-                      text = option,
-                      style = Typography.h4TextStyle(),
-                    )
+                    Text(text = option, style = Typography.h4TextStyle())
                   }
                   Spacer(Modifier.height(16.dp))
                 }
