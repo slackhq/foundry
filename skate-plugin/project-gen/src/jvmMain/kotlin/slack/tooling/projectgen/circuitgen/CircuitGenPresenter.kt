@@ -133,11 +133,13 @@ internal class CircuitGenPresenter(
         components.add(CircuitTest("PresenterTest", baseTestClass["PresenterTest"]))
       }
     }
-    components.forEach { component -> component.writeToFile(selectedDir, feature) }
+    if (components.isNotEmpty() && feature.isNotBlank()) {
+      components.forEach { component -> component.writeToFile(selectedDir, feature) }
 
-    fileGenerationListener.onFilesGenerated(
-      "${selectedDir}/${components.first().screenClassName(feature)}.kt"
-    )
+      fileGenerationListener.onFilesGenerated(
+        "${selectedDir}/${components.first().screenClassName(feature)}.kt"
+      )
+    }
   }
 }
 
