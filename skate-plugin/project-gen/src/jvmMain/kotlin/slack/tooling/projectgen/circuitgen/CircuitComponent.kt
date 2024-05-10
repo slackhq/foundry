@@ -95,9 +95,12 @@ class CircuitScreen : CircuitComponent {
     /**
      * Generate Circuit Screen class, eg:
      * ```kotlin
-     * @Parcelize class ${NAME}Screen : Screen { data class State( val eventSink: Event.() -> Unit =
-     *   {}, ) : CircuitUiState
-     * @Immutable sealed interface Event : CircuitUiEvent }
+     * @Parcelize class ${NAME}Screen : Screen {
+     *   data class State(
+     *     val eventSink: Event.() -> Unit = {}
+     *   ) : CircuitUiState
+     *   @Immutable sealed interface Event : CircuitUiEvent
+     * }
      * ```
      */
     val screenClassName = ClassName(packageName, screenClassName(className))
@@ -163,14 +166,14 @@ class CircuitPresenter(
      *   @Assisted private val screen: ${NAME}Screen,
      *   @Assisted private val navigator: Navigator,
      * ) : Presenter<${NAMEScreen.State> {
-     *    @Composable
-     *    override fun present(): FeatureScreen.State {}
+     *   @Composable
+     *   override fun present(): FeatureScreen.State {}
      *
-     *    @AssistedFactory
-     *    @CircuitInject( ${NAME}Screen::class, UserScope::class, )
-     *    fun interface Factory {
-     *      fun create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter
-     *    }
+     *   @AssistedFactory
+     *   @CircuitInject( ${NAME}Screen::class, UserScope::class, )
+     *   fun interface Factory {
+     *     fun create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter
+     *   }
      * }
      * ```
      *
@@ -179,9 +182,9 @@ class CircuitPresenter(
      * @CircuitInject( ${NAME}Screen::class, UserScope::class, )
      * class ${NAME}Presenter @Inject constructor(
      *   private val screen: ${NAME}Screen,
-     *  ) : Presenter<${NAMEScreen.State> {
-     *    @Composable override fun present(): FeatureScreen.State {}
-     *  }
+     * ) : Presenter<${NAMEScreen.State> {
+     *   @Composable override fun present(): FeatureScreen.State {}
+     * }
      *   ```
      */
     val screenClass = ClassName(packageName, screenClassName(className))
