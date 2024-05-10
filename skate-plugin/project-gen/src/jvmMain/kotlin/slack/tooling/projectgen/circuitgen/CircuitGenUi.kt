@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -46,11 +47,13 @@ import org.jetbrains.jewel.ui.Orientation
 import org.jetbrains.jewel.ui.component.Checkbox
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.Divider
+import org.jetbrains.jewel.ui.component.RadioButton
 import org.jetbrains.jewel.ui.component.Text
 import org.jetbrains.jewel.ui.component.TextField
 import org.jetbrains.jewel.ui.component.Typography
 import slack.tooling.projectgen.CheckboxElement
 import slack.tooling.projectgen.DividerElement
+import slack.tooling.projectgen.ExclusiveCheckboxElement
 import slack.tooling.projectgen.SectionElement
 import slack.tooling.projectgen.SlackDesktopTheme
 import slack.tooling.projectgen.TextElement
@@ -138,6 +141,30 @@ internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modi
                 Text(element.title, style = Typography.h4TextStyle())
                 Spacer(Modifier.width(8.dp))
                 Text(element.description)
+              }
+            }
+            is ExclusiveCheckboxElement -> {
+              Column(Modifier.padding(start = (element.indentLevel).dp)) {
+                element.options.forEach { option ->
+                  Row(
+                    Modifier
+                      .fillMaxWidth()
+                      .selectable(
+                        selected = (option == element.selectedCheckbox),
+                        onClick = { element.selectedCheckbox = option }
+                      )
+                  ) {
+                    RadioButton(
+                      selected = (option == element.selectedCheckbox),
+                      onClick = { element.selectedCheckbox = option }
+                    )
+                    Text(
+                      text = option,
+                      style = Typography.h4TextStyle(),
+                    )
+                  }
+                  Spacer(Modifier.height(16.dp))
+                }
               }
             }
             DividerElement -> {

@@ -22,6 +22,7 @@ import com.squareup.kotlinpoet.ClassName
 import java.nio.file.Path
 import slack.tooling.projectgen.CheckboxElement
 import slack.tooling.projectgen.DividerElement
+import slack.tooling.projectgen.ExclusiveCheckboxElement
 import slack.tooling.projectgen.SectionElement
 import slack.tooling.projectgen.TextElement
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.APP_SCOPE
@@ -41,6 +42,7 @@ internal class CircuitGenPresenter(
     CheckboxElement(false, name = "Presenter", hint = "Generate Presenter class", indentLevel = 10)
   private val assistedInjection =
     SectionElement("Assisted Injection", "(Optional)", indentLevel = 10)
+
   private val assistedScreen =
     CheckboxElement(
       false,
@@ -56,20 +58,7 @@ internal class CircuitGenPresenter(
       indentLevel = 30,
     )
   private val circuitInject = SectionElement("Circuit Injection", "(Optional)", indentLevel = 10)
-  private val userScopeCircuitInject =
-    CheckboxElement(
-      false,
-      name = "User Scope",
-      hint = "Add UserScope to Circuit Inject",
-      indentLevel = 30,
-    )
-  private val appScopeCircuitInject =
-    CheckboxElement(
-      false,
-      name = "App Scope",
-      hint = "Add AppScope to Circuit Inject",
-      indentLevel = 30,
-    )
+  private val circuitInjectOptions = ExclusiveCheckboxElement(null, listOf("User Scope", "App Scope"), indentLevel = 30)
   private val test =
     CheckboxElement(false, name = "Tests", hint = "Should generate test class", indentLevel = 10)
 
@@ -84,8 +73,7 @@ internal class CircuitGenPresenter(
       assistedScreen,
       assistedNavigator,
       circuitInject,
-      userScopeCircuitInject,
-      appScopeCircuitInject,
+      circuitInjectOptions,
       test,
     )
 
@@ -95,8 +83,8 @@ internal class CircuitGenPresenter(
     assistedInjection.isVisible = circuitPresenter.isChecked
     assistedScreen.isVisible = circuitPresenter.isChecked
     assistedNavigator.isVisible = circuitPresenter.isChecked
-    userScopeCircuitInject.isVisible = circuitPresenter.isChecked
-    appScopeCircuitInject.isVisible = circuitPresenter.isChecked
+    circuitInjectOptions.isVisible = circuitPresenter.isChecked
+
 
     return CircuitGenScreen.State(uiElements = uiElements) { event ->
       when (event) {
@@ -107,8 +95,7 @@ internal class CircuitGenPresenter(
             circuitUi.isChecked,
             assistedScreen.isChecked,
             assistedNavigator.isChecked,
-            userScopeCircuitInject.isChecked,
-            appScopeCircuitInject.isChecked,
+            circuitInjectOptions.selectedCheckbox,
             test.isChecked,
           )
           onDismissDialog()
@@ -123,19 +110,18 @@ internal class CircuitGenPresenter(
     circuitUi: Boolean,
     assistedScreen: Boolean,
     assistedNavigator: Boolean,
-    userScopeInject: Boolean,
-    appScopeInject: Boolean,
+    circuitInjection: String?,
     generateTest: Boolean,
   ) {
     val components = mutableListOf<CircuitComponent>()
+    val addedCircuitInject = when (circuitInjection) {
+      "User Scope" -> USER_SCOPE
+      "App Scope" -> APP_SCOPE
+      else -> null
+    }
 
     if (circuitUi) {
-      val additionalCircuitInject =
-        mutableListOf<ClassName>().apply {
-          if (userScopeInject) add(USER_SCOPE)
-          if (appScopeInject) add(APP_SCOPE)
-        }
-      components.add(CircuitUiFeature(additionalCircuitInject))
+      components.add(CircuitUiFeature(addedCircuitInject))
       if (generateTest) {
         components.add(CircuitTest("UiTest", baseTestClass["UiTest"]))
       }
@@ -143,16 +129,11 @@ internal class CircuitGenPresenter(
 
     if (circuitPresenter) {
       components.add(CircuitScreen())
-      val additionalCircuitInject =
-        mutableListOf<ClassName>().apply {
-          if (userScopeInject) add(USER_SCOPE)
-          if (appScopeInject) add(APP_SCOPE)
-        }
       components.add(
         CircuitPresenter(
           assistedInjection =
             AssistedInjectionConfig(screen = assistedScreen, navigator = assistedNavigator),
-          additionalCircuitInject = additionalCircuitInject,
+          additionalCircuitInject = addedCircuitInject,
           ui = circuitUi,
         )
       )
@@ -160,7 +141,6 @@ internal class CircuitGenPresenter(
         components.add(CircuitTest("PresenterTest", baseTestClass["PresenterTest"]))
       }
     }
-
     components.forEach { component -> component.writeToFile(selectedDir, feature) }
 
     fileGenerationListener.onFilesGenerated(

@@ -178,6 +178,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 }
               }
             }
+            is ExclusiveCheckboxElement -> TODO()
           }
         }
       }

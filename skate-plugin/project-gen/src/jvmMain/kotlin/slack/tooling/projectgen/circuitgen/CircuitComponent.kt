@@ -139,7 +139,7 @@ class CircuitScreen : CircuitComponent {
 
 class CircuitPresenter(
   private val assistedInjection: AssistedInjectionConfig,
-  private val additionalCircuitInject: List<ClassName> = listOf(),
+  private val additionalCircuitInject: ClassName?,
   private val ui: Boolean = true,
 ) : CircuitComponent {
   override val fileSuffix = "Presenter"
@@ -152,10 +152,13 @@ class CircuitPresenter(
      *
      * @Assisted private val screen: ${NAME}Screen,
      * @Assisted private val navigator: Navigator, ) : Presenter<${NAMEScreen.State> {
-     * @Composable override fun present(): FeatureScreen.State { } }
-     * @AssistedFactory
-     * @CircuitInject( ${NAME}Screen::class, UserScope::class, ) fun interface Factory { fun
-     *   create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter { } } }
+     *    @Composable override fun present(): FeatureScreen.State {
+     *    }
+     *  }
+     *  @AssistedFactory
+     * @CircuitInject( ${NAME}Screen::class, UserScope::class, )
+     * fun interface Factory {
+     *  fun create(screen: ${NAME}Screen, navigator: Navigator): ${NAME}Presenter { } } }
      *   ```
      */
     val screenClass = ClassName(packageName, screenClassName(className))
@@ -173,7 +176,9 @@ class CircuitPresenter(
           AnnotationSpec.builder(CIRCUIT_INJECT)
             .apply {
               addMember("%T::class", screenClass)
-              additionalCircuitInject.forEach { inject -> addMember("%T::class", inject) }
+              if (additionalCircuitInject != null) {
+                addMember("%T::class", additionalCircuitInject)
+              }
             }
             .build()
         )
@@ -251,7 +256,7 @@ class CircuitPresenter(
   }
 }
 
-class CircuitUiFeature(private val injectClasses: List<ClassName>) : CircuitComponent {
+class CircuitUiFeature(private val citcuitInject: ClassName?) : CircuitComponent {
   override val fileSuffix = ""
 
   override fun generate(packageName: String, className: String): FileSpec {
@@ -270,7 +275,9 @@ class CircuitUiFeature(private val injectClasses: List<ClassName>) : CircuitComp
           AnnotationSpec.builder(CIRCUIT_INJECT)
             .apply {
               addMember("%T::class", screenClass)
-              injectClasses.forEach { addMember("%T::class", it) }
+              if (citcuitInject != null) {
+                addMember("%T::class", citcuitInject)
+              }
             }
             .build()
         )
