@@ -31,8 +31,5 @@ object CircuitGenClassNames {
   val PRESENTER = ClassName("com.slack.circuit.runtime.presenter", "Presenter")
   val SCREEN_INTERFACE = ClassName("com.slack.circuit.runtime.screen", "Screen")
   val USER_SCOPE = ClassName("slack.di", "UserScope")
-  val SCOPE_MAP = mapOf(
-    "User Scope" to USER_SCOPE,
-    "App Scope" to APP_SCOPE
-  )
+  val SCOPE_MAP = mapOf("User Scope" to USER_SCOPE, "App Scope" to APP_SCOPE)
 }

@@ -24,9 +24,7 @@ import slack.tooling.projectgen.DividerElement
 import slack.tooling.projectgen.ExclusiveCheckboxElement
 import slack.tooling.projectgen.SectionElement
 import slack.tooling.projectgen.TextElement
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.APP_SCOPE
 import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.SCOPE_MAP
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.USER_SCOPE
 
 internal class CircuitGenPresenter(
   private val selectedDir: Path,
