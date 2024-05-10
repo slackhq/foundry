@@ -19,8 +19,8 @@ import com.google.common.truth.Truth.assertThat
 import java.io.StringWriter
 import org.junit.Test
 import slack.tooling.projectgen.circuitgen.AssistedInjectionConfig
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.APP_SCOPE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.USER_SCOPE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.APP_SCOPE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.USER_SCOPE
 import slack.tooling.projectgen.circuitgen.CircuitPresenter
 import slack.tooling.projectgen.circuitgen.CircuitScreen
 import slack.tooling.projectgen.circuitgen.CircuitTest
@@ -60,7 +60,7 @@ class CircuitComponentTest {
 
   @Test
   fun testGenerateCircuitPresenterNoAssistedInjection() {
-    val component = CircuitPresenter(AssistedInjectionConfig(), listOf(USER_SCOPE))
+    val component = CircuitPresenter(AssistedInjectionConfig(), USER_SCOPE)
     val resultSpec = component.generate("com.example.feature", "FooPresenter")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
@@ -70,25 +70,20 @@ class CircuitComponentTest {
 
       import androidx.compose.runtime.Composable
       import com.slack.circuit.codegen.annotations.CircuitInject
-      import com.slack.circuit.runtime.Navigator
       import com.slack.circuit.runtime.presenter.Presenter
+      import javax.inject.Inject
       import slack.di.UserScope
 
-      public class FooPresenter(
+      @CircuitInject(
+        FooScreen::class,
+        UserScope::class,
+      )
+      public class FooPresenter @Inject constructor(
         private val screen: FooScreen,
-        private val navigator: Navigator,
       ) : Presenter<FooScreen.State> {
         @Composable
         override fun present(): FooScreen.State {
           TODO("Implement me!")
-        }
-
-        @CircuitInject(
-          FooScreen::class,
-          UserScope::class,
-        )
-        public fun interface Factory {
-          public fun create(screen: FooScreen, navigator: Navigator): FooPresenter
         }
       }
 
@@ -100,7 +95,7 @@ class CircuitComponentTest {
   @Test
   fun testGenerateCircuitPresenterWithAssistedInjection() {
     val component =
-      CircuitPresenter(AssistedInjectionConfig(screen = true, navigator = true), listOf(APP_SCOPE))
+      CircuitPresenter(AssistedInjectionConfig(screen = true, navigator = true), APP_SCOPE)
     val resultSpec = component.generate("com.example.feature", "FooPresenter")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
@@ -147,7 +142,7 @@ class CircuitComponentTest {
   fun testGenerateTestClass() {
     val component =
       CircuitTest(fileSuffix = "UiTest", baseClass = "com.example.test.CustomBaseClass")
-    val resultSpec = component.generate("com.example.feature.test", "Foo")
+    val resultSpec = component.generate("com.example.feature.test", "FooUiTest")
     val stringWriter = StringWriter()
     resultSpec.writeTo(stringWriter)
     val expectedContent =

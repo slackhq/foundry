@@ -24,8 +24,9 @@ import slack.tooling.projectgen.DividerElement
 import slack.tooling.projectgen.ExclusiveCheckboxElement
 import slack.tooling.projectgen.SectionElement
 import slack.tooling.projectgen.TextElement
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.APP_SCOPE
-import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.Companion.USER_SCOPE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.APP_SCOPE
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.SCOPE_MAP
+import slack.tooling.projectgen.circuitgen.CircuitGenClassNames.USER_SCOPE
 
 internal class CircuitGenPresenter(
   private val selectedDir: Path,
@@ -58,7 +59,7 @@ internal class CircuitGenPresenter(
     )
   private val circuitInject = SectionElement("Circuit Injection", "(Optional)", indentLevel = 10)
   private val circuitInjectOptions =
-    ExclusiveCheckboxElement(null, listOf("User Scope", "App Scope"), indentLevel = 30)
+    ExclusiveCheckboxElement(SCOPE_MAP.keys.first(), SCOPE_MAP.keys.toList(), indentLevel = 30)
   private val test =
     CheckboxElement(false, name = "Tests", hint = "Should generate test class", indentLevel = 10)
 
@@ -109,19 +110,12 @@ internal class CircuitGenPresenter(
     circuitUi: Boolean,
     assistedScreen: Boolean,
     assistedNavigator: Boolean,
-    circuitInjection: String?,
+    circuitInjection: String,
     generateTest: Boolean,
   ) {
     val components = mutableListOf<CircuitComponent>()
-    val addedCircuitInject =
-      when (circuitInjection) {
-        "User Scope" -> USER_SCOPE
-        "App Scope" -> APP_SCOPE
-        else -> null
-      }
-
     if (circuitUi) {
-      components.add(CircuitUiFeature(addedCircuitInject))
+      components.add(CircuitUiFeature(SCOPE_MAP[circuitInjection]))
       if (generateTest) {
         components.add(CircuitTest("UiTest", baseTestClass["UiTest"]))
       }
@@ -133,7 +127,7 @@ internal class CircuitGenPresenter(
         CircuitPresenter(
           assistedInjection =
             AssistedInjectionConfig(screen = assistedScreen, navigator = assistedNavigator),
-          additionalCircuitInject = addedCircuitInject,
+          circuitInjectScope = SCOPE_MAP[circuitInjection],
           ui = circuitUi,
         )
       )

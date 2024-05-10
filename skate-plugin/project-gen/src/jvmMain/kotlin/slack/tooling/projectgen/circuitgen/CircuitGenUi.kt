@@ -17,6 +17,7 @@ package slack.tooling.projectgen.circuitgen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -103,14 +104,13 @@ class CircuitGenUi {
 
 @Composable
 internal fun CircuitGen(state: CircuitGenScreen.State, modifier: Modifier = Modifier) {
-
-  Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+  Box(modifier.fillMaxSize()) {
     val listState = rememberLazyListState()
     Column(Modifier.padding(16.dp)) {
       LazyColumn(
         modifier = Modifier.weight(1f),
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = spacedBy(16.dp),
       ) {
         items(state.uiElements.filter { it.isVisible }) { element ->
           when (element) {

@@ -89,7 +89,7 @@ internal class TextElement(
 }
 
 internal class ExclusiveCheckboxElement(
-  private val initialValue: String?,
+  initialValue: String,
   val options: List<String>,
   val indentLevel: Int = 0,
   isVisible: Boolean = true,

@@ -178,7 +178,9 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 }
               }
             }
-            is ExclusiveCheckboxElement -> TODO()
+            is ExclusiveCheckboxElement -> {
+              // Fill this in when project gen uses this ui component
+            }
           }
         }
       }
