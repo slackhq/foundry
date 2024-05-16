@@ -19,6 +19,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.intellij.openapi.diagnostic.logger
 import com.slack.sgp.intellij.codeowners.model.CodeOwnersFile
+import com.slack.sgp.intellij.codeowners.model.Path
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.text.Charsets.UTF_8
@@ -56,7 +57,7 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
             .map { codeOwner ->
               codeOwner.paths.map { path ->
                 // Lookup line in ownership file (0 if not found) and construct CodeOwnerInfo
-                CodeOwnerInfo(codeOwner.name, path, codeOwnershipLineMap[path] ?: 0)
+                CodeOwnerInfo(codeOwner.name, path.path, codeOwnershipLineMap[path.path] ?: 0)
               }
             }
             .flatten()
