@@ -78,13 +78,6 @@ internal fun Project.configureComposeCompiler(
         logger.debug(
           "Configuring compose compiler args in ${project.path}:${this@configureKotlinCompilationTask.name}"
         )
-        if (this is KotlinJvmCompilerOptions) {
-          freeCompilerArgs.addAll(
-            "-Xskip-prerelease-check",
-            "-P",
-            "$COMPOSE_COMPILER_OPTION_PREFIX:suppressKotlinVersionCompatibilityCheck=$kotlinVersion",
-          )
-        }
       }
     }
   } else {
