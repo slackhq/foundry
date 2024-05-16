@@ -40,7 +40,7 @@ class CodeOwnerRepositoryTest : BasePlatformTestCase() {
     val result = underTest.getCodeOwnership("app/folder2/subfolder/foo.kt")
     assertThat(result.size).isEqualTo(1)
     assertThat(result[0].packagePattern).isEqualTo(FOLDER_2_PATTERN)
-    assertThat(result[0].codeOwnerLineNumber).isEqualTo(14)
+    assertThat(result[0].codeOwnerLineNumber).isEqualTo(15)
     assertThat(result[0].team).isEqualTo(TEAM_1)
   }
 
@@ -49,10 +49,10 @@ class CodeOwnerRepositoryTest : BasePlatformTestCase() {
     val result = underTest.getCodeOwnership("app/folder3/subfolder/foo.kt")
     assertThat(result.size).isEqualTo(2)
     assertThat(result[0].packagePattern).isEqualTo(FOLDER_3_GRANULAR_PATTERN)
-    assertThat(result[0].codeOwnerLineNumber).isEqualTo(15)
+    assertThat(result[0].codeOwnerLineNumber).isEqualTo(16)
     assertThat(result[0].team).isEqualTo(TEAM_1)
     assertThat(result[1].packagePattern).isEqualTo(FOLDER_3_PATTERN)
-    assertThat(result[1].codeOwnerLineNumber).isEqualTo(19)
+    assertThat(result[1].codeOwnerLineNumber).isEqualTo(20)
     assertThat(result[1].team).isEqualTo(TEAM_2)
   }
 

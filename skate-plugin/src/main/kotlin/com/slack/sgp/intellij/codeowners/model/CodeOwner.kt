@@ -15,8 +15,46 @@
  */
 package com.slack.sgp.intellij.codeowners.model
 
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 
-@Serializable data class CodeOwner(val name: String, @Serializable val paths: List<Path>)
+object PathDeserializer : KSerializer<Path> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Path") {
+        element("path", String.serializer().descriptor)
+        element("notify", Boolean.serializer().descriptor)
+    }
 
-@Serializable data class Path(val path: String)
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun deserialize(decoder: Decoder): Path {
+        return decoder.decodeStructure(descriptor) {
+            var path = ""
+            var notify = true
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    0 -> path = decodeStringElement(descriptor, 0)
+                    1 -> notify = decodeBooleanElement(descriptor, 1)
+                    CompositeDecoder.DECODE_DONE -> break
+                    else -> error("Unexpected index: $index")
+                }
+            }
+            Path(path, notify)
+        }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun serialize(encoder: Encoder, value: Path) {
+        encoder.encodeStructure(descriptor) {
+            encodeStringElement(descriptor, 0, value.path)
+        }
+    }
+}
+
+@Serializable(with = PathDeserializer::class)
+data class Path(val path: String, val notify: Boolean?)
+
+@Serializable
+data class CodeOwner(val name: String, val paths: List<@Serializable(with = PathDeserializer::class)Path>)

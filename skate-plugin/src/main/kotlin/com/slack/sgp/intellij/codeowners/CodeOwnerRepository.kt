@@ -43,7 +43,7 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
         val codeOwnershipLineMap =
           codeOwnershipFile
             .readLines()
-            .mapIndexed { index, line -> line.trimStart(' ', '-') to index }
+            .mapIndexed { index, line -> line.trimStart(' ', '-').replace("path: ", "") to index }
             .toMap()
 
         // Marshal yaml
