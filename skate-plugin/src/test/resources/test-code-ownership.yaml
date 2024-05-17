@@ -11,8 +11,8 @@ included_extensions:
 ownership:
   - name: Team 1
     paths:
-      - app/folder1/.*
-      - app/folder5/.*
+      - path: app/folder1/.*
+        notify: false
       - app/folder2/.*
       - app/folder3/subfolder/.*
     bogusProp: Foo
