@@ -13,7 +13,19 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 
-object StringOrObjectSerializer : KSerializer<Path> {
+/**
+ * A "path" in the config = can be of two types:
+ * Scalar: - my/path/something.kt
+ * Map: - path: my/other/path/something.kt
+ *      - notify: false
+ *
+ * This serializer handles both variations and returns an object of type Path like so:
+ * For a Scalar: Path("my/path/something.kt" notify=true)
+ * For a Map: Path("my/path/something.kt" notify)
+ *
+ * Note: We do not need a serializer at the moment.
+ */
+object PathObjectSerializer : KSerializer<Path> {
     private val stringDescriptor = String.serializer().descriptor
     private val objectDescriptor = buildClassSerialDescriptor("Path") {
         element<String>("path")
@@ -22,7 +34,7 @@ object StringOrObjectSerializer : KSerializer<Path> {
 
     @OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
     override val descriptor: SerialDescriptor = buildSerialDescriptor(
-        StringOrObjectSerializer::class.java.name,
+        PathObjectSerializer::class.java.name,
         SerialKind.CONTEXTUAL
     ) {
         element("object", objectDescriptor)
