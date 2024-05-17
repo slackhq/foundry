@@ -19,7 +19,6 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.intellij.openapi.diagnostic.logger
 import com.slack.sgp.intellij.codeowners.model.CodeOwnersFile
-import com.slack.sgp.intellij.codeowners.model.Path
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.text.Charsets.UTF_8

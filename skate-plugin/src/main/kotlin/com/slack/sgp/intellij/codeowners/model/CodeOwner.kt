@@ -18,4 +18,7 @@ package com.slack.sgp.intellij.codeowners.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CodeOwner(val name: String, val paths: List<@Serializable(with = PathObjectSerializer::class) Path>)
+data class CodeOwner(
+  val name: String,
+  val paths: List<@Serializable(with = PathObjectSerializer::class) Path>,
+)
