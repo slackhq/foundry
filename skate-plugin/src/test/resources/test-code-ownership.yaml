@@ -13,7 +13,7 @@ ownership:
     paths:
       - path: app/folder1/.*
         notify: false
-      - path: app/folder2/.*
+      - app/folder2/.*
       - path: app/folder3/subfolder/.*
     bogusProp: Foo
   - name: Team 2
