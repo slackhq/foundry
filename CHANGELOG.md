@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.17.1
+------
+
+_2024-05-28_
+
+- Build against Kotlin `2.0.0`.
+- Build against KSP `2.0.0-1.0.21`.
+- Build against AGP `8.4.1`.
+
 0.17.0
 ------
 
