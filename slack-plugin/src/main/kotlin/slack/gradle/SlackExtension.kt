@@ -35,11 +35,11 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
-import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.util.addKspSource
 import slack.gradle.util.configureKotlinCompilationTask
@@ -54,11 +54,17 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
+  project: Project,
   versionCatalog: VersionCatalog,
 ) {
   internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
   internal val featuresHandler =
-    objects.newInstance<FeaturesHandler>(globalSlackProperties, slackProperties, versionCatalog)
+    objects.newInstance<FeaturesHandler>(
+      globalSlackProperties,
+      slackProperties,
+      project,
+      versionCatalog,
+    )
 
   /**
    * This is weird! Due to the non-property nature of some AGP DSL features (e.g. buildFeatures and
@@ -409,6 +415,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
+  private val project: Project,
   versionCatalog: VersionCatalog,
 ) {
   // Dagger features
@@ -544,12 +551,12 @@ constructor(
    * [SlackProperties.defaultComposeAndroidBundleAlias].
    */
   public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
-    composeHandler.enable(multiplatform = multiplatform)
+    composeHandler.enable(project = project, multiplatform = multiplatform)
     action.execute(composeHandler)
   }
 
   internal fun applyTo(project: Project) {
-    composeHandler.applyTo(project, slackProperties)
+    composeHandler.applyTo(project)
     circuitHandler.applyTo(project, slackProperties)
   }
 }
@@ -766,10 +773,6 @@ constructor(
     globalSlackProperties.defaultComposeAndroidBundleAlias?.let { alias ->
       versionCatalog.findBundle(alias).orElse(null)
     }
-  private val composeCompilerVersion by lazy {
-    slackProperties.versions.composeCompiler
-      ?: error("Missing `compose-compiler` version in catalog")
-  }
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
@@ -817,8 +820,9 @@ constructor(
     compilerOption("metricsDestination", metricsDestination.canonicalPath.toString())
   }
 
-  internal fun enable(multiplatform: Boolean) {
+  internal fun enable(project: Project, multiplatform: Boolean) {
     enabled.setDisallowChanges(true)
+    project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     this.multiplatform.setDisallowChanges(multiplatform)
     if (!multiplatform) {
       val extension =
@@ -828,7 +832,6 @@ constructor(
       extension.apply {
         buildFeatures { compose = true }
         composeOptions {
-          kotlinCompilerExtensionVersion = composeCompilerVersion
           // Disable live literals by default
           useLiveLiterals = slackProperties.composeEnableLiveLiterals
         }
@@ -836,22 +839,64 @@ constructor(
     }
   }
 
-  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+  internal fun applyTo(project: Project) {
     if (enabled.get()) {
+      val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
       val isMultiplatform = multiplatform.get()
       if (isMultiplatform) {
         project.pluginManager.apply("org.jetbrains.compose")
       } else {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
-      project.configureComposeCompiler(slackProperties, isMultiplatform)
 
-      project.tasks.configureKotlinCompilationTask {
-        compilerOptions.freeCompilerArgs.addAll(
-          this@ComposeHandler.compilerOptions.map { options ->
-            options.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+      // Because the Compose Compiler plugin auto applies common options for us, we need to know
+      // about those options and _avoid_ setting them a second time
+      val freeOptions = mutableListOf<String>()
+      for ((k, v) in compilerOptions.get().map { it.split('=') }) {
+        project.logger.debug("Processing compose option $k = $v")
+        when (k) {
+          "generateFunctionKeyMetaClasses" -> {
+            extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
           }
-        )
+          "sourceInformation" -> {
+            extension.includeSourceInformation.set(v.toBoolean())
+          }
+          "metricsDestination" -> {
+            extension.metricsDestination.set(project.file(v))
+          }
+          "reportsDestination" -> {
+            extension.reportsDestination.set(project.file(v))
+          }
+          "intrinsicRemember" -> {
+            extension.enableIntrinsicRemember.set(v.toBoolean())
+          }
+          "nonSkippingGroupOptimization" -> {
+            extension.enableNonSkippingGroupOptimization.set(v.toBoolean())
+          }
+          "suppressKotlinVersionCompatibilityCheck" -> {
+            error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
+          }
+          "strongSkipping" -> {
+            extension.enableStrongSkippingMode.set(v.toBoolean())
+          }
+          "stabilityConfigurationPath" -> {
+            extension.stabilityConfigurationFile.set(project.file(v))
+          }
+          "traceMarkersEnabled" -> {
+            extension.includeTraceMarkers.set(v.toBoolean())
+          }
+          else -> {
+            freeOptions += "$k=$v"
+          }
+        }
+      }
+
+      if (freeOptions.isNotEmpty()) {
+        project.tasks.configureKotlinCompilationTask {
+          compilerOptions.freeCompilerArgs.addAll(
+            freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+          )
+        }
       }
     }
   }

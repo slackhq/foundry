@@ -233,6 +233,7 @@ public class AffectedProjectsComputer(
    * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
    */
   private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path?>): Path? {
+    // TODO how can we check if the file was part of a deleted project?
     val currentDir =
       when {
         !exists() -> {

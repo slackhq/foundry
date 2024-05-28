@@ -31,12 +31,6 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   val agp: String?
     get() = getOptionalValue("agp").orElse(null)
 
-  val composeCompiler: String?
-    get() = getOptionalValue("compose-compiler").orElse(null)
-
-  val composeCompilerKotlinVersion: String?
-    get() = getOptionalValue("compose-compiler-kotlinVersion").orElse(null)
-
   val detekt: String?
     get() = getOptionalValue("detekt").orElse(null)
 
