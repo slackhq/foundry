@@ -645,6 +645,10 @@ internal constructor(
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("sgp.config.jvmVendor.optOut", defaultValue = false)
 
+  /** Option to force a specific kotlin language version. */
+  public val kotlinLanguageVersionOverride: String?
+    get() = optionalStringProperty("sgp.kotlin.languageVersionOverride", defaultValue = null)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("slack.minSdkVersion not set")
