@@ -18,25 +18,26 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.variant.*
-import com.android.build.gradle.AppExtension
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
+import com.android.build.api.variant.HasAndroidTestBuilder
+import com.android.build.api.variant.HasUnitTestBuilder
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import com.android.build.gradle.internal.dsl.BuildType
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import com.slapin.napt.JvmArgsStrongEncapsulation
 import com.slapin.napt.NaptGradleExtension
-import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.Action
-import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ArtifactView
@@ -53,21 +54,12 @@ import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
-import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.dependencyrake.RakeDependencies
-import slack.gradle.AptOptionsConfig.AptOptionsConfigurer
-import slack.gradle.AptOptionsConfigs.invoke
+import slack.gradle.Configurations.isPlatformConfigurationName
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.SgpArtifact
-import slack.gradle.dependencies.BuildConfig
 import slack.gradle.dependencies.SlackDependencies
-import slack.gradle.lint.DetektTasks
+import slack.gradle.kgp.KgpTasks
 import slack.gradle.lint.LintTasks
 import slack.gradle.permissionchecks.PermissionChecks
 import slack.gradle.tasks.AndroidTestApksTask
@@ -75,7 +67,6 @@ import slack.gradle.tasks.CheckManifestPermissionsTask
 import slack.gradle.tasks.SimpleFileProducerTask
 import slack.gradle.tasks.publishWith
 import slack.gradle.tasks.robolectric.UpdateRobolectricJarsTask
-import slack.gradle.util.configureKotlinCompilationTask
 import slack.gradle.util.setDisallowChanges
 import slack.unittest.UnitTests
 
@@ -104,15 +95,6 @@ internal class StandardProjectConfigurations(
   private val versionCatalog: VersionCatalog,
   private val slackTools: SlackTools,
 ) {
-
-  private val kotlinCompilerArgs =
-    mutableListOf<String>()
-      .apply {
-        addAll(BuildConfig.KOTLIN_COMPILER_ARGS)
-        // Left as a toe-hold for any future dynamic arguments
-      }
-      .distinct()
-
   fun applyTo(project: Project) {
     val slackProperties = SlackProperties(project)
     val slackExtension =
@@ -128,10 +110,8 @@ internal class StandardProjectConfigurations(
       setUpSubprojectArtifactPublishing(project)
     }
     project.applyCommonConfigurations(slackProperties)
-    val jdkVersion = project.jdkVersion()
-    val jvmTargetVersion = project.jvmTargetVersion()
-    project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
-    project.configureKotlinProjects(jdkVersion, jvmTargetVersion, slackProperties)
+    project.applyJvmConfigurations(slackProperties, slackExtension)
+    KgpTasks.configure(project, slackTools, slackProperties)
   }
 
   /**
@@ -184,8 +164,6 @@ internal class StandardProjectConfigurations(
   }
 
   private fun Project.applyJvmConfigurations(
-    jdkVersion: Int,
-    jvmTargetVersion: Int,
     slackProperties: SlackProperties,
     slackExtension: SlackExtension,
   ) {
@@ -201,7 +179,7 @@ internal class StandardProjectConfigurations(
     }
 
     checkAndroidXDependencies(slackProperties)
-    configureAnnotationProcessors()
+    AnnotationProcessing.configureFor(project)
 
     pluginManager.onFirst(JVM_PLUGINS) { pluginId ->
       slackProperties.versions.bundles.commonAnnotations.ifPresent {
@@ -267,8 +245,8 @@ internal class StandardProjectConfigurations(
     }
 
     // TODO always configure compileOptions here
-    configureAndroidProjects(slackExtension, jvmTargetVersion, slackProperties)
-    configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
+    configureAndroidProjects(slackExtension, slackProperties)
+    configureJavaProject(slackProperties)
     slackExtension.applyTo(this)
 
     pluginManager.withPlugin("com.sergei-lapin.napt") {
@@ -343,22 +321,21 @@ internal class StandardProjectConfigurations(
   }
 
   /** Adds common configuration for Java projects. */
-  private fun Project.configureJavaProject(
-    jdkVersion: Int,
-    jvmTargetVersion: Int,
-    slackProperties: SlackProperties,
-  ) {
+  private fun Project.configureJavaProject(slackProperties: SlackProperties) {
+    val releaseVersion =
+      slackProperties.versions.jvmTarget.map(JavaVersion::toVersion).asProvider(providers)
     plugins.withType(JavaBasePlugin::class.java).configureEach {
       project.configure<JavaPluginExtension> {
-        val version = JavaVersion.toVersion(jvmTargetVersion)
-        sourceCompatibility = version
-        targetCompatibility = version
+        sourceCompatibility = releaseVersion.get()
+        targetCompatibility = releaseVersion.get()
       }
-      if (jdkVersion >= 9) {
-        tasks.configureEach<JavaCompile> {
-          if (!isAndroid) {
-            logger.logWithTag("Configuring release option for $path")
-            options.release.setDisallowChanges(jvmTargetVersion)
+      slackProperties.versions.jdk.ifPresent {
+        if (it >= 9) {
+          tasks.configureEach<JavaCompile> {
+            if (!isAndroid) {
+              logger.logWithTag("Configuring release option for $path")
+              options.release.setDisallowChanges(releaseVersion.map { it.majorVersion.toInt() })
+            }
           }
         }
       }
@@ -376,12 +353,17 @@ internal class StandardProjectConfigurations(
       // TODO if we set it in android, does the config from this get safely ignored?
       // TODO re-enable in android at all after AGP 7.1
       if (!isAndroid) {
-        val target = if (isAndroid) jvmTargetVersion else jdkVersion
-        logger.logWithTag("Configuring toolchain for $path to $jdkVersion")
+        val target =
+          if (isAndroid) releaseVersion
+          else
+            slackProperties.versions.jdk.map(JavaVersion::toVersion).asProvider(project.providers)
+        logger.logWithTag("Configuring toolchain for $path")
         // Can't use disallowChanges here because Gradle sets it again later for some reason
         javaCompiler.set(
           javaToolchains.compilerFor {
-            languageVersion.setDisallowChanges(JavaLanguageVersion.of(target))
+            languageVersion.setDisallowChanges(
+              target.map { JavaLanguageVersion.of(it.majorVersion) }
+            )
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         )
@@ -467,10 +449,9 @@ internal class StandardProjectConfigurations(
   @Suppress("LongMethod")
   private fun Project.configureAndroidProjects(
     slackExtension: SlackExtension,
-    jvmTargetVersion: Int,
     slackProperties: SlackProperties,
   ) {
-    val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
+    val javaVersion = slackProperties.versions.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
       Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
@@ -577,8 +558,8 @@ internal class StandardProjectConfigurations(
         }
 
         compileOptions {
-          sourceCompatibility = javaVersion
-          targetCompatibility = javaVersion
+          sourceCompatibility = javaVersion.get()
+          targetCompatibility = javaVersion.get()
           isCoreLibraryDesugaringEnabled = true
         }
 
@@ -900,191 +881,11 @@ internal class StandardProjectConfigurations(
     }
   }
 
-  @Suppress("LongMethod")
-  private fun Project.configureKotlinProjects(
-    jdkVersion: Int?,
-    jvmTargetVersion: Int,
-    slackProperties: SlackProperties,
-  ) {
-    val actualJvmTarget =
-      if (jvmTargetVersion == 8) {
-        "1.8"
-      } else {
-        jvmTargetVersion.toString()
-      }
-
-    val detektConfigured = AtomicBoolean()
-    // Must be outside the withType() block below because you can't apply new plugins in that block
-    if (slackProperties.autoApplyDetekt) {
-      project.pluginManager.apply("io.gitlab.arturbosch.detekt")
-    }
-
-    plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      val kotlinExtension = project.kotlinExtension
-      kotlinExtension.apply {
-        kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
-        if (jdkVersion != null) {
-          jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(jdkVersion))
-            slackTools.globalConfig.jvmVendor?.let(vendor::set)
-          }
-        }
-      }
-
-      val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
-
-      tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
-        // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
-        // target compilation
-        val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
-
-        compilerOptions {
-          progressiveMode.set(true)
-          // TODO probably just want to make these configurable in SlackProperties
-          optIn.addAll(
-            "kotlin.contracts.ExperimentalContracts",
-            "kotlin.experimental.ExperimentalTypeInference",
-            "kotlin.ExperimentalStdlibApi",
-            "kotlin.time.ExperimentalTime",
-          )
-          if (!slackProperties.allowWarnings && !name.contains("test", ignoreCase = true)) {
-            allWarningsAsErrors.set(true)
-          }
-          if (!isKaptGenerateStubsTask) {
-            freeCompilerArgs.addAll(kotlinCompilerArgs)
-          }
-
-          if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
-            // Potentially useful for static analysis or annotation processors
-            javaParameters.set(true)
-            freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS)
-
-            // Set the module name to a dashified version of the project path to ensure uniqueness
-            // in created .kotlin_module files
-            moduleName.set(project.path.replace(":", "-"))
-
-            if (!isKotlinAndroid) {
-              // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-              freeCompilerArgs.add("-Xjdk-release=$actualJvmTarget")
-            }
-          }
-        }
-      }
-
-      configureFreeKotlinCompilerArgs()
-
-      if (!detektConfigured.getAndSet(true)) {
-        DetektTasks.configureSubProject(
-          project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-          actualJvmTarget,
-        )
-      }
-    }
-
-    pluginManager.withPlugin("org.jetbrains.kotlin.android") {
-      // Configure kotlin sources in Android projects
-      configure<BaseExtension> {
-        sourceSets.configureEach {
-          val nestedSourceDir = "src/$name/kotlin"
-          val dir = File(projectDir, nestedSourceDir)
-          if (dir.exists()) {
-            // Standard source set
-            // Only added if it exists to avoid potentially adding empty source dirs
-            java.srcDirs(layout.projectDirectory.dir(nestedSourceDir))
-          }
-        }
-      }
-    }
-
-    pluginManager.withPlugin("org.jetbrains.kotlin.android.extensions") {
-      throw GradleException(
-        "Don't use the deprecated 'android.extensions' plugin, switch to " +
-          "'plugin.parcelize' instead."
-      )
-    }
-
-    pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
-      configure<KaptExtension> {
-        // By default, Kapt replaces unknown types with `NonExistentClass`. This flag asks kapt
-        // to infer the type, which is useful for processors that reference to-be-generated
-        // classes.
-        // https://kotlinlang.org/docs/reference/kapt.html#non-existent-type-correction
-        correctErrorTypes = true
-
-        // Maps source errors to Kotlin sources rather than Java stubs
-        // Disabled because this triggers a bug in kapt on android 30
-        // https://github.com/JetBrains/kotlin/pull/3610
-        mapDiagnosticLocations = false
-      }
-
-      // See doc on the property for details
-      if (!slackProperties.enableKaptInTests) {
-        tasks.configureEach {
-          if (name.startsWith("kapt") && name.endsWith("TestKotlin", ignoreCase = true)) {
-            enabled = false
-          }
-        }
-      }
-    }
-  }
-
-  /** Common configuration for annotation processors, such as standard options. */
-  private fun Project.configureAnnotationProcessors() {
-    logger.debug("Configuring any annotation processors on $path")
-    val configs =
-      APT_OPTION_CONFIGS.mapValues { (_, value) ->
-        value.newConfigurer(this@configureAnnotationProcessors)
-      }
-    configurations.configureEach {
-      // Try common case first
-      val isApt =
-        name in Configurations.Groups.APT ||
-          // Try custom configs like testKapt, debugAnnotationProcessor, etc.
-          Configurations.Groups.APT.any { name.endsWith(it, ignoreCase = true) }
-      if (isApt) {
-        val context = ConfigurationContext(project, this@configureEach)
-        incoming.afterResolve {
-          dependencies.forEach { dependency -> configs[dependency.name]?.configure(context) }
-        }
-      }
-    }
-  }
-
-  /**
-   * Configures per-dependency free Kotlin compiler args. This is necessary because otherwise
-   * kotlinc will emit angry warnings.
-   */
-  private fun Project.configureFreeKotlinCompilerArgs() {
-    logger.debug("Configuring specific Kotlin compiler args on $path")
-    val once = AtomicBoolean()
-    configurations.configureEach {
-      if (isKnownConfiguration(name, Configurations.Groups.RUNTIME)) {
-        incoming.afterResolve {
-          dependencies.forEach { dependency ->
-            KotlinArgConfigs.ALL[dependency.name]?.let { config ->
-              if (once.compareAndSet(false, true)) {
-                tasks.configureKotlinCompilationTask {
-                  compilerOptions { freeCompilerArgs.addAll(config.args) }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
   companion object {
     private val CACHED_KSP_ARTIFACTS_FIELD =
       JavaPreCompileTask::class.java.getDeclaredField("kspProcessorArtifacts").apply {
         isAccessible = true
       }
-
-    private val APT_OPTION_CONFIGS: Map<String, AptOptionsConfig> =
-      AptOptionsConfigs().associateBy { it.targetDependency }
 
     /** Top-level JVM plugin IDs. Usually only one of these is applied. */
     private val JVM_PLUGINS =
@@ -1097,214 +898,10 @@ internal class StandardProjectConfigurations(
         "com.android.application",
         "com.android.test",
       )
-
-    private fun isKnownConfiguration(configurationName: String, knownNames: Set<String>): Boolean {
-      // Try trimming the flavor by just matching the suffix
-      return knownNames.any { platformConfig ->
-        configurationName.endsWith(platformConfig, ignoreCase = true)
-      }
-    }
-
-    /**
-     * Best effort fuzzy matching on known configuration names that we want to opt into platforming.
-     * We don't blanket apply them to all configurations because
-     */
-    internal fun isPlatformConfigurationName(name: String): Boolean {
-      // Kapt/ksp/compileOnly are special cases since they can be combined with others
-      val isKaptOrCompileOnly =
-        name.startsWith(Configurations.KAPT, ignoreCase = true) ||
-          name.startsWith(Configurations.KSP, ignoreCase = true) ||
-          name == Configurations.COMPILE_ONLY
-      if (isKaptOrCompileOnly) {
-        return true
-      }
-      return isKnownConfiguration(name, Configurations.Groups.PLATFORM)
-    }
-  }
-}
-
-internal interface KotlinArgConfig {
-  val targetDependency: String
-  val args: Set<String>
-}
-
-@Suppress("unused") // Nested classes here are looked up reflectively
-internal object KotlinArgConfigs {
-
-  val ALL: Map<String, KotlinArgConfig> by lazy {
-    KotlinArgConfigs::class
-      .nestedClasses
-      .map { it.objectInstance }
-      .filterIsInstance<KotlinArgConfig>()
-      .associateBy { it.targetDependency }
-  }
-
-  object Coroutines : KotlinArgConfig {
-    override val targetDependency: String = "kotlinx-coroutines-core"
-    override val args =
-      setOf(
-        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "-opt-in=kotlinx.coroutines.FlowPreview",
-      )
   }
 }
 
 /** A simple context for the current configuration being processed. */
 internal data class ConfigurationContext(val project: Project, val configuration: Configuration) {
   val isKaptConfiguration = configuration.name.endsWith("kapt", ignoreCase = true)
-}
-
-/**
- * A common interface for configuration of annotation processors. It's recommended to make
- * implementers of this interface `object` types. The pipeline for configuration of projects will
- * appropriately call [newConfigurer] per-project to create a project-local context.
- */
-internal interface AptOptionsConfig {
-
-  /**
-   * The targeted dependency of this config. This should be treated as the maven artifact ID of the
-   * dependency, such as "dagger-compiler". This should ideally also be a constant.
-   */
-  val targetDependency: String
-
-  /** @return a new [AptOptionsConfigurer] for this config on the target [project]. */
-  fun newConfigurer(project: Project): AptOptionsConfigurer
-
-  interface AptOptionsConfigurer {
-
-    val project: Project
-
-    /**
-     * Configure appropriate annotation processor options on the given [project] given the current
-     * [configurationContext].
-     */
-    fun configure(configurationContext: ConfigurationContext)
-  }
-}
-
-/**
- * A basic [BasicAptOptionsConfig] that makes setup ceremony easier for common cases. This tries to
- * ensure an optimized configuration that avoids object/action allocations and simplify wiring into
- * our different common project types.
- *
- * The general usage that you define a top level object that extends this and override the necessary
- * properties.
- *
- * ```
- * object ButterKnifeAptOptionsConfig : BasicAptOptionsConfig() {
- *   override val targetDependency: String = "butterknife-compiler"
- *   override val globalOptions: Map<String, String> = mapOf("butterknife.minSdk" to "21")
- * }
- * ```
- */
-internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
-  private val rawAptCompilerOptions by lazy {
-    globalOptions.map { (option, value) -> "-A$option=$value" }
-  }
-
-  open val name: String = this::class.java.simpleName
-  open val globalOptions: Map<String, String> = emptyMap()
-
-  val javaCompileAptAction =
-    Action<JavaCompile> { options.compilerArgs.addAll(rawAptCompilerOptions) }
-
-  final override fun newConfigurer(project: Project): AptOptionsConfigurer {
-    return newConfigurer(project, BasicAptOptionsConfigurer(project, this))
-  }
-
-  /**
-   * Optional callback with the created basic configurer. By default this just returns that created
-   * instance, but you can optionally override this to customize the behavior. Using class
-   * delegation is recommended to simplify reuse.
-   */
-  open fun newConfigurer(
-    project: Project,
-    basicConfigurer: AptOptionsConfigurer,
-  ): AptOptionsConfigurer = basicConfigurer
-
-  private class BasicAptOptionsConfigurer(
-    override val project: Project,
-    private val baseConfig: BasicAptOptionsConfig,
-  ) : AptOptionsConfigurer {
-
-    private val baseBuildTypeAction =
-      Action<BuildType> {
-        project.logger.debug(
-          "${baseConfig.name}: Adding javac apt options to android project " +
-            "${project.path} at buildType $name"
-        )
-        baseConfig.globalOptions.forEach { (key, value) ->
-          javaCompileOptions.annotationProcessorOptions.arguments[key] = value
-        }
-      }
-
-    private val javaLibraryAction =
-      Action<Any> {
-        // Implicitly not using Kotlin because we would have to use Kapt
-        project.logger.debug(
-          "${baseConfig.name}: Adding javac apt options to android project ${project.path}"
-        )
-        project.tasks.withType(JavaCompile::class.java, baseConfig.javaCompileAptAction)
-      }
-
-    override fun configure(configurationContext: ConfigurationContext) =
-      with(configurationContext.project) {
-        if (configurationContext.isKaptConfiguration) {
-          logger.debug("${baseConfig.name}: Adding kapt arguments to $path")
-          configure<KaptExtension> {
-            arguments { baseConfig.globalOptions.forEach { (key, value) -> arg(key, value) } }
-          }
-        } else {
-          project.pluginManager.withPlugin("com.android.application") {
-            logger.debug(
-              "${baseConfig.name}: Adding javac apt options to android application project $path"
-            )
-            configure<AppExtension> { buildTypes.configureEach(baseBuildTypeAction) }
-          }
-          project.pluginManager.withPlugin("com.android.library") {
-            logger.debug(
-              "${baseConfig.name}: Adding javac apt options to android library project $path"
-            )
-            configure<LibraryExtension> { buildTypes.configureEach(baseBuildTypeAction) }
-          }
-          project.pluginManager.withPlugin("java", javaLibraryAction)
-          project.pluginManager.withPlugin("java-library", javaLibraryAction)
-        }
-      }
-  }
-}
-
-/**
- * All [AptOptionsConfig] types. Please follow the standard structure of one object per config and
- * don't add any other types. This ensures that [invoke] works smoothly.
- */
-@Suppress("unused") // Nested classes here are looked up reflectively
-internal object AptOptionsConfigs {
-
-  operator fun invoke(): List<AptOptionsConfig> =
-    AptOptionsConfigs::class
-      .nestedClasses
-      .map { it.objectInstance }
-      .filterIsInstance<AptOptionsConfig>()
-
-  object Dagger : BasicAptOptionsConfig() {
-    override val targetDependency: String = "dagger-compiler"
-    override val globalOptions: Map<String, String> =
-      mapOf(
-        "dagger.warnIfInjectionFactoryNotGeneratedUpstream" to "enabled",
-        // New error messages. Feedback should go to https://github.com/google/dagger/issues/1769
-        "dagger.experimentalDaggerErrorMessages" to "enabled",
-        // Fast init mode for improved dagger perf on startup:
-        // https://dagger.dev/dev-guide/compiler-options.html#fastinit-mode
-        "dagger.fastInit" to "enabled",
-        // https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
-        "dagger.ignoreProvisionKeyWildcards" to "ENABLED",
-      )
-  }
-
-  object Moshi : BasicAptOptionsConfig() {
-    override val targetDependency: String = "moshi-kotlin-codegen"
-    override val globalOptions: Map<String, String> =
-      mapOf("moshi.generated" to "javax.annotation.Generated")
-  }
 }

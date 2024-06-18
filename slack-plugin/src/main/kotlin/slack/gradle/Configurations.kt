@@ -55,4 +55,27 @@ internal object Configurations {
         "lintRelease",
       )
   }
+
+  internal fun isKnownConfiguration(configurationName: String, knownNames: Set<String>): Boolean {
+    // Try trimming the flavor by just matching the suffix
+    return knownNames.any { platformConfig ->
+      configurationName.endsWith(platformConfig, ignoreCase = true)
+    }
+  }
+
+  /**
+   * Best effort fuzzy matching on known configuration names that we want to opt into platforming.
+   * We don't blanket apply them to all configurations because
+   */
+  internal fun isPlatformConfigurationName(name: String): Boolean {
+    // Kapt/ksp/compileOnly are special cases since they can be combined with others
+    val isKaptOrCompileOnly =
+      name.startsWith(Configurations.KAPT, ignoreCase = true) ||
+        name.startsWith(Configurations.KSP, ignoreCase = true) ||
+        name == Configurations.COMPILE_ONLY
+    if (isKaptOrCompileOnly) {
+      return true
+    }
+    return isKnownConfiguration(name, Configurations.Groups.PLATFORM)
+  }
 }

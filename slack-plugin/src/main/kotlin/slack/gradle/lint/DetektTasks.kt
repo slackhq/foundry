@@ -66,7 +66,6 @@ internal object DetektTasks {
     project: Project,
     slackProperties: SlackProperties,
     affectedProjects: Set<String>?,
-    jvmTarget: String,
   ) {
     check(!project.isRootProject) {
       "This method should only be called for subprojects, not the root project."
@@ -113,13 +112,13 @@ internal object DetektTasks {
 
       // Duplicate configs due to https://github.com/detekt/detekt/issues/5940
       project.tasks.configureEach<Detekt> {
-        this.jvmTarget = jvmTarget
+        this.jvmTarget = slackProperties.versions.jvmTarget.get().toString()
         exclude("**/build/**")
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
-        this.jvmTarget = jvmTarget
+        this.jvmTarget = slackProperties.versions.jvmTarget.get().toString()
         exclude("**/build/**")
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())

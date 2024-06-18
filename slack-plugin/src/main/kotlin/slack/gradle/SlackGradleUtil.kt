@@ -22,6 +22,7 @@ import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.google.common.base.CaseFormat
 import java.io.File
 import java.util.Locale
+import java.util.Optional
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -29,6 +30,7 @@ import org.gradle.api.UnknownTaskException
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -170,14 +172,6 @@ internal fun Project.ciUnitTestAndroidVariant(): String {
   return ciUnitTestVariant.capitalizeUS()
 }
 
-internal fun Project.jdkVersion(): Int {
-  return SlackProperties(this).jdkVersion
-}
-
-internal fun Project.jvmTargetVersion(): Int {
-  return SlackProperties(this).jvmTarget
-}
-
 internal fun Project.getVersionsCatalog(name: String = "libs"): VersionCatalog {
   return getVersionsCatalogOrNull(name) ?: error("No versions catalog found!")
 }
@@ -286,3 +280,6 @@ internal inline fun <reified T : Task> Project.namedLazy(
     }
   }
 }
+
+internal fun <T : Any> Optional<T>.asProvider(providers: ProviderFactory) =
+  providers.provider { get() }

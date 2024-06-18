@@ -452,14 +452,6 @@ internal constructor(
   public val strictJdk: Boolean
     get() = booleanProperty("slackToolchainsStrict", defaultValue = true)
 
-  /** The JDK version to use for compilations. */
-  public val jdkVersion: Int
-    get() = versions.jdk
-
-  /** The JDK runtime to target for compilations. */
-  public val jvmTarget: Int
-    get() = versions.jvmTarget
-
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
 
@@ -644,6 +636,35 @@ internal constructor(
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("sgp.config.jvmVendor.optOut", defaultValue = false)
+
+  /**
+   * Option to force a specific kotlin language version. By default defers to the KGP default the
+   * build is running with.
+   */
+  public val kotlinLanguageVersionOverride: Provider<String>
+    get() = resolver.optionalStringProvider("sgp.kotlin.languageVersionOverride")
+
+  /**
+   * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in all compilations.
+   * Should not include opt-in arguments or `-progressive`.
+   */
+  public val kotlinFreeArgs: Provider<List<String>>
+    get() = resolver.optionalStringProvider("sgp.kotlin.freeArgs").map { it.split(',') }
+
+  /**
+   * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in JVM compilations.
+   * Should not include opt-in arguments or `-progressive`.
+   */
+  public val kotlinJvmFreeArgs: Provider<List<String>>
+    get() = resolver.optionalStringProvider("sgp.kotlin.jvmFreeArgs").map { it.split(',') }
+
+  /** Opt-in annotations to pass to Kotlin's `optIn` property. */
+  public val kotlinOptIn: Provider<List<String>>
+    get() = resolver.optionalStringProvider("sgp.kotlin.optIns").map { it.split(',') }
+
+  /** Default for Kotlin's `progressive` mode. Defaults to enabled. */
+  public val kotlinProgressive: Provider<Boolean>
+    get() = resolver.booleanProvider("sgp.kotlin.progressive", defaultValue = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")

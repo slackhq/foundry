@@ -1,6 +1,19 @@
 Changelog
 =========
 
+**Unreleased**
+--------------
+
+- Make default Kotlin compiler arguments more configurable. This includes removing some previously-default behavior.
+  - `sgp.kotlin.languageVersionOverride`. Default is null, which will just defer to KGP's default.
+  - `sgp.kotlin.optIns`
+    - Previous default opt-ins = `kotlin.contracts.ExperimentalContracts`, `kotlin.experimental.ExperimentalTypeInference`, `kotlin.ExperimentalStdlibApi`, `kotlin.time.ExperimentalTime`
+  - `sgp.kotlin.freeArgs`
+    - Previous default free args = `-Xenhance-type-parameter-types-to-def-not-null`, `-Xself-upper-bound-inference`
+  - `sgp.kotlin.jvmFreeArgs`
+    - Previous default JVM free args = `-Xjsr305=strict`, `-Xassertions=jvm`, `-Xemit-jvm-type-annotations`, `-Xjvm-default=all`, `-Xtype-enhancement-improvements-strict-mode`, `-Xjspecify-annotations=strict`
+  - `sgp.kotlin.progressive`. Default is true.
+
 0.17.1
 ------
 
