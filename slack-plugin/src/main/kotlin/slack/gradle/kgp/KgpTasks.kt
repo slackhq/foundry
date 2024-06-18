@@ -33,6 +33,7 @@ import slack.gradle.Configurations
 import slack.gradle.Configurations.isKnownConfiguration
 import slack.gradle.SlackProperties
 import slack.gradle.SlackTools
+import slack.gradle.asProvider
 import slack.gradle.configure
 import slack.gradle.lint.DetektTasks
 import slack.gradle.util.configureKotlinCompilationTask
@@ -40,20 +41,7 @@ import slack.gradle.util.configureKotlinCompilationTask
 /** Common configuration for Kotlin projects. */
 internal object KgpTasks {
   @Suppress("LongMethod")
-  fun configure(
-    project: Project,
-    jdkVersion: Int?,
-    jvmTargetVersion: Int,
-    slackTools: SlackTools,
-    slackProperties: SlackProperties,
-  ) {
-    val actualJvmTarget =
-      if (jvmTargetVersion == 8) {
-        "1.8"
-      } else {
-        jvmTargetVersion.toString()
-      }
-
+  fun configure(project: Project, slackTools: SlackTools, slackProperties: SlackProperties) {
     val detektConfigured = AtomicBoolean()
     // Must be outside the withType() block below because you can't apply new plugins in that block
     if (slackProperties.autoApplyDetekt) {
@@ -64,7 +52,7 @@ internal object KgpTasks {
       val kotlinExtension = project.project.kotlinExtension
       kotlinExtension.apply {
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
-        if (jdkVersion != null) {
+        slackProperties.versions.jdk.ifPresent { jdkVersion ->
           jvmToolchain {
             languageVersion.set(JavaLanguageVersion.of(jdkVersion))
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
@@ -97,8 +85,12 @@ internal object KgpTasks {
             freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
           }
 
+          val jvmTargetProvider =
+            slackProperties.versions.jvmTarget
+              .map { JvmTarget.fromTarget(it.toString()) }
+              .asProvider(project.providers)
           if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
+            this.jvmTarget.set(jvmTarget)
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
             freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
@@ -109,7 +101,7 @@ internal object KgpTasks {
 
             if (!isKotlinAndroid) {
               // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-              freeCompilerArgs.add("-Xjdk-release=$actualJvmTarget")
+              freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
             }
           }
         }
@@ -122,7 +114,6 @@ internal object KgpTasks {
           project.project,
           slackProperties,
           slackTools.globalConfig.affectedProjects,
-          actualJvmTarget,
         )
       }
     }

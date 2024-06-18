@@ -452,14 +452,6 @@ internal constructor(
   public val strictJdk: Boolean
     get() = booleanProperty("slackToolchainsStrict", defaultValue = true)
 
-  /** The JDK version to use for compilations. */
-  public val jdkVersion: Int
-    get() = versions.jdk
-
-  /** The JDK runtime to target for compilations. */
-  public val jvmTarget: Int
-    get() = versions.jvmTarget
-
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
 

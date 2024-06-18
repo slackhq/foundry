@@ -18,7 +18,13 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.variant.*
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
+import com.android.build.api.variant.HasAndroidTestBuilder
+import com.android.build.api.variant.HasUnitTestBuilder
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
@@ -49,7 +55,6 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import slack.dependencyrake.RakeDependencies
-import slack.gradle.AptOptionsConfigs.invoke
 import slack.gradle.Configurations.isPlatformConfigurationName
 import slack.gradle.artifacts.Publisher
 import slack.gradle.artifacts.SgpArtifact
@@ -105,10 +110,8 @@ internal class StandardProjectConfigurations(
       setUpSubprojectArtifactPublishing(project)
     }
     project.applyCommonConfigurations(slackProperties)
-    val jdkVersion = project.jdkVersion()
-    val jvmTargetVersion = project.jvmTargetVersion()
-    project.applyJvmConfigurations(jdkVersion, jvmTargetVersion, slackProperties, slackExtension)
-    KgpTasks.configure(project, jdkVersion, jvmTargetVersion, slackTools, slackProperties)
+    project.applyJvmConfigurations(slackProperties, slackExtension)
+    KgpTasks.configure(project, slackTools, slackProperties)
   }
 
   /**
@@ -161,8 +164,6 @@ internal class StandardProjectConfigurations(
   }
 
   private fun Project.applyJvmConfigurations(
-    jdkVersion: Int,
-    jvmTargetVersion: Int,
     slackProperties: SlackProperties,
     slackExtension: SlackExtension,
   ) {
@@ -244,8 +245,8 @@ internal class StandardProjectConfigurations(
     }
 
     // TODO always configure compileOptions here
-    configureAndroidProjects(slackExtension, jvmTargetVersion, slackProperties)
-    configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
+    configureAndroidProjects(slackExtension, slackProperties)
+    configureJavaProject(slackProperties)
     slackExtension.applyTo(this)
 
     pluginManager.withPlugin("com.sergei-lapin.napt") {
@@ -320,22 +321,21 @@ internal class StandardProjectConfigurations(
   }
 
   /** Adds common configuration for Java projects. */
-  private fun Project.configureJavaProject(
-    jdkVersion: Int,
-    jvmTargetVersion: Int,
-    slackProperties: SlackProperties,
-  ) {
+  private fun Project.configureJavaProject(slackProperties: SlackProperties) {
+    val releaseVersion =
+      slackProperties.versions.jvmTarget.map(JavaVersion::toVersion).asProvider(providers)
     plugins.withType(JavaBasePlugin::class.java).configureEach {
       project.configure<JavaPluginExtension> {
-        val version = JavaVersion.toVersion(jvmTargetVersion)
-        sourceCompatibility = version
-        targetCompatibility = version
+        sourceCompatibility = releaseVersion.get()
+        targetCompatibility = releaseVersion.get()
       }
-      if (jdkVersion >= 9) {
-        tasks.configureEach<JavaCompile> {
-          if (!isAndroid) {
-            logger.logWithTag("Configuring release option for $path")
-            options.release.setDisallowChanges(jvmTargetVersion)
+      slackProperties.versions.jdk.ifPresent {
+        if (it >= 9) {
+          tasks.configureEach<JavaCompile> {
+            if (!isAndroid) {
+              logger.logWithTag("Configuring release option for $path")
+              options.release.setDisallowChanges(releaseVersion.map { it.majorVersion.toInt() })
+            }
           }
         }
       }
@@ -353,12 +353,12 @@ internal class StandardProjectConfigurations(
       // TODO if we set it in android, does the config from this get safely ignored?
       // TODO re-enable in android at all after AGP 7.1
       if (!isAndroid) {
-        val target = if (isAndroid) jvmTargetVersion else jdkVersion
-        logger.logWithTag("Configuring toolchain for $path to $jdkVersion")
+        val target = if (isAndroid) releaseVersion else slackProperties.versions.jdk.map(JavaVersion::toVersion).asProvider(project.providers)
+        logger.logWithTag("Configuring toolchain for $path")
         // Can't use disallowChanges here because Gradle sets it again later for some reason
         javaCompiler.set(
           javaToolchains.compilerFor {
-            languageVersion.setDisallowChanges(JavaLanguageVersion.of(target))
+            languageVersion.setDisallowChanges(target.map { JavaLanguageVersion.of(it.majorVersion) })
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         )
@@ -444,10 +444,9 @@ internal class StandardProjectConfigurations(
   @Suppress("LongMethod")
   private fun Project.configureAndroidProjects(
     slackExtension: SlackExtension,
-    jvmTargetVersion: Int,
     slackProperties: SlackProperties,
   ) {
-    val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
+    val javaVersion = slackProperties.versions.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
       Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
@@ -554,8 +553,8 @@ internal class StandardProjectConfigurations(
         }
 
         compileOptions {
-          sourceCompatibility = javaVersion
-          targetCompatibility = javaVersion
+          sourceCompatibility = javaVersion.get()
+          targetCompatibility = javaVersion.get()
           isCoreLibraryDesugaringEnabled = true
         }
 

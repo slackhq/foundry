@@ -54,7 +54,6 @@ import slack.cli.AppleSiliconCompat.isMacOS
 import slack.gradle.SlackProperties
 import slack.gradle.isCi
 import slack.gradle.isRootProject
-import slack.gradle.jdkVersion
 import slack.gradle.listProperty
 import slack.gradle.property
 import slack.gradle.register
@@ -324,16 +323,16 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
     public fun register(
       project: Project,
+      jdkVersion: Provider<Int>,
       jvmVendor: JvmVendorSpec?,
     ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
         project.tasks.register<CoreBootstrapTask>(NAME) {
-          val jdkVersion = project.jdkVersion()
           val service = project.serviceOf<JavaToolchainService>()
           val defaultLauncher =
             service.launcherFor {
-              languageVersion.setDisallowChanges(JavaLanguageVersion.of(jdkVersion))
+              languageVersion.setDisallowChanges(jdkVersion.map(JavaLanguageVersion::of))
               if (jvmVendor != null) {
                 vendor.setDisallowChanges(jvmVendor)
               }
