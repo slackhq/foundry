@@ -181,17 +181,6 @@ subprojects {
     project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
       configure<BuildConfigExtension> {
         buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
-        // Using Any here due to https://github.com/gmazzo/gradle-buildconfig-plugin/issues/9
-        buildConfigField(
-          "kotlin.collections.List<String>",
-          "KOTLIN_COMPILER_ARGS",
-          "listOf(${kotlinBuildConfig.kotlinCompilerArgs.joinToString(", ") { "\"$it\"" }})",
-        )
-        buildConfigField(
-          "kotlin.collections.List<String>",
-          "KOTLIN_JVM_COMPILER_ARGS",
-          "listOf(${kotlinBuildConfig.kotlinJvmCompilerArgs.joinToString(", ") { "\"$it\"" }})",
-        )
       }
     }
   }
@@ -225,6 +214,7 @@ subprojects {
     apply(plugin = "com.squareup.sort-dependencies")
   }
 
+  val jvmTarget = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
   plugins.withType<KotlinBasePlugin>().configureEach {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
@@ -246,12 +236,34 @@ subprojects {
         } else {
           allWarningsAsErrors.set(true)
         }
-        val javaVersion = JvmTarget.JVM_17
-        jvmTarget.set(javaVersion)
-        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinCompilerArgs)
-        freeCompilerArgs.addAll(kotlinBuildConfig.kotlinJvmCompilerArgs)
+        this.jvmTarget.set(jvmTarget)
+        freeCompilerArgs.addAll(
+          // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
+          // => T & Any)
+          "-Xenhance-type-parameter-types-to-def-not-null",
+          // Use fast implementation on Jar FS. This may speed up compilation time, but currently it's
+          // an experimental mode
+          // TODO toe-hold but we can't use it yet because it emits a warning that fails with -Werror
+          //  https://youtrack.jetbrains.com/issue/KT-54928
+          //    "-Xuse-fast-jar-file-system",
+          // Support inferring type arguments based on only self upper bounds of the corresponding type
+          // parameters
+          "-Xself-upper-bound-inference",
+          "-Xjsr305=strict",
+          // Match JVM assertion behavior:
+          // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
+          "-Xassertions=jvm",
+          // Potentially useful for static analysis tools or annotation processors.
+          "-Xemit-jvm-type-annotations",
+          // Enable new jvm-default behavior
+          // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
+          "-Xjvm-default=all",
+          "-Xtype-enhancement-improvements-strict-mode",
+          // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
+          "-Xjspecify-annotations=strict",
+        )
         // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-        freeCompilerArgs.add("-Xjdk-release=${javaVersion.target}")
+        freeCompilerArgs.add(jvmTarget.map { "-Xjdk-release=${it.target}" })
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
@@ -261,7 +273,7 @@ subprojects {
       }
     }
 
-    tasks.withType<Detekt>().configureEach { jvmTarget = "17" }
+    tasks.withType<Detekt>().configureEach { this.jvmTarget = jvmTarget.get().target }
   }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
