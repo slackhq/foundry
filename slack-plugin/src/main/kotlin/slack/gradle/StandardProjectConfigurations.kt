@@ -353,12 +353,17 @@ internal class StandardProjectConfigurations(
       // TODO if we set it in android, does the config from this get safely ignored?
       // TODO re-enable in android at all after AGP 7.1
       if (!isAndroid) {
-        val target = if (isAndroid) releaseVersion else slackProperties.versions.jdk.map(JavaVersion::toVersion).asProvider(project.providers)
+        val target =
+          if (isAndroid) releaseVersion
+          else
+            slackProperties.versions.jdk.map(JavaVersion::toVersion).asProvider(project.providers)
         logger.logWithTag("Configuring toolchain for $path")
         // Can't use disallowChanges here because Gradle sets it again later for some reason
         javaCompiler.set(
           javaToolchains.compilerFor {
-            languageVersion.setDisallowChanges(target.map { JavaLanguageVersion.of(it.majorVersion) })
+            languageVersion.setDisallowChanges(
+              target.map { JavaLanguageVersion.of(it.majorVersion) }
+            )
             slackTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         )

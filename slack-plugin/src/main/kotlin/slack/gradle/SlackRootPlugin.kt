@@ -169,7 +169,7 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
     }
     project.configureSlackRootBuildscript(
       slackProperties.versions.jdk.asProvider(project.providers),
-      slackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull
+      slackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
     )
     LintTasks.configureRootProject(project)
     DetektTasks.configureRootProject(project, slackProperties)
@@ -468,7 +468,10 @@ internal class SlackRootPlugin @Inject constructor(private val buildFeatures: Bu
   }
 }
 
-private fun Project.configureSlackRootBuildscript(jdkProvider: Provider<Int>, jvmVendor: JvmVendorSpec?) {
+private fun Project.configureSlackRootBuildscript(
+  jdkProvider: Provider<Int>,
+  jvmVendor: JvmVendorSpec?,
+) {
   // Only register bootstrap if explicitly requested for now
   if (CoreBootstrapTask.isBootstrapEnabled(this)) {
     CoreBootstrapTask.register(this, jdkProvider, jvmVendor)

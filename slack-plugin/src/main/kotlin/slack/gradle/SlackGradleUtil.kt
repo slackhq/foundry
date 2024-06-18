@@ -281,4 +281,5 @@ internal inline fun <reified T : Task> Project.namedLazy(
   }
 }
 
-internal fun <T : Any> Optional<T>.asProvider(providers: ProviderFactory) = providers.provider { get() }
+internal fun <T : Any> Optional<T>.asProvider(providers: ProviderFactory) =
+  providers.provider { get() }

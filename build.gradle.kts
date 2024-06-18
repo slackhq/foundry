@@ -176,6 +176,8 @@ tasks.dokkaHtmlMultiModule {
 val kotlinVersion = libs.versions.kotlin.get()
 val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 
+val jvmTargetVersion = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
+
 subprojects {
   if (project.path == ":slack-plugin") {
     project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
@@ -214,7 +216,6 @@ subprojects {
     apply(plugin = "com.squareup.sort-dependencies")
   }
 
-  val jvmTarget = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
   plugins.withType<KotlinBasePlugin>().configureEach {
     tasks.withType<KotlinCompile>().configureEach {
       compilerOptions {
@@ -236,17 +237,21 @@ subprojects {
         } else {
           allWarningsAsErrors.set(true)
         }
-        this.jvmTarget.set(jvmTarget)
+        this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
-          // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
+          // Enhance not null annotated type parameter's types to definitely not null types
+          // (@NotNull T
           // => T & Any)
           "-Xenhance-type-parameter-types-to-def-not-null",
-          // Use fast implementation on Jar FS. This may speed up compilation time, but currently it's
+          // Use fast implementation on Jar FS. This may speed up compilation time, but currently
+          // it's
           // an experimental mode
-          // TODO toe-hold but we can't use it yet because it emits a warning that fails with -Werror
+          // TODO toe-hold but we can't use it yet because it emits a warning that fails with
+          // -Werror
           //  https://youtrack.jetbrains.com/issue/KT-54928
           //    "-Xuse-fast-jar-file-system",
-          // Support inferring type arguments based on only self upper bounds of the corresponding type
+          // Support inferring type arguments based on only self upper bounds of the corresponding
+          // type
           // parameters
           "-Xself-upper-bound-inference",
           "-Xjsr305=strict",
@@ -263,7 +268,7 @@ subprojects {
           "-Xjspecify-annotations=strict",
         )
         // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-        freeCompilerArgs.add(jvmTarget.map { "-Xjdk-release=${it.target}" })
+        freeCompilerArgs.add(jvmTargetVersion.map { "-Xjdk-release=${it.target}" })
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
@@ -273,7 +278,7 @@ subprojects {
       }
     }
 
-    tasks.withType<Detekt>().configureEach { this.jvmTarget = jvmTarget.get().target }
+    tasks.withType<Detekt>().configureEach { this.jvmTarget = jvmTargetVersion.get().target }
   }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {

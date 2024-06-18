@@ -16,8 +16,6 @@
 package slack.gradle
 
 import java.util.Optional
-import java.util.OptionalInt
-import kotlin.jvm.optionals.getOrDefault
 import org.gradle.api.artifacts.ExternalModuleDependencyBundle
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -59,20 +57,15 @@ internal class SlackVersions(val catalog: VersionCatalog) {
 
   /** The JDK version to use for compilations. */
   val jdk: Optional<Int>
-    get() = getOptionalValue("jdk")
-      .flatMap { Optional.of(it.toInt()) }
-      .also {
-        check(it.isPresent) {
-          "A `jdk` version must be defined in libs.versions.toml"
-        }
-      }
+    get() =
+      getOptionalValue("jdk")
+        .flatMap { Optional.of(it.toInt()) }
+        .also { check(it.isPresent) { "A `jdk` version must be defined in libs.versions.toml" } }
 
   /** The JDK runtime to target for compilations. */
   // Can't use OptionalInt because it lacks mapping functions
   val jvmTarget: Optional<Int>
-    get() = getOptionalValue("jvmTarget")
-      .flatMap { Optional.of(it.toInt()) }
-      .or { Optional.of(17) }
+    get() = getOptionalValue("jvmTarget").flatMap { Optional.of(it.toInt()) }.or { Optional.of(17) }
 
   val composeJb: String?
     get() = getOptionalValue("compose-jb").orElse(null)
