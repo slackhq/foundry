@@ -9,6 +9,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
@@ -18,21 +19,11 @@ import slack.gradle.Configurations.isKnownConfiguration
 import slack.gradle.SlackProperties
 import slack.gradle.SlackTools
 import slack.gradle.configure
-import slack.gradle.dependencies.BuildConfig
 import slack.gradle.lint.DetektTasks
 import slack.gradle.util.configureKotlinCompilationTask
 
 /** Common configuration for Kotlin projects. */
 internal object KgpTasks {
-
-  private val KOTLIN_COMPILER_ARGS =
-    mutableListOf<String>()
-      .apply {
-        addAll(BuildConfig.KOTLIN_COMPILER_ARGS)
-        // Left as a toe-hold for any future dynamic arguments
-      }
-      .distinct()
-
   @Suppress("LongMethod")
   fun configure(
     project: Project,
@@ -74,14 +65,13 @@ internal object KgpTasks {
         val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
 
         compilerOptions {
-          progressiveMode.set(true)
-          // TODO probably just want to make these configurable in SlackProperties
-          optIn.addAll(
-            "kotlin.contracts.ExperimentalContracts",
-            "kotlin.experimental.ExperimentalTypeInference",
-            "kotlin.ExperimentalStdlibApi",
-            "kotlin.time.ExperimentalTime",
-          )
+          progressiveMode.set(slackProperties.kotlinProgressive)
+          optIn.addAll(slackProperties.kotlinOptIn)
+          if (slackProperties.kotlinLanguageVersionOverride.isPresent) {
+            languageVersion.set(
+              slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
+            )
+          }
           if (
             !slackProperties.allowWarnings &&
               !this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)
@@ -89,14 +79,14 @@ internal object KgpTasks {
             allWarningsAsErrors.set(true)
           }
           if (!isKaptGenerateStubsTask) {
-            freeCompilerArgs.addAll(KOTLIN_COMPILER_ARGS)
+            freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
           }
 
           if (this is KotlinJvmCompilerOptions) {
             jvmTarget.set(JvmTarget.fromTarget(actualJvmTarget))
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
-            freeCompilerArgs.addAll(BuildConfig.KOTLIN_JVM_COMPILER_ARGS)
+            freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
 
             // Set the module name to a dashified version of the project path to ensure uniqueness
             // in created .kotlin_module files

@@ -645,9 +645,34 @@ internal constructor(
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("sgp.config.jvmVendor.optOut", defaultValue = false)
 
-  /** Option to force a specific kotlin language version. */
-  public val kotlinLanguageVersionOverride: String?
-    get() = optionalStringProperty("sgp.kotlin.languageVersionOverride", defaultValue = null)
+  /**
+   * Option to force a specific kotlin language version. By default defers to the KGP default the
+   * build is running with.
+   */
+  public val kotlinLanguageVersionOverride: Provider<String>
+    get() = resolver.optionalStringProvider("sgp.kotlin.languageVersionOverride")
+
+  /**
+   * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in all compilations.
+   * Should not include opt-in arguments or `-progressive`.
+   */
+  public val kotlinFreeArgs: Provider<List<String>>
+    get() = resolver.optionalStringProvider("sgp.kotlin.freeArgs").map { it.split(',') }
+
+  /**
+   * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in JVM compilations.
+   * Should not include opt-in arguments or `-progressive`.
+   */
+  public val kotlinJvmFreeArgs: Provider<List<String>>
+    get() = resolver.optionalStringProvider("sgp.kotlin.jvmFreeArgs").map { it.split(',') }
+
+  /** Opt-in annotations to pass to Kotlin's `optIn` property. */
+  public val kotlinOptIn: Provider<List<String>>
+    get() = resolver.optionalStringProvider("sgp.kotlin.optIns").map { it.split(',') }
+
+  /** Default for Kotlin's `progressive` mode. Defaults to enabled. */
+  public val kotlinProgressive: Provider<Boolean>
+    get() = resolver.booleanProvider("sgp.kotlin.progressive", defaultValue = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")
