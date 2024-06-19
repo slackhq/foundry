@@ -13,10 +13,10 @@ SNAPSHOT_VERSION=$(getProperty 'VERSION_NAME' gradle.properties)
 
 echo "Publishing $NEW_VERSION"
 
-# Prepare release
-sed -i '' "s/${SNAPSHOT_VERSION}/${NEW_VERSION}/g" gradle.properties
-git commit -am "Prepare for release $NEW_VERSION."
-git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION"
+# # Prepare release
+# sed -i '' "s/${SNAPSHOT_VERSION}/${NEW_VERSION}/g" gradle.properties
+# git commit -am "Prepare for release $NEW_VERSION."
+# git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION"
 
 # Publish
 ./gradlew publish -x dokkaHtml --no-configuration-cache
