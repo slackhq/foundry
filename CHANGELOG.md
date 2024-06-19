@@ -1,8 +1,9 @@
 Changelog
 =========
 
-**Unreleased**
---------------
+0.17.2
+------
+_2024-05-28_
 
 - Make default Kotlin compiler arguments more configurable. This includes removing some previously-default behavior.
   - `sgp.kotlin.languageVersionOverride`. Default is null, which will just defer to KGP's default.
@@ -13,6 +14,7 @@ Changelog
   - `sgp.kotlin.jvmFreeArgs`
     - Previous default JVM free args = `-Xjsr305=strict`, `-Xassertions=jvm`, `-Xemit-jvm-type-annotations`, `-Xjvm-default=all`, `-Xtype-enhancement-improvements-strict-mode`, `-Xjspecify-annotations=strict`
   - `sgp.kotlin.progressive`. Default is true.
+- Build against AGP `8.5`.
 
 0.17.1
 ------
