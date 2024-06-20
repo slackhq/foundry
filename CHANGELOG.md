@@ -14,7 +14,12 @@ _2024-05-28_
   - `sgp.kotlin.jvmFreeArgs`
     - Previous default JVM free args = `-Xjsr305=strict`, `-Xassertions=jvm`, `-Xemit-jvm-type-annotations`, `-Xjvm-default=all`, `-Xtype-enhancement-improvements-strict-mode`, `-Xjspecify-annotations=strict`
   - `sgp.kotlin.progressive`. Default is true.
-- Build against AGP `8.5`.
+- Build against AGP `8.5.0`.
+- Build against DAGP `1.32.0`.
+- Build against Compose Multiplatform `1.6.11`.
+- Update to Kaml `0.60.0`.
+- Update to Guava `33.2.1-jre`.
+- Update to MoshiX `0.27.1`.
 
 0.17.1
 ------
