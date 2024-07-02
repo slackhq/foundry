@@ -100,11 +100,7 @@ internal object UnitTests {
     if (
       slackProperties.ciUnitTestEnableKover && project.path != slackProperties.platformProjectPath
     ) {
-      project.afterEvaluate {
-        // Remove afterEvaluate
-        // after https://github.com/Kotlin/kotlinx-kover/issues/362 is fixed
-        project.pluginManager.apply("org.jetbrains.kotlinx.kover")
-      }
+      project.pluginManager.apply("org.jetbrains.kotlinx.kover")
     }
 
     val unitTestsPublisher: Publisher<SgpArtifact>? =
