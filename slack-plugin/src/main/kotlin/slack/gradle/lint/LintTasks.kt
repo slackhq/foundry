@@ -273,7 +273,7 @@ internal object LintTasks {
       checkTestSources = slackProperties.lintCheckTestSources
 
       textReport = true
-      xmlReport = true
+      xmlReport = false
       htmlReport = true
       sarifReport = true
 
