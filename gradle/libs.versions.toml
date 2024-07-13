@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.1"
-agpAlpha = "8.5.0"
+agpAlpha = "8.5.1"
 anvil = "2.5.0-beta09"
 bugsnagGradle = "8.1.0"
 circuit = "0.22.2"
