@@ -124,4 +124,4 @@ retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", v
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.8"
 slackLints-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slack-lint" }
 slackLints-annotations = { module = "com.slack.lint:slack-lint-annotations", version.ref = "slack-lint" }
-truth = "com.google.truth:truth:1.4.3"
+truth = "com.google.truth:truth:1.4.4"
