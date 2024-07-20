@@ -4,6 +4,20 @@ Changelog
 **Unreleased**
 --------------
 
+0.18.1
+------
+_2024-07-19_
+
+- **Fix**: Fix circular evaluation dependency for `jvmTarget`.
+- Remove Kover Workaround for `0.7.1`.
+- Turn off xml report generation for lint task.
+- Update KotlinPoet to `1.18.1`.
+- Update Wire to `5.0.0`.
+- Update MoshiX to `0.27.2`.
+- Build against Gradle `8.9`.
+- Build against KSP `2.0.0-1.0.23`.
+- Build against AGP `8.5.1`.
+- Build against sort-dependencies `0.7`.
 
 0.17.2
 ------
