@@ -90,7 +90,7 @@ internal object KgpTasks {
               .map { JvmTarget.fromTarget(it.toString()) }
               .asProvider(project.providers)
           if (this is KotlinJvmCompilerOptions) {
-            this.jvmTarget.set(jvmTarget)
+            jvmTarget.set(jvmTargetProvider)
             // Potentially useful for static analysis or annotation processors
             javaParameters.set(true)
             freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
