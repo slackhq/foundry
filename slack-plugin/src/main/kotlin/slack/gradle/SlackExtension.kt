@@ -825,7 +825,6 @@ constructor(
         // Don't need to set buildFeatures.compose = true as that defaults to true if the compose compiler gradle
         // plugin is applied
         if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
-          project.logger.lifecycle("AGP version is ${AndroidPluginVersion.getCurrent()}, less than $AGP_LIVE_LITERALS_MAX_VERSION. Configuring live literals")
           composeOptions {
             // Disable live literals by default
             @Suppress("DEPRECATION")
