@@ -19,6 +19,7 @@ package slack.gradle
 
 import app.cash.sqldelight.gradle.SqlDelightExtension
 import app.cash.sqldelight.gradle.SqlDelightTask
+import com.android.build.api.AndroidPluginVersion
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
@@ -821,10 +822,20 @@ constructor(
           "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
         }
       extension.apply {
-        buildFeatures { compose = true }
-        composeOptions {
-          // Disable live literals by default
-          useLiveLiterals = slackProperties.composeEnableLiveLiterals
+        // Don't need to set buildFeatures.compose = true as that defaults to true if the compose compiler gradle
+        // plugin is applied
+        if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
+          project.logger.lifecycle("AGP version is ${AndroidPluginVersion.getCurrent()}, less than $AGP_LIVE_LITERALS_MAX_VERSION. Configuring live literals")
+          composeOptions {
+            // Disable live literals by default
+            @Suppress("DEPRECATION")
+            useLiveLiterals = slackProperties.composeEnableLiveLiterals
+          }
+        } else if (slackProperties.composeEnableLiveLiterals) {
+          project.logger.error(
+            "Live literals are disabled and deprecated in AGP 8.7+. " +
+              "Please remove the `slack.compose.android.enableLiveLiterals` property."
+          )
         }
       }
     }
@@ -890,6 +901,11 @@ constructor(
         }
       }
     }
+  }
+
+  private companion object {
+    /** Live literals are disabled and deprecated in AGP 8.7+ */
+    val AGP_LIVE_LITERALS_MAX_VERSION = AndroidPluginVersion(8, 6, 0)
   }
 }
 
