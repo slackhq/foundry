@@ -83,7 +83,6 @@ dependencyResolutionManagement {
         includeModule("gradle.plugin.org.gradle.android", "android-cache-fix-gradle-plugin")
         includeModule("net.ltgt.gradle", "gradle-errorprone-plugin")
         includeModule("net.ltgt.gradle", "gradle-nullaway-plugin")
-        includeModule("com.sergei-lapin.napt", "gradle")
         includeModule("com.jraska.module.graph.assertion", "plugin")
       }
     }
