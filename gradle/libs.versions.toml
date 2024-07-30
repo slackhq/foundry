@@ -89,7 +89,6 @@ gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", vers
 gradlePlugins-kgp-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
-gradlePlugins-napt = "com.sergei-lapin.napt:gradle:1.16"
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
 gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.8.1"
 gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.5.8"

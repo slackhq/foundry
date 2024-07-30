@@ -326,14 +326,6 @@ internal constructor(
   public val moshixGenerateProguardRules: Boolean
     get() = booleanProperty("moshix.generateProguardRules", defaultValue = true)
 
-  /** Flag to enable/disable Napt. */
-  public val allowNapt: Boolean
-    get() = booleanProperty("slack.allow-napt")
-
-  /** Flag to enable/disable Dagger KSP. */
-  public val allowDaggerKsp: Boolean
-    get() = booleanProperty("slack.ksp.allow-dagger")
-
   /** Flag to connect SqlDelight sources to KSP. */
   public val kspConnectSqlDelight: Boolean
     get() = booleanProperty("sgp.ksp.connect.sqldelight")

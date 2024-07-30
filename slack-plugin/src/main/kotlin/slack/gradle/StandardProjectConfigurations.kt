@@ -18,7 +18,13 @@
 package slack.gradle
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.variant.*
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
+import com.android.build.api.variant.HasAndroidTestBuilder
+import com.android.build.api.variant.HasUnitTestBuilder
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.android.build.api.variant.LibraryVariant
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
@@ -28,8 +34,6 @@ import com.android.build.gradle.internal.dsl.BuildType
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
-import com.slapin.napt.JvmArgsStrongEncapsulation
-import com.slapin.napt.NaptGradleExtension
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import net.ltgt.gradle.errorprone.CheckSeverity
@@ -269,26 +273,6 @@ internal class StandardProjectConfigurations(
     configureAndroidProjects(slackExtension, jvmTargetVersion, slackProperties)
     configureJavaProject(jdkVersion, jvmTargetVersion, slackProperties)
     slackExtension.applyTo(this)
-
-    pluginManager.withPlugin("com.sergei-lapin.napt") {
-      configure<NaptGradleExtension> {
-        // Don't generate triggers, we'll handle ensuring Java files ourselves.
-        generateNaptTrigger.setDisallowChanges(false)
-
-        // We need to add extra args due to dagger-android running GJF.
-        // Can remove once this is fixed or dagger-android's removed.
-        // https://github.com/google/dagger/pull/3532
-        forkJvmArgs.setDisallowChanges(
-          listOf(
-            "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-          ) + JvmArgsStrongEncapsulation
-        )
-      }
-    }
   }
 
   /**

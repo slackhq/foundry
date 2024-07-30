@@ -94,31 +94,22 @@ constructor(
       featuresHandler.applyTo(project)
 
       var kaptRequired = false
-      var naptRequired = false
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
       val allowKsp = slackProperties.allowKsp
       val allowMoshiIr = slackProperties.allowMoshiIr
-      val allowNapt = slackProperties.allowNapt
-      val allowDaggerKsp = slackProperties.allowNapt
       val anvilMode = slackProperties.anvilMode
-      val allowKspComponentGen = allowDaggerKsp && anvilMode.useKspComponentGen
+      val allowDaggerKsp = anvilMode.useKspContributionMerging && anvilMode.useDaggerKsp
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
-        if (allowNapt) {
-          naptRequired = true
-          // Apply napt for them
-          pluginManager.apply("com.sergei-lapin.napt")
-        } else {
-          kaptRequired = true
-          // Apply kapt for them
-          pluginManager.apply("org.jetbrains.kotlin.kapt")
-        }
+        kaptRequired = true
+        // Apply kapt for them
+        pluginManager.apply("org.jetbrains.kotlin.kapt")
         if (logVerbose) {
           logger.lifecycle(
             """
-            [kapt/napt Config]
+            [kapt Config]
             project = $path
             source = $source
             """
@@ -170,7 +161,7 @@ constructor(
       }
 
       fun aptConfiguration(): String {
-        return if (isKotlin && !naptRequired) {
+        return if (isKotlin) {
           "kapt"
         } else {
           "annotationProcessor"
@@ -180,7 +171,7 @@ constructor(
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
       val daggerConfig = featuresHandler.daggerHandler.computeConfig()
-      val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspComponentGen
+      val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspContributionMerging
       if (daggerConfig != null) {
         dependencies.add("implementation", SlackDependencies.Dagger.dagger)
         dependencies.add("implementation", SlackDependencies.javaxInject)
@@ -214,7 +205,7 @@ constructor(
               pluginManager.apply("com.google.devtools.ksp")
               anvilExtension.useKsp(
                 contributesAndFactoryGeneration = true,
-                componentMerging = anvilMode.useKspComponentGen,
+                componentMerging = anvilMode.useKspContributionMerging,
               )
 
               // Make KSP depend on sqldelight and viewbinding tasks
@@ -301,7 +292,7 @@ constructor(
         }
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowKspComponentGen)) {
+          if (allowDaggerKsp && (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)) {
             markKspNeeded("Dagger compiler")
             dependencies.add("ksp", SlackDependencies.Dagger.compiler)
           } else {
