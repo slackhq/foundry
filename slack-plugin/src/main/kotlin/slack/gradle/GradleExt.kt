@@ -39,7 +39,6 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.reflect.TypeOf
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.configurationcache.extensions.get
 import org.gradle.internal.service.ServiceRegistry
 
 /*
