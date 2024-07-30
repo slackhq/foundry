@@ -112,7 +112,6 @@ dependencies {
   compileOnly(libs.gradlePlugins.kgp)
   compileOnly(libs.gradlePlugins.ksp)
   compileOnly(libs.gradlePlugins.moshix)
-  compileOnly(libs.gradlePlugins.napt)
   compileOnly(libs.gradlePlugins.nullaway)
   compileOnly(libs.gradlePlugins.redacted)
   compileOnly(libs.gradlePlugins.retry)

@@ -32,8 +32,6 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
-import com.slapin.napt.JvmArgsStrongEncapsulation
-import com.slapin.napt.NaptGradleExtension
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
@@ -248,26 +246,6 @@ internal class StandardProjectConfigurations(
     configureAndroidProjects(slackExtension, slackProperties)
     configureJavaProject(slackProperties)
     slackExtension.applyTo(this)
-
-    pluginManager.withPlugin("com.sergei-lapin.napt") {
-      configure<NaptGradleExtension> {
-        // Don't generate triggers, we'll handle ensuring Java files ourselves.
-        generateNaptTrigger.setDisallowChanges(false)
-
-        // We need to add extra args due to dagger-android running GJF.
-        // Can remove once this is fixed or dagger-android's removed.
-        // https://github.com/google/dagger/pull/3532
-        forkJvmArgs.setDisallowChanges(
-          listOf(
-            "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-          ) + JvmArgsStrongEncapsulation
-        )
-      }
-    }
   }
 
   /**
