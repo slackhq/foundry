@@ -822,8 +822,8 @@ constructor(
           "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
         }
       extension.apply {
-        // Don't need to set buildFeatures.compose = true as that defaults to true if the compose compiler gradle
-        // plugin is applied
+        // Don't need to set buildFeatures.compose = true as that defaults to true if the compose
+        // compiler gradle plugin is applied
         if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
           composeOptions {
             // Disable live literals by default
