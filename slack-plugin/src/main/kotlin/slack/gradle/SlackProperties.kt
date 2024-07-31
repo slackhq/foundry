@@ -642,6 +642,9 @@ internal constructor(
    */
   public val kotlinFreeArgs: Provider<List<String>>
     get() = resolver.optionalStringProvider("sgp.kotlin.freeArgs").map { it.split(',') }
+      // Super important to default if absent due to
+      // https://docs.gradle.org/8.7/release-notes.html#build-authoring-improvements
+      .orElse(emptyList())
 
   /**
    * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in JVM compilations.
@@ -649,10 +652,16 @@ internal constructor(
    */
   public val kotlinJvmFreeArgs: Provider<List<String>>
     get() = resolver.optionalStringProvider("sgp.kotlin.jvmFreeArgs").map { it.split(',') }
+      // Super important to default if absent due to
+      // https://docs.gradle.org/8.7/release-notes.html#build-authoring-improvements
+      .orElse(emptyList())
 
   /** Opt-in annotations to pass to Kotlin's `optIn` property. */
   public val kotlinOptIn: Provider<List<String>>
     get() = resolver.optionalStringProvider("sgp.kotlin.optIns").map { it.split(',') }
+      // Super important to default if absent due to
+      // https://docs.gradle.org/8.7/release-notes.html#build-authoring-improvements
+      .orElse(emptyList())
 
   /** Default for Kotlin's `progressive` mode. Defaults to enabled. */
   public val kotlinProgressive: Provider<Boolean>
