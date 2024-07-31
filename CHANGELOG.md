@@ -4,12 +4,24 @@ Changelog
 **Unreleased**
 --------------
 
+0.18.2
+------
+
+_2024-07-31_
+
 - Fix applying free compiler args from Gradle properties.
 - Gate disabling compose live literals on relevant AGP versions. This is deprecated in new AGP versions.
 - Remove a noisy log.
+- Streamline dagger ksp handling + remove napt support.
+- Update Kaml to `0.61.0`.
+- Update Oshi to `6.6.2`.
+- Build against DAGP `1.33.0`.
+- Build against KSP `2.0.0-1.0.24`.
+- Build against Anvil `2.5.0-beta11`.
 
 0.18.1
 ------
+
 _2024-07-19_
 
 - **Fix**: Fix circular evaluation dependency for `jvmTarget`.
@@ -25,6 +37,7 @@ _2024-07-19_
 
 0.17.2
 ------
+
 _2024-05-28_
 
 - Make default Kotlin compiler arguments more configurable. This includes removing some previously-default behavior.
