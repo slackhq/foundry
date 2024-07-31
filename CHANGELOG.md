@@ -4,6 +4,10 @@ Changelog
 **Unreleased**
 --------------
 
+- Fix applying free compiler args from Gradle properties.
+- Gate disabling compose live literals on relevant AGP versions. This is deprecated in new AGP versions.
+- Remove a noisy log.
+
 0.18.1
 ------
 _2024-07-19_
