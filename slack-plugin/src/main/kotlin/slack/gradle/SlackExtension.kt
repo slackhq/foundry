@@ -184,7 +184,14 @@ constructor(
         dependencies.add("implementation", SlackDependencies.javaxInject)
 
         if (daggerConfig.runtimeOnly) {
-          dependencies.add("compileOnly", SlackDependencies.Anvil.annotations)
+          dependencies.add(
+            "compileOnly",
+            if (slackProperties.anvilUseKspFork) {
+              "dev.zacsweers.anvil:annotations"
+            } else {
+              "com.squareup.anvil:annotations"
+            },
+          )
         }
 
         if (logVerbose) {
@@ -200,7 +207,12 @@ constructor(
 
         if (daggerConfig.enableAnvil) {
           if (!slackProperties.disableAnvilForK2Testing) {
-            pluginManager.apply("com.squareup.anvil")
+            val anvilId = if (slackProperties.anvilUseKspFork) {
+              "dev.zacsweers.anvil"
+            } else {
+              "com.squareup.anvil"
+            }
+            pluginManager.apply(anvilId)
             val anvilExtension = extensions.getByType<AnvilExtension>()
             anvilExtension.apply {
               generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
