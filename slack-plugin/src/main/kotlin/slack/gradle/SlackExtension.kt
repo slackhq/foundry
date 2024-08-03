@@ -207,11 +207,12 @@ constructor(
 
         if (daggerConfig.enableAnvil) {
           if (!slackProperties.disableAnvilForK2Testing) {
-            val anvilId = if (slackProperties.anvilUseKspFork) {
-              "dev.zacsweers.anvil"
-            } else {
-              "com.squareup.anvil"
-            }
+            val anvilId =
+              if (slackProperties.anvilUseKspFork) {
+                "dev.zacsweers.anvil"
+              } else {
+                "com.squareup.anvil"
+              }
             pluginManager.apply(anvilId)
             val anvilExtension = extensions.getByType<AnvilExtension>()
             anvilExtension.apply {

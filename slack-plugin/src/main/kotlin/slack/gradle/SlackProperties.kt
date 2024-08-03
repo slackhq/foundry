@@ -210,9 +210,7 @@ internal constructor(
   public val anvilRuntimeProjects: String?
     get() = optionalStringProperty("slack.anvil.runtimeProjects")
 
-  /**
-   * Flag to enable use of the Anvil KSP fork. https://github.com/ZacSweers/anvil
-   */
+  /** Flag to enable use of the Anvil KSP fork. https://github.com/ZacSweers/anvil */
   public val anvilUseKspFork: Boolean
     get() = booleanProperty("slack.anvil.useKspFork", defaultValue = false)
 
