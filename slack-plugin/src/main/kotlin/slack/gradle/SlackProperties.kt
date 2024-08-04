@@ -212,7 +212,7 @@ internal constructor(
 
   /** Flag to enable use of the Anvil KSP fork. https://github.com/ZacSweers/anvil */
   public val anvilUseKspFork: Boolean
-    get() = booleanProperty("slack.anvil.useKspFork", defaultValue = false)
+    get() = booleanProperty("sgp.anvil.useKspFork", defaultValue = false)
 
   /** Log Slack extension configuration state verbosely. */
   public val slackExtensionVerbose: Boolean
