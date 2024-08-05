@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.18.3
+------
+
+_2024-08-04_
+
+- Add support for changing Anvil implementations.
+
 0.18.2
 ------
 
