@@ -68,12 +68,28 @@ internal object KgpTasks {
         val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
 
         compilerOptions {
-          progressiveMode.set(slackProperties.kotlinProgressive)
+          if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
+            val zipped =
+              slackProperties.kotlinProgressive.zip(slackProperties.kaptLanguageVersion) {
+                progressive,
+                kaptLanguageVersion ->
+                if (kaptLanguageVersion != KotlinVersion.DEFAULT) {
+                  false
+                } else {
+                  progressive
+                }
+              }
+            progressiveMode.set(zipped)
+          } else {
+            progressiveMode.set(slackProperties.kotlinProgressive)
+          }
           optIn.addAll(slackProperties.kotlinOptIn)
           if (slackProperties.kotlinLanguageVersionOverride.isPresent) {
             languageVersion.set(
               slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
             )
+          } else if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
+            languageVersion.set(slackProperties.kaptLanguageVersion)
           }
           if (
             !slackProperties.allowWarnings &&
