@@ -10,6 +10,9 @@ Changelog
 _2024-08-12_
 
 - Add `sgp.kapt.languageVersion` property to override the language version used for KAPT.
+- Build against Kotlin `2.0.10`.
+- Build against KSP `2.0.10-1.0.24`.
+- Build against AGP `8.5.2`.
 
 0.18.3
 ------
