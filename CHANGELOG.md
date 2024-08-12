@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.18.4
+------
+
+_2024-08-12_
+
+- Add `sgp.kapt.languageVersion` property to override the language version used for KAPT.
+
 0.18.3
 ------
 
