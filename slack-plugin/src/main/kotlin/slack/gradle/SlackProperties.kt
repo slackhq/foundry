@@ -19,6 +19,7 @@ import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import slack.gradle.anvil.AnvilMode
 import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.util.PropertyResolver
@@ -616,6 +617,13 @@ internal constructor(
     get() =
       resolver.stringValue("sgp.anvil.mode", defaultValue = AnvilMode.K1_EMBEDDED.name).let {
         AnvilMode.valueOf(it.uppercase(Locale.US))
+      }
+
+  /** Overrides the kotlin language version if present. */
+  public val kaptLanguageVersion: Provider<KotlinVersion>
+    get() =
+      resolver.optionalStringProvider("sgp.kapt.languageVersion").map {
+        KotlinVersion.fromVersion(it)
       }
 
   /** Defines a required vendor for JDK toolchains. */
