@@ -32,7 +32,7 @@ public class SimpleTraceReporter(
     Retrofit.Builder()
       .callFactory { client.value.newCall(it) }
       .addConverterFactory(WireConverterFactory.create())
-      .baseUrl("https://example.com") // Throwaway, URL is always passed directly in
+      .baseUrl("https://example.com")
       .validateEagerly(true)
       .build()
       .create<TracingService>()
