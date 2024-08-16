@@ -79,11 +79,6 @@ internal object SlackDependencies : DependencySet() {
 
   internal val javaxInject: Any by artifact("javax.inject", "javax.inject")
 
-  object Anvil : DependencyGroup("com.squareup.anvil", "anvil") {
-    internal val annotations by artifact()
-    val compiler: Any by artifact()
-  }
-
   object Auto : DependencySet() {
     val common: Any by artifact("com.google.auto", "auto-common")
 

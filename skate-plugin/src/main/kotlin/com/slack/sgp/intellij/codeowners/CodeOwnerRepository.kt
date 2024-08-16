@@ -42,7 +42,7 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
         val codeOwnershipLineMap =
           codeOwnershipFile
             .readLines()
-            .mapIndexed { index, line -> line.trimStart(' ', '-') to index }
+            .mapIndexed { index, line -> line.trimStart(' ', '-').replace("path: ", "") to index }
             .toMap()
 
         // Marshal yaml
@@ -56,7 +56,7 @@ class CodeOwnerRepository(codeOwnerFileFetcher: CodeOwnerFileFetcher) {
             .map { codeOwner ->
               codeOwner.paths.map { path ->
                 // Lookup line in ownership file (0 if not found) and construct CodeOwnerInfo
-                CodeOwnerInfo(codeOwner.name, path, codeOwnershipLineMap[path] ?: 0)
+                CodeOwnerInfo(codeOwner.name, path.path, codeOwnershipLineMap[path.path] ?: 0)
               }
             }
             .flatten()

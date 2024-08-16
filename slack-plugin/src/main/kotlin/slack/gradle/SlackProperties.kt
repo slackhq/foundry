@@ -19,6 +19,7 @@ import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import slack.gradle.anvil.AnvilMode
 import slack.gradle.artifacts.SgpArtifact
 import slack.gradle.util.PropertyResolver
@@ -167,14 +168,6 @@ internal constructor(
         .orElse(emptyList())
 
   /**
-   * If true, uses the AndroidX compose compiler [SlackVersions.composeCompiler] for Compose
-   * Multiplatform compilations rather than the Jetbrains one. This can be useful in testing where
-   * AndroidX's compiler is farther ahead.
-   */
-  public val forceAndroidXComposeCompilerForComposeMultiplatform: Boolean
-    get() = booleanProperty("sgp.compose.multiplatform.forceAndroidXComposeCompiler", false)
-
-  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *
@@ -217,6 +210,10 @@ internal constructor(
    */
   public val anvilRuntimeProjects: String?
     get() = optionalStringProperty("slack.anvil.runtimeProjects")
+
+  /** Flag to enable use of the Anvil KSP fork. https://github.com/ZacSweers/anvil */
+  public val anvilUseKspFork: Boolean
+    get() = booleanProperty("sgp.anvil.useKspFork", defaultValue = false)
 
   /** Log Slack extension configuration state verbosely. */
   public val slackExtensionVerbose: Boolean
@@ -325,14 +322,6 @@ internal constructor(
   /** Flag to enable/disable moshi proguard rule gen. */
   public val moshixGenerateProguardRules: Boolean
     get() = booleanProperty("moshix.generateProguardRules", defaultValue = true)
-
-  /** Flag to enable/disable Napt. */
-  public val allowNapt: Boolean
-    get() = booleanProperty("slack.allow-napt")
-
-  /** Flag to enable/disable Dagger KSP. */
-  public val allowDaggerKsp: Boolean
-    get() = booleanProperty("slack.ksp.allow-dagger")
 
   /** Flag to connect SqlDelight sources to KSP. */
   public val kspConnectSqlDelight: Boolean
@@ -459,14 +448,6 @@ internal constructor(
   /** Flag to enable strict JDK mode, forcing some things like JAVA_HOME. */
   public val strictJdk: Boolean
     get() = booleanProperty("slackToolchainsStrict", defaultValue = true)
-
-  /** The JDK version to use for compilations. */
-  public val jdkVersion: Int
-    get() = versions.jdk
-
-  /** The JDK runtime to target for compilations. */
-  public val jvmTarget: Int
-    get() = versions.jvmTarget
 
   /** Android cache fix plugin. */
   public val enableAndroidCacheFix: Boolean = booleanProperty("slack.plugins.android-cache-fix")
@@ -638,6 +619,13 @@ internal constructor(
         AnvilMode.valueOf(it.uppercase(Locale.US))
       }
 
+  /** Overrides the kotlin language version if present. */
+  public val kaptLanguageVersion: Provider<KotlinVersion>
+    get() =
+      resolver.optionalStringProvider("sgp.kapt.languageVersion").map {
+        KotlinVersion.fromVersion(it)
+      }
+
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
@@ -652,6 +640,53 @@ internal constructor(
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("sgp.config.jvmVendor.optOut", defaultValue = false)
+
+  /**
+   * Option to force a specific kotlin language version. By default defers to the KGP default the
+   * build is running with.
+   */
+  public val kotlinLanguageVersionOverride: Provider<String>
+    get() = resolver.optionalStringProvider("sgp.kotlin.languageVersionOverride")
+
+  /**
+   * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in all compilations.
+   * Should not include opt-in arguments or `-progressive`.
+   */
+  public val kotlinFreeArgs: Provider<List<String>>
+    get() =
+      resolver
+        .optionalStringProvider("sgp.kotlin.freeArgs")
+        .map { it.split(',') }
+        // Super important to default if absent due to
+        // https://docs.gradle.org/8.7/release-notes.html#build-authoring-improvements
+        .orElse(emptyList())
+
+  /**
+   * Free compiler arguments to pass to Kotlin's `freeCompilerArgs` property in JVM compilations.
+   * Should not include opt-in arguments or `-progressive`.
+   */
+  public val kotlinJvmFreeArgs: Provider<List<String>>
+    get() =
+      resolver
+        .optionalStringProvider("sgp.kotlin.jvmFreeArgs")
+        .map { it.split(',') }
+        // Super important to default if absent due to
+        // https://docs.gradle.org/8.7/release-notes.html#build-authoring-improvements
+        .orElse(emptyList())
+
+  /** Opt-in annotations to pass to Kotlin's `optIn` property. */
+  public val kotlinOptIn: Provider<List<String>>
+    get() =
+      resolver
+        .optionalStringProvider("sgp.kotlin.optIns")
+        .map { it.split(',') }
+        // Super important to default if absent due to
+        // https://docs.gradle.org/8.7/release-notes.html#build-authoring-improvements
+        .orElse(emptyList())
+
+  /** Default for Kotlin's `progressive` mode. Defaults to enabled. */
+  public val kotlinProgressive: Provider<Boolean>
+    get() = resolver.booleanProvider("sgp.kotlin.progressive", defaultValue = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("slack.compileSdkVersion not set")

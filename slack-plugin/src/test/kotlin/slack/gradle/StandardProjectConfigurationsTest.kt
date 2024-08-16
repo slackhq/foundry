@@ -16,6 +16,7 @@
 package slack.gradle
 
 import org.junit.Test
+import slack.gradle.Configurations.isPlatformConfigurationName
 
 class StandardProjectConfigurationsTest {
 
@@ -42,7 +43,7 @@ class StandardProjectConfigurationsTest {
       )
 
     for (name in validNames) {
-      check(StandardProjectConfigurations.isPlatformConfigurationName(name)) {
+      check(isPlatformConfigurationName(name)) {
         "Name is platform-compatible but isPlatformConfigurationName() returned false: '$name'"
       }
     }
@@ -50,7 +51,7 @@ class StandardProjectConfigurationsTest {
     val invalidNames = setOf("runtime", "kotlinCompileClasspath", "runtimeClassPath")
 
     for (name in invalidNames) {
-      check(!StandardProjectConfigurations.isPlatformConfigurationName(name)) {
+      check(!isPlatformConfigurationName(name)) {
         "Name is not platform-compatible but isPlatformConfigurationName() returned false: '$name'"
       }
     }

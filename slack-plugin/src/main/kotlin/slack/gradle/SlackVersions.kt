@@ -31,12 +31,6 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   val agp: String?
     get() = getOptionalValue("agp").orElse(null)
 
-  val composeCompiler: String?
-    get() = getOptionalValue("compose-compiler").orElse(null)
-
-  val composeCompilerKotlinVersion: String?
-    get() = getOptionalValue("compose-compiler-kotlinVersion").orElse(null)
-
   val detekt: String?
     get() = getOptionalValue("detekt").orElse(null)
 
@@ -61,11 +55,17 @@ internal class SlackVersions(val catalog: VersionCatalog) {
   val objenesis: String?
     get() = getOptionalValue("objenesis").orElse(null)
 
-  val jdk: Int
-    get() = getValue("jdk").toInt()
+  /** The JDK version to use for compilations. */
+  val jdk: Optional<Int>
+    get() =
+      getOptionalValue("jdk")
+        .flatMap { Optional.of(it.toInt()) }
+        .also { check(it.isPresent) { "A `jdk` version must be defined in libs.versions.toml" } }
 
-  val jvmTarget: Int
-    get() = getOptionalValue("jvmTarget").map { it.toInt() }.orElse(11)
+  /** The JDK runtime to target for compilations. */
+  // Can't use OptionalInt because it lacks mapping functions
+  val jvmTarget: Optional<Int>
+    get() = getOptionalValue("jvmTarget").flatMap { Optional.of(it.toInt()) }.or { Optional.of(17) }
 
   val composeJb: String?
     get() = getOptionalValue("compose-jb").orElse(null)

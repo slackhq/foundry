@@ -19,6 +19,7 @@ package slack.gradle
 
 import app.cash.sqldelight.gradle.SqlDelightExtension
 import app.cash.sqldelight.gradle.SqlDelightTask
+import com.android.build.api.AndroidPluginVersion
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
@@ -35,11 +36,11 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.anvil.AnvilMode
 import slack.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
-import slack.gradle.compose.configureComposeCompiler
 import slack.gradle.dependencies.SlackDependencies
 import slack.gradle.util.addKspSource
 import slack.gradle.util.configureKotlinCompilationTask
@@ -54,11 +55,17 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
+  project: Project,
   versionCatalog: VersionCatalog,
 ) {
   internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
   internal val featuresHandler =
-    objects.newInstance<FeaturesHandler>(globalSlackProperties, slackProperties, versionCatalog)
+    objects.newInstance<FeaturesHandler>(
+      globalSlackProperties,
+      slackProperties,
+      project,
+      versionCatalog,
+    )
 
   /**
    * This is weird! Due to the non-property nature of some AGP DSL features (e.g. buildFeatures and
@@ -94,31 +101,22 @@ constructor(
       featuresHandler.applyTo(project)
 
       var kaptRequired = false
-      var naptRequired = false
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
       val allowKsp = slackProperties.allowKsp
       val allowMoshiIr = slackProperties.allowMoshiIr
-      val allowNapt = slackProperties.allowNapt
-      val allowDaggerKsp = slackProperties.allowNapt
       val anvilMode = slackProperties.anvilMode
-      val allowKspComponentGen = allowDaggerKsp && anvilMode.useKspComponentGen
+      val allowDaggerKsp = anvilMode.useKspContributionMerging && anvilMode.useDaggerKsp
 
       /** Marks this project as needing kapt code gen. */
       fun markKaptNeeded(source: String) {
-        if (allowNapt) {
-          naptRequired = true
-          // Apply napt for them
-          pluginManager.apply("com.sergei-lapin.napt")
-        } else {
-          kaptRequired = true
-          // Apply kapt for them
-          pluginManager.apply("org.jetbrains.kotlin.kapt")
-        }
+        kaptRequired = true
+        // Apply kapt for them
+        pluginManager.apply("org.jetbrains.kotlin.kapt")
         if (logVerbose) {
           logger.lifecycle(
             """
-            [kapt/napt Config]
+            [kapt Config]
             project = $path
             source = $source
             """
@@ -170,7 +168,7 @@ constructor(
       }
 
       fun aptConfiguration(): String {
-        return if (isKotlin && !naptRequired) {
+        return if (isKotlin) {
           "kapt"
         } else {
           "annotationProcessor"
@@ -180,13 +178,20 @@ constructor(
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
       val daggerConfig = featuresHandler.daggerHandler.computeConfig()
-      val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspComponentGen
+      val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspContributionMerging
       if (daggerConfig != null) {
         dependencies.add("implementation", SlackDependencies.Dagger.dagger)
         dependencies.add("implementation", SlackDependencies.javaxInject)
 
         if (daggerConfig.runtimeOnly) {
-          dependencies.add("compileOnly", SlackDependencies.Anvil.annotations)
+          dependencies.add(
+            "compileOnly",
+            if (slackProperties.anvilUseKspFork) {
+              "dev.zacsweers.anvil:annotations"
+            } else {
+              "com.squareup.anvil:annotations"
+            },
+          )
         }
 
         if (logVerbose) {
@@ -202,7 +207,13 @@ constructor(
 
         if (daggerConfig.enableAnvil) {
           if (!slackProperties.disableAnvilForK2Testing) {
-            pluginManager.apply("com.squareup.anvil")
+            val anvilId =
+              if (slackProperties.anvilUseKspFork) {
+                "dev.zacsweers.anvil"
+              } else {
+                "com.squareup.anvil"
+              }
+            pluginManager.apply(anvilId)
             val anvilExtension = extensions.getByType<AnvilExtension>()
             anvilExtension.apply {
               generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
@@ -214,7 +225,7 @@ constructor(
               pluginManager.apply("com.google.devtools.ksp")
               anvilExtension.useKsp(
                 contributesAndFactoryGeneration = true,
-                componentMerging = anvilMode.useKspComponentGen,
+                componentMerging = anvilMode.useKspContributionMerging,
               )
 
               // Make KSP depend on sqldelight and viewbinding tasks
@@ -301,7 +312,7 @@ constructor(
         }
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-          if (allowDaggerKsp && (!daggerConfig.enableAnvil || allowKspComponentGen)) {
+          if (allowDaggerKsp && (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)) {
             markKspNeeded("Dagger compiler")
             dependencies.add("ksp", SlackDependencies.Dagger.compiler)
           } else {
@@ -409,6 +420,7 @@ constructor(
   objects: ObjectFactory,
   globalSlackProperties: SlackProperties,
   private val slackProperties: SlackProperties,
+  private val project: Project,
   versionCatalog: VersionCatalog,
 ) {
   // Dagger features
@@ -544,12 +556,12 @@ constructor(
    * [SlackProperties.defaultComposeAndroidBundleAlias].
    */
   public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
-    composeHandler.enable(multiplatform = multiplatform)
+    composeHandler.enable(project = project, multiplatform = multiplatform)
     action.execute(composeHandler)
   }
 
   internal fun applyTo(project: Project) {
-    composeHandler.applyTo(project, slackProperties)
+    composeHandler.applyTo(project)
     circuitHandler.applyTo(project, slackProperties)
   }
 }
@@ -766,10 +778,6 @@ constructor(
     globalSlackProperties.defaultComposeAndroidBundleAlias?.let { alias ->
       versionCatalog.findBundle(alias).orElse(null)
     }
-  private val composeCompilerVersion by lazy {
-    slackProperties.versions.composeCompiler
-      ?: error("Missing `compose-compiler` version in catalog")
-  }
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
@@ -817,8 +825,9 @@ constructor(
     compilerOption("metricsDestination", metricsDestination.canonicalPath.toString())
   }
 
-  internal fun enable(multiplatform: Boolean) {
+  internal fun enable(project: Project, multiplatform: Boolean) {
     enabled.setDisallowChanges(true)
+    project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     this.multiplatform.setDisallowChanges(multiplatform)
     if (!multiplatform) {
       val extension =
@@ -826,34 +835,89 @@ constructor(
           "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
         }
       extension.apply {
-        buildFeatures { compose = true }
-        composeOptions {
-          kotlinCompilerExtensionVersion = composeCompilerVersion
-          // Disable live literals by default
-          useLiveLiterals = slackProperties.composeEnableLiveLiterals
+        // Don't need to set buildFeatures.compose = true as that defaults to true if the compose
+        // compiler gradle plugin is applied
+        if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
+          composeOptions {
+            // Disable live literals by default
+            @Suppress("DEPRECATION")
+            useLiveLiterals = slackProperties.composeEnableLiveLiterals
+          }
+        } else if (slackProperties.composeEnableLiveLiterals) {
+          project.logger.error(
+            "Live literals are disabled and deprecated in AGP 8.7+. " +
+              "Please remove the `slack.compose.android.enableLiveLiterals` property."
+          )
         }
       }
     }
   }
 
-  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+  internal fun applyTo(project: Project) {
     if (enabled.get()) {
+      val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
       val isMultiplatform = multiplatform.get()
       if (isMultiplatform) {
         project.pluginManager.apply("org.jetbrains.compose")
       } else {
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
-      project.configureComposeCompiler(slackProperties, isMultiplatform)
 
-      project.tasks.configureKotlinCompilationTask {
-        compilerOptions.freeCompilerArgs.addAll(
-          this@ComposeHandler.compilerOptions.map { options ->
-            options.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+      // Because the Compose Compiler plugin auto applies common options for us, we need to know
+      // about those options and _avoid_ setting them a second time
+      val freeOptions = mutableListOf<String>()
+      for ((k, v) in compilerOptions.get().map { it.split('=') }) {
+        project.logger.debug("Processing compose option $k = $v")
+        when (k) {
+          "generateFunctionKeyMetaClasses" -> {
+            extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
           }
-        )
+          "sourceInformation" -> {
+            extension.includeSourceInformation.set(v.toBoolean())
+          }
+          "metricsDestination" -> {
+            extension.metricsDestination.set(project.file(v))
+          }
+          "reportsDestination" -> {
+            extension.reportsDestination.set(project.file(v))
+          }
+          "intrinsicRemember" -> {
+            extension.enableIntrinsicRemember.set(v.toBoolean())
+          }
+          "nonSkippingGroupOptimization" -> {
+            extension.enableNonSkippingGroupOptimization.set(v.toBoolean())
+          }
+          "suppressKotlinVersionCompatibilityCheck" -> {
+            error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
+          }
+          "strongSkipping" -> {
+            extension.enableStrongSkippingMode.set(v.toBoolean())
+          }
+          "stabilityConfigurationPath" -> {
+            extension.stabilityConfigurationFile.set(project.file(v))
+          }
+          "traceMarkersEnabled" -> {
+            extension.includeTraceMarkers.set(v.toBoolean())
+          }
+          else -> {
+            freeOptions += "$k=$v"
+          }
+        }
+      }
+
+      if (freeOptions.isNotEmpty()) {
+        project.tasks.configureKotlinCompilationTask {
+          compilerOptions.freeCompilerArgs.addAll(
+            freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+          )
+        }
       }
     }
+  }
+
+  private companion object {
+    /** Live literals are disabled and deprecated in AGP 8.7+ */
+    val AGP_LIVE_LITERALS_MAX_VERSION = AndroidPluginVersion(8, 6, 0)
   }
 }
 

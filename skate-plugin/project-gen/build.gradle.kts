@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.compose)
+  alias(libs.plugins.kotlin.plugin.compose)
   alias(libs.plugins.lint)
 }
 
@@ -47,19 +47,6 @@ kotlin {
         implementation(libs.markdown)
       }
     }
-  }
-}
-
-configure<ComposeExtension> {
-  val kotlinVersion = libs.versions.kotlin.get()
-  // Flag to disable Compose's kotlin version check because they're often behind
-  // Or ahead
-  // Or if they're the same, do nothing
-  // It's basically just very noisy.
-  kotlinCompilerPlugin.set(libs.compose.compilerJb.map { it.toString() })
-  val suppressComposeKotlinVersion = kotlinVersion != libs.versions.compose.jb.kotlinVersion.get()
-  if (suppressComposeKotlinVersion) {
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
   }
 }
 

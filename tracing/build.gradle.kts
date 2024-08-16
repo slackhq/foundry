@@ -23,7 +23,7 @@ plugins {
 wire {
   kotlin {}
   sourcePath {
-    srcDir("src/main/proto")
+    srcDir(layout.projectDirectory.dir("src/main/proto"))
     include("trace.proto")
   }
 }

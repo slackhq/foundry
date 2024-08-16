@@ -103,6 +103,7 @@ dependencies {
   // management between this plugin and the root build.gradle.kts file.
   compileOnly(libs.gradlePlugins.bugsnag)
   compileOnly(libs.gradlePlugins.compose)
+  compileOnly(libs.gradlePlugins.composeCompiler)
   compileOnly(libs.gradlePlugins.dependencyAnalysis)
   compileOnly(libs.gradlePlugins.detekt)
   compileOnly(libs.gradlePlugins.develocity)
@@ -111,7 +112,6 @@ dependencies {
   compileOnly(libs.gradlePlugins.kgp)
   compileOnly(libs.gradlePlugins.ksp)
   compileOnly(libs.gradlePlugins.moshix)
-  compileOnly(libs.gradlePlugins.napt)
   compileOnly(libs.gradlePlugins.nullaway)
   compileOnly(libs.gradlePlugins.redacted)
   compileOnly(libs.gradlePlugins.retry)

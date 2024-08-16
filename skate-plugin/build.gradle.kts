@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
-  alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.kotlin.plugin.serialization)
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)

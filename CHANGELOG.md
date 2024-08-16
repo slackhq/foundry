@@ -1,6 +1,87 @@
 Changelog
 =========
 
+**Unreleased**
+--------------
+
+0.18.4
+------
+
+_2024-08-12_
+
+- Add `sgp.kapt.languageVersion` property to override the language version used for KAPT.
+- Build against Kotlin `2.0.10`.
+- Build against KSP `2.0.10-1.0.24`.
+- Build against AGP `8.5.2`.
+
+0.18.3
+------
+
+_2024-08-04_
+
+- Add support for changing Anvil implementations.
+
+0.18.2
+------
+
+_2024-07-31_
+
+- Fix applying free compiler args from Gradle properties.
+- Gate disabling compose live literals on relevant AGP versions. This is deprecated in new AGP versions.
+- Remove a noisy log.
+- Streamline dagger ksp handling + remove napt support.
+- Update Kaml to `0.61.0`.
+- Update Oshi to `6.6.2`.
+- Build against DAGP `1.33.0`.
+- Build against KSP `2.0.0-1.0.24`.
+- Build against Anvil `2.5.0-beta11`.
+
+0.18.1
+------
+
+_2024-07-19_
+
+- **Fix**: Fix circular evaluation dependency for `jvmTarget`.
+- Remove Kover Workaround for `0.7.1`.
+- Turn off xml report generation for lint task.
+- Update KotlinPoet to `1.18.1`.
+- Update Wire to `5.0.0`.
+- Update MoshiX to `0.27.2`.
+- Build against Gradle `8.9`.
+- Build against KSP `2.0.0-1.0.23`.
+- Build against AGP `8.5.1`.
+- Build against sort-dependencies `0.7`.
+
+0.17.2
+------
+
+_2024-05-28_
+
+- Make default Kotlin compiler arguments more configurable. This includes removing some previously-default behavior.
+  - `sgp.kotlin.languageVersionOverride`. Default is null, which will just defer to KGP's default.
+  - `sgp.kotlin.optIns`
+    - Previous default opt-ins = `kotlin.contracts.ExperimentalContracts`, `kotlin.experimental.ExperimentalTypeInference`, `kotlin.ExperimentalStdlibApi`, `kotlin.time.ExperimentalTime`
+  - `sgp.kotlin.freeArgs`
+    - Previous default free args = `-Xenhance-type-parameter-types-to-def-not-null`, `-Xself-upper-bound-inference`
+  - `sgp.kotlin.jvmFreeArgs`
+    - Previous default JVM free args = `-Xjsr305=strict`, `-Xassertions=jvm`, `-Xemit-jvm-type-annotations`, `-Xjvm-default=all`, `-Xtype-enhancement-improvements-strict-mode`, `-Xjspecify-annotations=strict`
+  - `sgp.kotlin.progressive`. Default is true.
+- Build against AGP `8.5.0`.
+- Build against DAGP `1.32.0`.
+- Build against Compose Multiplatform `1.6.11`.
+- Update to Kaml `0.60.0`.
+- Update to Guava `33.2.1-jre`.
+- Update to MoshiX `0.27.1`.
+
+0.17.1
+------
+
+_2024-05-28_
+
+- Build against Kotlin `2.0.0`.
+- Build against KSP `2.0.0-1.0.21`.
+- Build against AGP `8.4.1`.
+
 0.17.0
 ------
 

@@ -17,42 +17,62 @@ package slack.gradle.anvil
 
 public enum class AnvilMode(
   public val useKspFactoryGen: Boolean,
-  public val useKspComponentGen: Boolean,
+  public val useKspContributionMerging: Boolean,
   public val languageVersionOverride: String?,
+  public val useDaggerKsp: Boolean,
 ) {
   /**
    * Anvil support for K1.
    * - `AnalysisHandlerExtension`
-   * - KAPT3 component gen
+   * - KAPT3 contribution merging
+   * - dagger apt
    */
-  K1_EMBEDDED(false, false, null),
+  K1_EMBEDDED(false, false, null, false),
   /**
    * Anvil support for K1.
    * - KSP factory gen
-   * - KAPT component gen
+   * - KAPT contribution merging
+   * - dagger apt
    */
-  K1_KAPT(true, false, null),
+  K1_KAPT(true, false, null, false),
   /**
    * Anvil support for K1.
    * - KSP factory gen
-   * - KSP component gen
+   * - KSP contribution merging
+   * - dagger apt
    */
-  K1_KSP(true, true, null),
+  K1_KSP_KAPT(true, true, null, false),
+  /**
+   * Anvil support for K1.
+   * - KSP factory gen
+   * - KSP contribution merging
+   * - dagger-ksp
+   */
+  K1_KSP_ONLY(true, true, null, true),
   /**
    * Anvil support for K2. Same as [K1_EMBEDDED] but it forces Anvil-integrated kotlin compilations
    * to language version 1.9.
    */
-  K2_COMPAT(false, false, "1.9"),
+  K2_COMPAT(false, false, "1.9", false),
   /**
    * Anvil support for K2.
    * - KSP factory gen
-   * - KAPT component gen
+   * - KAPT contribution merging
+   * - dagger apt
    */
-  K2_KAPT(true, false, null),
+  K2_KAPT(true, false, null, false),
   /**
    * Anvil support for K2.
    * - KSP factory gen
-   * - KSP component gen
+   * - KSP contribution merging
+   * - dagger apt
    */
-  K2_KSP(true, true, null),
+  K2_KSP_KAPT(true, true, null, false),
+  /**
+   * Anvil support for K2.
+   * - KSP factory gen
+   * - KSP contribution merging
+   * - dagger-ksp
+   */
+  K2_KSP_ONLY(true, true, null, true),
 }

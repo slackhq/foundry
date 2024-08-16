@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.gradle.compose
+package com.slack.sgp.intellij.codeowners.model
 
-internal const val COMPOSE_COMPILER_OPTION_PREFIX =
-  "plugin:androidx.compose.compiler.plugins.kotlin"
+import kotlinx.serialization.Serializable
+
+@Serializable data class Path(val path: String, val notify: Boolean?)
