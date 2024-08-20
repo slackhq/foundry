@@ -155,6 +155,7 @@ include(
   ":platforms:intellij:compose:playground",
   ":platforms:intellij:skate",
   ":tools:cli",
+  ":tools:develocity-miner",
   ":tools:foundry-common",
   ":tools:skippy",
   ":tools:tracing",
