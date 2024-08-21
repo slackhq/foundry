@@ -39,6 +39,7 @@
         <externalAnnotator language="kotlin" implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
         <projectIndexingActivityHistoryListener implementation="com.slack.sgp.intellij.idemetrics.IndexingListener"/>
         <postStartupActivity implementation="com.slack.sgp.intellij.PostStartupActivityExtension"/>
+        <toolWindow factoryClass="com.slack.sgp.intellij.aibot.ChatBotToolWindowCompose" id="DevXPAI" anchor="right" canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning" />
     </extensions>
 
     <projectListeners>
