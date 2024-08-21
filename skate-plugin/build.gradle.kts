@@ -26,6 +26,8 @@ plugins {
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.lint)
+  alias(libs.plugins.compose)
+  alias(libs.plugins.kotlin.plugin.compose)
 }
 
 group = "com.slack.intellij"
@@ -125,6 +127,13 @@ dependencies {
   implementation(libs.okhttp.loggingInterceptor)
   implementation(projects.skatePlugin.projectGen)
   implementation(projects.tracing)
+
+  implementation(compose.desktop.common)
+  implementation(compose.desktop.currentOs)
+  implementation(compose.foundation)
+  implementation(compose.material3)
+  implementation(compose.runtime)
+  implementation(compose.ui)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
