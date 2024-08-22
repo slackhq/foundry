@@ -121,13 +121,6 @@ configurations
 dependencies {
   lintChecks(libs.composeLints)
 
-  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
-  implementation(libs.kaml)
-  implementation(libs.okhttp)
-  implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.skatePlugin.projectGen)
-  implementation(projects.tracing)
-
   implementation(compose.animation)
   implementation(compose.desktop.common)
   implementation(compose.desktop.linux_arm64)
@@ -139,6 +132,12 @@ dependencies {
   implementation(compose.material)
   implementation(compose.material3)
   implementation(compose.ui)
+  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.kaml)
+  implementation(libs.okhttp)
+  implementation(libs.okhttp.loggingInterceptor)
+  implementation(projects.skatePlugin.projectGen)
+  implementation(projects.tracing)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
