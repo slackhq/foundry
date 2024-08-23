@@ -132,8 +132,8 @@ dependencies {
   implementation(compose.material)
   implementation(compose.material3)
   implementation(compose.ui)
-  implementation(libs.jewel.bridge232)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.jewel.bridge232)
   implementation(libs.kaml)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
