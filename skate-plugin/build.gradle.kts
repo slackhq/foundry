@@ -26,8 +26,6 @@ plugins {
   alias(libs.plugins.pluginUploader)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.lint)
-  alias(libs.plugins.compose)
-  alias(libs.plugins.kotlin.plugin.compose)
 }
 
 group = "com.slack.intellij"
@@ -121,17 +119,6 @@ configurations
 dependencies {
   lintChecks(libs.composeLints)
 
-  implementation(compose.animation)
-  implementation(compose.desktop.common)
-  implementation(compose.desktop.linux_arm64)
-  implementation(compose.desktop.linux_x64)
-  implementation(compose.desktop.macos_arm64)
-  implementation(compose.desktop.macos_x64)
-  implementation(compose.desktop.windows_x64)
-  implementation(compose.foundation)
-  implementation(compose.material)
-  implementation(compose.material3)
-  implementation(compose.ui)
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
   implementation(libs.jewel.bridge232)
   implementation(libs.kaml)

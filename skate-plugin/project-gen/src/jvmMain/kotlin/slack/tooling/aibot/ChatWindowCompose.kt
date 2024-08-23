@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.aibot
+package slack.tooling.aibot
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,7 +58,7 @@ fun ConversationField(modifier: Modifier = Modifier) {
       modifier = Modifier.weight(1f).padding(4.dp).height(56.dp),
       placeholder = { Text("Start your conversation") },
     )
-    Column() {
+    Column {
       DefaultButton(
         modifier = Modifier.defaultMinSize(minWidth = 56.dp).padding(4.dp),
         onClick = { textValue = TextFieldValue("") },
