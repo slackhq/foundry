@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import slack.gradle.Configurations
 import slack.gradle.Configurations.isKnownConfiguration
 import slack.gradle.SlackProperties
@@ -36,20 +35,22 @@ import slack.gradle.SlackTools
 import slack.gradle.asProvider
 import slack.gradle.configure
 import slack.gradle.lint.DetektTasks
+import slack.gradle.onFirst
 import slack.gradle.util.configureKotlinCompilationTask
 
 /** Common configuration for Kotlin projects. */
 internal object KgpTasks {
+  private val KGP_PLUGINS =
+    listOf(
+      "org.jetbrains.kotlin.multiplatform",
+      "org.jetbrains.kotlin.jvm",
+      "org.jetbrains.kotlin.android",
+    )
+
   @Suppress("LongMethod")
   fun configure(project: Project, slackTools: SlackTools, slackProperties: SlackProperties) {
-    val detektConfigured = AtomicBoolean()
-    // Must be outside the withType() block below because you can't apply new plugins in that block
-    if (slackProperties.autoApplyDetekt) {
-      project.project.pluginManager.apply("io.gitlab.arturbosch.detekt")
-    }
-
-    project.plugins.withType(KotlinBasePlugin::class.java).configureEach {
-      val kotlinExtension = project.project.kotlinExtension
+    project.pluginManager.onFirst(KGP_PLUGINS) {
+      val kotlinExtension = project.kotlinExtension
       kotlinExtension.apply {
         kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
         slackProperties.versions.jdk.ifPresent { jdkVersion ->
@@ -125,14 +126,16 @@ internal object KgpTasks {
 
       project.configureFreeKotlinCompilerArgs()
 
-      if (!detektConfigured.getAndSet(true)) {
-        DetektTasks.configureSubProject(
-          project.project,
-          slackProperties,
-          slackTools.globalConfig.affectedProjects,
-        )
+      if (slackProperties.autoApplyDetekt) {
+        project.project.pluginManager.apply("io.gitlab.arturbosch.detekt")
       }
     }
+
+    DetektTasks.configureSubProject(
+      project.project,
+      slackProperties,
+      slackTools.globalConfig.affectedProjects,
+    )
 
     project.pluginManager.withPlugin("org.jetbrains.kotlin.android") {
       // Configure kotlin sources in Android projects
