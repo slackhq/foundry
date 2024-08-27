@@ -20,8 +20,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,16 +52,16 @@ fun ChatWindowCompose(modifier: Modifier = Modifier) {
 @Composable
 fun ConversationField(modifier: Modifier = Modifier) {
   var textValue by remember { mutableStateOf(TextFieldValue("")) }
-  Row(modifier) {
+  Row(Modifier.height(IntrinsicSize.Min)) {
     TextField(
       value = textValue,
       onValueChange = { newText -> textValue = newText },
-      modifier = Modifier.weight(1f).padding(4.dp).height(56.dp),
+      modifier = Modifier.weight(1f).padding(4.dp).fillMaxHeight(),
       placeholder = { Text("Start your conversation") },
     )
-    Column {
+    Column(modifier.fillMaxHeight()) {
       DefaultButton(
-        modifier = Modifier.defaultMinSize(minWidth = 56.dp).padding(4.dp),
+        modifier = Modifier.padding(4.dp),
         onClick = { textValue = TextFieldValue("") },
       ) {
         Text("Send")
