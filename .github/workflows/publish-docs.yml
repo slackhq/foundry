@@ -18,11 +18,17 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@v3
 
+      - name: Export JDK version
+        shell: bash
+        run: |
+          JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
+          echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
+
       - name: Install JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '20'
+          java-version: '${{ env.JDK_VERSION }}'
 
       - name: Build Dokka API docs
         uses: gradle/gradle-build-action@v3
