@@ -15,9 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v3
-
       - name: Export JDK version
         shell: bash
         run: |
@@ -30,10 +27,11 @@ jobs:
           distribution: 'zulu'
           java-version: '${{ env.JDK_VERSION }}'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build Dokka API docs
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: dokkaHtml --no-configuration-cache
+        run: dokkaHtml --no-configuration-cache
 
       - name: Setup Python
         uses: actions/setup-python@v5
