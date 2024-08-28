@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -106,28 +105,24 @@ fun ConversationField(modifier: Modifier = Modifier) {
       keyboardActions = KeyboardActions.Default,
       maxLines = Int.MAX_VALUE,
     )
-    Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(
-          modifier = Modifier.padding(4.dp).fadeWhenDisabled(isTextNotEmpty),
-          onClick = {
-            if (isTextNotEmpty) {
-              textValue = TextFieldValue()
-            }
-          },
-          enabled = isTextNotEmpty,
-        ) {
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-          ) {
-            Icon(
-              painter = painterResource("/drawable/send.svg"),
-              contentDescription = "Send",
-              modifier = Modifier.size(20.dp),
-            )
-          }
+    IconButton(
+      modifier = Modifier.padding(4.dp).fadeWhenDisabled(isTextNotEmpty),
+      onClick = {
+        if (isTextNotEmpty) {
+          textValue = TextFieldValue()
         }
+      },
+      enabled = isTextNotEmpty,
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        Icon(
+          painter = painterResource("/drawable/send.svg"),
+          contentDescription = "Send",
+          modifier = Modifier.size(20.dp),
+        )
       }
     }
   }
