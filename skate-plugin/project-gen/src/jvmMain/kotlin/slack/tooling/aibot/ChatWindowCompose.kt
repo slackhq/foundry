@@ -16,7 +16,6 @@
 package slack.tooling.aibot
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -38,8 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -55,7 +52,7 @@ import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.Icon
 import org.jetbrains.jewel.ui.component.IconButton
 import org.jetbrains.jewel.ui.component.Text
-import org.jetbrains.jewel.ui.component.TextField
+import org.jetbrains.jewel.ui.component.TextArea
 
 @Composable
 fun ChatWindowCompose(modifier: Modifier = Modifier) {
@@ -71,50 +68,43 @@ fun ChatWindowCompose(modifier: Modifier = Modifier) {
 fun ConversationField(modifier: Modifier = Modifier) {
   var textValue by remember { mutableStateOf(TextFieldValue()) }
   val isTextNotEmpty = textValue.text.isNotBlank()
-  val requester = remember { FocusRequester() }
   Row(
     modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(4.dp),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    TextField(
+    TextArea(
       value = textValue,
       onValueChange = { newText -> textValue = newText },
       modifier =
-        Modifier.weight(1f)
-          .padding(4.dp)
-          .heightIn(min = 56.dp)
-          .focusRequester(requester)
-          .focusable()
-          .onPreviewKeyEvent { event ->
-            when {
-              event.key == Key.Enter && event.type == KeyEventType.KeyDown -> {
-                if (!event.isShiftPressed && isTextNotEmpty) {
-                  sendMessage(textValue.text)
-                  textValue = TextFieldValue()
-                  true
-                } else if (event.isShiftPressed) {
-                  textValue =
-                    TextFieldValue(textValue.text + "\n", TextRange(textValue.text.length + 1))
-                  true
-                } else {
-                  false
-                }
+        Modifier.weight(1f).padding(4.dp).heightIn(min = 56.dp).onPreviewKeyEvent { event ->
+          when {
+            (event.key == Key.Enter || event.key == Key.NumPadEnter) &&
+              event.type == KeyEventType.KeyDown -> {
+              if (event.isShiftPressed) {
+                // handle shift + enter to enter new line
+                val newText =
+                  textValue.text.replaceRange(
+                    textValue.selection.start,
+                    textValue.selection.end,
+                    "\n",
+                  )
+                val newSelection = TextRange(textValue.selection.start + 1)
+                textValue = TextFieldValue(newText, newSelection)
+                true
+              } else {
+                textValue = TextFieldValue("")
+                true
               }
-              else -> false
             }
-          },
-      placeholder = { Text("Start your conversation") },
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-      keyboardActions =
-        KeyboardActions(
-          onSend = {
-            if (isTextNotEmpty) {
-              sendMessage(textValue.text)
-              textValue = TextFieldValue()
-            }
+            else -> false
           }
-        ),
+        },
+      placeholder = { Text("Start your conversation") },
+      readOnly = false,
+      keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
+      keyboardActions = KeyboardActions.Default,
+      maxLines = Int.MAX_VALUE,
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       Row(verticalAlignment = Alignment.CenterVertically) {
@@ -136,7 +126,6 @@ fun ConversationField(modifier: Modifier = Modifier) {
               contentDescription = "Send",
               modifier = Modifier.size(20.dp),
             )
-            Text("Send")
           }
         }
       }
@@ -146,8 +135,4 @@ fun ConversationField(modifier: Modifier = Modifier) {
 
 fun Modifier.fadeWhenDisabled(enabled: Boolean): Modifier {
   return this.then(if (enabled) Modifier else Modifier.alpha(0.5f))
-}
-
-fun sendMessage(text: String) {
-  println("Sending message: $text")
 }
