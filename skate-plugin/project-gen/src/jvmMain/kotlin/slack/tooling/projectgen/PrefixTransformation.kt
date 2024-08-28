@@ -17,9 +17,10 @@ package slack.tooling.projectgen
 
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.insert
 
 class PrefixTransformation(private val prefix: String) : OutputTransformation {
   override fun TextFieldBuffer.transformOutput() {
-    prefix + originalText
+    insert(0, prefix)
   }
 }
