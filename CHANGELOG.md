@@ -4,6 +4,22 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.0
+------
+
+_2024-08-27_
+
+- Improve KGP plugin handling to better support upcoming AGP kotlin compilation.
+- Build with JDK 22. Still targets JVM 17.
+- Update MoshiX to `0.28.0`.
+- Update RxJava to `3.1.9`.
+- Update Oshi to `6.6.3`.
+- Revert dependency sorter back to `0.7`.
+- Build against Kotlin `2.0.20`.
+- Build against redacted-compiler-plugin `1.10.0`.
+- Build against KSP `2.0.20-1.0.24`.
+- Build against Gradle `8.10`.
+
 0.18.4
 ------
 
