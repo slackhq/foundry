@@ -4,7 +4,8 @@ agpAlpha = "8.5.2"
 anvil = "2.5.0-beta11"
 bugsnagGradle = "8.1.0"
 circuit = "0.23.1"
-compose-jb = "1.6.11"
+compose-jb = "1.7.0-alpha03"
+compose-jb-stable = "1.6.11"
 coroutines = "1.8.1"
 dependencyAnalysisPlugin = "1.33.0"
 detekt = "1.23.6"
@@ -12,7 +13,7 @@ dokka = "1.9.20"
 errorproneGradle = "3.0.1"
 jdk = "22"
 jvmTarget = "17"
-jewel = "0.15.2.2"
+jewel = "0.23.0"
 jna = "5.14.0"
 kaml = "0.61.0"
 kotlin = "2.0.20"
@@ -77,7 +78,7 @@ develocity-agent-adapters = "com.gradle:develocity-gradle-plugin-adapters:1.0.3"
 gradleLints = "androidx.lint:lint-gradle:1.0.0-alpha01"
 gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
-gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb" }
+gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb-stable" }
 gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -104,8 +105,8 @@ kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
-jewel-bridge232 = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-232", version.ref = "jewel" }
-jewel-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version = "0.15.2" }
+jewel-bridge = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-241", version.ref = "jewel" }
+jewel-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone-241", version.ref = "jewel" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
