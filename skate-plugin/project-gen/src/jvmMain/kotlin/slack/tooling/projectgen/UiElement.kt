@@ -15,6 +15,7 @@
  */
 package slack.tooling.projectgen
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
@@ -68,17 +69,17 @@ internal class TextElement(
   private val dependentElements: List<CheckboxElement> = emptyList(),
   val validationRegex: Regex? = null,
 ) : UiElement {
-  var value by mutableStateOf(initialValue)
+  val value = TextFieldState(initialValue)
 
   val enabled by derivedStateOf { !readOnly && dependentElements.all { it.isChecked } }
 
   val isValid by derivedStateOf {
-    validationRegex?.let { value.isNotBlank() && value.matches(it) } != false
+    validationRegex?.let { value.text.isNotBlank() && value.text.matches(it) } != false
   }
 
   override fun reset() {
-    value = initialValue
     isVisible = initialVisibility
+    value.edit { replace(0, length, initialValue) }
   }
 
   override var isVisible: Boolean by mutableStateOf(initialVisibility)

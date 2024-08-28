@@ -42,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -118,7 +117,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
     )
   }
 
-  Box(modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+  Box(modifier.fillMaxSize().background(JewelTheme.globalColors.panelBackground)) {
     val listState = rememberLazyListState()
     Column(Modifier.padding(16.dp)) {
       LazyColumn(
@@ -133,7 +132,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
               Divider(Orientation.Horizontal)
             }
             is SectionElement -> {
-              Column(Modifier.animateItemPlacement()) {
+              Column(Modifier.animateItem()) {
                 Text(element.title, style = Typography.h1TextStyle())
                 Text(element.description)
               }
@@ -143,27 +142,23 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 element.name,
                 element.hint,
                 element.isChecked,
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 indent = (element.indentLevel * INDENT_SIZE).dp,
                 onEnabledChange = { element.isChecked = it },
               )
             }
             is TextElement -> {
               Column(
-                Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp)
-                  .animateItemPlacement()
+                Modifier.padding(start = (element.indentLevel * INDENT_SIZE).dp).animateItem()
               ) {
                 Text(text = element.label, style = Typography.h4TextStyle())
                 Spacer(Modifier.height(4.dp))
                 TextField(
-                  value = element.value,
-                  onValueChange = { newValue -> element.value = newValue },
+                  state = element.value,
                   modifier = Modifier.fillMaxWidth(),
                   readOnly = element.readOnly,
                   enabled = element.enabled,
-                  visualTransformation =
-                    element.prefixTransformation?.let(::PrefixTransformation)
-                      ?: VisualTransformation.None,
+                  outputTransformation = element.prefixTransformation?.let(::PrefixTransformation),
                   outline = if (element.isValid) Outline.None else Outline.Error,
                 )
                 element.description?.let {
@@ -177,7 +172,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
       }
       Divider(Orientation.Horizontal)
       Box(
-        Modifier.background(JewelTheme.globalColors.paneBackground)
+        Modifier.background(JewelTheme.globalColors.panelBackground)
           .fillMaxWidth()
           .padding(top = 16.dp, start = 16.dp, end = 16.dp),
         contentAlignment = Alignment.CenterEnd,
@@ -239,7 +234,7 @@ private fun StatusDialog(
     Box(
       Modifier.width(600.dp)
         .height(100.dp)
-        .background(JewelTheme.globalColors.paneBackground)
+        .background(JewelTheme.globalColors.panelBackground)
         .border(1.5.dp, JewelTheme.globalColors.borders.disabled, RoundedCornerShape(8.dp))
     ) {
       Column(
