@@ -189,7 +189,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
   /** Retrieves a loaded instance of [T], if any. */
   public fun <T : SlackToolsExtension> findExtension(type: Class<out T>): T? {
-    @Suppress("UNCHECKED_CAST") return extensions[type] as T?
+    @Suppress("UNCHECKED_CAST")
+    return extensions[type] as T?
   }
 
   internal fun logAvoidedTask(taskType: String, taskName: String) {
