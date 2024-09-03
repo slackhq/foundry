@@ -34,4 +34,5 @@ repositories {
 dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+  intellijPlatform { instrumentationTools() }
 }

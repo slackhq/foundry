@@ -18,13 +18,15 @@ package slack.tooling.aibot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
@@ -35,7 +37,6 @@ import org.jetbrains.jewel.ui.component.TextArea
 
 @Composable
 fun ChatWindowCompose(modifier: Modifier = Modifier) {
-  // add modifier: Modifier = Modifier in params
   Column(
     modifier = Modifier.fillMaxSize().background(JewelTheme.globalColors.panelBackground),
     verticalArrangement = Arrangement.Bottom,
@@ -45,18 +46,12 @@ fun ChatWindowCompose(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TextBox(modifier: Modifier = Modifier) {
-  Text(modifier = modifier.padding(4.dp), text = "Hello world")
-}
-
-@Composable
 fun UpdatedTextArea(
   state: TextFieldState,
   modifier: Modifier = Modifier,
-  placeholder: String = "",
+  placeholder: String = "Start your conversation",
 ) {
-  Box(modifier = modifier.padding(8.dp)) {
-    Text("Debug: Inside UpdatedTextArea", color = Color.Magenta)
+  Box(modifier) {
     TextArea(
       state = state,
       modifier = Modifier.fillMaxSize(),
@@ -76,31 +71,39 @@ fun UpdatedTextArea(
 
 @Composable
 fun ConversationField(modifier: Modifier = Modifier) {
-  var text by remember { mutableStateOf("") }
-  var textValue by remember { mutableStateOf(TextFieldValue()) }
   val textFieldState = remember { TextFieldState() }
-  val placeholder = "Start your conversation"
   val isTextNotEmpty by remember { derivedStateOf { textFieldState.text.isNotEmpty() } }
-
-  Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
-    Row(
-      modifier = Modifier.fillMaxWidth().height(100.dp),
-      horizontalArrangement = Arrangement.Center,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      UpdatedTextArea(
-        state = textFieldState,
-        modifier = Modifier.fillMaxSize(),
-        placeholder = placeholder,
-      )
-    }
+  Row(
+    modifier = modifier.fillMaxWidth().padding(4.dp).height(50.dp),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    UpdatedTextArea(
+      state = textFieldState,
+      modifier =
+        Modifier.weight(1f).padding(end = 8.dp).onPreviewKeyEvent { event ->
+          when {
+            event.key == Key.Enter && event.type == KeyEventType.KeyDown -> {
+              if (!event.isShiftPressed && isTextNotEmpty) {
+                textFieldState.clearText()
+                true
+              } else if (event.isShiftPressed) {
+                textFieldState.setTextAndPlaceCursorAtEnd("${textFieldState.text} \n")
+                true
+              } else {
+                false
+              }
+            }
+            else -> false
+          }
+        },
+    )
     SelectableIconButton(
       selected = false,
       onClick = {
         if (isTextNotEmpty) {
-          // Handle send action
-          text = ""
-          textValue = TextFieldValue()
+          println("Clear text")
+          textFieldState.clearText()
         }
       },
       enabled = isTextNotEmpty,

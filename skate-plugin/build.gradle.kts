@@ -138,5 +138,6 @@ dependencies {
     instrumentationTools()
 
     testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.Plugin.Java)
   }
 }
