@@ -42,7 +42,7 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-intellij = { id = "org.jetbrains.intellij", version = "1.17.0" }
+intellij = { id = "org.jetbrains.intellij.platform", version = "2.0.1" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -104,6 +104,7 @@ kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlinx-serialization-core = "org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.2"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jewel-bridge = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-241", version.ref = "jewel" }
 jewel-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone-241", version.ref = "jewel" }

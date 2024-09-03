@@ -114,6 +114,8 @@ pluginManagement {
 
     google()
 
+    gradlePluginPortal()
+
     // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only
     // tested on CI shadow jobs
     // https://kotlinlang.slack.com/archives/C0KLZSCHF/p1616514468003200?thread_ts=1616509748.001400&cid=C0KLZSCHF
@@ -154,11 +156,10 @@ pluginManagement {
           "com.autonomousapps.plugin-best-practices-plugin",
           "com.autonomousapps.plugin-best-practices-plugin.gradle.plugin",
         )
-        includeModule("org.jetbrains.intellij", "org.jetbrains.intellij.gradle.plugin")
-        includeModule("org.jetbrains.intellij.plugins", "gradle-intellij-plugin")
         includeModule("gradle.plugin.org.jetbrains.gradle.plugin.idea-ext", "gradle-idea-ext")
         includeGroup("dev.bmac.intellij.plugins")
         includeGroup("dev.bmac.intellij.plugin-uploader")
+        includeGroup("org.jetbrains.intellij.platform")
       }
     }
   }

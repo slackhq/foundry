@@ -24,7 +24,12 @@ group = "com.slack.intellij"
 
 version = property("VERSION_NAME").toString()
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+  gradlePluginPortal()
+
+  intellijPlatform { defaultRepositories() }
+}
 
 dependencies {
   testImplementation(libs.junit)

@@ -17,6 +17,7 @@ import com.jetbrains.plugin.structure.base.utils.exists
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -35,16 +36,8 @@ repositories {
   google()
   maven("https://packages.jetbrains.team/maven/p/kpm/public/")
   maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
-
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-  plugins.add("com.intellij.java")
-  plugins.add("org.intellij.plugins.markdown")
-  plugins.add("org.jetbrains.plugins.terminal")
-  plugins.add("org.jetbrains.kotlin")
-  plugins.add("org.jetbrains.android")
+  intellijPlatform { defaultRepositories() }
+  gradlePluginPortal()
 }
 
 fun isGitHash(hash: String): Boolean {
@@ -120,13 +113,30 @@ dependencies {
   lintChecks(libs.composeLints)
 
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
-  implementation(libs.jewel.bridge232)
+  implementation(libs.jewel.bridge)
   implementation(libs.kaml)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
   implementation(projects.skatePlugin.projectGen)
   implementation(projects.tracing)
+  implementation(libs.kotlinx.serialization.core)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
+  intellijPlatform {
+    bundledPlugins(
+      "com.intellij.java",
+      "org.intellij.plugins.markdown",
+      "org.jetbrains.plugins.terminal",
+      "org.jetbrains.kotlin",
+    )
+    plugin("org.jetbrains.android", "241.14494.240")
+
+    pluginVerifier()
+    zipSigner()
+    instrumentationTools()
+
+    testFramework(TestFrameworkType.Platform)
+  }
 }
