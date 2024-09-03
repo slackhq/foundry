@@ -532,17 +532,7 @@ internal object BootstrapUtils {
     val extraArgs = gradleGcArgs.plus(jdkArgs).plus(extraJvmArgs.get()).joinToString(" ")
 
     val gradleDaemonArgs =
-      GradleDaemonArgs(
-        listOf(
-          "-Xms${gradleXms}g",
-          "-Xmx${gradleXmx}g",
-          // Really important to set this for multiple reasons
-          // - https://github.com/gradle/gradle/issues/19750
-          // - Gradle's default is really low
-          "-XX:MaxMetaspaceSize=1g",
-        ) + extraArgs,
-        maxWorkers,
-      )
+      GradleDaemonArgs(listOf("-Xms${gradleXms}g", "-Xmx${gradleXmx}g") + extraArgs, maxWorkers)
     val kotlinDaemonArgs =
       KotlinDaemonArgs(listOf("-Xms${kotlinXms}g", "-Xmx${kotlinXmx}g") + kotlinDaemonGcArgs)
 
