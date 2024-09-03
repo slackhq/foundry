@@ -726,6 +726,10 @@ internal constructor(
     // Key-only because it's used in a task init without a project instance
     public const val MIN_GRADLE_XMX: String = "slack.bootstrap.minGradleXmx"
 
+    /** Minimum xms value for the Gradle daemon. Value is an integer and unit is gigabytes. */
+    // Key-only because it's used in a task init without a project instance
+    public const val MIN_GRADLE_XMS: String = "slack.bootstrap.minGradleXms"
+
     private const val CACHED_PROVIDER_EXT_NAME = "slack.properties.provider"
 
     public operator fun invoke(

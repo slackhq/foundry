@@ -139,11 +139,17 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
    */
   @get:Optional @get:Nested public abstract val launcher: Property<JavaLauncher>
 
-  /** If using java toolchains, this is specified to indicate the requested JDK version. */
+  /** Optional override for min gradle daemon xmx. This should an integer >= 0. */
   @get:Optional
   @get:Input
   public val minGradleXmx: Property<Int> =
     objects.property<Int>().convention(argsProvider.minGradleXmx)
+
+  /** Optional override for max gradle daemon xmx. This should an integer >= 0. */
+  @get:Optional
+  @get:Input
+  public val minGradleXms: Property<Int> =
+    objects.property<Int>().convention(argsProvider.minGradleXms)
 
   /** If using java toolchains, this is specified to indicate the requested JDK version. */
   @get:Optional @get:Input public abstract val jdkVersion: Property<Int>
@@ -233,6 +239,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
         customCoreMultiplier,
         gradleMemoryPercentage,
         minGradleXmx,
+        minGradleXms,
         extraJvmArgs,
         garbageCollector,
         diagnosticsOutput::appendLine,
@@ -411,6 +418,7 @@ internal object BootstrapUtils {
     val customCoreMultiplier: Provider<String>,
     val gradleMemoryPercentage: Provider<String>,
     val minGradleXmx: Provider<Int>,
+    val minGradleXms: Provider<Int>,
     val extraJvmArgs: Provider<List<String>>,
     val garbageCollector: Provider<String>,
   ) {
@@ -422,6 +430,8 @@ internal object BootstrapUtils {
           gradleMemoryPercentage = providers.environmentVariable("GRADLE_MEMORY_PERCENT"),
           minGradleXmx =
             providers.gradleProperty(SlackProperties.MIN_GRADLE_XMX).mapToInt().orElse(1),
+          minGradleXms =
+            providers.gradleProperty(SlackProperties.MIN_GRADLE_XMS).mapToInt().orElse(1),
           extraJvmArgs = providers.provider { emptyList() },
           garbageCollector = providers.environmentVariable("BOOTSTRAP_GC"),
         )
@@ -435,6 +445,7 @@ internal object BootstrapUtils {
     customCoreMultiplier: Provider<String>,
     gradleMemoryPercentage: Provider<String>,
     minGradleXmx: Provider<Int>,
+    minGradleXms: Provider<Int>,
     extraJvmArgs: Provider<List<String>>,
     garbageCollector: Provider<String>,
     diagnostic: (String) -> Unit,
@@ -444,11 +455,6 @@ internal object BootstrapUtils {
       return if (isCi) ci else local
     }
 
-    // CPU cores
-    // - Always 50% of what gradle recommends for local envs.
-    //   Our max parallelism on the crit path is around 8-12 workers, so no need to go ham and
-    //   risk thermal throttling or pegged CPUs.
-    // - 100% for normal CI
     // Memory
     // - 50% for local builds, lower bound 15%
     // - 75% for CI builds, fixed size.
@@ -460,6 +466,11 @@ internal object BootstrapUtils {
       } else {
         pickValue(ci = 0.75, local = 0.5)
       }
+    // CPU cores
+    // - Always 50% of what gradle recommends for local envs.
+    //   Our max parallelism on the crit path is around 8-12 workers, so no need to go ham and
+    //   risk thermal throttling or pegged CPUs.
+    // - 100% for normal CI
     val coreMultiplier =
       if (customCoreMultiplier.isPresent) {
         customCoreMultiplier.get().toInt() / 100.0
@@ -479,9 +490,9 @@ internal object BootstrapUtils {
       gradleMemoryPercentage.map { it.toFloat() / 100 }.getOrElse(DEFAULT_GRADLE_MEMORY_PERCENT)
     val kotlinMemoryPercent = (1 - gradleMemoryPercent)
     val gradleXmx: Int = floorInt(rawXmx * gradleMemoryPercent, minValue = minGradleXmx.get())
-    val gradleXms: Int = floorInt(rawXms * gradleMemoryPercent, minValue = 1)
-    val kotlinXmx: Int = floorInt(rawXmx * kotlinMemoryPercent, minValue = 1)
-    val kotlinXms: Int = floorInt(rawXms * kotlinMemoryPercent, minValue = 1)
+    val gradleXms: Int = floorInt(rawXms * gradleMemoryPercent, minValue = minGradleXms.get())
+    val kotlinXmx: Int = floorInt(rawXmx * kotlinMemoryPercent, minValue = minGradleXmx.get())
+    val kotlinXms: Int = floorInt(rawXms * kotlinMemoryPercent, minValue = minGradleXms.get())
     val maxWorkers = floorInt(cores * coreMultiplier, minValue = 1)
     diagnostic("Gradle xms: ${gradleXms}GB")
     diagnostic("Gradle xmx: ${gradleXmx}GB")
