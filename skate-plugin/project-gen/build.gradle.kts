@@ -42,7 +42,7 @@ kotlin {
         implementation(compose.ui)
         implementation(libs.circuit.foundation)
         implementation(libs.compose.markdown)
-        implementation(libs.jewel.bridge)
+        implementation(libs.jewel.bridge232)
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
       }
