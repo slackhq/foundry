@@ -186,7 +186,7 @@ internal interface DependenciesVisitor {
 }
 
 internal data class AndroidLibraryFeature(
-  val resourcesPrefix: CharSequence?,
+  val resourcesPrefix: String?,
   val viewBindingEnabled: Boolean,
   val androidTest: Boolean,
   val packageName: String,

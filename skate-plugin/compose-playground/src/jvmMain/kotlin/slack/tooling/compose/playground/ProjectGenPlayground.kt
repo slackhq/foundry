@@ -35,7 +35,7 @@ import slack.tooling.projectgen.ProjectGenUi.ProjectGenApp
 fun main() = singleWindowApplication {
   var isDark by remember { mutableStateOf(false) }
   IntUiTheme(isDark) {
-    Column(Modifier.background(JewelTheme.globalColors.panelBackground)) {
+    Column(Modifier.background(JewelTheme.globalColors.paneBackground)) {
       DefaultButton(modifier = Modifier.padding(16.dp), onClick = { isDark = !isDark }) {
         Text("Toggle dark mode")
       }
