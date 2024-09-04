@@ -4,6 +4,18 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.1
+------
+
+_2024-09-03_
+
+- Add `slack.bootstrap.minGradleXms` property to set minimum xms values for daemon memory args.
+- Apply `slack.boostrap.minGradleXm*` values to kotlin daemon jvm args too.
+- Remove MaxMetaspace caps from bootstrap. This shouldn't be set anymore in JDK 17+.
+- Update develocity-gradle-plugin-adapters to `1.0.4`.
+- Update Bugsnag to `3.7.2`.
+- Build against AGP `8.6.0`.
+
 0.19.0
 ------
 
