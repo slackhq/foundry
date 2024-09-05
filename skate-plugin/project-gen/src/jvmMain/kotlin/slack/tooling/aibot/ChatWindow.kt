@@ -16,17 +16,7 @@
 package slack.tooling.aibot
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -67,9 +57,9 @@ fun ConversationField(modifier: Modifier = Modifier) {
   var textValue by remember { mutableStateOf(TextFieldValue()) }
   val isTextNotEmpty = textValue.text.isNotBlank()
   Row(
-    modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(4.dp),
+    modifier.padding(4.dp).height(IntrinsicSize.Min).padding(4.dp),
     horizontalArrangement = Arrangement.Center,
-    verticalAlignment = Alignment.CenterVertically,
+    verticalAlignment = Alignment.Bottom,
   ) {
     TextArea(
       value = textValue,
@@ -94,6 +84,7 @@ fun ConversationField(modifier: Modifier = Modifier) {
                 true
               }
             }
+
             else -> false
           }
         },
@@ -102,32 +93,25 @@ fun ConversationField(modifier: Modifier = Modifier) {
       maxLines = Int.MAX_VALUE,
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(
-          modifier = Modifier.padding(4.dp).fadeWhenDisabled(isTextNotEmpty),
-          onClick = {
-            if (isTextNotEmpty) {
-              textValue = TextFieldValue()
-            }
-          },
-          enabled = isTextNotEmpty,
-        ) {
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-          ) {
-            Icon(
-              painter = painterResource("/drawable/send.svg"),
-              contentDescription = "Send",
-              modifier = Modifier.size(20.dp),
-            )
+      IconButton(
+        modifier = Modifier.padding(4.dp).contentAlpha(isTextNotEmpty),
+        onClick = {
+          if (isTextNotEmpty) {
+            textValue = TextFieldValue()
           }
-        }
+        },
+        enabled = isTextNotEmpty,
+      ) {
+        Icon(
+          painter = painterResource("/drawable/send.svg"),
+          contentDescription = "Send",
+          modifier = Modifier.size(20.dp),
+        )
       }
     }
   }
 }
 
-fun Modifier.fadeWhenDisabled(enabled: Boolean): Modifier {
+fun Modifier.contentAlpha(enabled: Boolean): Modifier {
   return this.then(if (enabled) Modifier else Modifier.alpha(0.5f))
 }
