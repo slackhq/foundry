@@ -115,5 +115,5 @@ fun ConversationField(modifier: Modifier = Modifier) {
 }
 
 fun Modifier.enabled(enabled: Boolean): Modifier {
-  return this.then(if (enabled) Modifier else Modifier.alpha(0.5f))
+  return this.then(if (enabled) Modifier.alpha(1.0f) else Modifier.alpha(0.38f))
 }
