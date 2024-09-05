@@ -61,6 +61,8 @@ fun ConversationField(modifier: Modifier = Modifier) {
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.Bottom,
   ) {
+    // user text input. enter sends the message and clears text
+    // shift + enter adds a new line and expands the text field
     TextArea(
       value = textValue,
       onValueChange = { newText -> textValue = newText },
@@ -84,7 +86,6 @@ fun ConversationField(modifier: Modifier = Modifier) {
                 true
               }
             }
-
             else -> false
           }
         },
@@ -93,8 +94,9 @@ fun ConversationField(modifier: Modifier = Modifier) {
       maxLines = Int.MAX_VALUE,
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
+      // button will be disabled if there is no text
       IconButton(
-        modifier = Modifier.padding(4.dp).contentAlpha(isTextNotEmpty),
+        modifier = Modifier.padding(4.dp).enabled(isTextNotEmpty),
         onClick = {
           if (isTextNotEmpty) {
             textValue = TextFieldValue()
@@ -112,6 +114,6 @@ fun ConversationField(modifier: Modifier = Modifier) {
   }
 }
 
-fun Modifier.contentAlpha(enabled: Boolean): Modifier {
+fun Modifier.enabled(enabled: Boolean): Modifier {
   return this.then(if (enabled) Modifier else Modifier.alpha(0.5f))
 }
