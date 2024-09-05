@@ -17,6 +17,9 @@ package slack.tooling.aibot
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -34,30 +39,44 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
-import org.jetbrains.jewel.ui.component.Icon
-import org.jetbrains.jewel.ui.component.IconButton
-import org.jetbrains.jewel.ui.component.Text
-import org.jetbrains.jewel.ui.component.TextArea
+import org.jetbrains.jewel.ui.component.*
 
 @Composable
 fun ChatWindow(modifier: Modifier = Modifier) {
-  Column(
-    modifier = Modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground),
-    verticalArrangement = Arrangement.Bottom,
-  ) {
-    ConversationField(modifier)
+  var messages by remember { mutableStateOf(listOf<Message>()) }
+  Column(modifier = Modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+    LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
+      items(messages.reversed()) { message -> ChatBubble(message) }
+    }
+    ConversationField(
+      modifier = modifier,
+      onSendMessage = { userMessage ->
+        messages = messages + Message(userMessage, true)
+        val response = callApi(userMessage)
+        messages = messages + Message(response, false)
+      },
+    )
   }
 }
 
 @Composable
-fun ConversationField(modifier: Modifier = Modifier) {
+fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
   var textValue by remember { mutableStateOf(TextFieldValue()) }
   val isTextNotEmpty = textValue.text.isNotBlank()
+
+  fun sendMessage() {
+    if (isTextNotEmpty) {
+      onSendMessage(textValue.text)
+      textValue = TextFieldValue("")
+    }
+  }
+
   Row(
-    modifier.padding(4.dp).height(IntrinsicSize.Min).padding(4.dp),
+    modifier.padding(4.dp).height(IntrinsicSize.Min),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.Bottom,
   ) {
@@ -67,7 +86,7 @@ fun ConversationField(modifier: Modifier = Modifier) {
       value = textValue,
       onValueChange = { newText -> textValue = newText },
       modifier =
-        Modifier.weight(1f).padding(4.dp).heightIn(min = 56.dp).onPreviewKeyEvent { event ->
+        Modifier.weight(1f).heightIn(min = 56.dp).padding(4.dp).onPreviewKeyEvent { event ->
           when {
             (event.key == Key.Enter || event.key == Key.NumPadEnter) &&
               event.type == KeyEventType.KeyDown -> {
@@ -82,7 +101,7 @@ fun ConversationField(modifier: Modifier = Modifier) {
                 textValue = TextFieldValue(newText, newSelection)
                 true
               } else {
-                textValue = TextFieldValue("")
+                sendMessage()
                 true
               }
             }
@@ -99,7 +118,7 @@ fun ConversationField(modifier: Modifier = Modifier) {
         modifier = Modifier.padding(4.dp).enabled(isTextNotEmpty),
         onClick = {
           if (isTextNotEmpty) {
-            textValue = TextFieldValue()
+            sendMessage()
           }
         },
         enabled = isTextNotEmpty,
@@ -114,6 +133,41 @@ fun ConversationField(modifier: Modifier = Modifier) {
   }
 }
 
+@Composable
+fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
+  Box(
+    Modifier.fillMaxWidth()
+      .padding(8.dp)
+      .shadow(elevation = 0.5.dp, shape = RoundedCornerShape(25.dp), clip = true)
+      .background(
+        color = if (message.isMe) ChatColors.promptBackground else ChatColors.responseBackground
+      )
+      .padding(8.dp)
+  ) {
+    Text(
+      text = message.text,
+      color = if (message.isMe) ChatColors.userTextColor else ChatColors.responseTextColor,
+      modifier = modifier.padding(8.dp),
+      fontFamily = FontFamily.SansSerif,
+    )
+  }
+}
+
 fun Modifier.enabled(enabled: Boolean): Modifier {
   return this.then(if (enabled) Modifier.alpha(1.0f) else Modifier.alpha(0.38f))
 }
+
+fun callApi(message: String): String {
+  // function set up to call the DevXP API in the future.
+  // right now, just sends back the user input message
+  return (message)
+}
+
+object ChatColors {
+  val promptBackground = Color(0xFF45494A)
+  val responseBackground = Color(0xFF2d2f30)
+  val userTextColor = Color(0xFFEAEEF7)
+  val responseTextColor = Color(0xFFE0EEF7)
+}
+
+data class Message(val text: String, val isMe: Boolean)
