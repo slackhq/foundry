@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,7 +65,14 @@ fun ChatWindow(modifier: Modifier = Modifier) {
   var messages by remember { mutableStateOf(listOf<Message>()) }
   Column(modifier = Modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
     LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
-      items(messages.reversed()) { message -> ChatBubble(message) }
+      items(messages.reversed()) { message ->
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start,
+        ) {
+          ChatBubble(message)
+        }
+      }
     }
     ConversationField(
       modifier = modifier,
@@ -150,7 +158,7 @@ fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> 
 @Composable
 fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
   Box(
-    Modifier.fillMaxWidth()
+    Modifier.wrapContentWidth()
       .padding(8.dp)
       .shadow(elevation = 0.5.dp, shape = RoundedCornerShape(25.dp), clip = true)
       .background(
