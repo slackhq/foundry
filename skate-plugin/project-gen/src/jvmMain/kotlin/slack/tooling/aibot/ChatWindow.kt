@@ -42,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -183,13 +182,6 @@ fun callApi(message: String): String {
   // function set up to call the DevXP API in the future.
   // right now, just sends back the user input message
   return (message)
-}
-
-object ChatColors {
-  val promptBackground = Color(0xFF45494A)
-  val responseBackground = Color(0xFF2d2f30)
-  val userTextColor = Color(0xFFEAEEF7)
-  val responseTextColor = Color(0xFFE0EEF7)
 }
 
 data class Message(val text: String, val isMe: Boolean)
