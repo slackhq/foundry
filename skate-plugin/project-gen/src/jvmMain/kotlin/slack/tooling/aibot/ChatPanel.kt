@@ -21,7 +21,7 @@ import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import java.awt.Dimension
 import javax.swing.JComponent
-import slack.tooling.aibot.ChatWindow.ChatWindowUi
+import slack.tooling.aibot.ChatWindowUi.ChatWindow
 import slack.tooling.projectgen.SlackDesktopTheme
 
 object ChatPanel {
@@ -37,7 +37,7 @@ object ChatPanel {
     val circuit =
       Circuit.Builder()
         .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter())
-        .addUi<ChatScreen, ChatScreen.State> { state, modifier -> ChatWindowUi(state, modifier) }
+        .addUi<ChatScreen, ChatScreen.State> { state, modifier -> ChatWindow(state, modifier) }
         .build()
 
     CircuitContent(ChatScreen, circuit = circuit)

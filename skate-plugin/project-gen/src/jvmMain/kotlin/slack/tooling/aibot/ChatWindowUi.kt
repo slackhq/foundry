@@ -59,9 +59,9 @@ import org.jetbrains.jewel.ui.component.IconButton
 import org.jetbrains.jewel.ui.component.Text
 import org.jetbrains.jewel.ui.component.TextArea
 
-object ChatWindow {
+object ChatWindowUi {
   @Composable
-  fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
+  fun ChatWindow(state: ChatScreen.State, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
       LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
         items(state.messages.reversed()) { message ->
