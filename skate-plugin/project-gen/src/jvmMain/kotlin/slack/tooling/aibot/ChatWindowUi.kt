@@ -82,31 +82,6 @@ object ChatWindowUi {
     }
   }
 
-  // @Composable
-  // fun ChatWindow(modifier: Modifier = Modifier) {
-  //  var messages by remember { mutableStateOf(listOf<Message>()) }
-  //  Column(modifier = Modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
-  //    LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
-  //      items(messages.reversed()) { message ->
-  //        Row(
-  //          modifier = Modifier.fillMaxWidth(),
-  //          horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start,
-  //        ) {
-  //          ChatBubble(message)
-  //        }
-  //      }
-  //    }
-  //    ConversationField(
-  //      modifier = modifier,
-  //      onSendMessage = { userMessage ->
-  //        messages = messages + Message(userMessage, true)
-  //        val response = callApi(userMessage)
-  //        messages = messages + Message(response, false)
-  //      },
-  //    )
-  //  }
-  // }
-
   @Composable
   fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
     var textValue by remember { mutableStateOf(TextFieldValue()) }

@@ -17,4 +17,5 @@ package slack.tooling.aibot
 
 import androidx.compose.runtime.Immutable
 
+// not sure if I need this in a separate class
 @Immutable data class Message(val text: String, val isMe: Boolean)
