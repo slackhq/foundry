@@ -37,6 +37,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.anvil.AnvilMode
@@ -882,16 +883,22 @@ constructor(
             extension.reportsDestination.set(project.file(v))
           }
           "intrinsicRemember" -> {
-            extension.enableIntrinsicRemember.set(v.toBoolean())
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
+            }
           }
           "nonSkippingGroupOptimization" -> {
-            extension.enableNonSkippingGroupOptimization.set(v.toBoolean())
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+            }
           }
           "suppressKotlinVersionCompatibilityCheck" -> {
             error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
           }
           "strongSkipping" -> {
-            extension.enableStrongSkippingMode.set(v.toBoolean())
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
+            }
           }
           "stabilityConfigurationPath" -> {
             extension.stabilityConfigurationFile.set(project.file(v))
