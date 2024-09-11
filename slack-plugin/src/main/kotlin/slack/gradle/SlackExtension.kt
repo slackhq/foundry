@@ -37,6 +37,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.utils.named
 import slack.gradle.agp.PermissionAllowlistConfigurer
 import slack.gradle.anvil.AnvilMode
@@ -167,31 +168,41 @@ constructor(
         }
       }
 
-      fun aptConfiguration(): String {
+      fun aptConfiguration(variant: String = ""): String {
         return if (isKotlin) {
-          "kapt"
+          "kapt${variant.capitalizeUS()}"
         } else {
-          "annotationProcessor"
+          "annotationProcessor${variant.capitalizeUS()}"
         }
+      }
+
+      fun kspConfiguration(variant: String = ""): String {
+        return "ksp${variant.capitalizeUS()}"
       }
 
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
-      val daggerConfig = featuresHandler.daggerHandler.computeConfig()
+      val daggerConfig =
+        featuresHandler.daggerHandler.computeConfig(
+          featuresHandler.testFixturesUseDagger.getOrElse(false)
+        )
       val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspContributionMerging
       if (daggerConfig != null) {
         dependencies.add("implementation", SlackDependencies.Dagger.dagger)
         dependencies.add("implementation", SlackDependencies.javaxInject)
 
+        val anvilPackage =
+          if (slackProperties.anvilUseKspFork) {
+            "dev.zacsweers.anvil"
+          } else {
+            "com.squareup.anvil"
+          }
         if (daggerConfig.runtimeOnly) {
-          dependencies.add(
-            "compileOnly",
-            if (slackProperties.anvilUseKspFork) {
-              "dev.zacsweers.anvil:annotations"
-            } else {
-              "com.squareup.anvil:annotations"
-            },
-          )
+          val annotations = "$anvilPackage:annotations"
+          dependencies.add("compileOnly", annotations)
+          if (daggerConfig.testFixturesUseDagger) {
+            dependencies.add("testFixturesCompileOnly", annotations)
+          }
         }
 
         if (logVerbose) {
@@ -227,6 +238,10 @@ constructor(
                 contributesAndFactoryGeneration = true,
                 componentMerging = anvilMode.useKspContributionMerging,
               )
+
+              if (daggerConfig.testFixturesUseDagger) {
+                dependencies.add(kspConfiguration("testFixtures"), "$anvilPackage:compiler")
+              }
 
               // Make KSP depend on sqldelight and viewbinding tasks
               // This is opt-in as it's better for build performance to skip this linking if
@@ -308,13 +323,18 @@ constructor(
 
           for (runtimeProject in runtimeProjects) {
             dependencies.add("implementation", project(runtimeProject))
+            if (daggerConfig.testFixturesUseDagger) {
+              dependencies.add("testFixturesImplementation", project(runtimeProject))
+            }
           }
         }
 
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
           if (allowDaggerKsp && (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)) {
             markKspNeeded("Dagger compiler")
-            dependencies.add("ksp", SlackDependencies.Dagger.compiler)
+            dependencies.add(kspConfiguration(""), SlackDependencies.Dagger.compiler)
+            // Currently we don't support dagger-compiler or components in test fixtures, but if we
+            // did it would go here
           } else {
             markKaptNeeded("Dagger compiler")
             dependencies.add(aptConfiguration(), SlackDependencies.Dagger.compiler)
@@ -435,6 +455,10 @@ constructor(
   /** Enables redacted-compiler-plugin on this project. */
   internal abstract val redacted: Property<Boolean>
 
+  internal val testFixtures: Property<Boolean> = objects.property<Boolean>().convention(false)
+  internal val testFixturesUseDagger: Property<Boolean> =
+    objects.property<Boolean>().convention(false)
+
   // Moshi
   internal val moshiHandler = objects.newInstance<MoshiHandler>()
 
@@ -551,6 +575,33 @@ constructor(
     redacted.setDisallowChanges(true)
   }
 
+  /** Enables test fixtures on this project. */
+  public fun testFixtures() {
+    testFixtures(includeDagger = false)
+  }
+
+  /**
+   * Enables test fixtures on this project.
+   *
+   * **NOTE**: This is currently private because it appears that KSP does not yet work on test
+   * fixtures. Left as a toe-hold for future use though. See
+   * https://github.com/google/ksp/issues/2093.
+   *
+   * @param includeDagger if enabled, will run dagger/anvil factory generation over test fixtures
+   *   sources. This is _only_ necessary if you are contributing classes or Dagger modules from your
+   *   test fixtures.
+   */
+  private fun testFixtures(includeDagger: Boolean = false) {
+    testFixtures.setDisallowChanges(true)
+    testFixturesUseDagger.setDisallowChanges(includeDagger)
+    if (androidExtension != null) {
+      (androidExtension as? LibraryExtension)?.let { it.testFixtures.enable = true }
+        ?: error("Attempted to enable test fixtures on non-library project ${project.path}")
+    } else {
+      project.pluginManager.apply("java-test-fixtures")
+    }
+  }
+
   /**
    * Enables Compose for this project and applies any version catalog bundle dependencies defined by
    * [SlackProperties.defaultComposeAndroidBundleAlias].
@@ -563,6 +614,13 @@ constructor(
   internal fun applyTo(project: Project) {
     composeHandler.applyTo(project)
     circuitHandler.applyTo(project, slackProperties)
+    // Validate we've enabled dagger if we requested test fixtures with dagger code
+    if (testFixturesUseDagger.getOrElse(false) && !daggerHandler.enabled.getOrElse(false)) {
+      error(
+        "In order to enable test fixtures with dagger, you must also enable " +
+          "the `slack { features { dagger() } }` feature"
+      )
+    }
   }
 }
 
@@ -625,10 +683,13 @@ public abstract class MoshiHandler {
 public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory) {
   /** Sets up circuit code gen, includes annotations and KSP setup. */
   public val codegen: Property<Boolean> = objects.property<Boolean>().convention(false)
+
   /** Includes the circuit-runtime dep (including screen, ui, presenter). */
   public val runtime: Property<Boolean> = objects.property<Boolean>().convention(false)
+
   /** Includes the circuit-foundation dep. */
   public val foundation: Property<Boolean> = objects.property<Boolean>().convention(false)
+
   /**
    * When enabled, includes a common bundle as defined by the `circuit-common` bundle ID in
    * `libs.versions.toml`.
@@ -662,11 +723,13 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
 
   @SlackExtensionMarker
   public abstract class CircuitXHandler @Inject constructor(objects: ObjectFactory) {
-    /** Correpsonds to the circuitx-android artifact. */
+    /** Corresponds to the circuitx-android artifact. */
     public val android: Property<Boolean> = objects.property<Boolean>().convention(false)
-    /** Correpsonds to the circuitx-gesture-navigation artifact. */
+
+    /** Corresponds to the circuitx-gesture-navigation artifact. */
     public val gestureNav: Property<Boolean> = objects.property<Boolean>().convention(false)
-    /** Correpsonds to the circuitx-overlays artifact. */
+
+    /** Corresponds to the circuitx-overlays artifact. */
     public val overlays: Property<Boolean> = objects.property<Boolean>().convention(false)
 
     internal fun applyTo(project: Project) {
@@ -730,9 +793,12 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     disableAnvil.setDisallowChanges(true)
   }
 
-  internal fun computeConfig(): DaggerConfig? {
+  internal fun computeConfig(testFixturesUseDagger: Boolean): DaggerConfig? {
     if (!enabled.get()) return null
     val runtimeOnly = runtimeOnly.get()
+    if (runtimeOnly && testFixturesUseDagger) {
+      error("Cannot enable dagger in test-fixtures *and* be runtimeOnly(). Please pick one.")
+    }
     val enableAnvil = !runtimeOnly && !disableAnvil.get()
     var anvilFactories = true
     var anvilFactoriesOnly = false
@@ -751,6 +817,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
       anvilFactoriesOnly,
       useDaggerCompiler,
       alwaysEnableAnvilComponentMerging,
+      testFixturesUseDagger,
     )
   }
 
@@ -761,6 +828,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     var anvilFactoriesOnly: Boolean,
     val useDaggerCompiler: Boolean,
     val alwaysEnableAnvilComponentMerging: Boolean,
+    val testFixturesUseDagger: Boolean,
   )
 }
 
@@ -872,33 +940,49 @@ constructor(
           "generateFunctionKeyMetaClasses" -> {
             extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
           }
+
           "sourceInformation" -> {
             extension.includeSourceInformation.set(v.toBoolean())
           }
+
           "metricsDestination" -> {
             extension.metricsDestination.set(project.file(v))
           }
+
           "reportsDestination" -> {
             extension.reportsDestination.set(project.file(v))
           }
+
           "intrinsicRemember" -> {
-            extension.enableIntrinsicRemember.set(v.toBoolean())
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
+            }
           }
+
           "nonSkippingGroupOptimization" -> {
-            extension.enableNonSkippingGroupOptimization.set(v.toBoolean())
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+            }
           }
+
           "suppressKotlinVersionCompatibilityCheck" -> {
             error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
           }
+
           "strongSkipping" -> {
-            extension.enableStrongSkippingMode.set(v.toBoolean())
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
+            }
           }
+
           "stabilityConfigurationPath" -> {
             extension.stabilityConfigurationFile.set(project.file(v))
           }
+
           "traceMarkersEnabled" -> {
             extension.includeTraceMarkers.set(v.toBoolean())
           }
+
           else -> {
             freeOptions += "$k=$v"
           }
