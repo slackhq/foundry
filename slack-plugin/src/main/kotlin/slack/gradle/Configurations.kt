@@ -25,6 +25,7 @@ internal object Configurations {
   const val CORE_LIBRARY_DESUGARING = "coreLibraryDesugaring"
   const val KAPT = "kapt"
   const val KSP = "ksp"
+  const val SQL_DELIGHT_DIALECT = "DialectClasspath"
 
   fun isTest(name: String): Boolean = testConfigurationRegex.matches(name)
 
@@ -50,6 +51,7 @@ internal object Configurations {
         *ERROR_PRONE.toTypedArray(),
         *RUNTIME.toTypedArray(),
         COMPILE_ONLY,
+        SQL_DELIGHT_DIALECT,
         "androidTestUtil",
         "lintChecks",
         "lintRelease",
@@ -70,12 +72,12 @@ internal object Configurations {
   internal fun isPlatformConfigurationName(name: String): Boolean {
     // Kapt/ksp/compileOnly are special cases since they can be combined with others
     val isKaptOrCompileOnly =
-      name.startsWith(Configurations.KAPT, ignoreCase = true) ||
-        name.startsWith(Configurations.KSP, ignoreCase = true) ||
-        name == Configurations.COMPILE_ONLY
+      name.startsWith(KAPT, ignoreCase = true) ||
+        name.startsWith(KSP, ignoreCase = true) ||
+        name == COMPILE_ONLY
     if (isKaptOrCompileOnly) {
       return true
     }
-    return isKnownConfiguration(name, Configurations.Groups.PLATFORM)
+    return isKnownConfiguration(name, Groups.PLATFORM)
   }
 }
