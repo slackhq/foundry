@@ -15,15 +15,19 @@
  */
 package slack.gradle.kgp
 
+import com.android.build.api.AndroidPluginVersion
 import com.android.build.gradle.BaseExtension
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.Provider
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
@@ -34,6 +38,7 @@ import slack.gradle.SlackProperties
 import slack.gradle.SlackTools
 import slack.gradle.asProvider
 import slack.gradle.configure
+import slack.gradle.getByType
 import slack.gradle.lint.DetektTasks
 import slack.gradle.onFirst
 import slack.gradle.util.configureKotlinCompilationTask
@@ -46,6 +51,14 @@ internal object KgpTasks {
       "org.jetbrains.kotlin.jvm",
       "org.jetbrains.kotlin.android",
     )
+
+  /**
+   * Surprisingly, AGP only wants to use its _own_ `android.kotlinOptions` for any `KotlinCompile`
+   * tasks it creates. This is really annoying and means AGP will override any we set in certain
+   * cases. To work around this, we run it in an afterEvaluate until AGP 8.8
+   * https://issuetracker.google.com/issues/364331837
+   */
+  private val FIXED_KOTLIN_OPTIONS_AGP_VERSION = AndroidPluginVersion(8, 8)
 
   @Suppress("LongMethod")
   fun configure(project: Project, slackTools: SlackTools, slackProperties: SlackProperties) {
@@ -63,68 +76,24 @@ internal object KgpTasks {
 
       val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
 
-      project.tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
-        // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
-        // target compilation
-        val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
+      val jvmTargetProvider =
+        slackProperties.versions.jvmTarget
+          .map { JvmTarget.fromTarget(it.toString()) }
+          .asProvider(project.providers)
 
-        compilerOptions {
-          if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
-            val zipped =
-              slackProperties.kotlinProgressive.zip(slackProperties.kaptLanguageVersion) {
-                progressive,
-                kaptLanguageVersion ->
-                if (kaptLanguageVersion != KotlinVersion.DEFAULT) {
-                  false
-                } else {
-                  progressive
-                }
-              }
-            progressiveMode.set(zipped)
-          } else {
-            progressiveMode.set(slackProperties.kotlinProgressive)
-          }
-          optIn.addAll(slackProperties.kotlinOptIn)
-          if (slackProperties.kotlinLanguageVersionOverride.isPresent) {
-            languageVersion.set(
-              slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
-            )
-          } else if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
-            languageVersion.set(slackProperties.kaptLanguageVersion)
-          }
-          if (
-            !slackProperties.allowWarnings &&
-              !this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)
-          ) {
-            allWarningsAsErrors.set(true)
-          }
-          if (!isKaptGenerateStubsTask) {
-            freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
-          }
-
-          val jvmTargetProvider =
-            slackProperties.versions.jvmTarget
-              .map { JvmTarget.fromTarget(it.toString()) }
-              .asProvider(project.providers)
-          if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.set(jvmTargetProvider)
-            // Potentially useful for static analysis or annotation processors
-            javaParameters.set(true)
-            freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
-
-            // Set the module name to a dashified version of the project path to ensure uniqueness
-            // in created .kotlin_module files
-            moduleName.set(project.path.replace(":", "-"))
-
-            if (!isKotlinAndroid) {
-              // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-              freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
-            }
-          }
+      if (isKotlinAndroid && slackTools.agpHandler.agpVersion < FIXED_KOTLIN_OPTIONS_AGP_VERSION) {
+        // TODO find a way to get this to not set an empty provider on a collection
+        val oldExtension = project.extensions.getByType<BaseExtension>()
+        val kotlinOptions =
+          (oldExtension as ExtensionAware).extensions.findByName("kotlinOptions")
+            as? KotlinJvmOptions
+        kotlinOptions?.apply { freeCompilerArgs += slackProperties.kotlinJvmFreeArgs.get() }
+        project.afterEvaluate {
+          configureKotlinCompileTasks(project, slackProperties, jvmTargetProvider, true)
         }
+      } else {
+        configureKotlinCompileTasks(project, slackProperties, jvmTargetProvider, isKotlinAndroid)
       }
-
-      project.configureFreeKotlinCompilerArgs()
 
       if (slackProperties.autoApplyDetekt) {
         project.project.pluginManager.apply("io.gitlab.arturbosch.detekt")
@@ -182,6 +151,72 @@ internal object KgpTasks {
         }
       }
     }
+  }
+
+  private fun configureKotlinCompileTasks(
+    project: Project,
+    slackProperties: SlackProperties,
+    jvmTargetProvider: Provider<JvmTarget>,
+    isKotlinAndroid: Boolean,
+  ) {
+    project.tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
+      // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
+      // target compilation
+      val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
+
+      compilerOptions {
+        if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
+          val zipped =
+            slackProperties.kotlinProgressive.zip(slackProperties.kaptLanguageVersion) {
+              progressive,
+              kaptLanguageVersion ->
+              if (kaptLanguageVersion != KotlinVersion.DEFAULT) {
+                false
+              } else {
+                progressive
+              }
+            }
+          progressiveMode.set(zipped)
+        } else {
+          progressiveMode.set(slackProperties.kotlinProgressive)
+        }
+        optIn.addAll(slackProperties.kotlinOptIn)
+        if (slackProperties.kotlinLanguageVersionOverride.isPresent) {
+          languageVersion.set(
+            slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
+          )
+        } else if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
+          languageVersion.set(slackProperties.kaptLanguageVersion)
+        }
+        if (
+          !slackProperties.allowWarnings &&
+            !this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)
+        ) {
+          allWarningsAsErrors.set(true)
+        }
+        if (!isKaptGenerateStubsTask) {
+          freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
+        }
+
+        if (this is KotlinJvmCompilerOptions) {
+          jvmTarget.set(jvmTargetProvider)
+          // Potentially useful for static analysis or annotation processors
+          javaParameters.set(true)
+          freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
+
+          // Set the module name to a dashified version of the project path to ensure uniqueness
+          // in created .kotlin_module files
+          moduleName.set(project.path.replace(":", "-"))
+
+          if (!isKotlinAndroid) {
+            // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+            freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
+          }
+        }
+      }
+    }
+
+    project.configureFreeKotlinCompilerArgs()
   }
 
   /**
