@@ -150,22 +150,9 @@ internal object KgpTasks {
           }
         }
       }
-    }
-  }
 
-  private fun configureKotlinCompileTasks(
-    project: Project,
-    slackProperties: SlackProperties,
-    jvmTargetProvider: Provider<JvmTarget>,
-    isKotlinAndroid: Boolean,
-  ) {
-    project.tasks.configureKotlinCompilationTask(includeKaptGenerateStubsTask = true) {
-      // Don't add compiler args to KaptGenerateStubsTask because it inherits arguments from the
-      // target compilation
-      val isKaptGenerateStubsTask = this is KaptGenerateStubsTask
-
-      compilerOptions {
-        if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
+      project.tasks.withType(KaptGenerateStubsTask::class.java).configureEach {
+        compilerOptions {
           val zipped =
             slackProperties.kotlinProgressive.zip(slackProperties.kaptLanguageVersion) {
               progressive,
@@ -177,16 +164,29 @@ internal object KgpTasks {
               }
             }
           progressiveMode.set(zipped)
-        } else {
-          progressiveMode.set(slackProperties.kotlinProgressive)
+
+          if (slackProperties.kaptLanguageVersion.isPresent) {
+            languageVersion.set(slackProperties.kaptLanguageVersion)
+          }
         }
+      }
+    }
+  }
+
+  private fun configureKotlinCompileTasks(
+    project: Project,
+    slackProperties: SlackProperties,
+    jvmTargetProvider: Provider<JvmTarget>,
+    isKotlinAndroid: Boolean,
+  ) {
+    project.tasks.configureKotlinCompilationTask {
+      compilerOptions {
+        progressiveMode.set(slackProperties.kotlinProgressive)
         optIn.addAll(slackProperties.kotlinOptIn)
         if (slackProperties.kotlinLanguageVersionOverride.isPresent) {
           languageVersion.set(
             slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
           )
-        } else if (isKaptGenerateStubsTask && slackProperties.kaptLanguageVersion.isPresent) {
-          languageVersion.set(slackProperties.kaptLanguageVersion)
         }
         if (
           !slackProperties.allowWarnings &&
@@ -194,18 +194,15 @@ internal object KgpTasks {
         ) {
           allWarningsAsErrors.set(true)
         }
-        if (!isKaptGenerateStubsTask) {
-          freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
-        }
+        freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
 
         if (this is KotlinJvmCompilerOptions) {
           jvmTarget.set(jvmTargetProvider)
+
           // Potentially useful for static analysis or annotation processors
           javaParameters.set(true)
 
-          if (!isKaptGenerateStubsTask) {
-            freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
-          }
+          freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
 
           // Set the module name to a dashified version of the project path to ensure uniqueness
           // in created .kotlin_module files
