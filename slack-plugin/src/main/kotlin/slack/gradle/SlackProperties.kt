@@ -405,8 +405,8 @@ internal constructor(
    *
    * Should be `:path:to:robolectric-core` format
    */
-  public val robolectricCoreProject: Project
-    get() = project.project(stringProperty("slack.location.robolectric-core"))
+  public val robolectricCoreProject: String?
+    get() = optionalStringProperty("slack.location.robolectric-core")
 
   /**
    * Gradle path to a platform project to be referenced by other projects.

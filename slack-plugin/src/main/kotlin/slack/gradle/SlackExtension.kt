@@ -1054,7 +1054,7 @@ constructor(objects: ObjectFactory, private val slackProperties: SlackProperties
           // to be on the classpath).
           add("testImplementation", SlackDependencies.Testing.Robolectric.annotations)
           add("testImplementation", SlackDependencies.Testing.Robolectric.robolectric)
-          add("testImplementation", slackProperties.robolectricCoreProject)
+          slackProperties.robolectricCoreProject?.let { add("testImplementation", project(it)) }
         }
       }
     }
