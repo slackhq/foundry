@@ -202,7 +202,10 @@ internal object KgpTasks {
           jvmTarget.set(jvmTargetProvider)
           // Potentially useful for static analysis or annotation processors
           javaParameters.set(true)
-          freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
+
+          if (!isKaptGenerateStubsTask) {
+            freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
+          }
 
           // Set the module name to a dashified version of the project path to ensure uniqueness
           // in created .kotlin_module files
