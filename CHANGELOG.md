@@ -4,6 +4,14 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.3
+------
+
+_2024-09-12_
+
+- **Change**: Rename `testFixtures()` feature DSL to `enableTestFixtures()` to disambiguate from Gradle's methods.
+- **New**: Introduce new `sgp.compose.stabilityConfigurationPath` property to specify a Compose configuration file path from the root project. It is also now disallowed to specify this via `sgp.compose.commonCompilerOptions`.
+
 0.19.2
 ------
 
