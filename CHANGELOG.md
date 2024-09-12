@@ -4,16 +4,16 @@ Changelog
 **Unreleased**
 --------------
 
-- **New**: Add new `slack { features { testFixtures() } }` DSL for enabling test fixtures in a project-agnostic way.
-- Make `slack.location.robolectric-core` property optional.
-- Clean up duplicate Kotlin JVM argument handling in `KaptGenerateStubsTask`.
-- Update to the new compose-compiler-gradle-plugin feature flag API.
-- Apply platform project BOMs to SqlDelight `DialectClasspath` configurations too.
-- Build against Kotlin `2.0.20`.
-- Build against KSP `2.0.20-1.0.25`.
-- Build against AGP `8.6.0`.
-- Build against Gradle `8.10.1`.
-- Build against Wire `5.1.0`.
+- [sgp] **New**: Add new `slack { features { testFixtures() } }` DSL for enabling test fixtures in a project-agnostic way.
+- [sgp] Make `slack.location.robolectric-core` property optional.
+- [sgp] Clean up duplicate Kotlin JVM argument handling in `KaptGenerateStubsTask`.
+- [sgp] Update to the new compose-compiler-gradle-plugin feature flag API.
+- [sgp] Apply platform project BOMs to SqlDelight `DialectClasspath` configurations too.
+- [sgp] Build against KSP `2.0.20-1.0.25`.
+- [sgp] Build against AGP `8.6.0`.
+- [sgp] Build against Gradle `8.10.1`.
+- [sgp] Build against Wire `5.1.0`.
+- [skippy] Don't treat testFixtures as test sources
 
 0.19.1
 ------
