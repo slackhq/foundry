@@ -576,8 +576,10 @@ constructor(
   }
 
   /** Enables test fixtures on this project. */
-  public fun testFixtures() {
-    testFixtures(includeDagger = false)
+  // TODO rename this back to testFixtures() once it doesn't conflict with
+  //  gradle-dependencies-sorter
+  public fun enableTestFixtures() {
+    enableTestFixtures(includeDagger = false)
   }
 
   /**
@@ -591,7 +593,7 @@ constructor(
    *   sources. This is _only_ necessary if you are contributing classes or Dagger modules from your
    *   test fixtures.
    */
-  private fun testFixtures(includeDagger: Boolean = false) {
+  private fun enableTestFixtures(includeDagger: Boolean = false) {
     testFixtures.setDisallowChanges(true)
     testFixturesUseDagger.setDisallowChanges(includeDagger)
     if (androidExtension != null) {
