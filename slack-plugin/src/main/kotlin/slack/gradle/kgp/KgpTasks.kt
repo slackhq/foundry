@@ -21,13 +21,11 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
@@ -38,7 +36,6 @@ import slack.gradle.SlackProperties
 import slack.gradle.SlackTools
 import slack.gradle.asProvider
 import slack.gradle.configure
-import slack.gradle.getByType
 import slack.gradle.lint.DetektTasks
 import slack.gradle.onFirst
 import slack.gradle.util.configureKotlinCompilationTask
@@ -82,12 +79,6 @@ internal object KgpTasks {
           .asProvider(project.providers)
 
       if (isKotlinAndroid && slackTools.agpHandler.agpVersion < FIXED_KOTLIN_OPTIONS_AGP_VERSION) {
-        // TODO find a way to get this to not set an empty provider on a collection
-        val oldExtension = project.extensions.getByType<BaseExtension>()
-        val kotlinOptions =
-          (oldExtension as ExtensionAware).extensions.findByName("kotlinOptions")
-            as? KotlinJvmOptions
-        kotlinOptions?.apply { freeCompilerArgs += slackProperties.kotlinJvmFreeArgs.get() }
         project.afterEvaluate {
           configureKotlinCompileTasks(project, slackProperties, jvmTargetProvider, true)
         }
