@@ -933,6 +933,12 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
 
+      if (slackProperties.composeStabilityConfigurationPath.isPresent) {
+        extension.stabilityConfigurationFile.setDisallowChanges(
+          slackProperties.composeStabilityConfigurationPath
+        )
+      }
+
       // Because the Compose Compiler plugin auto applies common options for us, we need to know
       // about those options and _avoid_ setting them a second time
       val freeOptions = mutableListOf<String>()
@@ -978,7 +984,9 @@ constructor(
           }
 
           "stabilityConfigurationPath" -> {
-            extension.stabilityConfigurationFile.set(project.file(v))
+            error(
+              "Use the 'sgp.compose.stabilityConfigurationPath' Gradle property to specify a stability configuration path"
+            )
           }
 
           "traceMarkersEnabled" -> {
