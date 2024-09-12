@@ -267,7 +267,10 @@ public object ModuleStatsTasks {
       // TODO would be nice if we could drop autovalue into this
       project.afterEvaluate {
         val extension = project.extensions.getByType<SlackExtension>()
-        val daggerConfig = extension.featuresHandler.daggerHandler.computeConfig()
+        val daggerConfig =
+          extension.featuresHandler.daggerHandler.computeConfig(
+            extension.featuresHandler.testFixturesUseDagger.getOrElse(false)
+          )
         if (daggerConfig != null) {
           if (daggerConfig.useDaggerCompiler) {
             addCollectorTag(ModuleStatsCollectorTask.TAG_DAGGER_COMPILER)
