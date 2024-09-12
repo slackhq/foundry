@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.2
+------
+
+_2024-09-12_
+
 - [sgp] **New**: Add new `slack { features { testFixtures() } }` DSL for enabling test fixtures in a project-agnostic way.
 - [sgp] Make `slack.location.robolectric-core` property optional.
 - [sgp] Clean up duplicate Kotlin JVM argument handling in `KaptGenerateStubsTask`.
