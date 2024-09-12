@@ -32,7 +32,7 @@ sortDependencies = "0.7"
 spotless = "7.0.0.BETA2"
 sqldelight = "2.0.2"
 versionsPlugin = "0.47.0"
-wire = "5.0.0"
+wire = "5.1.0"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }

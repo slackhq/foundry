@@ -11,6 +11,7 @@ Changelog
 - Build against KSP `2.0.20-1.0.25`.
 - Build against AGP `8.6.0`.
 - Build against Gradle `8.10.1`.
+- Apply platform project BOMs to SqlDelight `DialectClasspath` configurations too.
 
 0.19.1
 ------
