@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Apply platform project BOMs to SqlDelight `DialectClasspath` configurations too.
+
 0.19.1
 ------
 
