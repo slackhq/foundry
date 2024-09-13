@@ -16,6 +16,7 @@
 package com.slack.skippy
 
 import com.slack.sgp.common.SgpLogger
+import com.slack.sgp.common.filterToSet
 import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlin.time.measureTimedValue
 import okio.FileSystem
@@ -328,15 +329,19 @@ private data class ChangedProject(
   val gradlePath: String,
   val changedPaths: Set<Path>,
 ) {
-  val testPaths: Set<Path> = changedPaths.filterTo(mutableSetOf(), testPathMatcher::matches)
+  val testPaths =
+    changedPaths.filterToSet {
+      // Have to check both because test fixtures do affect downstream dependents
+      testPathMatcher.matches(it) && !testFixturePathMatcher.matches(it)
+    }
+
   /**
    * Returns true if all changed files are in a test directory and therefore do not carry-over to
    * downstream dependents.
    */
   val onlyTestsAreChanged = testPaths.size == changedPaths.size
 
-  val androidTestPaths: Set<Path> =
-    changedPaths.filterTo(mutableSetOf(), androidTestPathMatcher::matches)
+  val androidTestPaths = changedPaths.filterToSet(androidTestPathMatcher::matches)
   /**
    * Returns true if all changed files are in an androidTest directory and therefore do not
    * carry-over to downstream dependents but *do* affect app-level instrumentation tests.
@@ -347,8 +352,7 @@ private data class ChangedProject(
    * Returns true if all changed files are just `lint-baseline.xml`. This is useful because it means
    * they don't affect downstream dependants.
    */
-  val lintBaseline: Set<Path> =
-    changedPaths.filterTo(mutableSetOf(), lintBaselinePathMatcher::matches)
+  val lintBaseline = changedPaths.filterToSet(lintBaselinePathMatcher::matches)
   val onlyLintBaselineChanged = lintBaseline.size == changedPaths.size
 
   /**
@@ -363,6 +367,7 @@ private data class ChangedProject(
   companion object {
     // This covers snapshot tests too as they are under src/test/snapshots/**
     private val testPathMatcher = "**/src/test*/**".toPathMatcher()
+    private val testFixturePathMatcher = "**/src/testFixtures/**".toPathMatcher()
     private val androidTestPathMatcher = "**/src/androidTest*/**".toPathMatcher()
     private val lintBaselinePathMatcher = "**/lint-baseline.xml".toPathMatcher()
   }

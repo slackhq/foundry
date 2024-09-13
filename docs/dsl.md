@@ -55,6 +55,10 @@ The Compose feature handles setting up Compose in both Android and multiplatform
 boilerplate (see `ComposeUtil.kt`) for applying the right compose-compiler artifact version as well as enabling the
 right controls in the Android plugin.
 
+### Test Fixtures
+
+This enables Gradle test fixtures in a project-agnostic fashion. In JVM projects this will apply the `java-test-fixtures` plugin, in Android projects this will configure the `android.testFixtures.enable` property.
+
 ## Android Features
 
 ### Robolectric

@@ -18,6 +18,7 @@ package slack.gradle
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import slack.gradle.anvil.AnvilMode
@@ -166,6 +167,13 @@ internal constructor(
         .providerFor("sgp.compose.commonCompilerOptions")
         .map { value -> value.split(",").map { it.trim() } }
         .orElse(emptyList())
+
+  /** Relative path to a Compose stability configuration file from the _root_ project. */
+  public val composeStabilityConfigurationPath: Provider<RegularFile>
+    get() =
+      resolver.providerFor("sgp.compose.stabilityConfigurationPath").map {
+        project.rootProject.layout.projectDirectory.file(it)
+      }
 
   /**
    * When this property is present, the "internalRelease" build variant will have an application id
@@ -405,8 +413,8 @@ internal constructor(
    *
    * Should be `:path:to:robolectric-core` format
    */
-  public val robolectricCoreProject: Project
-    get() = project.project(stringProperty("slack.location.robolectric-core"))
+  public val robolectricCoreProject: String?
+    get() = optionalStringProperty("slack.location.robolectric-core")
 
   /**
    * Gradle path to a platform project to be referenced by other projects.

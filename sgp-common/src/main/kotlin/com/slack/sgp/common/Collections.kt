@@ -23,6 +23,10 @@ public fun <T, R> Collection<T>.flatMapToSet(transform: (T) -> Iterable<R>): Set
   return flatMapTo(mutableSetOf(), transform)
 }
 
+public fun <T> Collection<T>.filterToSet(predicate: (T) -> Boolean): Set<T> {
+  return filterTo(mutableSetOf(), predicate)
+}
+
 /**
  * Flips a map. In the context of `ComputeAffectedProjectsTask`, we use this to flip a map of
  * projects to their dependencies to a map of projects to the projects that depend on them. We use

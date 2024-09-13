@@ -4,6 +4,30 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.3
+------
+
+_2024-09-12_
+
+- **Change**: Rename `testFixtures()` feature DSL to `enableTestFixtures()` to disambiguate from Gradle's methods.
+- **New**: Introduce new `sgp.compose.stabilityConfigurationPath` property to specify a Compose configuration file path from the root project. It is also now disallowed to specify this via `sgp.compose.commonCompilerOptions`.
+
+0.19.2
+------
+
+_2024-09-12_
+
+- [sgp] **New**: Add new `slack { features { testFixtures() } }` DSL for enabling test fixtures in a project-agnostic way.
+- [sgp] Make `slack.location.robolectric-core` property optional.
+- [sgp] Clean up duplicate Kotlin JVM argument handling in `KaptGenerateStubsTask`.
+- [sgp] Update to the new compose-compiler-gradle-plugin feature flag API.
+- [sgp] Apply platform project BOMs to SqlDelight `DialectClasspath` configurations too.
+- [sgp] Build against KSP `2.0.20-1.0.25`.
+- [sgp] Build against AGP `8.6.0`.
+- [sgp] Build against Gradle `8.10.1`.
+- [sgp] Build against Wire `5.1.0`.
+- [skippy] Don't treat testFixtures as test sources
+
 0.19.1
 ------
 
