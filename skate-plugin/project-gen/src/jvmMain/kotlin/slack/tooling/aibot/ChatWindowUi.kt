@@ -124,8 +124,6 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
           }
         },
       placeholder = { Text("Start your conversation") },
-      //        keyboardActions = KeyboardActions.Default,
-      //        maxLines = Int.MAX_VALUE,
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
