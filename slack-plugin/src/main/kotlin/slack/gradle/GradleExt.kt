@@ -35,6 +35,7 @@ import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.reflect.TypeOf
 import org.gradle.api.tasks.TaskContainer
@@ -282,3 +283,6 @@ internal inline fun <reified T : Task> TaskContainer.registerOrConfigure(
     in names -> named(taskName) as TaskProvider<T>
     else -> register(taskName, T::class.java)
   }.apply { configure { configureAction() } }
+
+/** Returns a provider that is the inverse of this. */
+internal fun Provider<Boolean>.not(): Provider<Boolean> = map { !it }

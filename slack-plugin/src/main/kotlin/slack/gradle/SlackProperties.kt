@@ -199,9 +199,13 @@ internal constructor(
   public val robolectricIVersion: Int
     get() = intProperty("slack.robolectricIVersion")
 
-  /** Opt out for -Werror, should only be used for prototype projects. */
-  public val allowWarnings: Boolean
-    get() = booleanProperty("slack.allowWarnings")
+  /** Opt out for -Werror. */
+  public val allowWarnings: Provider<Boolean>
+    get() = resolver.booleanProvider("sgp.kotlin.allowWarnings", defaultValue = false)
+
+  /** Opt out for -Werror in tests. */
+  public val allowWarningsInTests: Provider<Boolean>
+    get() = resolver.booleanProvider("sgp.kotlin.allowWarningsInTests", defaultValue = false)
 
   /**
    * Anvil generator projects that should always be included when Anvil is enabled.
