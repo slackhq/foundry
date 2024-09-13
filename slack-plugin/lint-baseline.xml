@@ -147,6 +147,17 @@
     <issue
         id="GradleProjectIsolation"
         message="Avoid using method getRootProject"
+        errorLine1="        project.rootProject.layout.projectDirectory.file(it)"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/slack/gradle/SlackProperties.kt"
+            line="175"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
         errorLine1="    require(project == project.rootProject) {"
         errorLine2="                               ~~~~~~~~~~~">
         <location
