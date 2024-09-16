@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,11 +59,10 @@ import org.jetbrains.jewel.ui.component.Text
 import org.jetbrains.jewel.ui.component.TextArea
 
 @Composable
-fun ChatWindow(modifier: Modifier = Modifier) {
-  var messages by remember { mutableStateOf(listOf<Message>()) }
-  Column(modifier = Modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
+  Column(modifier = modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
     LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
-      items(messages.reversed()) { message ->
+      items(state.messages.reversed()) { message ->
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start,
@@ -74,18 +72,14 @@ fun ChatWindow(modifier: Modifier = Modifier) {
       }
     }
     ConversationField(
-      modifier = modifier,
-      onSendMessage = { userMessage ->
-        messages = messages + Message(userMessage, true)
-        val response = callApi(userMessage)
-        messages = messages + Message(response, false)
-      },
+      modifier = Modifier,
+      onSendMessage = { userMessage -> state.eventSink(ChatScreen.Event.SendMessage(userMessage)) },
     )
   }
 }
 
 @Composable
-fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
+private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
   var textValue by remember { mutableStateOf(TextFieldValue()) }
   val isTextNotEmpty = textValue.text.isNotBlank()
 
@@ -130,8 +124,6 @@ fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> 
           }
         },
       placeholder = { Text("Start your conversation") },
-      keyboardActions = KeyboardActions.Default,
-      maxLines = Int.MAX_VALUE,
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
@@ -155,7 +147,7 @@ fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> 
 }
 
 @Composable
-fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
+private fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
   Box(
     Modifier.wrapContentWidth()
       .padding(8.dp)
@@ -174,14 +166,6 @@ fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
   }
 }
 
-fun Modifier.enabled(enabled: Boolean): Modifier {
+private fun Modifier.enabled(enabled: Boolean): Modifier {
   return this.then(if (enabled) Modifier.alpha(1.0f) else Modifier.alpha(0.38f))
 }
-
-fun callApi(message: String): String {
-  // function set up to call the DevXP API in the future.
-  // right now, just sends back the user input message
-  return (message)
-}
-
-data class Message(val text: String, val isMe: Boolean)

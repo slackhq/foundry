@@ -15,7 +15,11 @@
  */
 package slack.tooling.aibot
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposePanel
+import com.slack.circuit.foundation.Circuit
+import com.slack.circuit.foundation.CircuitContent
 import java.awt.Dimension
 import javax.swing.JComponent
 import slack.tooling.projectgen.SlackDesktopTheme
@@ -24,7 +28,19 @@ object ChatPanel {
   fun createPanel(): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
-      setContent { SlackDesktopTheme { ChatWindow() } }
+      setContent { SlackDesktopTheme { ChatApp() } }
     }
+  }
+
+  @Composable
+  private fun ChatApp() {
+    val circuit = remember {
+      Circuit.Builder()
+        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter())
+        .addUi<ChatScreen, ChatScreen.State> { state, modifier -> ChatWindowUi(state, modifier) }
+        .build()
+    }
+
+    CircuitContent(ChatScreen, circuit = circuit)
   }
 }
