@@ -27,6 +27,15 @@ import kotlinx.coroutines.withContext
 
 class ChatBotActionService {
   suspend fun executeCommand(question: String): String {
+    val jsonInput = createJsonInput(question)
+    val scriptContent = createScriptContent(jsonInput)
+    val tempScript = createTempScript(scriptContent)
+    val output = runScript(tempScript)
+    tempScript.delete()
+    return parseOutput(output)
+  }
+
+  private fun createJsonInput(question: String): String {
     val gsonInput = Gson()
     val jsonObjectInput =
       JsonObject().apply {
@@ -46,20 +55,30 @@ class ChatBotActionService {
       }
 
     val content = gsonInput.toJson(jsonObjectInput)
+    return content
+  }
 
+  private fun createScriptContent(jsonInput: String): String {
     val scriptContent =
       """
         #!/bin/bash
         export PATH="/usr/local/bin:/usr/bin:${'$'}PATH"
         export SSH_OPTIONS="-T"
 
-        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/ -H "Content-Type: application/json" -d '$content'
+        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/ -H "Content-Type: application/json" -d '$jsonInput'
     """
         .trimIndent()
+    return scriptContent
+  }
 
+  suspend fun createTempScript(scriptContent: String): File {
     val tempScript = withContext(Dispatchers.IO) { File.createTempFile("run_command", ".sh") }
     tempScript.writeText(scriptContent)
     tempScript.setExecutable(true)
+    return tempScript
+  }
+
+  private fun runScript(tempScript: File): String {
 
     val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
     processBuilder.redirectErrorStream(true)
@@ -81,7 +100,10 @@ class ChatBotActionService {
     }
 
     tempScript.delete()
+    return output.toString()
+  }
 
+  private fun parseOutput(output: String): String {
     val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
     val result = regex.find(output.toString())?.value ?: "{}"
     val gson = Gson()
@@ -92,4 +114,74 @@ class ChatBotActionService {
 
     return actualContent
   }
+
+  // original suspend function command before splitting up:
+  //    suspend fun executeCommand(question: String): String {
+  //        val gsonInput = Gson()
+  //        val jsonObjectInput =
+  //            JsonObject().apply {
+  //                add(
+  //                    "messages",
+  //                    JsonArray().apply {
+  //                        add(
+  //                            JsonObject().apply {
+  //                                addProperty("role", "user")
+  //                                addProperty("content", question)
+  //                            }
+  //                        )
+  //                    },
+  //                )
+  //                addProperty("source", "curl")
+  //                addProperty("max_tokens", 2048)
+  //            }
+  //
+  //        val content = gsonInput.toJson(jsonObjectInput)
+  //
+  //        val scriptContent =
+  //            """
+  //        #!/bin/bash
+  //        export PATH="/usr/local/bin:/usr/bin:${'$'}PATH"
+  //        export SSH_OPTIONS="-T"
+  //
+  //        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/
+  // -H "Content-Type: application/json" -d '$content'
+  //    """
+  //                .trimIndent()
+  //
+  //        val tempScript = withContext(Dispatchers.IO) { File.createTempFile("run_command", ".sh")
+  // }
+  //        tempScript.writeText(scriptContent)
+  //        tempScript.setExecutable(true)
+  //
+  //        val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
+  //        processBuilder.redirectErrorStream(true)
+  //
+  //        val process = processBuilder.start()
+  //        val output = StringBuilder()
+  //
+  //        BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
+  //            var line: String?
+  //            while (reader.readLine().also { line = it } != null) {
+  //                output.append(line).append("\n")
+  //            }
+  //        }
+  //
+  //        val completed = process.waitFor(600, TimeUnit.SECONDS)
+  //        if (!completed) {
+  //            process.destroyForcibly()
+  //            throw RuntimeException("Process timed out after 600 seconds")
+  //        }
+  //
+  //        tempScript.delete()
+  //
+  //        val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
+  //        val result = regex.find(output.toString())?.value ?: "{}"
+  //        val gson = Gson()
+  //        val jsonObject = gson.fromJson(result, JsonObject::class.java)
+  //        val contentArray = jsonObject.getAsJsonArray("content")
+  //        val contentObject = contentArray.get(0).asJsonObject
+  //        val actualContent = contentObject.get("content").asString
+  //
+  //        return actualContent
+  //    }
 }

@@ -38,7 +38,7 @@ class ChatPresenter : Presenter<ChatScreen.State> {
           val newMessage = Message(event.message, isMe = true)
           messages = messages + newMessage
 
-          CoroutineScope(Dispatchers.Main).launch {
+          CoroutineScope(Dispatchers.IO).launch {
             println("${newMessage}")
             println("ChatPresenter: Fetching a quote")
             val response = chatBotActionService.executeCommand(event.message)
