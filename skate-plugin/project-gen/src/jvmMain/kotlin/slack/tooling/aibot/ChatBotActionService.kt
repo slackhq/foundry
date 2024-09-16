@@ -24,6 +24,7 @@ import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.annotations.VisibleForTesting
 
 class ChatBotActionService {
   suspend fun executeCommand(question: String): String {
@@ -35,6 +36,7 @@ class ChatBotActionService {
     return parseOutput(output)
   }
 
+  @VisibleForTesting
   private fun createJsonInput(question: String): String {
     val gsonInput = Gson()
     val jsonObjectInput =
@@ -58,6 +60,7 @@ class ChatBotActionService {
     return content
   }
 
+  @VisibleForTesting
   private fun createScriptContent(jsonInput: String): String {
     val scriptContent =
       """
@@ -78,6 +81,7 @@ class ChatBotActionService {
     return tempScript
   }
 
+  @VisibleForTesting
   private fun runScript(tempScript: File): String {
 
     val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
@@ -103,6 +107,7 @@ class ChatBotActionService {
     return output.toString()
   }
 
+  @VisibleForTesting
   private fun parseOutput(output: String): String {
     val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
     val result = regex.find(output.toString())?.value ?: "{}"
