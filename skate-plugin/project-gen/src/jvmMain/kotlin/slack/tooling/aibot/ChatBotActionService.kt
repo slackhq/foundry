@@ -20,60 +20,10 @@ import com.google.gson.JsonObject
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.*
 
 class ChatBotActionService {
-  //  private val retrofit: Retrofit
-  //
-  //  init {
-  //    val loggingInterceptor =
-  //      HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-  //
-  //    val client = OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
-  //
-  //    retrofit =
-  //      Retrofit.Builder()
-  //        .baseUrl("https://jsonplaceholder.typicode.com/")
-  //        .client(client)
-  //        .addConverterFactory(GsonConverterFactory.create())
-  //        .build()
-  //  }
-
-  //  interface JsonPlaceholderApi {
-  //    @GET("posts")
-  //    suspend fun getPosts(): List<Post>
-  //  }
-
-  //  private val api: JsonPlaceholderApi = retrofit.create(JsonPlaceholderApi::class.java)
-
-  //  suspend fun executeCommand(userInput: String): String {
-  //    println("Received input: '$userInput'. Fetching a random post.")
-  //    return withContext(Dispatchers.IO) {
-  //      try {
-  //        val posts = api.getPosts()
-  //        val randomPost = posts[Random.nextInt(posts.size)]
-  //        """I received your message: "$userInput"
-  //                Here's a random post for you:
-  //                Title: ${randomPost.title}
-  //                Body: ${randomPost.body}
-  //                """.trimIndent()
-  //      } catch (e: Exception) {
-  //        println("Error fetching post: ${e.message}")
-  //        e.printStackTrace()
-  //        "I received your message, but I'm unable to fetch a post at this time. Error:
-  // ${e.message}"
-  //      }
-  //    }
-  //  }
-  //
-  //  data class Post(
-  //    val id: Int,
-  //    val title: String,
-  //    val body: String,
-  //    val userId: Int
-  //  )
   suspend fun executeCommand(question: String): String {
-    val jsonContent =
+    val content =
       """
         {
             "messages": [{"role": "user", "content": "$question"}],
@@ -89,7 +39,7 @@ class ChatBotActionService {
         export PATH="/usr/local/bin:/usr/bin:${'$'}PATH"
         export SSH_OPTIONS="-T"
 
-        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/ -H "Content-Type: application/json" -d '$jsonContent'
+        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/ -H "Content-Type: application/json" -d '$content'
     """
         .trimIndent()
 
@@ -115,8 +65,6 @@ class ChatBotActionService {
       val actualContent = contentObject.get("content").asString
 
       actualContent
-
-      //        output
     }
   }
 }
