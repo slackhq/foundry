@@ -16,22 +16,36 @@
 package slack.tooling.aibot
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class ChatBotActionService {
   suspend fun executeCommand(question: String): String {
-    val content =
-      """
-        {
-            "messages": [{"role": "user", "content": "$question"}],
-            "source": "curl",
-            "max_tokens": 2048
-        }
-    """
-        .trimIndent()
+    val gsonInput = Gson()
+    val jsonObjectInput =
+      JsonObject().apply {
+        add(
+          "messages",
+          JsonArray().apply {
+            add(
+              JsonObject().apply {
+                addProperty("role", "user")
+                addProperty("content", question)
+              }
+            )
+          },
+        )
+        addProperty("source", "curl")
+        addProperty("max_tokens", 2048)
+      }
+
+    val content = gsonInput.toJson(jsonObjectInput)
 
     val scriptContent =
       """
@@ -43,28 +57,39 @@ class ChatBotActionService {
     """
         .trimIndent()
 
-    return withContext(Dispatchers.IO) {
-      val tempScript = File.createTempFile("run_command", ".sh")
-      tempScript.writeText(scriptContent)
-      tempScript.setExecutable(true)
+    val tempScript = withContext(Dispatchers.IO) { File.createTempFile("run_command", ".sh") }
+    tempScript.writeText(scriptContent)
+    tempScript.setExecutable(true)
 
-      val process =
-        ProcessBuilder("/bin/bash", tempScript.absolutePath).redirectErrorStream(true).start()
+    val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
+    processBuilder.redirectErrorStream(true)
 
-      val output = process.inputStream.bufferedReader().use { it.readText() }
-      process.waitFor()
+    val process = processBuilder.start()
+    val output = StringBuilder()
 
-      tempScript.delete()
-
-      val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
-      val result = regex.find(output.toString())?.value ?: "{}"
-      val gson = Gson()
-      val jsonObject = gson.fromJson(result, JsonObject::class.java)
-      val contentArray = jsonObject.getAsJsonArray("content")
-      val contentObject = contentArray.get(0).asJsonObject
-      val actualContent = contentObject.get("content").asString
-
-      actualContent
+    BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
+      var line: String?
+      while (reader.readLine().also { line = it } != null) {
+        output.append(line).append("\n")
+      }
     }
+
+    val completed = process.waitFor(600, TimeUnit.SECONDS)
+    if (!completed) {
+      process.destroyForcibly()
+      throw RuntimeException("Process timed out after 600 seconds")
+    }
+
+    tempScript.delete()
+
+    val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
+    val result = regex.find(output.toString())?.value ?: "{}"
+    val gson = Gson()
+    val jsonObject = gson.fromJson(result, JsonObject::class.java)
+    val contentArray = jsonObject.getAsJsonArray("content")
+    val contentObject = contentArray.get(0).asJsonObject
+    val actualContent = contentObject.get("content").asString
+
+    return actualContent
   }
 }
