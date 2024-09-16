@@ -21,8 +21,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChatPresenter : Presenter<ChatScreen.State> {
+  private val chatBotActionService = ChatBotActionService()
+
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
@@ -32,16 +37,16 @@ class ChatPresenter : Presenter<ChatScreen.State> {
         is ChatScreen.Event.SendMessage -> {
           val newMessage = Message(event.message, isMe = true)
           messages = messages + newMessage
-          val response = Message(callApi(event.message), isMe = false)
-          messages = messages + response
+
+          CoroutineScope(Dispatchers.Main).launch {
+            println("${newMessage}")
+            println("ChatPresenter: Fetching a quote")
+            val response = chatBotActionService.executeCommand(event.message)
+            println("ChatPresenter: Received response: $newMessage")
+            messages = messages + Message(response, isMe = false)
+          }
         }
       }
     }
-  }
-
-  private fun callApi(message: String): String {
-    // function set up to call the DevXP API in the future.
-    // right now, just sends back the user input message
-    return ("I am a bot. You said \"${message}\"")
   }
 }
