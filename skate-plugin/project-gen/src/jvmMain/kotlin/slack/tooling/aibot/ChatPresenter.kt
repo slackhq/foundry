@@ -26,6 +26,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChatPresenter : Presenter<ChatScreen.State> {
+  val user = "user"
+  val bot = "bot"
   private val chatBotActionService = ChatBotActionService()
 
   @Composable
@@ -35,7 +37,7 @@ class ChatPresenter : Presenter<ChatScreen.State> {
     return ChatScreen.State(messages = messages) { event ->
       when (event) {
         is ChatScreen.Event.SendMessage -> {
-          val newMessage = Message(event.message, isMe = true)
+          val newMessage = Message(role = user, event.message)
           messages = messages + newMessage
 
           CoroutineScope(Dispatchers.IO).launch {
@@ -43,7 +45,7 @@ class ChatPresenter : Presenter<ChatScreen.State> {
             println("ChatPresenter: Fetching a quote")
             val response = chatBotActionService.executeCommand(event.message)
             println("ChatPresenter: Received response: $newMessage")
-            messages = messages + Message(response, isMe = false)
+            messages = messages + Message(role = user, response)
           }
         }
       }

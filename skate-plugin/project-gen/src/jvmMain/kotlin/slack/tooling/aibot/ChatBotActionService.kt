@@ -16,6 +16,7 @@
 package slack.tooling.aibot
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.BufferedReader
 import java.io.File
@@ -38,11 +39,37 @@ class ChatBotActionService {
   @VisibleForTesting
   private fun createJsonInput(question: String): String {
     val gsonInput = Gson()
-    val content =
-      Content(messages = listOf(Message(question, isMe = true)), source = "curl", max_tokens = 2048)
+    val jsonObjectInput =
+      Content(
+        messages = listOf(Message(role = "user", question)),
+        source = "curl",
+        max_tokens = 2048,
+      )
 
-    val jsonContent = gsonInput.toJson(content)
-    return jsonContent
+    val jsonObjectInput2 =
+      JsonObject().apply {
+        add(
+          "messages",
+          JsonArray().apply {
+            add(
+              JsonObject().apply {
+                addProperty("role", "user")
+                addProperty("content", question)
+              }
+            )
+          },
+        )
+        addProperty("source", "curl")
+        addProperty("max_tokens", 2048)
+      }
+
+    val content = gsonInput.toJson(jsonObjectInput)
+    val content2 = gsonInput.toJson(jsonObjectInput2)
+
+    println("jsonContent ${content}")
+    println("jsonContent2 ${content2}")
+
+    return content
   }
 
   @VisibleForTesting
@@ -94,6 +121,7 @@ class ChatBotActionService {
 
   @VisibleForTesting
   private fun parseOutput(output: String): String {
+    println("output: ${output}")
     val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
     val result = regex.find(output.toString())?.value ?: "{}"
     val gson = Gson()
@@ -101,6 +129,8 @@ class ChatBotActionService {
     val contentArray = jsonObject.getAsJsonArray("content")
     val contentObject = contentArray.get(0).asJsonObject
     val actualContent = contentObject.get("content").asString
+
+    println("actual content ${actualContent}")
 
     return actualContent
   }
@@ -110,74 +140,4 @@ class ChatBotActionService {
     val source: String = "curl",
     val max_tokens: Int = 512,
   )
-
-  // original suspend function command before splitting up:
-  //    suspend fun executeCommand(question: String): String {
-  //        val gsonInput = Gson()
-  //        val jsonObjectInput =
-  //            JsonObject().apply {
-  //                add(
-  //                    "messages",
-  //                    JsonArray().apply {
-  //                        add(
-  //                            JsonObject().apply {
-  //                                addProperty("role", "user")
-  //                                addProperty("content", question)
-  //                            }
-  //                        )
-  //                    },
-  //                )
-  //                addProperty("source", "curl")
-  //                addProperty("max_tokens", 2048)
-  //            }
-  //
-  //        val content = gsonInput.toJson(jsonObjectInput)
-  //
-  //        val scriptContent =
-  //            """
-  //        #!/bin/bash
-  //        export PATH="/usr/local/bin:/usr/bin:${'$'}PATH"
-  //        export SSH_OPTIONS="-T"
-  //
-  //        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/
-  // -H "Content-Type: application/json" -d '$content'
-  //    """
-  //                .trimIndent()
-  //
-  //        val tempScript = withContext(Dispatchers.IO) { File.createTempFile("run_command", ".sh")
-  // }
-  //        tempScript.writeText(scriptContent)
-  //        tempScript.setExecutable(true)
-  //
-  //        val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
-  //        processBuilder.redirectErrorStream(true)
-  //
-  //        val process = processBuilder.start()
-  //        val output = StringBuilder()
-  //
-  //        BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-  //            var line: String?
-  //            while (reader.readLine().also { line = it } != null) {
-  //                output.append(line).append("\n")
-  //            }
-  //        }
-  //
-  //        val completed = process.waitFor(600, TimeUnit.SECONDS)
-  //        if (!completed) {
-  //            process.destroyForcibly()
-  //            throw RuntimeException("Process timed out after 600 seconds")
-  //        }
-  //
-  //        tempScript.delete()
-  //
-  //        val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
-  //        val result = regex.find(output.toString())?.value ?: "{}"
-  //        val gson = Gson()
-  //        val jsonObject = gson.fromJson(result, JsonObject::class.java)
-  //        val contentArray = jsonObject.getAsJsonArray("content")
-  //        val contentObject = contentArray.get(0).asJsonObject
-  //        val actualContent = contentObject.get("content").asString
-  //
-  //        return actualContent
-  //    }
 }

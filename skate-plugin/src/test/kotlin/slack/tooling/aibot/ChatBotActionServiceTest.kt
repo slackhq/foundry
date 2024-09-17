@@ -54,9 +54,10 @@ class ChatBotActionServiceTest {
   }
 
   private fun createJsonInput(question: String): String {
+    val user = "user"
     val gsonInput = Gson()
     val content =
-      Content(messages = listOf(Message(question, isMe = true)), source = "curl", max_tokens = 2048)
+      Content(messages = listOf(Message(role = user, question)), source = "curl", max_tokens = 2048)
 
     val jsonContent = gsonInput.toJson(content)
     return jsonContent
