@@ -16,7 +16,6 @@
 package slack.tooling.aibot
 
 import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.BufferedReader
 import java.io.File
@@ -39,25 +38,11 @@ class ChatBotActionService {
   @VisibleForTesting
   private fun createJsonInput(question: String): String {
     val gsonInput = Gson()
-    val jsonObjectInput =
-      JsonObject().apply {
-        add(
-          "messages",
-          JsonArray().apply {
-            add(
-              JsonObject().apply {
-                addProperty("role", "user")
-                addProperty("content", question)
-              }
-            )
-          },
-        )
-        addProperty("source", "curl")
-        addProperty("max_tokens", 2048)
-      }
+    val content =
+      Content(messages = listOf(Message(question, isMe = true)), source = "curl", max_tokens = 2048)
 
-    val content = gsonInput.toJson(jsonObjectInput)
-    return content
+    val jsonContent = gsonInput.toJson(content)
+    return jsonContent
   }
 
   @VisibleForTesting
@@ -119,6 +104,12 @@ class ChatBotActionService {
 
     return actualContent
   }
+
+  data class Content(
+    val messages: List<Message>,
+    val source: String = "curl",
+    val max_tokens: Int = 512,
+  )
 
   // original suspend function command before splitting up:
   //    suspend fun executeCommand(question: String): String {
