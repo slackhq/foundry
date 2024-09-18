@@ -15,7 +15,8 @@
  */
 package com.slack.skippy
 
-import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.command.SuspendingCliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
@@ -33,7 +34,6 @@ import kotlin.io.path.readText
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newFixedThreadPoolContext
-import kotlinx.coroutines.runBlocking
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 
@@ -41,10 +41,10 @@ import okio.Path.Companion.toOkioPath
  * @see AffectedProjectsComputer for most of the salient docs! The inputs in this CLI more or less
  *   match 1:1 to the properties of that class.
  */
-public class ComputeAffectedProjectsCli :
-  CliktCommand(
-    help = "Computes affected projects and writes output files to an output directory."
-  ) {
+public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
+
+  override fun help(context: Context): String =
+    "Computes affected projects and writes output files to an output directory."
 
   private val debug: Boolean by
     option("--debug", help = "Enable debug logging.").flag(default = false)
@@ -102,7 +102,7 @@ public class ComputeAffectedProjectsCli :
   private val logger = SgpLogger.clikt(this)
 
   @OptIn(DelicateCoroutinesApi::class)
-  override fun run() {
+  override suspend fun run() {
     val moshi = Moshi.Builder().build()
     val dependencyGraph =
       ObjectInputStream(serializedDependencyGraph.inputStream()).use {
@@ -136,15 +136,11 @@ public class ComputeAffectedProjectsCli :
         .run(context)
     }
 
-    runBlocking {
-      if (parallelism == 1) {
-        body(Dispatchers.Unconfined)
-      } else {
-        logger.lifecycle("Running $parallelism configs in parallel")
-        newFixedThreadPoolContext(3, "computeAffectedProjects").use { dispatcher ->
-          body(dispatcher)
-        }
-      }
+    if (parallelism == 1) {
+      body(Dispatchers.Unconfined)
+    } else {
+      logger.lifecycle("Running $parallelism configs in parallel")
+      newFixedThreadPoolContext(3, "computeAffectedProjects").use { dispatcher -> body(dispatcher) }
     }
   }
 }
