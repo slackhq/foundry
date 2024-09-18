@@ -15,12 +15,13 @@
  */
 package com.slack.skippy
 
-import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.BaseCliktCommand
 import com.slack.sgp.common.SgpLogger
 
-internal fun SgpLogger.Companion.clikt(command: CliktCommand): SgpLogger = CliktSgpLogger(command)
+internal fun SgpLogger.Companion.clikt(command: BaseCliktCommand<*>): SgpLogger =
+  CliktSgpLogger(command)
 
-private class CliktSgpLogger(private val command: CliktCommand) : SgpLogger {
+private class CliktSgpLogger(private val command: BaseCliktCommand<*>) : SgpLogger {
   override fun debug(message: String) {
     command.echo(message)
   }
