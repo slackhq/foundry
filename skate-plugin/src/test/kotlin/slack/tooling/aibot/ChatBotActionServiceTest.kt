@@ -21,15 +21,8 @@ import org.junit.Test
 
 class ChatBotActionServiceTest {
   @Test
-  fun `say 1+1 equals 2`() {
-    val result = 1 + 1
-    val actual = 2
-    assertThat(actual).isEqualTo(result)
-  }
-
-  @Test
   fun `test creating the Json input`() {
-    val question = "What's the capital of Canada"
+    val question = "Why is the sky blue?"
 
     val result = createJsonInput(question)
 
@@ -39,27 +32,30 @@ class ChatBotActionServiceTest {
             "messages": [
             {
                 "role": "user",
-                "content": "What's the capital of Canada"
+                "content": "Why is the sky blue?"
             }
         ],
         "source": "curl",
-        "max_tokens": 2048
+        "max_tokens": 512
+        }
     """
         .trimIndent()
 
-    println("expected is ${expectedJson}")
-    println("actual is ${result}")
+    val trimmedExpected = expectedJson.replace(Regex("\\s"), "")
+    val trimmedResult = result.replace(Regex("\\s"), "")
+    println("expected is ${trimmedExpected}")
+    println("actual is ${trimmedResult}")
 
-    assertThat(result).isEqualTo(expectedJson)
+    assertThat(trimmedResult).isEqualTo(trimmedExpected)
   }
 
   private fun createJsonInput(question: String): String {
     val user = "user"
     val gsonInput = Gson()
     val content =
-      Content(messages = listOf(Message(role = user, question)), source = "curl", max_tokens = 2048)
+      Content(messages = listOf(Message(role = user, question)), source = "curl", max_tokens = 512)
 
-    val jsonContent = gsonInput.toJson(content)
+    val jsonContent = gsonInput.toJson(content).toString()
     return jsonContent
   }
 

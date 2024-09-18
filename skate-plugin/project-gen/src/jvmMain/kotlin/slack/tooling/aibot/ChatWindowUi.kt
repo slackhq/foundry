@@ -149,9 +149,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
 
 @Composable
 private fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
-  val user = "user"
-  val isMe = message.role == user
-
+  val isMe = message.role == "user"
   Box(
     Modifier.wrapContentWidth()
       .padding(8.dp)

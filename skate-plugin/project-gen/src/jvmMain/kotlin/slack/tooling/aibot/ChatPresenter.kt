@@ -45,7 +45,7 @@ class ChatPresenter : Presenter<ChatScreen.State> {
             println("ChatPresenter: Fetching a quote")
             val response = chatBotActionService.executeCommand(event.message)
             println("ChatPresenter: Received response: $newMessage")
-            messages = messages + Message(role = user, response)
+            messages = messages + Message(role = bot, response)
           }
         }
       }
