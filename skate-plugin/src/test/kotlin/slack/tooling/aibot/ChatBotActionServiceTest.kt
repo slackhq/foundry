@@ -17,11 +17,13 @@ package slack.tooling.aibot
 
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
 class ChatBotActionServiceTest {
   @Test
-  fun `test creating the Json input`() {
+  fun `createJsonInput with simple input`() {
     val question = "Why is the sky blue?"
 
     val result = createJsonInput(question)
@@ -43,10 +45,35 @@ class ChatBotActionServiceTest {
 
     val trimmedExpected = expectedJson.replace(Regex("\\s"), "")
     val trimmedResult = result.replace(Regex("\\s"), "")
-    println("expected is ${trimmedExpected}")
-    println("actual is ${trimmedResult}")
+    println("expected is $trimmedExpected")
+    println("actual is $trimmedResult")
 
     assertThat(trimmedResult).isEqualTo(trimmedExpected)
+  }
+
+  @Test
+  fun `createJsonInput with long strings`() {
+    val question = "A".repeat(10000)
+    val result = createJsonInput(question)
+    println("result $result")
+    val jsonObject = Gson().fromJson(result, JsonObject::class.java)
+    println(jsonObject)
+    assertEquals(
+      question,
+      jsonObject.get("messages").asJsonArray[0].asJsonObject.get("content").asString,
+    )
+  }
+
+  @Test
+  fun `createJsonInput with special characters`() {
+    val question = "What about \n, \t, and \"quotes\"? and \'apostrophes"
+    val result = createJsonInput(question)
+    println("result $result")
+    val jsonObject = Gson().fromJson(result, JsonObject::class.java)
+    assertEquals(
+      question,
+      jsonObject.get("messages").asJsonArray[0].asJsonObject.get("content").asString,
+    )
   }
 
   private fun createJsonInput(question: String): String {

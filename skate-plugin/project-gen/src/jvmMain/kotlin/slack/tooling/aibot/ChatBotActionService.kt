@@ -16,7 +16,6 @@
 package slack.tooling.aibot
 
 import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.BufferedReader
 import java.io.File
@@ -46,28 +45,9 @@ class ChatBotActionService {
         max_tokens = 2048,
       )
 
-    val jsonObjectInput2 =
-      JsonObject().apply {
-        add(
-          "messages",
-          JsonArray().apply {
-            add(
-              JsonObject().apply {
-                addProperty("role", "user")
-                addProperty("content", question)
-              }
-            )
-          },
-        )
-        addProperty("source", "curl")
-        addProperty("max_tokens", 2048)
-      }
-
     val content = gsonInput.toJson(jsonObjectInput)
-    val content2 = gsonInput.toJson(jsonObjectInput2)
 
-    println("jsonContent ${content}")
-    println("jsonContent2 ${content2}")
+    println("jsonContent $content")
 
     return content
   }
@@ -86,7 +66,8 @@ class ChatBotActionService {
     return scriptContent
   }
 
-  suspend fun createTempScript(scriptContent: String): File {
+  @VisibleForTesting
+  private suspend fun createTempScript(scriptContent: String): File {
     val tempScript = withContext(Dispatchers.IO) { File.createTempFile("run_command", ".sh") }
     tempScript.writeText(scriptContent)
     tempScript.setExecutable(true)
@@ -121,7 +102,7 @@ class ChatBotActionService {
 
   @VisibleForTesting
   private fun parseOutput(output: String): String {
-    println("output: ${output}")
+    println("output: $output")
     val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
     val result = regex.find(output.toString())?.value ?: "{}"
     val gson = Gson()
@@ -130,7 +111,7 @@ class ChatBotActionService {
     val contentObject = contentArray.get(0).asJsonObject
     val actualContent = contentObject.get("content").asString
 
-    println("actual content ${actualContent}")
+    println("actual content $actualContent")
 
     return actualContent
   }
