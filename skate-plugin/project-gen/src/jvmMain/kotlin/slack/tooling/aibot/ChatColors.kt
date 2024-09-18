@@ -24,12 +24,12 @@ object ChatColors {
   val promptBackground = Color(0xFF45494A)
 
   // Color(0xFF2d2f30) responseBackground
-  val responseBackground: Color
-    @Composable @ReadOnlyComposable get() = JewelTheme.globalColors.infoContent
+  val responseBackground = Color(0xFF2d2f30)
+//    @Composable @ReadOnlyComposable get() = JewelTheme.globalColors.infoContent
 
   // Color(0xFFEAEEF7) userTextColor
-  val userTextColor: Color
-    @Composable @ReadOnlyComposable get() = JewelTheme.globalColors.infoContent
+  val userTextColor = Color(0xFFEAEEF7)
+//    @Composable @ReadOnlyComposable get() = JewelTheme.globalColors.infoContent
 
   val responseTextColor = Color(0xFFE0EEF7)
 }
