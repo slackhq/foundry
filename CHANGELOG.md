@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Change `slack.allowWarnings` property to `sgp.kotlin.allowWarnings`.
+- Disallow warnings in Kotlin test compilations by default, add `sgp.kotlin.allowWarningsInTests` property to opt-out.
+
 0.19.3
 ------
 

@@ -37,8 +37,10 @@ import slack.gradle.SlackTools
 import slack.gradle.asProvider
 import slack.gradle.configure
 import slack.gradle.lint.DetektTasks
+import slack.gradle.not
 import slack.gradle.onFirst
 import slack.gradle.util.configureKotlinCompilationTask
+import slack.gradle.util.setDisallowChanges
 
 /** Common configuration for Kotlin projects. */
 internal object KgpTasks {
@@ -179,11 +181,10 @@ internal object KgpTasks {
             slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
           )
         }
-        if (
-          !slackProperties.allowWarnings &&
-            !this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)
-        ) {
-          allWarningsAsErrors.set(true)
+        if (this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)) {
+          allWarningsAsErrors.setDisallowChanges(slackProperties.allowWarningsInTests.not())
+        } else {
+          allWarningsAsErrors.setDisallowChanges(slackProperties.allowWarnings.not())
         }
         freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
 
