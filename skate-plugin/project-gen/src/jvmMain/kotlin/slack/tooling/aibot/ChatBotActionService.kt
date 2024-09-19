@@ -56,12 +56,8 @@ class ChatBotActionService {
   private fun createScriptContent(jsonInput: String): String {
     val scriptContent =
       """
-        #!/bin/bash
-        export PATH="/usr/local/bin:/usr/bin:${'$'}PATH"
-        export SSH_OPTIONS="-T"
-
-        /usr/local/bin/slack-uberproxy-curl -X POST https://devxp-ai-api.tinyspeck.com/v1/chat/ -H "Content-Type: application/json" -d '$jsonInput'
-    """
+        temp
+      """
         .trimIndent()
     return scriptContent
   }
