@@ -99,7 +99,7 @@ gradlePlugins-versions = { module = "com.github.ben-manes:gradle-versions-plugin
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
 guava = "com.google.guava:guava:33.3.0-jre"
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
-kotlinCliUtil = "com.slack.cli:kotlin-cli-util:2.6.3"
+kotlinCliUtil = "com.slack.cli:kotlin-cli-util:3.0.0"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
