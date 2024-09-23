@@ -24,7 +24,19 @@ group = "com.slack.intellij"
 
 version = property("VERSION_NAME").toString()
 
-repositories { mavenCentral() }
+intellijPlatform {
+  pluginConfiguration {
+    name = "Artifactory Authenticator"
+    id = "com.slack.intellij.artifactory"
+    version = property("VERSION_NAME").toString()
+    description = "A plugin for authenticating plugin repositories with Artifactory."
+    vendor {
+      name = "Slack"
+      url = "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin/artifactory-authenticator"
+      email = "oss@slack-corp.com"
+    }
+  }
+}
 
 dependencies {
   testImplementation(libs.junit)

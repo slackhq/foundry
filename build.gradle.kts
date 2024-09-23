@@ -27,9 +27,10 @@ import java.net.URI
 import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.intellij.IntelliJPluginExtension
-import org.jetbrains.intellij.tasks.BuildPluginTask
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
+import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
+import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
+import org.jetbrains.intellij.platform.gradle.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
@@ -221,6 +222,7 @@ subprojects {
       compilerOptions {
         val kotlinVersion =
           if (isForIntelliJPlugin) {
+            // TODO bump to 1.9 with 2024.1
             KOTLIN_1_8
           } else {
             KOTLIN_1_9
@@ -329,12 +331,21 @@ subprojects {
   }
 
   if (isForIntelliJPlugin) {
-    project.pluginManager.withPlugin("org.jetbrains.intellij") {
-      configure<IntelliJPluginExtension> {
-        version.set("2023.2.1")
-        type.set("IC")
-        // Don't assign untilBuild to sinceBuild
-        updateSinceUntilBuild.set(false)
+    project.pluginManager.withPlugin("org.jetbrains.intellij.platform") {
+      configure<IntelliJPlatformExtension> {
+        pluginConfiguration {
+          ideaVersion {
+            // Don't assign untilBuild to sinceBuild
+            sinceBuild.set(project.provider { null })
+            untilBuild.set(project.provider { null })
+          }
+        }
+      }
+      project.dependencies {
+        configure<IntelliJPlatformDependenciesExtension> {
+          // TODO move up to 2024.1.2
+          intellijIdeaCommunity("2023.2.1")
+        }
       }
 
       data class PluginDetails(
@@ -346,6 +357,7 @@ subprojects {
         val urlSuffix: String,
       )
 
+      // TODO most of this can maybe move to pluginConfiguration {} above
       val pluginDetails =
         PluginDetails(
           pluginId = property("PLUGIN_ID").toString(),
@@ -360,7 +372,7 @@ subprojects {
         sinceBuild.set(pluginDetails.sinceBuild)
         pluginId.set(pluginDetails.pluginId)
         pluginDescription.set(pluginDetails.description)
-        version.set(pluginDetails.version)
+        pluginVersion.set(pluginDetails.version)
       }
 
       if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
