@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Add workaround for KGP not applying `sourceInformation` compose options in android projects and default it to true.
+
 0.19.4
 ------
 
