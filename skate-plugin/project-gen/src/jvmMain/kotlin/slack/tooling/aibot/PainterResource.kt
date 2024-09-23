@@ -28,39 +28,36 @@ import org.jetbrains.compose.resources.decodeToSvgPainter
 
 // Migration snippet copied from https://github.com/JetBrains/compose-multiplatform-core/pull/1457
 // To resolve deprecated painterResource function from upgrading compose-jb
-object PainterResource {
-  @Composable
-  fun painterResource(resourcePath: String): Painter =
-    when (resourcePath.substringAfterLast(".")) {
-      "svg" -> rememberSvgResource(resourcePath)
-      "xml" -> rememberVectorXmlResource(resourcePath)
-      else -> rememberBitmapResource(resourcePath)
-    }
-
-  @OptIn(ExperimentalResourceApi::class)
-  @Composable
-  internal fun rememberBitmapResource(path: String): Painter {
-    return remember(path) { BitmapPainter(readResourceBytes(path).decodeToImageBitmap()) }
+@Composable
+fun painterResource(resourcePath: String): Painter =
+  when (resourcePath.substringAfterLast(".")) {
+    "svg" -> rememberSvgResource(resourcePath)
+    "xml" -> rememberVectorXmlResource(resourcePath)
+    else -> rememberBitmapResource(resourcePath)
   }
 
-  @OptIn(ExperimentalResourceApi::class)
-  @Composable
-  internal fun rememberVectorXmlResource(path: String): Painter {
-    val density = LocalDensity.current
-    val imageVector =
-      remember(density, path) { readResourceBytes(path).decodeToImageVector(density) }
-    return rememberVectorPainter(imageVector)
-  }
-
-  @OptIn(ExperimentalResourceApi::class)
-  @Composable
-  internal fun rememberSvgResource(path: String): Painter {
-    val density = LocalDensity.current
-    return remember(density, path) { readResourceBytes(path).decodeToSvgPainter(density) }
-  }
-
-  private object ResourceLoader
-
-  private fun readResourceBytes(resourcePath: String) =
-    ResourceLoader.javaClass.classLoader.getResourceAsStream(resourcePath).readAllBytes()
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun rememberBitmapResource(path: String): Painter {
+  return remember(path) { BitmapPainter(readResourceBytes(path).decodeToImageBitmap()) }
 }
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun rememberVectorXmlResource(path: String): Painter {
+  val density = LocalDensity.current
+  val imageVector = remember(density, path) { readResourceBytes(path).decodeToImageVector(density) }
+  return rememberVectorPainter(imageVector)
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun rememberSvgResource(path: String): Painter {
+  val density = LocalDensity.current
+  return remember(density, path) { readResourceBytes(path).decodeToSvgPainter(density) }
+}
+
+private object ResourceLoader
+
+private fun readResourceBytes(resourcePath: String) =
+  ResourceLoader.javaClass.classLoader.getResourceAsStream(resourcePath).readAllBytes()
