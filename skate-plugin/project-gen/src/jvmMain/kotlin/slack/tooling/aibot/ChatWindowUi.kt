@@ -19,7 +19,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,16 +27,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,13 +47,9 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.Icon
@@ -97,29 +89,30 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
     }
   }
   Row(
-    modifier.padding(4.dp).height(100.dp),
+    modifier = Modifier.padding(4.dp).height(100.dp),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.Bottom,
   ) {
     TextArea(
       state = textState,
-      modifier = Modifier.weight(1f).heightIn(min = 56.dp).onKeyEvent { event ->
-        if(event.type == KeyEventType.KeyDown){
-          when {
-            event.key == Key.Enter && event.isShiftPressed -> {
-              sendMessage()
-              true
+      modifier =
+        Modifier.weight(1f).heightIn(min = 56.dp).onKeyEvent { event ->
+          if (event.type == KeyEventType.KeyDown) {
+            when {
+              event.key == Key.Enter && event.isShiftPressed -> {
+                sendMessage()
+                true
+              }
+              else -> false
             }
-            else -> false
+          } else {
+            false
           }
-        } else {
-          false
-        }
-      },
-      placeholder = { Text("Start your conversation...", modifier.padding(4.dp))},
+        },
+      placeholder = { Text("Start your conversation...", modifier.padding(4.dp)) },
       decorationBoxModifier = Modifier.padding(4.dp),
       textStyle = JewelTheme.defaultTextStyle,
-      lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE)
+      lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE),
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
