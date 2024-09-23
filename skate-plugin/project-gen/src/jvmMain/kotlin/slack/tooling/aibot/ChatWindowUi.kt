@@ -63,9 +63,10 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
   Column(modifier = modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
     LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
       items(state.messages.reversed()) { message ->
+        val isMe = message.role == "user"
         Row(
           modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start,
+          horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start,
         ) {
           ChatBubble(message)
         }
@@ -148,18 +149,19 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
 
 @Composable
 private fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
+  val isMe = message.role == "user"
   Box(
     Modifier.wrapContentWidth()
       .padding(8.dp)
       .shadow(elevation = 0.5.dp, shape = RoundedCornerShape(25.dp), clip = true)
       .background(
-        color = if (message.isMe) ChatColors.promptBackground else ChatColors.responseBackground
+        color = if (isMe) ChatColors.promptBackground else ChatColors.responseBackground
       )
       .padding(8.dp)
   ) {
     Text(
-      text = message.text,
-      color = if (message.isMe) ChatColors.userTextColor else ChatColors.responseTextColor,
+      text = message.content,
+      color = if (isMe) ChatColors.userTextColor else ChatColors.responseTextColor,
       modifier = modifier.padding(8.dp),
       fontFamily = FontFamily.SansSerif,
     )
