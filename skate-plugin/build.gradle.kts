@@ -33,11 +33,6 @@ group = "com.slack.intellij"
 
 intellijPlatform {
   pluginConfiguration {
-    name = "Skate"
-    id = "com.slack.intellij.skate"
-    version = property("VERSION_NAME").toString()
-    description =
-      "A plugin for IntelliJ and Android Studio for faster Kotlin and Android development!"
     vendor {
       name = "Slack"
       url = "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin"
@@ -128,12 +123,15 @@ dependencies {
   implementation(projects.tracing)
 
   intellijPlatform {
+    // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
+    // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
+    // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
+    plugin("org.jetbrains.android:241.17011.79")
     bundledPlugins(
       "com.intellij.java",
       "org.intellij.plugins.markdown",
       "org.jetbrains.plugins.terminal",
       "org.jetbrains.kotlin",
-      "org.jetbrains.android",
     )
 
     pluginVerifier()

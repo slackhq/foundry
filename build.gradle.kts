@@ -30,10 +30,8 @@ import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
-import org.jetbrains.intellij.platform.gradle.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -222,8 +220,7 @@ subprojects {
       compilerOptions {
         val kotlinVersion =
           if (isForIntelliJPlugin) {
-            // TODO bump to 1.9 with 2024.1
-            KOTLIN_1_8
+            KOTLIN_1_9
           } else {
             KOTLIN_1_9
           }
@@ -332,22 +329,6 @@ subprojects {
 
   if (isForIntelliJPlugin) {
     project.pluginManager.withPlugin("org.jetbrains.intellij.platform") {
-      configure<IntelliJPlatformExtension> {
-        pluginConfiguration {
-          ideaVersion {
-            // Don't assign untilBuild to sinceBuild
-            sinceBuild.set(project.provider { null })
-            untilBuild.set(project.provider { null })
-          }
-        }
-      }
-      project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> {
-          // TODO move up to 2024.1.2
-          intellijIdeaCommunity("2023.2.1")
-        }
-      }
-
       data class PluginDetails(
         val pluginId: String,
         val name: String,
@@ -357,7 +338,6 @@ subprojects {
         val urlSuffix: String,
       )
 
-      // TODO most of this can maybe move to pluginConfiguration {} above
       val pluginDetails =
         PluginDetails(
           pluginId = property("PLUGIN_ID").toString(),
@@ -368,11 +348,20 @@ subprojects {
           urlSuffix = property("ARTIFACTORY_URL_SUFFIX").toString(),
         )
 
-      project.tasks.named<PatchPluginXmlTask>("patchPluginXml") {
-        sinceBuild.set(pluginDetails.sinceBuild)
-        pluginId.set(pluginDetails.pluginId)
-        pluginDescription.set(pluginDetails.description)
-        pluginVersion.set(pluginDetails.version)
+      configure<IntelliJPlatformExtension> {
+        pluginConfiguration {
+          id.set(pluginDetails.pluginId)
+          name.set(pluginDetails.name)
+          version.set(pluginDetails.version)
+          description.set(pluginDetails.description)
+          ideaVersion {
+            sinceBuild.set(pluginDetails.sinceBuild)
+            untilBuild.set(project.provider { null })
+          }
+        }
+      }
+      project.dependencies {
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.1.2") }
       }
 
       if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
