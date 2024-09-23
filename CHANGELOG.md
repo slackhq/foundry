@@ -4,8 +4,20 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.4
+------
+
+_2024-09-22_
+
 - Change `slack.allowWarnings` property to `sgp.kotlin.allowWarnings`.
 - Disallow warnings in Kotlin test compilations by default, add `sgp.kotlin.allowWarningsInTests` property to opt-out.
+- Update to kotlinx-coroutines `1.9.0`.
+- Update Okio to `3.9.1`.
+- Update to Clikt `5.0.0`.
+- Update JNA to `5.15.0`.
+- Update oshi-core to `6.6.4`.
+- Update kotlin-cli-util to `3.0.0`.
+- Build against AGP `8.6.1`.
 
 0.19.3
 ------
