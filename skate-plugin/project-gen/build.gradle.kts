@@ -30,6 +30,7 @@ kotlin {
     jvmMain {
       dependencies {
         implementation(compose.animation)
+        implementation(compose.components.resources)
         implementation(compose.desktop.common)
         implementation(compose.desktop.linux_arm64)
         implementation(compose.desktop.linux_x64)
