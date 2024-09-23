@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.decodeToSvgPainter
 
 // Migration snippet copied from https://github.com/JetBrains/compose-multiplatform-core/pull/1457
 // To resolve deprecated painterResource function from upgrading compose-jb
-class PainterResource {
+object PainterResource {
   @Composable
   fun painterResource(resourcePath: String): Painter =
     when (resourcePath.substringAfterLast(".")) {

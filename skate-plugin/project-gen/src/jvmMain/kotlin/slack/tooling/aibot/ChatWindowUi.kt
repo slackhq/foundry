@@ -124,7 +124,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
         enabled = isTextNotEmpty,
       ) {
         Icon(
-          painter = PainterResource().painterResource("drawable/send.svg"),
+          painter = PainterResource.painterResource("drawable/send.svg"),
           contentDescription = "Send",
           modifier = Modifier.size(20.dp),
         )
