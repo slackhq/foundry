@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Introduce `sgp.compose.global.stabilityConfigurationPath` to specify a global compose stability configuration file.
+- **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
+- Update to Kotlin `2.1.0`.
+- Build against KSP `2.1.0-TODO`
+
 0.19.4
 ------
 

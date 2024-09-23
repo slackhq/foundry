@@ -933,10 +933,14 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
 
-      if (slackProperties.composeStabilityConfigurationPath.isPresent) {
-        extension.stabilityConfigurationFile.setDisallowChanges(
-          slackProperties.composeStabilityConfigurationPath
+      if (slackProperties.composeGlobalStabilityConfigurationPath.isPresent) {
+        extension.stabilityConfigurationFiles.add(
+          slackProperties.composeGlobalStabilityConfigurationPath
         )
+      }
+
+      if (slackProperties.composeStabilityConfigurationPath.isPresent) {
+        extension.stabilityConfigurationFiles.add(slackProperties.composeStabilityConfigurationPath)
       }
 
       // Because the Compose Compiler plugin auto applies common options for us, we need to know

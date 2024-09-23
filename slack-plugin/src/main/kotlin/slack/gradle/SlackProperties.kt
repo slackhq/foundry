@@ -169,10 +169,17 @@ internal constructor(
         .orElse(emptyList())
 
   /** Relative path to a Compose stability configuration file from the _root_ project. */
+  public val composeGlobalStabilityConfigurationPath: Provider<RegularFile>
+    get() =
+      resolver.providerFor("sgp.compose.global.stabilityConfigurationPath").map {
+        project.rootProject.layout.projectDirectory.file(it)
+      }
+
+  /** Relative path to a Compose stability configuration file from the current project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
     get() =
       resolver.providerFor("sgp.compose.stabilityConfigurationPath").map {
-        project.rootProject.layout.projectDirectory.file(it)
+        project.layout.projectDirectory.file(it)
       }
 
   /**
