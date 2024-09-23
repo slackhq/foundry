@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -96,7 +97,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
     }
   }
   Row(
-    modifier.padding(4.dp).height(56.dp),
+    modifier.padding(4.dp).height(100.dp),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.Bottom,
   ) {
@@ -115,9 +116,10 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
           false
         }
       },
+      placeholder = { Text("Start your conversation...", modifier.padding(4.dp))},
       decorationBoxModifier = Modifier.padding(4.dp),
-      placeholder = { Text("Start your conversation...", modifier= Modifier.padding(4.dp))},
       textStyle = JewelTheme.defaultTextStyle,
+      lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE)
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
