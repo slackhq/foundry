@@ -15,6 +15,7 @@ env
 node_modules
 reports
 .cxx
+.intellijPlatform
 
 # IDE-generated dir
 out/
