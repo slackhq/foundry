@@ -19,7 +19,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,11 +31,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,12 +45,9 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.Icon
@@ -60,7 +57,7 @@ import org.jetbrains.jewel.ui.component.TextArea
 
 @Composable
 fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
-  Column(modifier = modifier.fillMaxSize().background(JewelTheme.globalColors.paneBackground)) {
+  Column(modifier = modifier.fillMaxSize().background(JewelTheme.globalColors.panelBackground)) {
     LazyColumn(modifier = Modifier.weight(1f), reverseLayout = true) {
       items(state.messages.reversed()) { message ->
         Row(
@@ -80,50 +77,40 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
-  var textValue by remember { mutableStateOf(TextFieldValue()) }
-  val isTextNotEmpty = textValue.text.isNotBlank()
+  val textState by remember { mutableStateOf(TextFieldState()) }
+  val isTextNotEmpty = textState.text.isNotBlank()
 
   fun sendMessage() {
     if (isTextNotEmpty) {
-      onSendMessage(textValue.text)
-      textValue = TextFieldValue("")
+      onSendMessage(textState.text.toString())
+      textState.clearText()
     }
   }
-
   Row(
-    modifier.padding(4.dp).height(IntrinsicSize.Min),
+    modifier = Modifier.padding(4.dp).height(100.dp),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.Bottom,
   ) {
-    // user text input. enter sends the message and clears text
-    // shift + enter adds a new line and expands the text field
     TextArea(
-      value = textValue,
-      onValueChange = { newText -> textValue = newText },
+      state = textState,
       modifier =
-        Modifier.weight(1f).heightIn(min = 56.dp).padding(4.dp).onPreviewKeyEvent { event ->
-          when {
-            (event.key == Key.Enter || event.key == Key.NumPadEnter) &&
-              event.type == KeyEventType.KeyDown -> {
-              if (event.isShiftPressed) {
-                val newText =
-                  textValue.text.replaceRange(
-                    textValue.selection.start,
-                    textValue.selection.end,
-                    "\n",
-                  )
-                val newSelection = TextRange(textValue.selection.start + 1)
-                textValue = TextFieldValue(newText, newSelection)
-                true
-              } else {
+        Modifier.weight(1f).heightIn(min = 56.dp).onKeyEvent { event ->
+          if (event.type == KeyEventType.KeyDown) {
+            when {
+              event.key == Key.Enter && event.isShiftPressed -> {
                 sendMessage()
                 true
               }
+              else -> false
             }
-            else -> false
+          } else {
+            false
           }
         },
-      placeholder = { Text("Start your conversation") },
+      placeholder = { Text("Start your conversation...", modifier.padding(4.dp)) },
+      decorationBoxModifier = Modifier.padding(4.dp),
+      textStyle = JewelTheme.defaultTextStyle,
+      lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE),
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
@@ -137,7 +124,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
         enabled = isTextNotEmpty,
       ) {
         Icon(
-          painter = painterResource("/drawable/send.svg"),
+          painter = painterResource("drawable/send.svg"),
           contentDescription = "Send",
           modifier = Modifier.size(20.dp),
         )
@@ -168,4 +155,8 @@ private fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
 
 private fun Modifier.enabled(enabled: Boolean): Modifier {
   return this.then(if (enabled) Modifier.alpha(1.0f) else Modifier.alpha(0.38f))
+}
+
+private fun TextFieldState.clearText() {
+  edit { replace(0, length, "") }
 }
