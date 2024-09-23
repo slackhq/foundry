@@ -32,7 +32,8 @@ intellijPlatform {
     description = "A plugin for authenticating plugin repositories with Artifactory."
     vendor {
       name = "Slack"
-      url = "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin/artifactory-authenticator"
+      url =
+        "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin/artifactory-authenticator"
       email = "oss@slack-corp.com"
     }
   }
