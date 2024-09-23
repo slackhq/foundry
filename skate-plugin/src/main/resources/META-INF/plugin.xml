@@ -1,22 +1,4 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>com.slack.intellij.skate</id>
-
-    <!-- Public plugin name should be written in Title Case.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Skate</name>
-
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="oss@slack-corp.com" url="https://www.github.com/slackhq">Slack</vendor>
-
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description><![CDATA[
-    A plugin for IntelliJ and Android Studio for faster Kotlin and Android development!
-  ]]></description>
-
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
@@ -36,10 +18,12 @@
         <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig" displayName="Skate Configuration"/>
         <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
         <annotator language="kotlin" implementationClass="com.slack.sgp.intellij.modeltranslator.TranslatorAnnotator"/>
-        <externalAnnotator language="kotlin" implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
+        <externalAnnotator language="kotlin"
+                           implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
         <projectIndexingActivityHistoryListener implementation="com.slack.sgp.intellij.idemetrics.IndexingListener"/>
         <postStartupActivity implementation="com.slack.sgp.intellij.PostStartupActivityExtension"/>
-        <toolWindow factoryClass="com.slack.sgp.intellij.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right" canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning" />
+        <toolWindow factoryClass="com.slack.sgp.intellij.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"
+                    canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>
     </extensions>
 
     <projectListeners>

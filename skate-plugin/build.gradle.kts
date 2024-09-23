@@ -17,6 +17,7 @@ import com.jetbrains.plugin.structure.base.utils.exists
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -30,21 +31,14 @@ plugins {
 
 group = "com.slack.intellij"
 
-repositories {
-  mavenCentral()
-  google()
-  maven("https://packages.jetbrains.team/maven/p/kpm/public/")
-  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
-
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-  plugins.add("com.intellij.java")
-  plugins.add("org.intellij.plugins.markdown")
-  plugins.add("org.jetbrains.plugins.terminal")
-  plugins.add("org.jetbrains.kotlin")
-  plugins.add("org.jetbrains.android")
+intellijPlatform {
+  pluginConfiguration {
+    vendor {
+      name = "Slack"
+      url = "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin"
+      email = "oss@slack-corp.com"
+    }
+  }
 }
 
 fun isGitHash(hash: String): Boolean {
@@ -120,11 +114,33 @@ dependencies {
   lintChecks(libs.composeLints)
 
   implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  implementation(libs.okio)
   implementation(libs.kaml)
+  implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
   implementation(projects.skatePlugin.projectGen)
   implementation(projects.tracing)
+
+  intellijPlatform {
+    // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
+    // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
+    // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
+    plugin("org.jetbrains.android:241.17011.79")
+    bundledPlugins(
+      "com.intellij.java",
+      "org.intellij.plugins.markdown",
+      "org.jetbrains.plugins.terminal",
+      "org.jetbrains.kotlin",
+    )
+
+    pluginVerifier()
+    zipSigner()
+    instrumentationTools()
+
+    testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.Bundled)
+  }
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
