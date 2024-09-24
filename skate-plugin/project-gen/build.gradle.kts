@@ -30,6 +30,7 @@ kotlin {
     jvmMain {
       dependencies {
         implementation(compose.animation)
+        implementation(compose.components.resources)
         implementation(compose.desktop.common)
         implementation(compose.desktop.linux_arm64)
         implementation(compose.desktop.linux_x64)
@@ -42,7 +43,7 @@ kotlin {
         implementation(compose.ui)
         implementation(libs.circuit.foundation)
         implementation(libs.compose.markdown)
-        implementation(libs.jewel.bridge232)
+        implementation(libs.jewel.bridge)
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
 
