@@ -46,10 +46,4 @@ class ChatPresenter : Presenter<ChatScreen.State> {
       }
     }
   }
-
-  private fun callApi(message: String): String {
-    // function set up to call the DevXP API in the future.
-    // right now, just sends back the user input message
-    return ("I am a bot. You said \"${message}\"")
-  }
 }
