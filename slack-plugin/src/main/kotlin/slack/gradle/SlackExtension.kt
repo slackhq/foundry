@@ -942,6 +942,8 @@ constructor(
       // Because the Compose Compiler plugin auto applies common options for us, we need to know
       // about those options and _avoid_ setting them a second time
       val freeOptions = mutableListOf<String>()
+      var includeSourceInformation =
+        slackProperties.composeIncludeSourceInformationEverywhereByDefault
       for ((k, v) in compilerOptions.get().map { it.split('=') }) {
         project.logger.debug("Processing compose option $k = $v")
         when (k) {
@@ -949,8 +951,8 @@ constructor(
             extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
           }
 
-          "sourceInformation" -> {
-            extension.includeSourceInformation.set(v.toBoolean())
+          OPTION_SOURCE_INFORMATION -> {
+            includeSourceInformation = v.toBoolean()
           }
 
           "metricsDestination" -> {
@@ -999,6 +1001,14 @@ constructor(
         }
       }
 
+      if (includeSourceInformation) {
+        if (androidExtension == null) {
+          extension.includeSourceInformation.set(true)
+        } else if (slackProperties.composeUseIncludeInformationWorkaround) {
+          freeOptions += "$OPTION_SOURCE_INFORMATION=true"
+        }
+      }
+
       if (freeOptions.isNotEmpty()) {
         project.tasks.configureKotlinCompilationTask {
           compilerOptions.freeCompilerArgs.addAll(
@@ -1011,7 +1021,8 @@ constructor(
 
   private companion object {
     /** Live literals are disabled and deprecated in AGP 8.7+ */
-    val AGP_LIVE_LITERALS_MAX_VERSION = AndroidPluginVersion(8, 6, 0)
+    private val AGP_LIVE_LITERALS_MAX_VERSION = AndroidPluginVersion(8, 6, 0)
+    private const val OPTION_SOURCE_INFORMATION = "sourceInformation"
   }
 }
 

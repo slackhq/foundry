@@ -176,6 +176,31 @@ internal constructor(
       }
 
   /**
+   * Use a workaround for compose-compiler's `includeInformation` option on android projects.
+   *
+   * On android projects, the compose compiler gradle plugin annoyingly no-ops
+   * https://issuetracker.google.com/issues/362780328#comment4
+   */
+  public val composeUseIncludeInformationWorkaround: Boolean
+    get() =
+      resolver.booleanValue("sgp.compose.useIncludeInformationWorkaround", defaultValue = true)
+
+  /**
+   * By default, Compose on android only enables source information in debug variants. This is a bit
+   * silly in large projects because we generally make all libraries single-variant as "release",
+   * and can result in libraries not having source information. Instead, we rely on R8 to strip out
+   * this information in release builds as needed.
+   *
+   * @see <a href="https://issuetracker.google.com/issues/362780328">Upstream issue</a>
+   */
+  public val composeIncludeSourceInformationEverywhereByDefault: Boolean
+    get() =
+      resolver.booleanValue(
+        "sgp.compose.includeSourceInformationEverywhereByDefault",
+        defaultValue = true,
+      )
+
+  /**
    * When this property is present, the "internalRelease" build variant will have an application id
    * of "com.Slack.prototype", instead of "com.Slack.internal".
    *
