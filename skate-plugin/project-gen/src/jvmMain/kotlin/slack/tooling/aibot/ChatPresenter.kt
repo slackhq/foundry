@@ -21,8 +21,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChatPresenter : Presenter<ChatScreen.State> {
+  val user = "user"
+  val bot = "bot"
+  private val chatBotActionService = ChatBotActionService()
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
@@ -30,10 +36,12 @@ class ChatPresenter : Presenter<ChatScreen.State> {
     return ChatScreen.State(messages = messages) { event ->
       when (event) {
         is ChatScreen.Event.SendMessage -> {
-          val newMessage = Message(event.message, isMe = true)
+          val newMessage = Message(role = user, event.message)
           messages = messages + newMessage
-          val response = Message(callApi(event.message), isMe = false)
-          messages = messages + response
+         CoroutineScope(Dispatchers.IO).launch {
+           val response = chatBotActionService.executeCommand(event.message)
+           messages = messages + Message(role = bot, response)
+         }
         }
       }
     }
