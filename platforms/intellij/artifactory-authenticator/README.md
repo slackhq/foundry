@@ -16,9 +16,9 @@ The check is a prefix check, so you should use a base url for your artifactory i
 To publish this plugin to a given artifactory repository, the following three Gradle properties must be set:
 
 ```properties
-SgpIntellijArtifactoryBaseUrl=https://artifactory.example.com/artifactory
-SgpIntellijArtifactoryUsername=jane.doe@example.com
-SgpIntellijArtifactoryToken=1234567890abcdef1234567890abcdef12345678
+FoundryIntellijArtifactoryBaseUrl=https://artifactory.example.com/artifactory
+FoundryIntellijArtifactoryUsername=jane.doe@example.com
+FoundryIntellijArtifactoryToken=1234567890abcdef1234567890abcdef12345678
 ```
 
 Then run `./gradlew :platforms:intellij:artifactory-authenticator:uploadPluginToArtifactory` to publish the plugin to the configured repository.

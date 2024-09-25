@@ -3,15 +3,15 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <pluginRepositoryAuthProvider
-                implementation="com.slack.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
+                implementation="com.slack.foundry.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
         <projectConfigurable
                 displayName="Artifactory Auth"
-                instance="com.slack.intellij.artifactory.AuthConfig"/>
+                instance="com.slack.foundry.intellij.artifactory.AuthConfig"/>
     </extensions>
 
     <!-- Workaround for https://youtrack.jetbrains.com/issue/IDEA-315487 -->
     <applicationListeners>
-        <listener class="com.slack.intellij.artifactory.RepoAuthHotfix"
+        <listener class="com.slack.foundry.intellij.artifactory.RepoAuthHotfix"
                   topic="com.intellij.ide.AppLifecycleListener"/>
     </applicationListeners>
 </idea-plugin>
