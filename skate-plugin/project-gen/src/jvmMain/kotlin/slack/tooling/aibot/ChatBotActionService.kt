@@ -39,11 +39,7 @@ class ChatBotActionService {
 
     @VisibleForTesting
     private fun createScriptContent(jsonInput: String): String {
-        val scriptContent =
-            """
-        temp
-      """
-                .trimIndent()
+        val scriptContent = AIBotScriptFetcher.getAIBotScript()
         return scriptContent
     }
 
@@ -98,8 +94,8 @@ class ChatBotActionService {
     }
 
     data class Content(
-        val messages: List<Message>,
-        val source: String = "curl",
-        val max_tokens: Int = 512,
+      val messages: List<Message>,
+      val source: String = "curl",
+      val max_tokens: Int = 512,
     )
 }

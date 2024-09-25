@@ -41,6 +41,7 @@ internal class SkateConfigUI(
     featureFlagSettings()
     tracingSettings()
     codeOwnerSettings()
+    aiBotSettings()
   }
 
   private fun Panel.whatsNewPanelSettings() {
@@ -190,6 +191,17 @@ internal class SkateConfigUI(
           if (it.text.isBlank()) error(SkateBundle.message(errorMessageKey)) else null
         }
         .apply { enabledCondition?.let { enabledIf(it) } }
+    }
+  }
+
+  private fun Panel.aiBotSettings(){
+    group("DevXP AI bot"){
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.aiBotSettings.title",
+        getter = { settings.devxpAPIcall },
+        setter = { settings.devxpAPIcall = it },
+        errorMessageKey = "skate.configuration.aiBotSettings.error",
+      )
     }
   }
 }

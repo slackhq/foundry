@@ -38,10 +38,10 @@ class ChatPresenter : Presenter<ChatScreen.State> {
         is ChatScreen.Event.SendMessage -> {
           val newMessage = Message(role = user, event.message)
           messages = messages + newMessage
-         CoroutineScope(Dispatchers.IO).launch {
-           val response = chatBotActionService.executeCommand(event.message)
-           messages = messages + Message(role = bot, response)
-         }
+          CoroutineScope(Dispatchers.IO).launch {
+            val response = chatBotActionService.executeCommand(event.message)
+            messages = messages + Message(role = bot, response)
+          }
         }
       }
     }
