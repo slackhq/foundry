@@ -405,13 +405,8 @@ internal object BootstrapUtils {
         "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-        // For Gson's reflective serialization during AGP manifest merging
-        // Can be removed with AGP 7.1+
-        // https://issuetracker.google.com/issues/193919814
-        "--add-opens=java.base/java.io=ALL-UNNAMED",
       )
-      .distinct()
-      .sorted()
+      .toSortedSet()
 
   class DaemonArgsProvider(
     val customMemoryMultiplier: Provider<String>,
@@ -499,13 +494,13 @@ internal object BootstrapUtils {
     diagnostic("Kotlin Daemon xms: ${kotlinXms}GB")
     diagnostic("Kotlin Daemon xmx: ${kotlinXmx}GB")
 
-    val gradleGcArgs = mutableListOf<String>()
+    val gradleDaemonGcArgs = mutableListOf<String>()
     val kotlinDaemonGcArgs = mutableListOf<String>()
     val customGc = garbageCollector.orNull
     when {
       customGc != null && customGc != "default" -> {
         val args = listOf("-XX:+$customGc", "-XX:+UnlockExperimentalVMOptions")
-        gradleGcArgs += args
+        gradleDaemonGcArgs += args
         kotlinDaemonGcArgs += args
       }
       else -> {
@@ -517,24 +512,30 @@ internal object BootstrapUtils {
             "-XX:G1NewSizePercent=$simplePercent",
             "-XX:G1MaxNewSizePercent=$simplePercent",
           )
-        gradleGcArgs += args
+        gradleDaemonGcArgs += args
         kotlinDaemonGcArgs += args
       }
     }
 
     kotlinDaemonGcArgs += jdkOpensAndExports
 
-    // TODO Make CI use no GC on JDK 11+?
-    // https://openjdk.java.net/jeps/318
-
-    val jdkArgs = jdkOpensAndExports
-
-    val extraArgs = gradleGcArgs.plus(jdkArgs).plus(extraJvmArgs.get()).joinToString(" ")
+    fun buildJvmArgs(xmsG: Int, xmxG: Int, gcArgs: List<String>): List<String> =
+      buildList {
+          add("-Xms${xmsG}g")
+          add("-Xmx${xmxG}g")
+          // https://www.jasonpearson.dev/softreflrupolicymspermb-in-jvm-builds/
+          add("-XX:SoftRefLRUPolicyMSPerMB=1")
+          // https://www.jasonpearson.dev/codecache-in-jvm-builds/
+          add("-XX:ReservedCodeCacheSize=320m")
+          addAll(gcArgs)
+          addAll(extraJvmArgs.get())
+          addAll(jdkOpensAndExports)
+        }
+        .sorted()
 
     val gradleDaemonArgs =
-      GradleDaemonArgs(listOf("-Xms${gradleXms}g", "-Xmx${gradleXmx}g") + extraArgs, maxWorkers)
-    val kotlinDaemonArgs =
-      KotlinDaemonArgs(listOf("-Xms${kotlinXms}g", "-Xmx${kotlinXmx}g") + kotlinDaemonGcArgs)
+      GradleDaemonArgs(buildJvmArgs(gradleXms, gradleXmx, gradleDaemonGcArgs), maxWorkers)
+    val kotlinDaemonArgs = KotlinDaemonArgs(buildJvmArgs(kotlinXms, kotlinXmx, kotlinDaemonGcArgs))
 
     return DaemonArgs(gradleDaemonArgs, kotlinDaemonArgs)
   }
