@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.slack.sgp.intellij.SkatePluginSettings
+import java.io.File
 import java.nio.file.Path
 
 class AIBotScriptFetcher(
@@ -12,15 +13,17 @@ class AIBotScriptFetcher(
     private val basePath: String = project.basePath ?: "",
     ) {
 
-    private val logger = logger<AIBotScriptFetcher>()
-    fun getAIBotScript(): Unit? {
+    fun getAIBotScript(): File? {
         val settings = project.service<SkatePluginSettings>()
         val aiBotScriptSetting = settings.devxpAPIcall
+        println("init")
 
-        return aiBotScriptSetting?.let{
+        return aiBotScriptSetting?.let { scriptSetting ->
             val fs = LocalFileSystem.getInstance()
-            val path = Path.of(basePath, aiBotScriptSetting)
-            logger.debug("getAIBotScript path location: $path")
+            val path = Path.of(basePath, scriptSetting).toString()
+            println("getAIBotScript path location: $path")
+            fs.findFileByNioFile(path)?.toNioPath()?.toFile()
         }
     }
 }
+

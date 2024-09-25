@@ -25,13 +25,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ChatPresenter : Presenter<ChatScreen.State> {
+class ChatPresenter(private val scriptPath: String?) : Presenter<ChatScreen.State> {
   val user = "user"
   val bot = "bot"
   private val chatBotActionService = ChatBotActionService()
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
+
+    println("print script path $scriptPath")
 
     return ChatScreen.State(messages = messages) { event ->
       when (event) {

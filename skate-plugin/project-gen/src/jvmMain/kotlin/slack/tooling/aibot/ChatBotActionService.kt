@@ -39,8 +39,7 @@ class ChatBotActionService {
 
     @VisibleForTesting
     private fun createScriptContent(jsonInput: String): String {
-        val scriptContent = AIBotScriptFetcher.getAIBotScript()
-        return scriptContent
+        return jsonInput
     }
 
     @VisibleForTesting

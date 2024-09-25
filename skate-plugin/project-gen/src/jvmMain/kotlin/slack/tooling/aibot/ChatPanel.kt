@@ -25,18 +25,18 @@ import javax.swing.JComponent
 import slack.tooling.projectgen.SlackDesktopTheme
 
 object ChatPanel {
-  fun createPanel(): JComponent {
+  fun createPanel(scriptPath: String?): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
-      setContent { SlackDesktopTheme { ChatApp() } }
+      setContent { SlackDesktopTheme { ChatApp(scriptPath) } }
     }
   }
 
   @Composable
-  private fun ChatApp() {
+  private fun ChatApp(scriptPath: String?) {
     val circuit = remember {
       Circuit.Builder()
-        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter())
+        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter(scriptPath))
         .addUi<ChatScreen, ChatScreen.State> { state, modifier -> ChatWindowUi(state, modifier) }
         .build()
     }
