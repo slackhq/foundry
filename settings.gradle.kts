@@ -143,7 +143,7 @@ develocity {
   }
 }
 
-rootProject.name = "slack-gradle-plugin"
+rootProject.name = "foundry"
 
 // Please keep these in alphabetical order!
 include(
