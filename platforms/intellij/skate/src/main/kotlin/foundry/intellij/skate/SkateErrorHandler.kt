@@ -24,9 +24,6 @@ import com.intellij.openapi.diagnostic.ErrorReportSubmitter
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.util.Consumer
-import com.slack.sgp.intellij.BUGSNAG_KEY
-import com.slack.sgp.intellij.GIT_SHA
-import com.slack.sgp.intellij.VERSION
 import java.awt.Component
 
 /**

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.6.0)" variant="all" version="8.8.0-alpha01">
+<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.6.1)" variant="all" version="8.8.0-alpha01">
 
     <issue
         id="GradleProjectIsolation"
@@ -7,7 +7,7 @@
         errorLine1="        project.rootProject.layout.projectDirectory.file(&quot;ci/release.version&quot;)"
         errorLine2="                ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/ApkVersioningPlugin.kt"
+            file="src/main/kotlin/foundry/gradle/ApkVersioningPlugin.kt"
             line="82"
             column="17"/>
     </issue>
@@ -18,7 +18,7 @@
         errorLine1="        project.rootProject.file(&quot;config/detekt/detekt.yml&quot;)"
         errorLine2="                ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/lint/DetektTasks.kt"
+            file="src/main/kotlin/foundry/gradle/lint/DetektTasks.kt"
             line="83"
             column="17"/>
     </issue>
@@ -29,7 +29,7 @@
         errorLine1="            config.from(project.rootProject.file(configFile))"
         errorLine2="                                ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/lint/DetektTasks.kt"
+            file="src/main/kotlin/foundry/gradle/lint/DetektTasks.kt"
             line="86"
             column="33"/>
     </issue>
@@ -40,7 +40,7 @@
         errorLine1="  if (project.rootProject.extensions.findByName(&quot;develocity&quot;) != null) {"
         errorLine2="              ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/develocity/DevelocityFinderApi.kt"
+            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
             line="33"
             column="15"/>
     </issue>
@@ -51,7 +51,7 @@
         errorLine1="    return DevelocityConfigurationAdapter(project.rootProject.extensions.getByName(&quot;develocity&quot;))"
         errorLine2="                                                  ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/develocity/DevelocityFinderApi.kt"
+            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
             line="34"
             column="51"/>
     </issue>
@@ -62,7 +62,7 @@
         errorLine1="  } else if (project.rootProject.extensions.findByName(&quot;gradleEnterprise&quot;) != null) {"
         errorLine2="                     ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/develocity/DevelocityFinderApi.kt"
+            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
             line="36"
             column="22"/>
     </issue>
@@ -73,9 +73,31 @@
         errorLine1="        project.rootProject.extensions.getByName(&quot;gradleEnterprise&quot;)"
         errorLine2="                ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/develocity/DevelocityFinderApi.kt"
+            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
             line="38"
             column="17"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="    require(project == project.rootProject) {"
+        errorLine2="                               ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
+            line="69"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="      delete(rootProject.layout.buildDirectory)"
+        errorLine2="             ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
+            line="488"
+            column="14"/>
     </issue>
 
     <issue
@@ -84,7 +106,7 @@
         errorLine1="      check(project == project.rootProject) { &quot;Project is not root project!&quot; }"
         errorLine2="                               ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GlobalConfig.kt"
+            file="src/main/kotlin/foundry/gradle/GlobalConfig.kt"
             line="32"
             column="32"/>
     </issue>
@@ -95,8 +117,8 @@
         errorLine1="  get() = rootProject === this"
         errorLine2="          ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GradleExt.kt"
-            line="63"
+            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
+            line="64"
             column="11"/>
     </issue>
 
@@ -106,8 +128,8 @@
         errorLine1="      (findProperty(AndroidProject.PROPERTY_BUILD_MODEL_ONLY) == &quot;true&quot; ||"
         errorLine2="       ~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GradleExt.kt"
-            line="239"
+            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
+            line="240"
             column="8"/>
     </issue>
 
@@ -117,8 +139,8 @@
         errorLine1="        findProperty(AndroidProject.PROPERTY_GENERATE_SOURCES_ONLY) == &quot;true&quot;)"
         errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GradleExt.kt"
-            line="240"
+            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
+            line="241"
             column="9"/>
     </issue>
 
@@ -128,8 +150,8 @@
         errorLine1="  get() = hasProperty(&quot;android.injected.invoked.from.ide&quot;)"
         errorLine2="          ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GradleExt.kt"
-            line="244"
+            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
+            line="245"
             column="11"/>
     </issue>
 
@@ -139,7 +161,7 @@
         errorLine1="      lintConfig = rootProject.layout.projectDirectory.file(&quot;config/lint/lint.xml&quot;).asFile"
         errorLine2="                   ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/lint/LintTasks.kt"
+            file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
             line="339"
             column="20"/>
     </issue>
@@ -150,31 +172,9 @@
         errorLine1="        project.rootProject.layout.projectDirectory.file(it)"
         errorLine2="                ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/SlackProperties.kt"
+            file="src/main/kotlin/foundry/gradle/SlackProperties.kt"
             line="175"
             column="17"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="    require(project == project.rootProject) {"
-        errorLine2="                               ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/slack/gradle/SlackRootPlugin.kt"
-            line="70"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="      delete(rootProject.layout.buildDirectory)"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/slack/gradle/SlackRootPlugin.kt"
-            line="488"
-            column="14"/>
     </issue>
 
     <issue
@@ -183,7 +183,7 @@
         errorLine1="            else -> project.rootProject.projectDir.absolutePath"
         errorLine2="                            ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/unittest/UnitTests.kt"
+            file="src/main/kotlin/foundry/gradle/unittest/UnitTests.kt"
             line="228"
             column="29"/>
     </issue>
@@ -194,7 +194,7 @@
         errorLine1="import com.android.build.gradle.internal.SdkLocationSourceSet"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/AndroidSourcesConfigurer.kt"
+            file="src/main/kotlin/foundry/gradle/AndroidSourcesConfigurer.kt"
             line="18"
             column="1"/>
     </issue>
@@ -205,7 +205,7 @@
         errorLine1="import com.android.build.gradle.internal.SdkLocator"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/AndroidSourcesConfigurer.kt"
+            file="src/main/kotlin/foundry/gradle/AndroidSourcesConfigurer.kt"
             line="19"
             column="1"/>
     </issue>
@@ -216,7 +216,7 @@
         errorLine1="import com.android.build.gradle.internal.dsl.BuildType"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/AnnotationProcessing.kt"
+            file="src/main/kotlin/foundry/gradle/AnnotationProcessing.kt"
             line="20"
             column="1"/>
     </issue>
@@ -227,7 +227,7 @@
         errorLine1="import com.android.build.gradle.internal.publishing.AndroidArtifacts"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/tasks/BaseDependencyCheckTask.kt"
+            file="src/main/kotlin/foundry/gradle/tasks/BaseDependencyCheckTask.kt"
             line="18"
             column="1"/>
     </issue>
@@ -238,7 +238,7 @@
         errorLine1="import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/tasks/BaseDependencyCheckTask.kt"
+            file="src/main/kotlin/foundry/gradle/tasks/BaseDependencyCheckTask.kt"
             line="19"
             column="1"/>
     </issue>
@@ -249,7 +249,7 @@
         errorLine1="import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/lint/LintTasks.kt"
+            file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
             line="23"
             column="1"/>
     </issue>
@@ -260,7 +260,7 @@
         errorLine1="import com.android.build.gradle.internal.lint.LintModelWriterTask"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/lint/LintTasks.kt"
+            file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
             line="24"
             column="1"/>
     </issue>
@@ -271,7 +271,7 @@
         errorLine1="import com.android.build.gradle.internal.lint.VariantInputs"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/lint/LintTasks.kt"
+            file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
             line="25"
             column="1"/>
     </issue>
@@ -282,7 +282,7 @@
         errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/SlackExtension.kt"
+            file="src/main/kotlin/foundry/gradle/SlackExtension.kt"
             line="25"
             column="1"/>
     </issue>
@@ -293,7 +293,7 @@
         errorLine1="import com.android.build.gradle.internal.dsl.BaseAppModuleExtension"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/StandardProjectConfigurations.kt"
+            file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
             line="31"
             column="1"/>
     </issue>
@@ -304,7 +304,7 @@
         errorLine1="import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/tasks/BaseDependencyCheckTask.kt"
+            file="src/main/kotlin/foundry/gradle/tasks/BaseDependencyCheckTask.kt"
             line="26"
             column="1"/>
     </issue>
@@ -315,8 +315,8 @@
         errorLine1="import org.gradle.internal.logging.progress.ProgressLoggerFactory"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/tasks/BaseDownloadTask.kt"
-            line="30"
+            file="src/main/kotlin/foundry/gradle/tasks/BaseDownloadTask.kt"
+            line="31"
             column="1"/>
     </issue>
 
@@ -326,7 +326,7 @@
         errorLine1="import org.gradle.api.internal.project.ProjectInternal"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GradleExt.kt"
+            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
             line="30"
             column="1"/>
     </issue>
@@ -337,8 +337,8 @@
         errorLine1="import org.gradle.internal.service.ServiceRegistry"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/GradleExt.kt"
-            line="42"
+            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
+            line="43"
             column="1"/>
     </issue>
 
@@ -348,8 +348,8 @@
         errorLine1="import org.gradle.api.internal.provider.MissingValueException"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/Platforms.kt"
-            line="26"
+            file="src/main/kotlin/foundry/gradle/Platforms.kt"
+            line="33"
             column="1"/>
     </issue>
 
@@ -359,7 +359,7 @@
         errorLine1="import org.gradle.internal.logging.progress.ProgressLogger"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/tasks/ProgressResponseBody.kt"
+            file="src/main/kotlin/foundry/gradle/tasks/ProgressResponseBody.kt"
             line="26"
             column="1"/>
     </issue>
@@ -370,8 +370,8 @@
         errorLine1="import org.gradle.internal.os.OperatingSystem"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/SlackTools.kt"
-            line="41"
+            file="src/main/kotlin/foundry/gradle/SlackTools.kt"
+            line="52"
             column="1"/>
     </issue>
 
@@ -381,7 +381,7 @@
         errorLine1="        project.tasks.withType(JavaCompile::class.java, baseConfig.javaCompileAptAction)"
         errorLine2="                      ~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/AnnotationProcessing.kt"
+            file="src/main/kotlin/foundry/gradle/AnnotationProcessing.kt"
             line="142"
             column="23"/>
     </issue>
@@ -392,7 +392,7 @@
         errorLine1="    project.plugins.withType(AppPlugin::class.java) {"
         errorLine2="                    ~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/ApkVersioningPlugin.kt"
+            file="src/main/kotlin/foundry/gradle/ApkVersioningPlugin.kt"
             line="50"
             column="21"/>
     </issue>
@@ -403,7 +403,7 @@
         errorLine1="  tasks.withType(T::class.java) {"
         errorLine2="        ~~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/SlackGradleUtil.kt"
+            file="src/main/kotlin/foundry/gradle/SlackGradleUtil.kt"
             line="270"
             column="9"/>
     </issue>
@@ -414,8 +414,8 @@
         errorLine1="            add(&quot;api&quot;, def.coordinates) { version { require(version) } }"
         errorLine2="                                                    ~~~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/Platforms.kt"
-            line="273"
+            file="src/main/kotlin/foundry/gradle/Platforms.kt"
+            line="269"
             column="53"/>
     </issue>
 
@@ -425,7 +425,7 @@
         errorLine1="    check(logs.isNotEmpty())"
         errorLine2="    ~~~~~">
         <location
-            file="src/main/kotlin/slack/gradle/util/ThermalsWatcher.kt"
+            file="src/main/kotlin/foundry/gradle/util/ThermalsWatcher.kt"
             line="216"
             column="5"/>
     </issue>

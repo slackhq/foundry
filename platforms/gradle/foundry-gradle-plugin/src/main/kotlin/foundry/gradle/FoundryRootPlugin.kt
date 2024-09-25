@@ -59,10 +59,10 @@ import org.gradle.jvm.toolchain.JvmVendorSpec
 import slack.cli.AppleSiliconCompat
 
 /**
- * A common entry point for Slack project configuration. This should only be applied once and on the
- * root project, with a full view of the entire project tree.
+ * A common entry point for Foundry project configuration. This should only be applied once and on
+ * the root project, with a full view of the entire project tree.
  */
-internal class SlackRootPlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
+internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
   Plugin<Project> {
 
   override fun apply(project: Project) {

@@ -27,21 +27,21 @@ plugins {
 
 gradlePlugin {
   plugins.create("foundry-root") {
-    id = "com.slack.gradle.root"
-    implementationClass = "slack.gradle.SlackRootPlugin"
+    id = "foundry.gradle.root"
+    implementationClass = "foundry.gradle.FoundryRootPlugin"
   }
   plugins.create("foundry-base") {
-    id = "com.slack.gradle.base"
-    implementationClass = "slack.gradle.SlackBasePlugin"
+    id = "foundry.gradle.base"
+    implementationClass = "foundry.gradle.FoundryBasePlugin"
   }
   plugins.create("apkVersioning") {
-    id = "com.slack.gradle.apk-versioning"
-    implementationClass = "slack.gradle.ApkVersioningPlugin"
+    id = "foundry.gradle.apk-versioning"
+    implementationClass = "foundry.gradle.ApkVersioningPlugin"
   }
 }
 
 buildConfig {
-  packageName("slack.gradle.dependencies")
+  packageName("foundry.gradle.dependencies")
   useKotlinOutput { internalVisibility = true }
 }
 

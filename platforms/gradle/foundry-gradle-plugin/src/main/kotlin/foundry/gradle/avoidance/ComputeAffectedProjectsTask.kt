@@ -16,14 +16,14 @@
 package foundry.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
-import com.slack.sgp.common.SgpLogger
-import com.slack.skippy.AffectedProjectsComputer
-import com.slack.skippy.SkippyRunner
+import foundry.common.FoundryLogger
 import foundry.gradle.SlackProperties
 import foundry.gradle.property
 import foundry.gradle.util.JsonTools
 import foundry.gradle.util.gradle
 import foundry.gradle.util.setDisallowChanges
+import foundry.skippy.AffectedProjectsComputer
+import foundry.skippy.SkippyRunner
 import java.io.ObjectInputStream
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -129,7 +129,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug.get(),
-          logger = SgpLogger.gradle(logger),
+          logger = FoundryLogger.gradle(logger),
           mergeOutputs = mergeOutputs.get(),
           outputsDir = outputsDir.get().asFile.toOkioPath(),
           androidTestProjects = androidTestProjects,

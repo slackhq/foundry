@@ -35,9 +35,9 @@ import org.gradle.api.provider.Provider
  * Simple base plugin over [StandardProjectConfigurations]. Eventually functionality from this will
  * be split into more granular plugins.
  *
- * The goal of separating this from [SlackRootPlugin] is project isolation.
+ * The goal of separating this from [FoundryRootPlugin] is project isolation.
  */
-internal class SlackBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
+internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
   Plugin<Project> {
   override fun apply(target: Project) {
     val slackProperties = SlackProperties(target)

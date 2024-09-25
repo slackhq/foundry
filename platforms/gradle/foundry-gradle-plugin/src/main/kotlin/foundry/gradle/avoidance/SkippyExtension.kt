@@ -15,14 +15,14 @@
  */
 package foundry.gradle.avoidance
 
-import com.slack.skippy.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
-import com.slack.skippy.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
-import com.slack.skippy.SkippyConfig
-import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import foundry.gradle.SlackExtensionMarker
 import foundry.gradle.SlackProperties
 import foundry.gradle.property
 import foundry.gradle.setProperty
+import foundry.skippy.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
+import foundry.skippy.AffectedProjectsDefaults.DEFAULT_NEVER_SKIP_PATTERNS
+import foundry.skippy.SkippyConfig
+import foundry.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Named

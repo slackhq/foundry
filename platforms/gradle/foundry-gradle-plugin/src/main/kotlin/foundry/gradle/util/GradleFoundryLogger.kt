@@ -15,11 +15,11 @@
  */
 package foundry.gradle.util
 
-import com.slack.sgp.common.SgpLogger
+import foundry.common.FoundryLogger
 import org.gradle.api.logging.Logger
 
-/** A Gradle [Logger]-based [SgpLogger]. */
-private class GradleSgpLogger(private val delegate: Logger) : SgpLogger {
+/** A Gradle [Logger]-based [FoundryLogger]. */
+private class GradleFoundryLogger(private val delegate: Logger) : FoundryLogger {
   override fun debug(message: String) {
     delegate.debug(message)
   }
@@ -49,4 +49,5 @@ private class GradleSgpLogger(private val delegate: Logger) : SgpLogger {
   }
 }
 
-internal fun SgpLogger.Companion.gradle(logger: Logger): SgpLogger = GradleSgpLogger(logger)
+internal fun FoundryLogger.Companion.gradle(logger: Logger): FoundryLogger =
+  GradleFoundryLogger(logger)

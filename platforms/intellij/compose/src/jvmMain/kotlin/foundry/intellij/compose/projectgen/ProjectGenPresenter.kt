@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
 import java.io.File
-import slack.tooling.projectgen.*
 
 internal class ProjectGenPresenter(
   private val rootDir: String,
