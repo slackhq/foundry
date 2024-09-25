@@ -22,8 +22,8 @@ import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
 import com.squareup.wire.gradle.WireTask
-import foundry.gradle.SlackExtension
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryExtension
+import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.artifacts.SgpArtifact
@@ -78,8 +78,8 @@ public object ModuleStatsTasks {
   private fun Project.includeGenerated() =
     providers.environmentVariable("MODULE_SCORE_INCLUDE_GENERATED").mapToBoolean().orElse(true)
 
-  internal fun configureRoot(rootProject: Project, slackProperties: SlackProperties) {
-    if (!slackProperties.modScoreGlobalEnabled) return
+  internal fun configureRoot(rootProject: Project, foundryProperties: FoundryProperties) {
+    if (!foundryProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
     val resolver = Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
 
@@ -105,14 +105,14 @@ public object ModuleStatsTasks {
     return MAIN_SRC_DIRS.firstOrNull { File(this@findMainSourceDir, it).exists() }
   }
 
-  internal fun configureSubproject(project: Project, slackProperties: SlackProperties) {
-    if (!slackProperties.modScoreGlobalEnabled) return
+  internal fun configureSubproject(project: Project, foundryProperties: FoundryProperties) {
+    if (!foundryProperties.modScoreGlobalEnabled) return
     if (!project.buildFile.exists()) return
 
-    if (slackProperties.modScoreIgnore) return
+    if (foundryProperties.modScoreIgnore) return
 
     // Don't run on the platform project, it's a special case
-    if (project.path == slackProperties.platformProjectPath) return
+    if (project.path == foundryProperties.platformProjectPath) return
 
     val mainSrcDir = File(project.projectDir, "src").findMainSourceDir()
 
@@ -225,7 +225,7 @@ public object ModuleStatsTasks {
         //          }
       }
       withPlugin("com.android.library") {
-        val multiVariant = slackProperties.libraryWithVariants
+        val multiVariant = foundryProperties.libraryWithVariants
         addCollectorTag(ModuleStatsCollectorTask.TAG_ANDROID)
         if (multiVariant) {
           addCollectorTag(ModuleStatsCollectorTask.TAG_VARIANTS)
@@ -266,7 +266,7 @@ public object ModuleStatsTasks {
 
       // TODO would be nice if we could drop autovalue into this
       project.afterEvaluate {
-        val extension = project.extensions.getByType<SlackExtension>()
+        val extension = project.extensions.getByType<FoundryExtension>()
         val daggerConfig =
           extension.featuresHandler.daggerHandler.computeConfig(
             extension.featuresHandler.testFixturesUseDagger.getOrElse(false)

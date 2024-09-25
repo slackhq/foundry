@@ -28,11 +28,11 @@ import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 /**
- * (Mostly Gradle) properties for configuration of SlackPlugin.
+ * (Mostly Gradle) properties for configuration of Foundry Gradle Plugin.
  *
  * Order attempted as described by [PropertyResolver.providerFor].
  */
-public class SlackProperties
+public class FoundryProperties
 internal constructor(
   private val project: Project,
   startParameterProperty: (String) -> Provider<String>,
@@ -66,7 +66,7 @@ internal constructor(
       blankIsNull && it.isBlank()
     }
 
-  internal val versions: SlackVersions by lazy { SlackVersions(project.getVersionsCatalog()) }
+  internal val versions: FoundryVersions by lazy { FoundryVersions(project.getVersionsCatalog()) }
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
@@ -771,17 +771,17 @@ internal constructor(
 
     public operator fun invoke(
       project: Project,
-      slackTools: Provider<SlackTools>? = project.slackToolsProvider(),
-    ): SlackProperties {
+      foundryTools: Provider<FoundryTools>? = project.foundryToolsProvider(),
+    ): FoundryProperties {
       return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
-        SlackProperties(
+        FoundryProperties(
           project = p,
           startParameterProperty = { key ->
-            slackTools?.flatMap { tools -> tools.globalStartParameterProperty(key) }
+            foundryTools?.flatMap { tools -> tools.globalStartParameterProperty(key) }
               ?: p.provider { null }
           },
           globalLocalProperty = { key ->
-            slackTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
+            foundryTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
           },
         )
       }

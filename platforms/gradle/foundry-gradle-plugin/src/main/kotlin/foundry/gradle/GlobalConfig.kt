@@ -30,13 +30,13 @@ private constructor(
   internal companion object {
     operator fun invoke(project: Project): GlobalConfig {
       check(project == project.rootProject) { "Project is not root project!" }
-      val globalSlackProperties = SlackProperties(project)
+      val globalFoundryProperties = FoundryProperties(project)
       return GlobalConfig(
-        kotlinDaemonArgs = globalSlackProperties.kotlinDaemonArgs.split(" "),
+        kotlinDaemonArgs = globalFoundryProperties.kotlinDaemonArgs.split(" "),
         errorProneCheckNamesAsErrors =
-          globalSlackProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty(),
+          globalFoundryProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty(),
         affectedProjects =
-          globalSlackProperties.affectedProjects?.let { file ->
+          globalFoundryProperties.affectedProjects?.let { file ->
             project.logger.lifecycle("[Skippy] Affected projects found in '$file'")
             // Check file existence. This way we can allow specifying the property even if it
             // doesn't exist, which can be more convenient in CI pipelines.
@@ -50,7 +50,7 @@ private constructor(
             }
           },
         jvmVendor =
-          globalSlackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull.also {
+          globalFoundryProperties.jvmVendor.map(JvmVendorSpec::matching).orNull.also {
             project.logger.debug("[SGP] JVM vendor: $it")
           },
       )

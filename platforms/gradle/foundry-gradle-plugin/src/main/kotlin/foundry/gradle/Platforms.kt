@@ -241,8 +241,8 @@ public object Platforms {
     }
 
     val logger = project.logger
-    val slackProperties = SlackProperties(project)
-    val snapshotsEnabled = slackProperties.enableSnapshots
+    val foundryProperties = FoundryProperties(project)
+    val snapshotsEnabled = foundryProperties.enableSnapshots
 
     // Overrides provider, used when testing newer dependency versions on shadow builds
     // TODO We should just make the shadow build replace the versions in gradle.properties and
@@ -250,7 +250,7 @@ public object Platforms {
     //  logic
     val overridesProvider =
       project.providers.provider {
-        val path = slackProperties.versionsJson ?: return@provider sneakyNull()
+        val path = foundryProperties.versionsJson ?: return@provider sneakyNull()
         println("Parsing versions json at $path")
         path.source().buffer().use { JsonTools.MOSHI.adapter<VersionsOutput>().fromJson(it)!! }
       }

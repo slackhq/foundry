@@ -15,7 +15,7 @@
  */
 package foundry.gradle.lint
 
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.artifacts.SgpArtifact
@@ -44,9 +44,9 @@ internal object DetektTasks {
   private const val CI_DETEKT_TASK_NAME = "ciDetekt"
   private const val LOG = "SlackDetekt:"
 
-  fun configureRootProject(project: Project, slackProperties: SlackProperties) {
+  fun configureRootProject(project: Project, foundryProperties: FoundryProperties) {
     // Add detekt download task
-    slackProperties.versions.detekt?.let { detektVersion ->
+    foundryProperties.versions.detekt?.let { detektVersion ->
       project.tasks.register<DetektDownloadTask>("updateDetekt") {
         version.setDisallowChanges(detektVersion)
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/detekt"))
@@ -64,13 +64,13 @@ internal object DetektTasks {
 
   fun configureSubProject(
     project: Project,
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
   ) {
     check(!project.isRootProject) {
       "This method should only be called for subprojects, not the root project."
     }
-    if (slackProperties.versions.detekt == null) return
+    if (foundryProperties.versions.detekt == null) return
 
     project.pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
       project.logger.debug("$LOG Configuring Detekt tasks for project ${project.path}...")
@@ -79,9 +79,9 @@ internal object DetektTasks {
       project.configure<DetektExtension> {
         buildUponDefaultConfig = true
         toolVersion =
-          slackProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
+          foundryProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
         project.rootProject.file("config/detekt/detekt.yml")
-        slackProperties.detektConfigs?.let { configs ->
+        foundryProperties.detektConfigs?.let { configs ->
           for (configFile in configs) {
             config.from(project.rootProject.file(configFile))
           }
@@ -91,7 +91,7 @@ internal object DetektTasks {
         // default to using the project's "detekt-baseline.xml" file if available, which we don't
         // want.
         baseline =
-          slackProperties.detektBaselineFileName?.let { baselineFile ->
+          foundryProperties.detektBaselineFileName?.let { baselineFile ->
             project.layout.projectDirectory.file(baselineFile).asFile
           }
       }
@@ -101,7 +101,7 @@ internal object DetektTasks {
           Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_DETEKT)
         } else {
           val log = "$LOG Skipping ${project.path}:detekt because it is not affected."
-          if (slackProperties.debug) {
+          if (foundryProperties.debug) {
             project.logger.lifecycle(log)
           } else {
             project.logger.debug(log)
@@ -112,13 +112,13 @@ internal object DetektTasks {
 
       // Duplicate configs due to https://github.com/detekt/detekt/issues/5940
       project.tasks.configureEach<Detekt> {
-        this.jvmTarget = slackProperties.versions.jvmTarget.get().toString()
+        this.jvmTarget = foundryProperties.versions.jvmTarget.get().toString()
         exclude("**/build/**")
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
-        this.jvmTarget = slackProperties.versions.jvmTarget.get().toString()
+        this.jvmTarget = foundryProperties.versions.jvmTarget.get().toString()
         exclude("**/build/**")
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
@@ -127,7 +127,7 @@ internal object DetektTasks {
       // Wire up to the global task
       // We use a filter on Detekt tasks because not every project actually makes one!
       val taskSpec =
-        if (slackProperties.enableFullDetekt) {
+        if (foundryProperties.enableFullDetekt) {
           // Depend on all Detekt tasks with type resolution
           // The "detekt" task is excluded because it is a plain, non-type-resolution version
           Spec<String> { it != DetektPlugin.DETEKT_TASK_NAME }

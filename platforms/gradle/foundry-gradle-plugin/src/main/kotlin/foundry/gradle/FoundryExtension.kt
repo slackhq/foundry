@@ -29,7 +29,7 @@ import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import foundry.gradle.agp.PermissionAllowlistConfigurer
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
-import foundry.gradle.dependencies.SlackDependencies
+import foundry.gradle.dependencies.FoundryDependencies
 import foundry.gradle.util.addKspSource
 import foundry.gradle.util.configureKotlinCompilationTask
 import foundry.gradle.util.setDisallowChanges
@@ -47,23 +47,23 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.utils.named
 
-@DslMarker public annotation class SlackExtensionMarker
+@DslMarker public annotation class FoundryExtensionMarker
 
-@SlackExtensionMarker
-public abstract class SlackExtension
+@FoundryExtensionMarker
+public abstract class FoundryExtension
 @Inject
 constructor(
   objects: ObjectFactory,
-  globalSlackProperties: SlackProperties,
-  private val slackProperties: SlackProperties,
+  globalFoundryProperties: FoundryProperties,
+  private val foundryProperties: FoundryProperties,
   project: Project,
   versionCatalog: VersionCatalog,
 ) {
-  internal val androidHandler = objects.newInstance<AndroidHandler>(slackProperties)
+  internal val androidHandler = objects.newInstance<AndroidHandler>(foundryProperties)
   internal val featuresHandler =
     objects.newInstance<FeaturesHandler>(
-      globalSlackProperties,
-      slackProperties,
+      globalFoundryProperties,
+      foundryProperties,
       project,
       versionCatalog,
     )
@@ -96,7 +96,7 @@ constructor(
   }
 
   internal fun applyTo(project: Project) {
-    val logVerbose = slackProperties.slackExtensionVerbose
+    val logVerbose = foundryProperties.slackExtensionVerbose
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       featuresHandler.applyTo(project)
@@ -104,9 +104,9 @@ constructor(
       var kaptRequired = false
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
-      val allowKsp = slackProperties.allowKsp
-      val allowMoshiIr = slackProperties.allowMoshiIr
-      val anvilMode = slackProperties.anvilMode
+      val allowKsp = foundryProperties.allowKsp
+      val allowMoshiIr = foundryProperties.allowMoshiIr
+      val anvilMode = foundryProperties.anvilMode
       val allowDaggerKsp = anvilMode.useKspContributionMerging && anvilMode.useDaggerKsp
 
       /** Marks this project as needing kapt code gen. */
@@ -163,7 +163,7 @@ constructor(
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
         }
-        if (slackProperties.moshixGenerateProguardRules) {
+        if (foundryProperties.moshixGenerateProguardRules) {
           markKspNeeded("Moshi IR code gen")
         }
       }
@@ -188,11 +188,11 @@ constructor(
         )
       val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspContributionMerging
       if (daggerConfig != null) {
-        dependencies.add("implementation", SlackDependencies.Dagger.dagger)
-        dependencies.add("implementation", SlackDependencies.javaxInject)
+        dependencies.add("implementation", FoundryDependencies.Dagger.dagger)
+        dependencies.add("implementation", FoundryDependencies.javaxInject)
 
         val anvilPackage =
-          if (slackProperties.anvilUseKspFork) {
+          if (foundryProperties.anvilUseKspFork) {
             "dev.zacsweers.anvil"
           } else {
             "com.squareup.anvil"
@@ -217,9 +217,9 @@ constructor(
         }
 
         if (daggerConfig.enableAnvil) {
-          if (!slackProperties.disableAnvilForK2Testing) {
+          if (!foundryProperties.disableAnvilForK2Testing) {
             val anvilId =
-              if (slackProperties.anvilUseKspFork) {
+              if (foundryProperties.anvilUseKspFork) {
                 "dev.zacsweers.anvil"
               } else {
                 "com.squareup.anvil"
@@ -250,10 +250,12 @@ constructor(
               //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
               //  let's make this optional
               // afterEvaluate is necessary in order to wait for tasks to exist
-              if (slackProperties.kspConnectSqlDelight || slackProperties.kspConnectViewBinding) {
+              if (
+                foundryProperties.kspConnectSqlDelight || foundryProperties.kspConnectViewBinding
+              ) {
                 afterEvaluate {
                   if (
-                    slackProperties.kspConnectSqlDelight &&
+                    foundryProperties.kspConnectSqlDelight &&
                       pluginManager.hasPlugin("app.cash.sqldelight")
                   ) {
                     val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
@@ -283,9 +285,9 @@ constructor(
 
                   // If using viewbinding, need to wire those up too
                   if (
-                    slackProperties.kspConnectViewBinding &&
+                    foundryProperties.kspConnectViewBinding &&
                       isAndroidLibrary &&
-                      !slackProperties.libraryWithVariants &&
+                      !foundryProperties.libraryWithVariants &&
                       androidHandler.isViewBindingEnabled
                   ) {
                     val databindingTask =
@@ -305,7 +307,7 @@ constructor(
               val generatorProjects =
                 buildSet<Any> {
                   addAll(
-                    slackProperties.anvilGeneratorProjects
+                    foundryProperties.anvilGeneratorProjects
                       ?.splitToSequence(";")
                       ?.map(::project)
                       .orEmpty()
@@ -319,7 +321,7 @@ constructor(
           }
 
           val runtimeProjects =
-            slackProperties.anvilRuntimeProjects?.splitToSequence(";")?.toSet().orEmpty()
+            foundryProperties.anvilRuntimeProjects?.splitToSequence(";")?.toSet().orEmpty()
 
           for (runtimeProject in runtimeProjects) {
             dependencies.add("implementation", project(runtimeProject))
@@ -332,12 +334,12 @@ constructor(
         if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
           if (allowDaggerKsp && (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)) {
             markKspNeeded("Dagger compiler")
-            dependencies.add(kspConfiguration(""), SlackDependencies.Dagger.compiler)
+            dependencies.add(kspConfiguration(""), FoundryDependencies.Dagger.compiler)
             // Currently we don't support dagger-compiler or components in test fixtures, but if we
             // did it would go here
           } else {
             markKaptNeeded("Dagger compiler")
-            dependencies.add(aptConfiguration(), SlackDependencies.Dagger.compiler)
+            dependencies.add(aptConfiguration(), FoundryDependencies.Dagger.compiler)
           }
         }
       }
@@ -351,12 +353,12 @@ constructor(
       if (featuresHandler.autoService.getOrElse(false)) {
         if (allowKsp) {
           markKspNeeded("AutoService")
-          dependencies.add("implementation", SlackDependencies.Auto.Service.annotations)
-          dependencies.add("ksp", SlackDependencies.Auto.Service.ksp)
+          dependencies.add("implementation", FoundryDependencies.Auto.Service.annotations)
+          dependencies.add("ksp", FoundryDependencies.Auto.Service.ksp)
         } else {
           markKaptNeeded("AutoService")
-          dependencies.add("compileOnly", SlackDependencies.Auto.Service.annotations)
-          dependencies.add(aptConfiguration(), SlackDependencies.Auto.Service.autoservice)
+          dependencies.add("compileOnly", FoundryDependencies.Auto.Service.annotations)
+          dependencies.add(aptConfiguration(), FoundryDependencies.Auto.Service.autoservice)
         }
       }
 
@@ -365,53 +367,53 @@ constructor(
       }
 
       if (featuresHandler.moshiHandler.moshi.getOrElse(false)) {
-        dependencies.add("implementation", SlackDependencies.Moshi.moshi)
+        dependencies.add("implementation", FoundryDependencies.Moshi.moshi)
         if (moshiCodegenEnabled) {
           if (allowMoshiIr) {
             markMoshiGradleNeeded("Moshi code gen", false)
           } else if (allowKsp) {
             markKspNeeded("Moshi code gen")
-            dependencies.add("ksp", SlackDependencies.Moshi.codeGen)
+            dependencies.add("ksp", FoundryDependencies.Moshi.codeGen)
           } else {
             markKaptNeeded("Moshi code gen")
-            dependencies.add(aptConfiguration(), SlackDependencies.Moshi.codeGen)
+            dependencies.add(aptConfiguration(), FoundryDependencies.Moshi.codeGen)
           }
         }
         if (featuresHandler.moshiHandler.moshiAdapters.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Moshi.adapters)
+          dependencies.add("implementation", FoundryDependencies.Moshi.adapters)
         }
         if (featuresHandler.moshiHandler.moshiKotlinReflect.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Moshi.kotlinReflect)
+          dependencies.add("implementation", FoundryDependencies.Moshi.kotlinReflect)
         }
         if (featuresHandler.moshiHandler.moshixAdapters.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Moshi.MoshiX.adapters)
+          dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.adapters)
         }
         if (featuresHandler.moshiHandler.moshixMetadataReflect.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Moshi.MoshiX.metadataReflect)
+          dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.metadataReflect)
         }
         if (featuresHandler.moshiHandler.lazyAdapters.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Moshi.lazyAdapters)
+          dependencies.add("implementation", FoundryDependencies.Moshi.lazyAdapters)
         }
         if (featuresHandler.moshiHandler.sealed.getOrElse(false)) {
-          dependencies.add("implementation", SlackDependencies.Moshi.MoshiX.Sealed.runtime)
+          dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.Sealed.runtime)
           if (moshiSealedCodegenEnabled) {
             if (allowMoshiIr) {
               markMoshiGradleNeeded("Moshi sealed codegen", enableSealed = true)
             } else if (allowKsp) {
               markKspNeeded("Moshi sealed codegen")
-              dependencies.add("ksp", SlackDependencies.Moshi.MoshiX.Sealed.codegen)
+              dependencies.add("ksp", FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
             } else {
               markKaptNeeded("Moshi sealed codegen")
-              dependencies.add(aptConfiguration(), SlackDependencies.Moshi.MoshiX.Sealed.codegen)
+              dependencies.add(aptConfiguration(), FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
             }
           }
           if (featuresHandler.moshiHandler.sealedReflect.getOrElse(false)) {
-            dependencies.add("implementation", SlackDependencies.Moshi.MoshiX.Sealed.reflect)
+            dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.Sealed.reflect)
           }
           if (featuresHandler.moshiHandler.sealedMetadataReflect.getOrElse(false)) {
             dependencies.add(
               "implementation",
-              SlackDependencies.Moshi.MoshiX.Sealed.metadataReflect,
+              FoundryDependencies.Moshi.MoshiX.Sealed.metadataReflect,
             )
           }
         }
@@ -433,13 +435,13 @@ constructor(
   }
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class FeaturesHandler
 @Inject
 constructor(
   objects: ObjectFactory,
-  globalSlackProperties: SlackProperties,
-  private val slackProperties: SlackProperties,
+  globalFoundryProperties: FoundryProperties,
+  private val foundryProperties: FoundryProperties,
   private val project: Project,
   versionCatalog: VersionCatalog,
 ) {
@@ -464,9 +466,9 @@ constructor(
 
   // Compose features
   internal val composeHandler =
-    objects.newInstance<ComposeHandler>(globalSlackProperties, slackProperties, versionCatalog)
+    objects.newInstance<ComposeHandler>(globalFoundryProperties, foundryProperties, versionCatalog)
 
-  /** @see [SlackExtension.androidExtension] */
+  /** @see [FoundryExtension.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
     set(value) {
       field = value
@@ -523,7 +525,7 @@ constructor(
    *   (slower!) because Anvil only processes Kotlin files.
    * @param action optional block for extra configuration, such as anvil generators or android.
    */
-  @DelicateSlackPluginApi
+  @DelicateFoundryGradlePluginApi
   public fun dagger(
     enableComponents: Boolean = false,
     projectHasJavaInjections: Boolean = false,
@@ -606,7 +608,7 @@ constructor(
 
   /**
    * Enables Compose for this project and applies any version catalog bundle dependencies defined by
-   * [SlackProperties.defaultComposeAndroidBundleAlias].
+   * [FoundryProperties.defaultComposeAndroidBundleAlias].
    */
   public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
     composeHandler.enable(project = project, multiplatform = multiplatform)
@@ -615,7 +617,7 @@ constructor(
 
   internal fun applyTo(project: Project) {
     composeHandler.applyTo(project)
-    circuitHandler.applyTo(project, slackProperties)
+    circuitHandler.applyTo(project, foundryProperties)
     // Validate we've enabled dagger if we requested test fixtures with dagger code
     if (testFixturesUseDagger.getOrElse(false) && !daggerHandler.enabled.getOrElse(false)) {
       error(
@@ -626,7 +628,7 @@ constructor(
   }
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class MoshiHandler {
   internal abstract val moshi: Property<Boolean>
   internal abstract val moshiAdapters: Property<Boolean>
@@ -681,7 +683,7 @@ public abstract class MoshiHandler {
 }
 
 /** DSL for configuring Circuit. */
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory) {
   /** Sets up circuit code gen, includes annotations and KSP setup. */
   public val codegen: Property<Boolean> = objects.property<Boolean>().convention(false)
@@ -704,7 +706,7 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
     action.execute(circuitx)
   }
 
-  internal fun applyTo(project: Project, slackProperties: SlackProperties) {
+  internal fun applyTo(project: Project, foundryProperties: FoundryProperties) {
     if (runtime.getOrElse(false)) {
       project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime")
       project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime-presenter")
@@ -715,7 +717,7 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
       project.dependencies.add("implementation", "com.slack.circuit:circuit-foundation")
     }
     if (commonBundle.getOrElse(false)) {
-      slackProperties.versions.bundles.commonCircuit.ifPresent {
+      foundryProperties.versions.bundles.commonCircuit.ifPresent {
         project.dependencies.add("implementation", it)
       }
     }
@@ -723,7 +725,7 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
     circuitx.applyTo(project)
   }
 
-  @SlackExtensionMarker
+  @FoundryExtensionMarker
   public abstract class CircuitXHandler @Inject constructor(objects: ObjectFactory) {
     /** Corresponds to the circuitx-android artifact. */
     public val android: Property<Boolean> = objects.property<Boolean>().convention(false)
@@ -748,7 +750,7 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
   }
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) {
   internal val enabled: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val useDaggerCompiler: Property<Boolean> = objects.property<Boolean>().convention(false)
@@ -781,7 +783,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
    * incurs a cost of disabling incremental kapt stubs. If we need it though (aka this is running in
    * app-di or another project that actually has components), this can be always enabled as needed.
    */
-  @DelicateSlackPluginApi
+  @DelicateFoundryGradlePluginApi
   public fun alwaysEnableAnvilComponentMerging() {
     alwaysEnableAnvilComponentMerging.setDisallowChanges(true)
   }
@@ -790,7 +792,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
    * Disables anvil. Should only be used for cases where anvil is explicitly not wanted, such as
    * using Dagger KSP while Anvil doesn't support it.
    */
-  @DelicateSlackPluginApi
+  @DelicateFoundryGradlePluginApi
   public fun disableAnvil() {
     disableAnvil.setDisallowChanges(true)
   }
@@ -834,25 +836,25 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
   )
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class ComposeHandler
 @Inject
 constructor(
   objects: ObjectFactory,
-  globalSlackProperties: SlackProperties,
-  private val slackProperties: SlackProperties,
+  globalFoundryProperties: FoundryProperties,
+  private val foundryProperties: FoundryProperties,
   versionCatalog: VersionCatalog,
 ) {
 
   private val composeBundleAlias =
-    globalSlackProperties.defaultComposeAndroidBundleAlias?.let { alias ->
+    globalFoundryProperties.defaultComposeAndroidBundleAlias?.let { alias ->
       versionCatalog.findBundle(alias).orElse(null)
     }
   internal val enabled = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   private val compilerOptions: ListProperty<String> =
-    objects.listProperty<String>().convention(slackProperties.composeCommonCompilerOptions)
+    objects.listProperty<String>().convention(foundryProperties.composeCommonCompilerOptions)
 
   /**
    * Configures the compiler options for Compose. This is a list of strings that will be passed into
@@ -886,7 +888,7 @@ constructor(
    * Enables compose compiler metrics for this project. Note this should not be enabled by default
    * and is just for debugging!
    */
-  @DelicateSlackPluginApi
+  @DelicateFoundryGradlePluginApi
   public fun enableCompilerMetricsForDebugging(
     reportsDestination: File,
     metricsDestination: File = reportsDestination,
@@ -911,9 +913,9 @@ constructor(
           composeOptions {
             // Disable live literals by default
             @Suppress("DEPRECATION")
-            useLiveLiterals = slackProperties.composeEnableLiveLiterals
+            useLiveLiterals = foundryProperties.composeEnableLiveLiterals
           }
-        } else if (slackProperties.composeEnableLiveLiterals) {
+        } else if (foundryProperties.composeEnableLiveLiterals) {
           project.logger.error(
             "Live literals are disabled and deprecated in AGP 8.7+. " +
               "Please remove the `slack.compose.android.enableLiveLiterals` property."
@@ -933,9 +935,9 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
 
-      if (slackProperties.composeStabilityConfigurationPath.isPresent) {
+      if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
         extension.stabilityConfigurationFile.setDisallowChanges(
-          slackProperties.composeStabilityConfigurationPath
+          foundryProperties.composeStabilityConfigurationPath
         )
       }
 
@@ -943,7 +945,7 @@ constructor(
       // about those options and _avoid_ setting them a second time
       val freeOptions = mutableListOf<String>()
       var includeSourceInformation =
-        slackProperties.composeIncludeSourceInformationEverywhereByDefault
+        foundryProperties.composeIncludeSourceInformationEverywhereByDefault
       for ((k, v) in compilerOptions.get().map { it.split('=') }) {
         project.logger.debug("Processing compose option $k = $v")
         when (k) {
@@ -1004,7 +1006,7 @@ constructor(
       if (includeSourceInformation) {
         if (androidExtension == null) {
           extension.includeSourceInformation.set(true)
-        } else if (slackProperties.composeUseIncludeInformationWorkaround) {
+        } else if (foundryProperties.composeUseIncludeInformationWorkaround) {
           freeOptions += "$OPTION_SOURCE_INFORMATION=true"
         }
       }
@@ -1026,17 +1028,17 @@ constructor(
   }
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class AndroidHandler
 @Inject
-constructor(objects: ObjectFactory, private val slackProperties: SlackProperties) {
+constructor(objects: ObjectFactory, private val foundryProperties: FoundryProperties) {
   internal val libraryHandler = objects.newInstance<SlackAndroidLibraryExtension>()
   internal val appHandler = objects.newInstance<SlackAndroidAppExtension>()
 
   @Suppress("MemberVisibilityCanBePrivate")
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
-  /** @see [SlackExtension.androidExtension] */
+  /** @see [FoundryExtension.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
     set(value) {
       field = value
@@ -1066,23 +1068,23 @@ constructor(objects: ObjectFactory, private val slackProperties: SlackProperties
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       if (featuresHandler.robolectric.getOrElse(false)) {
-        checkNotNull(slackProperties.versions.robolectric) {
+        checkNotNull(foundryProperties.versions.robolectric) {
           "Robolectric support requested in ${project.path} but no version was specified in the version catalog."
         }
         project.dependencies.apply {
           // For projects using robolectric, we want to make sure they include robolectric-core to
           // ensure robolectric uses our custom dependency resolver and config (which just need
           // to be on the classpath).
-          add("testImplementation", SlackDependencies.Testing.Robolectric.annotations)
-          add("testImplementation", SlackDependencies.Testing.Robolectric.robolectric)
-          slackProperties.robolectricCoreProject?.let { add("testImplementation", project(it)) }
+          add("testImplementation", FoundryDependencies.Testing.Robolectric.annotations)
+          add("testImplementation", FoundryDependencies.Testing.Robolectric.robolectric)
+          foundryProperties.robolectricCoreProject?.let { add("testImplementation", project(it)) }
         }
       }
     }
   }
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val androidTest: Property<Boolean>
   internal abstract val androidTestExcludeFromFladle: Property<Boolean>
@@ -1134,12 +1136,12 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   }
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class SlackAndroidLibraryExtension {
   // Left as a toe-hold for the future
 }
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class SlackAndroidAppExtension {
   internal var allowlistAction: Action<PermissionAllowlistConfigurer>? = null
 

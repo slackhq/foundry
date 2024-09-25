@@ -21,6 +21,6 @@ import org.jetbrains.jewel.foundation.ExperimentalJewelApi
 
 @OptIn(ExperimentalJewelApi::class)
 @Composable
-fun SlackDesktopTheme(content: @Composable () -> Unit) {
+fun FoundryDesktopTheme(content: @Composable () -> Unit) {
   SwingBridgeTheme(content = content)
 }

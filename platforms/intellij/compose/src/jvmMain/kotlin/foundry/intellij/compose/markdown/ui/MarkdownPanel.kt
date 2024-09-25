@@ -54,7 +54,7 @@ import com.mikepenz.markdown.model.DefaultMarkdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.markdownExtendedSpans
-import foundry.intellij.compose.projectgen.SlackDesktopTheme
+import foundry.intellij.compose.projectgen.FoundryDesktopTheme
 import java.awt.Dimension
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
@@ -71,7 +71,7 @@ object MarkdownPanel {
       // Necessary to avoid an NPE in JPanel
       // This is just a minimum
       preferredSize = Dimension(400, 600)
-      setContent { SlackDesktopTheme { MarkdownContent(computeMarkdown = computeMarkdown) } }
+      setContent { FoundryDesktopTheme { MarkdownContent(computeMarkdown = computeMarkdown) } }
     }
   }
 }

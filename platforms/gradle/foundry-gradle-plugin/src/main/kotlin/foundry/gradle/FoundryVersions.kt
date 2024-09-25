@@ -27,7 +27,7 @@ import org.gradle.api.provider.Provider
  * as they appear in the toml file.
  */
 // TODO generate something to map these in the future? Or with reflection?
-internal class SlackVersions(val catalog: VersionCatalog) {
+internal class FoundryVersions(val catalog: VersionCatalog) {
   val agp: String?
     get() = getOptionalValue("agp").orElse(null)
 

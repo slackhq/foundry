@@ -20,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposePanel
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
-import foundry.intellij.compose.projectgen.SlackDesktopTheme
+import foundry.intellij.compose.projectgen.FoundryDesktopTheme
 import java.awt.Dimension
 import javax.swing.JComponent
 
@@ -28,7 +28,7 @@ object ChatPanel {
   fun createPanel(): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
-      setContent { SlackDesktopTheme { ChatApp() } }
+      setContent { FoundryDesktopTheme { ChatApp() } }
     }
   }
 

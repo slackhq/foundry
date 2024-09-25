@@ -15,8 +15,8 @@
  */
 package foundry.gradle.avoidance
 
-import foundry.gradle.SlackExtensionMarker
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryExtensionMarker
+import foundry.gradle.FoundryProperties
 import foundry.gradle.property
 import foundry.gradle.setProperty
 import foundry.skippy.AffectedProjectsDefaults.DEFAULT_INCLUDE_PATTERNS
@@ -32,13 +32,13 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 
-@SlackExtensionMarker
+@FoundryExtensionMarker
 public abstract class SkippyExtension
 @Inject
-constructor(slackProperties: SlackProperties, objects: ObjectFactory) {
+constructor(foundryProperties: FoundryProperties, objects: ObjectFactory) {
 
   public val debug: Property<Boolean> =
-    objects.property<Boolean>().convention(slackProperties.debug)
+    objects.property<Boolean>().convention(foundryProperties.debug)
 
   public val mergeOutputs: Property<Boolean> = objects.property<Boolean>().convention(true)
 

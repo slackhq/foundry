@@ -15,7 +15,7 @@
  */
 package foundry.gradle.tasks.robolectric
 
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.register
 import foundry.gradle.robolectricJars
 import foundry.gradle.tasks.BootstrapTask
@@ -97,11 +97,11 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
 
     fun register(
       project: Project,
-      slackProperties: SlackProperties,
+      foundryProperties: FoundryProperties,
     ): TaskProvider<UpdateRobolectricJarsTask> {
       return project.tasks.register<UpdateRobolectricJarsTask>(NAME) {
-        val iVersion = slackProperties.robolectricIVersion
-        for (sdkInt in slackProperties.robolectricTestSdks) {
+        val iVersion = foundryProperties.robolectricIVersion
+        for (sdkInt in foundryProperties.robolectricTestSdks) {
           // Create a new configuration
           val sdk = sdkFor(sdkInt, iVersion)
           // Add relevant dep

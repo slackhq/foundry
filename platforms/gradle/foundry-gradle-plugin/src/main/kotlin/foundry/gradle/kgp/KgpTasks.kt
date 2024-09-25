@@ -19,8 +19,8 @@ import com.android.build.api.AndroidPluginVersion
 import com.android.build.gradle.BaseExtension
 import foundry.gradle.Configurations
 import foundry.gradle.Configurations.isKnownConfiguration
-import foundry.gradle.SlackProperties
-import foundry.gradle.SlackTools
+import foundry.gradle.FoundryProperties
+import foundry.gradle.FoundryTools
 import foundry.gradle.asProvider
 import foundry.gradle.configure
 import foundry.gradle.lint.DetektTasks
@@ -60,15 +60,19 @@ internal object KgpTasks {
   private val FIXED_KOTLIN_OPTIONS_AGP_VERSION = AndroidPluginVersion(8, 8)
 
   @Suppress("LongMethod")
-  fun configure(project: Project, slackTools: SlackTools, slackProperties: SlackProperties) {
+  fun configure(
+    project: Project,
+    foundryTools: FoundryTools,
+    foundryProperties: FoundryProperties,
+  ) {
     project.pluginManager.onFirst(KGP_PLUGINS) {
       val kotlinExtension = project.kotlinExtension
       kotlinExtension.apply {
-        kotlinDaemonJvmArgs = slackTools.globalConfig.kotlinDaemonArgs
-        slackProperties.versions.jdk.ifPresent { jdkVersion ->
+        kotlinDaemonJvmArgs = foundryTools.globalConfig.kotlinDaemonArgs
+        foundryProperties.versions.jdk.ifPresent { jdkVersion ->
           jvmToolchain {
             languageVersion.set(JavaLanguageVersion.of(jdkVersion))
-            slackTools.globalConfig.jvmVendor?.let(vendor::set)
+            foundryTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         }
       }
@@ -76,27 +80,29 @@ internal object KgpTasks {
       val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
 
       val jvmTargetProvider =
-        slackProperties.versions.jvmTarget
+        foundryProperties.versions.jvmTarget
           .map { JvmTarget.fromTarget(it.toString()) }
           .asProvider(project.providers)
 
-      if (isKotlinAndroid && slackTools.agpHandler.agpVersion < FIXED_KOTLIN_OPTIONS_AGP_VERSION) {
+      if (
+        isKotlinAndroid && foundryTools.agpHandler.agpVersion < FIXED_KOTLIN_OPTIONS_AGP_VERSION
+      ) {
         project.afterEvaluate {
-          configureKotlinCompileTasks(project, slackProperties, jvmTargetProvider, true)
+          configureKotlinCompileTasks(project, foundryProperties, jvmTargetProvider, true)
         }
       } else {
-        configureKotlinCompileTasks(project, slackProperties, jvmTargetProvider, isKotlinAndroid)
+        configureKotlinCompileTasks(project, foundryProperties, jvmTargetProvider, isKotlinAndroid)
       }
 
-      if (slackProperties.autoApplyDetekt) {
+      if (foundryProperties.autoApplyDetekt) {
         project.project.pluginManager.apply("io.gitlab.arturbosch.detekt")
       }
     }
 
     DetektTasks.configureSubProject(
       project.project,
-      slackProperties,
-      slackTools.globalConfig.affectedProjects,
+      foundryProperties,
+      foundryTools.globalConfig.affectedProjects,
     )
 
     project.pluginManager.withPlugin("org.jetbrains.kotlin.android") {
@@ -136,7 +142,7 @@ internal object KgpTasks {
       }
 
       // See doc on the property for details
-      if (!slackProperties.enableKaptInTests) {
+      if (!foundryProperties.enableKaptInTests) {
         project.tasks.configureEach {
           if (name.startsWith("kapt") && name.endsWith("TestKotlin", ignoreCase = true)) {
             enabled = false
@@ -147,7 +153,7 @@ internal object KgpTasks {
       project.tasks.withType(KaptGenerateStubsTask::class.java).configureEach {
         compilerOptions {
           val zipped =
-            slackProperties.kotlinProgressive.zip(slackProperties.kaptLanguageVersion) {
+            foundryProperties.kotlinProgressive.zip(foundryProperties.kaptLanguageVersion) {
               progressive,
               kaptLanguageVersion ->
               if (kaptLanguageVersion != KotlinVersion.DEFAULT) {
@@ -158,8 +164,8 @@ internal object KgpTasks {
             }
           progressiveMode.set(zipped)
 
-          if (slackProperties.kaptLanguageVersion.isPresent) {
-            languageVersion.set(slackProperties.kaptLanguageVersion)
+          if (foundryProperties.kaptLanguageVersion.isPresent) {
+            languageVersion.set(foundryProperties.kaptLanguageVersion)
           }
         }
       }
@@ -168,25 +174,25 @@ internal object KgpTasks {
 
   private fun configureKotlinCompileTasks(
     project: Project,
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     jvmTargetProvider: Provider<JvmTarget>,
     isKotlinAndroid: Boolean,
   ) {
     project.tasks.configureKotlinCompilationTask {
       compilerOptions {
-        progressiveMode.set(slackProperties.kotlinProgressive)
-        optIn.addAll(slackProperties.kotlinOptIn)
-        if (slackProperties.kotlinLanguageVersionOverride.isPresent) {
+        progressiveMode.set(foundryProperties.kotlinProgressive)
+        optIn.addAll(foundryProperties.kotlinOptIn)
+        if (foundryProperties.kotlinLanguageVersionOverride.isPresent) {
           languageVersion.set(
-            slackProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
+            foundryProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
           )
         }
         if (this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)) {
-          allWarningsAsErrors.setDisallowChanges(slackProperties.allowWarningsInTests.not())
+          allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarningsInTests.not())
         } else {
-          allWarningsAsErrors.setDisallowChanges(slackProperties.allowWarnings.not())
+          allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarnings.not())
         }
-        freeCompilerArgs.addAll(slackProperties.kotlinFreeArgs)
+        freeCompilerArgs.addAll(foundryProperties.kotlinFreeArgs)
 
         if (this is KotlinJvmCompilerOptions) {
           jvmTarget.set(jvmTargetProvider)
@@ -194,7 +200,7 @@ internal object KgpTasks {
           // Potentially useful for static analysis or annotation processors
           javaParameters.set(true)
 
-          freeCompilerArgs.addAll(slackProperties.kotlinJvmFreeArgs)
+          freeCompilerArgs.addAll(foundryProperties.kotlinJvmFreeArgs)
 
           // Set the module name to a dashified version of the project path to ensure uniqueness
           // in created .kotlin_module files

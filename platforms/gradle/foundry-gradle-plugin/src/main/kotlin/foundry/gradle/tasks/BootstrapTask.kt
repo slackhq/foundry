@@ -15,7 +15,7 @@
  */
 package foundry.gradle.tasks
 
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.isCi
 import foundry.gradle.isRootProject
 import foundry.gradle.listProperty
@@ -249,7 +249,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       mutableMapOf(
         "org.gradle.jvmargs" to
           "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError ${gradleArgs.args.joinToString(" ")}",
-        SlackProperties.KOTLIN_DAEMON_ARGS_KEY to
+        FoundryProperties.KOTLIN_DAEMON_ARGS_KEY to
           "-Duser.country=US -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError ${kotlinArgs.args.joinToString(" ")}",
       )
 
@@ -424,9 +424,9 @@ internal object BootstrapUtils {
           customCoreMultiplier = providers.environmentVariable("BOOTSTRAP_CORE_MULTIPLIER"),
           gradleMemoryPercentage = providers.environmentVariable("GRADLE_MEMORY_PERCENT"),
           minGradleXmx =
-            providers.gradleProperty(SlackProperties.MIN_GRADLE_XMX).mapToInt().orElse(1),
+            providers.gradleProperty(FoundryProperties.MIN_GRADLE_XMX).mapToInt().orElse(1),
           minGradleXms =
-            providers.gradleProperty(SlackProperties.MIN_GRADLE_XMS).mapToInt().orElse(1),
+            providers.gradleProperty(FoundryProperties.MIN_GRADLE_XMS).mapToInt().orElse(1),
           extraJvmArgs = providers.provider { emptyList() },
           garbageCollector = providers.environmentVariable("BOOTSTRAP_GC"),
         )

@@ -15,10 +15,10 @@
  */
 package foundry.gradle.dependencies
 
-import foundry.gradle.dependencies.SlackDependencies.artifact
+import foundry.gradle.dependencies.FoundryDependencies.artifact
 
 /**
- * Slack dependencies! Please keep these in order:
+ * Foundry dependencies! Please keep these in order:
  * - Properties before types
  * - Alphabetical order
  *
@@ -75,7 +75,7 @@ import foundry.gradle.dependencies.SlackDependencies.artifact
  * ```
  */
 @Suppress("MemberNameEqualsClassName") // Detekt is being silly here
-internal object SlackDependencies : DependencySet() {
+internal object FoundryDependencies : DependencySet() {
 
   internal val javaxInject: Any by artifact("javax.inject", "javax.inject")
 

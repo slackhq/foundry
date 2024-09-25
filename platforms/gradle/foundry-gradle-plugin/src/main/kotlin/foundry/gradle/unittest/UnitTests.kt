@@ -15,7 +15,7 @@
  */
 package foundry.gradle.unittest
 
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.artifacts.SgpArtifact
@@ -62,8 +62,8 @@ internal object UnitTests {
   private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
   private const val LOG = "SlackUnitTests:"
 
-  private fun maxForks(slackProperties: SlackProperties): Int {
-    val multiplier = slackProperties.unitTestParallelismMultiplier
+  private fun maxForks(foundryProperties: FoundryProperties): Int {
+    val multiplier = foundryProperties.unitTestParallelismMultiplier
     return max((Runtime.getRuntime().availableProcessors() * multiplier).roundToInt(), 1)
   }
 
@@ -81,24 +81,25 @@ internal object UnitTests {
   fun configureSubproject(
     project: Project,
     pluginId: String,
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) {
     // Projects can opt out of creating the task with this property.
     // android test projects don't support unit tests
-    val enabled = slackProperties.ciUnitTestEnabled && pluginId != "com.android.test"
+    val enabled = foundryProperties.ciUnitTestEnabled && pluginId != "com.android.test"
     if (!enabled) {
       project.logger.debug("$LOG Skipping creation of \"$CI_UNIT_TEST_TASK_NAME\" task")
       return
     }
 
-    slackProperties.versions.bundles.commonTest.ifPresent {
+    foundryProperties.versions.bundles.commonTest.ifPresent {
       project.dependencies.add("testImplementation", it)
     }
 
     if (
-      slackProperties.ciUnitTestEnableKover && project.path != slackProperties.platformProjectPath
+      foundryProperties.ciUnitTestEnableKover &&
+        project.path != foundryProperties.platformProjectPath
     ) {
       project.pluginManager.apply("org.jetbrains.kotlinx.kover")
     }
@@ -110,7 +111,7 @@ internal object UnitTests {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)
         val log = "$LOG Skipping $taskPath because it is not affected."
-        if (slackProperties.debug) {
+        if (foundryProperties.debug) {
           project.logger.lifecycle(log)
         } else {
           project.logger.debug(log)
@@ -136,7 +137,7 @@ internal object UnitTests {
       }
     }
 
-    configureTestTasks(project, slackProperties)
+    configureTestTasks(project, foundryProperties)
   }
 
   private fun createAndroidCiUnitTestTask(
@@ -157,7 +158,7 @@ internal object UnitTests {
     }
   }
 
-  private fun configureTestTasks(project: Project, slackProperties: SlackProperties) {
+  private fun configureTestTasks(project: Project, foundryProperties: FoundryProperties) {
     val isCi = project.isCi
 
     // Unit test task configuration
@@ -165,7 +166,7 @@ internal object UnitTests {
       // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
       // CPUs.
       maxParallelForks =
-        maxForks(slackProperties).also { logger.debug("$LOG Setting maxParallelForks to $it") }
+        maxForks(foundryProperties).also { logger.debug("$LOG Setting maxParallelForks to $it") }
 
       // Denote flaky failures as <flakyFailure> instead of <failure> in JUnit test XML files
       reports.junitXml.mergeReruns.setDisallowChanges(true)
@@ -177,7 +178,7 @@ internal object UnitTests {
 
       // helps when tests leak memory
       // Suppression is because the property syntax uses a deprecated Gradle API
-      @Suppress("UsePropertyAccessSyntax") setForkEvery(slackProperties.unitTestForkEvery)
+      @Suppress("UsePropertyAccessSyntax") setForkEvery(foundryProperties.unitTestForkEvery)
 
       // Cap JVM args per test
       minHeapSize = "128m"
@@ -207,7 +208,7 @@ internal object UnitTests {
       // https://github.com/robolectric/robolectric/releases/tag/robolectric-4.10-alpha-1
       systemProperty("robolectric.graphicsMode", "NATIVE")
 
-      if (slackProperties.testVerboseLogging) {
+      if (foundryProperties.testVerboseLogging) {
         // Add additional logging on Jenkins to help debug hanging or OOM-ing unit tests.
         testLogging {
           showStandardStreams = true
@@ -240,15 +241,17 @@ internal object UnitTests {
     }
 
     if (isCi) {
-      if (slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN) {
+      if (
+        foundryProperties.testRetryPluginType == FoundryProperties.TestRetryPluginType.RETRY_PLUGIN
+      ) {
         project.pluginManager.withPlugin("org.gradle.test-retry") {
           project.tasks.withType(Test::class.java).configureEach {
             retry {
               failOnPassedAfterRetry.setDisallowChanges(
-                slackProperties.testRetryFailOnPassedAfterRetry
+                foundryProperties.testRetryFailOnPassedAfterRetry
               )
-              maxFailures.setDisallowChanges(slackProperties.testRetryMaxFailures)
-              maxRetries.setDisallowChanges(slackProperties.testRetryMaxRetries)
+              maxFailures.setDisallowChanges(foundryProperties.testRetryMaxFailures)
+              maxRetries.setDisallowChanges(foundryProperties.testRetryMaxRetries)
             }
           }
         }
@@ -257,10 +260,10 @@ internal object UnitTests {
         project.tasks.withType(Test::class.java).configureEach {
           develocity.testRetry {
             failOnPassedAfterRetry.setDisallowChanges(
-              slackProperties.testRetryFailOnPassedAfterRetry
+              foundryProperties.testRetryFailOnPassedAfterRetry
             )
-            maxFailures.setDisallowChanges(slackProperties.testRetryMaxFailures)
-            maxRetries.setDisallowChanges(slackProperties.testRetryMaxRetries)
+            maxFailures.setDisallowChanges(foundryProperties.testRetryMaxFailures)
+            maxRetries.setDisallowChanges(foundryProperties.testRetryMaxRetries)
           }
         }
       }

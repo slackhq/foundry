@@ -17,7 +17,7 @@ package foundry.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.register
 import foundry.gradle.util.setDisallowChanges
 import java.io.ObjectOutputStream
@@ -67,12 +67,12 @@ internal abstract class GenerateDependencyGraphTask : DefaultTask() {
 
     fun register(
       rootProject: Project,
-      slackProperties: SlackProperties,
+      foundryProperties: FoundryProperties,
     ): TaskProvider<GenerateDependencyGraphTask> {
       val configurationsToLook by lazy {
-        val providedConfigs = slackProperties.affectedProjectConfigurations
+        val providedConfigs = foundryProperties.affectedProjectConfigurations
         providedConfigs?.splitToSequence(',')?.toSet()?.let { providedConfigSet ->
-          if (slackProperties.buildUponDefaultAffectedProjectConfigurations) {
+          if (foundryProperties.buildUponDefaultAffectedProjectConfigurations) {
             DEFAULT_CONFIGURATIONS + providedConfigSet
           } else {
             providedConfigSet

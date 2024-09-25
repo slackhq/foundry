@@ -52,14 +52,14 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val versionMinor = project.localGradleProperty("versionMinor")
       val versionPatch = project.localGradleProperty("versionPatch")
 
-      val slackProperties = SlackProperties(project)
+      val foundryProperties = FoundryProperties(project)
 
       val debugVersionNameProvider =
         versionNameProvider(
           versionMajor,
           versionMinor,
           versionPatch,
-          user = project.provider { slackProperties.debugUserString },
+          user = project.provider { foundryProperties.debugUserString },
         )
 
       val defaultVersionNameProvider =
@@ -76,7 +76,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         )
 
       val debugVersionCodeProvider: Provider<Int> =
-        project.provider { SlackProperties(project).debugVersionCode }
+        project.provider { FoundryProperties(project).debugVersionCode }
 
       val ciVersionFileProvider =
         project.rootProject.layout.projectDirectory.file("ci/release.version")

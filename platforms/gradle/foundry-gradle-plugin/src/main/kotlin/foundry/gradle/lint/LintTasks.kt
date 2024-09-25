@@ -23,7 +23,7 @@ import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.lint.VariantInputs
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.androidExtension
 import foundry.gradle.androidExtensionNullable
 import foundry.gradle.artifacts.Publisher
@@ -77,13 +77,13 @@ internal object LintTasks {
 
   fun configureSubProject(
     project: Project,
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) {
     project.log("Configuring lint tasks for project ${project.path}")
     // Projects can opt out of creating the task with this property.
-    val enabled = slackProperties.ciLintEnabled
+    val enabled = foundryProperties.ciLintEnabled
     if (!enabled) {
       project.log("Skipping creation of \"$CI_LINT_TASK_NAME\" task")
       return
@@ -94,14 +94,14 @@ internal object LintTasks {
           is AppPlugin,
           is LibraryPlugin ->
             project.configureAndroidProjectForLint(
-              slackProperties,
+              foundryProperties,
               affectedProjects,
               onProjectSkipped,
             )
           is TestPlugin -> {
-            if (slackProperties.enableLintInAndroidTestProjects) {
+            if (foundryProperties.enableLintInAndroidTestProjects) {
               project.configureAndroidProjectForLint(
-                slackProperties,
+                foundryProperties,
                 affectedProjects,
                 onProjectSkipped,
               )
@@ -113,7 +113,7 @@ internal object LintTasks {
           is JavaPlugin ->
             if (project.multiplatformExtension == null) {
               project.configureNonAndroidProjectForLint(
-                slackProperties,
+                foundryProperties,
                 affectedProjects,
                 onProjectSkipped,
               )
@@ -128,7 +128,7 @@ internal object LintTasks {
                 !project.plugins.hasPlugin(LibraryPlugin::class.java)
             ) {
               project.configureNonAndroidProjectForLint(
-                slackProperties,
+                foundryProperties,
                 affectedProjects,
                 onProjectSkipped,
               )
@@ -140,13 +140,13 @@ internal object LintTasks {
 
   /** Android Lint configuration entry point for Android projects. */
   private fun Project.configureAndroidProjectForLint(
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) =
     androidExtension.finalizeDsl { extension ->
-      slackProperties.lintVersionOverride?.let {
-        val lintVersion = slackProperties.versions.lookupVersion(it)
+      foundryProperties.lintVersionOverride?.let {
+        val lintVersion = foundryProperties.versions.lookupVersion(it)
         extension.experimentalProperties["android.experimental.lint.version"] = lintVersion
       }
 
@@ -159,7 +159,7 @@ internal object LintTasks {
       log("Creating ciLint task")
       val ciLintTask = createCiLintTask(project)
 
-      val ciLintVariants = slackProperties.ciLintVariants
+      val ciLintVariants = foundryProperties.ciLintVariants
       if (ciLintVariants != null) {
         ciLintTask.configure {
           // Even if the task isn't created yet, we can do this by name alone and it will resolve at
@@ -185,16 +185,16 @@ internal object LintTasks {
       configureLint(
         extension.lint,
         ciLintTask,
-        slackProperties,
+        foundryProperties,
         affectedProjects,
         onProjectSkipped,
-        slackProperties.requireAndroidSdkProperties(),
+        foundryProperties.requireAndroidSdkProperties(),
       )
     }
 
   /** Android Lint configuration entry point for non-Android projects. */
   private fun Project.configureNonAndroidProjectForLint(
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) = afterEvaluate {
@@ -228,7 +228,7 @@ internal object LintTasks {
     configureLint(
       extensions.getByType(),
       ciLint,
-      slackProperties,
+      foundryProperties,
       affectedProjects,
       onProjectSkipped,
     )
@@ -237,20 +237,20 @@ internal object LintTasks {
   private fun Project.configureLint(
     lint: Lint,
     ciLint: TaskProvider<SimpleFileProducerTask>,
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
-    androidSdkVersions: SlackProperties.AndroidSdkProperties? = null,
+    androidSdkVersions: FoundryProperties.AndroidSdkProperties? = null,
   ) {
     val isMultiplatform = multiplatformExtension != null
 
-    slackProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
+    foundryProperties.versions.bundles.commonLint.ifPresent { dependencies.add("lintChecks", it) }
 
     if (affectedProjects != null && path !in affectedProjects) {
       val taskPath = "${path}:$CI_LINT_TASK_NAME"
       val log = "Skipping $taskPath because it is not affected."
       onProjectSkipped(GLOBAL_CI_LINT_TASK_NAME, taskPath)
-      if (slackProperties.debug) {
+      if (foundryProperties.debug) {
         log(log)
       } else {
         log(log)
@@ -266,11 +266,11 @@ internal object LintTasks {
     // Lint is configured entirely in finalizeDsl so that individual projects cannot easily
     // disable individual checks in the DSL for any reason.
     lint.apply {
-      ignoreWarnings = slackProperties.lintErrorsOnly
+      ignoreWarnings = foundryProperties.lintErrorsOnly
 
       // Run lint on tests. Uses top-level lint.xml to specify checks.
-      ignoreTestSources = slackProperties.lintIgnoreTestSources
-      checkTestSources = slackProperties.lintCheckTestSources
+      ignoreTestSources = foundryProperties.lintIgnoreTestSources
+      checkTestSources = foundryProperties.lintCheckTestSources
 
       textReport = true
       xmlReport = false
@@ -290,7 +290,7 @@ internal object LintTasks {
       // We run lint on each library, so we don't want transitive checking of each dependency
       checkDependencies = false
 
-      if (!slackProperties.isTestLibrary) {
+      if (!foundryProperties.isTestLibrary) {
         fatal += "VisibleForTests"
       }
 
@@ -339,7 +339,7 @@ internal object LintTasks {
       lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
 
       baseline =
-        slackProperties.lintBaselineFileName?.let {
+        foundryProperties.lintBaselineFileName?.let {
           project.layout.projectDirectory.file(it).asFile
         }
     }

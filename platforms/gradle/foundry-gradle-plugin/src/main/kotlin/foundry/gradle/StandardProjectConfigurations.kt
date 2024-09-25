@@ -35,7 +35,7 @@ import com.bugsnag.android.gradle.BugsnagPluginExtension
 import foundry.gradle.Configurations.isPlatformConfigurationName
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.SgpArtifact
-import foundry.gradle.dependencies.SlackDependencies
+import foundry.gradle.dependencies.FoundryDependencies
 import foundry.gradle.dependencyrake.RakeDependencies
 import foundry.gradle.kgp.KgpTasks
 import foundry.gradle.lint.LintTasks
@@ -89,27 +89,27 @@ private fun Logger.logWithTag(message: String) {
  */
 @Suppress("TooManyFunctions")
 internal class StandardProjectConfigurations(
-  private val globalProperties: SlackProperties,
+  private val globalProperties: FoundryProperties,
   private val versionCatalog: VersionCatalog,
-  private val slackTools: SlackTools,
+  private val foundryTools: FoundryTools,
 ) {
   fun applyTo(project: Project) {
-    val slackProperties = SlackProperties(project)
-    val slackExtension =
+    val foundryProperties = FoundryProperties(project)
+    val foundryExtension =
       project.extensions.create(
         "slack",
-        SlackExtension::class.java,
+        FoundryExtension::class.java,
         globalProperties,
-        slackProperties,
+        foundryProperties,
         project,
         versionCatalog,
       )
-    if (slackProperties.eagerlyConfigureArtifactPublishing) {
+    if (foundryProperties.eagerlyConfigureArtifactPublishing) {
       setUpSubprojectArtifactPublishing(project)
     }
-    project.applyCommonConfigurations(slackProperties)
-    project.applyJvmConfigurations(slackProperties, slackExtension)
-    KgpTasks.configure(project, slackTools, slackProperties)
+    project.applyCommonConfigurations(foundryProperties)
+    project.applyJvmConfigurations(foundryProperties, foundryExtension)
+    KgpTasks.configure(project, foundryTools, foundryProperties)
   }
 
   /**
@@ -135,7 +135,7 @@ internal class StandardProjectConfigurations(
     }
   }
 
-  private fun Project.applyCommonConfigurations(slackProperties: SlackProperties) {
+  private fun Project.applyCommonConfigurations(foundryProperties: FoundryProperties) {
     if (globalProperties.autoApplySortDependencies) {
       if (project.buildFile.exists()) {
         val sortDependenciesIgnoreSet =
@@ -147,9 +147,9 @@ internal class StandardProjectConfigurations(
     }
     LintTasks.configureSubProject(
       project,
-      slackProperties,
-      slackTools.globalConfig.affectedProjects,
-      slackTools::logAvoidedTask,
+      foundryProperties,
+      foundryTools.globalConfig.affectedProjects,
+      foundryTools::logAvoidedTask,
     )
   }
 
@@ -157,53 +157,53 @@ internal class StandardProjectConfigurations(
   private fun Project.javaCompilerFor(version: Int): Provider<JavaCompiler> {
     return extensions.getByType<JavaToolchainService>().compilerFor {
       languageVersion.setDisallowChanges(JavaLanguageVersion.of(version))
-      slackTools.globalConfig.jvmVendor?.let(vendor::set)
+      foundryTools.globalConfig.jvmVendor?.let(vendor::set)
     }
   }
 
   private fun Project.applyJvmConfigurations(
-    slackProperties: SlackProperties,
-    slackExtension: SlackExtension,
+    foundryProperties: FoundryProperties,
+    foundryExtension: FoundryExtension,
   ) {
-    val platformProjectPath = slackProperties.platformProjectPath
+    val platformProjectPath = foundryProperties.platformProjectPath
     if (platformProjectPath == null) {
-      if (slackProperties.strictMode) {
+      if (foundryProperties.strictMode) {
         logger.warn(
           "slack.location.slack-platform is not set. Consider creating one to ensure consistent dependency versions across projects!"
         )
       }
-    } else if (!slackProperties.noPlatform && path != platformProjectPath) {
-      applyPlatforms(slackProperties.versions.boms, platformProjectPath)
+    } else if (!foundryProperties.noPlatform && path != platformProjectPath) {
+      applyPlatforms(foundryProperties.versions.boms, platformProjectPath)
     }
 
-    checkAndroidXDependencies(slackProperties)
+    checkAndroidXDependencies(foundryProperties)
     AnnotationProcessing.configureFor(project)
 
     pluginManager.onFirst(JVM_PLUGINS) { pluginId ->
-      slackProperties.versions.bundles.commonAnnotations.ifPresent {
+      foundryProperties.versions.bundles.commonAnnotations.ifPresent {
         dependencies.add("implementation", it)
       }
 
       UnitTests.configureSubproject(
         project,
         pluginId,
-        slackProperties,
-        slackTools.globalConfig.affectedProjects,
-        slackTools::logAvoidedTask,
+        foundryProperties,
+        foundryTools.globalConfig.affectedProjects,
+        foundryTools::logAvoidedTask,
       )
 
       if (pluginId != "com.android.test") {
         // Configure dependencyAnalysis
         // TODO move up once DAGP supports com.android.test projects
         //  https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/797
-        if (slackProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
+        if (foundryProperties.enableAnalysisPlugin && project.path != platformProjectPath) {
           val buildFile = project.buildFile
           // This can run on some intermediate middle directories, like `carbonite` in
           // `carbonite:carbonite`
           if (buildFile.exists()) {
             // Configure rake
             plugins.withId("com.autonomousapps.dependency-analysis") {
-              val isNoApi = slackProperties.rakeNoApi
+              val isNoApi = foundryProperties.rakeNoApi
               val catalogNames =
                 extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
 
@@ -243,9 +243,9 @@ internal class StandardProjectConfigurations(
     }
 
     // TODO always configure compileOptions here
-    configureAndroidProjects(slackExtension, slackProperties)
-    configureJavaProject(slackProperties)
-    slackExtension.applyTo(this)
+    configureAndroidProjects(foundryExtension, foundryProperties)
+    configureJavaProject(foundryProperties)
+    foundryExtension.applyTo(this)
   }
 
   /**
@@ -280,8 +280,8 @@ internal class StandardProjectConfigurations(
    * we apply this on all projects (not just android projects) because some android dependencies are
    * plain jars that can be used in standard JVM projects.
    */
-  private fun Project.checkAndroidXDependencies(slackProperties: SlackProperties) {
-    if (!slackProperties.skipAndroidxCheck) {
+  private fun Project.checkAndroidXDependencies(foundryProperties: FoundryProperties) {
+    if (!foundryProperties.skipAndroidxCheck) {
       configurations.configureEach {
         resolutionStrategy {
           eachDependency {
@@ -299,15 +299,15 @@ internal class StandardProjectConfigurations(
   }
 
   /** Adds common configuration for Java projects. */
-  private fun Project.configureJavaProject(slackProperties: SlackProperties) {
+  private fun Project.configureJavaProject(foundryProperties: FoundryProperties) {
     val releaseVersion =
-      slackProperties.versions.jvmTarget.map(JavaVersion::toVersion).asProvider(providers)
+      foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion).asProvider(providers)
     plugins.withType(JavaBasePlugin::class.java).configureEach {
       project.configure<JavaPluginExtension> {
         sourceCompatibility = releaseVersion.get()
         targetCompatibility = releaseVersion.get()
       }
-      slackProperties.versions.jdk.ifPresent {
+      foundryProperties.versions.jdk.ifPresent {
         if (it >= 9) {
           tasks.configureEach<JavaCompile> {
             if (!isAndroid) {
@@ -334,7 +334,7 @@ internal class StandardProjectConfigurations(
         val target =
           if (isAndroid) releaseVersion
           else
-            slackProperties.versions.jdk.map(JavaVersion::toVersion).asProvider(project.providers)
+            foundryProperties.versions.jdk.map(JavaVersion::toVersion).asProvider(project.providers)
         logger.logWithTag("Configuring toolchain for $path")
         // Can't use disallowChanges here because Gradle sets it again later for some reason
         javaCompiler.set(
@@ -342,13 +342,13 @@ internal class StandardProjectConfigurations(
             languageVersion.setDisallowChanges(
               target.map { JavaLanguageVersion.of(it.majorVersion) }
             )
-            slackTools.globalConfig.jvmVendor?.let(vendor::set)
+            foundryTools.globalConfig.jvmVendor?.let(vendor::set)
           }
         )
       }
     }
 
-    configureErrorProne(slackProperties)
+    configureErrorProne(foundryProperties)
   }
 
   /**
@@ -356,13 +356,13 @@ internal class StandardProjectConfigurations(
    * application of the error prone plugin as an opt-in marker for now, and is not applied to every
    * project.
    */
-  private fun Project.configureErrorProne(slackProperties: SlackProperties) {
-    val autoPatchEnabled = slackProperties.errorProneAutoPatch
+  private fun Project.configureErrorProne(foundryProperties: FoundryProperties) {
+    val autoPatchEnabled = foundryProperties.errorProneAutoPatch
     pluginManager.withPlugin("net.ltgt.nullaway") {
-      val nullawayBaseline = slackProperties.nullawayBaseline
+      val nullawayBaseline = foundryProperties.nullawayBaseline
 
       val nullawayDep =
-        slackProperties.versions.catalog.findLibrary("errorProne-nullaway").orElseThrow {
+        foundryProperties.versions.catalog.findLibrary("errorProne-nullaway").orElseThrow {
           IllegalStateException("Could not find errorProne-nullaway in the catalog")
         }
       dependencies.apply { add("errorprone", nullawayDep) }
@@ -389,7 +389,7 @@ internal class StandardProjectConfigurations(
       }
     }
     pluginManager.withPlugin("net.ltgt.errorprone") {
-      dependencies.add("errorprone", SlackDependencies.ErrorProne.core)
+      dependencies.add("errorprone", FoundryDependencies.ErrorProne.core)
 
       val isAndroidProject = isAndroid
 
@@ -400,7 +400,7 @@ internal class StandardProjectConfigurations(
           // https://github.com/google/error-prone/issues/2092
           excludedPaths.setDisallowChanges(".*/build/generated/.*")
           disable("HidingField")
-          error(*slackTools().globalConfig.errorProneCheckNamesAsErrors.toTypedArray())
+          error(*foundryTools().globalConfig.errorProneCheckNamesAsErrors.toTypedArray())
 
           if (isAndroidProject) {
             options.compilerArgs.add("-XDandroidCompatible=true")
@@ -426,22 +426,23 @@ internal class StandardProjectConfigurations(
 
   @Suppress("LongMethod")
   private fun Project.configureAndroidProjects(
-    slackExtension: SlackExtension,
-    slackProperties: SlackProperties,
+    foundryExtension: FoundryExtension,
+    foundryProperties: FoundryProperties,
   ) {
-    val javaVersion = slackProperties.versions.jvmTarget.map(JavaVersion::toVersion)
+    val javaVersion = foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
       Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
-    val isAffectedProject = slackTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
+    val isAffectedProject =
+      foundryTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
     val skippyAndroidTestProjectPublisher =
       Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
         val variantsToDisable =
-          slackProperties.disabledVariants?.splitToSequence(",")?.associate {
+          foundryProperties.disabledVariants?.splitToSequence(",")?.associate {
             val (flavorName, buildType) = it.split("+")
             flavorName to buildType
           } ?: emptyMap()
@@ -477,9 +478,8 @@ internal class StandardProjectConfigurations(
           val isLibraryVariant = variant is LibraryVariant
           val excluded =
             isLibraryVariant &&
-              slackExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle.getOrElse(
-                false
-              )
+              foundryExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle
+                .getOrElse(false)
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
@@ -505,8 +505,8 @@ internal class StandardProjectConfigurations(
               val reason = if (excluded) "excluded" else "not affected"
               val taskPath = "${projectPath}:androidTest"
               val log = "$LOG Skipping $taskPath because it is $reason."
-              slackTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
-              if (slackProperties.debug) {
+              foundryTools.logAvoidedTask(AndroidTestApksTask.NAME, taskPath)
+              if (foundryProperties.debug) {
                 project.logger.lifecycle(log)
               } else {
                 project.logger.debug(log)
@@ -516,8 +516,8 @@ internal class StandardProjectConfigurations(
         }
       }
 
-    val sdkVersions = lazy { slackProperties.requireAndroidSdkProperties() }
-    val shouldApplyCacheFixPlugin = slackProperties.enableAndroidCacheFix
+    val sdkVersions = lazy { foundryProperties.requireAndroidSdkProperties() }
+    val shouldApplyCacheFixPlugin = foundryProperties.enableAndroidCacheFix
     val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {
@@ -525,8 +525,8 @@ internal class StandardProjectConfigurations(
         }
 
         compileSdkVersion(sdkVersions.value.compileSdk)
-        slackProperties.ndkVersion?.let { ndkVersion = it }
-        slackProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
+        foundryProperties.ndkVersion?.let { ndkVersion = it }
+        foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
           minSdk = sdkVersions.value.minSdk
@@ -550,7 +550,7 @@ internal class StandardProjectConfigurations(
           testOptions {
             animationsDisabled = true
 
-            if (slackProperties.useOrchestrator) {
+            if (foundryProperties.useOrchestrator) {
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -566,7 +566,7 @@ internal class StandardProjectConfigurations(
             // See https://developer.android.com/training/testing/unit-testing/local-unit-tests
             // #error-not-mocked for more details
             unitTests.isReturnDefaultValues = true
-            if (slackProperties.alwaysEnableResourcesInTests) {
+            if (foundryProperties.alwaysEnableResourcesInTests) {
               unitTests.isIncludeAndroidResources = true
             }
 
@@ -578,7 +578,7 @@ internal class StandardProjectConfigurations(
                 // based on dependencies unfortunately, as the task graph is already wired by the
                 // time dependencies start getting resolved.
                 //
-                slackProperties.versions.robolectric?.let {
+                foundryProperties.versions.robolectric?.let {
                   logger.debug("Configuring $name test task to depend on Robolectric jar downloads")
                   // Depending on the root project task by name alone is ok for Project Isolation
                   test.dependsOn(":${UpdateRobolectricJarsTask.NAME}")
@@ -593,7 +593,7 @@ internal class StandardProjectConfigurations(
         }
       }
 
-    val objenesis2Version = slackProperties.versions.objenesis
+    val objenesis2Version = foundryProperties.versions.objenesis
     val prepareAndroidTestConfigurations = {
       configurations.configureEach {
         if (name.contains("androidTest", ignoreCase = true)) {
@@ -623,7 +623,7 @@ internal class StandardProjectConfigurations(
 
     pluginManager.withPlugin("com.android.test") {
       configure<TestExtension> {
-        slackExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(false)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
       }
@@ -646,10 +646,10 @@ internal class StandardProjectConfigurations(
 
           // Must be in the beforeVariants block to defer read until after evaluation
           val androidTestEnabled =
-            slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+            foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           val variantEnabled =
             androidTestEnabled &&
-              slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+              foundryExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) ?: true
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.androidTest.enable = variantEnabled
@@ -661,7 +661,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<BaseAppModuleExtension> {
-        slackExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
@@ -708,7 +708,7 @@ internal class StandardProjectConfigurations(
 
         PermissionChecks.configure(
           project = project,
-          allowListActionGetter = { slackExtension.androidHandler.appHandler.allowlistAction },
+          allowListActionGetter = { foundryExtension.androidHandler.appHandler.allowlistAction },
         ) { taskName, file, allowListProvider ->
           tasks.register<CheckManifestPermissionsTask>(taskName) {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -721,7 +721,7 @@ internal class StandardProjectConfigurations(
 
         pluginManager.withPlugin("com.bugsnag.android.gradle") {
           val branchMatchesPatternProvider =
-            slackProperties.bugsnagEnabledBranchPattern.zip(gitBranch()) { pattern, branch ->
+            foundryProperties.bugsnagEnabledBranchPattern.zip(gitBranch()) { pattern, branch ->
               if (pattern == null || branch == null) {
                 return@zip false
               }
@@ -729,7 +729,7 @@ internal class StandardProjectConfigurations(
             }
 
           val enabledProvider =
-            slackProperties.bugsnagEnabled.orElse(branchMatchesPatternProvider).orElse(false).zip(
+            foundryProperties.bugsnagEnabled.orElse(branchMatchesPatternProvider).orElse(false).zip(
               provider { isCi }
             ) { enabled, isRunningOnCi ->
               // Only enable if we're also on CI
@@ -762,12 +762,12 @@ internal class StandardProjectConfigurations(
         }
       }
 
-      slackExtension.androidHandler.applyTo(project)
+      foundryExtension.androidHandler.applyTo(project)
     }
 
     pluginManager.withPlugin("com.android.library") {
       prepareAndroidTestConfigurations()
-      val isLibraryWithVariants = slackProperties.libraryWithVariants
+      val isLibraryWithVariants = foundryProperties.libraryWithVariants
 
       configure<LibraryAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
@@ -786,15 +786,17 @@ internal class StandardProjectConfigurations(
         // Disable androidTest tasks in libraries unless they opt-in
         beforeVariants { builder ->
           val androidTestEnabled =
-            slackExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+            foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           val variantEnabled =
             androidTestEnabled &&
-              slackExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
+              foundryExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) ?: true
           builder.androidTest.enable = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly
-            if (slackProperties.strictMode && slackProperties.strictValidateAndroidTestManifest) {
+            if (
+              foundryProperties.strictMode && foundryProperties.strictValidateAndroidTestManifest
+            ) {
               val manifest = project.file("src/androidTest/AndroidManifest.xml")
               check(manifest.exists()) {
                 "AndroidManifest.xml is missing from src/androidTest. Ensure it exists and also is set to debuggable!"
@@ -830,7 +832,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
-        slackExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         if (isLibraryWithVariants) {
           buildTypes {
@@ -855,7 +857,7 @@ internal class StandardProjectConfigurations(
         // We don't set targetSdkVersion in libraries since this is controlled by the app.
       }
 
-      slackExtension.androidHandler.applyTo(project)
+      foundryExtension.androidHandler.applyTo(project)
     }
   }
 

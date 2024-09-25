@@ -17,7 +17,7 @@ package foundry.gradle.avoidance
 
 import com.jraska.module.graph.DependencyGraph
 import foundry.common.FoundryLogger
-import foundry.gradle.SlackProperties
+import foundry.gradle.FoundryProperties
 import foundry.gradle.property
 import foundry.gradle.util.JsonTools
 import foundry.gradle.util.gradle
@@ -162,12 +162,12 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
 
     fun register(
       rootProject: Project,
-      slackProperties: SlackProperties,
+      foundryProperties: FoundryProperties,
       dependencyGraphProvider: Provider<RegularFile>,
       androidTestProjectPathsProvider: Provider<RegularFile>,
     ): TaskProvider<ComputeAffectedProjectsTask> {
       val extension =
-        rootProject.extensions.create("skippy", SkippyExtension::class.java, slackProperties)
+        rootProject.extensions.create("skippy", SkippyExtension::class.java, foundryProperties)
 
       return rootProject.tasks.register(NAME, ComputeAffectedProjectsTask::class.java) {
         debug.setDisallowChanges(extension.debug)

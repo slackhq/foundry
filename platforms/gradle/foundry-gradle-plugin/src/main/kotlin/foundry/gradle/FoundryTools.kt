@@ -19,8 +19,8 @@ import com.google.common.collect.Sets
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
-import foundry.gradle.SlackTools.Companion.SERVICE_NAME
-import foundry.gradle.SlackTools.Parameters
+import foundry.gradle.FoundryTools.Companion.SERVICE_NAME
+import foundry.gradle.FoundryTools.Parameters
 import foundry.gradle.agp.AgpHandler
 import foundry.gradle.agp.AgpHandlers
 import foundry.gradle.util.JsonTools
@@ -52,8 +52,8 @@ import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
 import slack.cli.AppleSiliconCompat
 
-/** Misc tools for Slack Gradle projects, usable in tasks as a [BuildService] too. */
-public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
+/** Misc tools for Foundry Gradle projects, usable in tasks as a [BuildService] too. */
+public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
 
   public val agpHandler: AgpHandler by lazy { AgpHandlers.createHandler() }
   public val moshi: Moshi
@@ -64,8 +64,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   // work for BuildService parameters
   public lateinit var globalConfig: GlobalConfig
 
-  private val logger = Logging.getLogger("SlackTools")
-  private val extensions: Map<Class<out SlackToolsExtension>, SlackToolsExtension>
+  private val logger = Logging.getLogger("FoundryTools")
+  private val extensions: Map<Class<out FoundryToolsExtension>, FoundryToolsExtension>
 
   private val okHttpClient = lazy { OkHttpClient.Builder().build() }
 
@@ -118,8 +118,8 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
     extensions = buildMap {
       ServiceLoader.load(
-          SlackToolsExtension::class.java,
-          SlackToolsExtension::class.java.classLoader,
+          FoundryToolsExtension::class.java,
+          FoundryToolsExtension::class.java.classLoader,
         )
         .stream()
         .asSequence()
@@ -142,16 +142,16 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
 
     if (extensions.isNotEmpty()) {
       val dependencies =
-        object : SlackToolsDependencies {
+        object : FoundryToolsDependencies {
           override val okHttpClient: Lazy<OkHttpClient>
-            get() = this@SlackTools.okHttpClient
+            get() = this@FoundryTools.okHttpClient
         }
       val context =
-        object : SlackToolsExtension.Context {
+        object : FoundryToolsExtension.Context {
           override val isOffline: Boolean
-            get() = this@SlackTools.parameters.offline.get()
+            get() = this@FoundryTools.parameters.offline.get()
 
-          override val sharedDependencies: SlackToolsDependencies
+          override val sharedDependencies: FoundryToolsDependencies
             get() = dependencies
         }
       for (extension in extensions.values) {
@@ -188,7 +188,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   }
 
   /** Retrieves a loaded instance of [T], if any. */
-  public fun <T : SlackToolsExtension> findExtension(type: Class<out T>): T? {
+  public fun <T : FoundryToolsExtension> findExtension(type: Class<out T>): T? {
     @Suppress("UNCHECKED_CAST")
     return extensions[type] as T?
   }
@@ -241,7 +241,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
     }
 
     runCatchingWithLog("Failed to close extension") {
-      extensions.values.forEach(SlackToolsExtension::close)
+      extensions.values.forEach(FoundryToolsExtension::close)
     }
 
     thermalsExecutor?.shutdown()
@@ -271,7 +271,7 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
   }
 
   public companion object {
-    public const val SERVICE_NAME: String = "SlackTools"
+    public const val SERVICE_NAME: String = "FoundryTools"
 
     internal fun register(
       project: Project,
@@ -282,9 +282,9 @@ public abstract class SlackTools : BuildService<Parameters>, AutoCloseable {
       isConfigurationCacheRequested: Provider<Boolean>,
       startParameterProperties: Provider<Map<String, String>>,
       globalLocalProperties: Provider<Map<String, String>>,
-    ): Provider<SlackTools> {
+    ): Provider<FoundryTools> {
       return project.gradle.sharedServices
-        .registerIfAbsent(SERVICE_NAME, SlackTools::class.java) {
+        .registerIfAbsent(SERVICE_NAME, FoundryTools::class.java) {
           parameters.thermalsOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("outputs/logs/last-build-thermals.log")
           )
@@ -333,27 +333,27 @@ public interface ThermalsReporter {
   public fun reportThermals(thermals: Thermals)
 }
 
-public interface SlackToolsDependencies {
+public interface FoundryToolsDependencies {
   public val okHttpClient: Lazy<OkHttpClient>
 }
 
 /** An extension for SlackTools. */
-public interface SlackToolsExtension : AutoCloseable {
+public interface FoundryToolsExtension : AutoCloseable {
   public fun bind(context: Context)
 
   public interface Context {
     public val isOffline: Boolean
-    public val sharedDependencies: SlackToolsDependencies
+    public val sharedDependencies: FoundryToolsDependencies
   }
 }
 
-public fun Project.slackTools(): SlackTools {
-  return slackToolsProvider().get()
+public fun Project.foundryTools(): FoundryTools {
+  return foundryToolsProvider().get()
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun Project.slackToolsProvider(): Provider<SlackTools> {
+public fun Project.foundryToolsProvider(): Provider<FoundryTools> {
   return (project.gradle.sharedServices.registrations.getByName(SERVICE_NAME)
-      as BuildServiceRegistration<SlackTools, Parameters>)
+      as BuildServiceRegistration<FoundryTools, Parameters>)
     .service
 }

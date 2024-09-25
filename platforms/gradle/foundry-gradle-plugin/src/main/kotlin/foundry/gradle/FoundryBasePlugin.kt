@@ -40,9 +40,9 @@ import org.gradle.api.provider.Provider
 internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
   Plugin<Project> {
   override fun apply(target: Project) {
-    val slackProperties = SlackProperties(target)
+    val foundryProperties = FoundryProperties(target)
 
-    if (slackProperties.relocateBuildDir && !target.isSyncing) {
+    if (foundryProperties.relocateBuildDir && !target.isSyncing) {
       // <root-dir>/../<root-dir-name>-out/<project's relative path>
       val rootDir = target.rootDir
       val rootDirName = rootDir.name
@@ -54,41 +54,42 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
     if (!target.isRootProject) {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
-      val slackTools = target.slackTools()
-      StandardProjectConfigurations(slackProperties, versionCatalog, slackTools).applyTo(target)
+      val slackTools = target.foundryTools()
+      StandardProjectConfigurations(foundryProperties, versionCatalog, slackTools).applyTo(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
       // there is somewhat expected.
       if (
-        slackProperties.autoApplyTestRetry &&
+        foundryProperties.autoApplyTestRetry &&
           target.isCi &&
-          slackProperties.testRetryPluginType == SlackProperties.TestRetryPluginType.RETRY_PLUGIN
+          foundryProperties.testRetryPluginType ==
+            FoundryProperties.TestRetryPluginType.RETRY_PLUGIN
       ) {
         target.pluginManager.apply("org.gradle.test-retry")
       }
 
-      if (slackProperties.autoApplyCacheFix) {
+      if (foundryProperties.autoApplyCacheFix) {
         target.pluginManager.withPlugin("com.android.base") {
           target.pluginManager.apply("org.gradle.android.cache-fix")
         }
       }
 
-      if (slackProperties.autoApplyNullaway) {
+      if (foundryProperties.autoApplyNullaway) {
         // Always apply the NullAway plugin with errorprone
         target.pluginManager.withPlugin("net.ltgt.errorprone") {
           target.pluginManager.apply("net.ltgt.nullaway")
         }
       }
 
-      ModuleStatsTasks.configureSubproject(target, slackProperties)
+      ModuleStatsTasks.configureSubproject(target, foundryProperties)
     }
 
     // Everything in here applies to all projects
-    target.configureClasspath(slackProperties)
+    target.configureClasspath(foundryProperties)
     if (!this.buildFeatures.isolatedProjects.requested.getOrElse(false)) {
       // TODO https://github.com/diffplug/spotless/issues/1979
-      target.configureSpotless(slackProperties)
+      target.configureSpotless(foundryProperties)
       // TODO not clear how to access the build scan API from a non-root project
       val scanApi = findAdapter(target)
       if (scanApi !is NoOpBuildScanAdapter) {
@@ -98,9 +99,9 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
   }
 
   /** Configures Spotless for formatting. Note we do this per-project for improved performance. */
-  private fun Project.configureSpotless(slackProperties: SlackProperties) {
+  private fun Project.configureSpotless(foundryProperties: FoundryProperties) {
     val isRootProject = this.isRootProject
-    if (slackProperties.autoApplySpotless) {
+    if (foundryProperties.autoApplySpotless) {
       pluginManager.apply("com.diffplug.spotless")
     } else {
       return
@@ -113,14 +114,14 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
           endWithNewline()
         }
 
-        val ktlintVersion = slackProperties.versions.ktlint
+        val ktlintVersion = foundryProperties.versions.ktlint
         if (ktlintVersion != null) {
           val ktlintUserData = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
           kotlin { ktlint(ktlintVersion).editorConfigOverride(ktlintUserData) }
           kotlinGradle { ktlint(ktlintVersion).editorConfigOverride(ktlintUserData) }
         }
 
-        val ktfmtVersion = slackProperties.versions.ktfmt
+        val ktfmtVersion = foundryProperties.versions.ktfmt
         if (ktfmtVersion != null) {
           kotlin { ktfmt(ktfmtVersion).googleStyle() }
           kotlinGradle { ktfmt(ktfmtVersion).googleStyle() }
@@ -142,7 +143,7 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
           }
         }
 
-        slackProperties.versions.gjf?.let { gjfVersion ->
+        foundryProperties.versions.gjf?.let { gjfVersion ->
           java {
             target("src/**/*.java")
             googleJavaFormat(gjfVersion).reflowLongStrings()
@@ -150,7 +151,7 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
             endWithNewline()
           }
         }
-        slackProperties.versions.gson?.let { gsonVersion ->
+        foundryProperties.versions.gson?.let { gsonVersion ->
           json {
             target("src/**/*.json", "*.json")
             target("*.json")
@@ -177,16 +178,16 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
   }
 
   @Suppress("LongMethod", "ComplexMethod")
-  private fun Project.configureClasspath(slackProperties: SlackProperties) {
-    val hamcrestDep = slackProperties.versions.catalog.findLibrary("testing-hamcrest")
-    val checkerDep = slackProperties.versions.catalog.findLibrary("checkerFrameworkQual")
+  private fun Project.configureClasspath(foundryProperties: FoundryProperties) {
+    val hamcrestDep = foundryProperties.versions.catalog.findLibrary("testing-hamcrest")
+    val checkerDep = foundryProperties.versions.catalog.findLibrary("checkerFrameworkQual")
     val isTestProject = "test" in name || "test" in path
     configurations.configureEach {
       configureConfigurationResolutionStrategies(this, isTestProject, hamcrestDep, checkerDep)
     }
 
-    val enableMavenLocal = slackProperties.enableMavenLocal
-    val enableSnapshots = slackProperties.enableSnapshots
+    val enableMavenLocal = foundryProperties.enableMavenLocal
+    val enableSnapshots = foundryProperties.enableSnapshots
     // Check if we're running a `dependencyUpdates` task is running by looking for its `-Drevision=`
     // property, which this
     // breaks otherwise.

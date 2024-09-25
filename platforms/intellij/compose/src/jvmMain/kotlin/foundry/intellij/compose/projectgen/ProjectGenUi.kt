@@ -70,7 +70,7 @@ object ProjectGenUi {
   fun createPanel(rootDir: String, width: Int, height: Int, events: Events): JComponent {
     return ComposePanel().apply {
       setBounds(0, 0, width, height)
-      setContent { SlackDesktopTheme { ProjectGenApp(rootDir, events) } }
+      setContent { FoundryDesktopTheme { ProjectGenApp(rootDir, events) } }
     }
   }
 

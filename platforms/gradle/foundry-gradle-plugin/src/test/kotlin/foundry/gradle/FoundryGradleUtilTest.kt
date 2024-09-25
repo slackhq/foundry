@@ -19,7 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import foundry.gradle.agp.VersionNumber
 import org.junit.Test
 
-class SlackGradleUtilTest {
+class FoundryGradleUtilTest {
 
   @Test
   fun standardGitParse() {

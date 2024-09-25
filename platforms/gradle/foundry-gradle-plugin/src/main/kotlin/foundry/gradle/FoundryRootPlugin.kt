@@ -98,54 +98,54 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     val globalLocalProperty: (String) -> Provider<String> = { key ->
       localProperties.map { sneakyNull(it[key]) }
     }
-    val slackProperties =
-      SlackProperties(
+    val foundryProperties =
+      FoundryProperties(
         project,
         startParameterProperty = startParameterProperty,
         globalLocalProperty = globalLocalProperty,
       )
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
-    val logThermals = slackProperties.logThermals
-    val enableSkippy = slackProperties.affectedProjects?.exists() == true
+    val logThermals = foundryProperties.logThermals
+    val enableSkippy = foundryProperties.affectedProjects?.exists() == true
     if (enableSkippy) {
       project.logger.lifecycle(
-        "Enabling Skippy using projects in ${slackProperties.affectedProjects}"
+        "Enabling Skippy using projects in ${foundryProperties.affectedProjects}"
       )
-    } else if (slackProperties.affectedProjects != null) {
+    } else if (foundryProperties.affectedProjects != null) {
       project.logger.lifecycle(
-        "Skippy is disabled because file '${slackProperties.affectedProjects}' does not exist."
+        "Skippy is disabled because file '${foundryProperties.affectedProjects}' does not exist."
       )
     } else {
       project.logger.debug("Skippy is disabled")
     }
 
-    SlackTools.register(
+    FoundryTools.register(
       project = project,
       logThermals = logThermals,
       enableSkippyDiagnostics = enableSkippy,
-      logVerbosely = slackProperties.verboseLogging,
+      logVerbosely = foundryProperties.verboseLogging,
       thermalsLogJsonFileProvider = thermalsLogJsonFile,
       isConfigurationCacheRequested = buildFeatures.configurationCache.requested,
       startParameterProperties = startParameterProperties,
       globalLocalProperties = localProperties,
     )
-    configureRootProject(project, slackProperties, thermalsLogJsonFile)
+    configureRootProject(project, foundryProperties, thermalsLogJsonFile)
   }
 
   // These checks is a false positive because we have inner lambdas
   @Suppress("ReturnCount", "LongMethod", "ComplexMethod")
   private fun configureRootProject(
     project: Project,
-    slackProperties: SlackProperties,
+    foundryProperties: FoundryProperties,
     thermalsLogJsonFileProvider: Provider<RegularFile>,
   ) {
 
     // Check enforced JDK version
-    if (slackProperties.strictJdk) {
+    if (foundryProperties.strictJdk) {
       val runtimeVersion =
         project.providers.systemProperty("java.specification.version").get().toInt()
-      val jdk = slackProperties.versions.jdk.get()
+      val jdk = foundryProperties.versions.jdk.get()
       check(jdk == runtimeVersion) {
         """
           Current Java version ($runtimeVersion) does not match the enforced version ($jdk).
@@ -160,32 +160,33 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     }
 
     if (!project.isCi) {
-      slackProperties.compileSdkVersion?.substringAfter("-")?.toInt()?.let { compileSdk ->
-        val latestCompileSdkWithSources = slackProperties.latestCompileSdkWithSources(compileSdk)
+      foundryProperties.compileSdkVersion?.substringAfter("-")?.toInt()?.let { compileSdk ->
+        val latestCompileSdkWithSources = foundryProperties.latestCompileSdkWithSources(compileSdk)
         AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
       }
-      project.configureGit(slackProperties)
+      project.configureGit(foundryProperties)
     }
     project.configureSlackRootBuildscript(
-      slackProperties.versions.jdk.asProvider(project.providers),
-      slackProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
+      foundryProperties.versions.jdk.asProvider(project.providers),
+      foundryProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
     )
     LintTasks.configureRootProject(project)
-    DetektTasks.configureRootProject(project, slackProperties)
-    project.configureMisc(slackProperties)
+    DetektTasks.configureRootProject(project, foundryProperties)
+    project.configureMisc(foundryProperties)
     UnitTests.configureRootProject(project)
-    ModuleStatsTasks.configureRoot(project, slackProperties)
-    val generateDependencyGraphTask = GenerateDependencyGraphTask.register(project, slackProperties)
+    ModuleStatsTasks.configureRoot(project, foundryProperties)
+    val generateDependencyGraphTask =
+      GenerateDependencyGraphTask.register(project, foundryProperties)
     val generateAndroidTestProjectsTask = GenerateAndroidTestProjectPathsTask.register(project)
     ComputeAffectedProjectsTask.register(
       rootProject = project,
-      slackProperties = slackProperties,
+      foundryProperties = foundryProperties,
       dependencyGraphProvider = generateDependencyGraphTask.flatMap { it.outputFile },
       androidTestProjectPathsProvider = generateAndroidTestProjectsTask.flatMap { it.outputFile },
     )
     // Register robolectric jar downloads if requested
-    slackProperties.versions.robolectric?.let {
-      UpdateRobolectricJarsTask.register(project, slackProperties)
+    foundryProperties.versions.robolectric?.let {
+      UpdateRobolectricJarsTask.register(project, foundryProperties)
     }
 
     val scanApi = findAdapter(project)
@@ -230,7 +231,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     }
 
     // Add ktlint download task
-    slackProperties.versions.ktlint?.let { ktlintVersion ->
+    foundryProperties.versions.ktlint?.let { ktlintVersion ->
       project.tasks.register<KtLintDownloadTask>("updateKtLint") {
         version.setDisallowChanges(ktlintVersion)
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/ktlint"))
@@ -238,7 +239,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     }
 
     // Add GJF download task
-    slackProperties.versions.gjf?.let { gjfVersion ->
+    foundryProperties.versions.gjf?.let { gjfVersion ->
       project.tasks.register<GjfDownloadTask>("updateGjf") {
         version.setDisallowChanges(gjfVersion)
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/gjf"))
@@ -246,7 +247,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     }
 
     // Add ktfmt download task
-    slackProperties.versions.ktfmt?.let { ktfmtVersion ->
+    foundryProperties.versions.ktfmt?.let { ktfmtVersion ->
       project.tasks.register<KtfmtDownloadTask>("updateKtfmt") {
         version.setDisallowChanges(ktfmtVersion)
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/ktfmt"))
@@ -254,7 +255,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     }
 
     // Add sortDependencies download task
-    slackProperties.versions.sortDependencies?.let { sortDependenciesVersion ->
+    foundryProperties.versions.sortDependencies?.let { sortDependenciesVersion ->
       project.tasks.register<SortDependenciesDownloadTask>("updateSortDependencies") {
         version.setDisallowChanges(sortDependenciesVersion)
         outputFile.setDisallowChanges(
@@ -267,7 +268,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     // Usage: ./gradlew clean buildHealth
     project.pluginManager.withPlugin("com.autonomousapps.dependency-analysis") {
       // Register the missing identifiers aggregator
-      if (slackProperties.enableAnalysisPlugin) {
+      if (foundryProperties.enableAnalysisPlugin) {
         MissingIdentifiersAggregatorTask.register(project)
       }
       project.configure<DependencyAnalysisExtension> {
@@ -365,7 +366,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
               // Chime uses unconventional version names, which aren't reliable for semver checks
               return@rejectVersionIf true
             }
-            !slackProperties.versionsPluginAllowUnstable -> {
+            !foundryProperties.versionsPluginAllowUnstable -> {
               val currentIsStable = isStable(currentVersion)
               val candidateIsStable = isStable(candidate.version)
               if (!currentIsStable) {
@@ -417,15 +418,15 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     return stableKeyword || STABLE_REGEX.matches(version)
   }
 
-  private fun Project.configureGit(slackProperties: SlackProperties) {
+  private fun Project.configureGit(foundryProperties: FoundryProperties) {
     // Only run locally
     if (!isCi) {
-      slackProperties.gitHooksFile?.let { hooksPath ->
+      foundryProperties.gitHooksFile?.let { hooksPath ->
         // Configure hooks
         providers.gitExecProvider("git", "config", "core.hooksPath", hooksPath.canonicalPath).get()
       }
 
-      val revsFile = slackProperties.gitIgnoreRevsFile ?: return
+      val revsFile = foundryProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
       val gitVersion = providers.gitVersionProvider().get()
       val versionNumber = parseGitVersion(gitVersion)
@@ -479,7 +480,7 @@ private fun Project.configureSlackRootBuildscript(
   InstallCommitHooksTask.register(this)
 }
 
-private fun Project.configureMisc(slackProperties: SlackProperties) {
+private fun Project.configureMisc(foundryProperties: FoundryProperties) {
   tasks
     .withType(Delete::class.java)
     .named { it == "clean" }
@@ -539,7 +540,7 @@ private fun Project.configureMisc(slackProperties: SlackProperties) {
         ensureJavaHomeIsSet.setDisallowChanges(true)
 
         /** For now, we just give a heavy-handed warning with a link to our wiki! */
-        failOnError.setDisallowChanges(provider { slackProperties.strictJdk })
+        failOnError.setDisallowChanges(provider { foundryProperties.strictJdk })
 
         /** Link our wiki page in its messages to get developers up and running. */
         extraMessage.setDisallowChanges(
