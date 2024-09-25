@@ -54,6 +54,7 @@ import com.mikepenz.markdown.model.DefaultMarkdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.markdownExtendedSpans
+import foundry.intellij.compose.projectgen.SlackDesktopTheme
 import java.awt.Dimension
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
@@ -63,7 +64,6 @@ import org.jetbrains.jewel.ui.component.Typography
 import org.jetbrains.jewel.ui.component.Typography.labelTextSize
 import org.jetbrains.jewel.ui.component.minus
 import org.jetbrains.jewel.ui.theme.colorPalette
-import foundry.intellij.compose.projectgen.SlackDesktopTheme
 
 object MarkdownPanel {
   fun createPanel(computeMarkdown: suspend () -> String): JComponent {

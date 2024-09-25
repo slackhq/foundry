@@ -1,5 +1,5 @@
-package foundry.intellij.skate/*
- * Copyright (C) 2023 Slack Technologies, LLC
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@ package foundry.intellij.skate/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package foundry.intellij.skate
+
 import com.intellij.util.xmlb.Converter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

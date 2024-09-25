@@ -22,10 +22,10 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
+import foundry.intellij.compose.markdown.ui.MarkdownPanel
 import foundry.intellij.skate.ChangelogJournal
 import foundry.intellij.skate.ChangelogParser
 import javax.swing.JComponent
-import foundry.intellij.compose.markdown.ui.MarkdownPanel
 
 /**
  * The WhatsNewPanelFactory class takes the markdown file string from SkateService and displays it

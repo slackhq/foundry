@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import foundry.intellij.compose.projectgen.ProjectGenUi
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
@@ -27,7 +28,6 @@ import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
 import kotlin.io.path.absolutePathString
-import foundry.intellij.compose.projectgen.ProjectGenUi
 
 class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent) :
   DialogWrapper(currentProject), ProjectGenUi.Events {

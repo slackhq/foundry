@@ -25,12 +25,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
+import foundry.intellij.compose.projectgen.ProjectGenUi
+import foundry.intellij.compose.projectgen.ProjectGenUi.ProjectGenApp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.Text
-import foundry.intellij.compose.projectgen.ProjectGenUi
-import foundry.intellij.compose.projectgen.ProjectGenUi.ProjectGenApp
 
 fun main() = singleWindowApplication {
   var isDark by remember { mutableStateOf(false) }
