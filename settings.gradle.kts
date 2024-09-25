@@ -26,13 +26,13 @@ pluginManagement {
 
     // Snapshots/local go first in order to pre-empty other repos that may contain unscrupulous
     // snapshots.
-    if (hasProperty("slack.gradle.config.enableSnapshots")) {
+    if (hasProperty("foundry.gradle.config.enableSnapshots")) {
       maven("https://oss.sonatype.org/content/repositories/snapshots")
       maven("https://androidx.dev/snapshots/latest/artifacts/repository")
       maven("https://oss.jfrog.org/libs-snapshot")
     }
 
-    if (hasProperty("slack.gradle.config.enableMavenLocal")) {
+    if (hasProperty("foundry.gradle.config.enableMavenLocal")) {
       mavenLocal()
     }
 
@@ -97,13 +97,13 @@ dependencyResolutionManagement {
 
     // Snapshots/local go first in order to pre-empty other repos that may contain unscrupulous
     // snapshots.
-    if (hasProperty("slack.gradle.config.enableSnapshots")) {
+    if (hasProperty("foundry.gradle.config.enableSnapshots")) {
       maven("https://oss.sonatype.org/content/repositories/snapshots")
       maven("https://androidx.dev/snapshots/latest/artifacts/repository")
       maven("https://oss.jfrog.org/libs-snapshot")
     }
 
-    if (hasProperty("slack.gradle.config.enableMavenLocal")) {
+    if (hasProperty("foundry.gradle.config.enableMavenLocal")) {
       mavenLocal()
     }
 
@@ -143,19 +143,19 @@ develocity {
   }
 }
 
-rootProject.name = "slack-gradle-plugin"
+rootProject.name = "foundry"
 
 // Please keep these in alphabetical order!
 include(
-  ":agp-handlers:agp-handler-api",
-  ":skippy",
-  ":sgp-common",
-  ":skate-plugin",
-  ":skate-plugin:artifactory-authenticator",
-  ":skate-plugin:compose-playground",
-  ":skate-plugin:project-gen",
-  ":slack-plugin",
-  ":tracing",
+  ":platforms:gradle:agp-handlers:agp-handler-api",
+  ":platforms:gradle:foundry-gradle-plugin",
+  ":platforms:intellij:artifactory-authenticator",
+  ":platforms:intellij:compose",
+  ":platforms:intellij:compose:playground",
+  ":platforms:intellij:skate",
+  ":tools:foundry-common",
+  ":tools:skippy",
+  ":tools:tracing",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

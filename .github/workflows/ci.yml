@@ -79,5 +79,5 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish snapshot
-        if: github.repository == 'slackhq/slack-gradle-plugin'
+        if: github.repository == 'slackhq/foundry'
         run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }} -x dokkaHtml --no-configuration-cache

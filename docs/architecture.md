@@ -38,7 +38,7 @@ Its responsibilities include:
 - Running standard subproject configurations via `StandardProjectConfigurations`.
 - Configuring unit tests via `UnitTests`. This also includes configuring the Gradle test retry plugin, if enabled.
 - Configuring NullAway, if enabled.
-- Configuring [Skippy](/skippy).
+- Configuring [Skippy](/tools/skippy).
 - Configuring [Mod Score](/mod-score) tasks.
 
 ### `StandardProjectConfigurations`
@@ -78,7 +78,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 
 ##### Android
 
-- Configures AndroidTest APK aggregation with [Skippy](/skippy) support.
+- Configures AndroidTest APK aggregation with [Skippy](/tools/skippy) support.
 - Applies the [Android cache fix plugin](https://github.com/gradle/android-cache-fix-gradle-plugin), if enabled.
 - Configures common AGP extensions (both legacy extensions and new Component extensions).
   - Disables unused/irrelevant variants. SGP is single-variant for library projects by default.
