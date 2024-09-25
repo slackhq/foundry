@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.tracing.reporter
+package foundry.tracing.reporter
 
-import com.slack.sgp.tracing.ListOfSpans
+import foundry.tracing.ListOfSpans
 
 /** Reports a build trace (modeled as list of spans, in protocol buffer format) to some location. */
 public interface TraceReporter {

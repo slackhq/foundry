@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.tracing.model
+package foundry.tracing.model
 
-import com.slack.sgp.tracing.Span
+import java.util.Locale
+import kotlin.random.Random
 import okio.ByteString
+import okio.ByteString.Companion.encodeUtf8
 
-/** Creates a span. If no trace ID is specified, a random one is generated. */
-@Suppress("LongParameterList")
-public fun buildSpan(
-  name: String,
-  startTimestampMicros: Long,
-  durationMicros: Long,
-  traceId: ByteString = makeId(),
-  parentId: ByteString = ByteString.EMPTY,
-  addTags: TagBuilder.() -> Unit = {},
-): Span {
-  return Span(
-    id = makeId(),
-    name = name,
-    parent_id = parentId,
-    trace_id = traceId,
-    start_timestamp_micros = startTimestampMicros,
-    duration_micros = durationMicros,
-    tags = newTagBuilder().apply(addTags),
-  )
+/** Creates a new ID for a span or trace. */
+public fun makeId(seed: Int? = null): ByteString = random16HexString(seed).encodeUtf8()
+
+private const val BYTES_FOR_16_HEX_DIGITS = 8
+
+/** Returns a [String] of 16 random hexadecimal digits. */
+private fun random16HexString(seed: Int?): String {
+  val bytes = ByteArray(BYTES_FOR_16_HEX_DIGITS)
+  val random = seed?.let { Random(seed) } ?: Random.Default
+  random.nextBytes(bytes)
+  return bytes.joinToString("") { "%02x".format(Locale.US, it) }
 }

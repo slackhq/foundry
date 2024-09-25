@@ -15,9 +15,9 @@
  */
 package foundry.intellij.skate.tracing
 
-import com.slack.sgp.tracing.KeyValue
-import com.slack.sgp.tracing.model.TagBuilder
-import com.slack.sgp.tracing.model.newTagBuilder
+import foundry.tracing.KeyValue
+import foundry.tracing.model.TagBuilder
+import foundry.tracing.model.newTagBuilder
 import java.util.*
 
 class SkateSpanBuilder {

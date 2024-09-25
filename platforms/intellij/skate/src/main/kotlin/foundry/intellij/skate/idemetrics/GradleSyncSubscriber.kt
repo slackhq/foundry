@@ -21,7 +21,7 @@ import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
 import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isTracingEnabled
-import com.slack.sgp.tracing.model.makeId
+import foundry.tracing.model.makeId
 import java.time.Instant
 import okio.ByteString
 

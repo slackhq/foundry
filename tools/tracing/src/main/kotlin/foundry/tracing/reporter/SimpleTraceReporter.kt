@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.tracing.reporter
+package foundry.tracing.reporter
 
-import com.slack.sgp.tracing.ListOfSpans
-import com.slack.sgp.tracing.api.TracingService
+import foundry.tracing.ListOfSpans
+import foundry.tracing.api.TracingService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.wire.WireConverterFactory

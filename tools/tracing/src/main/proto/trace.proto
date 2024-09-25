@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package trace;
 
-option java_package = "com.slack.sgp.tracing";
+option java_package = "foundry.tracing";
 option java_outer_classname = "Trace";
 
 // The KeyValue message defines a key and value pair.

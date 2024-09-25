@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.tracing.api
+package foundry.tracing.api
 
-import com.slack.sgp.tracing.ListOfSpans
+import foundry.tracing.ListOfSpans
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Url

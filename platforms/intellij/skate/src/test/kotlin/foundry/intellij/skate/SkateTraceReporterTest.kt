@@ -21,9 +21,9 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import foundry.intellij.skate.tracing.SkateTraceReporter
 import foundry.intellij.skate.tracing.SkateTraceReporter.Companion.DATABASE_NAME
 import foundry.intellij.skate.tracing.SkateTraceReporter.Companion.SERVICE_NAME
-import com.slack.sgp.tracing.KeyValue
-import com.slack.sgp.tracing.ValueType
-import com.slack.sgp.tracing.model.newTagBuilder
+import foundry.tracing.KeyValue
+import foundry.tracing.ValueType
+import foundry.tracing.model.newTagBuilder
 import java.time.Instant
 import okio.ByteString
 

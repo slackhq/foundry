@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.tracing.model
+package foundry.tracing.model
 
-import com.slack.sgp.tracing.KeyValue
-import com.slack.sgp.tracing.ValueType
+import foundry.tracing.KeyValue
+import foundry.tracing.ValueType
 import okio.ByteString
 
 public interface TagBuilder : MutableList<KeyValue> {
