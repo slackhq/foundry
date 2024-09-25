@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/usr/bin/env sh
 
 cd platforms/gradle/foundry-gradle-plugin || exit 1
 swiftc thermal_state.swift -emit-library
