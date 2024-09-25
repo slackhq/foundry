@@ -20,7 +20,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import javax.swing.JComponent
-import slack.tooling.aibot.ChatPanel
+import foundry.intellij.compose.aibot.ChatPanel
 
 class ChatBotToolWindow : ToolWindowFactory {
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {

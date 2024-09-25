@@ -25,7 +25,7 @@ import com.intellij.ui.content.ContentManagerListener
 import com.slack.sgp.intellij.ChangelogJournal
 import com.slack.sgp.intellij.ChangelogParser
 import javax.swing.JComponent
-import slack.tooling.markdown.ui.MarkdownPanel
+import foundry.intellij.compose.markdown.ui.MarkdownPanel
 
 /**
  * The WhatsNewPanelFactory class takes the markdown file string from SkateService and displays it

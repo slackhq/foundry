@@ -27,7 +27,7 @@ import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
 import kotlin.io.path.absolutePathString
-import slack.tooling.projectgen.ProjectGenUi
+import foundry.intellij.compose.projectgen.ProjectGenUi
 
 class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent) :
   DialogWrapper(currentProject), ProjectGenUi.Events {

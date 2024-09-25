@@ -119,7 +119,7 @@ dependencies {
   implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.platforms.intellij.projectGen)
+  implementation(projects.platforms.intellij.compose)
   implementation(projects.tools.tracing)
 
   intellijPlatform {
