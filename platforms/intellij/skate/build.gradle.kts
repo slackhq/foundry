@@ -80,12 +80,12 @@ fun readGitRepoCommit(): String? {
 }
 
 buildConfig {
-  packageName("com.slack.sgp.intellij")
+  packageName("foundry.intellij.skate")
   buildConfigField("String", "VERSION", "\"${project.property("VERSION_NAME")}\"")
   buildConfigField(
     "String",
     "BUGSNAG_KEY",
-    "\"${project.findProperty("SgpIntellijBugsnagKey")?.toString().orEmpty()}\"",
+    "\"${project.findProperty("FoundryIntellijBugsnagKey")?.toString().orEmpty()}\"",
   )
   buildConfigField("String", "GIT_SHA", provider { "\"${readGitRepoCommit().orEmpty()}\"" })
   useKotlinOutput {

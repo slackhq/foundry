@@ -148,7 +148,7 @@ rootProject.name = "foundry"
 // Please keep these in alphabetical order!
 include(
   ":platforms:gradle:agp-handlers:agp-handler-api",
-  ":platforms:gradle:slack-plugin",
+  ":platforms:gradle:foundry-slack-plugin",
   ":platforms:intellij:artifactory-authenticator",
   ":platforms:intellij:compose",
   ":platforms:intellij:compose:playground",

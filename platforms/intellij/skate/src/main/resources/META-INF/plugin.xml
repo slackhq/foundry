@@ -11,30 +11,30 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <statusBarWidgetFactory implementation="com.slack.sgp.intellij.ui.CodeOwnerWidgetFactory" id="CodeOwnerWidget"/>
+        <statusBarWidgetFactory implementation="foundry.intellij.skate.ui.CodeOwnerWidgetFactory" id="CodeOwnerWidget"/>
         <projectService
-                serviceInterface="com.slack.sgp.intellij.SkateProjectService"
-                serviceImplementation="com.slack.sgp.intellij.SkateProjectServiceImpl"/>
-        <projectConfigurable instance="com.slack.sgp.intellij.SkateConfig" displayName="Skate Configuration"/>
-        <errorHandler implementation="com.slack.sgp.intellij.SkateErrorHandler"/>
-        <annotator language="kotlin" implementationClass="com.slack.sgp.intellij.modeltranslator.TranslatorAnnotator"/>
+                serviceInterface="foundry.intellij.skate.SkateProjectService"
+                serviceImplementation="foundry.intellij.skate.SkateProjectServiceImpl"/>
+        <projectConfigurable instance="foundry.intellij.skate.SkateConfig" displayName="Skate Configuration"/>
+        <errorHandler implementation="foundry.intellij.skate.SkateErrorHandler"/>
+        <annotator language="kotlin" implementationClass="foundry.intellij.skate.modeltranslator.TranslatorAnnotator"/>
         <externalAnnotator language="kotlin"
-                           implementationClass="com.slack.sgp.intellij.featureflags.FeatureFlagAnnotator"/>
-        <projectIndexingActivityHistoryListener implementation="com.slack.sgp.intellij.idemetrics.IndexingListener"/>
-        <postStartupActivity implementation="com.slack.sgp.intellij.PostStartupActivityExtension"/>
-        <toolWindow factoryClass="com.slack.sgp.intellij.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"
+                           implementationClass="foundry.intellij.skate.featureflags.FeatureFlagAnnotator"/>
+        <projectIndexingActivityHistoryListener implementation="foundry.intellij.skate.idemetrics.IndexingListener"/>
+        <postStartupActivity implementation="foundry.intellij.skate.PostStartupActivityExtension"/>
+        <toolWindow factoryClass="foundry.intellij.skate.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"
                     canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>
     </extensions>
 
     <projectListeners>
         <listener
-                class="com.slack.sgp.intellij.WhatsNewToolWindowListener"
+                class="foundry.intellij.skate.WhatsNewToolWindowListener"
                 topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
     </projectListeners>
 
     <actions>
-        <action id="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
-                class="com.slack.sgp.intellij.projectgen.ProjectGenMenuAction"
+        <action id="foundry.intellij.skate.projectgen.ProjectGenMenuAction"
+                class="foundry.intellij.skate.projectgen.ProjectGenMenuAction"
                 text="Slack Subproject"
                 description="Create a new Slack subproject">
             <add-to-group group-id="NewGroup" anchor="last"/>
