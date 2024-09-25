@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import foundry.gradle.AndroidHandler
+import foundry.gradle.SlackAndroidAppExtension
+import foundry.gradle.SlackAndroidLibraryExtension
+import foundry.gradle.SlackExtension
+import foundry.gradle.findByType
 import org.gradle.api.Action
 import org.gradle.api.Project
-import slack.gradle.AndroidHandler
-import slack.gradle.SlackAndroidAppExtension
-import slack.gradle.SlackAndroidLibraryExtension
-import slack.gradle.SlackExtension
-import slack.gradle.findByType
 
 /*
  * This file exists because of a strange behavior in Gradle. If you want to access buildSrc code from the root project's
