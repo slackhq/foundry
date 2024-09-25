@@ -26,13 +26,13 @@ pluginManagement {
 
     // Snapshots/local go first in order to pre-empty other repos that may contain unscrupulous
     // snapshots.
-    if (hasProperty("slack.gradle.config.enableSnapshots")) {
+    if (hasProperty("foundry.gradle.config.enableSnapshots")) {
       maven("https://oss.sonatype.org/content/repositories/snapshots")
       maven("https://androidx.dev/snapshots/latest/artifacts/repository")
       maven("https://oss.jfrog.org/libs-snapshot")
     }
 
-    if (hasProperty("slack.gradle.config.enableMavenLocal")) {
+    if (hasProperty("foundry.gradle.config.enableMavenLocal")) {
       mavenLocal()
     }
 
@@ -97,13 +97,13 @@ dependencyResolutionManagement {
 
     // Snapshots/local go first in order to pre-empty other repos that may contain unscrupulous
     // snapshots.
-    if (hasProperty("slack.gradle.config.enableSnapshots")) {
+    if (hasProperty("foundry.gradle.config.enableSnapshots")) {
       maven("https://oss.sonatype.org/content/repositories/snapshots")
       maven("https://androidx.dev/snapshots/latest/artifacts/repository")
       maven("https://oss.jfrog.org/libs-snapshot")
     }
 
-    if (hasProperty("slack.gradle.config.enableMavenLocal")) {
+    if (hasProperty("foundry.gradle.config.enableMavenLocal")) {
       mavenLocal()
     }
 
