@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
 import java.util.Collections.unmodifiableSet
 

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
-import com.slack.sgp.common.SgpLogger
-import com.slack.sgp.common.filterToSet
-import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
+import foundry.common.FoundryLogger
+import foundry.common.filterToSet
+import foundry.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlin.time.measureTimedValue
 import okio.FileSystem
 import okio.Path
@@ -89,7 +89,7 @@ public class AffectedProjectsComputer(
   private val androidTestProjects: Set<String> = emptySet(),
   private val debug: Boolean = false,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
-  private val logger: SgpLogger = SgpLogger.noop(),
+  private val logger: FoundryLogger = FoundryLogger.noop(),
 ) {
   public fun compute(): AffectedProjectsResult? {
     return logTimedValue("full computation of ${config.tool}") { computeImpl() }

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
-import com.slack.sgp.common.prepareForGradleOutput
-import com.slack.skippy.SkippyOutput.Companion.AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME
-import com.slack.skippy.SkippyOutput.Companion.AFFECTED_PROJECTS_FILE_NAME
-import com.slack.skippy.SkippyOutput.Companion.FOCUS_SETTINGS_FILE_NAME
+import foundry.common.prepareForGradleOutput
+import foundry.skippy.SkippyOutput.Companion.AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME
+import foundry.skippy.SkippyOutput.Companion.AFFECTED_PROJECTS_FILE_NAME
+import foundry.skippy.SkippyOutput.Companion.FOCUS_SETTINGS_FILE_NAME
 import okio.FileSystem
 import okio.Path
 

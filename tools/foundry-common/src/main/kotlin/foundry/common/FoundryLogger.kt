@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.common
+package foundry.common
 
-/** A simple logging abstraction for use in SGP. */
-public interface SgpLogger {
+/** A simple logging abstraction for use in Foundry. */
+public interface FoundryLogger {
   public fun debug(message: String)
 
   public fun info(message: String)
@@ -33,22 +33,24 @@ public interface SgpLogger {
 
   public companion object {
 
-    public fun noop(): SgpLogger = NoopSgpLogger
+    public fun noop(): FoundryLogger = NoopFoundryLogger
 
-    public fun system(): SgpLogger = SystemSgpLogger
+    public fun system(): FoundryLogger = SystemFoundryLogger
 
-    public fun prefix(prefix: String, delegate: SgpLogger): SgpLogger =
-      PrefixSgpLogger(prefix, delegate)
+    public fun prefix(prefix: String, delegate: FoundryLogger): FoundryLogger =
+      PrefixFoundryLogger(prefix, delegate)
   }
 }
 
 /** A simple delegating logger that allows overwriting functions as desired. */
-internal abstract class DelegatingSgpLogger(private val delegate: SgpLogger) :
-  SgpLogger by delegate
+internal abstract class DelegatingFoundryLogger(private val delegate: FoundryLogger) :
+  FoundryLogger by delegate
 
 /** A logger that always adds the given [prefix] to log messages. */
-internal class PrefixSgpLogger(private val prefix: String, private val delegate: SgpLogger) :
-  SgpLogger {
+internal class PrefixFoundryLogger(
+  private val prefix: String,
+  private val delegate: FoundryLogger,
+) : FoundryLogger {
   override fun debug(message: String) {
     delegate.debug("$prefix $message")
   }
@@ -78,8 +80,8 @@ internal class PrefixSgpLogger(private val prefix: String, private val delegate:
   }
 }
 
-/** A quiet no-op [SgpLogger]. */
-private object NoopSgpLogger : SgpLogger {
+/** A quiet no-op [FoundryLogger]. */
+private object NoopFoundryLogger : FoundryLogger {
   override fun debug(message: String) {}
 
   override fun info(message: String) {}
@@ -95,8 +97,8 @@ private object NoopSgpLogger : SgpLogger {
   override fun error(message: String, error: Throwable) {}
 }
 
-/** An [SgpLogger] that just writes to [System.out] and [System.err]. */
-private object SystemSgpLogger : SgpLogger {
+/** An [FoundryLogger] that just writes to [System.out] and [System.err]. */
+private object SystemFoundryLogger : FoundryLogger {
   override fun debug(message: String) {
     println(message)
   }

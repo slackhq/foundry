@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
 import com.google.common.truth.Truth.assertThat
 import com.jraska.module.graph.DependencyGraph
-import com.slack.sgp.common.SgpLogger
-import com.slack.sgp.common.readLines
-import com.slack.sgp.common.writeLines
-import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import com.squareup.moshi.Moshi
+import foundry.common.FoundryLogger
+import foundry.common.readLines
+import foundry.common.writeLines
+import foundry.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlinx.coroutines.test.runTest
 import okio.Path
 import okio.fakefilesystem.FakeFileSystem
@@ -61,7 +61,7 @@ class SkippyRunnerTest {
         originalConfigMap = configs.associateBy { it.tool },
         moshi = Moshi.Builder().build(),
         debug = true,
-        logger = SgpLogger.system(),
+        logger = FoundryLogger.system(),
         mergeOutputs = true,
         fs = fs,
       )

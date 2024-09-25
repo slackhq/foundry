@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
 import com.jraska.module.graph.DependencyGraph
-import com.slack.sgp.common.SgpLogger
-import com.slack.sgp.common.flatMapToSet
-import com.slack.sgp.common.flip
-import com.slack.sgp.common.parallelMapNotNull
-import com.slack.sgp.common.readLines
-import com.slack.sgp.common.writeLines
-import com.slack.sgp.common.writeText
-import com.slack.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
+import foundry.common.FoundryLogger
+import foundry.common.flatMapToSet
+import foundry.common.flip
+import foundry.common.parallelMapNotNull
+import foundry.common.readLines
+import foundry.common.writeLines
+import foundry.common.writeText
+import foundry.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.async
@@ -46,7 +46,7 @@ public class SkippyRunner(
   private val parallelism: Int = originalConfigMap.size,
   private val fs: FileSystem = FileSystem.SYSTEM,
   private val debug: Boolean = false,
-  private val logger: SgpLogger = SgpLogger.noop(),
+  private val logger: FoundryLogger = FoundryLogger.noop(),
   private val mergeOutputs: Boolean = true,
 ) {
   init {
@@ -183,7 +183,7 @@ public class SkippyRunner(
   ): SkippyOutput? {
     val tool = config.tool
     val skippyOutputs = WritableSkippyOutput(tool, outputDir, fs)
-    val prefixLogger = SgpLogger.prefix("$LOG_PREFIX[$tool]", logger)
+    val prefixLogger = FoundryLogger.prefix("$LOG_PREFIX[$tool]", logger)
     val diagnostics =
       if (debug) {
         val diagnosticsDir = outputsDir / tool / "diagnostics"

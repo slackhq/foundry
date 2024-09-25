@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.Context
@@ -22,9 +22,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import com.jraska.module.graph.DependencyGraph
-import com.slack.sgp.common.SgpLogger
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
+import foundry.common.FoundryLogger
 import java.io.ObjectInputStream
 import java.nio.file.Path
 import kotlin.coroutines.CoroutineContext
@@ -99,7 +99,7 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
       .path(mustExist = true, canBeDir = false, mustBeReadable = true)
       .required()
 
-  private val logger = SgpLogger.clikt(this)
+  private val logger = FoundryLogger.clikt(this)
 
   @OptIn(DelicateCoroutinesApi::class)
   override suspend fun run() {

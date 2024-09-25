@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
 import com.google.common.truth.Truth.assertThat
-import com.slack.sgp.common.SgpLogger
-import com.slack.skippy.AffectedProjectsComputer.Companion.anyNeverSkip
-import com.slack.skippy.AffectedProjectsComputer.Companion.anyNeverSkipDebug
-import com.slack.skippy.AffectedProjectsComputer.Companion.filterExcludes
-import com.slack.skippy.AffectedProjectsComputer.Companion.filterIncludes
+import foundry.common.FoundryLogger
+import foundry.skippy.AffectedProjectsComputer.Companion.anyNeverSkip
+import foundry.skippy.AffectedProjectsComputer.Companion.anyNeverSkipDebug
+import foundry.skippy.AffectedProjectsComputer.Companion.filterExcludes
+import foundry.skippy.AffectedProjectsComputer.Companion.filterIncludes
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
@@ -57,7 +57,7 @@ class AffectedProjectsComputerTest {
       androidTestProjects = setOf(":foo"),
       rootDirPath = rootDirPath,
       debug = true,
-      logger = SgpLogger.system(),
+      logger = FoundryLogger.system(),
       diagnostics = diagnosticWriter,
     )
 

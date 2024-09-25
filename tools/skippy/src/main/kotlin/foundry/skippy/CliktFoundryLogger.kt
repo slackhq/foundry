@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.skippy
+package foundry.skippy
 
 import com.github.ajalt.clikt.core.BaseCliktCommand
-import com.slack.sgp.common.SgpLogger
+import foundry.common.FoundryLogger
 
-internal fun SgpLogger.Companion.clikt(command: BaseCliktCommand<*>): SgpLogger =
-  CliktSgpLogger(command)
+internal fun FoundryLogger.Companion.clikt(command: BaseCliktCommand<*>): FoundryLogger =
+  CliktFoundryLogger(command)
 
-private class CliktSgpLogger(private val command: BaseCliktCommand<*>) : SgpLogger {
+private class CliktFoundryLogger(private val command: BaseCliktCommand<*>) : FoundryLogger {
   override fun debug(message: String) {
     command.echo(message)
   }
