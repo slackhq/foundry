@@ -15,10 +15,12 @@
  */
 package com.slack.sgp.intellij.aibot
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
+import com.slack.sgp.intellij.SkatePluginSettings
 import javax.swing.JComponent
 import slack.tooling.aibot.ChatPanel
 
@@ -30,10 +32,13 @@ class ChatBotToolWindow : ToolWindowFactory {
   }
 
   private fun createComposePanel(project: Project): JComponent {
+    val settings = project.service<SkatePluginSettings>()
+    val aiBotScriptSetting = settings.devxpAPIcall
+    println("aiBotScriptSetting in ChatBotToolWindow $aiBotScriptSetting")
     val scriptFetcher = AIBotScriptFetcher(project)
     println("AIBotScriptFetcher $scriptFetcher")
     val scriptPath = scriptFetcher.getAIBotScript()
     println("Printing script path $scriptPath")
-    return ChatPanel.createPanel(scriptPath.toString())
+    return ChatPanel.createPanel(scriptPath)
   }
 }

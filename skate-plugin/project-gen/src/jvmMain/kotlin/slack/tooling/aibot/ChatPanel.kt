@@ -23,9 +23,10 @@ import com.slack.circuit.foundation.CircuitContent
 import java.awt.Dimension
 import javax.swing.JComponent
 import slack.tooling.projectgen.SlackDesktopTheme
+import java.nio.file.Path
 
 object ChatPanel {
-  fun createPanel(scriptPath: String?): JComponent {
+  fun createPanel(scriptPath: Path): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
       setContent { SlackDesktopTheme { ChatApp(scriptPath) } }
@@ -33,7 +34,9 @@ object ChatPanel {
   }
 
   @Composable
-  private fun ChatApp(scriptPath: String?) {
+  private fun ChatApp(scriptPath: Path) {
+    println("ChatApp Script Path $scriptPath")
+    println("ChatApp Script Path absolutely ${scriptPath.toAbsolutePath()}")
     val circuit = remember {
       Circuit.Builder()
         .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter(scriptPath))

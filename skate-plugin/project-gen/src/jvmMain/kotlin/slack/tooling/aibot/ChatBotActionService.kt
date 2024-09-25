@@ -9,15 +9,24 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
 
-class ChatBotActionService {
-    suspend fun executeCommand(question: String): String {
+class ChatBotActionService(private val scriptPath: Path) {
+    fun executeCommand(question: String): String {
         val jsonInput = createJsonInput(question)
-        val scriptContent = createScriptContent(jsonInput)
-        val tempScript = createTempScript(scriptContent)
-        val output = runScript(tempScript)
-        tempScript.delete()
+//        val scriptContent = createScriptContent(jsonInput)
+//        val tempScript = createTempScript(scriptContent)
+        println("executing command $scriptPath")
+        val output = runScript(Paths.get(scriptPath.toString()), jsonInput)
+
+//        val output = runScript(scriptPath, jsonInput)
+//        val output = scriptPath?.let { runScript(it, jsonInput) }
+        println("output $output")
+//        tempScript.delete()
         return parseOutput(output)
+//        return output?.let { parseOutput(it) } ?: "Sorry, I couldn't generate a response."
     }
 
     @VisibleForTesting
@@ -37,10 +46,11 @@ class ChatBotActionService {
         return content
     }
 
-    @VisibleForTesting
-    private fun createScriptContent(jsonInput: String): String {
-        return jsonInput
-    }
+//    @VisibleForTesting
+//    private fun createScriptContent(jsonInput: String): String {
+//        val scriptContent = """"""
+//        return scriptContent
+//    }
 
     @VisibleForTesting
     private suspend fun createTempScript(scriptContent: String): File {
@@ -51,10 +61,21 @@ class ChatBotActionService {
     }
 
     @VisibleForTesting
-    private fun runScript(tempScript: File): String {
+    private fun runScript(scriptPath: Path, jsonInput: String): String {
+//        val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
+        println("running script")
+        println("scriptPath for runScript: $scriptPath")
+        println("jsonInput for runScript: $jsonInput")
 
-        val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
+//        val command = listOf("/bin/bash", scriptPath.absolutePathString(), jsonInput)
+//        println(command)
+//        val processBuilder = ProcessBuilder(command)
+
+//        val processBuilder = ProcessBuilder(scriptPath.toString(), jsonInput)
+        val processBuilder = ProcessBuilder("/bin/bash", scriptPath.toString(), jsonInput)
         processBuilder.redirectErrorStream(true)
+        println("ProcessBuilder command: ${processBuilder.command().joinToString(" ")}")
+
 
         val process = processBuilder.start()
         val output = StringBuilder()
@@ -63,6 +84,7 @@ class ChatBotActionService {
             var line: String?
             while (reader.readLine().also { line = it } != null) {
                 output.append(line).append("\n")
+                println("Script output: $line")
             }
         }
 
@@ -72,18 +94,22 @@ class ChatBotActionService {
             throw RuntimeException("Process timed out after 600 seconds")
         }
 
-        tempScript.delete()
-        return output.toString()
+//        tempScript.delete()
+        println("printing claude output: $output")
+        return output.toString().trim()
     }
 
     @VisibleForTesting
     private fun parseOutput(output: String): String {
-        println("output: $output")
+        println("parseOutput beginning: $output")
         val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
         val result = regex.find(output.toString())?.value ?: "{}"
+        println("parse Output $result")
         val gson = Gson()
         val jsonObject = gson.fromJson(result, JsonObject::class.java)
+        println("json Object $jsonObject")
         val contentArray = jsonObject.getAsJsonArray("content")
+        println("content array $contentArray")
         val contentObject = contentArray.get(0).asJsonObject
         val actualContent = contentObject.get("content").asString
 
