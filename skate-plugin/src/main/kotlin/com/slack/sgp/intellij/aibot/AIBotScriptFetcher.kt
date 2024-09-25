@@ -20,7 +20,7 @@ class AIBotScriptFetcher(
 
         return aiBotScriptSetting?.let { scriptSetting ->
             val fs = LocalFileSystem.getInstance()
-            val path = Path.of(basePath, scriptSetting).toString()
+            val path = Path.of(basePath, scriptSetting)
             println("getAIBotScript path location: $path")
             fs.findFileByNioFile(path)?.toNioPath()?.toFile()
         }

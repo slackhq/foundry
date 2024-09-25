@@ -33,7 +33,7 @@ class ChatBotToolWindow : ToolWindowFactory {
     val scriptFetcher = AIBotScriptFetcher(project)
     println("AIBotScriptFetcher $scriptFetcher")
     val scriptPath = scriptFetcher.getAIBotScript()
-    println("apple $scriptPath")
+    println("Printing script path $scriptPath")
     return ChatPanel.createPanel(scriptPath.toString())
   }
 }
