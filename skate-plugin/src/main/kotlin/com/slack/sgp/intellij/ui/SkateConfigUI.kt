@@ -41,6 +41,7 @@ internal class SkateConfigUI(
     featureFlagSettings()
     tracingSettings()
     codeOwnerSettings()
+    aiBotSettings()
   }
 
   private fun Panel.whatsNewPanelSettings() {
@@ -190,6 +191,18 @@ internal class SkateConfigUI(
           if (it.text.isBlank()) error(SkateBundle.message(errorMessageKey)) else null
         }
         .apply { enabledCondition?.let { enabledIf(it) } }
+    }
+  }
+
+  private fun Panel.aiBotSettings() {
+    group(SkateBundle.message("skate.configuration.aiBot.title")) {
+      row {
+        checkBox(SkateBundle.message("skate.configuration.enableAiBot.description"))
+          .bindSelected(
+            getter = { settings.isAiBotEnabled },
+            setter = { settings.isAiBotEnabled = it },
+          )
+      }
     }
   }
 }

@@ -15,15 +15,25 @@
  */
 package com.slack.sgp.intellij.aibot
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
+import com.slack.sgp.intellij.SkatePluginSettings
 import javax.swing.JComponent
 import slack.tooling.aibot.ChatPanel
 
 class ChatBotToolWindow : ToolWindowFactory {
+
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+
+    val settings = project.service<SkatePluginSettings>()
+    if (!settings.isAiBotEnabled) {
+      toolWindow.hide()
+      return
+    }
+
     val contentFactory = ContentFactory.getInstance()
     val content = contentFactory.createContent(createComposePanel(), "", false)
     toolWindow.contentManager.addContent(content)

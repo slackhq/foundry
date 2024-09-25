@@ -122,6 +122,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.codeOwnerFilePath = value
     }
 
+  var isAiBotEnabled: Boolean
+    get() = state.isAiBotEnabled
+    set(value) {
+      state.isAiBotEnabled = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -137,5 +143,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var tracingEndpoint by string()
     var codeOwnerFilePath by string()
     var isCodeOwnerEnabled by property(true)
+    var isAiBotEnabled by property(true)
   }
 }
