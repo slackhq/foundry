@@ -81,6 +81,17 @@
     <issue
         id="GradleProjectIsolation"
         message="Avoid using method getRootProject"
+        errorLine1="        project.rootProject.layout.projectDirectory.file(it)"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
+            line="175"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
         errorLine1="    require(project == project.rootProject) {"
         errorLine2="                               ~~~~~~~~~~~">
         <location
@@ -96,7 +107,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="488"
+            line="489"
             column="14"/>
     </issue>
 
@@ -169,22 +180,11 @@
     <issue
         id="GradleProjectIsolation"
         message="Avoid using method getRootProject"
-        errorLine1="        project.rootProject.layout.projectDirectory.file(it)"
-        errorLine2="                ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/SlackProperties.kt"
-            line="175"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
         errorLine1="            else -> project.rootProject.projectDir.absolutePath"
         errorLine2="                            ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/unittest/UnitTests.kt"
-            line="228"
+            line="229"
             column="29"/>
     </issue>
 
@@ -246,6 +246,17 @@
     <issue
         id="InternalAgpApiUsage"
         message="Avoid using internal Android Gradle Plugin APIs"
+        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
+            line="25"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalAgpApiUsage"
+        message="Avoid using internal Android Gradle Plugin APIs"
         errorLine1="import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -272,17 +283,6 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="25"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalAgpApiUsage"
-        message="Avoid using internal Android Gradle Plugin APIs"
-        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/SlackExtension.kt"
             line="25"
             column="1"/>
     </issue>
@@ -317,6 +317,17 @@
         <location
             file="src/main/kotlin/foundry/gradle/tasks/BaseDownloadTask.kt"
             line="31"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.internal.os.OperatingSystem"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryTools.kt"
+            line="52"
             column="1"/>
     </issue>
 
@@ -365,17 +376,6 @@
     </issue>
 
     <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.internal.os.OperatingSystem"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/SlackTools.kt"
-            line="52"
-            column="1"/>
-    </issue>
-
-    <issue
         id="WithTypeWithoutConfigureEach"
         message="Avoid passing a closure to withType, use withType().configureEach instead"
         errorLine1="        project.tasks.withType(JavaCompile::class.java, baseConfig.javaCompileAptAction)"
@@ -403,7 +403,7 @@
         errorLine1="  tasks.withType(T::class.java) {"
         errorLine2="        ~~~~~~~~">
         <location
-            file="src/main/kotlin/foundry/gradle/SlackGradleUtil.kt"
+            file="src/main/kotlin/foundry/gradle/FoundryGradleUtil.kt"
             line="270"
             column="9"/>
     </issue>
