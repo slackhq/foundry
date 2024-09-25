@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 plugins {
-  kotlin("jvm")
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.moshix)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.lint)
 }
 
 dependencies {
   api(platform(libs.coroutines.bom))
-  api(libs.okio)
 
+  implementation(libs.clikt)
   implementation(libs.coroutines.core)
+  implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
+  implementation(libs.kotlinCliUtil)
+  implementation(libs.moshi)
+  implementation(libs.okio)
+  implementation(projects.tools.foundryCommon)
+
+  testImplementation(platform(libs.coroutines.bom))
+  testImplementation(libs.coroutines.test)
+  testImplementation(libs.junit)
+  testImplementation(libs.okio.fakefilesystem)
+  testImplementation(libs.truth)
 }

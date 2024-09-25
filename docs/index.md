@@ -1,4 +1,4 @@
-slack-gradle-plugin
+foundry
 ===================
 
 This repository contains the core Gradle plugin and associated logic used for Slack's Android app.

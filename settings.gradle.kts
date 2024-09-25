@@ -147,15 +147,15 @@ rootProject.name = "foundry"
 
 // Please keep these in alphabetical order!
 include(
-  ":agp-handlers:agp-handler-api",
-  ":skippy",
-  ":sgp-common",
-  ":skate-plugin",
-  ":skate-plugin:artifactory-authenticator",
-  ":skate-plugin:compose-playground",
-  ":skate-plugin:project-gen",
-  ":slack-plugin",
-  ":tracing",
+  ":platforms:gradle:agp-handlers:agp-handler-api",
+  ":platforms:gradle:slack-plugin",
+  ":platforms:intellij:artifactory-authenticator",
+  ":platforms:intellij:compose-playground",
+  ":platforms:intellij:project-gen",
+  ":platforms:intellij:skate",
+  ":tools:foundry-common",
+  ":tools:skippy",
+  ":tools:tracing",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

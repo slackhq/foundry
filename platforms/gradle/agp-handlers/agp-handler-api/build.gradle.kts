@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 plugins {
-  kotlin("jvm")
+  alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.lint)
 }

@@ -26,11 +26,11 @@ plugins {
 }
 
 gradlePlugin {
-  plugins.create("slack-root") {
+  plugins.create("foundry-root") {
     id = "com.slack.gradle.root"
     implementationClass = "slack.gradle.SlackRootPlugin"
   }
-  plugins.create("slack-base") {
+  plugins.create("foundry-base") {
     id = "com.slack.gradle.base"
     implementationClass = "slack.gradle.SlackBasePlugin"
   }
@@ -73,7 +73,7 @@ dependencies {
   api(libs.okhttp)
   // Better I/O
   api(libs.okio)
-  api(projects.agpHandlers.agpHandlerApi)
+  api(projects.platforms.gradle.agpHandlers.agpHandlerApi)
 
   implementation(platform(libs.coroutines.bom))
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
@@ -89,8 +89,8 @@ dependencies {
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
-  implementation(projects.sgpCommon)
-  implementation(projects.skippy)
+  implementation(projects.tools.foundryCommon)
+  implementation(projects.tools.skippy)
 
   compileOnly(platform(libs.kotlin.bom))
   compileOnly(gradleApi())

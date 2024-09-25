@@ -60,8 +60,8 @@ class ChangeLogParserTest {
 
       - Switch Robolectric jar downloads to use detached configurations.
         - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
-      - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
-      - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+      - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
       - Update `kotlin-cli-util` to 1.2.2.
 
       2023-06-25
@@ -78,8 +78,8 @@ class ChangeLogParserTest {
 
       - Switch Robolectric jar downloads to use detached configurations.
         - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
-      - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
-      - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+      - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
       - Update `kotlin-cli-util` to 1.2.2.
       """
         .trimIndent()
@@ -99,8 +99,8 @@ class ChangeLogParserTest {
 
       - Switch Robolectric jar downloads to use detached configurations.
         - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
-      - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
-      - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+      - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
       - Update `kotlin-cli-util` to 1.2.2.
 
       2023-06-25
@@ -118,8 +118,8 @@ class ChangeLogParserTest {
 
       - Switch Robolectric jar downloads to use detached configurations.
         - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
-      - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
-      - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+      - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
       - Update `kotlin-cli-util` to 1.2.2.
       """
         .trimIndent()
@@ -231,8 +231,8 @@ class ChangeLogParserTest {
 
         - Switch Robolectric jar downloads to use detached configurations.
           - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
-        - Docs are now published on https://slackhq.github.io/slack-gradle-plugin. This is a work in progress.
-        - API kdocs are published at https://slackhq.github.io/slack-gradle-plugin/api/0.x/.
+        - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
+        - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
         - Update `kotlin-cli-util` to 1.2.2.
         """
         .trimIndent()

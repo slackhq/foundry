@@ -178,11 +178,9 @@ val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 val jvmTargetVersion = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
 
 subprojects {
-  if (project.path == ":slack-plugin") {
-    project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
-      configure<BuildConfigExtension> {
-        buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
-      }
+  project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
+    configure<BuildConfigExtension> {
+      buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
     }
   }
 

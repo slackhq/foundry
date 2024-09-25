@@ -5,7 +5,7 @@
   "branchPrefix": "test-renovate/",
   "gitAuthor": "OSS-Bot <svc-oss-bot@slack-corp.com>",
   "repositories": [
-    "slackhq/slack-gradle-plugin"  
+    "slackhq/foundry"
   ],
   "platformAutomerge": true,
   "packageRules": [

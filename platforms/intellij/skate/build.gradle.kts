@@ -35,7 +35,7 @@ intellijPlatform {
   pluginConfiguration {
     vendor {
       name = "Slack"
-      url = "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin"
+      url = "https://github.com/slackhq/foundry/tree/main/platforms/intellij/skate"
       email = "oss@slack-corp.com"
     }
   }
@@ -119,8 +119,8 @@ dependencies {
   implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.skatePlugin.projectGen)
-  implementation(projects.tracing)
+  implementation(projects.platforms.intellij.projectGen)
+  implementation(projects.tools.tracing)
 
   intellijPlatform {
     // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio

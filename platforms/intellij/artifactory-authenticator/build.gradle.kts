@@ -33,7 +33,7 @@ intellijPlatform {
     vendor {
       name = "Slack"
       url =
-        "https://github.com/slackhq/slack-gradle-plugin/tree/main/skate-plugin/artifactory-authenticator"
+        "https://github.com/slackhq/foundry/tree/main/platforms/intellij/artifactory-authenticator"
       email = "oss@slack-corp.com"
     }
   }

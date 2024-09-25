@@ -14,7 +14,7 @@ fi
 
 if ! [[ ${local} || ${ci} ]]; then
   set -ex
-  REPO="git@github.com:slackhq/slack-gradle-plugin.git"
+  REPO="git@github.com:slackhq/foundry.git"
   DIR=temp-clone
   # Delete any existing temporary website clone
   rm -rf ${DIR}

@@ -44,7 +44,7 @@ kotlin {
         implementation(libs.jewel.standalone)
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
-        implementation(projects.skatePlugin.projectGen)
+        implementation(projects.platforms.intellij.projectGen)
       }
     }
   }
