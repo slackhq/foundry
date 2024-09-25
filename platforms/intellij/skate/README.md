@@ -30,6 +30,6 @@ We're sending analytics for almost all Skate features to track user usage. To se
 3. Make call to `SkateTraceReporter` to send up the traces
 
 ## Releasing
-1. Update `change-notes.html` file under `skate-plugin/` and merge it to `main`
+1. Update `change-notes.html` file under `skate/` and merge it to `main`
 2. Run `publish-skate` Github Action.
-Behind the scene the action's running`./gradlew :skate-plugin:uploadPluginToArtifactory`
+Behind the scene the action's running`./gradlew :platforms:intellij:skate:uploadPluginToArtifactory`
