@@ -4,6 +4,17 @@ Changelog
 **Unreleased**
 --------------
 
+0.19.6
+------
+
+_2024-09-25_
+
+- Intro `SoftRefLRUPolicyMSPerMB` + `ReservedCodeCacheSize` jvm args to bootstrap
+  - Learnings from https://jasonpearson.dev/codecache-in-jvm-builds and https://jasonpearson.dev/softreflrupolicymspermb-in-jvm-builds.
+- Update kotlin-cli-util to `3.0.1`.
+- Update to Guava `33.3.1-jre`.
+- Build against Gradle `8.10.2`.
+
 0.19.5
 ------
 

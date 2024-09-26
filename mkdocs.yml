@@ -2,9 +2,9 @@
 # mkdocs serve
 # mkdocs gh-deploy
 
-site_name: slack-gradle-plugin
-repo_name: slack-gradle-plugin
-repo_url: https://github.com/slackhq/slack-gradle-plugin
+site_name: foundry
+repo_name: foundry
+repo_url: https://github.com/slackhq/foundry
 site_description: "Gradle and IntelliJ build tooling used in Slack's Android repo"
 site_author: Slack
 remote_branch: gh-pages
@@ -72,7 +72,7 @@ nav:
 #  - 'Mod Score': mod-score.md
 #  - 'Formatters & Analysis': formatters-and-analysis.md
 #  - 'Thermals Logging': thermals-logging.md
-  - 'Discussions ⏏': https://github.com/slackhq/slack-gradle-plugin/discussions
+  - 'Discussions ⏏': https://github.com/slackhq/foundry/discussions
   - 'Change Log': changelog.md
   - 'API': api/0.x/
   - 'Contributing': contributing.md

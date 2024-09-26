@@ -1,0 +1,81 @@
+// A proto for capturing a trace.
+
+syntax = "proto3";
+
+package trace;
+
+option java_package = "foundry.tracing";
+option java_outer_classname = "Trace";
+
+// The KeyValue message defines a key and value pair.
+// The key is always a string. The value for the field is determined by the ValueType.
+// If the ValueType is STRING the field v_str should be set, for BOOL v_bool is used etc..
+// Only the type of valueType is used. Rest of the fields are ignored even if they are set.
+// So, of v_type is ValueType.STRING, only the value v_str is used. Rest of the fields are ignored.
+// We chose not to use OneOf field, since it's JSON encoding is not as straight forward.
+enum ValueType {
+  STRING = 0;
+  BOOL = 1;
+  INT64 = 2;
+  FLOAT64 = 3;
+  BINARY = 4;
+};
+
+message KeyValue {
+  string    key = 1;
+  ValueType v_type = 2;
+  string    v_str = 3;
+  bool      v_bool = 4;
+  int64     v_int64 = 5;
+  double    v_float64 = 6;
+  bytes     v_binary = 7;
+}
+
+// A span defines a single event in a trace.
+// This span format is inspired by the zipkin span design at:
+// https://github.com/openzipkin/zipkin-api/blob/master/zipkin.proto
+message Span {
+  // A field that uniquely identifies this event.
+  // This field usually contains a randomly generated UUID.
+  // This field is required and encoded as 8 or 16 bytes, in big endian byte order.
+  bytes id = 1;
+
+  // This field contains the parent id of this span.  It is useful to establish
+  // a parent-child relationships between spans.
+  // If empty, this span will be considered a root span.
+  bytes parent_id = 2;
+
+  // A trace is a directed acyclic graph of spans. All spans with the same trace_id belong to the
+  // same transaction. This field is required.
+  bytes trace_id = 3;
+
+  // A name for the event.
+  string name = 4;
+
+  // The timestamp field stores the epoch microseconds at which this event happened.
+  // For example: a value of 1551849569000000 represents March 6, 2019 5:19:29 UTC.
+  // We use fixed64 since it is more wire efficient for than int64 for larger numbers.
+  // This field is required.
+  fixed64 start_timestamp_micros = 5;
+
+  // This field stored the duration in microseconds for the event in the critical path.
+  // For example 150 milliseconds is 150000 microseconds.
+  // This field is required.
+  uint64 duration_micros = 6;
+
+  // A list of key value pairs.
+  repeated KeyValue tags = 7;
+}
+
+// List of spans is a message to send multiple spans in a single call.
+// Any tags specified in this call will be added to all the spans sent in this message.
+// If the list of spans is empty, this message will be ignored even if tags field is set.
+message ListOfSpans {
+  // A list of spans.
+  repeated Span spans = 1;
+
+  // A list of tags common to all the spans in this request.
+  // All these tags will be added for all the spans sent in this request.
+  // Sending common tags this way is more network efficient.
+  repeated KeyValue tags = 2;
+}

@@ -1,7 +1,7 @@
-slack-gradle-plugin
+foundry
 ===================
 
-### [slackhq.github.io/slack-gradle-plugin](https://slackhq.github.io/slack-gradle-plugin)
+### [slackhq.github.io/foundry](https://slackhq.github.io/foundry)
 
 License
 --------
