@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package slack.tooling.aibot
+package foundry.intellij.compose.aibot
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -23,7 +23,7 @@ import com.slack.circuit.foundation.CircuitContent
 import java.awt.Dimension
 import java.nio.file.Path
 import javax.swing.JComponent
-import slack.tooling.projectgen.SlackDesktopTheme
+import foundry.intellij.compose.projectgen.FoundryDesktopTheme
 
 object ChatPanel {
   fun createPanel(scriptPath: Path): JComponent {

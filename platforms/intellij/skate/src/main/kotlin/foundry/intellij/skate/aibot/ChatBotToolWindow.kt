@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.slack.sgp.intellij.aibot
+package foundry.intellij.skate.aibot
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
-import com.slack.sgp.intellij.SkatePluginSettings
+import com.slack.sgp.intellij.aibot.AIBotScriptFetcher
 import javax.swing.JComponent
-import slack.tooling.aibot.ChatPanel
+import foundry.intellij.compose.aibot.ChatPanel
+import foundry.intellij.skate.SkatePluginSettings
 
 class ChatBotToolWindow : ToolWindowFactory {
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
