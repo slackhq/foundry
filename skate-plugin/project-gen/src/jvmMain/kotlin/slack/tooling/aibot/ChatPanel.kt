@@ -21,9 +21,9 @@ import androidx.compose.ui.awt.ComposePanel
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import java.awt.Dimension
+import java.nio.file.Path
 import javax.swing.JComponent
 import slack.tooling.projectgen.SlackDesktopTheme
-import java.nio.file.Path
 
 object ChatPanel {
   fun createPanel(scriptPath: Path): JComponent {

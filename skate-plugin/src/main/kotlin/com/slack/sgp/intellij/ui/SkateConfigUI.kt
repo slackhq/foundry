@@ -194,8 +194,8 @@ internal class SkateConfigUI(
     }
   }
 
-  private fun Panel.aiBotSettings(){
-    group("DevXP AI bot"){
+  private fun Panel.aiBotSettings() {
+    group("DevXP AI bot") {
       bindAndValidateTextFieldRow(
         titleMessageKey = "skate.configuration.aiBotSettings.title",
         getter = { settings.devxpAPIcall },

@@ -141,9 +141,7 @@ private fun ChatBubble(message: Message, modifier: Modifier = Modifier) {
     Modifier.wrapContentWidth()
       .padding(8.dp)
       .shadow(elevation = 0.5.dp, shape = RoundedCornerShape(25.dp), clip = true)
-      .background(
-        color = if (isMe) ChatColors.promptBackground else ChatColors.responseBackground
-      )
+      .background(color = if (isMe) ChatColors.promptBackground else ChatColors.responseBackground)
       .padding(8.dp)
   ) {
     Text(
