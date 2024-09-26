@@ -28,17 +28,9 @@ import org.jetbrains.annotations.VisibleForTesting
 class ChatBotActionService(private val scriptPath: Path) {
   fun executeCommand(question: String): String {
     val jsonInput = createJsonInput(question)
-    //        val scriptContent = createScriptContent(jsonInput)
-    //        val tempScript = createTempScript(scriptContent)
-    println("executing command $scriptPath")
     val output = runScript(Paths.get(scriptPath.toString()), jsonInput)
-
-    //        val output = runScript(scriptPath, jsonInput)
-    //        val output = scriptPath?.let { runScript(it, jsonInput) }
     val parsedOutput = parseOutput(output)
-    println("output that is parsed${parsedOutput}")
-    //        tempScript.delete()
-    return parseOutput(output)
+    return parsedOutput
   }
 
   @VisibleForTesting
@@ -58,36 +50,10 @@ class ChatBotActionService(private val scriptPath: Path) {
     return content
   }
 
-  //    @VisibleForTesting
-  //    private fun createScriptContent(jsonInput: String): String {
-  //        val scriptContent = """"""
-  //        return scriptContent
-  //    }
-
-  //    @VisibleForTesting
-  //    private suspend fun createTempScript(scriptContent: String): File {
-  //        val tempScript = withContext(Dispatchers.IO) { File.createTempFile("run_command", ".sh")
-  // }
-  //        tempScript.writeText(scriptContent)
-  //        tempScript.setExecutable(true)
-  //        return tempScript
-  //    }
-
   @VisibleForTesting
   private fun runScript(scriptPath: Path, jsonInput: String): String {
-    //        val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
-    println("running script")
-    println("scriptPath for runScript: $scriptPath")
-    println("jsonInput for runScript: $jsonInput")
-
-    //        val command = listOf("/bin/bash", scriptPath.absolutePathString(), jsonInput)
-    //        println(command)
-    //        val processBuilder = ProcessBuilder(command)
-
-    //        val processBuilder = ProcessBuilder(scriptPath.toString(), jsonInput)
     val processBuilder = ProcessBuilder("/bin/bash", scriptPath.toString(), jsonInput)
     processBuilder.redirectErrorStream(true)
-    println("ProcessBuilder command: ${processBuilder.command().joinToString(" ")}")
 
     val process = processBuilder.start()
     val output = StringBuilder()
@@ -106,8 +72,6 @@ class ChatBotActionService(private val scriptPath: Path) {
       throw RuntimeException("Process timed out after 600 seconds")
     }
 
-    //        tempScript.delete()
-    println("printing claude output: $output")
     return output.toString().trim()
   }
 
@@ -125,9 +89,7 @@ class ChatBotActionService(private val scriptPath: Path) {
     var foundFirst = false
     var secondJsonObject: JsonObject? = null
 
-    // Filter and parse the second JSON object
     for (json in jsonStrings) {
-      // Check if the line contains valid JSON format
       if (json.trim().startsWith("{") && json.trim().endsWith("}")) {
         try {
           if (foundFirst) {
@@ -143,11 +105,7 @@ class ChatBotActionService(private val scriptPath: Path) {
 
     var actualContent = ""
     secondJsonObject?.let { jsonObject ->
-      println("Deserialization successful: $jsonObject")
-
       val contentArray = jsonObject.getAsJsonArray("content")
-      println("Content array: $contentArray")
-
       if (contentArray.size() > 0) {
         val contentObject = contentArray[0].asJsonObject
         actualContent = contentObject.get("content").asString
@@ -158,17 +116,6 @@ class ChatBotActionService(private val scriptPath: Path) {
     } ?: println("No valid second JSON object found.")
 
     return actualContent
-
-    //        val jsonObject = gson.fromJson(result, JsonObject::class.java)
-    //        println("json Object $jsonObject")
-    //        val contentArray = jsonObject.getAsJsonArray("content")
-    //        println("content array $contentArray")
-    //        val contentObject = contentArray.get(0).asJsonObject
-    //        val actualContent = contentObject.get("content").asString
-    //
-    //        println("actual content $actualContent")
-
-    //        return actualContent
   }
 
   data class Content(
