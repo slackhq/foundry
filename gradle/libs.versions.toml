@@ -56,7 +56,7 @@ lint = { id = "com.android.lint", version.ref = "agp" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
-pluginUploader = { id = "dev.bmac.intellij.plugin-uploader", version = "1.3.2" }
+pluginUploader = { id = "dev.bmac.intellij.plugin-uploader", version = "1.3.5" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 sortDependencies = { id = "com.squareup.sort-dependencies", version.ref = "sortDependencies" }
 versionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
