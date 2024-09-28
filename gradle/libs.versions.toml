@@ -88,7 +88,7 @@ gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plu
 gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:3.18.1"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
-gradlePlugins-graphAssert = "com.jraska.module.graph.assertion:plugin:2.3.1"
+gradlePlugins-graphAssert = "com.jraska.module.graph.assertion:plugin:2.7.1"
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-kgp-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
