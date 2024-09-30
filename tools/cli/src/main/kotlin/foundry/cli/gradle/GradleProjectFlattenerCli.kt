@@ -24,6 +24,8 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.auto.service.AutoService
 import foundry.cli.CommandFactory
+import foundry.cli.dryRunOption
+import foundry.cli.projectDirOption
 import java.io.File
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendLines
@@ -33,8 +35,6 @@ import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
-import slack.cli.dryRunOption
-import slack.cli.projectDirOption
 
 /**
  * A CLI that flattens all gradle projects in a given directory to be top level while preserving
@@ -53,8 +53,8 @@ public class GradleProjectFlattenerCli : CliktCommand() {
         "preserving their original project paths."
   }
 
-  @AutoService(foundry.cli.CommandFactory::class)
-  public class Factory : foundry.cli.CommandFactory {
+  @AutoService(CommandFactory::class)
+  public class Factory : CommandFactory {
     override val key: String = "flatten-gradle-projects"
     override val description: String = DESCRIPTION
 

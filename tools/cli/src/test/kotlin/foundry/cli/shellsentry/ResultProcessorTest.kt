@@ -25,15 +25,6 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import slack.cli.shellsentry.AnalysisResult
-import slack.cli.shellsentry.KnownIssue
-import slack.cli.shellsentry.KnownIssues
-import slack.cli.shellsentry.ResultProcessor
-import slack.cli.shellsentry.RetrySignal
-import slack.cli.shellsentry.ShellSentryConfig
-import slack.cli.shellsentry.ShellSentryExtension
-import slack.cli.shellsentry.executeCommand
-import slack.cli.shellsentry.parseBuildScan
 
 @RunWith(Parameterized::class)
 class ResultProcessorTest(private val useExtensions: Boolean) {

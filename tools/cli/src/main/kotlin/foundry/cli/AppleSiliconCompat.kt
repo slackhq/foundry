@@ -16,9 +16,9 @@
 package foundry.cli
 
 import eu.jrie.jetbrains.kotlinshell.shell.shell
+import foundry.cli.AppleSiliconCompat.Arch.ARM64
+import foundry.cli.AppleSiliconCompat.Arch.X86_64
 import okio.Buffer
-import slack.cli.AppleSiliconCompat.Arch.ARM64
-import slack.cli.AppleSiliconCompat.Arch.X86_64
 
 public object AppleSiliconCompat {
   /**

@@ -24,6 +24,11 @@ import com.github.ajalt.clikt.parameters.types.path
 import com.google.auto.service.AutoService
 import com.tickaroo.tikxml.converter.htmlescape.StringEscapeUtils
 import foundry.cli.CommandFactory
+import foundry.cli.projectDirOption
+import foundry.cli.sarif.BASELINE_SUPPRESSION
+import foundry.cli.sarif.levelOption
+import foundry.cli.skipBuildAndCacheDirs
+import foundry.cli.walkEachFile
 import io.github.detekt.sarif4k.ArtifactContent
 import io.github.detekt.sarif4k.ArtifactLocation
 import io.github.detekt.sarif4k.Level
@@ -60,11 +65,6 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 import nl.adaptivity.xmlutil.serialization.XML
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
-import slack.cli.projectDirOption
-import slack.cli.sarif.BASELINE_SUPPRESSION
-import slack.cli.sarif.levelOption
-import slack.cli.skipBuildAndCacheDirs
-import slack.cli.walkEachFile
 
 /** A CLI that merges lint baseline xml files into one. */
 public class LintBaselineMergerCli : CliktCommand(DESCRIPTION) {
@@ -72,8 +72,8 @@ public class LintBaselineMergerCli : CliktCommand(DESCRIPTION) {
     const val DESCRIPTION = "Merges multiple lint baselines into one"
   }
 
-  @AutoService(foundry.cli.CommandFactory::class)
-  public class Factory : foundry.cli.CommandFactory {
+  @AutoService(CommandFactory::class)
+  public class Factory : CommandFactory {
     override val key: String = "merge-lint-baselines"
     override val description: String = DESCRIPTION
 

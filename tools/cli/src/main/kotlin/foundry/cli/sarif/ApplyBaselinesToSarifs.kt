@@ -24,6 +24,7 @@ import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.auto.service.AutoService
 import foundry.cli.CommandFactory
+import foundry.cli.sarif.ApplyBaselinesToSarifs.Mode
 import io.github.detekt.sarif4k.BaselineState
 import io.github.detekt.sarif4k.SarifSchema210
 import io.github.detekt.sarif4k.SarifSerializer
@@ -34,8 +35,8 @@ import kotlin.system.exitProcess
 /** A CLI that applies baselines data to a SARIF file. See the docs on [Mode] for more details. */
 public class ApplyBaselinesToSarifs : CliktCommand() {
 
-  @AutoService(foundry.cli.CommandFactory::class)
-  public class Factory : foundry.cli.CommandFactory {
+  @AutoService(CommandFactory::class)
+  public class Factory : CommandFactory {
     override val key: String = "apply-baselines-to-sarifs"
     override val description: String = DESCRIPTION
 

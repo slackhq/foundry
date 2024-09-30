@@ -23,8 +23,8 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.auto.service.AutoService
 import foundry.cli.CommandFactory
+import foundry.cli.projectDirOption
 import org.jetbrains.annotations.TestOnly
-import slack.cli.projectDirOption
 
 /**
  * Executes a command with Bugsnag tracing and retries as needed. This CLI is a shim over
@@ -41,8 +41,8 @@ public class ShellSentryCli : CliktCommand(DESCRIPTION) {
     const val DESCRIPTION = "Executes a command with Bugsnag tracing and retries as needed."
   }
 
-  @AutoService(foundry.cli.CommandFactory::class)
-  public class Factory : foundry.cli.CommandFactory {
+  @AutoService(CommandFactory::class)
+  public class Factory : CommandFactory {
     override val key: String = "shell-sentry"
     override val description: String = DESCRIPTION
 

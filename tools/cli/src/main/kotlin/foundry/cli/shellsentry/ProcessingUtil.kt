@@ -17,9 +17,9 @@ package foundry.cli.shellsentry
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.addAdapter
-import slack.cli.util.DurationJsonAdapter
-import slack.cli.util.RegexJsonAdapter
-import slack.cli.util.SingleItemListJsonAdapterFactory
+import foundry.cli.util.DurationJsonAdapter
+import foundry.cli.util.RegexJsonAdapter
+import foundry.cli.util.SingleItemListJsonAdapterFactory
 
 internal object ProcessingUtil {
   fun newMoshi(): Moshi {

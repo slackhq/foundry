@@ -24,6 +24,9 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.auto.service.AutoService
 import foundry.cli.CommandFactory
+import foundry.cli.projectDirOption
+import foundry.cli.skipBuildAndCacheDirs
+import foundry.cli.walkEachFile
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -35,9 +38,6 @@ import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.system.exitProcess
-import slack.cli.projectDirOption
-import slack.cli.skipBuildAndCacheDirs
-import slack.cli.walkEachFile
 
 /** A CLI that verifies a given settings file has only valid projects. */
 public class GradleSettingsVerifierCli : CliktCommand() {
@@ -46,8 +46,8 @@ public class GradleSettingsVerifierCli : CliktCommand() {
     const val DESCRIPTION = "A CLI that verifies a given settings file has only valid projects."
   }
 
-  @AutoService(foundry.cli.CommandFactory::class)
-  public class Factory : foundry.cli.CommandFactory {
+  @AutoService(CommandFactory::class)
+  public class Factory : CommandFactory {
     override val key: String = "verify-gradle-settings"
     override val description: String = DESCRIPTION
 

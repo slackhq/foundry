@@ -16,8 +16,8 @@
 package foundry.cli.util
 
 import com.squareup.moshi.adapter
+import foundry.cli.shellsentry.ProcessingUtil
 import org.junit.Test
-import slack.cli.shellsentry.ProcessingUtil
 
 class SingleItemListAdapterTest {
   @Test

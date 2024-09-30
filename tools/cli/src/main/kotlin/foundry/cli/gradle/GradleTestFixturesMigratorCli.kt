@@ -26,6 +26,12 @@ import com.google.auto.service.AutoService
 import eu.jrie.jetbrains.kotlinshell.shell.ScriptingShell
 import eu.jrie.jetbrains.kotlinshell.shell.ShellScript
 import foundry.cli.CommandFactory
+import foundry.cli.dryRunOption
+import foundry.cli.gradle.GradleTestFixturesMigratorCli.Companion.DESCRIPTION
+import foundry.cli.multipleSet
+import foundry.cli.projectDirOption
+import foundry.cli.skipBuildAndCacheDirs
+import foundry.cli.walkEachFile
 import java.io.File
 import java.nio.file.Path
 import java.util.Locale
@@ -48,11 +54,6 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import okio.blackholeSink
 import okio.buffer
-import slack.cli.dryRunOption
-import slack.cli.multipleSet
-import slack.cli.projectDirOption
-import slack.cli.skipBuildAndCacheDirs
-import slack.cli.walkEachFile
 
 /** @see DESCRIPTION */
 public class GradleTestFixturesMigratorCli : CliktCommand() {
@@ -66,8 +67,8 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
     val POINTLESS_TEST_FIXTURE_CONFIGURATIONS = setOf("testImplementation")
   }
 
-  @AutoService(foundry.cli.CommandFactory::class)
-  public class Factory : foundry.cli.CommandFactory {
+  @AutoService(CommandFactory::class)
+  public class Factory : CommandFactory {
     override val key: String = "migrate-gradle-test-fixtures"
     override val description: String = DESCRIPTION
 

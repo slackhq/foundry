@@ -26,7 +26,14 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
-kotlin { compilerOptions { optIn.add("kotlin.ExperimentalStdlibApi") } }
+kotlin {
+  compilerOptions {
+    optIn.addAll(
+      "kotlin.ExperimentalStdlibApi",
+      "kotlinx.coroutines.flow.ExperimentalCoroutinesApi",
+    )
+  }
+}
 
 lint { baseline = file("lint-baseline.xml") }
 

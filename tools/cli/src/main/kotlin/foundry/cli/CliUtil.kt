@@ -32,16 +32,16 @@ import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.visitFileTree
 
 /**
- * Skips `build` and cache directories (starting with `.`, like `.gradle`) in [FileTreeWalks]
- * [FileTreeWalk].
+ * Skips `build` and cache directories (starting with `.`, like `.gradle`) in
+ * [FileTreeWalks][FileTreeWalk].
  */
 public fun FileTreeWalk.skipBuildAndCacheDirs(): FileTreeWalk {
   return onEnter { dir -> !dir.name.startsWith(".") && dir.name != "build" }
 }
 
 /**
- * Skips `build` and cache directories (starting with `.`, like `.gradle`) in [FileTreeWalks]
- * [FileTreeWalk].
+ * Skips `build` and cache directories (starting with `.`, like `.gradle`) in
+ * [FileTreeWalks][FileTreeWalk].
  */
 @ExperimentalPathApi
 public fun FileVisitorBuilder.skipBuildAndCacheDirs() {
