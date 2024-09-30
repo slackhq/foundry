@@ -25,6 +25,7 @@ import java.nio.file.Path
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import slack.tooling.aibot.ChatBotActionService
 
 class ChatPresenter(private val scriptPath: Path) : Presenter<ChatScreen.State> {
   val user = "user"

@@ -17,7 +17,7 @@ package com.slack.sgp.intellij.aibot
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.slack.sgp.intellij.SkatePluginSettings
+import foundry.intellij.skate.SkatePluginSettings
 import java.nio.file.Files
 import java.nio.file.Path
 
