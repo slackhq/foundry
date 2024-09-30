@@ -153,6 +153,7 @@ include(
   ":platforms:intellij:compose",
   ":platforms:intellij:compose:playground",
   ":platforms:intellij:skate",
+  ":tools:cli",
   ":tools:foundry-common",
   ":tools:skippy",
   ":tools:tracing",

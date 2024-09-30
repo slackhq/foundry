@@ -54,6 +54,7 @@ plugins {
   alias(libs.plugins.buildConfig) apply false
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
+  alias(libs.plugins.binaryCompatibilityValidator)
 }
 
 configure<DetektExtension> {
