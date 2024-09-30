@@ -21,9 +21,9 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.slack.sgp.intellij.aibot.AIBotScriptFetcher
-import javax.swing.JComponent
 import foundry.intellij.compose.aibot.ChatPanel
 import foundry.intellij.skate.SkatePluginSettings
+import javax.swing.JComponent
 
 class ChatBotToolWindow : ToolWindowFactory {
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {

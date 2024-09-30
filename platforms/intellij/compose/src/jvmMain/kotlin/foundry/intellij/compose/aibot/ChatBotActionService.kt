@@ -18,6 +18,7 @@ package slack.tooling.aibot
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
+import foundry.intellij.compose.aibot.Message
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.file.Path

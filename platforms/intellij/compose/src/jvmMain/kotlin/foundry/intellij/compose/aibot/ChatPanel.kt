@@ -29,7 +29,7 @@ object ChatPanel {
   fun createPanel(scriptPath: Path): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
-      setContent { SlackDesktopTheme { ChatApp(scriptPath) } }
+      setContent { FoundryDesktopTheme { ChatApp(scriptPath) } }
     }
   }
 
