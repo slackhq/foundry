@@ -115,7 +115,7 @@ class ResultProcessorTest(private val useExtensions: Boolean) {
         .padWithTestLogs()
     )
     val signal = newProcessor().process("", 1, outputFile.toPath(), isAfterRetry = false)
-    check(signal is RetrySignal.Unknown)
+    assertThat(signal).isInstanceOf(RetrySignal.Unknown::class.java)
   }
 
   @Test

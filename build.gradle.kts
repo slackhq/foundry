@@ -61,7 +61,7 @@ plugins {
 apiValidation {
   // only :tools:cli is tracking this right now
   // Annoyingly this only uses simple names
-  // https://github.com/Kotlin/binary-compatibility-validator/issues/257
+  // https://github.com/Kotlin/binary-compatibility-validator/issues/16
   ignoredProjects +=
     listOf(
       "agp-handler-api",

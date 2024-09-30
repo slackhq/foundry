@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.dokka)
@@ -26,14 +25,7 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
-kotlin {
-  compilerOptions {
-    optIn.addAll(
-      "kotlin.ExperimentalStdlibApi",
-      "kotlinx.coroutines.flow.ExperimentalCoroutinesApi",
-    )
-  }
-}
+kotlin { compilerOptions { optIn.addAll("kotlin.ExperimentalStdlibApi") } }
 
 lint { baseline = file("lint-baseline.xml") }
 

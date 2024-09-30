@@ -19,6 +19,7 @@ import com.autonomousapps.DependencyAnalysisExtension
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
 import com.squareup.moshi.adapter
+import foundry.cli.AppleSiliconCompat
 import foundry.gradle.agp.VersionNumber
 import foundry.gradle.avoidance.ComputeAffectedProjectsTask
 import foundry.gradle.avoidance.GenerateAndroidTestProjectPathsTask
@@ -56,7 +57,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.jvm.toolchain.JvmVendorSpec
-import slack.cli.AppleSiliconCompat
 
 /**
  * A common entry point for Foundry project configuration. This should only be applied once and on
