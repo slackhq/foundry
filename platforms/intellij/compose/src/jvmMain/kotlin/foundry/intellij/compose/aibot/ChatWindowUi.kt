@@ -87,7 +87,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
     }
   }
   Row(
-    modifier = Modifier.padding(4.dp).height(100.dp),
+    modifier = modifier.padding(4.dp).height(100.dp),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.Bottom,
   ) {
@@ -107,8 +107,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
             false
           }
         },
-      placeholder = { Text("Start your conversation...", modifier.padding(4.dp)) },
-      decorationBoxModifier = Modifier.padding(4.dp),
+      placeholder = { Text("Start your conversation...") },
       textStyle = JewelTheme.defaultTextStyle,
       lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE),
     )
