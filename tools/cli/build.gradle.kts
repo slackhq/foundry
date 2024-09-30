@@ -33,15 +33,15 @@ lint { baseline = file("lint-baseline.xml") }
 moshi { enableSealed.set(true) }
 
 // We have a couple flaky tests on CI right now
-// if (System.getenv("CI") != null) {
-//  tasks.test {
-//    retry {
-//      maxRetries.set(2)
-//      maxFailures.set(20)
-//      failOnPassedAfterRetry.set(false)
-//    }
-//  }
-// }
+if (System.getenv("CI") != null) {
+  tasks.test {
+    develocity.testRetry {
+      maxRetries.set(2)
+      maxFailures.set(20)
+      failOnPassedAfterRetry.set(false)
+    }
+  }
+}
 
 dependencies {
   ksp(libs.autoService.ksp)
