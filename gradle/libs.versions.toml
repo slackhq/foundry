@@ -10,11 +10,11 @@ coroutines = "1.9.0"
 dependencyAnalysisPlugin = "1.33.0"
 detekt = "1.23.7"
 dokka = "1.9.20"
-errorproneGradle = "3.0.1"
+errorproneGradle = "3.1.0"
 intellij-platform = "2.1.0"
 jdk = "22"
 jvmTarget = "17"
-jewel = "0.24.2"
+jewel = "0.25.0"
 jna = "5.15.0"
 kaml = "0.61.0"
 kotlin = "2.0.20"
@@ -26,7 +26,7 @@ markdown = "0.26.0"
 mavenPublish = "0.29.0"
 moshi = "1.15.1"
 moshix = "0.28.0"
-nullawayGradle = "1.3.0"
+nullawayGradle = "1.6.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.1"
 retrofit = "2.11.0"
@@ -39,7 +39,7 @@ wire = "5.1.0"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.3.5" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.5.0" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
@@ -95,7 +95,7 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle
 gradlePlugins-moshix = { module = "dev.zacsweers.moshix:moshi-gradle-plugin", version.ref = "moshix" }
 gradlePlugins-nullaway = { module = "net.ltgt.gradle:gradle-nullaway-plugin", version.ref = "nullawayGradle" }
 gradlePlugins-redacted = "dev.zacsweers.redacted:redacted-compiler-plugin-gradle:1.10.0"
-gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.5.8"
+gradlePlugins-retry = "org.gradle:test-retry-gradle-plugin:1.6.0"
 gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "sortDependencies" }
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
