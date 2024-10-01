@@ -89,7 +89,6 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
   fun sendMessage() {
     if (isTextNotEmpty) {
       setHasStartedConversation(true)
-      println("conversation started? $setHasStartedConversation")
       onSendMessage(textState.text.toString())
       textState.clearText()
     }
