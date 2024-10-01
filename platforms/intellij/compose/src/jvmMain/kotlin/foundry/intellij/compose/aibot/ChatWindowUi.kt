@@ -102,7 +102,6 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
             (event.key == Key.Enter || event.key == Key.NumPadEnter) &&
               event.type == KeyEventType.KeyDown -> {
               if (event.isShiftPressed) {
-                //                sendMessage()
                 textState.edit { append("\n") }
                 true
               } else {
