@@ -46,14 +46,10 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.Icon
@@ -104,9 +100,9 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
         Modifier.weight(1f).heightIn(min = 56.dp).onPreviewKeyEvent { event ->
           when {
             (event.key == Key.Enter || event.key == Key.NumPadEnter) &&
-                    event.type == KeyEventType.KeyDown -> {
+              event.type == KeyEventType.KeyDown -> {
               if (event.isShiftPressed) {
-//                sendMessage()
+                //                sendMessage()
                 textState.edit { append("\n") }
                 true
               } else {
@@ -120,9 +116,7 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
       placeholder = { Text("Start your conversation...") },
       textStyle = JewelTheme.defaultTextStyle,
       lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE),
-      keyboardOptions = KeyboardOptions(
-        imeAction = ImeAction.None
-      )
+      keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
