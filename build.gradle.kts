@@ -32,6 +32,7 @@ import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtensi
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -54,6 +55,25 @@ plugins {
   alias(libs.plugins.buildConfig) apply false
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
+  alias(libs.plugins.binaryCompatibilityValidator)
+}
+
+apiValidation {
+  // only :tools:cli is tracking this right now
+  // Annoyingly this only uses simple names
+  // https://github.com/Kotlin/binary-compatibility-validator/issues/16
+  ignoredProjects +=
+    listOf(
+      "agp-handler-api",
+      "foundry-gradle-plugin",
+      "artifactory-authenticator",
+      "compose",
+      "playground",
+      "skate",
+      "foundry-common",
+      "skippy",
+      "tracing",
+    )
 }
 
 configure<DetektExtension> {
@@ -196,7 +216,10 @@ subprojects {
     tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
-  val isForIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
+  val isForIntelliJPlugin =
+    project.hasProperty("INTELLIJ_PLUGIN") || project.path.startsWith(":platforms:intellij")
+  val isForGradle =
+    project.hasProperty("GRADLE_PLUGIN") || project.path.startsWith(":platforms:gradle")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     extensions.configure<KotlinJvmProjectExtension> {
       if (!isForIntelliJPlugin) {
@@ -205,7 +228,7 @@ subprojects {
     }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
-    if (!isForIntelliJPlugin) {
+    if (isForGradle) {
       apply(plugin = "kotlin-sam-with-receiver")
       configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
     }
@@ -219,20 +242,25 @@ subprojects {
         val kotlinVersion =
           if (isForIntelliJPlugin) {
             KOTLIN_1_9
-          } else {
+          } else if (isForGradle) {
             KOTLIN_1_9
+          } else {
+            DEFAULT
           }
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
 
-        if (!isForIntelliJPlugin) {
-          // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
-          // this sometimes. https://github.com/gradle/gradle/issues/16345
+        if (kotlinVersion != DEFAULT) {
+          // Gradle/IntelliJ forces a lower version of kotlin, which results in warnings that
+          // prevent use of this sometimes.
+          // https://github.com/gradle/gradle/issues/16345
           allWarningsAsErrors.set(false)
-          // TODO required due to https://github.com/gradle/gradle/issues/24871
-          freeCompilerArgs.add("-Xsam-conversions=class")
         } else {
           allWarningsAsErrors.set(true)
+        }
+        if (isForGradle) {
+          // TODO required due to https://github.com/gradle/gradle/issues/24871
+          freeCompilerArgs.add("-Xsam-conversions=class")
         }
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
@@ -289,22 +317,28 @@ subprojects {
           includes.from(readMeProvider)
         }
         skipDeprecated.set(true)
-        // Gradle docs
-        externalDocumentationLink {
-          url.set(URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL())
-        }
-        // AGP docs
-        externalDocumentationLink {
-          val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
-          val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
-          packageListUrl.set(
-            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list")
-              .toURL()
-          )
-          url.set(
-            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
-              .toURL()
-          )
+        if (isForGradle) {
+          // Gradle docs
+          externalDocumentationLink {
+            url.set(
+              URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL()
+            )
+          }
+          // AGP docs
+          externalDocumentationLink {
+            val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
+            val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
+            packageListUrl.set(
+              URI(
+                  "https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list"
+                )
+                .toURL()
+            )
+            url.set(
+              URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
+                .toURL()
+            )
+          }
         }
         sourceLink {
           localDirectory.set(layout.projectDirectory.dir("src").asFile)

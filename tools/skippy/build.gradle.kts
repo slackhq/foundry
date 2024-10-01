@@ -26,9 +26,9 @@ dependencies {
   implementation(libs.clikt)
   implementation(libs.coroutines.core)
   implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
-  implementation(libs.kotlinCliUtil)
   implementation(libs.moshi)
   implementation(libs.okio)
+  implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
 
   testImplementation(platform(libs.coroutines.bom))

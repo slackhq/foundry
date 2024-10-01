@@ -19,6 +19,7 @@ import com.google.common.collect.Sets
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
+import foundry.cli.AppleSiliconCompat
 import foundry.gradle.FoundryTools.Companion.SERVICE_NAME
 import foundry.gradle.FoundryTools.Parameters
 import foundry.gradle.agp.AgpHandler
@@ -50,7 +51,6 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
-import slack.cli.AppleSiliconCompat
 
 /** Misc tools for Foundry Gradle projects, usable in tasks as a [BuildService] too. */
 public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
