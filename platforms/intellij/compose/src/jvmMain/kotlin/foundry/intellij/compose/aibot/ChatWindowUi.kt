@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
@@ -46,8 +47,13 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.Icon
@@ -92,24 +98,31 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
     verticalAlignment = Alignment.Bottom,
   ) {
     TextArea(
+      // handles shift + enter for new line, enter for send
       state = textState,
       modifier =
-        Modifier.weight(1f).heightIn(min = 56.dp).onKeyEvent { event ->
-          if (event.type == KeyEventType.KeyDown) {
-            when {
-              event.key == Key.Enter && event.isShiftPressed -> {
+        Modifier.weight(1f).heightIn(min = 56.dp).onPreviewKeyEvent { event ->
+          when {
+            (event.key == Key.Enter || event.key == Key.NumPadEnter) &&
+                    event.type == KeyEventType.KeyDown -> {
+              if (event.isShiftPressed) {
+//                sendMessage()
+                textState.edit { append("\n") }
+                true
+              } else {
                 sendMessage()
                 true
               }
-              else -> false
             }
-          } else {
-            false
+            else -> false
           }
         },
       placeholder = { Text("Start your conversation...") },
       textStyle = JewelTheme.defaultTextStyle,
       lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE),
+      keyboardOptions = KeyboardOptions(
+        imeAction = ImeAction.None
+      )
     )
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
