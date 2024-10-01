@@ -66,9 +66,9 @@ buildscript {
 }
 
 plugins {
-  id("com.gradle.develocity") version "3.17.2"
-  id("org.jetbrains.intellij.platform.settings") version "2.0.1"
-  id("org.jetbrains.intellij.platform") version "2.0.1" apply false
+  id("com.gradle.develocity") version "3.18.1"
+  id("org.jetbrains.intellij.platform.settings") version "2.1.0"
+  id("org.jetbrains.intellij.platform") version "2.1.0" apply false
 }
 
 dependencyResolutionManagement {
@@ -153,6 +153,7 @@ include(
   ":platforms:intellij:compose",
   ":platforms:intellij:compose:playground",
   ":platforms:intellij:skate",
+  ":tools:cli",
   ":tools:foundry-common",
   ":tools:skippy",
   ":tools:tracing",

@@ -15,6 +15,8 @@
  */
 package foundry.gradle.tasks
 
+import foundry.cli.AppleSiliconCompat
+import foundry.cli.AppleSiliconCompat.isMacOS
 import foundry.gradle.FoundryProperties
 import foundry.gradle.isCi
 import foundry.gradle.isRootProject
@@ -62,8 +64,6 @@ import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.jvm.toolchain.JvmVendorSpec
 import oshi.SystemInfo
-import slack.cli.AppleSiliconCompat
-import slack.cli.AppleSiliconCompat.isMacOS
 
 /**
  * Other bootstrap tasks can be finalized by this and/or depend on its outputs by implementing this
