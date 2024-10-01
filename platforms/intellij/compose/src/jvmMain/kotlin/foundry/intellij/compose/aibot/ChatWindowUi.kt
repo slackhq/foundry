@@ -81,9 +81,15 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
 private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
   val textState by remember { mutableStateOf(TextFieldState()) }
   val isTextNotEmpty = textState.text.isNotBlank()
+  val (hasStartedConversation, setHasStartedConversation) = remember { mutableStateOf(false) }
+
+  val smileyFace = "\uD83D\uDE00"
+  val conversationBubble = "\uD83D\uDCAC"
 
   fun sendMessage() {
     if (isTextNotEmpty) {
+      setHasStartedConversation(true)
+      println("conversation started? $setHasStartedConversation")
       onSendMessage(textState.text.toString())
       textState.clearText()
     }
@@ -112,7 +118,13 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
             else -> false
           }
         },
-      placeholder = { Text("Start your conversation...") },
+      placeholder = {
+        modifier.padding(horizontal = 4.dp, vertical = 10.dp)
+        Text(
+          if (hasStartedConversation) "Continue the conversation... $conversationBubble"
+          else "Start your conversation... $smileyFace"
+        )
+      },
       textStyle = JewelTheme.defaultTextStyle,
       lineLimits = TextFieldLineLimits.MultiLine(Int.MAX_VALUE),
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
