@@ -19,6 +19,9 @@ import com.squareup.moshi.JsonClass
 import com.sun.jna.Library
 import com.sun.jna.Native
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import foundry.cli.AppleSiliconCompat.Arch
+import foundry.cli.AppleSiliconCompat.Arch.ARM64
+import foundry.cli.AppleSiliconCompat.Arch.X86_64
 import foundry.gradle.util.AppleSiliconThermals.ThermalState.CRITICAL
 import foundry.gradle.util.AppleSiliconThermals.ThermalState.FAIR
 import foundry.gradle.util.AppleSiliconThermals.ThermalState.NOMINAL
@@ -39,9 +42,6 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.Throws
 import org.gradle.api.logging.Logger
-import slack.cli.AppleSiliconCompat.Arch
-import slack.cli.AppleSiliconCompat.Arch.ARM64
-import slack.cli.AppleSiliconCompat.Arch.X86_64
 
 /**
  * Simple interface for recording thermals data during the course of a build. The watcher should be

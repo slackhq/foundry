@@ -85,10 +85,10 @@ dependencies {
   implementation(libs.jgrapht)
   implementation(libs.jna)
   implementation(libs.jna.platform)
-  implementation(libs.kotlinCliUtil)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
+  implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
   implementation(projects.tools.skippy)
 
