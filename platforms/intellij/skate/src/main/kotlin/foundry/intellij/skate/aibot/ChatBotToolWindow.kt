@@ -15,15 +15,23 @@
  */
 package foundry.intellij.skate.aibot
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import foundry.intellij.compose.aibot.ChatPanel
+import foundry.intellij.skate.SkatePluginSettings
 import javax.swing.JComponent
 
 class ChatBotToolWindow : ToolWindowFactory {
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+    val settings = project.service<SkatePluginSettings>()
+    if (!settings.isAIBotEnabled) {
+      toolWindow.hide()
+      return
+    }
+
     val contentFactory = ContentFactory.getInstance()
     val content = contentFactory.createContent(createComposePanel(), "", false)
     toolWindow.contentManager.addContent(content)
