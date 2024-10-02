@@ -26,6 +26,10 @@
                     canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>
     </extensions>
 
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="true" />
+    </extensions>
+
     <projectListeners>
         <listener
                 class="foundry.intellij.skate.WhatsNewToolWindowListener"

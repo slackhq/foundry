@@ -336,7 +336,7 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.1.2") }
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.3") }
       }
 
       if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
