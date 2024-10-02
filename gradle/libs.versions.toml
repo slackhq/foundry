@@ -113,8 +113,8 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinShell = "eu.jrie.jetbrains:kotlin-shell-core:0.2.1"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
-jewel-bridge = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-241", version.ref = "jewel" }
-jewel-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone-241", version.ref = "jewel" }
+jewel-bridge = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-242", version.ref = "jewel" }
+jewel-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone-242", version.ref = "jewel" }
 jgrapht = "org.jgrapht:jgrapht-core:1.5.2"
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }

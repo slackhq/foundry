@@ -126,7 +126,7 @@ dependencies {
     // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
     // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
     // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
-    plugin("org.jetbrains.android:241.17011.79")
+    plugin("org.jetbrains.android:242.21829.142")
     bundledPlugins(
       "com.intellij.java",
       "org.intellij.plugins.markdown",

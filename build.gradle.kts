@@ -208,19 +208,10 @@ subprojects {
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
-          // (@NotNull T
-          // => T & Any)
+          // (@NotNull T => T & Any)
           "-Xenhance-type-parameter-types-to-def-not-null",
-          // Use fast implementation on Jar FS. This may speed up compilation time, but currently
-          // it's
-          // an experimental mode
-          // TODO toe-hold but we can't use it yet because it emits a warning that fails with
-          // -Werror
-          //  https://youtrack.jetbrains.com/issue/KT-54928
-          //    "-Xuse-fast-jar-file-system",
           // Support inferring type arguments based on only self upper bounds of the corresponding
-          // type
-          // parameters
+          // type parameters
           "-Xself-upper-bound-inference",
           "-Xjsr305=strict",
           // Match JVM assertion behavior:
@@ -336,7 +327,7 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.3") }
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.1") }
       }
 
       if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
