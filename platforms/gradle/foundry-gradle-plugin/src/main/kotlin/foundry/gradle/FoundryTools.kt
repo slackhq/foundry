@@ -90,7 +90,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
   private val avoidedTasks = Sets.newConcurrentHashSet<AvoidedTask>()
 
   init {
-    debugLog("SlackTools created")
+    debugLog("FoundryTools created")
 
     // Thermals logging
     var canLogThermals = parameters.logThermals.get()
@@ -98,7 +98,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
       if (AppleSiliconCompat.Arch.get() != AppleSiliconCompat.Arch.ARM64) {
         logger.warn(
           "Thermals logging is enabled but configuration cache is enabled and this is not an " +
-            "Apple Silicon machine. Thermals logging will be disabled. Please set 'slack.log-thermals' " +
+            "Apple Silicon machine. Thermals logging will be disabled. Please set 'foundry.log-thermals' " +
             "to false in your home gradle.properties."
         )
         canLogThermals = false

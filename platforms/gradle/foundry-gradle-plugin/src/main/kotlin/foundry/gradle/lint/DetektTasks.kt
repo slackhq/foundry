@@ -42,7 +42,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 internal object DetektTasks {
   private const val GLOBAL_CI_DETEKT_TASK_NAME = "globalCiDetekt"
   private const val CI_DETEKT_TASK_NAME = "ciDetekt"
-  private const val LOG = "SlackDetekt:"
+  private const val LOG = "FoundryDetekt:"
 
   fun configureRootProject(project: Project, foundryProperties: FoundryProperties) {
     // Add detekt download task

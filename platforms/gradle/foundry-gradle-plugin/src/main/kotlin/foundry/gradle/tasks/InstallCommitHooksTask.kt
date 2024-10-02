@@ -46,7 +46,7 @@ constructor(layout: ProjectLayout, objects: ObjectFactory) : DefaultTask() {
     objects.directoryProperty().convention(layout.projectDirectory.dir("config/git/hooks"))
 
   init {
-    group = "slack"
+    group = "foundry"
     description = "Installs basic git hook files for formatting to a given output directory."
   }
 

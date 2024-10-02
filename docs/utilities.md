@@ -13,7 +13,7 @@ will just show stub files instead.
 
 To work mitigate this, we will _patch_ the SDK by putting a copy of the previous version's sources in the location of
 the new SDK. This allows most sources to still index properly during the beta period. Then, once the new sources are
-available, the consuming repo needs only to update the `slack.latestCompileSdkWithSources` gradle property to that new
+available, the consuming repo needs only to update the `foundry.latestCompileSdkWithSources` gradle property to that new
 SDK version and the patcher will clear out that copy and let AGP download the real ones.
 
 This runs automatically in the root plugin.

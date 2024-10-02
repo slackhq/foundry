@@ -53,7 +53,7 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
   @get:Internal abstract val outputDir: DirectoryProperty
 
   init {
-    group = "slack"
+    group = "foundry"
     description = "Downloads the Robolectric android-all jars."
   }
 

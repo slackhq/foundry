@@ -59,7 +59,7 @@ import org.jetbrains.kotlin.tooling.core.withClosure
 internal object LintTasks {
   private const val GLOBAL_CI_LINT_TASK_NAME = "globalCiLint"
   private const val CI_LINT_TASK_NAME = "ciLint"
-  private const val LOG = "SlackLints:"
+  private const val LOG = "FoundryLints:"
 
   private fun Project.log(message: String) {
     logger.debug("$LOG $message")

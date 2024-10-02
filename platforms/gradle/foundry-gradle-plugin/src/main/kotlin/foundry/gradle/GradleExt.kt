@@ -46,19 +46,19 @@ import org.gradle.internal.service.ServiceRegistry
  * A set of utility functions that check and cache project information stored in extensions.
  */
 
-private const val IS_ANDROID = "slack.project.ext.isAndroid"
-private const val IS_ANDROID_APPLICATION = "slack.project.ext.isAndroidApplication"
-private const val IS_ANDROID_LIBRARY = "slack.project.ext.isAndroidLibrary"
-private const val IS_ANDROID_TEST = "slack.project.ext.isAndroidTest"
-private const val IS_USING_KAPT = "slack.project.ext.isUsingKapt"
-private const val IS_USING_KSP = "slack.project.ext.isUsingKsp"
-private const val IS_USING_MOSHI_IR = "slack.project.ext.isUsingMoshiIr"
-private const val IS_KOTLIN = "slack.project.ext.isKotlin"
-private const val IS_KOTLIN_ANDROID = "slack.project.ext.isKotlinAndroid"
-private const val IS_KOTLIN_JVM = "slack.project.ext.isKotlinJvm"
-private const val IS_KOTLIN_MULTIPLATFORM = "slack.project.ext.isKotlinMultiplatform"
-private const val IS_JAVA_LIBRARY = "slack.project.ext.isJavaLibrary"
-private const val IS_JAVA = "slack.project.ext.isJava"
+private const val IS_ANDROID = "foundry.project.ext.isAndroid"
+private const val IS_ANDROID_APPLICATION = "foundry.project.ext.isAndroidApplication"
+private const val IS_ANDROID_LIBRARY = "foundry.project.ext.isAndroidLibrary"
+private const val IS_ANDROID_TEST = "foundry.project.ext.isAndroidTest"
+private const val IS_USING_KAPT = "foundry.project.ext.isUsingKapt"
+private const val IS_USING_KSP = "foundry.project.ext.isUsingKsp"
+private const val IS_USING_MOSHI_IR = "foundry.project.ext.isUsingMoshiIr"
+private const val IS_KOTLIN = "foundry.project.ext.isKotlin"
+private const val IS_KOTLIN_ANDROID = "foundry.project.ext.isKotlinAndroid"
+private const val IS_KOTLIN_JVM = "foundry.project.ext.isKotlinJvm"
+private const val IS_KOTLIN_MULTIPLATFORM = "foundry.project.ext.isKotlinMultiplatform"
+private const val IS_JAVA_LIBRARY = "foundry.project.ext.isJavaLibrary"
+private const val IS_JAVA = "foundry.project.ext.isJava"
 
 internal val Project.isRootProject: Boolean
   get() = rootProject === this

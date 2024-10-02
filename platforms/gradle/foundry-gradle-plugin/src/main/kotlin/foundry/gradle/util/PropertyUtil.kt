@@ -109,7 +109,7 @@ internal fun Project.createPropertiesProvider(filePath: String): Provider<Proper
 internal fun Project.localProperty(key: String): Provider<String> {
   return localPropertiesProvider(
     key,
-    "slack.properties.provider.local-properties",
+    "foundry.properties.provider.local-properties",
     "local.properties",
   )
 }
@@ -120,7 +120,7 @@ internal fun Project.localProperty(key: String): Provider<String> {
 internal fun Project.localGradleProperty(key: String): Provider<String> {
   return localPropertiesProvider(
     key,
-    "slack.properties.provider.local-gradle-properties",
+    "foundry.properties.provider.local-gradle-properties",
     "gradle.properties",
   )
 }

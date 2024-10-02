@@ -53,7 +53,7 @@ internal abstract class SimpleFileProducerTask : DefaultTask() {
       description: String,
       outputFilePath: String = "artifactMetadata/$name/produced.txt",
       input: String = "${project.path}:$name",
-      group: String = "slack",
+      group: String = "foundry",
       action: Action<SimpleFileProducerTask> = Action {},
     ): TaskProvider<SimpleFileProducerTask> {
       return project.tasks.registerOrConfigure<SimpleFileProducerTask>(name) {
@@ -96,7 +96,7 @@ internal abstract class SimpleFilesConsumerTask : DefaultTask() {
       description: String,
       inputFiles: Provider<Set<File>>,
       outputFilePath: String = "artifactMetadata/$name/resolved.txt",
-      group: String = "slack",
+      group: String = "foundry",
       action: Action<SimpleFilesConsumerTask> = Action {},
     ): TaskProvider<SimpleFilesConsumerTask> {
       return project.tasks.registerOrConfigure<SimpleFilesConsumerTask>(name) {

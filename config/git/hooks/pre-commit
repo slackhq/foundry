@@ -2,8 +2,8 @@
 
 ######## FORMAT HOOK START ########
 
-if [[ "$SLACK_COMMIT_HOOK_OPT_OUT" == "true" ]]; then
-    echo 'Warning: Skipping pre-commit hook because SLACK_COMMIT_HOOK_OPT_OUT is true'
+if [[ "$FOUNDRY_COMMIT_HOOK_OPT_OUT" == "true" ]]; then
+    echo 'Warning: Skipping pre-commit hook because FOUNDRY_COMMIT_HOOK_OPT_OUT is true'
     exit
 fi
 
@@ -65,7 +65,7 @@ original_partially_staged_filenames=$(echo "$original_partially_staged_chksum" |
 
 #### Sort Dependencies section
 # Get a list of staged build.gradle.kts files
-kts_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*" | grep -Ei "build\.gradle\.kts$" | grep -v -x -F "tooling/slack-platform/build.gradle.kts")"
+kts_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*" | grep -Ei "build\.gradle\.kts$" )"
 if [[ ! -z ${kts_files_list} ]]; then
     # We have some build files! Join them to a string delimited on space. We'll pass these to sortDependencies
     kts_files_list="$(echo ${kts_files_list} | paste -sd " " -)"

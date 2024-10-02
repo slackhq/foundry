@@ -46,7 +46,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    group = "slack"
+    group = "foundry"
   }
 
   override fun handleDependencies(identifiersToVersions: Map<String, String>) {
@@ -71,7 +71,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
         "print${name.capitalizeUS()}FossaDependencies"
       ) {
         outputFile.setDisallowChanges(
-          project.layout.buildDirectory.file("reports/slack/fossa/$name.txt")
+          project.layout.buildDirectory.file("reports/foundry/fossa/$name.txt")
         )
         configureIdentifiersToVersions(configuration)
       }
