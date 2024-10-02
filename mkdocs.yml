@@ -5,11 +5,11 @@
 site_name: foundry
 repo_name: foundry
 repo_url: https://github.com/slackhq/foundry
-site_description: "Gradle and IntelliJ build tooling used in Slack's Android repo"
+site_description: "Gradle and IntelliJ build tooling used in Slack's Android projects"
 site_author: Slack
 remote_branch: gh-pages
 
-copyright: 'Copyright &copy; 2023 Slack Technologies, LLC'
+copyright: 'Copyright &copy; 2024 Slack Technologies, LLC'
 
 theme:
   name: 'material'

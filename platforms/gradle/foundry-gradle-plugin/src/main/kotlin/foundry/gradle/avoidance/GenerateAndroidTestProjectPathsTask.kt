@@ -65,7 +65,7 @@ internal abstract class GenerateAndroidTestProjectPathsTask : DefaultTask() {
       return rootProject.tasks.register<GenerateAndroidTestProjectPathsTask>(NAME) {
         androidTestProjectInputs.from(androidTestApksResolver.artifactView())
         outputFile.setDisallowChanges(
-          rootProject.layout.buildDirectory.file("slack/androidTestProjectPaths/paths.txt")
+          rootProject.layout.buildDirectory.file("foundry/androidTestProjectPaths/paths.txt")
         )
       }
     }

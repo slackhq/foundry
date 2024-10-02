@@ -166,7 +166,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
       }
       project.configureGit(foundryProperties)
     }
-    project.configureSlackRootBuildscript(
+    project.configureFoundryRootBuildscript(
       foundryProperties.versions.jdk.asProvider(project.providers),
       foundryProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
     )
@@ -469,7 +469,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
   }
 }
 
-private fun Project.configureSlackRootBuildscript(
+private fun Project.configureFoundryRootBuildscript(
   jdkProvider: Provider<Int>,
   jvmVendor: JvmVendorSpec?,
 ) {

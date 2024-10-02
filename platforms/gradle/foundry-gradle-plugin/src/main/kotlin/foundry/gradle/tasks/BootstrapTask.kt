@@ -209,6 +209,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
     if (launcher.isPresent) {
       diagnosticsOutput.appendLine("Initializing JDK")
+      // TODO make this message configurable
       diagnosticsOutput.appendLine(
         """
         JDK config:
@@ -264,17 +265,19 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     }
 
     val mode = propertiesMode.get()
-    val regionMarkerPrefix = "# Begin: Slack bootstrap-generated properties"
-    val regionMarkerSuffix = "# End: Slack bootstrap-generated properties"
+    val oldRegionMarkerPrefix = "# Begin: Slack bootstrap-generated properties"
+    val oldRegionMarkerSuffix = "# End: Slack bootstrap-generated properties"
+    val newRegionMarkerPrefix = "# Begin: Foundry bootstrap-generated properties"
+    val newRegionMarkerSuffix = "# End: Foundry bootstrap-generated properties"
     val prefix =
       """
-      $regionMarkerPrefix
+      $newRegionMarkerPrefix
       # Note that these properties will prevent you from using other projects on JDK 8
       # These are appended to the end of the file to override any previous declarations of the same
       # keys, but you should consider removing those keys if you have any.
     """
         .trimIndent()
-    val suffix = "\n$regionMarkerSuffix"
+    val suffix = "\n$newRegionMarkerSuffix"
     val propsString =
       properties.entries.joinToString("\n", prefix = "\n$prefix\n", postfix = suffix) { (key, value)
         ->
@@ -287,12 +290,16 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       if (mode == APPEND) {
         diagnosticsOutput.appendLine("Appending properties to $propsFile")
         val propsFileLines = ArrayList(propsFile.readLines())
-        val existingIndex = propsFileLines.indexOf(regionMarkerPrefix)
+        val existingIndex =
+          propsFileLines.indexOf(newRegionMarkerPrefix).takeUnless { it == -1 }
+            ?: propsFileLines.indexOf(oldRegionMarkerPrefix)
         if (existingIndex != -1) {
           diagnosticsOutput.appendLine("Removing existing region first")
-          val endIndex = propsFileLines.indexOf(regionMarkerSuffix)
+          val endIndex =
+            propsFileLines.indexOf(newRegionMarkerSuffix).takeUnless { it == -1 }
+              ?: propsFileLines.indexOf(oldRegionMarkerSuffix)
           check(endIndex != -1) {
-            "Could not find region suffix for properties, please delete the Slack properties below '$regionMarkerPrefix' and rerun."
+            "Could not find region suffix for properties, please delete the Slack properties below '$newRegionMarkerPrefix' and rerun."
           }
           propsFileLines.subList(existingIndex - 1, endIndex + 1).clear()
         }

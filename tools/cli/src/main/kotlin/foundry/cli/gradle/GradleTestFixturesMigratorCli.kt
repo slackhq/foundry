@@ -81,7 +81,7 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
 
   private val dryRun by dryRunOption()
 
-  private val useSgpDsl by option("--use-sgp").flag()
+  private val useFoundryDsl by option("--use-foundry").flag()
 
   private val targets by
     argument(
@@ -178,7 +178,7 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
     var locMoved = 0L
     var dependenciesMoved = 0L
     for (migration in migratableProjects) {
-      if (useSgpDsl) {
+      if (useFoundryDsl) {
         migration.validate()
       }
       migration.enableInBuildFile()
@@ -340,7 +340,7 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
   private fun TestFixtureTarget.enableInBuildFile() {
     val lines = hostProject.buildFile.readLines().toMutableList()
 
-    if (useSgpDsl) {
+    if (useFoundryDsl) {
       if ("enableTestFixtures()" in hostProject.buildFile.readText()) {
         // already enabled, return
         return
@@ -349,21 +349,21 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
       val featuresBlock =
         lines.indexOfFirst { it.contains("features {") && !it.contains("android {") }
       if (featuresBlock == -1) {
-        // No features block. Check for `slack {`
-        val slackBlock = lines.indexOfFirst { it.contains("slack {") }
-        if (slackBlock == -1) {
+        // No features block. Check for `foundry {`
+        val foundryBlock = lines.indexOfFirst { it.contains("foundry {") }
+        if (foundryBlock == -1) {
           // No DSL at all, add one
           val endOfPluginsBlock = lines.indexOfFirst { it == "}" }
           check(endOfPluginsBlock != -1) { "No plugins block found in ${hostProject.gradlePath}" }
-          lines.add(endOfPluginsBlock + 1, "slack { features { enableTestFixtures() } }")
+          lines.add(endOfPluginsBlock + 1, "foundry { features { enableTestFixtures() } }")
         } else {
-          if (!lines[slackBlock].endsWith("{")) {
+          if (!lines[foundryBlock].endsWith("{")) {
             // There's other stuff on the line, split there and insert in between
-            val (first, rest) = lines[slackBlock].split("slack {")
-            lines[slackBlock] = "${first}slack {"
-            lines.addAll(slackBlock + 1, listOf("features { enableTestFixtures() }", rest))
+            val (first, rest) = lines[foundryBlock].split("foundry {")
+            lines[foundryBlock] = "${first}foundry {"
+            lines.addAll(foundryBlock + 1, listOf("features { enableTestFixtures() }", rest))
           } else {
-            lines.add(slackBlock + 1, "features { enableTestFixtures() }")
+            lines.add(foundryBlock + 1, "features { enableTestFixtures() }")
           }
         }
       } else {

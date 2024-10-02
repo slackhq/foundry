@@ -69,7 +69,7 @@ internal data class BuildFile(val dependencies: List<Dependency>) {
       FileSpec.scriptBuilder("build.gradle").apply {
         // Plugins block
         beginControlFlow("plugins")
-        addStatement("alias(libs.plugins.slack.base)")
+        addStatement("alias(libs.plugins.foundry.base)")
         // TODO do we ever need to ensure no dupes?
         features.filterIsInstance<PluginVisitor>().forEach { it.writeToPlugins(this) }
         endControlFlow()
@@ -93,7 +93,7 @@ internal data class BuildFile(val dependencies: List<Dependency>) {
         val slackAndroidFeatures = features.filterIsInstance<SlackAndroidFeatureVisitor>()
         if (slackFeatures.isNotEmpty() || slackAndroidFeatures.isNotEmpty()) {
           addStatement("")
-          beginControlFlow("slack")
+          beginControlFlow("foundry")
           if (slackFeatures.isNotEmpty()) {
             beginControlFlow("features")
             for (feature in slackFeatures) {

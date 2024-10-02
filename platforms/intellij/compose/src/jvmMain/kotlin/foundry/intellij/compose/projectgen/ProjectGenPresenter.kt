@@ -42,6 +42,7 @@ internal class ProjectGenPresenter(
     TextElement(
       "",
       "Package Name",
+      // TODO make the prefix configurable
       description =
         "The project package name (must start with 'slack.') This is used for both source packages and android.namespace.",
       prefixTransformation = "slack.",
@@ -178,6 +179,7 @@ internal class ProjectGenPresenter(
     return generate(
       rootDir = File(rootDir),
       path = ":${path.value}",
+      // TODO make this configurable
       packageName = "slack.${packageName.value}",
       android = android.isChecked,
       androidFeatures =

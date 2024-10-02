@@ -4,6 +4,39 @@ Changelog
 **Unreleased**
 --------------
 
+### Project Restructuring
+
+We've restructured this project! Since its early days as a simple Gradle convention plugin it's expanded into IntelliJ plugins, CLIs, CI tooling, and more. To better capture this, we've renamed the project to *Foundry*, restructured its artifacts into a more cohesive setup, moved kotlin-cli-util into this repo, and will likely split out some more artifacts down the line.
+
+#### Migration Guide
+
+- Any **gradle properties** prefixed with `slack.` or `sgp.` have now moved to `foundry.`. `slack.gradle.` prefix have also removed the `gradle.` (i.e. `slack.gradle.foo` would now be `foundry.foo`).
+- Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
+- Gradle coordinates group have moved to the `com.slack.foundry` group name.
+
+    | Old Artifact ID     | New Artifact ID |
+    |---------------------|-----------------|
+    | sgp                 | gradle-plugin   |
+    | sgp-agp-handler-api | agp-handler-api |
+    | sgp-common          | foundry-common  |
+    | sgp-tracing         | tracing         |
+    | skippy              | skippy          |
+
+- The former `kotlin-cli-util` APIs have moved to the `com.slack.foundry:cli` artifact.
+- Platform-specific plugins now live under the `platforms/` directory.
+- All other tools now live under the `tools/` directory.
+- Most top-level `Slack`-prefixed APIs are now prefixed with `Foundry`.
+- The primary gradle entry points are now `foundry {}`, but the previous `slack {}` entry points are left with deprecation `ReplaceWith` options.
+- Gradle plugin IDs have migrated to `foundry.*` names.
+
+    | Old                           | New                      |
+    |-------------------------------|--------------------------|
+    | `slack.gradle.root`           | `foundry.root`           |
+    | `slack.gradle.base`           | `foundry.base`           |
+    | `slack.gradle.apk-versioning` | `foundry.apk-versioning` |
+
+- Introduce new required `foundry.android.defaultNamespacePrefix` property for android projects. This is necessary for projects that don't define an `android.namespace` explicitly.
+
 0.19.6
 ------
 

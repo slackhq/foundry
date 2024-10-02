@@ -131,69 +131,12 @@ allprojects {
   }
 }
 
-/**
- * These are magic shared versions that are used in both buildSrc's build file and
- * SlackDependencies. These are copied as a source into the main source set and templated for
- * replacement.
- */
-data class KotlinBuildConfig(val kotlin: String) {
-  private val kotlinVersion by lazy {
-    val (major, minor, patch) = kotlin.substringBefore("-").split('.').map { it.toInt() }
-    KotlinVersion(major, minor, patch)
-  }
-
-  // Left as a toe-hold for any future needs
-  private val extraArgs = arrayOf<String>()
-
-  /**
-   * See more information about these in
-   * - CommonCompilerArguments.kt
-   * - K2JVMCompilerArguments.kt
-   */
-  val kotlinCompilerArgs: List<String> =
-    listOf(
-      // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
-      // => T & Any)
-      "-Xenhance-type-parameter-types-to-def-not-null",
-      // Use fast implementation on Jar FS. This may speed up compilation time, but currently it's
-      // an experimental mode
-      // TODO toe-hold but we can't use it yet because it emits a warning that fails with -Werror
-      //  https://youtrack.jetbrains.com/issue/KT-54928
-      //    "-Xuse-fast-jar-file-system",
-      // Support inferring type arguments based on only self upper bounds of the corresponding type
-      // parameters
-      "-Xself-upper-bound-inference",
-    ) + extraArgs
-
-  /**
-   * See more information about these in
-   * - CommonCompilerArguments.kt
-   * - K2JVMCompilerArguments.kt
-   */
-  val kotlinJvmCompilerArgs: List<String> =
-    listOf(
-      "-Xjsr305=strict",
-      // Match JVM assertion behavior:
-      // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
-      "-Xassertions=jvm",
-      // Potentially useful for static analysis tools or annotation processors.
-      "-Xemit-jvm-type-annotations",
-      // Enable new jvm-default behavior
-      // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
-      "-Xjvm-default=all",
-      "-Xtype-enhancement-improvements-strict-mode",
-      // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
-      "-Xjspecify-annotations=strict",
-    )
-}
-
 tasks.dokkaHtmlMultiModule {
   outputDirectory.set(rootDir.resolve("docs/api/0.x"))
   includes.from(project.layout.projectDirectory.file("README.md"))
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
-val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 
 val jvmTargetVersion = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
 

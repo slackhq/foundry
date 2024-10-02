@@ -93,7 +93,7 @@ public abstract class CheckDependencyVersionsTask : BaseDependencyCheckTask() {
         configureIdentifiersToVersions(configuration)
         outputFile.setDisallowChanges(
           project.layout.buildDirectory.file(
-            "reports/slack/dependencyVersionsIssues/$name/issues.txt"
+            "reports/foundry/dependencyVersionsIssues/$name/issues.txt"
           )
         )
         val catalog = project.getVersionsCatalog()

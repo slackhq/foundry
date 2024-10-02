@@ -26,6 +26,7 @@ import foundry.gradle.dependencies.DependencyGroup
 import foundry.gradle.util.gitExecProvider
 import foundry.gradle.util.mapToBoolean
 import java.io.File
+import java.nio.file.Files
 import java.util.Locale
 import java.util.Optional
 import org.gradle.api.GradleException
@@ -85,15 +86,25 @@ internal fun parseGitVersion(gitVersion: String?): VersionNumber {
 }
 
 internal fun robolectricJars(gradleUserHomeDir: File, createDirsIfMissing: Boolean = true): File {
-  val slackHome =
-    File(gradleUserHomeDir, "slack").apply {
-      if (createDirsIfMissing) {
-        if (!exists()) {
-          mkdir()
-        }
+  val foundryHome = File(gradleUserHomeDir, "foundry")
+
+  // Migrate from existing slack
+  val slackHome = File(gradleUserHomeDir, "slack")
+  if (slackHome.exists()) {
+    println("Migrating slack home to foundry")
+    slackHome.copyRecursively(foundryHome, overwrite = true)
+    Files.deleteIfExists(slackHome.toPath())
+  }
+
+  foundryHome.apply {
+    if (createDirsIfMissing) {
+      if (!exists()) {
+        mkdir()
       }
     }
-  return File(slackHome, "robolectric-jars").apply {
+  }
+
+  return File(foundryHome, "robolectric-jars").apply {
     if (createDirsIfMissing) {
       if (!exists()) {
         mkdir()

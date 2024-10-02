@@ -35,7 +35,7 @@ public object AppleSiliconCompat {
    */
   @Suppress("ReturnCount")
   public fun validate(errorMessage: () -> String) {
-    if (System.getenv("SLACK_SKIP_APPLE_SILICON_CHECK")?.toBoolean() == true) {
+    if (System.getenv("FOUNDRY_SKIP_APPLE_SILICON_CHECK")?.toBoolean() == true) {
       // Toe-hold to skip this check if anything goes wrong.
       return
     }

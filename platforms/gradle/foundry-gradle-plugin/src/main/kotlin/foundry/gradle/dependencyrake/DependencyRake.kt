@@ -87,7 +87,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
       .setProperty(AnalysisMode::class.java)
       .convention(
         providers
-          .gradleProperty("slack.dependencyrake.modes")
+          .gradleProperty("foundry.dependencyrake.modes")
           .map { it.splitToSequence(",").map(AnalysisMode::valueOf).toSet() }
           .orElse(
             setOf(
@@ -105,7 +105,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
     objects
       .property<Boolean>()
       .convention(
-        providers.gradleProperty("slack.dependencyrake.dryRun").mapToBoolean().orElse(false)
+        providers.gradleProperty("foundry.dependencyrake.dryRun").mapToBoolean().orElse(false)
       )
 
   @get:Input abstract val noApi: Property<Boolean>

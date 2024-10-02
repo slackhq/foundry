@@ -15,8 +15,8 @@
  */
 import foundry.gradle.AndroidHandler
 import foundry.gradle.FoundryExtension
-import foundry.gradle.SlackAndroidAppExtension
-import foundry.gradle.SlackAndroidLibraryExtension
+import foundry.gradle.FoundryAndroidAppExtension
+import foundry.gradle.FoundryAndroidLibraryExtension
 import foundry.gradle.findByType
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -67,7 +67,7 @@ public fun Project.slackAndroid(action: Action<AndroidHandler>) {
   ReplaceWith("foundry { android { library(action) } }"),
   level = DeprecationLevel.WARNING,
 )
-public fun Project.slackAndroidLibrary(action: Action<SlackAndroidLibraryExtension>) {
+public fun Project.slackAndroidLibrary(action: Action<FoundryAndroidLibraryExtension>) {
   foundry { android { library(action) } }
 }
 
@@ -76,6 +76,6 @@ public fun Project.slackAndroidLibrary(action: Action<SlackAndroidLibraryExtensi
   ReplaceWith("foundry { android { app(action) } }"),
   level = DeprecationLevel.WARNING,
 )
-public fun Project.slackAndroidApp(action: Action<SlackAndroidAppExtension>) {
+public fun Project.slackAndroidApp(action: Action<FoundryAndroidAppExtension>) {
   foundry { android { app(action) } }
 }

@@ -96,7 +96,7 @@ constructor(
   }
 
   internal fun applyTo(project: Project) {
-    val logVerbose = foundryProperties.slackExtensionVerbose
+    val logVerbose = foundryProperties.foundryExtensionVerbose
     // Dirty but necessary since the extension isn't configured yet when we call this
     project.afterEvaluate {
       featuresHandler.applyTo(project)
@@ -622,7 +622,7 @@ constructor(
     if (testFixturesUseDagger.getOrElse(false) && !daggerHandler.enabled.getOrElse(false)) {
       error(
         "In order to enable test fixtures with dagger, you must also enable " +
-          "the `slack { features { dagger() } }` feature"
+          "the `foundry { features { dagger() } }` feature"
       )
     }
   }
@@ -765,7 +765,7 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
    * they would be added to regular project dependencies.
    *
    * ```
-   * slack {
+   * foundry {
    *   features {
    *     dagger(...) {
    *       anvilGenerators(projects.libraries.foundation.anvil.injection.compiler)
@@ -918,7 +918,7 @@ constructor(
         } else if (foundryProperties.composeEnableLiveLiterals) {
           project.logger.error(
             "Live literals are disabled and deprecated in AGP 8.7+. " +
-              "Please remove the `slack.compose.android.enableLiveLiterals` property."
+              "Please remove the `foundry.compose.android.enableLiveLiterals` property."
           )
         }
       }
@@ -1032,8 +1032,8 @@ constructor(
 public abstract class AndroidHandler
 @Inject
 constructor(objects: ObjectFactory, private val foundryProperties: FoundryProperties) {
-  internal val libraryHandler = objects.newInstance<SlackAndroidLibraryExtension>()
-  internal val appHandler = objects.newInstance<SlackAndroidAppExtension>()
+  internal val libraryHandler = objects.newInstance<FoundryAndroidLibraryExtension>()
+  internal val appHandler = objects.newInstance<FoundryAndroidAppExtension>()
 
   @Suppress("MemberVisibilityCanBePrivate")
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
@@ -1056,11 +1056,11 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
     action.execute(featuresHandler)
   }
 
-  public fun library(action: Action<SlackAndroidLibraryExtension>) {
+  public fun library(action: Action<FoundryAndroidLibraryExtension>) {
     action.execute(libraryHandler)
   }
 
-  public fun app(action: Action<SlackAndroidAppExtension>) {
+  public fun app(action: Action<FoundryAndroidAppExtension>) {
     action.execute(appHandler)
   }
 
@@ -1130,19 +1130,19 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   public fun resources(prefix: String) {
     val libraryExtension =
       androidExtension as? LibraryExtension
-        ?: error("slack.android.features.resources() is only applicable in libraries!")
+        ?: error("foundry.android.features.resources() is only applicable in libraries!")
     libraryExtension.resourcePrefix = prefix
     libraryExtension.buildFeatures { androidResources = true }
   }
 }
 
 @FoundryExtensionMarker
-public abstract class SlackAndroidLibraryExtension {
+public abstract class FoundryAndroidLibraryExtension {
   // Left as a toe-hold for the future
 }
 
 @FoundryExtensionMarker
-public abstract class SlackAndroidAppExtension {
+public abstract class FoundryAndroidAppExtension {
   internal var allowlistAction: Action<PermissionAllowlistConfigurer>? = null
 
   /**
@@ -1150,7 +1150,7 @@ public abstract class SlackAndroidAppExtension {
    *
    * Example:
    * ```
-   * slack {
+   * foundry {
    *   permissionAllowlist {
    *     if (buildType.name == "release") {
    *       setAllowlistFile(file('path/to/allowlist.txt'))
