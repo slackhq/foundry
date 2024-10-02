@@ -128,7 +128,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isAIBotEnabled = value
     }
 
-
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
