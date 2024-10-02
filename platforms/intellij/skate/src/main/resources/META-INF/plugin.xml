@@ -22,13 +22,14 @@
                            implementationClass="foundry.intellij.skate.featureflags.FeatureFlagAnnotator"/>
         <projectIndexingActivityHistoryListener implementation="foundry.intellij.skate.idemetrics.IndexingListener"/>
         <postStartupActivity implementation="foundry.intellij.skate.PostStartupActivityExtension"/>
-        <toolWindow factoryClass="foundry.intellij.skate.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"
-                    canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>
     </extensions>
 
     <projectListeners>
         <listener
                 class="foundry.intellij.skate.WhatsNewToolWindowListener"
+                topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
+        <listener
+                class="foundry.intellij.skate.aibot.ChatBotListener"
                 topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
     </projectListeners>
 
