@@ -2,6 +2,8 @@
 agp = "8.6.1"
 agpAlpha = "8.6.1"
 anvil = "2.5.0-beta11"
+# Release notes: https://asm.ow2.io/versions.html
+asm = "9.7"
 bugsnagGradle = "8.1.0"
 circuit = "0.23.1"
 compose-jb = "1.7.0-rc01"
@@ -13,7 +15,8 @@ dokka = "1.9.20"
 errorproneGradle = "3.1.0"
 gradle-retry = "1.6.0"
 intellij-platform = "2.1.0"
-jdk = "22"
+# Temporary until TODO link
+jdk = "21"
 jvmTarget = "17"
 jewel = "0.25.0"
 jna = "5.15.0"
@@ -69,6 +72,7 @@ wire = { id = "com.squareup.wire", version.ref = "wire" }
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 agpAlpha = { module = "com.android.tools.build:gradle", version.ref = "agpAlpha" }
+asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.2"
@@ -108,6 +112,7 @@ gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.
 guava = "com.google.guava:guava:33.3.1-jre"
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-gradlePlugins-bom = { module = "org.jetbrains.kotlin:kotlin-gradle-plugins-bom", version.ref = "kotlin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }

@@ -58,6 +58,16 @@ plugins {
   alias(libs.plugins.binaryCompatibilityValidator)
 }
 
+buildscript {
+  dependencies {
+    // Apply boms for buildscript classpath
+    classpath(platform(libs.asm.bom))
+    classpath(platform(libs.kotlin.bom))
+    classpath(platform(libs.coroutines.bom))
+    classpath(platform(libs.kotlin.gradlePlugins.bom))
+  }
+}
+
 apiValidation {
   // only :tools:cli is tracking this right now
   // Annoyingly this only uses simple names
@@ -156,7 +166,7 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
+    tasks.withType<JavaCompile>().configureEach { options.release.set(libs.versions.jvmTarget.map(String::toInt)) }
   }
 
   val isForIntelliJPlugin =
