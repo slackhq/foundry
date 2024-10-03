@@ -60,7 +60,7 @@ internal object UnitTests {
   private const val GLOBAL_CI_UNIT_TEST_TASK_NAME = "globalCiUnitTest"
   private const val CI_UNIT_TEST_TASK_NAME = "ciUnitTest"
   private const val COMPILE_CI_UNIT_TEST_NAME = "compileCiUnitTest"
-  private const val LOG = "SlackUnitTests:"
+  private const val LOG = "FoundryUnitTests:"
 
   private fun maxForks(foundryProperties: FoundryProperties): Int {
     val multiplier = foundryProperties.unitTestParallelismMultiplier

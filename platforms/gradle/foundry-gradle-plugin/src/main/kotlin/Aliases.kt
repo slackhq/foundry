@@ -15,8 +15,8 @@
  */
 import foundry.gradle.AndroidHandler
 import foundry.gradle.FoundryExtension
-import foundry.gradle.SlackAndroidAppExtension
-import foundry.gradle.SlackAndroidLibraryExtension
+import foundry.gradle.FoundryAndroidAppExtension
+import foundry.gradle.FoundryAndroidLibraryExtension
 import foundry.gradle.findByType
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -42,79 +42,40 @@ import org.gradle.api.Project
  * }
  * ```
  */
-public fun Project.foundry(body: FoundryExtension.() -> Unit) {
-  extensions.findByType<FoundryExtension>()?.let(body) ?: error("Foundry extension not found.")
+public fun Project.foundry(action: Action<FoundryExtension>) {
+  extensions.findByType<FoundryExtension>()?.let(action::execute)
+    ?: error("Foundry extension not found.")
 }
 
-@Deprecated("Use foundry", ReplaceWith("foundry(body)"), level = DeprecationLevel.ERROR)
-public fun Project.slack(body: FoundryExtension.() -> Unit) {
-  extensions.findByType<FoundryExtension>()?.let(body) ?: error("Foundry extension not found.")
-}
-
-/**
- * Common entry point for configuring slack-android-specific bits of projects.
- *
- * ```
- * foundryAndroid {
- *   library {
- *     // ...
- *   }
- * }
- * ```
- */
-public fun Project.foundryAndroid(action: Action<AndroidHandler>) {
-  foundry { android(action) }
+@Deprecated("Use foundry", ReplaceWith("foundry(action)"), level = DeprecationLevel.WARNING)
+public fun Project.slack(action: Action<FoundryExtension>) {
+  extensions.findByType<FoundryExtension>()?.let(action::execute)
+    ?: error("Foundry extension not found.")
 }
 
 @Deprecated(
   "Use foundryAndroid",
-  ReplaceWith("foundryAndroid(body)"),
-  level = DeprecationLevel.ERROR,
+  ReplaceWith("foundry { android(action) }"),
+  level = DeprecationLevel.WARNING,
 )
 public fun Project.slackAndroid(action: Action<AndroidHandler>) {
-  foundryAndroid(action)
-}
-
-/**
- * Common entry point for configuring slack-android-library-specific bits of projects.
- *
- * ```
- * androidLibrary {
- *   // ...
- * }
- * ```
- */
-public fun Project.foundryAndroidLibrary(action: Action<SlackAndroidLibraryExtension>) {
-  foundry { android { library(action) } }
+  foundry { android(action) }
 }
 
 @Deprecated(
   "Use foundryAndroidLibrary",
-  ReplaceWith("foundryAndroidLibrary(body)"),
-  level = DeprecationLevel.ERROR,
+  ReplaceWith("foundry { android { library(action) } }"),
+  level = DeprecationLevel.WARNING,
 )
-public fun Project.slackAndroidLibrary(action: Action<SlackAndroidLibraryExtension>) {
-  foundryAndroidLibrary(action)
-}
-
-/**
- * Common entry point for configuring slack-android-library-specific bits of projects.
- *
- * ```
- * androidApp {
- *   // ...
- * }
- * ```
- */
-public fun Project.foundryAndroidApp(action: Action<SlackAndroidAppExtension>) {
-  foundry { android { app(action) } }
+public fun Project.slackAndroidLibrary(action: Action<FoundryAndroidLibraryExtension>) {
+  foundry { android { library(action) } }
 }
 
 @Deprecated(
-  "Use foundryAndroidApp",
-  ReplaceWith("foundryAndroidApp(body)"),
-  level = DeprecationLevel.ERROR,
+  "Use foundry",
+  ReplaceWith("foundry { android { app(action) } }"),
+  level = DeprecationLevel.WARNING,
 )
-public fun Project.slackAndroidApp(action: Action<SlackAndroidAppExtension>) {
-  foundryAndroidApp(action)
+public fun Project.slackAndroidApp(action: Action<FoundryAndroidAppExtension>) {
+  foundry { android { app(action) } }
 }

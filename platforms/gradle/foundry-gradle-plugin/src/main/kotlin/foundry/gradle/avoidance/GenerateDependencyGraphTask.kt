@@ -87,7 +87,7 @@ internal abstract class GenerateDependencyGraphTask : DefaultTask() {
       return rootProject.tasks.register<GenerateDependencyGraphTask>(NAME) {
         dependencyGraph.setDisallowChanges(rootProject.provider { lazyGraph })
         outputFile.setDisallowChanges(
-          rootProject.layout.buildDirectory.file("slack/dependencyGraph/serializedGraph.bin")
+          rootProject.layout.buildDirectory.file("foundry/dependencyGraph/serializedGraph.bin")
         )
       }
     }

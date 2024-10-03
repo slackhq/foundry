@@ -68,7 +68,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
-private const val LOG = "SlackPlugin:"
+private const val LOG = "Foundry:"
 private const val FIVE_MINUTES_MS = 300_000L
 
 private fun Logger.logWithTag(message: String) {
@@ -97,7 +97,7 @@ internal class StandardProjectConfigurations(
     val foundryProperties = FoundryProperties(project)
     val foundryExtension =
       project.extensions.create(
-        "slack",
+        "foundry",
         FoundryExtension::class.java,
         globalProperties,
         foundryProperties,
@@ -169,7 +169,7 @@ internal class StandardProjectConfigurations(
     if (platformProjectPath == null) {
       if (foundryProperties.strictMode) {
         logger.warn(
-          "slack.location.slack-platform is not set. Consider creating one to ensure consistent dependency versions across projects!"
+          "foundry.location.foundry-platform is not set. Consider creating one to ensure consistent dependency versions across projects!"
         )
       }
     } else if (!foundryProperties.noPlatform && path != platformProjectPath) {
@@ -376,6 +376,7 @@ internal class StandardProjectConfigurations(
           }
         options.errorprone.nullaway {
           severity.setDisallowChanges(nullAwaySeverity)
+          // TODO make this configurable
           annotatedPackages.add("slack")
           checkOptionalEmptiness.setDisallowChanges(true)
           if (autoPatchEnabled && nullawayBaseline) {
@@ -383,6 +384,7 @@ internal class StandardProjectConfigurations(
             autoFixSuppressionComment.setDisallowChanges(
               "Nullability issue auto-patched by NullAway."
             )
+            // TODO make this configurable
             castToNonNullMethod.setDisallowChanges("slack.commons.JavaPreconditions.castToNotNull")
           }
         }
@@ -813,7 +815,7 @@ internal class StandardProjectConfigurations(
         finalizeDsl { libraryExtension ->
           if (libraryExtension.namespace == null) {
             libraryExtension.namespace =
-              "slack" +
+              foundryProperties.defaultNamespacePrefix +
                 projectPath
                   .asSequence()
                   .mapNotNull {

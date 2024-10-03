@@ -27,15 +27,15 @@ plugins {
 
 gradlePlugin {
   plugins.create("foundry-root") {
-    id = "foundry.gradle.root"
+    id = "foundry.root"
     implementationClass = "foundry.gradle.FoundryRootPlugin"
   }
   plugins.create("foundry-base") {
-    id = "foundry.gradle.base"
+    id = "foundry.base"
     implementationClass = "foundry.gradle.FoundryBasePlugin"
   }
   plugins.create("apkVersioning") {
-    id = "foundry.gradle.apk-versioning"
+    id = "foundry.apk-versioning"
     implementationClass = "foundry.gradle.ApkVersioningPlugin"
   }
 }
@@ -85,10 +85,10 @@ dependencies {
   implementation(libs.jgrapht)
   implementation(libs.jna)
   implementation(libs.jna.platform)
-  implementation(libs.kotlinCliUtil)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
+  implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
   implementation(projects.tools.skippy)
 

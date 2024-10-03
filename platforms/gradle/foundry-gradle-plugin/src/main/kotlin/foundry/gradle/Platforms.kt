@@ -19,7 +19,6 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
 import foundry.gradle.dependencies.DependencyCollection
 import foundry.gradle.dependencies.DependencyDef
-import foundry.gradle.dependencies.boms
 import foundry.gradle.dependencies.flattenedPlatformCoordinates
 import foundry.gradle.dependencies.identifierMap
 import foundry.gradle.util.JsonTools
@@ -68,87 +67,6 @@ public object Platforms {
       "com.google.auto:auto-common",
       "com.google.testing.compile:compile-testing",
     )
-
-  /** Generates a `libs.versions.toml` representation of this [dependencyCollection]. */
-  public fun generateLibsToml(
-    targetFile: File,
-    catalogName: String,
-    providers: ProviderFactory,
-    dependencyCollection: DependencyCollection,
-    logger: Logger,
-  ) {
-    logger.lifecycle("Generating $catalogName.toml")
-    if (targetFile.exists()) {
-      targetFile.delete()
-    }
-    targetFile.createNewFile()
-
-    val identifierMap = dependencyCollection.identifierMap()
-
-    targetFile.bufferedWriter().use { writer ->
-      val versionsToLibs =
-        dependencyCollection
-          .flattenedPlatformCoordinates()
-          .groupBy { it.gradleProperty }
-          .mapKeys { it.key.removePrefix("slack.dependencies.") }
-
-      writer.append("[versions]")
-      writer.appendLine()
-      versionsToLibs.keys.sorted().forEach {
-        writer.append(
-          "${tomlKey(it)} = \"${providers.gradleProperty("slack.dependencies.$it").get()}\""
-        )
-        writer.appendLine()
-      }
-      writer.appendLine()
-      writer.append("[libraries]")
-      writer.appendLine()
-      versionsToLibs
-        .flatMap { (key, deps) ->
-          deps.map { dep ->
-            val libPath = tomlLibIdentifier(identifierMap, dep.identifier)
-            val versionRef =
-              if (dep.isBomManaged) {
-                ""
-              } else {
-                ", version.ref = \"${tomlKey(key)}\""
-              }
-            "$libPath = { module = \"${dep.identifier}\"$versionRef }"
-          }
-        }
-        // Add `-bom` deps to libraries
-        .plus(
-          dependencyCollection.boms().map { group ->
-            val def = group.toBomDependencyDef()
-            val tomlKey = tomlKey(def.gradleProperty)
-            val libPath = "$tomlKey-bom"
-            "$libPath = { module = \"${def.identifier}\", version.ref = \"$tomlKey\" }"
-          }
-        )
-        .sorted()
-        .forEach { lib ->
-          writer.append(lib)
-          writer.appendLine()
-        }
-      writer.appendLine()
-
-      // Generate possible bundles. Note that we should check these manually and delete/adjust any
-      // as needed.
-      writer.append("[bundles]")
-      writer.appendLine()
-      for ((key, deps) in versionsToLibs.toSortedMap()) {
-        // bundles only make sense when there's multiple
-        if (deps.size < 2) continue
-        val bundleKeys =
-          deps.joinToString(", ") { dep ->
-            "\"${tomlLibIdentifier(identifierMap, dep.identifier)}\""
-          }
-        writer.append("${tomlKey(key)} = [ $bundleKeys ]")
-        writer.appendLine()
-      }
-    }
-    logger.lifecycle("Wrote toml to $targetFile")
-  }
 
   private fun tomlLibIdentifier(identifierMap: Map<String, String>, identifier: String) =
     tomlLibForPath(identifierMap.getValue(identifier))

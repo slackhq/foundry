@@ -106,7 +106,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   @get:Internal internal abstract val rootDir: DirectoryProperty
 
   init {
-    group = "slack"
+    group = "foundry"
     description = "Computes affected projects and writes output files to an output directory."
   }
 

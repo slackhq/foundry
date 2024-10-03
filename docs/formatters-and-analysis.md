@@ -27,7 +27,7 @@ The core set of analysis tools supported in SGP are:
 
 SGP ships with a standard set of git hooks (pre-commit, etc) that it can bootstrap in projects by running `./gradlew installCommitHooks`. These hooks rely on checking in relevant binaries for each formatter/checker, it's strongly recommended to use git-lfs for these. These files should be edited as needed to best serve the project they're running in.
 
-SGP can configure these hooks in the project automatically during bootstrap if you add the `slack.git.hooksPath` gradle property and point it at the hooks directory that the above command output to, or wherever the host project opts to store them.
+SGP can configure these hooks in the project automatically during bootstrap if you add the `foundry.git.hooksPath` gradle property and point it at the hooks directory that the above command output to, or wherever the host project opts to store them.
 
 Note that Detekt is not yet supported in git hooks as these require extra parameters for baselines.
 

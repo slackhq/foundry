@@ -1,33 +1,33 @@
 Architecture
 ============
 
-SGP consists of three Gradle plugins and some associated helper artifacts.
+Foundry contains three Gradle plugins and some associated helper artifacts.
 
-## `SlackRootPlugin`
+## `FoundryRootPlugin`
 
 This is the root plugin that is applied to the root project of a multi-project build.
 
 ```kotlin
 plugins {
-  id("com.slack.gradle.root")
+  id("foundry.root")
 }
 ```
 
 Its responsibilities include:
 
-- Registering the `SlackTools` build service.
+- Registering the `FoundryTools` build service.
 - Setting up global configuration (i.e. global lifecycle tasks, download tasks, etc).
 - Validating the JDK matches the expected JDK defined in `libs.versions.toml`.
 - Configure git (hooks, ignored revisions, etc).
 - (If running on macOS) Validating the build isn't running in Rosetta mode.
 
-## `SlackBasePlugin`
+## `FoundryBasePlugin`
 
 This is the base plugin that is applied to _all_ projects (including the root project).
 
 ```kotlin
 plugins {
-  id("com.slack.gradle.base")
+  id("foundry.base")
 }
 ```
 
@@ -45,7 +45,7 @@ Its responsibilities include:
 
 This class warrants special mention as it is responsible for the bulk of the configuration applied to projects SGP manages.
 
-- Creates and exposes the [`slack` extension DSL](/dsl).
+- Creates and exposes the [`foundry` extension DSL](/dsl).
 - Applies common configurations.
   - This largely just sets up the dependency sorter plugin.
 - Applies common JVM configurations.
@@ -74,7 +74,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 - Gradle toolchains are used to manage the JDK used for `JavaCompile` tasks in non-android projects to ensure consistency.
 - All `JavaCompile` tasks have `-parameters` added to `options.compilerArgs` for better static analysis and annotation processing support.
 - If opted-in, error-prone and nullaway are applied and set up with the project with common configurations (configured checks, ignoring build dirs, etc).
-  - SGP supports Error-Prone's auto-patching mode via enabling the `slack.epAutoPatch` property.
+  - Foundry supports Error-Prone's auto-patching mode via enabling the `foundry.epAutoPatch` property.
 
 ##### Android
 
@@ -147,7 +147,7 @@ This also adds a `generateVersionProperties` task that is more or less only rele
 
 ## AGP Handlers
 
-SGP is designed to work with multiple versions of AGP at a time, albeit only for forward compatibility and testing reasons. Generally SGP will only be tested against the latest stable version of AGP. To support multiple beta/canary versions of upcoming AGP versions, SGP has an API called `AgpHandler`, which is intended to be an AGP-agnostic common interface for configuring AGP projects across breaking API (source or binary) changes. When a new such change is introduced, we create an `AgpHandler{version}` artifact and implementation with that AGP version as its minimum. At runtime, SGP loads the relevant `AgpHandler` instance for the AGP version it is running against and relevant APIs use this instance via `SlackTools` to interact with them in a version-agnostic way. These aren't always needed so there may be times when there are no implementations needed for the current suite of AGP versions.
+SGP is designed to work with multiple versions of AGP at a time, albeit only for forward compatibility and testing reasons. Generally SGP will only be tested against the latest stable version of AGP. To support multiple beta/canary versions of upcoming AGP versions, SGP has an API called `AgpHandler`, which is intended to be an AGP-agnostic common interface for configuring AGP projects across breaking API (source or binary) changes. When a new such change is introduced, we create an `AgpHandler{version}` artifact and implementation with that AGP version as its minimum. At runtime, SGP loads the relevant `AgpHandler` instance for the AGP version it is running against and relevant APIs use this instance via `FoundryTools` to interact with them in a version-agnostic way. These aren't always needed so there may be times when there are no implementations needed for the current suite of AGP versions.
 
 An example handler for AGP 8.0 looks like this.
 

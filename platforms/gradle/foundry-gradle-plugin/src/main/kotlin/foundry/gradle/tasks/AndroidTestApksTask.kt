@@ -49,7 +49,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    group = "slack"
+    group = "foundry"
   }
 
   @OptIn(ExperimentalPathApi::class)
@@ -74,7 +74,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
       return project.tasks.register<AndroidTestApksTask>(NAME) {
         androidTestApkDirs.from(resolver.artifactView())
         outputFile.setDisallowChanges(
-          project.layout.buildDirectory.file("slack/androidTestAggregator/aggregatedTestApks.txt")
+          project.layout.buildDirectory.file("foundry/androidTestAggregator/aggregatedTestApks.txt")
         )
       }
     }

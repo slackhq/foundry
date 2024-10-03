@@ -19,6 +19,7 @@ import com.google.common.collect.Sets
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
+import foundry.cli.AppleSiliconCompat
 import foundry.gradle.FoundryTools.Companion.SERVICE_NAME
 import foundry.gradle.FoundryTools.Parameters
 import foundry.gradle.agp.AgpHandler
@@ -50,7 +51,6 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
 import org.gradle.internal.os.OperatingSystem
-import slack.cli.AppleSiliconCompat
 
 /** Misc tools for Foundry Gradle projects, usable in tasks as a [BuildService] too. */
 public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
@@ -90,7 +90,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
   private val avoidedTasks = Sets.newConcurrentHashSet<AvoidedTask>()
 
   init {
-    debugLog("SlackTools created")
+    debugLog("FoundryTools created")
 
     // Thermals logging
     var canLogThermals = parameters.logThermals.get()
@@ -98,7 +98,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
       if (AppleSiliconCompat.Arch.get() != AppleSiliconCompat.Arch.ARM64) {
         logger.warn(
           "Thermals logging is enabled but configuration cache is enabled and this is not an " +
-            "Apple Silicon machine. Thermals logging will be disabled. Please set 'slack.log-thermals' " +
+            "Apple Silicon machine. Thermals logging will be disabled. Please set 'foundry.log-thermals' " +
             "to false in your home gradle.properties."
         )
         canLogThermals = false

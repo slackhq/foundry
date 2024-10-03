@@ -32,6 +32,7 @@ import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtensi
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -54,6 +55,25 @@ plugins {
   alias(libs.plugins.buildConfig) apply false
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
+  alias(libs.plugins.binaryCompatibilityValidator)
+}
+
+apiValidation {
+  // only :tools:cli is tracking this right now
+  // Annoyingly this only uses simple names
+  // https://github.com/Kotlin/binary-compatibility-validator/issues/16
+  ignoredProjects +=
+    listOf(
+      "agp-handler-api",
+      "foundry-gradle-plugin",
+      "artifactory-authenticator",
+      "compose",
+      "playground",
+      "skate",
+      "foundry-common",
+      "skippy",
+      "tracing",
+    )
 }
 
 configure<DetektExtension> {
@@ -111,69 +131,12 @@ allprojects {
   }
 }
 
-/**
- * These are magic shared versions that are used in both buildSrc's build file and
- * SlackDependencies. These are copied as a source into the main source set and templated for
- * replacement.
- */
-data class KotlinBuildConfig(val kotlin: String) {
-  private val kotlinVersion by lazy {
-    val (major, minor, patch) = kotlin.substringBefore("-").split('.').map { it.toInt() }
-    KotlinVersion(major, minor, patch)
-  }
-
-  // Left as a toe-hold for any future needs
-  private val extraArgs = arrayOf<String>()
-
-  /**
-   * See more information about these in
-   * - CommonCompilerArguments.kt
-   * - K2JVMCompilerArguments.kt
-   */
-  val kotlinCompilerArgs: List<String> =
-    listOf(
-      // Enhance not null annotated type parameter's types to definitely not null types (@NotNull T
-      // => T & Any)
-      "-Xenhance-type-parameter-types-to-def-not-null",
-      // Use fast implementation on Jar FS. This may speed up compilation time, but currently it's
-      // an experimental mode
-      // TODO toe-hold but we can't use it yet because it emits a warning that fails with -Werror
-      //  https://youtrack.jetbrains.com/issue/KT-54928
-      //    "-Xuse-fast-jar-file-system",
-      // Support inferring type arguments based on only self upper bounds of the corresponding type
-      // parameters
-      "-Xself-upper-bound-inference",
-    ) + extraArgs
-
-  /**
-   * See more information about these in
-   * - CommonCompilerArguments.kt
-   * - K2JVMCompilerArguments.kt
-   */
-  val kotlinJvmCompilerArgs: List<String> =
-    listOf(
-      "-Xjsr305=strict",
-      // Match JVM assertion behavior:
-      // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
-      "-Xassertions=jvm",
-      // Potentially useful for static analysis tools or annotation processors.
-      "-Xemit-jvm-type-annotations",
-      // Enable new jvm-default behavior
-      // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
-      "-Xjvm-default=all",
-      "-Xtype-enhancement-improvements-strict-mode",
-      // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
-      "-Xjspecify-annotations=strict",
-    )
-}
-
 tasks.dokkaHtmlMultiModule {
   outputDirectory.set(rootDir.resolve("docs/api/0.x"))
   includes.from(project.layout.projectDirectory.file("README.md"))
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
-val kotlinBuildConfig = KotlinBuildConfig(kotlinVersion)
 
 val jvmTargetVersion = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
 
@@ -196,7 +159,10 @@ subprojects {
     tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
   }
 
-  val isForIntelliJPlugin = project.hasProperty("INTELLIJ_PLUGIN")
+  val isForIntelliJPlugin =
+    project.hasProperty("INTELLIJ_PLUGIN") || project.path.startsWith(":platforms:intellij")
+  val isForGradle =
+    project.hasProperty("GRADLE_PLUGIN") || project.path.startsWith(":platforms:gradle")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
     extensions.configure<KotlinJvmProjectExtension> {
       if (!isForIntelliJPlugin) {
@@ -205,7 +171,7 @@ subprojects {
     }
 
     // Reimplement kotlin-dsl's application of this function for nice DSLs
-    if (!isForIntelliJPlugin) {
+    if (isForGradle) {
       apply(plugin = "kotlin-sam-with-receiver")
       configure<SamWithReceiverExtension> { annotation("org.gradle.api.HasImplicitReceiver") }
     }
@@ -219,20 +185,25 @@ subprojects {
         val kotlinVersion =
           if (isForIntelliJPlugin) {
             KOTLIN_1_9
-          } else {
+          } else if (isForGradle) {
             KOTLIN_1_9
+          } else {
+            DEFAULT
           }
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
 
-        if (!isForIntelliJPlugin) {
-          // Gradle forces a lower version of kotlin, which results in warnings that prevent use of
-          // this sometimes. https://github.com/gradle/gradle/issues/16345
+        if (kotlinVersion != DEFAULT) {
+          // Gradle/IntelliJ forces a lower version of kotlin, which results in warnings that
+          // prevent use of this sometimes.
+          // https://github.com/gradle/gradle/issues/16345
           allWarningsAsErrors.set(false)
-          // TODO required due to https://github.com/gradle/gradle/issues/24871
-          freeCompilerArgs.add("-Xsam-conversions=class")
         } else {
           allWarningsAsErrors.set(true)
+        }
+        if (isForGradle) {
+          // TODO required due to https://github.com/gradle/gradle/issues/24871
+          freeCompilerArgs.add("-Xsam-conversions=class")
         }
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
@@ -289,22 +260,28 @@ subprojects {
           includes.from(readMeProvider)
         }
         skipDeprecated.set(true)
-        // Gradle docs
-        externalDocumentationLink {
-          url.set(URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL())
-        }
-        // AGP docs
-        externalDocumentationLink {
-          val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
-          val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
-          packageListUrl.set(
-            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list")
-              .toURL()
-          )
-          url.set(
-            URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
-              .toURL()
-          )
+        if (isForGradle) {
+          // Gradle docs
+          externalDocumentationLink {
+            url.set(
+              URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL()
+            )
+          }
+          // AGP docs
+          externalDocumentationLink {
+            val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
+            val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
+            packageListUrl.set(
+              URI(
+                  "https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list"
+                )
+                .toURL()
+            )
+            url.set(
+              URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
+                .toURL()
+            )
+          }
         }
         sourceLink {
           localDirectory.set(layout.projectDirectory.dir("src").asFile)

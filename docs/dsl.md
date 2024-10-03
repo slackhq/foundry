@@ -10,7 +10,7 @@ Some examples of this include Dagger, Moshi code gen, Robolectric, and more.
 The primary entry point is the `slack` extension in the build file, which is backed by the `SlackExtension` interface.
 
 ```kotlin
-slack {
+foundry {
     features {
         dagger(...)
         moshi(...)

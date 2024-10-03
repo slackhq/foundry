@@ -54,8 +54,8 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
     if (!target.isRootProject) {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
-      val slackTools = target.foundryTools()
-      StandardProjectConfigurations(foundryProperties, versionCatalog, slackTools).applyTo(target)
+      val foundryTools = target.foundryTools()
+      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryTools).applyTo(target)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure

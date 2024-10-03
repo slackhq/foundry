@@ -95,7 +95,7 @@ public object ModuleStatsTasks {
       )
       statsFiles.from(resolver.artifactView())
       outputFile.setDisallowChanges(
-        rootProject.layout.buildDirectory.file("reports/slack/moduleStats.json")
+        rootProject.layout.buildDirectory.file("reports/foundry/moduleStats.json")
       )
       this.includeGenerated.setDisallowChanges(includeGenerated)
     }
@@ -125,7 +125,7 @@ public object ModuleStatsTasks {
         project.tasks.register<LocTask>("loc") {
           srcsDir.setDisallowChanges(project.layout.projectDirectory.dir("src/$mainSrcDir"))
           outputFile.setDisallowChanges(
-            project.layout.buildDirectory.file("reports/slack/loc.json")
+            project.layout.buildDirectory.file("reports/foundry/loc.json")
           )
         }
       }
@@ -146,7 +146,7 @@ public object ModuleStatsTasks {
           }
           this.includeGenerated.setDisallowChanges(includeGenerated)
           outputFile.setDisallowChanges(
-            project.layout.buildDirectory.file("reports/slack/moduleStats.json")
+            project.layout.buildDirectory.file("reports/foundry/moduleStats.json")
           )
         }
 
@@ -303,7 +303,7 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    group = "slack"
+    group = "foundry"
   }
 
   @TaskAction
@@ -398,7 +398,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
   init {
-    group = "slack"
+    group = "foundry"
   }
 
   @TaskAction
