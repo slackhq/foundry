@@ -15,7 +15,7 @@ dokka = "1.9.20"
 errorproneGradle = "3.1.0"
 gradle-retry = "1.6.0"
 intellij-platform = "2.1.0"
-# Temporary until TODO link
+# Temporary until https://bugs.openjdk.org/browse/JDK-8331027 is fixed in 23
 jdk = "21"
 jvmTarget = "17"
 jewel = "0.25.0"
