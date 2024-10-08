@@ -70,7 +70,7 @@ internal constructor(
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
-    get() = booleanProperty("foundry.gradle.config.libraryWithVariants")
+    get() = booleanProperty("foundry.android.libraryWithVariants")
 
   /** Default namespace prefix for android proejcts if one isn't specified. */
   public val defaultNamespacePrefix: String
@@ -82,48 +82,48 @@ internal constructor(
    * is ignored.
    */
   public val versionsPluginAllowUnstable: Boolean
-    get() = booleanProperty("foundry.gradle.config.versionsPluginAllowUnstable")
+    get() = booleanProperty("foundry.versionsPlugin.allowUnstable")
 
   /** Opt-out flag to skip the androidx dependency check. Should only be used for debugging. */
   public val skipAndroidxCheck: Boolean
-    get() = booleanProperty("foundry.gradle.skipAndroidXCheck")
+    get() = booleanProperty("foundry.skipAndroidXCheck")
 
   /** Version code used for debug APK outputs. */
   public val debugVersionCode: Int
-    get() = intProperty("foundry.gradle.debugVersionCode", 90009999)
+    get() = intProperty("foundry.android.debugVersionCode", 90009999)
 
   /** User string used for debug APK outputs. */
   public val debugUserString: String
-    get() = stringProperty("foundry.gradle.debugUserString", "debug")
+    get() = stringProperty("foundry.android.debugUserString", "debug")
 
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
-    get() = booleanProperty("foundry.gradle.config.enableSnapshots")
+    get() = booleanProperty("foundry.gradle.enableSnapshots")
 
   /** Opt-in flag to enable mavenLocal repos, used for local testing. */
   public val enableMavenLocal: Boolean
-    get() = booleanProperty("foundry.gradle.config.enableMavenLocal")
+    get() = booleanProperty("foundry.gradle.enableMavenLocal")
 
   /**
    * Flag to indicate that this project should have no api dependencies, such as if it's solely an
    * annotation processor.
    */
   public val rakeNoApi: Boolean
-    get() = booleanProperty("foundry.gradle.config.rake.noapi")
+    get() = booleanProperty("foundry.rake.noapi")
 
   /**
    * Flag to enable the Gradle Dependency Analysis Plugin, which is disabled by default due to
    * https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/204
    */
   public val enableAnalysisPlugin: Boolean
-    get() = booleanProperty("foundry.gradle.config.enableAnalysisPlugin")
+    get() = booleanProperty("foundry.enableAnalysisPlugin")
 
   /**
    * Flag to indicate this project should be exempted from platforms, usually platform projects
    * themselves.
    */
   public val noPlatform: Boolean
-    get() = booleanProperty("foundry.gradle.config.noPlatform")
+    get() = booleanProperty("foundry.config.noPlatform")
 
   /** Property corresponding to the supported languages in GA builds */
   public val supportedLanguages: String
@@ -183,7 +183,8 @@ internal constructor(
    * Use a workaround for compose-compiler's `includeInformation` option on android projects.
    *
    * On android projects, the compose compiler gradle plugin annoyingly no-ops
-   * https://issuetracker.google.com/issues/362780328#comment4
+   *
+   * @see <a href="https://issuetracker.google.com/issues/362780328#comment4">Upstream issue</a>
    */
   public val composeUseIncludeInformationWorkaround: Boolean
     get() =
@@ -608,20 +609,19 @@ internal constructor(
    * should otherwise be off.
    */
   public val alwaysEnableResourcesInTests: Boolean
-    get() =
-      booleanProperty("foundry.gradle.config.test.alwaysEnableResources", defaultValue = false)
+    get() = booleanProperty("foundry.android.test.alwaysEnableResources", defaultValue = false)
 
   /** Global toggle to enable bugsnag. Note this still respects variant filters. */
   public val bugsnagEnabled: Provider<Boolean>
-    get() = resolver.booleanProvider("foundry.gradle.config.bugsnag.enabled")
+    get() = resolver.booleanProvider("foundry.android.bugsnag.enabled")
 
   /** Branch pattern for git branches Bugsnag should be enabled on. */
   public val bugsnagEnabledBranchPattern: Provider<String>
-    get() = resolver.optionalStringProvider("foundry.gradle.config.bugsnag.enabledBranchPattern")
+    get() = resolver.optionalStringProvider("foundry.android.bugsnag.enabledBranchPattern")
 
   /** Global boolean that controls whether mod score is enabled on this project. */
   public val modScoreGlobalEnabled: Boolean
-    get() = resolver.booleanValue("foundry.gradle.config.modscore.enabled")
+    get() = resolver.booleanValue("foundry.modscore.enabled")
 
   /**
    * Per-project boolean that allows for excluding this project from mod score.
@@ -629,7 +629,7 @@ internal constructor(
    * Note this should only be applied to projects that cannot be depended on.
    */
   public val modScoreIgnore: Boolean
-    get() = resolver.booleanValue("foundry.gradle.config.modscore.ignore")
+    get() = resolver.booleanValue("foundry.modscore.ignore")
 
   /** Experimental flag to enable logging thermal throttling on macOS devices. */
   public val logThermals: Boolean
@@ -671,7 +671,7 @@ internal constructor(
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
-      resolver.optionalStringProvider("foundry.config.jvmVendor").map {
+      resolver.optionalStringProvider("foundry.jvm.vendor").map {
         if (jvmVendorOptOut) {
           sneakyNull()
         } else {
@@ -681,7 +681,7 @@ internal constructor(
 
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean
-    get() = booleanProperty("foundry.config.jvmVendor.optOut", defaultValue = false)
+    get() = booleanProperty("foundry.jvm.vendor.optOut", defaultValue = false)
 
   /**
    * Option to force a specific kotlin language version. By default defers to the KGP default the
