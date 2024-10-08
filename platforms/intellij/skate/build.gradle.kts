@@ -95,7 +95,6 @@ buildConfig {
 }
 
 configurations
-  .named { it == "runtimeClasspath" }
   .configureEach {
     // Do not bring in Material (we use Jewel)
     exclude(group = "org.jetbrains.compose.material")
