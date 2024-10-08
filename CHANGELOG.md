@@ -38,6 +38,16 @@ We've restructured this project! Since its early days as a simple Gradle convent
 
 - Introduce new required `foundry.android.defaultNamespacePrefix` property for android projects. This is necessary for projects that don't define an `android.namespace` explicitly.
 
+### Misc
+
+- Update Clikt to `5.0.1`.
+- Update oshi-core to `6.6.5`.
+- Build against DAGP 2.x.
+- Build against gradle-error-prone `4.0.1`.
+- Build against gradle-nullaway `2.0.0`.
+- Build against Gradle versions plugin `0.51.0`.
+- Build against Develocity plugin `3.18.1`.
+
 0.19.6
 ------
 
