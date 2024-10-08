@@ -153,9 +153,9 @@ internal object KgpTasks {
       project.tasks.withType(KaptGenerateStubsTask::class.java).configureEach {
         compilerOptions {
           val zipped =
-            foundryProperties.kotlinProgressive.zip(foundryProperties.kaptLanguageVersion) {
-              progressive,
-              kaptLanguageVersion ->
+            foundryProperties.kotlinProgressive.zip(
+              foundryProperties.kaptLanguageVersion.orElse(KotlinVersion.DEFAULT)
+            ) { progressive, kaptLanguageVersion ->
               if (kaptLanguageVersion != KotlinVersion.DEFAULT) {
                 false
               } else {
