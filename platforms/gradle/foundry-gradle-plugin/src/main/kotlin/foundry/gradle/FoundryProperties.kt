@@ -605,7 +605,8 @@ internal constructor(
 
   /** Specific toggle for validating manifests in androidTest sources. */
   public val strictValidateAndroidTestManifest: Boolean
-    get() = booleanProperty("foundry.strict.validateAndroidTestManifests", defaultValue = true)
+    get() =
+      booleanProperty("foundry.android.strict.validateAndroidTestManifests", defaultValue = true)
 
   /**
    * Always enables resources in android unit tests. Only present for benchmarking purposes and
