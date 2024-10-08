@@ -94,16 +94,15 @@ buildConfig {
   }
 }
 
-configurations
-  .configureEach {
-    // Do not bring in Material (we use Jewel)
-    exclude(group = "org.jetbrains.compose.material")
-    // Do not bring Coroutines or slf4j (the IDE has its own)
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
-    exclude(group = "org.slf4j")
-  }
+configurations.configureEach {
+  // Do not bring in Material (we use Jewel)
+  exclude(group = "org.jetbrains.compose.material")
+  // Do not bring Coroutines or slf4j (the IDE has its own)
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
+  exclude(group = "org.slf4j")
+}
 
 configurations
   .named { it.endsWith("ForLint") }

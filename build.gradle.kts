@@ -166,7 +166,9 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach { options.release.set(libs.versions.jvmTarget.map(String::toInt)) }
+    tasks.withType<JavaCompile>().configureEach {
+      options.release.set(libs.versions.jvmTarget.map(String::toInt))
+    }
   }
 
   val isForIntelliJPlugin =
