@@ -11,6 +11,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
 #### Migration Guide
 
 - Any **gradle properties** prefixed with `slack.` or `sgp.` have now moved to `foundry.`. `slack.gradle.` prefix have also removed the `gradle.` (i.e. `slack.gradle.foo` would now be `foundry.foo`).
+  - Some properties have been further refined to be more specific. Please look at `FoundryProperties` to see the full list.
 - Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
 - Gradle coordinates group have moved to the `com.slack.foundry` group name.
 
