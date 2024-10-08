@@ -86,7 +86,7 @@ internal constructor(
 
   /** Opt-out flag to skip the androidx dependency check. Should only be used for debugging. */
   public val skipAndroidxCheck: Boolean
-    get() = booleanProperty("foundry.skipAndroidXCheck")
+    get() = booleanProperty("foundry.android.skipAndroidXCheck")
 
   /** Version code used for debug APK outputs. */
   public val debugVersionCode: Int
@@ -127,15 +127,15 @@ internal constructor(
 
   /** Property corresponding to the supported languages in GA builds */
   public val supportedLanguages: String
-    get() = stringProperty("foundry.supportedLanguages")
+    get() = stringProperty("foundry.android.supportedLanguages")
 
   /** Property corresponding to the supported languages in Internal builds */
   public val supportedLanguagesInternal: String
-    get() = stringProperty("foundry.supportedLanguagesInternal")
+    get() = stringProperty("foundry.android.supportedLanguagesInternal")
 
   /** Property corresponding to the supported languages in Beta builds */
   public val supportedLanguagesBeta: String
-    get() = stringProperty("foundry.supportedLanguagesBeta")
+    get() = stringProperty("foundry.android.supportedLanguagesBeta")
 
   /**
    * Property corresponding to the file path of a custom versions.json file for use with
@@ -215,7 +215,7 @@ internal constructor(
    * source sets), we swap the application id suffix at configuration time.
    */
   public val usePrototypeAppId: Boolean
-    get() = presenceProperty("foundry.usePrototypeAppId")
+    get() = presenceProperty("foundry.android.usePrototypeAppId")
 
   /**
    * Property corresponding to the SDK versions we test in Robolectric tests. Its value should be a
@@ -223,11 +223,14 @@ internal constructor(
    */
   public val robolectricTestSdks: List<Int>
     get() =
-      stringProperty("foundry.robolectricTestSdks").splitToSequence(",").map { it.toInt() }.toList()
+      stringProperty("foundry.android.robolectric.testSdks")
+        .splitToSequence(",")
+        .map { it.toInt() }
+        .toList()
 
   /** Property corresponding to the preinstrumented jars version (the `-i2` suffix in jars). */
   public val robolectricIVersion: Int
-    get() = intProperty("foundry.robolectricIVersion")
+    get() = intProperty("foundry.android.robolectric.iVersion")
 
   /** Opt out for -Werror. */
   public val allowWarnings: Provider<Boolean>
@@ -257,7 +260,7 @@ internal constructor(
   public val anvilUseKspFork: Boolean
     get() = booleanProperty("foundry.anvil.useKspFork", defaultValue = false)
 
-  /** Log Slack extension configuration state verbosely. */
+  /** Log Foundry extension configuration state verbosely. */
   public val foundryExtensionVerbose: Boolean
     get() = booleanProperty("foundry.extension.verbose")
 
@@ -266,7 +269,7 @@ internal constructor(
    * being introduced to a new module or upgrading EP itself.
    */
   public val errorProneAutoPatch: Boolean
-    get() = booleanProperty("foundry.epAutoPatch")
+    get() = booleanProperty("foundry.errorprone.autoPatch")
 
   /**
    * Error-Prone checks that should be considered errors.
@@ -276,14 +279,14 @@ internal constructor(
    * Example: "AnnotationMirrorToString:AutoValueSubclassLeaked"
    */
   public val errorProneCheckNamesAsErrors: String?
-    get() = optionalStringProperty("foundry.epCheckNamesAsErrors")
+    get() = optionalStringProperty("foundry.errorprone.checkNamesAsErrors")
 
   /**
    * Flag for Nullaway baselining. When enabled along with [errorProneAutoPatch], existing
    * nullability issues will be baselined with a `castToNonNull` call to wrap it.
    */
   public val nullawayBaseline: Boolean
-    get() = booleanProperty("foundry.nullaway.baseline")
+    get() = booleanProperty("foundry.errorprone.nullaway.baseline")
 
   /**
    * Ndk version to use for android projects.
@@ -291,7 +294,7 @@ internal constructor(
    * Latest versions can be found at https://developer.android.com/ndk/downloads
    */
   public val ndkVersion: String?
-    get() = optionalStringProperty("foundry.ndkVersion")
+    get() = optionalStringProperty("foundry.android.ndkVersion")
 
   /**
    * Enables verbose logging in miscellaneous places of SGP. This is intended to be a less noisy
@@ -312,7 +315,7 @@ internal constructor(
    * See https://youtrack.jetbrains.com/issue/KT-29481#focus=Comments-27-4651462.0-0
    */
   public val enableKaptInTests: Boolean
-    get() = booleanProperty("foundry.enabled-kapt-in-tests")
+    get() = booleanProperty("foundry.kapt.enabled-in-tests")
 
   /** Flag to enable errors only in lint checks. */
   public val lintErrorsOnly: Boolean
@@ -354,12 +357,12 @@ internal constructor(
     get() = booleanProperty("foundry.lint.enableOnAndroidTestProjects", false)
 
   /** Flag to enable/disable KSP. */
-  public val allowKsp: Boolean
-    get() = booleanProperty("foundry.allow-ksp")
+  public val enableKsp: Boolean
+    get() = booleanProperty("foundry.ksp.enable")
 
   /** Flag to enable/disable Moshi-IR. */
-  public val allowMoshiIr: Boolean
-    get() = booleanProperty("foundry.allow-moshi-ir")
+  public val enableMoshiIr: Boolean
+    get() = booleanProperty("foundry.moshi.ir.enable")
 
   /** Flag to enable/disable moshi proguard rule gen. */
   public val moshixGenerateProguardRules: Boolean
@@ -375,7 +378,7 @@ internal constructor(
 
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
-    get() = optionalStringProperty("foundry.disabledVariants")
+    get() = optionalStringProperty("foundry.android.disabledVariants")
 
   /**
    * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
@@ -439,7 +442,7 @@ internal constructor(
 
   /** Flag for enabling test orchestrator. */
   public val useOrchestrator: Boolean
-    get() = booleanProperty("orchestrator")
+    get() = booleanProperty("foundry.android.test.orchestrator")
 
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
@@ -633,7 +636,7 @@ internal constructor(
 
   /** Experimental flag to enable logging thermal throttling on macOS devices. */
   public val logThermals: Boolean
-    get() = resolver.booleanValue("foundry.log-thermals", defaultValue = false)
+    get() = resolver.booleanValue("foundry.logging.thermals", defaultValue = false)
 
   /**
    * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
@@ -731,9 +734,9 @@ internal constructor(
     get() = resolver.booleanProvider("foundry.kotlin.progressive", defaultValue = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
-    val compileSdk = compileSdkVersion ?: error("foundry.compileSdkVersion not set")
-    val minSdk = minSdkVersion?.toInt() ?: error("foundry.minSdkVersion not set")
-    val targetSdk = targetSdkVersion?.toInt() ?: error("foundry.targetSdkVersion not set")
+    val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
+    val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
+    val targetSdk = targetSdkVersion?.toInt() ?: error("foundry.android.targetSdkVersion not set")
     return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
   }
 
@@ -744,16 +747,16 @@ internal constructor(
   )
 
   public val compileSdkVersion: String?
-    get() = optionalStringProperty("foundry.compileSdkVersion")
+    get() = optionalStringProperty("foundry.android.compileSdkVersion")
 
   public fun latestCompileSdkWithSources(defaultValue: Int): Int =
-    intProperty("foundry.latestCompileSdkWithSources", defaultValue = defaultValue)
+    intProperty("foundry.android.latestCompileSdkWithSources", defaultValue = defaultValue)
 
   private val minSdkVersion: String?
-    get() = optionalStringProperty("foundry.minSdkVersion")
+    get() = optionalStringProperty("foundry.android.minSdkVersion")
 
   private val targetSdkVersion: String?
-    get() = optionalStringProperty("foundry.targetSdkVersion")
+    get() = optionalStringProperty("foundry.android.targetSdkVersion")
 
   public companion object {
     /**
