@@ -40,6 +40,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
 
 ### Misc
 
+- **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
 - Update Clikt to `5.0.1`.
 - Update oshi-core to `6.6.5`.
 - Build against DAGP 2.x.
