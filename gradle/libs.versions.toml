@@ -35,7 +35,7 @@ slack-lint = "0.8.1"
 sortDependencies = "0.7"
 spotless = "7.0.0.BETA2"
 sqldelight = "2.0.2"
-versionsPlugin = "0.47.0"
+versionsPlugin = "0.51.0"
 wire = "5.1.0"
 xmlutil = "0.90.1"
 
