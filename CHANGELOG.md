@@ -27,7 +27,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
 - All other tools now live under the `tools/` directory.
 - Most top-level `Slack`-prefixed APIs are now prefixed with `Foundry`.
 - The primary gradle entry points are now `foundry {}`, but the previous `slack {}` entry points are left with deprecation `ReplaceWith` options.
-- Gradle plugin IDs have migrated to `foundry.*` names.
+- Gradle plugin IDs have migrated to `com.slack.foundry.*` names.
 
     | Old                               | New                                |
     |-----------------------------------|------------------------------------|
