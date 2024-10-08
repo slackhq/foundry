@@ -29,11 +29,11 @@ We've restructured this project! Since its early days as a simple Gradle convent
 - The primary gradle entry points are now `foundry {}`, but the previous `slack {}` entry points are left with deprecation `ReplaceWith` options.
 - Gradle plugin IDs have migrated to `foundry.*` names.
 
-    | Old                           | New                      |
-    |-------------------------------|--------------------------|
-    | `slack.gradle.root`           | `foundry.root`           |
-    | `slack.gradle.base`           | `foundry.base`           |
-    | `slack.gradle.apk-versioning` | `foundry.apk-versioning` |
+    | Old                               | New                                |
+    |-----------------------------------|------------------------------------|
+    | `com.slack.gradle.root`           | `com.slack.foundry.root`           |
+    | `com.slack.gradle.base`           | `com.slack.foundry.base`           |
+    | `com.slack.gradle.apk-versioning` | `com.slack.foundry.apk-versioning` |
 
 - Introduce new required `foundry.android.defaultNamespacePrefix` property for android projects. This is necessary for projects that don't define an `android.namespace` explicitly.
 

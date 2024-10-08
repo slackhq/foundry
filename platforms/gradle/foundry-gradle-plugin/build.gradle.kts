@@ -27,15 +27,15 @@ plugins {
 
 gradlePlugin {
   plugins.create("foundry-root") {
-    id = "foundry.root"
+    id = "com.slack.foundry.root"
     implementationClass = "foundry.gradle.FoundryRootPlugin"
   }
   plugins.create("foundry-base") {
-    id = "foundry.base"
+    id = "com.slack.foundry.base"
     implementationClass = "foundry.gradle.FoundryBasePlugin"
   }
   plugins.create("apkVersioning") {
-    id = "foundry.apk-versioning"
+    id = "com.slack.foundry.apk-versioning"
     implementationClass = "foundry.gradle.ApkVersioningPlugin"
   }
 }
