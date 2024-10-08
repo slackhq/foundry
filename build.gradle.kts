@@ -23,10 +23,10 @@ import dev.bmac.gradle.intellij.PluginUploader
 import dev.bmac.gradle.intellij.UploadPluginTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import java.net.URI
 import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
@@ -131,9 +131,20 @@ allprojects {
   }
 }
 
-tasks.dokkaHtmlMultiModule {
-  outputDirectory.set(rootDir.resolve("docs/api/0.x"))
-  includes.from(project.layout.projectDirectory.file("README.md"))
+dokka {
+  dokkaPublications.html {
+    outputDirectory.set(rootDir.resolve("docs/api/0.x"))
+    includes.from(project.layout.projectDirectory.file("README.md"))
+  }
+}
+
+dependencies {
+  dokka(projects.tools.cli)
+  dokka(projects.tools.foundryCommon)
+  dokka(projects.tools.skippy)
+  dokka(projects.tools.tracing)
+  dokka(projects.platforms.gradle.foundryGradlePlugin)
+  dokka(projects.platforms.gradle.agpHandlers.agpHandlerApi)
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
@@ -252,43 +263,37 @@ subprojects {
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")
 
-    tasks.withType<DokkaTaskPartial>().configureEach {
-      outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
+    configure<DokkaExtension> {
+      dokkaPublicationDirectory.set(layout.buildDirectory.dir("dokkaDir"))
       dokkaSourceSets.configureEach {
         val readMeProvider = project.layout.projectDirectory.file("README.md")
         if (readMeProvider.asFile.exists()) {
           includes.from(readMeProvider)
         }
+        documentedVisibilities.add(VisibilityModifier.Public)
         skipDeprecated.set(true)
         if (isForGradle) {
           // Gradle docs
-          externalDocumentationLink {
-            url.set(
-              URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL()
-            )
+          externalDocumentationLinks.register("Gradle") {
+            packageListUrl("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/element-list")
+            url("https://docs.gradle.org/${gradle.gradleVersion}/javadoc")
           }
           // AGP docs
-          externalDocumentationLink {
+          externalDocumentationLinks.register("AGP") {
             val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
             val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
-            packageListUrl.set(
-              URI(
-                  "https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list"
-                )
-                .toURL()
+            packageListUrl(
+              "https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list"
             )
-            url.set(
-              URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
-                .toURL()
-            )
+            url("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
           }
         }
         sourceLink {
-          localDirectory.set(layout.projectDirectory.dir("src").asFile)
+          localDirectory.set(layout.projectDirectory.dir("src"))
           val relPath = rootProject.projectDir.toPath().relativize(projectDir.toPath())
-          remoteUrl.set(
+          remoteUrl(
             providers.gradleProperty("POM_SCM_URL").map { scmUrl ->
-              URI("$scmUrl/tree/main/$relPath/src").toURL()
+              "$scmUrl/tree/main/$relPath/src"
             }
           )
           remoteLineSuffix.set("#L")
