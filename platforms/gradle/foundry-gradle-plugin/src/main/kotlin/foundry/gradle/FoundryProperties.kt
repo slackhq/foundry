@@ -70,7 +70,7 @@ internal constructor(
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
-    get() = booleanProperty("foundry.gradle.config.libraryWithVariants")
+    get() = booleanProperty("foundry.android.libraryWithVariants")
 
   /** Default namespace prefix for android proejcts if one isn't specified. */
   public val defaultNamespacePrefix: String
@@ -82,60 +82,60 @@ internal constructor(
    * is ignored.
    */
   public val versionsPluginAllowUnstable: Boolean
-    get() = booleanProperty("foundry.gradle.config.versionsPluginAllowUnstable")
+    get() = booleanProperty("foundry.versionsPlugin.allowUnstable")
 
   /** Opt-out flag to skip the androidx dependency check. Should only be used for debugging. */
   public val skipAndroidxCheck: Boolean
-    get() = booleanProperty("foundry.gradle.skipAndroidXCheck")
+    get() = booleanProperty("foundry.android.skipAndroidXCheck")
 
   /** Version code used for debug APK outputs. */
   public val debugVersionCode: Int
-    get() = intProperty("foundry.gradle.debugVersionCode", 90009999)
+    get() = intProperty("foundry.android.debugVersionCode", 90009999)
 
   /** User string used for debug APK outputs. */
   public val debugUserString: String
-    get() = stringProperty("foundry.gradle.debugUserString", "debug")
+    get() = stringProperty("foundry.android.debugUserString", "debug")
 
   /** Opt-in flag to enable snapshots repos, used for the dependencies build shadow job. */
   public val enableSnapshots: Boolean
-    get() = booleanProperty("foundry.gradle.config.enableSnapshots")
+    get() = booleanProperty("foundry.gradle.enableSnapshots")
 
   /** Opt-in flag to enable mavenLocal repos, used for local testing. */
   public val enableMavenLocal: Boolean
-    get() = booleanProperty("foundry.gradle.config.enableMavenLocal")
+    get() = booleanProperty("foundry.gradle.enableMavenLocal")
 
   /**
    * Flag to indicate that this project should have no api dependencies, such as if it's solely an
    * annotation processor.
    */
   public val rakeNoApi: Boolean
-    get() = booleanProperty("foundry.gradle.config.rake.noapi")
+    get() = booleanProperty("foundry.rake.noapi")
 
   /**
    * Flag to enable the Gradle Dependency Analysis Plugin, which is disabled by default due to
    * https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/204
    */
   public val enableAnalysisPlugin: Boolean
-    get() = booleanProperty("foundry.gradle.config.enableAnalysisPlugin")
+    get() = booleanProperty("foundry.enableAnalysisPlugin")
 
   /**
    * Flag to indicate this project should be exempted from platforms, usually platform projects
    * themselves.
    */
   public val noPlatform: Boolean
-    get() = booleanProperty("foundry.gradle.config.noPlatform")
+    get() = booleanProperty("foundry.config.noPlatform")
 
   /** Property corresponding to the supported languages in GA builds */
   public val supportedLanguages: String
-    get() = stringProperty("foundry.supportedLanguages")
+    get() = stringProperty("foundry.android.supportedLanguages")
 
   /** Property corresponding to the supported languages in Internal builds */
   public val supportedLanguagesInternal: String
-    get() = stringProperty("foundry.supportedLanguagesInternal")
+    get() = stringProperty("foundry.android.supportedLanguagesInternal")
 
   /** Property corresponding to the supported languages in Beta builds */
   public val supportedLanguagesBeta: String
-    get() = stringProperty("foundry.supportedLanguagesBeta")
+    get() = stringProperty("foundry.android.supportedLanguagesBeta")
 
   /**
    * Property corresponding to the file path of a custom versions.json file for use with
@@ -183,7 +183,8 @@ internal constructor(
    * Use a workaround for compose-compiler's `includeInformation` option on android projects.
    *
    * On android projects, the compose compiler gradle plugin annoyingly no-ops
-   * https://issuetracker.google.com/issues/362780328#comment4
+   *
+   * @see <a href="https://issuetracker.google.com/issues/362780328#comment4">Upstream issue</a>
    */
   public val composeUseIncludeInformationWorkaround: Boolean
     get() =
@@ -214,7 +215,7 @@ internal constructor(
    * source sets), we swap the application id suffix at configuration time.
    */
   public val usePrototypeAppId: Boolean
-    get() = presenceProperty("foundry.usePrototypeAppId")
+    get() = presenceProperty("foundry.android.usePrototypeAppId")
 
   /**
    * Property corresponding to the SDK versions we test in Robolectric tests. Its value should be a
@@ -222,11 +223,14 @@ internal constructor(
    */
   public val robolectricTestSdks: List<Int>
     get() =
-      stringProperty("foundry.robolectricTestSdks").splitToSequence(",").map { it.toInt() }.toList()
+      stringProperty("foundry.android.robolectric.testSdks")
+        .splitToSequence(",")
+        .map { it.toInt() }
+        .toList()
 
   /** Property corresponding to the preinstrumented jars version (the `-i2` suffix in jars). */
   public val robolectricIVersion: Int
-    get() = intProperty("foundry.robolectricIVersion")
+    get() = intProperty("foundry.android.robolectric.iVersion")
 
   /** Opt out for -Werror. */
   public val allowWarnings: Provider<Boolean>
@@ -256,7 +260,7 @@ internal constructor(
   public val anvilUseKspFork: Boolean
     get() = booleanProperty("foundry.anvil.useKspFork", defaultValue = false)
 
-  /** Log Slack extension configuration state verbosely. */
+  /** Log Foundry extension configuration state verbosely. */
   public val foundryExtensionVerbose: Boolean
     get() = booleanProperty("foundry.extension.verbose")
 
@@ -265,7 +269,7 @@ internal constructor(
    * being introduced to a new module or upgrading EP itself.
    */
   public val errorProneAutoPatch: Boolean
-    get() = booleanProperty("foundry.epAutoPatch")
+    get() = booleanProperty("foundry.errorprone.autoPatch")
 
   /**
    * Error-Prone checks that should be considered errors.
@@ -275,14 +279,14 @@ internal constructor(
    * Example: "AnnotationMirrorToString:AutoValueSubclassLeaked"
    */
   public val errorProneCheckNamesAsErrors: String?
-    get() = optionalStringProperty("foundry.epCheckNamesAsErrors")
+    get() = optionalStringProperty("foundry.errorprone.checkNamesAsErrors")
 
   /**
    * Flag for Nullaway baselining. When enabled along with [errorProneAutoPatch], existing
    * nullability issues will be baselined with a `castToNonNull` call to wrap it.
    */
   public val nullawayBaseline: Boolean
-    get() = booleanProperty("foundry.nullaway.baseline")
+    get() = booleanProperty("foundry.errorprone.nullaway.baseline")
 
   /**
    * Ndk version to use for android projects.
@@ -290,7 +294,7 @@ internal constructor(
    * Latest versions can be found at https://developer.android.com/ndk/downloads
    */
   public val ndkVersion: String?
-    get() = optionalStringProperty("foundry.ndkVersion")
+    get() = optionalStringProperty("foundry.android.ndkVersion")
 
   /**
    * Enables verbose logging in miscellaneous places of SGP. This is intended to be a less noisy
@@ -311,7 +315,7 @@ internal constructor(
    * See https://youtrack.jetbrains.com/issue/KT-29481#focus=Comments-27-4651462.0-0
    */
   public val enableKaptInTests: Boolean
-    get() = booleanProperty("foundry.enabled-kapt-in-tests")
+    get() = booleanProperty("foundry.kapt.enabled-in-tests")
 
   /** Flag to enable errors only in lint checks. */
   public val lintErrorsOnly: Boolean
@@ -353,12 +357,12 @@ internal constructor(
     get() = booleanProperty("foundry.lint.enableOnAndroidTestProjects", false)
 
   /** Flag to enable/disable KSP. */
-  public val allowKsp: Boolean
-    get() = booleanProperty("foundry.allow-ksp")
+  public val enableKsp: Boolean
+    get() = booleanProperty("foundry.ksp.enable")
 
   /** Flag to enable/disable Moshi-IR. */
-  public val allowMoshiIr: Boolean
-    get() = booleanProperty("foundry.allow-moshi-ir")
+  public val enableMoshiIr: Boolean
+    get() = booleanProperty("foundry.moshi.ir.enable")
 
   /** Flag to enable/disable moshi proguard rule gen. */
   public val moshixGenerateProguardRules: Boolean
@@ -374,7 +378,7 @@ internal constructor(
 
   /** Variants that should be disabled in a given subproject. */
   public val disabledVariants: String?
-    get() = optionalStringProperty("foundry.disabledVariants")
+    get() = optionalStringProperty("foundry.android.disabledVariants")
 
   /**
    * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
@@ -438,7 +442,7 @@ internal constructor(
 
   /** Flag for enabling test orchestrator. */
   public val useOrchestrator: Boolean
-    get() = booleanProperty("orchestrator")
+    get() = booleanProperty("foundry.android.test.orchestrator")
 
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
@@ -608,20 +612,19 @@ internal constructor(
    * should otherwise be off.
    */
   public val alwaysEnableResourcesInTests: Boolean
-    get() =
-      booleanProperty("foundry.gradle.config.test.alwaysEnableResources", defaultValue = false)
+    get() = booleanProperty("foundry.android.test.alwaysEnableResources", defaultValue = false)
 
   /** Global toggle to enable bugsnag. Note this still respects variant filters. */
   public val bugsnagEnabled: Provider<Boolean>
-    get() = resolver.booleanProvider("foundry.gradle.config.bugsnag.enabled")
+    get() = resolver.booleanProvider("foundry.android.bugsnag.enabled")
 
   /** Branch pattern for git branches Bugsnag should be enabled on. */
   public val bugsnagEnabledBranchPattern: Provider<String>
-    get() = resolver.optionalStringProvider("foundry.gradle.config.bugsnag.enabledBranchPattern")
+    get() = resolver.optionalStringProvider("foundry.android.bugsnag.enabledBranchPattern")
 
   /** Global boolean that controls whether mod score is enabled on this project. */
   public val modScoreGlobalEnabled: Boolean
-    get() = resolver.booleanValue("foundry.gradle.config.modscore.enabled")
+    get() = resolver.booleanValue("foundry.modscore.enabled")
 
   /**
    * Per-project boolean that allows for excluding this project from mod score.
@@ -629,11 +632,11 @@ internal constructor(
    * Note this should only be applied to projects that cannot be depended on.
    */
   public val modScoreIgnore: Boolean
-    get() = resolver.booleanValue("foundry.gradle.config.modscore.ignore")
+    get() = resolver.booleanValue("foundry.modscore.ignore")
 
   /** Experimental flag to enable logging thermal throttling on macOS devices. */
   public val logThermals: Boolean
-    get() = resolver.booleanValue("foundry.log-thermals", defaultValue = false)
+    get() = resolver.booleanValue("foundry.logging.thermals", defaultValue = false)
 
   /**
    * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
@@ -671,7 +674,7 @@ internal constructor(
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
-      resolver.optionalStringProvider("foundry.config.jvmVendor").map {
+      resolver.optionalStringProvider("foundry.jvm.vendor").map {
         if (jvmVendorOptOut) {
           sneakyNull()
         } else {
@@ -681,7 +684,7 @@ internal constructor(
 
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean
-    get() = booleanProperty("foundry.config.jvmVendor.optOut", defaultValue = false)
+    get() = booleanProperty("foundry.jvm.vendor.optOut", defaultValue = false)
 
   /**
    * Option to force a specific kotlin language version. By default defers to the KGP default the
@@ -731,9 +734,9 @@ internal constructor(
     get() = resolver.booleanProvider("foundry.kotlin.progressive", defaultValue = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
-    val compileSdk = compileSdkVersion ?: error("foundry.compileSdkVersion not set")
-    val minSdk = minSdkVersion?.toInt() ?: error("foundry.minSdkVersion not set")
-    val targetSdk = targetSdkVersion?.toInt() ?: error("foundry.targetSdkVersion not set")
+    val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
+    val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
+    val targetSdk = targetSdkVersion?.toInt() ?: error("foundry.android.targetSdkVersion not set")
     return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
   }
 
@@ -744,16 +747,16 @@ internal constructor(
   )
 
   public val compileSdkVersion: String?
-    get() = optionalStringProperty("foundry.compileSdkVersion")
+    get() = optionalStringProperty("foundry.android.compileSdkVersion")
 
   public fun latestCompileSdkWithSources(defaultValue: Int): Int =
-    intProperty("foundry.latestCompileSdkWithSources", defaultValue = defaultValue)
+    intProperty("foundry.android.latestCompileSdkWithSources", defaultValue = defaultValue)
 
   private val minSdkVersion: String?
-    get() = optionalStringProperty("foundry.minSdkVersion")
+    get() = optionalStringProperty("foundry.android.minSdkVersion")
 
   private val targetSdkVersion: String?
-    get() = optionalStringProperty("foundry.targetSdkVersion")
+    get() = optionalStringProperty("foundry.android.targetSdkVersion")
 
   public companion object {
     /**

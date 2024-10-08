@@ -104,8 +104,8 @@ constructor(
       var kaptRequired = false
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
-      val allowKsp = foundryProperties.allowKsp
-      val allowMoshiIr = foundryProperties.allowMoshiIr
+      val allowKsp = foundryProperties.enableKsp
+      val allowMoshiIr = foundryProperties.enableMoshiIr
       val anvilMode = foundryProperties.anvilMode
       val allowDaggerKsp = anvilMode.useKspContributionMerging && anvilMode.useDaggerKsp
 

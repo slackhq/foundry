@@ -1,17 +1,18 @@
 [versions]
 agp = "8.7.0"
-agpAlpha = "8.8.0-alpha04"
+agpAlpha = "8.8.0-alpha05"
 anvil = "2.5.0-beta11"
 bugsnagGradle = "8.1.0"
 circuit = "0.23.1"
 compose-jb = "1.7.0-rc01"
 compose-jb-stable = "1.6.11"
 coroutines = "1.9.0"
-dependencyAnalysisPlugin = "1.33.0"
+dependencyAnalysisPlugin = "2.1.4"
 detekt = "1.23.7"
 dokka = "1.9.20"
-errorproneGradle = "3.1.0"
+errorproneGradle = "4.0.1"
 gradle-retry = "1.6.0"
+graph-assert = "2.7.1"
 intellij-platform = "2.1.0"
 jdk = "22"
 jvmTarget = "17"
@@ -27,15 +28,15 @@ markdown = "0.26.0"
 mavenPublish = "0.29.0"
 moshi = "1.15.1"
 moshix = "0.28.0"
-nullawayGradle = "1.6.0"
+nullawayGradle = "2.0.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.1"
 retrofit = "2.11.0"
-slack-lint = "0.7.4"
+slack-lint = "0.8.1"
 sortDependencies = "0.7"
 spotless = "7.0.0.BETA2"
 sqldelight = "2.0.2"
-versionsPlugin = "0.47.0"
+versionsPlugin = "0.51.0"
 wire = "5.1.0"
 xmlutil = "0.90.1"
 
@@ -47,6 +48,7 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+graphAssert = { id = "com.jraska.module.graph.assertion", version.ref = "graph-assert" }
 intellij = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 intellij-settings = { id = "org.jetbrains.intellij.platform.settings", version.ref = "intellij-platform" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -72,7 +74,7 @@ agpAlpha = { module = "com.android.tools.build:gradle", version.ref = "agpAlpha"
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.2"
-clikt = "com.github.ajalt.clikt:clikt:5.0.0"
+clikt = "com.github.ajalt.clikt:clikt:5.0.1"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.12.0"
 composeLints = "com.slack.lint.compose:compose-lint-checks:1.4.1"
@@ -92,7 +94,7 @@ gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plu
 gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:3.18.1"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
-gradlePlugins-graphAssert = "com.jraska.module.graph.assertion:plugin:2.7.1"
+gradlePlugins-graphAssert = { module = "com.jraska.module.graph.assertion:plugin", version.ref = "graph-assert" }
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-kgp-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-ksp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }

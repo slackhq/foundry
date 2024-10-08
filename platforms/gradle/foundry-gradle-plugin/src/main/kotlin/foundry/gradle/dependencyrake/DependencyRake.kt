@@ -16,12 +16,12 @@
 package foundry.gradle.dependencyrake
 
 import com.autonomousapps.AbstractPostProcessingTask
-import com.autonomousapps.advice.PluginAdvice
 import com.autonomousapps.model.Advice
 import com.autonomousapps.model.Coordinates
 import com.autonomousapps.model.FlatCoordinates
 import com.autonomousapps.model.IncludedBuildCoordinates
 import com.autonomousapps.model.ModuleCoordinates
+import com.autonomousapps.model.PluginAdvice
 import com.autonomousapps.model.ProjectCoordinates
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.artifacts.SgpArtifact
