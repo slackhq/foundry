@@ -56,6 +56,7 @@ plugins {
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
   alias(libs.plugins.binaryCompatibilityValidator)
+  alias(libs.plugins.graphAssert)
 }
 
 apiValidation {
@@ -74,6 +75,18 @@ apiValidation {
       "skippy",
       "tracing",
     )
+}
+
+moduleGraphAssert {
+  // Platforms can depend on tools but not the other way around
+  allowed =
+    arrayOf(
+      ":platforms.* -> :tools.*",
+      ":platforms:gradle.* -> :platforms:gradle.*",
+      ":platforms:intellij.* -> :platforms:intellij.*",
+      ":tools.* -> :tools.*",
+    )
+  configurations = setOf("api", "implementation")
 }
 
 configure<DetektExtension> {
