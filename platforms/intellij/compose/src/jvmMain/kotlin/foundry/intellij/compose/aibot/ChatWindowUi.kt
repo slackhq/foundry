@@ -71,7 +71,10 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
       }
     }
     if (state.isLoading) {
-      //       insert loading animation
+      LoadingAnimation(
+        modifier = Modifier
+          .padding(15.dp),
+      )
     }
     ConversationField(
       isLoading = state.isLoading,
