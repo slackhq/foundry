@@ -130,7 +130,7 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
 
   var devxpAPIlink: String?
     get() = state.devxpAPIlink
-    set(value){
+    set(value) {
       state.devxpAPIlink = value
     }
 

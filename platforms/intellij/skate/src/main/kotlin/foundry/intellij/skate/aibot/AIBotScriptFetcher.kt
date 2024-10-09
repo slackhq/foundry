@@ -39,19 +39,19 @@ class AIBotScriptFetcher(
     }
   }
 
-  fun getAIBotAPI() : String? {
+  fun getAIBotAPI(): String? {
     val aiBotAPILink = settings.devxpAPIlink
     return aiBotAPILink
-    }
   }
+}
 
-  private fun printScriptContent(scriptPath: Path) {
-    try {
-      println("Script content:")
-      println("--------------------")
-      Files.readAllLines(scriptPath).forEach { println(it) }
-      println("--------------------")
-    } catch (e: Exception) {
-      println("Error reading script content: ${e.message}")
-    }
+private fun printScriptContent(scriptPath: Path) {
+  try {
+    println("Script content:")
+    println("--------------------")
+    Files.readAllLines(scriptPath).forEach { println(it) }
+    println("--------------------")
+  } catch (e: Exception) {
+    println("Error reading script content: ${e.message}")
   }
+}

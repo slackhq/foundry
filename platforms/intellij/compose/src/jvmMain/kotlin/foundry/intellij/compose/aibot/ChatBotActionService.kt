@@ -17,25 +17,17 @@ package slack.tooling.aibot
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.JsonParseException
-import com.google.gson.JsonSyntaxException
 import foundry.intellij.compose.aibot.Message
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
-import java.io.File
 
-class ChatBotActionService(
-  private val scriptPath: Path,
-  private val apiLink: String
-) {
+class ChatBotActionService(private val scriptPath: Path, private val apiLink: String) {
   suspend fun executeCommand(question: String): String {
     val jsonInput = createJsonInput(question)
     val authInfo = getAuthInfo(scriptPath)
@@ -135,7 +127,8 @@ class ChatBotActionService(
             -H "User-Agent: $userAgent" \
             -H "Cookie: $cookies" \
             -d '$jsonInput'
-    """.trimIndent()
+    """
+      .trimIndent()
   }
 
   private suspend fun createTempScript(scriptContent: String): File {
