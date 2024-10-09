@@ -28,7 +28,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import foundry.intellij.skate.SkatePluginSettings
 import foundry.intellij.skate.modeltranslator.model.TranslatorBundle
 import foundry.intellij.skate.util.snakeToCamelCase
-import org.jetbrains.kotlin.idea.quickfix.createFromUsage.callableBuilder.getReturnTypeReference
+import org.jetbrains.kotlin.idea.base.psi.getReturnTypeReferences
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtConstructorCalleeExpression
 import org.jetbrains.kotlin.psi.KtImportDirective
@@ -94,7 +94,7 @@ object TranslatorHelper {
 
       // If the function doesn't have a return type, then it can't be a translator and no need to
       // process it.
-      val destinationModelRef = element.getReturnTypeReference()
+      val destinationModelRef = element.getReturnTypeReferences().firstOrNull()
       val destinationModel = destinationModelRef?.text ?: return null
 
       // If the source model is a String and the destination isn't an enum,

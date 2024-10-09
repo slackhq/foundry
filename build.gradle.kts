@@ -59,6 +59,16 @@ plugins {
   alias(libs.plugins.graphAssert)
 }
 
+buildscript {
+  dependencies {
+    // Apply boms for buildscript classpath
+    classpath(platform(libs.asm.bom))
+    classpath(platform(libs.kotlin.bom))
+    classpath(platform(libs.coroutines.bom))
+    classpath(platform(libs.kotlin.gradlePlugins.bom))
+  }
+}
+
 apiValidation {
   // only :tools:cli is tracking this right now
   // Annoyingly this only uses simple names
@@ -169,7 +179,9 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
+    tasks.withType<JavaCompile>().configureEach {
+      options.release.set(libs.versions.jvmTarget.map(String::toInt))
+    }
   }
 
   val isForIntelliJPlugin =
@@ -221,19 +233,10 @@ subprojects {
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
-          // (@NotNull T
-          // => T & Any)
+          // (@NotNull T => T & Any)
           "-Xenhance-type-parameter-types-to-def-not-null",
-          // Use fast implementation on Jar FS. This may speed up compilation time, but currently
-          // it's
-          // an experimental mode
-          // TODO toe-hold but we can't use it yet because it emits a warning that fails with
-          // -Werror
-          //  https://youtrack.jetbrains.com/issue/KT-54928
-          //    "-Xuse-fast-jar-file-system",
           // Support inferring type arguments based on only self upper bounds of the corresponding
-          // type
-          // parameters
+          // type parameters
           "-Xself-upper-bound-inference",
           "-Xjsr305=strict",
           // Match JVM assertion behavior:
@@ -349,7 +352,7 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.1.2") }
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.1") }
       }
 
       if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
