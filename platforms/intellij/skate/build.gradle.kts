@@ -95,9 +95,8 @@ buildConfig {
 }
 
 // TODO reconcile exclusions and this by figuring out which configurations need to exclude
-// coroutines
+//  coroutines. https://youtrack.jetbrains.com/issue/IJPL-163489
 configurations.configureEach {
-  logger.lifecycle(name)
   // Do not bring in Material (we use Jewel)
   exclude(group = "org.jetbrains.compose.material")
   // Do not bring Coroutines or slf4j (the IDE has its own)
