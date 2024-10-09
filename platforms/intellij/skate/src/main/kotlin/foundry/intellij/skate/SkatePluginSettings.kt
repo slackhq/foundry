@@ -128,6 +128,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.devxpAPIcall = value
     }
 
+  var devxpAPIlink: String?
+    get() = state.devxpAPIlink
+    set(value){
+      state.devxpAPIlink = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -144,5 +150,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var codeOwnerFilePath by string()
     var isCodeOwnerEnabled by property(true)
     var devxpAPIcall by string()
+    var devxpAPIlink by string()
   }
 }

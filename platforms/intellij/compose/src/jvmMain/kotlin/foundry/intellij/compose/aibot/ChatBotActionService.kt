@@ -17,20 +17,47 @@ package slack.tooling.aibot
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.JsonParseException
 import com.google.gson.JsonSyntaxException
 import foundry.intellij.compose.aibot.Message
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 import org.jetbrains.annotations.VisibleForTesting
+import java.io.File
 
-class ChatBotActionService(private val scriptPath: Path) {
-  fun executeCommand(question: String): String {
+class ChatBotActionService(
+  private val scriptPath: Path,
+  private val apiLink: String
+) {
+  suspend fun executeCommand(question: String): String {
     val jsonInput = createJsonInput(question)
-    val output = runScript(Paths.get(scriptPath.toString()), jsonInput)
-    val parsedOutput = parseOutput(output)
+    val authInfo = getAuthInfo(scriptPath)
+    println("authInfo $authInfo")
+    val (userAgent, cookies) = parseAuthJson(authInfo)
+
+    val scriptContent = createScriptContent(userAgent, cookies, jsonInput)
+
+    val tempScript = createTempScript(scriptContent)
+
+    val response = runScript(tempScript)
+
+    println("User Agent: $userAgent")
+    println("Cookies: $cookies")
+
+    println("authInfo $authInfo")
+    println("scriptContent $scriptContent")
+
+    println("Response from API: $response")
+
+    val parsedOutput = parseOutput(response)
+
     return parsedOutput
   }
 
@@ -52,8 +79,8 @@ class ChatBotActionService(private val scriptPath: Path) {
   }
 
   @VisibleForTesting
-  private fun runScript(scriptPath: Path, jsonInput: String): String {
-    val processBuilder = ProcessBuilder("/bin/bash", scriptPath.toString(), jsonInput)
+  private fun getAuthInfo(scriptPath: Path): String {
+    val processBuilder = ProcessBuilder("/bin/bash", scriptPath.toString())
     processBuilder.redirectErrorStream(true)
 
     val process = processBuilder.start()
@@ -73,48 +100,89 @@ class ChatBotActionService(private val scriptPath: Path) {
       throw RuntimeException("Process timed out after 600 seconds")
     }
 
-    return output.toString().trim()
+    val jsonStartIndex = output.indexOf("{")
+    return if (jsonStartIndex != -1) {
+      output.substring(jsonStartIndex).trim()
+    } else {
+      throw IllegalArgumentException("No valid JSON found in output")
+    }
+  }
+
+  private fun parseAuthJson(authJsonString: String): Pair<String, String> {
+    val gson = Gson()
+    val authJson = gson.fromJson(authJsonString, JsonObject::class.java)
+
+    println("authJson $authJson")
+    println("Parsed AuthJson: $authJson")
+
+    val userAgent = authJson.get("user-agent")?.asString ?: "unknown"
+    val machineCookie = authJson.get("machine-cookie")?.asString ?: "unknown"
+    val slauthSession = authJson.get("slauth-session")?.asString ?: "unknown"
+    val tsa2 = authJson.get("tsa2")?.asString ?: "unknown"
+
+    val cookies = "machine-cookie=$machineCookie; slauth-session=$slauthSession; tsa2=$tsa2"
+
+    println("User Agent: $userAgent")
+    println("cookies $cookies")
+    return Pair(userAgent, cookies)
+  }
+
+  private fun createScriptContent(userAgent: String, cookies: String, jsonInput: String): String {
+    return """
+        #!/bin/bash
+        curl -s -X POST $apiLink \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: $userAgent" \
+            -H "Cookie: $cookies" \
+            -d '$jsonInput'
+    """.trimIndent()
+  }
+
+  private suspend fun createTempScript(scriptContent: String): File {
+    return withContext(Dispatchers.IO) {
+      val tempScript = File.createTempFile("run_command", ".sh")
+      tempScript.writeText(scriptContent)
+      tempScript.setExecutable(true)
+      tempScript
+    }
+  }
+
+  private fun runScript(tempScript: File): String {
+    val processBuilder = ProcessBuilder("/bin/bash", tempScript.absolutePath)
+    processBuilder.redirectErrorStream(true)
+
+    val process = processBuilder.start()
+    val output = StringBuilder()
+
+    BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
+      var line: String?
+      while (reader.readLine().also { line = it } != null) {
+        output.append(line).append("\n")
+      }
+    }
+
+    val completed = process.waitFor(600, TimeUnit.SECONDS)
+    if (!completed) {
+      process.destroyForcibly()
+      throw RuntimeException("Process timed out after 600 seconds")
+    }
+
+    tempScript.delete()
+    return output.toString()
   }
 
   @VisibleForTesting
   private fun parseOutput(output: String): String {
-    println("parseOutput beginning: $output")
+    println("output: $output")
     val regex = """\{.*\}""".toRegex(RegexOption.DOT_MATCHES_ALL)
     val result = regex.find(output)?.value ?: "{}"
-    println("parse Output $result")
-
     val gson = Gson()
+    val jsonObject = gson.fromJson(result, JsonObject::class.java)
+    val contentArray = jsonObject.getAsJsonArray("content")
+    val contentObject = contentArray.get(0).asJsonObject
+    val actualContent = contentObject.get("content").asString
 
-    val jsonStrings = result.trim().split("\n")
-
-    var foundFirst = false
-    var secondJsonObject: JsonObject? = null
-
-    for (json in jsonStrings) {
-      if (json.trim().startsWith("{") && json.trim().endsWith("}")) {
-        try {
-          if (foundFirst) {
-            secondJsonObject = gson.fromJson(json, JsonObject::class.java)
-            break
-          }
-          foundFirst = true
-        } catch (e: JsonSyntaxException) {
-          println("Invalid JSON: ${e.message}")
-        }
-      }
-    }
-
-    var actualContent = ""
-    secondJsonObject?.let { jsonObject ->
-      val contentArray = jsonObject.getAsJsonArray("content")
-      if (contentArray.size() > 0) {
-        val contentObject = contentArray[0].asJsonObject
-        actualContent = contentObject.get("content").asString
-        println("Actual content: $actualContent")
-      } else {
-        println("Content array is empty.")
-      }
-    } ?: println("No valid second JSON object found.")
+    println("actual content $actualContent")
 
     return actualContent
   }

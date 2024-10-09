@@ -202,6 +202,13 @@ internal class SkateConfigUI(
         setter = { settings.devxpAPIcall = it },
         errorMessageKey = "skate.configuration.aiBotSettings.error",
       )
+
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.aiBotLink.title",
+        getter = { settings.devxpAPIlink },
+        setter = { settings.devxpAPIlink = it },
+        errorMessageKey = "skate.configuration.aiBotSettings.error",
+      )
     }
   }
 }

@@ -32,14 +32,15 @@ class ChatBotToolWindow : ToolWindowFactory {
     toolWindow.contentManager.addContent(content)
   }
 
-  private fun createComposePanel(project: Project): JComponent {
+  private fun createComposePanel(project: Project): JComponent? {
     val settings = project.service<SkatePluginSettings>()
     val aiBotScriptSetting = settings.devxpAPIcall
     println("aiBotScriptSetting in ChatBotToolWindow $aiBotScriptSetting")
     val scriptFetcher = AIBotScriptFetcher(project)
     println("AIBotScriptFetcher $scriptFetcher")
     val scriptPath = scriptFetcher.getAIBotScript()
+    val apiLink = scriptFetcher.getAIBotAPI()
     println("Printing script path $scriptPath")
-    return ChatPanel.createPanel(scriptPath)
+    return apiLink?.let { ChatPanel.createPanel(scriptPath, it) }
   }
 }

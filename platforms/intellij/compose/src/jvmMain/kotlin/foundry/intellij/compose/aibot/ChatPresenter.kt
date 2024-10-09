@@ -27,10 +27,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import slack.tooling.aibot.ChatBotActionService
 
-class ChatPresenter(private val scriptPath: Path) : Presenter<ChatScreen.State> {
+class ChatPresenter(private val scriptPath: Path, apiLink: String) : Presenter<ChatScreen.State> {
   val user = "user"
   val bot = "bot"
-  private val chatBotActionService = ChatBotActionService(scriptPath)
+  private val chatBotActionService = ChatBotActionService(scriptPath, apiLink)
 
   @Composable
   override fun present(): ChatScreen.State {

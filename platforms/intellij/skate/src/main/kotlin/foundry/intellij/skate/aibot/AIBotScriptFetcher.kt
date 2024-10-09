@@ -25,9 +25,9 @@ class AIBotScriptFetcher(
   private val project: Project,
   private val basePath: String = project.basePath ?: "",
 ) {
+  val settings = project.service<SkatePluginSettings>()
 
   fun getAIBotScript(): Path {
-    val settings = project.service<SkatePluginSettings>()
     val aiBotScriptSetting = settings.devxpAPIcall
     println("aiBotScriptSetting $aiBotScriptSetting")
 
@@ -36,6 +36,12 @@ class AIBotScriptFetcher(
       println("getAIBotScript path location: ${path.toAbsolutePath()}")
       println(printScriptContent(path))
       path
+    }
+  }
+
+  fun getAIBotAPI() : String? {
+    val aiBotAPILink = settings.devxpAPIlink
+    return aiBotAPILink
     }
   }
 
@@ -49,4 +55,3 @@ class AIBotScriptFetcher(
       println("Error reading script content: ${e.message}")
     }
   }
-}

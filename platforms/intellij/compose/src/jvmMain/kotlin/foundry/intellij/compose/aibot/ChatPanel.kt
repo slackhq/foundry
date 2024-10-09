@@ -26,20 +26,20 @@ import javax.swing.JComponent
 import foundry.intellij.compose.projectgen.FoundryDesktopTheme
 
 object ChatPanel {
-  fun createPanel(scriptPath: Path): JComponent {
+  fun createPanel(scriptPath: Path, apiLink: String): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
-      setContent { FoundryDesktopTheme { ChatApp(scriptPath) } }
+      setContent { FoundryDesktopTheme { ChatApp(scriptPath, apiLink) } }
     }
   }
 
   @Composable
-  private fun ChatApp(scriptPath: Path) {
+  private fun ChatApp(scriptPath: Path, apiLink: String) {
     println("ChatApp Script Path $scriptPath")
     println("ChatApp Script Path absolutely ${scriptPath.toAbsolutePath()}")
     val circuit = remember {
       Circuit.Builder()
-        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter(scriptPath))
+        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter(scriptPath, apiLink))
         .addUi<ChatScreen, ChatScreen.State> { state, modifier -> ChatWindowUi(state, modifier) }
         .build()
     }
