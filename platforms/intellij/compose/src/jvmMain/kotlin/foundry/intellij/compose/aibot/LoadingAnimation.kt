@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package foundry.intellij.compose.aibot
 
 import androidx.compose.animation.core.Animatable
@@ -27,45 +42,46 @@ import org.jetbrains.jewel.foundation.theme.JewelTheme
 
 @Composable
 fun LoadingAnimation(
-    modifier: Modifier = Modifier,
-    dotSize: Dp = 7.dp,
-    dotColor: Color = JewelTheme.contentColor,
-    spacing: Dp = 7.dp,
-    movementDistance: Dp = 10.dp,
+  modifier: Modifier = Modifier,
+  dotSize: Dp = 7.dp,
+  dotColor: Color = JewelTheme.contentColor,
+  spacing: Dp = 7.dp,
+  movementDistance: Dp = 10.dp,
 ) {
-    val animatedDots = List(4) { remember { Animatable(0f) } }
+  val animatedDots = List(4) { remember { Animatable(0f) } }
 
-    animatedDots.forEachIndexed { index, dot ->
-        LaunchedEffect(dot) {
-            delay(index * 100L)
-            dot.animateTo(
-                targetValue = 1f,
-                animationSpec =
-                infiniteRepeatable(
-                    animation =
-                    keyframes {
-                        durationMillis = 1200
-                        0.0f at 0 using LinearOutSlowInEasing
-                        1.0f at 300 using LinearOutSlowInEasing
-                        0.0f at 600 using LinearOutSlowInEasing
-                        0.0f at 1200 using LinearOutSlowInEasing
-                    },
-                    repeatMode = RepeatMode.Restart,
-                ),
-            )
-        }
+  animatedDots.forEachIndexed { index, dot ->
+    LaunchedEffect(dot) {
+      delay(index * 100L)
+      dot.animateTo(
+        targetValue = 1f,
+        animationSpec =
+          infiniteRepeatable(
+            animation =
+              keyframes {
+                durationMillis = 1200
+                0.0f at 0 using LinearOutSlowInEasing
+                1.0f at 300 using LinearOutSlowInEasing
+                0.0f at 600 using LinearOutSlowInEasing
+                0.0f at 1200 using LinearOutSlowInEasing
+              },
+            repeatMode = RepeatMode.Restart,
+          ),
+      )
     }
+  }
 
-    val animatedValues = animatedDots.map { it.value }
-    val pixelDistance = with(LocalDensity.current) { movementDistance.toPx() }
+  val animatedValues = animatedDots.map { it.value }
+  val pixelDistance = with(LocalDensity.current) { movementDistance.toPx() }
 
-    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
-        animatedValues.forEach { value ->
-            Box(
-                modifier = Modifier.size(dotSize)
-                    .graphicsLayer { translationY = -value * pixelDistance }
-                    .background(color = dotColor, shape = CircleShape)
-            )
-        }
+  Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
+    animatedValues.forEach { value ->
+      Box(
+        modifier =
+          Modifier.size(dotSize)
+            .graphicsLayer { translationY = -value * pixelDistance }
+            .background(color = dotColor, shape = CircleShape)
+      )
     }
+  }
 }

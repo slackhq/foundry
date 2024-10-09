@@ -16,13 +16,11 @@
 package foundry.intellij.compose.aibot
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
-import kotlinx.coroutines.delay
 
 class ChatPresenter : Presenter<ChatScreen.State> {
   @Composable
@@ -38,7 +36,7 @@ class ChatPresenter : Presenter<ChatScreen.State> {
           isLoading = true
           val response = Message(callApi(event.message), isMe = false)
           messages = messages + response
-//          isLoading = false commented out to test loading animation
+          //          isLoading = false commented out to test loading animation
         }
       }
     }
