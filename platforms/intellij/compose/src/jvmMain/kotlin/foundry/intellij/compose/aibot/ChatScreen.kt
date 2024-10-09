@@ -23,9 +23,8 @@ object ChatScreen : Screen {
   data class State(
     val messages: List<Message>,
     val isLoading: Boolean,
-    val eventSink: (Event) -> Unit = {}
-  ) :
-    CircuitUiState
+    val eventSink: (Event) -> Unit = {},
+  ) : CircuitUiState
 
   sealed class Event : CircuitUiEvent {
     data class SendMessage(val message: String) : Event()

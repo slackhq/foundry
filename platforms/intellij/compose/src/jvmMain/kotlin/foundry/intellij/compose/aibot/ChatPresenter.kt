@@ -20,25 +20,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import com.slack.circuit.runtime.presenter.Presenter
-import kotlinx.coroutines.runBlocking
 
 class ChatPresenter : Presenter<ChatScreen.State> {
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
-      var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     return ChatScreen.State(messages = messages, isLoading = isLoading) { event ->
       when (event) {
         is ChatScreen.Event.SendMessage -> {
           val newMessage = Message(event.message, isMe = true)
           messages = messages + newMessage
-            isLoading = true
+          isLoading = true
           val response = Message(callApi(event.message), isMe = false)
           messages = messages + response
-            isLoading = false
+          isLoading = false
         }
       }
     }
