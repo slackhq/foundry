@@ -11,7 +11,13 @@ We've restructured this project! Since its early days as a simple Gradle convent
 #### Migration Guide
 
 - Any **gradle properties** prefixed with `slack.` or `sgp.` have now moved to `foundry.`. `slack.gradle.` prefix have also removed the `gradle.` (i.e. `slack.gradle.foo` would now be `foundry.foo`).
-  - Some properties have been further refined to be more specific. Please look at `FoundryProperties` to see the full list.
+  - `SlackProperties` has been renamed to `FoundryProperties`.
+  - Some properties have been further refined to be more specific.
+  - There is a helper script you can use to automatically rename all properties in `foundry-migration/`.
+    - Download `mapping.txt`
+    - Download `property_migration.sh`
+    - Run `./property_migration.sh mapping.txt <path to target project>`.
+
 - Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
 - Gradle coordinates group have moved to the `com.slack.foundry` group name.
 
@@ -37,6 +43,17 @@ We've restructured this project! Since its early days as a simple Gradle convent
     | `com.slack.gradle.apk-versioning` | `com.slack.foundry.apk-versioning` |
 
 - Introduce new required `foundry.android.defaultNamespacePrefix` property for android projects. This is necessary for projects that don't define an `android.namespace` explicitly.
+
+### Misc
+
+- **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
+- Update Clikt to `5.0.1`.
+- Update oshi-core to `6.6.5`.
+- Build against DAGP 2.x.
+- Build against gradle-error-prone `4.0.1`.
+- Build against gradle-nullaway `2.0.0`.
+- Build against Gradle versions plugin `0.51.0`.
+- Build against Develocity plugin `3.18.1`.
 
 0.19.6
 ------
