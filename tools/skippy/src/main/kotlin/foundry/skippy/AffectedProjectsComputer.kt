@@ -17,6 +17,7 @@ package foundry.skippy
 
 import foundry.common.FoundryLogger
 import foundry.common.filterToSet
+import foundry.common.mapToSet
 import foundry.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlin.time.measureTimedValue
 import okio.FileSystem
@@ -149,13 +150,21 @@ public class AffectedProjectsComputer(
 
     val nearestProjectCache = mutableMapOf<Path, Path?>()
 
+    // Track deleted build files so we can indicate if a project _did_ exist
+    val deletedBuildFiles =
+      filteredChangedFilePaths
+        .filter { path -> path.name.startsWith("build.gradle") && !path.exists() }
+        .mapToSet(rootDirPath::resolve)
+
     // Mapping of Gradle project paths (like ":app") to the ChangedProject representation.
     val changedProjects =
       logTimedValue("computing changed projects") {
         filteredChangedFilePaths
           .groupBy {
             // We need the full path here in order to resolve file attributes correctly
-            rootDirPath.resolve(it).findNearestProjectDir(rootDirPath, nearestProjectCache)
+            rootDirPath
+              .resolve(it)
+              .findNearestProjectDir(rootDirPath, deletedBuildFiles, nearestProjectCache)
           }
           .filterNotNullKeys()
           .entries
@@ -233,8 +242,11 @@ public class AffectedProjectsComputer(
    * `/Users/username/projects/MyApp/app/src/main/kotlin/com/example/myapp/MainActivity.kt`, returns
    * the nearest Gradle project [Path] like `/Users/username/projects/MyApp/app`.
    */
-  private fun Path.findNearestProjectDir(repoRoot: Path, cache: MutableMap<Path, Path?>): Path? {
-    // TODO how can we check if the file was part of a deleted project?
+  private fun Path.findNearestProjectDir(
+    repoRoot: Path,
+    deletedBuildFiles: Set<Path>,
+    cache: MutableMap<Path, Path?>,
+  ): Path? {
     val currentDir =
       when {
         !exists() -> {
@@ -253,7 +265,7 @@ public class AffectedProjectsComputer(
         isDirectory() -> this
         else -> error("Unsupported file type: $this")
       }
-    return findNearestProjectDirRecursive(repoRoot, this, currentDir, cache)
+    return findNearestProjectDirRecursive(repoRoot, this, currentDir, deletedBuildFiles, cache)
   }
 
   private fun Path.isRegularFile(): Boolean = fileSystem.metadataOrNull(this)?.isRegularFile == true
@@ -266,21 +278,30 @@ public class AffectedProjectsComputer(
     repoRoot: Path,
     originalPath: Path,
     currentDir: Path?,
+    deletedBuildFiles: Set<Path>,
     cache: MutableMap<Path, Path?>,
   ): Path? {
     if (currentDir == null || currentDir == repoRoot) {
       error("Could not find build.gradle(.kts) for $originalPath")
     }
 
+    fun Path.existsOrWasDeleted() = exists() || this in deletedBuildFiles
+
     return cache.getOrPut(currentDir) {
       // Note the dir may not exist, but that's ok because we still want to check its parents
-      val hasBuildFile =
-        currentDir.resolve("build.gradle.kts").exists() ||
-          currentDir.resolve("build.gradle").exists()
-      if (hasBuildFile) {
+      var hasOrHadBuildFile =
+        currentDir.resolve("build.gradle.kts").existsOrWasDeleted() ||
+          currentDir.resolve("build.gradle").existsOrWasDeleted()
+      if (hasOrHadBuildFile) {
         return currentDir
       }
-      findNearestProjectDirRecursive(repoRoot, originalPath, currentDir.parent, cache)
+      findNearestProjectDirRecursive(
+        repoRoot,
+        originalPath,
+        currentDir.parent,
+        deletedBuildFiles,
+        cache,
+      )
     }
   }
 
