@@ -74,7 +74,7 @@ fun readGitRepoCommit(): String? {
     }
 
     return headFile.readText(Charsets.UTF_8).trim().takeIf { isGitHash(it) }
-  } catch (e: Exception) {
+  } catch (_: Exception) {
     return null
   }
 }
@@ -94,7 +94,17 @@ buildConfig {
   }
 }
 
+// TODO reconcile exclusions and this by figuring out which configurations need to exclude
+// coroutines
 configurations.configureEach {
+  logger.lifecycle(name)
+  // Do not bring in Material (we use Jewel)
+  exclude(group = "org.jetbrains.compose.material")
+  // Do not bring Coroutines or slf4j (the IDE has its own)
+  exclude(group = "org.slf4j")
+}
+
+val exclusions: Action<ModuleDependency> = Action {
   // Do not bring in Material (we use Jewel)
   exclude(group = "org.jetbrains.compose.material")
   // Do not bring Coroutines or slf4j (the IDE has its own)
@@ -111,14 +121,16 @@ configurations
 dependencies {
   lintChecks(libs.composeLints)
 
-  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  compileOnly(libs.coroutines.core.ij)
+
+  implementation(libs.bugsnag)
   implementation(libs.okio)
   implementation(libs.kaml)
   implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.platforms.intellij.compose)
-  implementation(projects.tools.tracing)
+  implementation(projects.platforms.intellij.compose, exclusions)
+  implementation(projects.tools.tracing, exclusions)
 
   intellijPlatform {
     // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
