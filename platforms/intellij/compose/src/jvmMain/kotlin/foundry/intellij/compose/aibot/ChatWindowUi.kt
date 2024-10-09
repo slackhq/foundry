@@ -74,18 +74,18 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
       //       insert loading animation
     }
     ConversationField(
+      isLoading = state.isLoading,
       modifier = Modifier,
       onSendMessage = { userMessage -> state.eventSink(ChatScreen.Event.SendMessage(userMessage)) },
-      isLoading = state.isLoading,
     )
   }
 }
 
 @Composable
 private fun ConversationField(
+  isLoading: Boolean,
   modifier: Modifier = Modifier,
   onSendMessage: (String) -> Unit,
-  isLoading: Boolean,
 ) {
   val textState by remember { mutableStateOf(TextFieldState()) }
   val isTextNotEmpty = textState.text.isNotBlank()
