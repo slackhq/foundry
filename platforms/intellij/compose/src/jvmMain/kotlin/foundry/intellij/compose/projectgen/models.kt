@@ -16,7 +16,14 @@
 package foundry.intellij.compose.projectgen
 
 import com.squareup.kotlinpoet.FileSpec
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.bufferedWriter
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createFile
+import kotlin.io.path.exists
+import kotlin.io.path.name
+import kotlin.io.path.readLines
+import kotlin.io.path.writeText
 
 internal data class Project(
   // Gradle path
@@ -26,13 +33,14 @@ internal data class Project(
   val features: List<Feature>,
 ) {
 
-  fun checkValidPath(rootDir: File): Boolean {
+  fun checkValidPath(rootDir: Path): Boolean {
     val projectDir = rootDir.resolve(path.removePrefix(":").replace(":", "/"))
     return !projectDir.exists()
   }
 
-  fun writeTo(rootDir: File) {
-    val projectDir = rootDir.resolve(path.removePrefix(":").replace(":", "/")).apply { mkdirs() }
+  fun writeTo(rootDir: Path) {
+    val projectDir =
+      rootDir.resolve(path.removePrefix(":").replace(":", "/")).apply { createDirectories() }
     buildFile.buildFileSpec(features).writeTo(projectDir)
 
     readMeFile.writeTo(projectDir)
@@ -41,7 +49,7 @@ internal data class Project(
       feature.renderFiles(projectDir)
     }
 
-    val settingsFile = File(rootDir, "settings-all.gradle.kts")
+    val settingsFile = rootDir.resolve("settings-all.gradle.kts")
     val includedProjects =
       settingsFile
         .readLines()
@@ -154,7 +162,7 @@ internal data class Dependency(
 }
 
 internal interface Feature {
-  fun renderFiles(projectDir: File) {}
+  fun renderFiles(projectDir: Path) {}
 }
 
 internal interface PluginVisitor {
@@ -213,13 +221,14 @@ internal data class AndroidLibraryFeature(
     resourcesPrefix?.let { builder.addStatement("resources(\"$it\")") }
   }
 
-  override fun renderFiles(projectDir: File) {
+  override fun renderFiles(projectDir: Path) {
     if (androidTest) {
-      val androidTestDir = File(projectDir, "src/androidTest")
-      androidTestDir.mkdirs()
+      val androidTestDir = projectDir.resolve("src/androidTest")
+      androidTestDir.createDirectories()
 
       // Write the manifest file
-      File(androidTestDir, "AndroidManifest.xml")
+      androidTestDir
+        .resolve("AndroidManifest.xml")
         // language=XML
         .writeText(
           """
@@ -245,15 +254,16 @@ internal data class KotlinFeature(val packageName: String, val isAndroid: Boolea
     builder.addStatement("alias(libs.plugins.kotlin.$marker)")
   }
 
-  override fun renderFiles(projectDir: File) {
+  override fun renderFiles(projectDir: Path) {
     writePlaceholderFileTo(projectDir.resolve("src/main"), packageName)
   }
 }
 
-private fun writePlaceholderFileTo(sourceSetDir: File, packageName: String) {
+private fun writePlaceholderFileTo(sourceSetDir: Path, packageName: String) {
   val mainSrcDir =
-    sourceSetDir.resolve("kotlin/${packageName.replace(".", "/")}").apply { mkdirs() }
-  File(mainSrcDir, "Placeholder.kt")
+    sourceSetDir.resolve("kotlin/${packageName.replace(".", "/")}").apply { createDirectories() }
+  mainSrcDir
+    .resolve("Placeholder.kt")
     .writeText(
       """
       package $packageName
@@ -296,10 +306,11 @@ internal object CircuitFeature : Feature, SlackFeatureVisitor {
 }
 
 internal class ReadMeFile {
-  fun writeTo(projectDir: File) {
+  fun writeTo(projectDir: Path) {
     val projectName = projectDir.name
-    File(projectDir, "README.md")
-      .apply { createNewFile() }
+    projectDir
+      .resolve("README.md")
+      .apply { createFile() }
       .bufferedWriter()
       .use { writer ->
         val underline = "=".repeat(projectName.length)
