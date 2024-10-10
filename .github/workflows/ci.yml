@@ -81,4 +81,4 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/foundry'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }} -x dokkaHtml --no-configuration-cache
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
