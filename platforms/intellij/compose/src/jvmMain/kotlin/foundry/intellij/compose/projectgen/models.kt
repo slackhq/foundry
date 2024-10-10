@@ -96,23 +96,23 @@ internal data class BuildFile(val dependencies: List<Dependency>) {
           endControlFlow()
         }
 
-        // slack features
-        val slackFeatures = features.filterIsInstance<SlackFeatureVisitor>()
-        val slackAndroidFeatures = features.filterIsInstance<SlackAndroidFeatureVisitor>()
-        if (slackFeatures.isNotEmpty() || slackAndroidFeatures.isNotEmpty()) {
+        // foundry features
+        val foundryFeatures = features.filterIsInstance<FoundryFeatureVisitor>()
+        val foundryAndroidFeatures = features.filterIsInstance<FoundryAndroidFeatureVisitor>()
+        if (foundryFeatures.isNotEmpty() || foundryAndroidFeatures.isNotEmpty()) {
           addStatement("")
           beginControlFlow("foundry")
-          if (slackFeatures.isNotEmpty()) {
+          if (foundryFeatures.isNotEmpty()) {
             beginControlFlow("features")
-            for (feature in slackFeatures) {
-              feature.writeToSlackFeatures(this)
+            for (feature in foundryFeatures) {
+              feature.writeToFoundryFeatures(this)
             }
             endControlFlow()
           }
-          if (slackAndroidFeatures.isNotEmpty()) {
+          if (foundryAndroidFeatures.isNotEmpty()) {
             beginControlFlow("android")
             beginControlFlow("features")
-            slackAndroidFeatures.forEach { it.writeToSlackAndroidFeatures(this) }
+            foundryAndroidFeatures.forEach { it.writeToFoundryAndroidFeatures(this) }
             endControlFlow()
             endControlFlow()
           }
@@ -170,14 +170,14 @@ internal interface PluginVisitor {
   fun writeToPlugins(builder: FileSpec.Builder)
 }
 
-internal interface SlackFeatureVisitor {
-  // Callback within slack.features { } block
-  fun writeToSlackFeatures(builder: FileSpec.Builder)
+internal interface FoundryFeatureVisitor {
+  // Callback within foundry.features { } block
+  fun writeToFoundryFeatures(builder: FileSpec.Builder)
 }
 
-internal interface SlackAndroidFeatureVisitor {
-  // Callback within slack.android.features { } block
-  fun writeToSlackAndroidFeatures(builder: FileSpec.Builder)
+internal interface FoundryAndroidFeatureVisitor {
+  // Callback within foundry.android.features { } block
+  fun writeToFoundryAndroidFeatures(builder: FileSpec.Builder)
 }
 
 internal interface AndroidBuildFeatureVisitor {
@@ -198,7 +198,7 @@ internal data class AndroidLibraryFeature(
   val viewBindingEnabled: Boolean,
   val androidTest: Boolean,
   val packageName: String,
-) : Feature, PluginVisitor, AndroidBuildFeatureVisitor, SlackAndroidFeatureVisitor {
+) : Feature, PluginVisitor, AndroidBuildFeatureVisitor, FoundryAndroidFeatureVisitor {
   override fun writeToPlugins(builder: FileSpec.Builder) {
     builder.addStatement("alias(libs.plugins.android.library)")
   }
@@ -214,7 +214,7 @@ internal data class AndroidLibraryFeature(
     }
   }
 
-  override fun writeToSlackAndroidFeatures(builder: FileSpec.Builder) {
+  override fun writeToFoundryAndroidFeatures(builder: FileSpec.Builder) {
     if (androidTest) {
       builder.addStatement("androidTest()")
     }
@@ -275,8 +275,8 @@ private fun writePlaceholderFileTo(sourceSetDir: Path, packageName: String) {
     )
 }
 
-internal data class DaggerFeature(val runtimeOnly: Boolean) : Feature, SlackFeatureVisitor {
-  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+internal data class DaggerFeature(val runtimeOnly: Boolean) : Feature, FoundryFeatureVisitor {
+  override fun writeToFoundryFeatures(builder: FileSpec.Builder) {
     // All these args are false by default, so only add arguments for enabled ones!
     val args =
       mapOf("runtimeOnly" to runtimeOnly)
@@ -287,20 +287,20 @@ internal data class DaggerFeature(val runtimeOnly: Boolean) : Feature, SlackFeat
   }
 }
 
-internal object RobolectricFeature : Feature, SlackAndroidFeatureVisitor {
-  override fun writeToSlackAndroidFeatures(builder: FileSpec.Builder) {
+internal object RobolectricFeature : Feature, FoundryAndroidFeatureVisitor {
+  override fun writeToFoundryAndroidFeatures(builder: FileSpec.Builder) {
     builder.addStatement("robolectric()")
   }
 }
 
-internal object ComposeFeature : Feature, SlackFeatureVisitor {
-  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+internal object ComposeFeature : Feature, FoundryFeatureVisitor {
+  override fun writeToFoundryFeatures(builder: FileSpec.Builder) {
     builder.addStatement("compose()")
   }
 }
 
-internal object CircuitFeature : Feature, SlackFeatureVisitor {
-  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+internal object CircuitFeature : Feature, FoundryFeatureVisitor {
+  override fun writeToFoundryFeatures(builder: FileSpec.Builder) {
     builder.addStatement("circuit()")
   }
 }
