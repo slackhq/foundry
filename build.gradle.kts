@@ -380,7 +380,7 @@ subprojects {
           notCompatibleWithConfigurationCache(
             "UploadPluginTask is not compatible with the configuration cache"
           )
-          dependsOn(blockMapTask)
+          blockmapFile.set(blockMapTask.flatMap { it.blockmapFile })
           url.set(
             providers.gradleProperty("SgpIntellijArtifactoryBaseUrl").map { baseUrl ->
               "$baseUrl/${pluginDetails.urlSuffix}"
