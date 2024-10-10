@@ -15,6 +15,7 @@
  */
 package foundry.gradle
 
+import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.util.PropertyResolver
@@ -72,12 +73,16 @@ internal constructor(
   public val libraryWithVariants: Boolean
     get() = booleanProperty("foundry.android.libraryWithVariants")
 
-  /** Default namespace prefix for android proejcts if one isn't specified. */
+  /** Default namespace prefix for android projects if one isn't specified. */
   public val defaultNamespacePrefix: String
-    get() = stringProperty("foundry.android.defaultNamespacePrefix")
+    get() = optionalStringProperty("foundry.android.defaultNamespacePrefix") ?: defaultPackagePrefix
+
+  /** Default package prefix for JVM projects if one isn't specified. */
+  public val defaultPackagePrefix: String
+    get() = stringProperty(FoundryKeys.DEFAULT_PACKAGE_PREFIX)
 
   /**
-   * Indicates that the gradle versions plugin should allow unstable versions. By default unstable
+   * Indicates that the gradle versions plugin should allow unstable versions. By default, unstable
    * versions are excluded due to the frequent androidx alpha/beta/rc cycle noise. Flag-only, value
    * is ignored.
    */
