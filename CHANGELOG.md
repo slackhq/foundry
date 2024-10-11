@@ -56,7 +56,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
 - Build against gradle-nullaway `2.0.0`.
 - Build against Gradle versions plugin `0.51.0`.
 - Build against Develocity plugin `3.18.1`.
-- Build against gradle-dependency-sorter plugin `0.9`.
+- Build against gradle-dependencies-sorter plugin `0.9`.
 
 0.19.6
 ------
