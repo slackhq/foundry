@@ -1,1 +1,1 @@
-sourceset_dependencies = '{":slack-plugin:dokkaHtmlPartial/main":[],":tracing:dokkaHtmlPartial/main":[],":agp-handlers:agp-handler-api:dokkaHtmlPartial/main":[],":skippy:dokkaHtmlPartial/main":[],":sgp-common:dokkaHtmlPartial/main":[]}'
+sourceset_dependencies = '{":tools:cli:dokkaHtmlPartial/main":[],":tools:tracing:dokkaHtmlPartial/main":[],":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main":[],":platforms:gradle:agp-handlers:agp-handler-api:dokkaHtmlPartial/main":[],":tools:skippy:dokkaHtmlPartial/main":[],":tools:foundry-common:dokkaHtmlPartial/main":[]}'

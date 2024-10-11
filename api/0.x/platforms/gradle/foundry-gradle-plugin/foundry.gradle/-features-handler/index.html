@@ -1,0 +1,224 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>FeaturesHandler</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../../index.html">
+                            foundry
+                    </a>            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="foundry-gradle-plugin::foundry.gradle/FeaturesHandler///PointingToDeclaration//-1311936788">
+  <div class="breadcrumbs"><a href="../../index.html">foundry-gradle-plugin</a><span class="delimiter">/</span><a href="../index.html">foundry.gradle</a><span class="delimiter">/</span><span class="current">FeaturesHandler</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Features</span><wbr><span><span>Handler</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">FeaturesHandler</a>&nbsp;<span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Inject///PointingToDeclaration/"><span class="token annotation builtin">Inject</span></span>&nbsp;</span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">objects<span class="token operator">: </span><span data-unresolved-link="org.gradle.api.model/ObjectFactory///PointingToDeclaration/">ObjectFactory</span><span class="token punctuation">, </span></span><span class="parameter ">globalFoundryProperties<span class="token operator">: </span><a href="../-foundry-properties/index.html">FoundryProperties</a><span class="token punctuation">, </span></span><span class="parameter ">foundryProperties<span class="token operator">: </span><a href="../-foundry-properties/index.html">FoundryProperties</a><span class="token punctuation">, </span></span><span class="parameter ">project<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project</span><span class="token punctuation">, </span></span><span class="parameter ">versionCatalog<span class="token operator">: </span><span data-unresolved-link="org.gradle.api.artifacts/VersionCatalog///PointingToDeclaration/">VersionCatalog</span></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/slackhq/foundry//tree/main/platforms/gradle/foundry-gradle-plugin/src/main/kotlin/foundry/gradle/FoundryExtension.kt#L439">source</a>)</span></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="318940091%2FConstructors%2F-1311936788" anchor-label="FeaturesHandler" id="318940091%2FConstructors%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-features-handler.html"><span>Features</span><wbr><span><span>Handler</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="318940091%2FConstructors%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Inject///PointingToDeclaration/"><span class="token annotation builtin">Inject</span></span></div></div><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">objects<span class="token operator">: </span><span data-unresolved-link="org.gradle.api.model/ObjectFactory///PointingToDeclaration/">ObjectFactory</span><span class="token punctuation">, </span></span><span class="parameter ">globalFoundryProperties<span class="token operator">: </span><a href="../-foundry-properties/index.html">FoundryProperties</a><span class="token punctuation">, </span></span><span class="parameter ">foundryProperties<span class="token operator">: </span><a href="../-foundry-properties/index.html">FoundryProperties</a><span class="token punctuation">, </span></span><span class="parameter ">project<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Project///PointingToDeclaration/">Project</span><span class="token punctuation">, </span></span><span class="parameter ">versionCatalog<span class="token operator">: </span><span data-unresolved-link="org.gradle.api.artifacts/VersionCatalog///PointingToDeclaration/">VersionCatalog</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="2033010364%2FFunctions%2F-1311936788" anchor-label="autoService" id="2033010364%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="auto-service.html"><span>auto</span><wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2033010364%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="auto-service.html"><span class="token function">autoService</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Enables AutoService on this project.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1381265675%2FFunctions%2F-1311936788" anchor-label="circuit" id="1381265675%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="circuit.html"><span><span>circuit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1381265675%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="circuit.html"><span class="token function">circuit</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">codegen<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">runtime<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">commonBundle<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">foundation<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Action///PointingToDeclaration/">Action</span><span class="token operator">&lt;</span><a href="../-circuit-handler/index.html">CircuitHandler</a><span class="token operator">&gt;</span><span class="token operator"> = </span>Action {}</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Configures Circuit on this project.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1370337357%2FFunctions%2F-1311936788" anchor-label="compose" id="-1370337357%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="compose.html"><span><span>compose</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1370337357%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="compose.html"><span class="token function">compose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">multiplatform<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Action///PointingToDeclaration/">Action</span><span class="token operator">&lt;</span><a href="../-compose-handler/index.html">ComposeHandler</a><span class="token operator">&gt;</span><span class="token operator"> = </span>Action {}</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Enables Compose for this project and applies any version catalog bundle dependencies defined by <a href="../-foundry-properties/default-compose-android-bundle-alias.html">FoundryProperties.defaultComposeAndroidBundleAlias</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-593299224%2FFunctions%2F-1311936788" anchor-label="dagger" id="-593299224%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dagger.html"><span><span>dagger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-593299224%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="dagger.html"><span class="token function">dagger</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Action///PointingToDeclaration/">Action</span><span class="token operator">&lt;</span><a href="../-dagger-handler/index.html">DaggerHandler</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../-delicate-foundry-gradle-plugin-api/index.html"><span class="token annotation builtin">DelicateFoundryGradlePluginApi</span></a></div></div><span class="token keyword">fun </span><a href="dagger.html"><span class="token function">dagger</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enableComponents<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">projectHasJavaInjections<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Action///PointingToDeclaration/">Action</span><span class="token operator">&lt;</span><a href="../-dagger-handler/index.html">DaggerHandler</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Enables dagger for this project.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1236704824%2FFunctions%2F-1311936788" anchor-label="daggerRuntimeOnly" id="-1236704824%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dagger-runtime-only.html"><span>dagger</span><wbr><span>Runtime</span><wbr><span><span>Only</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1236704824%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="dagger-runtime-only.html"><span class="token function">daggerRuntimeOnly</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds dagger's runtime as dependencies to this but runs no code generation.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-965399719%2FFunctions%2F-1311936788" anchor-label="enableTestFixtures" id="-965399719%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enable-test-fixtures.html"><span>enable</span><wbr><span>Test</span><wbr><span><span>Fixtures</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-965399719%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="enable-test-fixtures.html"><span class="token function">enableTestFixtures</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Enables test fixtures on this project.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-716008589%2FFunctions%2F-1311936788" anchor-label="moshi" id="-716008589%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="moshi.html"><span><span>moshi</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-716008589%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="moshi.html"><span class="token function">moshi</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">codegen<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">adapters<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">kotlinReflect<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span data-unresolved-link="org.gradle.api/Action///PointingToDeclaration/">Action</span><span class="token operator">&lt;</span><a href="../-moshi-handler/index.html">MoshiHandler</a><span class="token operator">&gt;</span><span class="token operator"> = </span>Action {}</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Enables Moshi for this project.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-465549096%2FFunctions%2F-1311936788" anchor-label="redacted" id="-465549096%2FFunctions%2F-1311936788" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="redacted.html"><span><span>redacted</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-465549096%2FFunctions%2F-1311936788"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="redacted.html"><span class="token function">redacted</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Enables redacted-compiler-plugin on this project.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

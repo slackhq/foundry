@@ -1,25 +1,29 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-$dokka.location:////PointingToDeclaration/slack-plugin/[root]/index.html
-$dokka.location://slack/org.gradle.api.Project#kotlin.Function1[slack.gradle.SlackExtension,kotlin.Unit]/PointingToDeclaration/slack-plugin/[root]/slack.html
-$dokka.location://slackAndroid/org.gradle.api.Project#org.gradle.api.Action[slack.gradle.AndroidHandler]/PointingToDeclaration/slack-plugin/[root]/slack-android.html
-$dokka.location://slackAndroidApp/org.gradle.api.Project#org.gradle.api.Action[slack.gradle.SlackAndroidAppExtension]/PointingToDeclaration/slack-plugin/[root]/slack-android-app.html
-$dokka.location://slackAndroidLibrary/org.gradle.api.Project#org.gradle.api.Action[slack.gradle.SlackAndroidLibraryExtension]/PointingToDeclaration/slack-plugin/[root]/slack-android-library.html
-module:sgp-common
-com.slack.sgp.common
+$dokka.location:////PointingToDeclaration/foundry-gradle-plugin/[root]/index.html
+$dokka.location://foundry/org.gradle.api.Project#org.gradle.api.Action[foundry.gradle.FoundryExtension]/PointingToDeclaration/foundry-gradle-plugin/[root]/foundry.html
+module:cli
+foundry.cli
+foundry.cli.buildkite
+foundry.cli.gradle
+foundry.cli.lint
+foundry.cli.sarif
+foundry.cli.shellsentry
+module:foundry-common
+foundry.common
 module:skippy
-com.slack.skippy
-module:slack-plugin
-slack.gradle
-slack.gradle.anvil
-slack.gradle.avoidance
-slack.gradle.dependencies
-slack.gradle.tasks
-slack.gradle.util
-slack.stats
+foundry.skippy
 module:tracing
-com.slack.sgp.tracing.model
-com.slack.sgp.tracing.reporter
+foundry.tracing.model
+foundry.tracing.reporter
+module:foundry-gradle-plugin
+foundry.gradle
+foundry.gradle.anvil
+foundry.gradle.avoidance
+foundry.gradle.dependencies
+foundry.gradle.stats
+foundry.gradle.tasks
+foundry.gradle.util
 module:agp-handler-api
-slack.gradle.agp
-slack.gradle.agp.internal
+foundry.gradle.agp
+foundry.gradle.agp.internal
