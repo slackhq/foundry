@@ -17,7 +17,6 @@ import com.jetbrains.plugin.structure.base.utils.exists
 import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -118,39 +117,20 @@ configurations
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
 dependencies {
-  lintChecks(libs.composeLints)
-
-  compileOnly(libs.coroutines.core.ij)
+  implementation(projects.platforms.intellij.compose, exclusions)
+  implementation(projects.tools.tracing, exclusions)
 
   implementation(libs.bugsnag)
-  implementation(libs.okio)
   implementation(libs.kaml)
   implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.platforms.intellij.compose, exclusions)
-  implementation(projects.tools.tracing, exclusions)
+  implementation(libs.okio)
 
-  intellijPlatform {
-    // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
-    // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
-    // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
-    plugin("org.jetbrains.android:242.21829.142")
-    bundledPlugins(
-      "com.intellij.java",
-      "org.intellij.plugins.markdown",
-      "org.jetbrains.plugins.terminal",
-      "org.jetbrains.kotlin",
-    )
-
-    pluginVerifier()
-    zipSigner()
-    instrumentationTools()
-
-    testFramework(TestFrameworkType.Platform)
-    testFramework(TestFrameworkType.Bundled)
-  }
+  compileOnly(libs.coroutines.core.ij)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
+  lintChecks(libs.composeLints)
 }
