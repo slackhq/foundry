@@ -46,6 +46,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
 
 ### Misc
 
+- **New**: Make JDK configuration docs and error messages configurable via `FoundryProperties`.
 - **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
 - **Fix**: Track deleted build files when computing parent projects in Skippy.
 - Update Clikt to `5.0.1`.

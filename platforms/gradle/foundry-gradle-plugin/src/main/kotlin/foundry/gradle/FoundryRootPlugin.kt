@@ -69,20 +69,6 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     require(project == project.rootProject) {
       "Slack plugin should only be applied on the root project!"
     }
-
-    AppleSiliconCompat.validate {
-      """
-        Rosetta detected!
-        You are running on an Apple Silicon device but running an x86 JDK. This means your OS is
-        running your process in a translated mode (i.e. slower) via Rosetta.
-
-        Please download a native arm64 JDK and remove your existing x86 JDK.
-
-        See: https://github.com/tinyspeck/slack-android-ng/wiki/JDK-Installation-&-JAVA_HOME
-      """
-        .trimIndent()
-    }
-
     val startParameters = project.gradle.startParameter.projectProperties
     val startParameterProperties =
       project.providers.of(StartParameterProperties::class.java) {
@@ -104,6 +90,20 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
         startParameterProperty = startParameterProperty,
         globalLocalProperty = globalLocalProperty,
       )
+
+    AppleSiliconCompat.validate {
+      """
+        Rosetta detected!
+        You are running on an Apple Silicon device but running an x86 JDK. This means your OS is
+        running your process in a translated mode (i.e. slower) via Rosetta.
+
+        Please download a native arm64 JDK and remove your existing x86 JDK.
+
+        See: ${foundryProperties.jdkDocsLink ?: "No docs link provided"}
+      """
+        .trimIndent()
+    }
+
     val thermalsLogJsonFile =
       project.layout.buildDirectory.file("outputs/logs/last-build-thermals.json")
     val logThermals = foundryProperties.logThermals
@@ -149,8 +149,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
       check(jdk == runtimeVersion) {
         """
           Current Java version ($runtimeVersion) does not match the enforced version ($jdk).
-          Run ./slackw bootstrap to upgrade and be sure to set your JAVA_HOME to the JDK path it
-          prints out.
+          ${foundryProperties.jdkErrorMessage.orEmpty()}
 
           If you're seeing this error from Studio, ensure Studio is using JDK $jdk in
           Preferences > Build, Execution, Deployment > Build tools > Gradle > Gradle JVM
@@ -169,6 +168,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     project.configureFoundryRootBuildscript(
       foundryProperties.versions.jdk.asProvider(project.providers),
       foundryProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
+      foundryProperties.jdkDocsLink,
     )
     LintTasks.configureRootProject(project)
     DetektTasks.configureRootProject(project, foundryProperties)
@@ -472,10 +472,11 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
 private fun Project.configureFoundryRootBuildscript(
   jdkProvider: Provider<Int>,
   jvmVendor: JvmVendorSpec?,
+  jdkDocsLink: String?,
 ) {
   // Only register bootstrap if explicitly requested for now
   if (CoreBootstrapTask.isBootstrapEnabled(this)) {
-    CoreBootstrapTask.register(this, jdkProvider, jvmVendor)
+    CoreBootstrapTask.register(this, jdkProvider, jvmVendor, jdkDocsLink)
   }
   InstallCommitHooksTask.register(this)
 }
@@ -543,9 +544,7 @@ private fun Project.configureMisc(foundryProperties: FoundryProperties) {
         failOnError.setDisallowChanges(provider { foundryProperties.strictJdk })
 
         /** Link our wiki page in its messages to get developers up and running. */
-        extraMessage.setDisallowChanges(
-          "https://github.com/tinyspeck/slack-android-ng/wiki/JDK-Installation-&-JAVA_HOME"
-        )
+        extraMessage.setDisallowChanges(foundryProperties.jdkDocsLink)
       }
     }
   }

@@ -692,6 +692,14 @@ internal constructor(
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("foundry.jvm.vendor.optOut", defaultValue = false)
 
+  /** Optional link to JDK configuration */
+  public val jdkDocsLink: String?
+    get() = optionalStringProperty("foundry.jdk.docsLink")
+
+  /** Optional error message to show when the JDK configuration is invalid. */
+  public val jdkErrorMessage: String?
+    get() = optionalStringProperty("foundry.jdk.errorMessage")
+
   /**
    * Option to force a specific kotlin language version. By default defers to the KGP default the
    * build is running with.
