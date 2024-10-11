@@ -48,7 +48,7 @@ fun LoadingAnimation(
   spacing: Dp = 7.dp,
   movementDistance: Dp = 10.dp,
 ) {
-  val animatedDots = List(3) { remember { Animatable(0f) } }
+  val animatedDots = remember { List(4) { Animatable(0f) } }
 
   animatedDots.forEachIndexed { index, dot ->
     LaunchedEffect(dot) {
