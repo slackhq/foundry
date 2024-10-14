@@ -31,7 +31,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build Dokka API docs
-        run: dokkaHtml --no-configuration-cache
+        run: :dokkaGenerate
 
       - name: Setup Python
         uses: actions/setup-python@v5
