@@ -41,12 +41,13 @@ import kotlinx.coroutines.delay
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 
 /**
- * This shows a loading animation of three bouncing dots that occurs when the user is waiting on a response.
+ * This shows a loading animation of three bouncing dots that occurs when the user is waiting on a
+ * response.
  *
  * Adopted from the Three-Dot Loading Animation Tutorial with Jetpack Compose by Stevdza-San from
+ *
  * @see [Source](https://www.youtube.com/watch?v=xakNOVaYLAg)
  */
-
 @Composable
 fun LoadingAnimation(
   modifier: Modifier = Modifier,
