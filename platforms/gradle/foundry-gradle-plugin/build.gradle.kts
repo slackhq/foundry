@@ -90,6 +90,7 @@ dependencies {
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
+  implementation(projects.platforms.gradle.betterGradleProperties)
   implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
   implementation(projects.tools.skippy)
