@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 import foundry.intellij.compose.projectgen.ProjectGenUi
 import foundry.intellij.compose.projectgen.ProjectGenUi.ProjectGenApp
+import kotlin.io.path.createTempDirectory
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
@@ -34,13 +35,14 @@ import org.jetbrains.jewel.ui.component.Text
 
 fun main() = singleWindowApplication {
   var isDark by remember { mutableStateOf(false) }
+  val projectDir by remember { mutableStateOf(createTempDirectory("project-gen-playground")) }
   IntUiTheme(isDark) {
     Column(Modifier.background(JewelTheme.globalColors.panelBackground)) {
       DefaultButton(modifier = Modifier.padding(16.dp), onClick = { isDark = !isDark }) {
         Text("Toggle dark mode")
       }
       ProjectGenApp(
-        rootDir = "rootDir",
+        rootDir = projectDir,
         events =
           object : ProjectGenUi.Events {
             override fun doOKAction() {

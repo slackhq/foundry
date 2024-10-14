@@ -194,6 +194,8 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
   public val gradleMemoryPercentage: Property<String> =
     objects.property<String>().convention(argsProvider.gradleMemoryPercentage)
 
+  @get:Optional @get:Input public abstract val jdkDocsLink: Property<String>
+
   @get:OutputDirectory public abstract val cacheDir: DirectoryProperty
 
   @get:OutputFile public abstract val diagnostics: RegularFileProperty
@@ -209,7 +211,6 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
     if (launcher.isPresent) {
       diagnosticsOutput.appendLine("Initializing JDK")
-      // TODO make this message configurable
       diagnosticsOutput.appendLine(
         """
         JDK config:
@@ -221,7 +222,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 
         Restart Android Studio once to ensure this is picked up in your Project Structure as well!
 
-        For advanced configuration see https://github.com/tinyspeck/slack-android-ng/wiki/JDK-Installation-&-JAVA_HOME
+        For advanced configuration see ${jdkDocsLink.orNull ?: "<no JDK docs link set>"}
 
         """
           .trimIndent()
@@ -339,6 +340,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       project: Project,
       jdkVersion: Provider<Int>,
       jvmVendor: JvmVendorSpec?,
+      jdkDocsLink: String?,
     ): TaskProvider<CoreBootstrapTask> {
       check(project.isRootProject) { "Bootstrap can only be applied to the root project" }
       val bootstrap =
@@ -353,6 +355,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
             }
           this.launcher.convention(defaultLauncher)
           this.jdkVersion.setDisallowChanges(jdkVersion)
+          this.jdkDocsLink.setDisallowChanges(jdkDocsLink)
 
           val cacheDirProvider = project.layout.projectDirectory.dir(".cache")
           val bootstrapVersionFileProvider = cacheDirProvider.file("bootstrap.txt")

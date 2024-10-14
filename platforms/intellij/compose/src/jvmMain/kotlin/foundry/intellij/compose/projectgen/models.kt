@@ -16,7 +16,14 @@
 package foundry.intellij.compose.projectgen
 
 import com.squareup.kotlinpoet.FileSpec
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.bufferedWriter
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createFile
+import kotlin.io.path.exists
+import kotlin.io.path.name
+import kotlin.io.path.readLines
+import kotlin.io.path.writeText
 
 internal data class Project(
   // Gradle path
@@ -26,13 +33,14 @@ internal data class Project(
   val features: List<Feature>,
 ) {
 
-  fun checkValidPath(rootDir: File): Boolean {
+  fun checkValidPath(rootDir: Path): Boolean {
     val projectDir = rootDir.resolve(path.removePrefix(":").replace(":", "/"))
     return !projectDir.exists()
   }
 
-  fun writeTo(rootDir: File) {
-    val projectDir = rootDir.resolve(path.removePrefix(":").replace(":", "/")).apply { mkdirs() }
+  fun writeTo(rootDir: Path) {
+    val projectDir =
+      rootDir.resolve(path.removePrefix(":").replace(":", "/")).apply { createDirectories() }
     buildFile.buildFileSpec(features).writeTo(projectDir)
 
     readMeFile.writeTo(projectDir)
@@ -41,7 +49,7 @@ internal data class Project(
       feature.renderFiles(projectDir)
     }
 
-    val settingsFile = File(rootDir, "settings-all.gradle.kts")
+    val settingsFile = rootDir.resolve("settings-all.gradle.kts")
     val includedProjects =
       settingsFile
         .readLines()
@@ -88,23 +96,23 @@ internal data class BuildFile(val dependencies: List<Dependency>) {
           endControlFlow()
         }
 
-        // slack features
-        val slackFeatures = features.filterIsInstance<SlackFeatureVisitor>()
-        val slackAndroidFeatures = features.filterIsInstance<SlackAndroidFeatureVisitor>()
-        if (slackFeatures.isNotEmpty() || slackAndroidFeatures.isNotEmpty()) {
+        // foundry features
+        val foundryFeatures = features.filterIsInstance<FoundryFeatureVisitor>()
+        val foundryAndroidFeatures = features.filterIsInstance<FoundryAndroidFeatureVisitor>()
+        if (foundryFeatures.isNotEmpty() || foundryAndroidFeatures.isNotEmpty()) {
           addStatement("")
           beginControlFlow("foundry")
-          if (slackFeatures.isNotEmpty()) {
+          if (foundryFeatures.isNotEmpty()) {
             beginControlFlow("features")
-            for (feature in slackFeatures) {
-              feature.writeToSlackFeatures(this)
+            for (feature in foundryFeatures) {
+              feature.writeToFoundryFeatures(this)
             }
             endControlFlow()
           }
-          if (slackAndroidFeatures.isNotEmpty()) {
+          if (foundryAndroidFeatures.isNotEmpty()) {
             beginControlFlow("android")
             beginControlFlow("features")
-            slackAndroidFeatures.forEach { it.writeToSlackAndroidFeatures(this) }
+            foundryAndroidFeatures.forEach { it.writeToFoundryAndroidFeatures(this) }
             endControlFlow()
             endControlFlow()
           }
@@ -154,7 +162,7 @@ internal data class Dependency(
 }
 
 internal interface Feature {
-  fun renderFiles(projectDir: File) {}
+  fun renderFiles(projectDir: Path) {}
 }
 
 internal interface PluginVisitor {
@@ -162,14 +170,14 @@ internal interface PluginVisitor {
   fun writeToPlugins(builder: FileSpec.Builder)
 }
 
-internal interface SlackFeatureVisitor {
-  // Callback within slack.features { } block
-  fun writeToSlackFeatures(builder: FileSpec.Builder)
+internal interface FoundryFeatureVisitor {
+  // Callback within foundry.features { } block
+  fun writeToFoundryFeatures(builder: FileSpec.Builder)
 }
 
-internal interface SlackAndroidFeatureVisitor {
-  // Callback within slack.android.features { } block
-  fun writeToSlackAndroidFeatures(builder: FileSpec.Builder)
+internal interface FoundryAndroidFeatureVisitor {
+  // Callback within foundry.android.features { } block
+  fun writeToFoundryAndroidFeatures(builder: FileSpec.Builder)
 }
 
 internal interface AndroidBuildFeatureVisitor {
@@ -190,7 +198,7 @@ internal data class AndroidLibraryFeature(
   val viewBindingEnabled: Boolean,
   val androidTest: Boolean,
   val packageName: String,
-) : Feature, PluginVisitor, AndroidBuildFeatureVisitor, SlackAndroidFeatureVisitor {
+) : Feature, PluginVisitor, AndroidBuildFeatureVisitor, FoundryAndroidFeatureVisitor {
   override fun writeToPlugins(builder: FileSpec.Builder) {
     builder.addStatement("alias(libs.plugins.android.library)")
   }
@@ -206,20 +214,21 @@ internal data class AndroidLibraryFeature(
     }
   }
 
-  override fun writeToSlackAndroidFeatures(builder: FileSpec.Builder) {
+  override fun writeToFoundryAndroidFeatures(builder: FileSpec.Builder) {
     if (androidTest) {
       builder.addStatement("androidTest()")
     }
     resourcesPrefix?.let { builder.addStatement("resources(\"$it\")") }
   }
 
-  override fun renderFiles(projectDir: File) {
+  override fun renderFiles(projectDir: Path) {
     if (androidTest) {
-      val androidTestDir = File(projectDir, "src/androidTest")
-      androidTestDir.mkdirs()
+      val androidTestDir = projectDir.resolve("src/androidTest")
+      androidTestDir.createDirectories()
 
       // Write the manifest file
-      File(androidTestDir, "AndroidManifest.xml")
+      androidTestDir
+        .resolve("AndroidManifest.xml")
         // language=XML
         .writeText(
           """
@@ -245,15 +254,16 @@ internal data class KotlinFeature(val packageName: String, val isAndroid: Boolea
     builder.addStatement("alias(libs.plugins.kotlin.$marker)")
   }
 
-  override fun renderFiles(projectDir: File) {
+  override fun renderFiles(projectDir: Path) {
     writePlaceholderFileTo(projectDir.resolve("src/main"), packageName)
   }
 }
 
-private fun writePlaceholderFileTo(sourceSetDir: File, packageName: String) {
+private fun writePlaceholderFileTo(sourceSetDir: Path, packageName: String) {
   val mainSrcDir =
-    sourceSetDir.resolve("kotlin/${packageName.replace(".", "/")}").apply { mkdirs() }
-  File(mainSrcDir, "Placeholder.kt")
+    sourceSetDir.resolve("kotlin/${packageName.replace(".", "/")}").apply { createDirectories() }
+  mainSrcDir
+    .resolve("Placeholder.kt")
     .writeText(
       """
       package $packageName
@@ -265,8 +275,8 @@ private fun writePlaceholderFileTo(sourceSetDir: File, packageName: String) {
     )
 }
 
-internal data class DaggerFeature(val runtimeOnly: Boolean) : Feature, SlackFeatureVisitor {
-  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+internal data class DaggerFeature(val runtimeOnly: Boolean) : Feature, FoundryFeatureVisitor {
+  override fun writeToFoundryFeatures(builder: FileSpec.Builder) {
     // All these args are false by default, so only add arguments for enabled ones!
     val args =
       mapOf("runtimeOnly" to runtimeOnly)
@@ -277,29 +287,30 @@ internal data class DaggerFeature(val runtimeOnly: Boolean) : Feature, SlackFeat
   }
 }
 
-internal object RobolectricFeature : Feature, SlackAndroidFeatureVisitor {
-  override fun writeToSlackAndroidFeatures(builder: FileSpec.Builder) {
+internal object RobolectricFeature : Feature, FoundryAndroidFeatureVisitor {
+  override fun writeToFoundryAndroidFeatures(builder: FileSpec.Builder) {
     builder.addStatement("robolectric()")
   }
 }
 
-internal object ComposeFeature : Feature, SlackFeatureVisitor {
-  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+internal object ComposeFeature : Feature, FoundryFeatureVisitor {
+  override fun writeToFoundryFeatures(builder: FileSpec.Builder) {
     builder.addStatement("compose()")
   }
 }
 
-internal object CircuitFeature : Feature, SlackFeatureVisitor {
-  override fun writeToSlackFeatures(builder: FileSpec.Builder) {
+internal object CircuitFeature : Feature, FoundryFeatureVisitor {
+  override fun writeToFoundryFeatures(builder: FileSpec.Builder) {
     builder.addStatement("circuit()")
   }
 }
 
 internal class ReadMeFile {
-  fun writeTo(projectDir: File) {
+  fun writeTo(projectDir: Path) {
     val projectName = projectDir.name
-    File(projectDir, "README.md")
-      .apply { createNewFile() }
+    projectDir
+      .resolve("README.md")
+      .apply { createFile() }
       .bufferedWriter()
       .use { writer ->
         val underline = "=".repeat(projectName.length)

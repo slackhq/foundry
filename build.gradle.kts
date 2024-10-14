@@ -355,7 +355,7 @@ subprojects {
         configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.1") }
       }
 
-      if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
+      if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {
         pluginManager.apply(libs.plugins.pluginUploader.get().pluginId)
         val archive = project.tasks.named<BuildPluginTask>("buildPlugin").flatMap { it.archiveFile }
         val blockMapTask =
@@ -366,11 +366,11 @@ subprojects {
             file.set(archive)
             blockmapFile.set(
               project.layout.buildDirectory.file(
-                "blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
+                "blockmap/blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
               )
             )
             blockmapHashFile.set(
-              project.layout.buildDirectory.file("blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
+              project.layout.buildDirectory.file("blockmap/blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
             )
           }
 
@@ -380,9 +380,12 @@ subprojects {
           notCompatibleWithConfigurationCache(
             "UploadPluginTask is not compatible with the configuration cache"
           )
+          // TODO why doesn't the flatmap below automatically handle this dependency?
           dependsOn(blockMapTask)
+          blockmapFile.set(blockMapTask.flatMap { it.blockmapFile })
+          blockmapHashFile.set(blockMapTask.flatMap { it.blockmapHashFile })
           url.set(
-            providers.gradleProperty("SgpIntellijArtifactoryBaseUrl").map { baseUrl ->
+            providers.gradleProperty("FoundryIntellijArtifactoryBaseUrl").map { baseUrl ->
               "$baseUrl/${pluginDetails.urlSuffix}"
             }
           )
@@ -398,9 +401,9 @@ subprojects {
           }
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
-            // Sip the username and token together to create an appropriate encoded auth header
-            providers.gradleProperty("SgpIntellijArtifactoryUsername").zip(
-              providers.gradleProperty("SgpIntellijArtifactoryToken")
+            // Zip the username and token together to create an appropriate encoded auth header
+            providers.gradleProperty("FoundryIntellijArtifactoryUsername").zip(
+              providers.gradleProperty("FoundryIntellijArtifactoryToken")
             ) { username, token ->
               "Basic ${"$username:$token".encode().base64()}"
             }

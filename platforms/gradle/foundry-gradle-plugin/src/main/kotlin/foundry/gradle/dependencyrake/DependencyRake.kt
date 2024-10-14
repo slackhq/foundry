@@ -48,6 +48,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.UntrackedTask
+import org.gradle.work.DisableCachingByDefault
 
 private const val IGNORE_COMMENT = "// dependency-rake=ignore"
 
@@ -71,6 +72,7 @@ private val MANAGED_DEPENDENCIES =
  * advice to the project build file. This is usually not run directly, but rather added as a
  * finalizer to the `AdviceTask` it reads from.
  */
+@DisableCachingByDefault
 internal abstract class RakeDependencies
 @Inject
 constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostProcessingTask() {
