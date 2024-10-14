@@ -17,7 +17,7 @@ _2024-10-14_
 
 _2024-10-14_
 
-Don't use this release! We goofed on something
+Don't use this release! We goofed on something.
 
 0.20.0
 ------
