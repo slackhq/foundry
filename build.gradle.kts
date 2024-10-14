@@ -370,7 +370,9 @@ subprojects {
               )
             )
             blockmapHashFile.set(
-              project.layout.buildDirectory.file("blockmap/blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
+              project.layout.buildDirectory.file(
+                "blockmap/blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}"
+              )
             )
           }
 
