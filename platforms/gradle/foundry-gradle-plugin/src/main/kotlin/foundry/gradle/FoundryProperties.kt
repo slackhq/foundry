@@ -400,7 +400,7 @@ internal constructor(
         ?.split(" ")
         ?.map(String::trim)
         ?.filterNot(String::isBlank)
-        ?.takeUnless(List<*>::isNotEmpty)
+        ?.takeUnless(List<*>::isEmpty)
 
   /**
    * Flag to enable ciUnitTest on this project. Default is true.
