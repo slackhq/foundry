@@ -392,7 +392,11 @@ internal constructor(
    * projects.
    */
   public val kotlinDaemonArgs: String
-    get() = stringProperty(KOTLIN_DAEMON_ARGS_KEY, defaultValue = "")
+    get() =
+      stringProperty(
+        KOTLIN_DAEMON_ARGS_KEY,
+        defaultValue = stringProperty(KOTLIN_DAEMON_ARGS_KEY_OLD, defaultValue = ""),
+      )
 
   /**
    * Flag to enable ciUnitTest on this project. Default is true.
@@ -780,6 +784,7 @@ internal constructor(
      * other projects.
      */
     public const val KOTLIN_DAEMON_ARGS_KEY: String = "foundry.kotlin.daemon.jvmargs"
+    public const val KOTLIN_DAEMON_ARGS_KEY_OLD: String = "slack.kotlin.daemon.jvmargs"
 
     /** Minimum xmx value for the Gradle daemon. Value is an integer and unit is gigabytes. */
     // Key-only because it's used in a task init without a project instance
