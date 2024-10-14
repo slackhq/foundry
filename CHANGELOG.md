@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+0.20.0
+------
+
+_2024-09-25_
+
 ### Project Restructuring
 
 We've restructured this project! Since its early days as a simple Gradle convention plugin it's expanded into IntelliJ plugins, CLIs, CI tooling, and more. To better capture this, we've renamed the project to *Foundry*, restructured its artifacts into a more cohesive setup, moved kotlin-cli-util into this repo, and will likely split out some more artifacts down the line.
@@ -17,6 +22,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
     - Download `mapping.txt`
     - Download `property_migration.sh`
     - Run `./property_migration.sh mapping.txt <path to target project>`.
+      - Note this only covers `*.kts` and `*.properties` files. This does not cover args passed via CLI or envs.
 
 - Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
 - Gradle coordinates group have moved to the `com.slack.foundry` group name.
@@ -46,6 +52,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
 
 ### Misc
 
+- **New**: Make JDK configuration docs and error messages configurable via `FoundryProperties`.
 - **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
 - **Fix**: Track deleted build files when computing parent projects in Skippy.
 - Update Clikt to `5.0.1`.

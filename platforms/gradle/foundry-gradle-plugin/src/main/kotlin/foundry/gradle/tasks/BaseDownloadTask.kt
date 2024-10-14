@@ -29,6 +29,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Downloads a binary from its GitHub releases.
@@ -38,6 +39,7 @@ import org.gradle.internal.logging.progress.ProgressLoggerFactory
  *     ./gradlew <updateThing>
  * ```
  */
+@DisableCachingByDefault
 internal abstract class BaseDownloadTask(
   private val targetName: String,
   private val addExecPrefix: Boolean = false,
