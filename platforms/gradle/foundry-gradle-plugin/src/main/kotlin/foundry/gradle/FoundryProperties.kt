@@ -386,17 +386,21 @@ internal constructor(
     get() = optionalStringProperty("foundry.android.disabledVariants")
 
   /**
-   * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
+   * The project-specific kotlin.daemon.jvmargs computed by bootstrap.
    *
    * We don't just blanket use `kotlin.daemon.jvmargs` alone because we don't want to pollute other
    * projects.
    */
-  public val kotlinDaemonArgs: String
+  public val kotlinDaemonArgs: List<String>?
     get() =
-      stringProperty(
-        KOTLIN_DAEMON_ARGS_KEY,
-        defaultValue = stringProperty(KOTLIN_DAEMON_ARGS_KEY_OLD, defaultValue = ""),
-      )
+      optionalStringProperty(
+          KOTLIN_DAEMON_ARGS_KEY,
+          defaultValue = optionalStringProperty(KOTLIN_DAEMON_ARGS_KEY_OLD, defaultValue = null),
+        )
+        ?.split(" ")
+        ?.map(String::trim)
+        ?.filterNot(String::isBlank)
+        ?.takeUnless(List<*>::isEmpty)
 
   /**
    * Flag to enable ciUnitTest on this project. Default is true.
@@ -658,7 +662,7 @@ internal constructor(
     get() = resolver.booleanValue("foundry.artifacts.configure-eagerly", defaultValue = false)
 
   /**
-   * Force-disables Anvil regardless of `SlackExtension.dagger()` settings, useful for K2 testing
+   * Force-disables Anvil regardless of `FoundryExtension.dagger()` settings, useful for K2 testing
    * where Anvil is unsupported.
    */
   public val disableAnvilForK2Testing: Boolean
@@ -778,7 +782,7 @@ internal constructor(
 
   public companion object {
     /**
-     * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
+     * The project-specific kotlin.daemon.jvmargs computed by bootstrap.
      *
      * We don't just blanket use `kotlin.daemon.jvmargs` alone because we don't want to pollute
      * other projects.

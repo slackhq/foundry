@@ -4,10 +4,25 @@ Changelog
 **Unreleased**
 --------------
 
+0.20.2
+------
+
+_2024-10-14_
+
+- **Fix**: Fall back to old property name for kotlin JVM args if the new one isn't found.
+- **Enhancement**: Don't try to apply kotlin JVM args if there are none.
+
+0.20.1
+------
+
+_2024-10-14_
+
+Don't use this release! We goofed on something.
+
 0.20.0
 ------
 
-_2024-09-25_
+_2024-10-11_
 
 ### Project Restructuring
 
