@@ -56,6 +56,17 @@ plugins {
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
   alias(libs.plugins.binaryCompatibilityValidator)
+  alias(libs.plugins.graphAssert)
+}
+
+buildscript {
+  dependencies {
+    // Apply boms for buildscript classpath
+    classpath(platform(libs.asm.bom))
+    classpath(platform(libs.kotlin.bom))
+    classpath(platform(libs.coroutines.bom))
+    classpath(platform(libs.kotlin.gradlePlugins.bom))
+  }
 }
 
 apiValidation {
@@ -74,6 +85,18 @@ apiValidation {
       "skippy",
       "tracing",
     )
+}
+
+moduleGraphAssert {
+  // Platforms can depend on tools but not the other way around
+  allowed =
+    arrayOf(
+      ":platforms.* -> :tools.*",
+      ":platforms:gradle.* -> :platforms:gradle.*",
+      ":platforms:intellij.* -> :platforms:intellij.*",
+      ":tools.* -> :tools.*",
+    )
+  configurations = setOf("api", "implementation")
 }
 
 configure<DetektExtension> {
@@ -167,7 +190,9 @@ subprojects {
       }
     }
 
-    tasks.withType<JavaCompile>().configureEach { options.release.set(17) }
+    tasks.withType<JavaCompile>().configureEach {
+      options.release.set(libs.versions.jvmTarget.map(String::toInt))
+    }
   }
 
   val isForIntelliJPlugin =
@@ -219,19 +244,10 @@ subprojects {
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
-          // (@NotNull T
-          // => T & Any)
+          // (@NotNull T => T & Any)
           "-Xenhance-type-parameter-types-to-def-not-null",
-          // Use fast implementation on Jar FS. This may speed up compilation time, but currently
-          // it's
-          // an experimental mode
-          // TODO toe-hold but we can't use it yet because it emits a warning that fails with
-          // -Werror
-          //  https://youtrack.jetbrains.com/issue/KT-54928
-          //    "-Xuse-fast-jar-file-system",
           // Support inferring type arguments based on only self upper bounds of the corresponding
-          // type
-          // parameters
+          // type parameters
           "-Xself-upper-bound-inference",
           "-Xjsr305=strict",
           // Match JVM assertion behavior:
@@ -341,10 +357,10 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.1.2") }
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.1") }
       }
 
-      if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
+      if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {
         pluginManager.apply(libs.plugins.pluginUploader.get().pluginId)
         val archive = project.tasks.named<BuildPluginTask>("buildPlugin").flatMap { it.archiveFile }
         val blockMapTask =
@@ -355,11 +371,13 @@ subprojects {
             file.set(archive)
             blockmapFile.set(
               project.layout.buildDirectory.file(
-                "blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
+                "blockmap/blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
               )
             )
             blockmapHashFile.set(
-              project.layout.buildDirectory.file("blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
+              project.layout.buildDirectory.file(
+                "blockmap/blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}"
+              )
             )
           }
 
@@ -369,9 +387,12 @@ subprojects {
           notCompatibleWithConfigurationCache(
             "UploadPluginTask is not compatible with the configuration cache"
           )
+          // TODO why doesn't the flatmap below automatically handle this dependency?
           dependsOn(blockMapTask)
+          blockmapFile.set(blockMapTask.flatMap { it.blockmapFile })
+          blockmapHashFile.set(blockMapTask.flatMap { it.blockmapHashFile })
           url.set(
-            providers.gradleProperty("SgpIntellijArtifactoryBaseUrl").map { baseUrl ->
+            providers.gradleProperty("FoundryIntellijArtifactoryBaseUrl").map { baseUrl ->
               "$baseUrl/${pluginDetails.urlSuffix}"
             }
           )
@@ -387,9 +408,9 @@ subprojects {
           }
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
-            // Sip the username and token together to create an appropriate encoded auth header
-            providers.gradleProperty("SgpIntellijArtifactoryUsername").zip(
-              providers.gradleProperty("SgpIntellijArtifactoryToken")
+            // Zip the username and token together to create an appropriate encoded auth header
+            providers.gradleProperty("FoundryIntellijArtifactoryUsername").zip(
+              providers.gradleProperty("FoundryIntellijArtifactoryToken")
             ) { username, token ->
               "Basic ${"$username:$token".encode().base64()}"
             }

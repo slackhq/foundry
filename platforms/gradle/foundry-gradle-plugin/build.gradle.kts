@@ -55,6 +55,8 @@ tasks.named<ProcessResources>("processResources") {
 
 moshi { enableSealed.set(true) }
 
+tasks.named<ValidatePlugins>("validatePlugins") { enableStricterValidation.set(true) }
+
 // This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
 // apply disambiguation rules
 dependencies.constraints {

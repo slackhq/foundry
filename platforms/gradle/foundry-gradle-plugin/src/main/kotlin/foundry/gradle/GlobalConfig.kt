@@ -21,7 +21,7 @@ import org.gradle.jvm.toolchain.JvmVendorSpec
 /** Registry of global configuration info. */
 public class GlobalConfig
 private constructor(
-  internal val kotlinDaemonArgs: List<String>,
+  internal val kotlinDaemonArgs: List<String>?,
   internal val errorProneCheckNamesAsErrors: List<String>,
   internal val affectedProjects: Set<String>?,
   internal val jvmVendor: JvmVendorSpec?,
@@ -32,7 +32,7 @@ private constructor(
       check(project == project.rootProject) { "Project is not root project!" }
       val globalFoundryProperties = FoundryProperties(project)
       return GlobalConfig(
-        kotlinDaemonArgs = globalFoundryProperties.kotlinDaemonArgs.split(" "),
+        kotlinDaemonArgs = globalFoundryProperties.kotlinDaemonArgs,
         errorProneCheckNamesAsErrors =
           globalFoundryProperties.errorProneCheckNamesAsErrors?.split(":").orEmpty(),
         affectedProjects =

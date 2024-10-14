@@ -4,6 +4,26 @@ Changelog
 **Unreleased**
 --------------
 
+0.20.2
+------
+
+_2024-10-14_
+
+- **Fix**: Fall back to old property name for kotlin JVM args if the new one isn't found.
+- **Enhancement**: Don't try to apply kotlin JVM args if there are none.
+
+0.20.1
+------
+
+_2024-10-14_
+
+Don't use this release! We goofed on something.
+
+0.20.0
+------
+
+_2024-10-11_
+
 ### Project Restructuring
 
 We've restructured this project! Since its early days as a simple Gradle convention plugin it's expanded into IntelliJ plugins, CLIs, CI tooling, and more. To better capture this, we've renamed the project to *Foundry*, restructured its artifacts into a more cohesive setup, moved kotlin-cli-util into this repo, and will likely split out some more artifacts down the line.
@@ -11,6 +31,14 @@ We've restructured this project! Since its early days as a simple Gradle convent
 #### Migration Guide
 
 - Any **gradle properties** prefixed with `slack.` or `sgp.` have now moved to `foundry.`. `slack.gradle.` prefix have also removed the `gradle.` (i.e. `slack.gradle.foo` would now be `foundry.foo`).
+  - `SlackProperties` has been renamed to `FoundryProperties`.
+  - Some properties have been further refined to be more specific.
+  - There is a helper script you can use to automatically rename all properties in `foundry-migration/`.
+    - Download `mapping.txt`
+    - Download `property_migration.sh`
+    - Run `./property_migration.sh mapping.txt <path to target project>`.
+      - Note this only covers `*.kts` and `*.properties` files. This does not cover args passed via CLI or envs.
+
 - Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
 - Gradle coordinates group have moved to the `com.slack.foundry` group name.
 
@@ -36,6 +64,19 @@ We've restructured this project! Since its early days as a simple Gradle convent
     | `com.slack.gradle.apk-versioning` | `com.slack.foundry.apk-versioning` |
 
 - Introduce new required `foundry.android.defaultNamespacePrefix` property for android projects. This is necessary for projects that don't define an `android.namespace` explicitly.
+
+### Misc
+
+- **New**: Make JDK configuration docs and error messages configurable via `FoundryProperties`.
+- **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
+- **Fix**: Track deleted build files when computing parent projects in Skippy.
+- Update Clikt to `5.0.1`.
+- Update oshi-core to `6.6.5`.
+- Build against DAGP 2.x.
+- Build against gradle-error-prone `4.0.1`.
+- Build against gradle-nullaway `2.0.0`.
+- Build against Gradle versions plugin `0.51.0`.
+- Build against Develocity plugin `3.18.1`.
 
 0.19.6
 ------

@@ -46,6 +46,7 @@ kotlin {
         implementation(libs.jewel.bridge)
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
+        implementation(projects.tools.foundryCommon)
       }
     }
   }

@@ -68,7 +68,7 @@ internal object KgpTasks {
     project.pluginManager.onFirst(KGP_PLUGINS) {
       val kotlinExtension = project.kotlinExtension
       kotlinExtension.apply {
-        kotlinDaemonJvmArgs = foundryTools.globalConfig.kotlinDaemonArgs
+        foundryTools.globalConfig.kotlinDaemonArgs?.let { kotlinDaemonJvmArgs = it }
         foundryProperties.versions.jdk.ifPresent { jdkVersion ->
           jvmToolchain {
             languageVersion.set(JavaLanguageVersion.of(jdkVersion))
@@ -153,9 +153,9 @@ internal object KgpTasks {
       project.tasks.withType(KaptGenerateStubsTask::class.java).configureEach {
         compilerOptions {
           val zipped =
-            foundryProperties.kotlinProgressive.zip(foundryProperties.kaptLanguageVersion) {
-              progressive,
-              kaptLanguageVersion ->
+            foundryProperties.kotlinProgressive.zip(
+              foundryProperties.kaptLanguageVersion.orElse(KotlinVersion.DEFAULT)
+            ) { progressive, kaptLanguageVersion ->
               if (kaptLanguageVersion != KotlinVersion.DEFAULT) {
                 false
               } else {

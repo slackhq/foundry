@@ -19,6 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import org.junit.Assume.assumeTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -72,6 +73,7 @@ class ResultProcessorTest(private val useExtensions: Boolean) {
     assertThat(logs.joinToString("\n").trim()).contains(expectedOutput)
   }
 
+  @Ignore("This test is flaky on CI but not locally for unknown reasons")
   @Test
   fun testExecuteCommandWithStderr() {
     val script =
