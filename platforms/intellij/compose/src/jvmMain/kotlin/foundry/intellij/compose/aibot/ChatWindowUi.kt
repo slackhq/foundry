@@ -139,7 +139,7 @@ private fun ConversationField(
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
       IconButton(
-        modifier = Modifier.padding(4.dp).enabled(isTextNotEmpty && !isLoading),
+        modifier = Modifier.padding(4.dp),
         onClick = {
           if (isTextNotEmpty) {
             sendMessage()

@@ -16,6 +16,7 @@
 package foundry.intellij.compose.aibot
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
@@ -28,6 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +41,8 @@ import kotlinx.coroutines.delay
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 
 /**
- * Tutorial from https://www.youtube.com/watch?v=xakNOVaYLAg
+ * Adopted from the Three-Dot Loading Animation Tutorial with Jetpack Compose
+ * by Stevdza-San from https://www.youtube.com/watch?v=xakNOVaYLAg
  */
 
 @Composable
@@ -50,8 +53,12 @@ fun LoadingAnimation(
   spacing: Dp = 7.dp,
   movementDistance: Dp = 10.dp,
 ) {
-  val animatedDots = remember { List(4) { Animatable(0f) } }
 
+  val animatedDots = remember {
+    mutableStateListOf<Animatable<Float, AnimationVector1D>>().apply {
+      repeat(4) { add(Animatable(0f)) }
+    }
+  }
   animatedDots.forEachIndexed { index, dot ->
     LaunchedEffect(dot) {
       delay(index * 100L)
