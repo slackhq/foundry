@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 
-// tutorial from https://www.youtube.com/watch?v=xakNOVaYLAg
+/**
+ * Tutorial from https://www.youtube.com/watch?v=xakNOVaYLAg
+ */
 
 @Composable
 fun LoadingAnimation(
