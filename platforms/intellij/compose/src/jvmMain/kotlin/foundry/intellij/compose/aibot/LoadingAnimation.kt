@@ -41,10 +41,9 @@ import kotlinx.coroutines.delay
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 
 /**
- * Adopted from the Three-Dot Loading Animation Tutorial with Jetpack Compose
- * by Stevdza-San from https://www.youtube.com/watch?v=xakNOVaYLAg
+ * Adopted from the Three-Dot Loading Animation Tutorial with Jetpack Compose by Stevdza-San from
+ * https://www.youtube.com/watch?v=xakNOVaYLAg
  */
-
 @Composable
 fun LoadingAnimation(
   modifier: Modifier = Modifier,
