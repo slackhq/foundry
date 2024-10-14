@@ -46,7 +46,7 @@ import org.jetbrains.jewel.foundation.theme.JewelTheme
  *
  * Adopted from the Three-Dot Loading Animation Tutorial with Jetpack Compose by Stevdza-San from
  *
- * @see [Source](https://www.youtube.com/watch?v=xakNOVaYLAg)
+ * @see <a href="https://www.youtube.com/watch?v=xakNOVaYLAg">Source</a>
  */
 @Composable
 fun LoadingAnimation(
