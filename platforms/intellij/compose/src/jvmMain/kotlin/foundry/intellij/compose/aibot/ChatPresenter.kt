@@ -36,7 +36,7 @@ class ChatPresenter : Presenter<ChatScreen.State> {
           isLoading = true
           val response = Message(callApi(event.message), isMe = false)
           messages = messages + response
-          //          isLoading = false
+          isLoading = false
         }
       }
     }
