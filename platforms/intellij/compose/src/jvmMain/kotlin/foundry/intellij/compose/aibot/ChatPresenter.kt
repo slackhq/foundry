@@ -26,14 +26,17 @@ class ChatPresenter : Presenter<ChatScreen.State> {
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
+    var isLoading by remember { mutableStateOf(false) }
 
-    return ChatScreen.State(messages = messages) { event ->
+    return ChatScreen.State(messages = messages, isLoading = isLoading) { event ->
       when (event) {
         is ChatScreen.Event.SendMessage -> {
           val newMessage = Message(event.message, isMe = true)
           messages = messages + newMessage
+          isLoading = true
           val response = Message(callApi(event.message), isMe = false)
           messages = messages + response
+          isLoading = false
         }
       }
     }
