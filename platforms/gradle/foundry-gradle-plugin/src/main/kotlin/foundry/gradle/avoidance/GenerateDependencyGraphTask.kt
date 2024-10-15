@@ -18,8 +18,8 @@ package foundry.gradle.avoidance
 import com.jraska.module.graph.DependencyGraph
 import com.jraska.module.graph.assertion.GradleDependencyGraphFactory
 import foundry.gradle.FoundryProperties
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.util.setDisallowChanges
 import java.io.ObjectOutputStream
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project

@@ -19,8 +19,8 @@ package foundry.gradle
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
-import foundry.gradle.util.localGradleProperty
-import foundry.gradle.util.setDisallowChanges
+import foundry.gradle.properties.localGradleProperty
+import foundry.gradle.properties.setDisallowChanges
 import java.util.Properties
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin

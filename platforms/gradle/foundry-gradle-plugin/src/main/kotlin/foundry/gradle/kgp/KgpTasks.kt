@@ -26,8 +26,8 @@ import foundry.gradle.configure
 import foundry.gradle.lint.DetektTasks
 import foundry.gradle.not
 import foundry.gradle.onFirst
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.util.configureKotlinCompilationTask
-import foundry.gradle.util.setDisallowChanges
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.GradleException

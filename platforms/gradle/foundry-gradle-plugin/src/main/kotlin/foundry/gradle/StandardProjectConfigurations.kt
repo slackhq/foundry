@@ -40,13 +40,13 @@ import foundry.gradle.dependencyrake.RakeDependencies
 import foundry.gradle.kgp.KgpTasks
 import foundry.gradle.lint.LintTasks
 import foundry.gradle.permissionchecks.PermissionChecks
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CheckManifestPermissionsTask
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.publishWith
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import foundry.gradle.unittest.UnitTests
-import foundry.gradle.util.setDisallowChanges
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway

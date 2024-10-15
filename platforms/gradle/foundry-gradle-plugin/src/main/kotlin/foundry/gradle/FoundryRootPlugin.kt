@@ -29,6 +29,11 @@ import foundry.gradle.develocity.NoOpBuildScanAdapter
 import foundry.gradle.develocity.findAdapter
 import foundry.gradle.lint.DetektTasks
 import foundry.gradle.lint.LintTasks
+import foundry.gradle.properties.StartParameterProperties
+import foundry.gradle.properties.createPropertiesProvider
+import foundry.gradle.properties.gitExecProvider
+import foundry.gradle.properties.setDisallowChanges
+import foundry.gradle.properties.sneakyNull
 import foundry.gradle.stats.ModuleStatsTasks
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CoreBootstrapTask
@@ -39,14 +44,8 @@ import foundry.gradle.tasks.KtfmtDownloadTask
 import foundry.gradle.tasks.SortDependenciesDownloadTask
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import foundry.gradle.unittest.UnitTests
-import foundry.gradle.util.StartParameterProperties
 import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsData
-import foundry.gradle.util.createPropertiesProvider
-import foundry.gradle.util.gitExecProvider
-import foundry.gradle.util.gitVersionProvider
-import foundry.gradle.util.setDisallowChanges
-import foundry.gradle.util.sneakyNull
 import java.util.Locale
 import javax.inject.Inject
 import org.gradle.api.Plugin
@@ -428,7 +427,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
 
       val revsFile = foundryProperties.gitIgnoreRevsFile ?: return
       // "git version 2.24.1"
-      val gitVersion = providers.gitVersionProvider().get()
+      val gitVersion = providers.gitExecProvider("git", "--version").get()
       val versionNumber = parseGitVersion(gitVersion)
       @Suppress(
         "ReplaceCallWithBinaryOperator"

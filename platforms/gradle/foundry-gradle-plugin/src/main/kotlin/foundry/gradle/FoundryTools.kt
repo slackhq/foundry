@@ -24,13 +24,13 @@ import foundry.gradle.FoundryTools.Companion.SERVICE_NAME
 import foundry.gradle.FoundryTools.Parameters
 import foundry.gradle.agp.AgpHandler
 import foundry.gradle.agp.AgpHandlers
+import foundry.gradle.properties.LocalProperties
+import foundry.gradle.properties.setDisallowChanges
+import foundry.gradle.properties.sneakyNull
 import foundry.gradle.util.JsonTools
-import foundry.gradle.util.LocalProperties
 import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsWatcher
-import foundry.gradle.util.setDisallowChanges
 import foundry.gradle.util.shutdown
-import foundry.gradle.util.sneakyNull
 import java.io.File
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutorService

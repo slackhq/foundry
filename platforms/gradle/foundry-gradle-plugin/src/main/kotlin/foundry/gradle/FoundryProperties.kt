@@ -18,9 +18,9 @@ package foundry.gradle
 import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.SgpArtifact
-import foundry.gradle.util.PropertyResolver
-import foundry.gradle.util.getOrCreateExtra
-import foundry.gradle.util.sneakyNull
+import foundry.gradle.properties.PropertyResolver
+import foundry.gradle.properties.getOrCreateExtra
+import foundry.gradle.properties.sneakyNull
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project

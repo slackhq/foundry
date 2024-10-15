@@ -21,6 +21,8 @@ import foundry.gradle.FoundryProperties
 import foundry.gradle.isCi
 import foundry.gradle.isRootProject
 import foundry.gradle.listProperty
+import foundry.gradle.properties.mapToInt
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.property
 import foundry.gradle.register
 import foundry.gradle.serviceOf
@@ -28,8 +30,6 @@ import foundry.gradle.tasks.BootstrapPropertiesMode.APPEND
 import foundry.gradle.tasks.BootstrapPropertiesMode.LOG
 import foundry.gradle.tasks.BootstrapUtils.DaemonArgsProvider
 import foundry.gradle.tasks.BootstrapUtils.computeDaemonArgs
-import foundry.gradle.util.mapToInt
-import foundry.gradle.util.setDisallowChanges
 import java.io.File
 import java.util.Locale
 import java.util.Properties

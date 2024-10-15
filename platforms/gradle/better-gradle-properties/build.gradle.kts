@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.lint)
 }
 
-dependencies {
-  compileOnly(gradleApi())
-}
+dependencies { compileOnly(gradleApi()) }

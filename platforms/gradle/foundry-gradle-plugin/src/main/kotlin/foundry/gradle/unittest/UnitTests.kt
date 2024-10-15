@@ -24,11 +24,11 @@ import foundry.gradle.ciUnitTestAndroidVariant
 import foundry.gradle.configureEach
 import foundry.gradle.isActionsCi
 import foundry.gradle.isCi
+import foundry.gradle.properties.setDisallowChanges
+import foundry.gradle.properties.synchronousEnvProperty
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.SimpleFilesConsumerTask
 import foundry.gradle.tasks.publish
-import foundry.gradle.util.setDisallowChanges
-import foundry.gradle.util.synchronousEnvProperty
 import kotlin.math.max
 import kotlin.math.roundToInt
 import org.gradle.api.Project

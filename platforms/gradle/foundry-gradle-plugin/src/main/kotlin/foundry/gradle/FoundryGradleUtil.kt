@@ -23,8 +23,8 @@ import com.google.common.base.CaseFormat
 import foundry.gradle.agp.VersionNumber
 import foundry.gradle.dependencies.DependencyDef
 import foundry.gradle.dependencies.DependencyGroup
-import foundry.gradle.util.gitExecProvider
-import foundry.gradle.util.mapToBoolean
+import foundry.gradle.properties.gitExecProvider
+import foundry.gradle.properties.mapToBoolean
 import java.io.File
 import java.util.Locale
 import java.util.Optional
