@@ -69,8 +69,6 @@ dependencies.constraints {
 }
 
 dependencies {
-  lintChecks(libs.gradleLints)
-
   api(platform(libs.okhttp.bom))
   api(libs.okhttp)
   // Better I/O
@@ -130,4 +128,6 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)
+
+  lintChecks(libs.gradleLints)
 }

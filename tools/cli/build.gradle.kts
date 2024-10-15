@@ -43,8 +43,6 @@ if (System.getenv("CI") != null) {
 }
 
 dependencies {
-  ksp(libs.autoService.ksp)
-
   api(libs.clikt)
 
   implementation(libs.autoService.annotations)
@@ -63,4 +61,6 @@ dependencies {
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
+  ksp(libs.autoService.ksp)
 }
