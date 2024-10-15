@@ -26,7 +26,7 @@ This includes a whole host of things!
 - Platforms and BOM dependencies (see "Platform plugins" section below).
 - Common lint checks (both on Android and plain JVM projects).
 
-Full docs can be found in the [architecture](architecture) docs.
+Full docs can be found in the [architecture](platforms/gradle/architecture.md) docs.
 
 ### Feature DSL
 
@@ -71,8 +71,7 @@ of our friends at Square).
 
 Gradle's built-in property support is limited and has surprising behavior, so we have our own
 system on top of it that has consistent precedence, `local.properties` support, project-local
-`gradle.properties`, and configuration caching support. Check out `safeProperty()` in
-`PropertyUtil.kt`.
+`gradle.properties`, and configuration caching support. Check out `PropertyResolver`.
 
 ### Dependency Rake
 
