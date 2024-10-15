@@ -30,9 +30,9 @@ import foundry.gradle.agp.PermissionAllowlistConfigurer
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import foundry.gradle.dependencies.FoundryDependencies
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.util.addKspSource
 import foundry.gradle.util.configureKotlinCompilationTask
-import foundry.gradle.util.setDisallowChanges
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.Action

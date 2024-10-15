@@ -19,8 +19,8 @@ package foundry.gradle
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
-import foundry.gradle.util.localGradleProperty
-import foundry.gradle.util.setDisallowChanges
+import foundry.gradle.properties.localGradleProperty
+import foundry.gradle.properties.setDisallowChanges
 import java.util.Properties
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
@@ -95,8 +95,8 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       )
 
       // Register a version properties task. This is run on ci via android_preflight.sh
-      val shortGitShaProvider = project.gitSha
-      val longGitShaProvider = project.fullGitSha
+      val shortGitShaProvider = project.gitShaProvider()
+      val longGitShaProvider = project.fullGitShaProvider()
       project.tasks.register<VersionPropertiesTask>("generateVersionProperties") {
         outputFile.setDisallowChanges(
           project.layout.buildDirectory.file("intermediates/versioning/version.properties")

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.gradle.util
+package foundry.gradle.properties
 
-import java.io.ByteArrayOutputStream
-import java.nio.charset.Charset
 import javax.inject.Inject
+import okio.Buffer
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -25,29 +24,36 @@ import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
 import org.gradle.process.ExecOperations
 
-internal fun ProviderFactory.gitVersionProvider(): Provider<String> {
-  return gitExecProvider("git", "--version")
-}
-
-internal fun ProviderFactory.gitExecProvider(vararg args: String): Provider<String> {
+/**
+ * Returns a new UTF8 String [Provider] backed by a [ValueSource] that produces a `git` exec
+ * operation with the given [args].
+ *
+ * Because this is a gradle property that could be used at configuration-time, it's recommended to
+ * be careful when using this to avoid accidental often configuration-cache invalidations.
+ */
+public fun ProviderFactory.gitExecProvider(vararg args: String): Provider<String> {
   require(args.isNotEmpty()) { "Args list is empty" }
   return of(GitExecValueSource::class.java) { parameters.args.addAll(*args) }
 }
 
 // Adapted from
 // https://docs.gradle.org/8.1/userguide/configuration_cache.html#config_cache:requirements:external_processes
-internal abstract class GitExecValueSource : ValueSource<String, GitExecValueSource.Parameters> {
-  @get:Inject abstract val execOperations: ExecOperations
+internal abstract class GitExecValueSource
+@Inject
+constructor(private val execOperations: ExecOperations) :
+  ValueSource<String, GitExecValueSource.Parameters> {
 
   override fun obtain(): String {
     val args = parameters.args.get()
     check(args.isNotEmpty()) { "Args list is empty" }
-    val output = ByteArrayOutputStream()
-    execOperations.exec {
-      commandLine(args)
-      standardOutput = output
+    val buffer = Buffer()
+    buffer.outputStream().use { output ->
+      execOperations.exec {
+        commandLine(args)
+        standardOutput = output
+      }
     }
-    return String(output.toByteArray(), Charset.defaultCharset()).trim { it <= ' ' }
+    return buffer.readUtf8().trim()
   }
 
   interface Parameters : ValueSourceParameters {

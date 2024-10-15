@@ -21,8 +21,8 @@ import foundry.gradle.dependencies.DependencyCollection
 import foundry.gradle.dependencies.DependencyDef
 import foundry.gradle.dependencies.flattenedPlatformCoordinates
 import foundry.gradle.dependencies.identifierMap
+import foundry.gradle.properties.sneakyNull
 import foundry.gradle.util.JsonTools
-import foundry.gradle.util.sneakyNull
 import java.io.File
 import okio.buffer
 import okio.source

@@ -148,6 +148,7 @@ rootProject.name = "foundry"
 // Please keep these in alphabetical order!
 include(
   ":platforms:gradle:agp-handlers:agp-handler-api",
+  ":platforms:gradle:better-gradle-properties",
   ":platforms:gradle:foundry-gradle-plugin",
   ":platforms:intellij:artifactory-authenticator",
   ":platforms:intellij:compose",

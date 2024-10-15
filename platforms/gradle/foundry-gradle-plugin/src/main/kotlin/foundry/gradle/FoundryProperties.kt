@@ -18,9 +18,9 @@ package foundry.gradle
 import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.SgpArtifact
-import foundry.gradle.util.PropertyResolver
-import foundry.gradle.util.getOrCreateExtra
-import foundry.gradle.util.sneakyNull
+import foundry.gradle.properties.PropertyResolver
+import foundry.gradle.properties.getOrCreateExtra
+import foundry.gradle.properties.sneakyNull
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
@@ -475,24 +475,6 @@ internal constructor(
    */
   public val platformProjectPath: String?
     get() = optionalStringProperty("foundry.location.foundry-platform")
-
-  /**
-   * Opt-in path for commit hooks in the consuming repo that should be automatically installed
-   * automatically. This is passed into [org.gradle.api.Project.file] from the root project.
-   *
-   * Corresponds to git's `core.hooksPath`.
-   */
-  public val gitHooksFile: File?
-    get() = fileProperty("foundry.git.hooksPath")
-
-  /**
-   * Opt-in path for a pre-commit hook in the consuming repo that should be automatically installed
-   * automatically. This is passed into [org.gradle.api.Project.file] from the root project.
-   *
-   * Corresponds to git's `blame.ignoreRevsFile`.
-   */
-  public val gitIgnoreRevsFile: File?
-    get() = fileProperty("foundry.git.ignoreRevsFile")
 
   /**
    * Optional file location for an `affected_projects.txt` file that contains a list of projects
