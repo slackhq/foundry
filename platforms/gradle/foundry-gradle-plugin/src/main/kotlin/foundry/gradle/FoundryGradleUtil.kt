@@ -20,9 +20,6 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.google.common.base.CaseFormat
-import foundry.gradle.agp.VersionNumber
-import foundry.gradle.dependencies.DependencyDef
-import foundry.gradle.dependencies.DependencyGroup
 import foundry.gradle.properties.gitExecProvider
 import foundry.gradle.properties.mapToBoolean
 import java.io.File
@@ -54,14 +51,8 @@ public val Project.isBuildkite: Boolean
 public val Project.isCi: Boolean
   get() = isActionsCi || isBuildkite
 
-/** Useful helper for resolving a `group:name:version` bom notation for a [DependencyGroup]. */
-internal fun DependencyGroup.toBomDependencyDef(): DependencyDef {
-  checkNotNull(bomArtifact) { "No bom found for group ${this::class.simpleName}" }
-  return DependencyDef(group, bomArtifact, gradleProperty = groupGradleProperty)
-}
-
 /** Returns the git branch this is running on. */
-public fun Project.gitBranch(): Provider<String> {
+public fun Project.gitBranchProvider(): Provider<String> {
   return when {
     isBuildkite -> providers.environmentVariable("BUILDKITE_BRANCH")
     else ->
@@ -69,21 +60,6 @@ public fun Project.gitBranch(): Provider<String> {
         it.lines()[0].trim()
       }
   }
-}
-
-private val GIT_VERSION_REGEX = Regex("git version (\\d+\\.\\d+(\\.\\d+)?).*")
-
-/**
- * Parses a git [VersionNumber] from a given [gitVersion], usually from a command line `git
- * --version` output.
- */
-internal fun parseGitVersion(gitVersion: String?): VersionNumber {
-  if (!gitVersion.isNullOrBlank()) {
-    return GIT_VERSION_REGEX.find(gitVersion)?.groupValues?.get(1)?.let(VersionNumber::parse)
-      ?: VersionNumber.UNKNOWN
-  }
-
-  return VersionNumber.UNKNOWN
 }
 
 @OptIn(ExperimentalPathApi::class)
@@ -143,15 +119,13 @@ public enum class SupportedLanguagesEnum {
   BETA,
 }
 
-public val Project.fullGitSha: Provider<String>
-  get() {
-    return providers.gitExecProvider("git", "rev-parse", "HEAD")
-  }
+public fun Project.fullGitShaProvider(): Provider<String> {
+  return providers.gitExecProvider("git", "rev-parse", "HEAD")
+}
 
-public val Project.gitSha: Provider<String>
-  get() {
-    return providers.gitExecProvider("git", "rev-parse", "--short", "HEAD")
-  }
+public fun Project.gitShaProvider(): Provider<String> {
+  return providers.gitExecProvider("git", "rev-parse", "--short", "HEAD")
+}
 
 public val Project.ciBuildNumber: Provider<String>
   get() {

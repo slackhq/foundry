@@ -4,6 +4,14 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Extract `better-gradle-properties` artifact, which is our hierarchical Gradle properties solution that better handles properties in Gradle. This is what powers `FoundryProperties` but is now extracted to be more portable.
+  - This checks in the following order of priority
+    - project-local `local.properties`
+    - project-local `gradle.properties`
+    - root-project `local.properties`
+    - root-project/global `gradle.properties`
+- Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
+
 0.20.2
 ------
 

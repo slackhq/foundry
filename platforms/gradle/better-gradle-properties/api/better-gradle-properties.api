@@ -1,0 +1,78 @@
+public final class foundry/gradle/properties/GitExecProvidersKt {
+	public static final fun gitExecProvider (Lorg/gradle/api/provider/ProviderFactory;[Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+}
+
+public final class foundry/gradle/properties/HasConfigurableValuesKt {
+	public static final fun fromDisallowChanges (Lorg/gradle/api/file/ConfigurableFileCollection;[Ljava/lang/Object;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/ListProperty;Ljava/lang/Iterable;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/ListProperty;Lorg/gradle/api/provider/Provider;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/ListProperty;Lorg/gradle/api/provider/Provider;Lkotlin/jvm/functions/Function1;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/MapProperty;Ljava/util/Map;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/provider/Provider;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/provider/Provider;Lkotlin/jvm/functions/Function1;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/Property;Ljava/lang/Object;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Provider;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/SetProperty;Ljava/lang/Iterable;)V
+	public static final fun setDisallowChanges (Lorg/gradle/api/provider/SetProperty;Lorg/gradle/api/provider/Provider;)V
+}
+
+public abstract class foundry/gradle/properties/LocalProperties : org/gradle/api/provider/ValueSource {
+	public fun <init> ()V
+	public synthetic fun obtain ()Ljava/lang/Object;
+	public fun obtain ()Ljava/util/Properties;
+}
+
+public abstract interface class foundry/gradle/properties/LocalProperties$Parameters : org/gradle/api/provider/ValueSourceParameters {
+	public abstract fun getPropertiesFile ()Lorg/gradle/api/file/RegularFileProperty;
+}
+
+public final class foundry/gradle/properties/PropertyResolver {
+	public fun <init> (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun booleanProvider (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public final fun booleanProvider (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
+	public final fun booleanProvider (Ljava/lang/String;Z)Lorg/gradle/api/provider/Provider;
+	public static synthetic fun booleanProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;ZILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
+	public final fun booleanValue (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)Z
+	public final fun booleanValue (Ljava/lang/String;Z)Z
+	public static synthetic fun booleanValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;ZILjava/lang/Object;)Z
+	public final fun intProvider (Ljava/lang/String;I)Lorg/gradle/api/provider/Provider;
+	public final fun intProvider (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
+	public static synthetic fun intProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;IILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
+	public final fun intValue (Ljava/lang/String;I)I
+	public final fun intValue (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)I
+	public static synthetic fun intValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;IILjava/lang/Object;)I
+	public final fun optionalStringProvider (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public final fun optionalStringProvider (Ljava/lang/String;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public static synthetic fun optionalStringProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
+	public final fun optionalStringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun optionalStringValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
+	public final fun providerFor (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public final fun stringValue (Ljava/lang/String;)Ljava/lang/String;
+	public final fun stringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class foundry/gradle/properties/PropertyUtil {
+	public static final fun createPropertiesProvider (Lorg/gradle/api/Project;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public static final fun getOrCreateExtra (Lorg/gradle/api/Project;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun localGradleProperty (Lorg/gradle/api/Project;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public static final fun localProperty (Lorg/gradle/api/Project;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public static final fun mapToBoolean (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
+	public static final fun mapToInt (Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
+	public static final fun markAsNonNullForGradle (Ljava/lang/Object;)V
+	public static final fun sneakyNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun sneakyNull$default (Ljava/lang/Object;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun synchronousEnvProperty (Lorg/gradle/api/Project;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun synchronousEnvProperty$default (Lorg/gradle/api/Project;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
+}
+
+public abstract class foundry/gradle/properties/StartParameterProperties : org/gradle/api/provider/ValueSource {
+	public fun <init> ()V
+	public synthetic fun obtain ()Ljava/lang/Object;
+	public fun obtain ()Ljava/util/Map;
+}
+
+public abstract interface class foundry/gradle/properties/StartParameterProperties$Parameters : org/gradle/api/provider/ValueSourceParameters {
+	public abstract fun getProperties ()Lorg/gradle/api/provider/MapProperty;
+}
+

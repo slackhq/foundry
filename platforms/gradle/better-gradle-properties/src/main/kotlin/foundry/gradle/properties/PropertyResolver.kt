@@ -19,7 +19,14 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 
 /**
- * A property resolver that handles multiple property sources.
+ * A property resolver that handles multiple property sources in a hierarchical fashion for
+ * [providerFor].
+ *
+ * This checks in the following order of priority
+ * - project-local `local.properties`
+ * - project-local `gradle.properties`
+ * - root-project `local.properties`
+ * - root-project/global `gradle.properties`
  *
  * @property project The project to resolve properties for.
  * @property startParameterProperty A provider of a property _only_ contained in the project's start

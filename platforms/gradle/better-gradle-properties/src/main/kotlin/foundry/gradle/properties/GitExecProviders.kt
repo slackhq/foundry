@@ -15,9 +15,8 @@
  */
 package foundry.gradle.properties
 
-import java.io.ByteArrayOutputStream
-import java.nio.charset.Charset
 import javax.inject.Inject
+import okio.Buffer
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -25,6 +24,13 @@ import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
 import org.gradle.process.ExecOperations
 
+/**
+ * Returns a new UTF8 String [Provider] backed by a [ValueSource] that produces a `git` exec
+ * operation with the given [args].
+ *
+ * Because this is a gradle property that could be used at configuration-time, it's recommended to
+ * be careful when using this to avoid accidental often configuration-cache invalidations.
+ */
 public fun ProviderFactory.gitExecProvider(vararg args: String): Provider<String> {
   require(args.isNotEmpty()) { "Args list is empty" }
   return of(GitExecValueSource::class.java) { parameters.args.addAll(*args) }
@@ -40,12 +46,14 @@ constructor(private val execOperations: ExecOperations) :
   override fun obtain(): String {
     val args = parameters.args.get()
     check(args.isNotEmpty()) { "Args list is empty" }
-    val output = ByteArrayOutputStream()
-    execOperations.exec {
-      commandLine(args)
-      standardOutput = output
+    val buffer = Buffer()
+    buffer.outputStream().use { output ->
+      execOperations.exec {
+        commandLine(args)
+        standardOutput = output
+      }
     }
-    return String(output.toByteArray(), Charset.defaultCharset()).trim { it <= ' ' }
+    return buffer.readUtf8().trim()
   }
 
   interface Parameters : ValueSourceParameters {

@@ -19,4 +19,8 @@ plugins {
   alias(libs.plugins.lint)
 }
 
-dependencies { compileOnly(gradleApi()) }
+dependencies {
+  implementation(libs.okio)
+
+  compileOnly(gradleApi())
+}

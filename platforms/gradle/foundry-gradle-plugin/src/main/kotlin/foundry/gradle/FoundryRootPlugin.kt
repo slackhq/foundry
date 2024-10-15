@@ -31,7 +31,6 @@ import foundry.gradle.lint.DetektTasks
 import foundry.gradle.lint.LintTasks
 import foundry.gradle.properties.StartParameterProperties
 import foundry.gradle.properties.createPropertiesProvider
-import foundry.gradle.properties.gitExecProvider
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.properties.sneakyNull
 import foundry.gradle.stats.ModuleStatsTasks
@@ -162,7 +161,6 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
         val latestCompileSdkWithSources = foundryProperties.latestCompileSdkWithSources(compileSdk)
         AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
       }
-      project.configureGit(foundryProperties)
     }
     project.configureFoundryRootBuildscript(
       foundryProperties.versions.jdk.asProvider(project.providers),
@@ -417,53 +415,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     return stableKeyword || STABLE_REGEX.matches(version)
   }
 
-  private fun Project.configureGit(foundryProperties: FoundryProperties) {
-    // Only run locally
-    if (!isCi) {
-      foundryProperties.gitHooksFile?.let { hooksPath ->
-        // Configure hooks
-        providers.gitExecProvider("git", "config", "core.hooksPath", hooksPath.canonicalPath).get()
-      }
-
-      val revsFile = foundryProperties.gitIgnoreRevsFile ?: return
-      // "git version 2.24.1"
-      val gitVersion = providers.gitExecProvider("git", "--version").get()
-      val versionNumber = parseGitVersion(gitVersion)
-      @Suppress(
-        "ReplaceCallWithBinaryOperator"
-      ) // Groovy classes don't seem to export equals() correctly
-      when {
-        versionNumber.equals(VersionNumber.UNKNOWN) -> {
-          logger.lifecycle(
-            "Could not infer git env from '$gitVersion'. This can happen if it's the pre-installed " +
-              "git version from Apple, please consider using a custom git installation from Homebrew or otherwise."
-          )
-        }
-        versionNumber < MIN_GIT_VERSION_FOR_IGNORE_REVS -> {
-          logger.lifecycle(
-            "Current git version ($versionNumber) is too low to use " +
-              "blame.ignoreRevsFile (2.23+). Please consider updating!"
-          )
-        }
-        else -> {
-          logger.debug("Configuring blame.ignoreRevsFile")
-          providers
-            .gitExecProvider("git", "config", "blame.ignoreRevsFile", file(revsFile).canonicalPath)
-            .get()
-        }
-      }
-    }
-  }
-
   private companion object {
-    /**
-     * Minimum supported version of git to use blame.ignoreRevsFile.
-     *
-     * See
-     * https://www.moxio.com/blog/43/ignoring-bulk-change-commits-with-git-blame#git-2.23-to-the-rescue.
-     */
-    val MIN_GIT_VERSION_FOR_IGNORE_REVS = VersionNumber.parse("2.23")
-
     private val STABLE_REGEX = "^[0-9,.v-]+(-android)?(-r)?$".toRegex()
   }
 }

@@ -477,24 +477,6 @@ internal constructor(
     get() = optionalStringProperty("foundry.location.foundry-platform")
 
   /**
-   * Opt-in path for commit hooks in the consuming repo that should be automatically installed
-   * automatically. This is passed into [org.gradle.api.Project.file] from the root project.
-   *
-   * Corresponds to git's `core.hooksPath`.
-   */
-  public val gitHooksFile: File?
-    get() = fileProperty("foundry.git.hooksPath")
-
-  /**
-   * Opt-in path for a pre-commit hook in the consuming repo that should be automatically installed
-   * automatically. This is passed into [org.gradle.api.Project.file] from the root project.
-   *
-   * Corresponds to git's `blame.ignoreRevsFile`.
-   */
-  public val gitIgnoreRevsFile: File?
-    get() = fileProperty("foundry.git.ignoreRevsFile")
-
-  /**
    * Optional file location for an `affected_projects.txt` file that contains a list of projects
    * affected in this build.
    */
