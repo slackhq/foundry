@@ -46,7 +46,7 @@ import org.jetbrains.jewel.foundation.theme.JewelTheme
  *
  * Adopted from the Three-Dot Loading Animation Tutorial with Jetpack Compose by Stevdza-San from
  *
- * @see <a href="https://www.youtube.com/watch?v=xakNOVaYLAg">Source</a>
+ * @see "https://www.youtube.com/watch?v=xakNOVaYLAg"
  */
 @Composable
 fun LoadingAnimation(
@@ -56,7 +56,6 @@ fun LoadingAnimation(
   spacing: Dp = 7.dp,
   movementDistance: Dp = 10.dp,
 ) {
-
   val animatedDots = remember {
     mutableStateListOf<Animatable<Float, AnimationVector1D>>().apply {
       repeat(4) { add(Animatable(0f)) }
@@ -83,15 +82,14 @@ fun LoadingAnimation(
     }
   }
 
-  val animatedValues = animatedDots.map { it.value }
   val pixelDistance = with(LocalDensity.current) { movementDistance.toPx() }
 
   Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
-    animatedValues.forEach { value ->
+    animatedDots.forEach { dot ->
       Box(
         modifier =
           Modifier.size(dotSize)
-            .graphicsLayer { translationY = -value * pixelDistance }
+            .graphicsLayer { translationY = -dot.value * pixelDistance }
             .background(color = dotColor, shape = CircleShape)
       )
     }
