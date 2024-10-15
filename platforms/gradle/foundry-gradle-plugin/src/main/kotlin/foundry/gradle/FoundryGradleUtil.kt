@@ -26,9 +26,10 @@ import foundry.gradle.dependencies.DependencyGroup
 import foundry.gradle.util.gitExecProvider
 import foundry.gradle.util.mapToBoolean
 import java.io.File
-import java.nio.file.Files
 import java.util.Locale
 import java.util.Optional
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteRecursively
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -85,6 +86,7 @@ internal fun parseGitVersion(gitVersion: String?): VersionNumber {
   return VersionNumber.UNKNOWN
 }
 
+@OptIn(ExperimentalPathApi::class)
 internal fun robolectricJars(gradleUserHomeDir: File, createDirsIfMissing: Boolean = true): File {
   val foundryHome = File(gradleUserHomeDir, "foundry")
 
@@ -93,7 +95,7 @@ internal fun robolectricJars(gradleUserHomeDir: File, createDirsIfMissing: Boole
   if (slackHome.exists()) {
     println("Migrating slack home to foundry")
     slackHome.copyRecursively(foundryHome, overwrite = true)
-    Files.deleteIfExists(slackHome.toPath())
+    slackHome.toPath().deleteRecursively()
   }
 
   foundryHome.apply {

@@ -48,6 +48,7 @@ import androidx.compose.ui.window.Popup
 import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import com.slack.circuit.runtime.ui.ui
+import java.nio.file.Path
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.Orientation
@@ -67,7 +68,7 @@ object ProjectGenUi {
     fun dismissDialogAndSync()
   }
 
-  fun createPanel(rootDir: String, width: Int, height: Int, events: Events): JComponent {
+  fun createPanel(rootDir: Path, width: Int, height: Int, events: Events): JComponent {
     return ComposePanel().apply {
       setBounds(0, 0, width, height)
       setContent { FoundryDesktopTheme { ProjectGenApp(rootDir, events) } }
@@ -75,7 +76,7 @@ object ProjectGenUi {
   }
 
   @Composable
-  fun ProjectGenApp(rootDir: String, events: Events) {
+  fun ProjectGenApp(rootDir: Path, events: Events) {
     val circuit = remember {
       Circuit.Builder()
         .addPresenterFactory { _, _, _ ->

@@ -35,10 +35,11 @@ class ChatPresenter(private val scriptPath: Path, apiLink: String) : Presenter<C
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
+    var isLoading by remember { mutableStateOf(false) }
 
     println("print script path $scriptPath")
 
-    return ChatScreen.State(messages = messages) { event ->
+    return ChatScreen.State(messages = messages, isLoading = isLoading) { event ->
       when (event) {
         is ChatScreen.Event.SendMessage -> {
           val newMessage = Message(role = user, event.message)
@@ -47,6 +48,10 @@ class ChatPresenter(private val scriptPath: Path, apiLink: String) : Presenter<C
             val response = chatBotActionService.executeCommand(event.message)
             messages = messages + Message(role = bot, response)
           }
+          isLoading = true
+          val response = Message(callApi(event.message), isMe = false)
+          messages = messages + response
+          isLoading = false
         }
       }
     }

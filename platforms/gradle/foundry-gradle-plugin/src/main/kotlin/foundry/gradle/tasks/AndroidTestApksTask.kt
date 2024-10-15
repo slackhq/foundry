@@ -34,6 +34,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * A task that aggregates all the androidTest apk paths and writes them (newline-delimited) to an
@@ -41,6 +42,7 @@ import org.gradle.api.tasks.TaskProvider
  *
  * Not cacheable because this outputs absolute paths.
  */
+@DisableCachingByDefault
 public abstract class AndroidTestApksTask : DefaultTask() {
   @get:PathSensitive(RELATIVE)
   @get:InputFiles

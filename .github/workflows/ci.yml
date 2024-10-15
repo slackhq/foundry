@@ -40,6 +40,7 @@ jobs:
 
       - name: Build and run tests
         id: gradle
+        timeout-minutes: 10
         run: ./gradlew check
 
       - name: Print build scan url
@@ -80,4 +81,4 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/foundry'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }} -x dokkaHtml --no-configuration-cache
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}

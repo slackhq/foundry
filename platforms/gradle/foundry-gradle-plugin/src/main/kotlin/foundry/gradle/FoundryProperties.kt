@@ -15,6 +15,7 @@
  */
 package foundry.gradle
 
+import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.util.PropertyResolver
@@ -72,12 +73,16 @@ internal constructor(
   public val libraryWithVariants: Boolean
     get() = booleanProperty("foundry.android.libraryWithVariants")
 
-  /** Default namespace prefix for android proejcts if one isn't specified. */
+  /** Default namespace prefix for android projects if one isn't specified. */
   public val defaultNamespacePrefix: String
-    get() = stringProperty("foundry.android.defaultNamespacePrefix")
+    get() = optionalStringProperty("foundry.android.defaultNamespacePrefix") ?: defaultPackagePrefix
+
+  /** Default package prefix for JVM projects if one isn't specified. */
+  public val defaultPackagePrefix: String
+    get() = stringProperty(FoundryKeys.DEFAULT_PACKAGE_PREFIX)
 
   /**
-   * Indicates that the gradle versions plugin should allow unstable versions. By default unstable
+   * Indicates that the gradle versions plugin should allow unstable versions. By default, unstable
    * versions are excluded due to the frequent androidx alpha/beta/rc cycle noise. Flag-only, value
    * is ignored.
    */
@@ -381,13 +386,21 @@ internal constructor(
     get() = optionalStringProperty("foundry.android.disabledVariants")
 
   /**
-   * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
+   * The project-specific kotlin.daemon.jvmargs computed by bootstrap.
    *
    * We don't just blanket use `kotlin.daemon.jvmargs` alone because we don't want to pollute other
    * projects.
    */
-  public val kotlinDaemonArgs: String
-    get() = stringProperty(KOTLIN_DAEMON_ARGS_KEY, defaultValue = "")
+  public val kotlinDaemonArgs: List<String>?
+    get() =
+      optionalStringProperty(
+          KOTLIN_DAEMON_ARGS_KEY,
+          defaultValue = optionalStringProperty(KOTLIN_DAEMON_ARGS_KEY_OLD, defaultValue = null),
+        )
+        ?.split(" ")
+        ?.map(String::trim)
+        ?.filterNot(String::isBlank)
+        ?.takeUnless(List<*>::isEmpty)
 
   /**
    * Flag to enable ciUnitTest on this project. Default is true.
@@ -649,7 +662,7 @@ internal constructor(
     get() = resolver.booleanValue("foundry.artifacts.configure-eagerly", defaultValue = false)
 
   /**
-   * Force-disables Anvil regardless of `SlackExtension.dagger()` settings, useful for K2 testing
+   * Force-disables Anvil regardless of `FoundryExtension.dagger()` settings, useful for K2 testing
    * where Anvil is unsupported.
    */
   public val disableAnvilForK2Testing: Boolean
@@ -686,6 +699,14 @@ internal constructor(
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("foundry.jvm.vendor.optOut", defaultValue = false)
+
+  /** Optional link to JDK configuration */
+  public val jdkDocsLink: String?
+    get() = optionalStringProperty("foundry.jdk.docsLink")
+
+  /** Optional error message to show when the JDK configuration is invalid. */
+  public val jdkErrorMessage: String?
+    get() = optionalStringProperty("foundry.jdk.errorMessage")
 
   /**
    * Option to force a specific kotlin language version. By default defers to the KGP default the
@@ -761,12 +782,13 @@ internal constructor(
 
   public companion object {
     /**
-     * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
+     * The project-specific kotlin.daemon.jvmargs computed by bootstrap.
      *
      * We don't just blanket use `kotlin.daemon.jvmargs` alone because we don't want to pollute
      * other projects.
      */
     public const val KOTLIN_DAEMON_ARGS_KEY: String = "foundry.kotlin.daemon.jvmargs"
+    public const val KOTLIN_DAEMON_ARGS_KEY_OLD: String = "slack.kotlin.daemon.jvmargs"
 
     /** Minimum xmx value for the Gradle daemon. Value is an integer and unit is gigabytes. */
     // Key-only because it's used in a task init without a project instance

@@ -26,7 +26,11 @@ import foundry.tracing.ValueType
 import foundry.tracing.model.newTagBuilder
 import java.time.Instant
 import okio.ByteString
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
+@RunWith(JUnit4::class)
 class SkateTraceReporterTest : BasePlatformTestCase() {
 
   override fun setUp() {
@@ -35,6 +39,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
     settings.isTracingEnabled = false
   }
 
+  @Test
   fun testSpanCreatedWithCorrectTags() {
     val traceTags =
       newTagBuilder().apply {
@@ -77,6 +82,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
     }
   }
 
+  @Test
   fun testSpanNotCreatedWhenSpanDataIsEmpty() {
     val listOfSpans =
       SkateTraceReporter(project)
@@ -92,6 +98,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
     assertThat(listOfSpans).isNull()
   }
 
+  @Test
   fun testSpanNotCreatedWhenIdeVersionEmpty() {
     val listOfSpans =
       SkateTraceReporter(project)

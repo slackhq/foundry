@@ -24,7 +24,9 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault
 public abstract class BaseDependencyCheckTask : DefaultTask() {
   @get:Input public abstract val identifiersToVersions: MapProperty<String, String>
 

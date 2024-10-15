@@ -27,7 +27,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
-import kotlin.io.path.absolutePathString
 
 class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent) :
   DialogWrapper(currentProject), ProjectGenUi.Events {
@@ -48,12 +47,7 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
 
   override fun createCenterPanel(): JComponent {
     setSize(600, 800)
-    return ProjectGenUi.createPanel(
-      rootDir = projectPath.absolutePathString(),
-      width = 600,
-      height = 800,
-      events = this,
-    )
+    return ProjectGenUi.createPanel(rootDir = projectPath, width = 600, height = 800, events = this)
   }
 
   /* Disable default OK and Cancel action button in Dialog window. */

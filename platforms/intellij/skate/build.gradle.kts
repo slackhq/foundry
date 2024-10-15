@@ -74,7 +74,7 @@ fun readGitRepoCommit(): String? {
     }
 
     return headFile.readText(Charsets.UTF_8).trim().takeIf { isGitHash(it) }
-  } catch (e: Exception) {
+  } catch (_: Exception) {
     return null
   }
 }
@@ -94,17 +94,24 @@ buildConfig {
   }
 }
 
-configurations
-  .named { it == "runtimeClasspath" }
-  .configureEach {
-    // Do not bring in Material (we use Jewel)
-    exclude(group = "org.jetbrains.compose.material")
-    // Do not bring Coroutines or slf4j (the IDE has its own)
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
-    exclude(group = "org.slf4j")
-  }
+// TODO reconcile exclusions and this by figuring out which configurations need to exclude
+//  coroutines. https://youtrack.jetbrains.com/issue/IJPL-163489
+configurations.configureEach {
+  // Do not bring in Material (we use Jewel)
+  exclude(group = "org.jetbrains.compose.material")
+  // Do not bring Coroutines or slf4j (the IDE has its own)
+  exclude(group = "org.slf4j")
+}
+
+val exclusions: Action<ModuleDependency> = Action {
+  // Do not bring in Material (we use Jewel)
+  exclude(group = "org.jetbrains.compose.material")
+  // Do not bring Coroutines or slf4j (the IDE has its own)
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-bom")
+  exclude(group = "org.slf4j")
+}
 
 configurations
   .named { it.endsWith("ForLint") }
@@ -113,20 +120,22 @@ configurations
 dependencies {
   lintChecks(libs.composeLints)
 
-  implementation(libs.bugsnag) { exclude(group = "org.slf4j") }
+  compileOnly(libs.coroutines.core.ij)
+
+  implementation(libs.bugsnag)
   implementation(libs.okio)
   implementation(libs.kaml)
   implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.platforms.intellij.compose)
-  implementation(projects.tools.tracing)
+  implementation(projects.platforms.intellij.compose, exclusions)
+  implementation(projects.tools.tracing, exclusions)
 
   intellijPlatform {
     // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
     // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
     // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
-    plugin("org.jetbrains.android:241.17011.79")
+    plugin("org.jetbrains.android:242.21829.142")
     bundledPlugins(
       "com.intellij.java",
       "org.intellij.plugins.markdown",

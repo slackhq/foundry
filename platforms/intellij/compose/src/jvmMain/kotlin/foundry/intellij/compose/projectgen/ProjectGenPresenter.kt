@@ -22,10 +22,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
-import java.io.File
+import foundry.common.FoundryKeys
+import java.nio.file.Path
+import java.util.Properties
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.bufferedReader
+import kotlin.io.path.exists
 
 internal class ProjectGenPresenter(
-  private val rootDir: String,
+  private val rootDir: Path,
   private val onDismissDialog: () -> Unit,
   private val onSync: () -> Unit,
 ) : Presenter<ProjectGenScreen.State> {
@@ -38,14 +43,24 @@ internal class ProjectGenPresenter(
       validationRegex = Regex("[a-zA-Z]([A-Za-z0-9\\-_:.])+"),
     )
 
+  private val defaultNamespacePrefix by lazy {
+    rootDir
+      .resolve("gradle.properties")
+      .takeIf { it.exists() }
+      ?.let { propertiesPath ->
+        Properties()
+          .apply { propertiesPath.bufferedReader().use(::load) }
+          .getProperty(FoundryKeys.DEFAULT_PACKAGE_PREFIX)
+      } ?: "foundry"
+  }
+
   private val packageName =
     TextElement(
       "",
       "Package Name",
-      // TODO make the prefix configurable
       description =
-        "The project package name (must start with 'slack.') This is used for both source packages and android.namespace.",
-      prefixTransformation = "slack.",
+        "The project package name (must start with '$defaultNamespacePrefix.') This is used for both source packages and android.namespace.",
+      prefixTransformation = "$defaultNamespacePrefix.",
       validationRegex = Regex("[A-Za-z0-9.]+"),
     )
 
@@ -105,7 +120,7 @@ internal class ProjectGenPresenter(
   private val uiElements =
     mutableStateListOf(
       SectionElement("Path Details", "(Required)"),
-      TextElement(rootDir, "Project root dir", readOnly = true),
+      TextElement(rootDir.absolutePathString(), "Project root dir", readOnly = true),
       path,
       packageName,
       DividerElement,
@@ -177,10 +192,9 @@ internal class ProjectGenPresenter(
 
   private fun generate(): Boolean {
     return generate(
-      rootDir = File(rootDir),
+      rootDir = rootDir,
       path = ":${path.value}",
-      // TODO make this configurable
-      packageName = "slack.${packageName.value}",
+      packageName = "$defaultNamespacePrefix.${packageName.value}",
       android = android.isChecked,
       androidFeatures =
         buildSet {
@@ -206,7 +220,7 @@ internal class ProjectGenPresenter(
 
   @Suppress("LongParameterList")
   private fun generate(
-    rootDir: File,
+    rootDir: Path,
     path: String,
     packageName: String,
     android: Boolean,

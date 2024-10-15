@@ -71,7 +71,11 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
         }
       }
     }
+    if (state.isLoading) {
+      LoadingAnimation(modifier = Modifier.padding(15.dp))
+    }
     ConversationField(
+      isLoading = state.isLoading,
       modifier = Modifier,
       onSendMessage = { userMessage -> state.eventSink(ChatScreen.Event.SendMessage(userMessage)) },
     )
@@ -79,7 +83,11 @@ fun ChatWindowUi(state: ChatScreen.State, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (String) -> Unit) {
+private fun ConversationField(
+  isLoading: Boolean,
+  modifier: Modifier = Modifier,
+  onSendMessage: (String) -> Unit,
+) {
   val textState by remember { mutableStateOf(TextFieldState()) }
   val isTextNotEmpty = textState.text.isNotBlank()
   val (hasStartedConversation, setHasStartedConversation) = remember { mutableStateOf(false) }
@@ -132,13 +140,13 @@ private fun ConversationField(modifier: Modifier = Modifier, onSendMessage: (Str
     Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
       // button will be disabled if there is no text
       IconButton(
-        modifier = Modifier.padding(4.dp).enabled(isTextNotEmpty),
+        modifier = Modifier.padding(4.dp),
         onClick = {
           if (isTextNotEmpty) {
             sendMessage()
           }
         },
-        enabled = isTextNotEmpty,
+        enabled = isTextNotEmpty && !isLoading,
       ) {
         Icon(
           painter = painterResource("drawable/send.svg"),

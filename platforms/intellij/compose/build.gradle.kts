@@ -53,6 +53,8 @@ kotlin {
         implementation(libs.retrofit)
         implementation(libs.retrofit.converter.gson)
         implementation(libs.moshi)
+        
+        implementation(projects.tools.foundryCommon)
       }
     }
   }

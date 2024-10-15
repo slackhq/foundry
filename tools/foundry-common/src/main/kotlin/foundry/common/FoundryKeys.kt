@@ -13,20 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.intellij.compose.aibot
+package foundry.common
 
-import com.slack.circuit.runtime.CircuitUiEvent
-import com.slack.circuit.runtime.CircuitUiState
-import com.slack.circuit.runtime.screen.Screen
-
-object ChatScreen : Screen {
-  data class State(
-    val messages: List<Message>,
-    val isLoading: Boolean,
-    val eventSink: (Event) -> Unit = {},
-  ) : CircuitUiState
-
-  sealed class Event : CircuitUiEvent {
-    data class SendMessage(val message: String) : Event()
-  }
+/** Key constants reused across multiple foundry projects. */
+public object FoundryKeys {
+  public const val DEFAULT_PACKAGE_PREFIX: String = "foundry.defaultPackagePrefix"
 }

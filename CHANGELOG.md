@@ -4,6 +4,26 @@ Changelog
 **Unreleased**
 --------------
 
+0.20.2
+------
+
+_2024-10-14_
+
+- **Fix**: Fall back to old property name for kotlin JVM args if the new one isn't found.
+- **Enhancement**: Don't try to apply kotlin JVM args if there are none.
+
+0.20.1
+------
+
+_2024-10-14_
+
+Don't use this release! We goofed on something.
+
+0.20.0
+------
+
+_2024-10-11_
+
 ### Project Restructuring
 
 We've restructured this project! Since its early days as a simple Gradle convention plugin it's expanded into IntelliJ plugins, CLIs, CI tooling, and more. To better capture this, we've renamed the project to *Foundry*, restructured its artifacts into a more cohesive setup, moved kotlin-cli-util into this repo, and will likely split out some more artifacts down the line.
@@ -13,117 +33,11 @@ We've restructured this project! Since its early days as a simple Gradle convent
 - Any **gradle properties** prefixed with `slack.` or `sgp.` have now moved to `foundry.`. `slack.gradle.` prefix have also removed the `gradle.` (i.e. `slack.gradle.foo` would now be `foundry.foo`).
   - `SlackProperties` has been renamed to `FoundryProperties`.
   - Some properties have been further refined to be more specific.
-
-    | Old                                                                  | New                                                                    |
-    |----------------------------------------------------------------------|------------------------------------------------------------------------|
-    | `orchestrator`                                                       | `foundry.android.test.orchestrator`                                    |
-    | `sgp.android.buildToolsVersionOverride`                              | `foundry.android.buildToolsVersionOverride`                            |
-    | `sgp.anvil.forceDisable`                                             | `foundry.anvil.forceDisable`                                           |
-    | `sgp.anvil.mode`                                                     | `foundry.anvil.mode`                                                   |
-    | `sgp.artifacts.configure-eagerly`                                    | `foundry.artifacts.configure-eagerly`                                  |
-    | `sgp.beta`                                                           | `foundry.beta`                                                         |
-    | `sgp.compose.commonCompilerOptions`                                  | `foundry.compose.commonCompilerOptions`                                |
-    | `sgp.compose.includeSourceInformationEverywhereByDefault`            | `foundry.compose.includeSourceInformationEverywhereByDefault`          |
-    | `sgp.compose.stabilityConfigurationPath`                             | `foundry.compose.stabilityConfigurationPath`                           |
-    | `sgp.compose.useIncludeInformationWorkaround`                        | `foundry.compose.useIncludeInformationWorkaround`                      |
-    | `sgp.config.jvmVendor.optOut`                                        | `foundry.jvm.vendor.optOut`                                            |
-    | `sgp.config.jvmVendor`                                               | `foundry.jvm.vendor`                                                   |
-    | `sgp.isTestLibrary`                                                  | `foundry.isTestLibrary`                                                |
-    | `sgp.kapt.languageVersion`                                           | `foundry.kapt.languageVersion`                                         |
-    | `sgp.kotlin.allowWarningsInTests`                                    | `foundry.kotlin.allowWarningsInTests`                                  |
-    | `sgp.kotlin.allowWarnings`                                           | `foundry.kotlin.allowWarnings`                                         |
-    | `sgp.kotlin.freeArgs`                                                | `foundry.kotlin.freeArgs`                                              |
-    | `sgp.kotlin.jvmFreeArgs`                                             | `foundry.kotlin.jvmFreeArgs`                                           |
-    | `sgp.kotlin.languageVersionOverride`                                 | `foundry.kotlin.languageVersionOverride`                               |
-    | `sgp.kotlin.optIns`                                                  | `foundry.kotlin.optIns`                                                |
-    | `sgp.kotlin.progressive`                                             | `foundry.kotlin.progressive`                                           |
-    | `sgp.ksp.connect.sqldelight`                                         | `foundry.ksp.connect.sqldelight`                                       |
-    | `sgp.ksp.connect.viewbinding`                                        | `foundry.ksp.connect.viewbinding`                                      |
-    | `sgp.lint.agpVersion`                                                | `foundry.lint.agpVersion`                                              |
-    | `sgp.lint.checkTestSources`                                          | `foundry.lint.checkTestSources`                                        |
-    | `sgp.lint.enableOnAndroidTestProjects`                               | `foundry.lint.enableOnAndroidTestProjects`                             |
-    | `sgp.lint.ignoreTestSources`                                         | `foundry.lint.ignoreTestSources`                                       |
-    | `sgp.logging.verbose`                                                | `foundry.logging.verbose`                                              |
-    | `sgp.perf.relocateBuildDir`                                          | `foundry.perf.relocateBuildDir`                                        |
-    | `slack.allow-ksp`                                                    | `foundry.ksp.enable`                                                   |
-    | `slack.allow-moshi-ir`                                               | `foundry.moshi.ir.enable`                                              |
-    | `slack.anvil.generatorProjects`                                      | `foundry.anvil.generatorProjects`                                      |
-    | `slack.anvil.runtimeProjects`                                        | `foundry.anvil.useKspFork`                                             |
-    | `slack.auto-apply.cache-fix`                                         | `foundry.auto-apply.cache-fix`                                         |
-    | `slack.auto-apply.detekt`                                            | `foundry.auto-apply.detekt`                                            |
-    | `slack.auto-apply.nullaway`                                          | `foundry.auto-apply.nullaway`                                          |
-    | `slack.auto-apply.sort-dependencies`                                 | `foundry.auto-apply.sort-dependencies`                                 |
-    | `slack.auto-apply.spotless`                                          | `foundry.auto-apply.spotless`                                          |
-    | `slack.auto-apply.test-retry`                                        | `foundry.auto-apply.test-retry`                                        |
-    | `slack.avoidance.affected-project-configurations`                    | `foundry.avoidance.affected-project-configurations`                    |
-    | `slack.avoidance.affectedProjectsFile`                               | `foundry.avoidance.affectedProjectsFile`                               |
-    | `slack.avoidance.build-upon-default-affected-project-configurations` | `foundry.avoidance.build-upon-default-affected-project-configurations` |
-    | `slack.bootstrap.minGradleXms`                                       | `foundry.bootstrap.minGradleXms`                                       |
-    | `slack.bootstrap.minGradleXmx`                                       | `foundry.bootstrap.minGradleXmx`                                       |
-    | `slack.ci-lint.enable`                                               | `foundry.ci-lint.enable`                                               |
-    | `slack.ci-lint.variants`                                             | `foundry.ci-lint.variants`                                             |
-    | `slack.ci-unit-test.enableKover`                                     | `foundry.ci-unit-test.enableKover`                                     |
-    | `slack.ci-unit-test.enable`                                          | `foundry.ci-unit-test.enable`                                          |
-    | `slack.ci-unit-test.variant`                                         | `foundry.ci-unit-test.variant`                                         |
-    | `slack.compileSdkVersion`                                            | `foundry.android.compileSdkVersion`                                    |
-    | `slack.compose.android.defaultBundleAlias`                           | `foundry.compose.android.defaultBundleAlias`                           |
-    | `slack.compose.android.enableLiveLiterals`                           | `foundry.compose.android.enableLiveLiterals`                           |
-    | `slack.debug`                                                        | `foundry.debug`                                                        |
-    | `slack.detekt.baseline-file-name`                                    | `foundry.detekt.baseline-file-name`                                    |
-    | `slack.detekt.configs`                                               | `foundry.detekt.configs`                                               |
-    | `slack.detekt.full`                                                  | `foundry.detekt.full`                                                  |
-    | `slack.disabledVariants`                                             | `foundry.android.disabledVariants`                                     |
-    | `slack.enabled-kapt-in-tests`                                        | `foundry.kapt.enabled-in-tests`                                        |
-    | `slack.epAutoPatch`                                                  | `foundry.errorprone.autoPatch`                                         |
-    | `slack.epCheckNamesAsErrors`                                         | `foundry.errorprone.checkNamesAsErrors`                                |
-    | `slack.extension.verbose`                                            | `foundry.extension.verbose`                                            |
-    | `slack.git.hooksPath`                                                | `foundry.git.hooksPath`                                                |
-    | `slack.git.ignoreRevsFile`                                           | `foundry.git.ignoreRevsFile`                                           |
-    | `slack.gradle.config.bugsnag.enabledBranchPattern`                   | `foundry.android.bugsnag.enabledBranchPattern`                         |
-    | `slack.gradle.config.bugsnag.enabled`                                | `foundry.android.bugsnag.enabled`                                      |
-    | `slack.gradle.config.enableAnalysisPlugin`                           | `foundry.enableAnalysisPlugin`                                         |
-    | `slack.gradle.config.enableMavenLocal`                               | `foundry.gradle.enableMavenLocal`                                      |
-    | `slack.gradle.config.enableSnapshots`                                | `foundry.gradle.enableSnapshots`                                       |
-    | `slack.gradle.config.libraryWithVariants`                            | `foundry.android.libraryWithVariants`                                  |
-    | `slack.gradle.config.modscore.enabled`                               | `foundry.modscore.enabled`                                             |
-    | `slack.gradle.config.modscore.ignore`                                | `foundry.modscore.ignore`                                              |
-    | `slack.gradle.config.noPlatform`                                     | `foundry.config.noPlatform`                                            |
-    | `slack.gradle.config.rake.noapi`                                     | `foundry.rake.noapi`                                                   |
-    | `slack.gradle.config.test.alwaysEnableResources`                     | `foundry.android.test.alwaysEnableResources`                           |
-    | `slack.gradle.config.versionsPluginAllowUnstable`                    | `foundry.versionsPlugin.allowUnstable`                                 |
-    | `slack.gradle.debugUserString`                                       | `foundry.android.debugUserString`                                      |
-    | `slack.gradle.debugVersionCode`                                      | `foundry.android.debugVersionCode`                                     |
-    | `slack.gradle.skipAndroidXCheck`                                     | `foundry.android.skipAndroidXCheck`                                    |
-    | `slack.kotlin.daemon.jvmargs`                                        | `foundry.kotlin.daemon.jvmargs`                                        |
-    | `slack.latestCompileSdkWithSources`                                  | `foundry.android.latestCompileSdkWithSources`                          |
-    | `slack.lint.baseline-file-name`                                      | `foundry.lint.baseline-file-name`                                      |
-    | `slack.lint.errors-only`                                             | `foundry.lint.errors-only`                                             |
-    | `slack.location.robolectric-core`                                    | `foundry.location.robolectric-core`                                    |
-    | `slack.location.slack-platform`                                      | `foundry.location.foundry-platform`                                    |
-    | `slack.log-thermals`                                                 | `foundry.logging.thermals`                                             |
-    | `slack.minSdkVersion`                                                | `foundry.android.minSdkVersion`                                        |
-    | `slack.ndkVersion`                                                   | `foundry.android.ndkVersion`                                           |
-    | `slack.nullaway.baseline`                                            | `foundry.errorprone.nullaway.baseline`                                 |
-    | `slack.plugins.android-cache-fix`                                    | `foundry.plugins.android-cache-fix`                                    |
-    | `slack.robolectricIVersion`                                          | `foundry.android.robolectric.iVersion`                                 |
-    | `slack.robolectricTestSdks`                                          | `foundry.android.robolectric.testSdks`                                 |
-    | `slack.sortDependencies.ignore`                                      | `foundry.sortDependencies.ignore`                                      |
-    | `slack.strict.validateAndroidTestManifests`                          | `foundry.android.strict.validateAndroidTestManifests`                  |
-    | `slack.strict`                                                       | `foundry.strict`                                                       |
-    | `slack.supportedLanguagesBeta`                                       | `foundry.android.supportedLanguagesBeta`                               |
-    | `slack.supportedLanguagesInternal`                                   | `foundry.android.supportedLanguagesInternal`                           |
-    | `slack.supportedLanguages`                                           | `foundry.android.supportedLanguages`                                   |
-    | `slack.targetSdkVersion`                                             | `foundry.android.targetSdkVersion`                                     |
-    | `slack.test.retry.failOnPassedAfterRetry`                            | `foundry.test.retry.failOnPassedAfterRetry`                            |
-    | `slack.test.retry.maxFailures`                                       | `foundry.test.retry.maxFailures`                                       |
-    | `slack.test.retry.maxRetries`                                        | `foundry.test.retry.maxRetries`                                        |
-    | `slack.test.retry.pluginType`                                        | `foundry.test.retry.pluginType`                                        |
-    | `slack.test.verboseLogging`                                          | `foundry.test.verboseLogging`                                          |
-    | `slack.unit-test.forkEvery`                                          | `foundry.unit-test.forkEvery`                                          |
-    | `slack.unit-test.parallelismMultiplier`                              | `foundry.unit-test.parallelismMultiplier`                              |
-    | `slack.usePrototypeAppId`                                            | `foundry.android.usePrototypeAppId`                                    |
-    | `slack.versionsJson`                                                 | `foundry.versionsJson`                                                 |
-    | `slackToolchainsStrict`                                              | `foundryToolchainsStrict`                                              |
+  - There is a helper script you can use to automatically rename all properties in `foundry-migration/`.
+    - Download `mapping.txt`
+    - Download `property_migration.sh`
+    - Run `./property_migration.sh mapping.txt <path to target project>`.
+      - Note this only covers `*.kts` and `*.properties` files. This does not cover args passed via CLI or envs.
 
 - Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
 - Gradle coordinates group have moved to the `com.slack.foundry` group name.
@@ -153,7 +67,9 @@ We've restructured this project! Since its early days as a simple Gradle convent
 
 ### Misc
 
+- **New**: Make JDK configuration docs and error messages configurable via `FoundryProperties`.
 - **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
+- **Fix**: Track deleted build files when computing parent projects in Skippy.
 - Update Clikt to `5.0.1`.
 - Update oshi-core to `6.6.5`.
 - Build against DAGP 2.x.
