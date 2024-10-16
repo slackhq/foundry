@@ -158,6 +158,7 @@ include(
   ":tools:foundry-common",
   ":tools:skippy",
   ":tools:tracing",
+  ":tools:version-number",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

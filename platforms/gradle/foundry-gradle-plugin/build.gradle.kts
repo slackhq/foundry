@@ -76,6 +76,7 @@ dependencies {
   // Better I/O
   api(libs.okio)
   api(projects.platforms.gradle.agpHandlers.agpHandlerApi)
+  api(projects.tools.versionNumber)
 
   implementation(platform(libs.coroutines.bom))
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }

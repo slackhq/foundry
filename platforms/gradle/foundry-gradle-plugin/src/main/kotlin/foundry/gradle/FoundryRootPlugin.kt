@@ -20,7 +20,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
 import com.squareup.moshi.adapter
 import foundry.cli.AppleSiliconCompat
-import foundry.gradle.agp.VersionNumber
+import foundry.common.versioning.VersionNumber
 import foundry.gradle.avoidance.ComputeAffectedProjectsTask
 import foundry.gradle.avoidance.GenerateAndroidTestProjectPathsTask
 import foundry.gradle.avoidance.GenerateDependencyGraphTask

@@ -10,6 +10,7 @@ Changelog
     - project-local `gradle.properties`
     - root-project `local.properties`
     - root-project/global `gradle.properties`
+- **New**: Extract `version-number` artifact. This contains a Kotlin, non-deprecated `VersionNumber` API. This is useful given that Gradle's is both deprecated and not available in standard JVM projects.
 - Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
 
 0.20.2
