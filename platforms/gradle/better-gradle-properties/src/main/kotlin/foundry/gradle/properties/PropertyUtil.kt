@@ -15,7 +15,7 @@
  */
 @file:JvmName("PropertyUtil")
 
-package foundry.gradle.util
+package foundry.gradle.properties
 
 import java.util.Properties
 import kotlin.contracts.contract
@@ -30,7 +30,7 @@ import org.gradle.api.provider.ValueSourceParameters
 // null returns. This
 // abuses kotlin contracts to safe cast without a null check.
 // https://github.com/gradle/gradle/issues/12388
-internal fun <T> sneakyNull(value: T? = null): T {
+public fun <T> sneakyNull(value: T? = null): T {
   markAsNonNullForGradle(value)
   return value
 }
@@ -38,15 +38,15 @@ internal fun <T> sneakyNull(value: T? = null): T {
 // Gradle's map {} APIs sometimes are interpreted by Kotlin to be non-null only but legally allow
 // null returns. This
 // abuses kotlin contracts to safe cast without a null check.
-internal fun <T> markAsNonNullForGradle(value: T?) {
+public fun <T> markAsNonNullForGradle(value: T?) {
   contract { returns() implies (value != null) }
 }
 
 /** Implementation of provider holding a start parameter's parsed project properties. */
-internal abstract class StartParameterProperties :
+public abstract class StartParameterProperties :
   ValueSource<Map<String, String>, StartParameterProperties.Parameters> {
-  interface Parameters : ValueSourceParameters {
-    val properties: MapProperty<String, String>
+  public interface Parameters : ValueSourceParameters {
+    public val properties: MapProperty<String, String>
   }
 
   override fun obtain(): Map<String, String>? {
@@ -55,9 +55,9 @@ internal abstract class StartParameterProperties :
 }
 
 /** Implementation of provider holding a local properties file's parsed [Properties]. */
-internal abstract class LocalProperties : ValueSource<Properties, LocalProperties.Parameters> {
-  interface Parameters : ValueSourceParameters {
-    val propertiesFile: RegularFileProperty
+public abstract class LocalProperties : ValueSource<Properties, LocalProperties.Parameters> {
+  public interface Parameters : ValueSourceParameters {
+    public val propertiesFile: RegularFileProperty
   }
 
   override fun obtain(): Properties? {
@@ -69,12 +69,12 @@ internal abstract class LocalProperties : ValueSource<Properties, LocalPropertie
     if (!propertiesFile.exists()) {
       return null
     }
-    return Properties().apply { propertiesFile.inputStream().use(::load) }
+    return Properties().apply { propertiesFile.bufferedReader().use(::load) }
   }
 }
 
 /** Gets or creates a cached extra property. */
-internal fun <T> Project.getOrCreateExtra(key: String, body: (Project) -> T): T {
+public fun <T> Project.getOrCreateExtra(key: String, body: (Project) -> T): T {
   with(project.extensions.extraProperties) {
     if (!has(key)) {
       set(key, body(project))
@@ -99,14 +99,14 @@ private fun Project.localPropertiesProvider(
   return provider.map { it.getProperty(key) }
 }
 
-internal fun Project.createPropertiesProvider(filePath: String): Provider<Properties> {
+public fun Project.createPropertiesProvider(filePath: String): Provider<Properties> {
   return project.providers.of(LocalProperties::class.java) {
     parameters.propertiesFile.setDisallowChanges(project.layout.projectDirectory.file(filePath))
   }
 }
 
 /** Returns a provider of a property _only_ contained in this project's local.properties. */
-internal fun Project.localProperty(key: String): Provider<String> {
+public fun Project.localProperty(key: String): Provider<String> {
   return localPropertiesProvider(
     key,
     "foundry.properties.provider.local-properties",
@@ -117,7 +117,7 @@ internal fun Project.localProperty(key: String): Provider<String> {
 /** Returns a provider of a property _only_ contained in this project's local gradle.properties. */
 // Local gradle properties are not compatible with configuration caching and thus not accessible
 // from providers.gradleProperty -_-. https://github.com/gradle/gradle/issues/13302
-internal fun Project.localGradleProperty(key: String): Provider<String> {
+public fun Project.localGradleProperty(key: String): Provider<String> {
   return localPropertiesProvider(
     key,
     "foundry.properties.provider.local-gradle-properties",
@@ -125,15 +125,15 @@ internal fun Project.localGradleProperty(key: String): Provider<String> {
   )
 }
 
-internal fun Provider<String>.mapToBoolean(): Provider<Boolean> {
+public fun Provider<String>.mapToBoolean(): Provider<Boolean> {
   return map(String::toBoolean)
 }
 
-internal fun Provider<String>.mapToInt(): Provider<Int> {
+public fun Provider<String>.mapToInt(): Provider<Int> {
   return map(String::toInt)
 }
 
 @Suppress("RedundantNullableReturnType")
-internal fun Project.synchronousEnvProperty(env: String, default: String? = null): String? {
+public fun Project.synchronousEnvProperty(env: String, default: String? = null): String? {
   return providers.environmentVariable(env).getOrElse(sneakyNull(default))
 }

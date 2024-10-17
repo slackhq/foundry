@@ -40,7 +40,7 @@ tasks
 ```
 
 This task is automatically added to whenever a subproject uses
-the `androidTest()` [DSL feature](/dsl/#android-test).
+the `androidTest()` [DSL feature](../dsl/#android-test).
 
 ## `PermissionChecks`
 
@@ -51,7 +51,7 @@ The workflow we use at Slack is like this:
 
 - We check in a `permissionsAllowlist.txt` file in the Slack android repo.
 - This file is owned in GitHub by a specific codeowner rule that adds a permission reviewers group.
-- This file is passed into the `allowListFile` [DSL feature](/dsl/#permission-allowlist) in the application
+- This file is passed into the `allowListFile` [DSL feature](../dsl/#permission-allowlist) in the application
   project.
 - On each build, SGP automatically checks that the permissions present in the release APK manifest match the ones
   defined in the allowlist.

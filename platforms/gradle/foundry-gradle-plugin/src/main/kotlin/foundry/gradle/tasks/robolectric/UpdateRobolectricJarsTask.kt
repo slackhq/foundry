@@ -16,10 +16,10 @@
 package foundry.gradle.tasks.robolectric
 
 import foundry.gradle.FoundryProperties
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.robolectricJars
 import foundry.gradle.tasks.BootstrapTask
-import foundry.gradle.util.setDisallowChanges
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project

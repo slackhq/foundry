@@ -33,10 +33,10 @@ import foundry.gradle.convertProjectPathToAccessor
 import foundry.gradle.dependsOn
 import foundry.gradle.getByType
 import foundry.gradle.namedLazy
+import foundry.gradle.properties.mapToBoolean
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.util.JsonTools
-import foundry.gradle.util.mapToBoolean
-import foundry.gradle.util.setDisallowChanges
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject

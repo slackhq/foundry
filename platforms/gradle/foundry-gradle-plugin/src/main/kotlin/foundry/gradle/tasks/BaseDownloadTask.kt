@@ -15,7 +15,7 @@
  */
 package foundry.gradle.tasks
 
-import foundry.gradle.agp.VersionNumber
+import foundry.common.versioning.VersionNumber
 import java.io.IOException
 import javax.inject.Inject
 import okhttp3.OkHttpClient

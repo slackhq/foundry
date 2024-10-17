@@ -166,6 +166,8 @@ dependencies {
   dokka(projects.tools.foundryCommon)
   dokka(projects.tools.skippy)
   dokka(projects.tools.tracing)
+  dokka(projects.tools.versionNumber)
+  dokka(projects.platforms.gradle.betterGradleProperties)
   dokka(projects.platforms.gradle.foundryGradlePlugin)
   dokka(projects.platforms.gradle.agpHandlers.agpHandlerApi)
 }

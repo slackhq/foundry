@@ -39,13 +39,13 @@ Its responsibilities include:
 - Configuring unit tests via `UnitTests`. This also includes configuring the Gradle test retry plugin, if enabled.
 - Configuring NullAway, if enabled.
 - Configuring [Skippy](/tools/skippy).
-- Configuring [Mod Score](/mod-score) tasks.
+- Configuring [Mod Score](../mod-score) tasks.
 
 ### `StandardProjectConfigurations`
 
 This class warrants special mention as it is responsible for the bulk of the configuration applied to projects SGP manages.
 
-- Creates and exposes the [`foundry` extension DSL](/dsl).
+- Creates and exposes the [`foundry` extension DSL](../dsl).
 - Applies common configurations.
   - This largely just sets up the dependency sorter plugin.
 - Applies common JVM configurations.
@@ -59,7 +59,7 @@ All JVM projects (Android, Java, Kotlin) receive some common configuration for t
 
 - Applies the repo's platform project, if any.
 - Applies any BOM dependencies to platform-configurable configurations.
-- Configures the dependency analysis gradle plugin and [`DependencyRake`](/dependency-rake).
+- Configures the dependency analysis gradle plugin and [`DependencyRake`](../dependency-rake).
 - Applies common annotations and common test bundles from version catalogs.
 - Fails on non-androidx support library dependencies.
 - Configure common annotations processors.
@@ -96,7 +96,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 - Application projects...
   - have their packaging config set up with some convenience common exclusions and handling common `jniLibs` handling.
   - have v3 and v4 signing enabled by default.
-  - are configured with [`PermissionChecks`](/utilities/#permissionchecks).
+  - are configured with [`PermissionChecks`](../utilities/#permissionchecks).
   - are configured with the Bugsnag gradle plugin, if enabled.
 - Library projects...
   - are configured with an automatic `android.namespace`, if none is manually specified in the buildscript. The namespace is inferred from the project's Gradle path.

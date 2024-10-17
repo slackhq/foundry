@@ -1,0 +1,33 @@
+public final class foundry/common/versioning/VersionNumber : java/lang/Comparable {
+	public static final field Companion Lfoundry/common/versioning/VersionNumber$Companion;
+	public fun <init> (IIIILjava/lang/String;)V
+	public synthetic fun <init> (IIIILjava/lang/String;Lfoundry/common/versioning/VersionNumber$AbstractScheme;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (IIILjava/lang/String;)V
+	public fun compareTo (Lfoundry/common/versioning/VersionNumber;)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseVersion ()Lfoundry/common/versioning/VersionNumber;
+	public final fun getMajor ()I
+	public final fun getMicro ()I
+	public final fun getMinor ()I
+	public final fun getPatch ()I
+	public final fun getQualifier ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class foundry/common/versioning/VersionNumber$Companion {
+	public final fun getUNKNOWN ()Lfoundry/common/versioning/VersionNumber;
+	public final fun parse (Ljava/lang/String;)Lfoundry/common/versioning/VersionNumber;
+	public final fun scheme ()Lfoundry/common/versioning/VersionNumber$Scheme;
+	public final fun version (I)Lfoundry/common/versioning/VersionNumber;
+	public final fun version (II)Lfoundry/common/versioning/VersionNumber;
+	public static synthetic fun version$default (Lfoundry/common/versioning/VersionNumber$Companion;IIILjava/lang/Object;)Lfoundry/common/versioning/VersionNumber;
+	public final fun withPatchNumber ()Lfoundry/common/versioning/VersionNumber$Scheme;
+}
+
+public abstract interface class foundry/common/versioning/VersionNumber$Scheme {
+	public abstract fun format (Lfoundry/common/versioning/VersionNumber;)Ljava/lang/String;
+	public abstract fun parse (Ljava/lang/String;)Lfoundry/common/versioning/VersionNumber;
+}
+
