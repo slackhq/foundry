@@ -15,7 +15,6 @@
  */
 package foundry.intellij.compose.projectgen
 
-import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Immutable
@@ -92,7 +91,7 @@ internal class TextElement(
 
   override var isVisible: Boolean by mutableStateOf(initialVisibility)
 
-//  fun edit(block: TextFieldBuffer.() -> Unit) {
-//    state.edit(block)
-//  }
+  //  fun edit(block: TextFieldBuffer.() -> Unit) {
+  //    state.edit(block)
+  //  }
 }

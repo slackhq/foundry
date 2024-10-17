@@ -202,8 +202,7 @@ internal class ProjectGenPresenter(
             add("view-binding")
           }
         },
-      androidResourcePrefix =
-        androidResourcePrefix.value.takeIf { androidResources.isChecked },
+      androidResourcePrefix = androidResourcePrefix.value.takeIf { androidResources.isChecked },
       dagger = dagger.isChecked,
       daggerFeatures =
         buildSet {
