@@ -155,7 +155,7 @@ internal fun ProjectGen(state: ProjectGenScreen.State, modifier: Modifier = Modi
                 Text(text = element.label, style = Typography.h4TextStyle())
                 Spacer(Modifier.height(4.dp))
                 TextField(
-                  state = element.value,
+                  state = element.state,
                   modifier = Modifier.fillMaxWidth(),
                   readOnly = element.readOnly,
                   enabled = element.enabled,

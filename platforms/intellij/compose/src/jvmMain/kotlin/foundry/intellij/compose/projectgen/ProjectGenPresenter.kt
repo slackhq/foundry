@@ -203,7 +203,7 @@ internal class ProjectGenPresenter(
           }
         },
       androidResourcePrefix =
-        androidResourcePrefix.value.text.takeIf { androidResources.isChecked },
+        androidResourcePrefix.value.takeIf { androidResources.isChecked },
       dagger = dagger.isChecked,
       daggerFeatures =
         buildSet {
