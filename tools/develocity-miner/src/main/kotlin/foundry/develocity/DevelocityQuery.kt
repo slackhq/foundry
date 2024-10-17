@@ -1,4 +1,4 @@
-package com.slack.gradle.develocity
+package foundry.develocity
 
 import com.gabrielfeo.develocity.api.DevelocityApi
 import java.time.Instant

@@ -1,4 +1,4 @@
-package com.slack.gradle.develocity
+package foundry.develocity
 
 import com.gabrielfeo.develocity.api.Config
 import com.gabrielfeo.develocity.api.DevelocityApi
@@ -7,10 +7,13 @@ import com.gabrielfeo.develocity.api.model.Build
 import com.gabrielfeo.develocity.api.model.BuildModelName
 import com.gabrielfeo.develocity.api.model.GradleAttributes
 import com.gabrielfeo.develocity.api.model.GradleBuildCachePerformance
-import com.github.ajalt.mordant.animation.progressAnimation
+import com.github.ajalt.mordant.animation.coroutines.animateInCoroutine
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.terminal.Terminal
 import com.github.ajalt.mordant.widgets.Spinner
+import com.github.ajalt.mordant.widgets.progress.progressBarLayout
+import com.github.ajalt.mordant.widgets.progress.spinner
+import com.github.ajalt.mordant.widgets.progress.text
 import com.jakewharton.picnic.Table
 import com.jakewharton.picnic.TextAlignment
 import com.jakewharton.picnic.table
@@ -18,10 +21,12 @@ import java.time.Instant
 import java.util.ServiceLoader
 import kotlin.time.Duration.Companion.days
 import kotlin.time.toJavaDuration
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import okio.FileSystem
 import okio.Path
 
@@ -104,14 +109,16 @@ internal class DevelocityMiner(
   }
 }
 
-private suspend fun Terminal.runLoad(message: String, block: suspend () -> Any) {
-  val animation = progressAnimation {
-    spinner(Spinner.Dots(TextColors.brightBlue))
-    text(message)
-  }
-  animation.start()
+private suspend fun Terminal.runLoad(message: String, block: suspend () -> Any) = coroutineScope {
+  val animation =
+    progressBarLayout {
+        spinner(Spinner.Dots(TextColors.brightBlue))
+        text(message)
+      }
+      .animateInCoroutine(this@runLoad)
+  launch { animation.execute() }
   val result = block()
-  animation.stop()
+  animation.clear()
   rawPrint("\n\n")
   rawPrint(result.toString())
   rawPrint("\n\n")

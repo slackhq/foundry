@@ -1,4 +1,4 @@
-package com.slack.gradle.develocity
+package foundry.develocity
 
 import com.gabrielfeo.develocity.api.DevelocityApi
 import com.gabrielfeo.develocity.api.extension.getBuildsFlow
@@ -11,9 +11,7 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
