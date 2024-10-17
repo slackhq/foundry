@@ -15,51 +15,48 @@
  */
 package foundry.develocity
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.command.SuspendingCliktCommand
+import com.github.ajalt.clikt.command.main
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import kotlin.system.exitProcess
-import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 import retrofit2.HttpException
 
-internal class DevelocityMinerCli : CliktCommand() {
+internal class DevelocityMinerCli : SuspendingCliktCommand() {
   private val apiUrl by option("--api-url", envvar = "DEVELOCITY_API_URL").required()
   private val apiToken by option("--api-token", envvar = "DEVELOCITY_API_TOKEN").required()
   private val logLevel by option("--log-level").default("off")
   private val apiCache by option("--api-cache-dir").path(canBeFile = false, mustExist = false)
   private val queries by option("--query").multiple()
 
-  override fun run() {
-    runBlocking {
-      val status =
-        try {
-          DevelocityMiner(
-              apiUrl = apiUrl,
-              apiToken = apiToken,
-              apiCache = apiCache?.toOkioPath(),
-              logLevel = logLevel,
-              requestedQueries = queries.toSet(),
-            )
-            .run()
-          0
-        } catch (e: Exception) {
-          e.printStackTrace()
-          if (e is HttpException) {
-            e.response()?.body()?.let { System.err.println(it) }
-          }
-          1
+  override suspend fun run() {
+    val status =
+      try {
+        DevelocityMiner(
+            apiUrl = apiUrl,
+            apiToken = apiToken,
+            apiCache = apiCache?.toOkioPath(),
+            logLevel = logLevel,
+            requestedQueries = queries.toSet(),
+          )
+          .run()
+        0
+      } catch (e: Exception) {
+        e.printStackTrace()
+        if (e is HttpException) {
+          e.response()?.body()?.let { System.err.println(it) }
         }
-      exitProcess(status)
-    }
+        1
+      }
+    exitProcess(status)
   }
 }
 
-public fun main(args: Array<String>) {
+public suspend fun main(args: Array<String>) {
   DevelocityMinerCli()
     .main(
       args +
