@@ -16,6 +16,7 @@
 package foundry.intellij.compose.projectgen
 
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Test
 
 class TextElementTest {
@@ -41,6 +42,18 @@ class TextElementTest {
 
     textElement.value = "Changed Text"
     assertEquals("Changed Text", textElement.value)
+
+    textElement.reset()
+    assertEquals("TextFieldState initial value", textElement.state.text)
+  }
+
+  @Test
+  fun `test TextFieldState visibility`(){
+    val textElement = TextElement(initialValue = "TextFieldState initial value", label = "Label")
+    assertTrue(textElement.isVisible)
+
+    textElement.isVisible = false
+    assertEquals(textElement.isVisible, false)
 
     textElement.reset()
     assertEquals("TextFieldState initial value", textElement.state.text)
