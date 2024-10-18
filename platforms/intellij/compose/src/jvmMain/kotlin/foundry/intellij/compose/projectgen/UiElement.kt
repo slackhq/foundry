@@ -90,8 +90,4 @@ internal class TextElement(
   }
 
   override var isVisible: Boolean by mutableStateOf(initialVisibility)
-
-  //  fun edit(block: TextFieldBuffer.() -> Unit) {
-  //    state.edit(block)
-  //  }
 }
