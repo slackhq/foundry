@@ -17,8 +17,8 @@ package foundry.gradle.tasks
 
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.artifacts.SgpArtifact
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.util.setDisallowChanges
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension

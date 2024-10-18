@@ -26,8 +26,8 @@ import com.autonomousapps.model.ProjectCoordinates
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.convertProjectPathToAccessor
+import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.property
-import foundry.gradle.util.mapToBoolean
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask

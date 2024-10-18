@@ -16,8 +16,8 @@
 package foundry.gradle.tasks
 
 import foundry.gradle.capitalizeUS
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.util.setDisallowChanges
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.RegularFileProperty

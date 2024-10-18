@@ -23,13 +23,13 @@ import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.configure
 import foundry.gradle.configureEach
 import foundry.gradle.isRootProject
+import foundry.gradle.properties.setDisallowChanges
+import foundry.gradle.properties.sneakyNull
 import foundry.gradle.register
 import foundry.gradle.tasks.DetektDownloadTask
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.SimpleFilesConsumerTask
 import foundry.gradle.tasks.publish
-import foundry.gradle.util.setDisallowChanges
-import foundry.gradle.util.sneakyNull
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import io.gitlab.arturbosch.detekt.DetektPlugin

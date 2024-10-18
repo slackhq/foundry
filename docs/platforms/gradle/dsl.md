@@ -73,7 +73,7 @@ behavior.
 
 By default, SGP disables androidTests in projects. These can be enabled via the `androidTest()` feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.
 
-This is important for opting in tests to [AndroidTest APK Aggregation](/utilities/#androidtest-apk-aggregation).
+This is important for opting in tests to [AndroidTest APK Aggregation](../utilities/#androidtest-apk-aggregation).
 
 ### Resources
 
@@ -85,5 +85,5 @@ This can be enabled via the `resources()` feature, which will enable the relevan
 
 ### Permission AllowList
 
-This enables checking of a permission allowlist. See [`PermissionChecks`](/utilities/#permissionchecks) for more
+This enables checking of a permission allowlist. See [`PermissionChecks`](../utilities/#permissionchecks) for more
 details.

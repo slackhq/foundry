@@ -76,6 +76,7 @@ dependencies {
   // Better I/O
   api(libs.okio)
   api(projects.platforms.gradle.agpHandlers.agpHandlerApi)
+  api(projects.tools.versionNumber)
 
   implementation(platform(libs.coroutines.bom))
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
@@ -90,6 +91,7 @@ dependencies {
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
+  implementation(projects.platforms.gradle.betterGradleProperties)
   implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
   implementation(projects.tools.skippy)

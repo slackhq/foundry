@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,7 @@ plugins {
 }
 
 dependencies {
-  lintChecks(libs.gradleLints)
-  implementation(projects.tools.versionNumber)
+  implementation(libs.okio)
 
   compileOnly(gradleApi())
-  compileOnly(libs.agp)
-
-  testImplementation(gradleApi())
-  testImplementation(libs.agp)
-  testImplementation(libs.junit)
-  testImplementation(libs.truth)
 }
