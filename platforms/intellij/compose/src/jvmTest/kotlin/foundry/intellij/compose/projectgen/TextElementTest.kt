@@ -48,7 +48,7 @@ class TextElementTest {
   }
 
   @Test
-  fun `test TextFieldState visibility`(){
+  fun `test TextFieldState visibility`() {
     val textElement = TextElement(initialValue = "TextFieldState initial value", label = "Label")
     assertTrue(textElement.isVisible)
 
