@@ -49,6 +49,11 @@ kotlin {
         implementation(projects.tools.foundryCommon)
       }
     }
+    jvmTest{
+      dependencies{
+        implementation(libs.junit)
+      }
+    }
   }
 }
 
@@ -57,4 +62,7 @@ configurations
   .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
-dependencies { lintChecks(libs.composeLints) }
+dependencies {
+  lintChecks(libs.composeLints)
+}
+
