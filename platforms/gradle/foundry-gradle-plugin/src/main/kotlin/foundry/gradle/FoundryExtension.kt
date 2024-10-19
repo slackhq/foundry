@@ -942,7 +942,9 @@ constructor(
       }
 
       if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
-        extension.stabilityConfigurationFiles.add(foundryProperties.composeStabilityConfigurationPath)
+        extension.stabilityConfigurationFiles.add(
+          foundryProperties.composeStabilityConfigurationPath
+        )
       }
 
       // Because the Compose Compiler plugin auto applies common options for us, we need to know
