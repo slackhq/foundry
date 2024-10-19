@@ -4,10 +4,110 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Extract `better-gradle-properties` artifact, which is our hierarchical Gradle properties solution that better handles properties in Gradle. This is what powers `FoundryProperties` but is now extracted to be more portable.
+  - This checks in the following order of priority
+    - project-local `local.properties`
+    - project-local `gradle.properties`
+    - root-project `local.properties`
+    - root-project/global `gradle.properties`
+- **New**: Extract `version-number` artifact. This contains a Kotlin, non-deprecated `VersionNumber` API. This is useful given that Gradle's is both deprecated and not available in standard JVM projects.
+- Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
 - **New**: Introduce `sgp.compose.global.stabilityConfigurationPath` to specify a global compose stability configuration file.
 - **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
 - Update to Kotlin `2.1.0`.
 - Build against KSP `2.1.0-TODO`
+
+0.20.2
+------
+
+_2024-10-14_
+
+- **Fix**: Fall back to old property name for kotlin JVM args if the new one isn't found.
+- **Enhancement**: Don't try to apply kotlin JVM args if there are none.
+
+0.20.1
+------
+
+_2024-10-14_
+
+Don't use this release! We goofed on something.
+
+0.20.0
+------
+
+_2024-10-11_
+
+### Project Restructuring
+
+We've restructured this project! Since its early days as a simple Gradle convention plugin it's expanded into IntelliJ plugins, CLIs, CI tooling, and more. To better capture this, we've renamed the project to *Foundry*, restructured its artifacts into a more cohesive setup, moved kotlin-cli-util into this repo, and will likely split out some more artifacts down the line.
+
+#### Migration Guide
+
+- Any **gradle properties** prefixed with `slack.` or `sgp.` have now moved to `foundry.`. `slack.gradle.` prefix have also removed the `gradle.` (i.e. `slack.gradle.foo` would now be `foundry.foo`).
+  - `SlackProperties` has been renamed to `FoundryProperties`.
+  - Some properties have been further refined to be more specific.
+  - There is a helper script you can use to automatically rename all properties in `foundry-migration/`.
+    - Download `mapping.txt`
+    - Download `property_migration.sh`
+    - Run `./property_migration.sh mapping.txt <path to target project>`.
+      - Note this only covers `*.kts` and `*.properties` files. This does not cover args passed via CLI or envs.
+
+- Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
+- Gradle coordinates group have moved to the `com.slack.foundry` group name.
+
+    | Old Artifact ID     | New Artifact ID |
+    |---------------------|-----------------|
+    | sgp                 | gradle-plugin   |
+    | sgp-agp-handler-api | agp-handler-api |
+    | sgp-common          | foundry-common  |
+    | sgp-tracing         | tracing         |
+    | skippy              | skippy          |
+
+- The former `kotlin-cli-util` APIs have moved to the `com.slack.foundry:cli` artifact.
+- Platform-specific plugins now live under the `platforms/` directory.
+- All other tools now live under the `tools/` directory.
+- Most top-level `Slack`-prefixed APIs are now prefixed with `Foundry`.
+- The primary gradle entry points are now `foundry {}`, but the previous `slack {}` entry points are left with deprecation `ReplaceWith` options.
+- Gradle plugin IDs have migrated to `com.slack.foundry.*` names.
+
+    | Old                               | New                                |
+    |-----------------------------------|------------------------------------|
+    | `com.slack.gradle.root`           | `com.slack.foundry.root`           |
+    | `com.slack.gradle.base`           | `com.slack.foundry.base`           |
+    | `com.slack.gradle.apk-versioning` | `com.slack.foundry.apk-versioning` |
+
+- Introduce new required `foundry.android.defaultNamespacePrefix` property for android projects. This is necessary for projects that don't define an `android.namespace` explicitly.
+
+### Misc
+
+- **New**: Make JDK configuration docs and error messages configurable via `FoundryProperties`.
+- **Fix**: Gracefully handle undefined kapt language versions when computing `progressive`.
+- **Fix**: Track deleted build files when computing parent projects in Skippy.
+- Update Clikt to `5.0.1`.
+- Update oshi-core to `6.6.5`.
+- Build against DAGP 2.x.
+- Build against gradle-error-prone `4.0.1`.
+- Build against gradle-nullaway `2.0.0`.
+- Build against Gradle versions plugin `0.51.0`.
+- Build against Develocity plugin `3.18.1`.
+
+0.19.6
+------
+
+_2024-09-25_
+
+- Intro `SoftRefLRUPolicyMSPerMB` + `ReservedCodeCacheSize` jvm args to bootstrap
+  - Learnings from https://jasonpearson.dev/codecache-in-jvm-builds and https://jasonpearson.dev/softreflrupolicymspermb-in-jvm-builds.
+- Update kotlin-cli-util to `3.0.1`.
+- Update to Guava `33.3.1-jre`.
+- Build against Gradle `8.10.2`.
+
+0.19.5
+------
+
+_2024-09-23_
+
+- Add workaround for KGP not applying `sourceInformation` compose options in android projects and default it to true.
 
 0.19.4
 ------

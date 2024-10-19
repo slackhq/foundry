@@ -14,7 +14,7 @@ fi
 
 if ! [[ ${local} || ${ci} ]]; then
   set -ex
-  REPO="git@github.com:slackhq/slack-gradle-plugin.git"
+  REPO="git@github.com:slackhq/foundry.git"
   DIR=temp-clone
   # Delete any existing temporary website clone
   rm -rf ${DIR}
@@ -23,7 +23,7 @@ if ! [[ ${local} || ${ci} ]]; then
   # Move working directory into temp folder
   cd ${DIR}
   # Generate the API docs
-  ./gradlew dokkaHtmlMultiModule --no-configuration-cache
+  ./gradlew :dokkaGenerate
 fi
 
 # Copy in special files that GitHub wants in the project root.

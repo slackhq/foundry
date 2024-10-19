@@ -2,14 +2,14 @@
 # mkdocs serve
 # mkdocs gh-deploy
 
-site_name: slack-gradle-plugin
-repo_name: slack-gradle-plugin
-repo_url: https://github.com/slackhq/slack-gradle-plugin
-site_description: "Gradle and IntelliJ build tooling used in Slack's Android repo"
+site_name: Foundry
+repo_name: foundry
+repo_url: https://github.com/slackhq/foundry
+site_description: "Gradle and IntelliJ build tooling used in Slack's Android projects"
 site_author: Slack
 remote_branch: gh-pages
 
-copyright: 'Copyright &copy; 2023 Slack Technologies, LLC'
+copyright: 'Copyright &copy; 2024 Slack Technologies, LLC'
 
 theme:
   name: 'material'
@@ -58,21 +58,25 @@ markdown_extensions:
 
 nav:
   - 'Overview': index.md
-  - 'Architecture': architecture.md
-  - 'Dependency Rake': dependency-rake.md
-  - 'Bootstrap': bootstrap.md
-  - 'DSL': dsl.md
-  - 'Utilities': utilities.md
-  # TODO
-#  - 'Configuration': configuration.md
-#  - 'Lint': lint.md
-#  - 'Testing': testing.md
-#  - 'Skippy': skippy.md
-#  - 'Properties': properties.md
-#  - 'Mod Score': mod-score.md
-#  - 'Formatters & Analysis': formatters-and-analysis.md
-#  - 'Thermals Logging': thermals-logging.md
-  - 'Discussions ⏏': https://github.com/slackhq/slack-gradle-plugin/discussions
+  - 'Platforms':
+    - 'Gradle':
+      - 'Architecture': platforms/gradle/architecture.md
+      - 'Dependency Rake': platforms/gradle/dependency-rake.md
+      - 'Bootstrap': platforms/gradle/bootstrap.md
+      - 'DSL': platforms/gradle/dsl.md
+      - 'Utilities': platforms/gradle/utilities.md
+      # TODO
+    #  - 'Configuration': platforms/gradle/configuration.md
+    #  - 'Lint': platforms/gradle/lint.md
+    #  - 'Testing': platforms/gradle/testing.md
+    #  - 'Skippy': platforms/gradle/skippy.md
+    #  - 'Properties': platforms/gradle/properties.md
+    #  - 'Mod Score': platforms/gradle/mod-score.md
+    #  - 'Formatters & Analysis': platforms/gradle/formatters-and-analysis.md
+    #  - 'Thermals Logging': platforms/gradle/thermals-logging.md
+  - 'Tools':
+      - 'CLI': tools/cli.md
+  - 'Discussions ⏏': https://github.com/slackhq/foundry/discussions
   - 'Change Log': changelog.md
   - 'API': api/0.x/
   - 'Contributing': contributing.md

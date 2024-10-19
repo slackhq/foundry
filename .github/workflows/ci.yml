@@ -40,6 +40,7 @@ jobs:
 
       - name: Build and run tests
         id: gradle
+        timeout-minutes: 10
         run: ./gradlew check
 
       - name: Print build scan url
@@ -79,5 +80,5 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish snapshot
-        if: github.repository == 'slackhq/slack-gradle-plugin'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }} -x dokkaHtml --no-configuration-cache
+        if: github.repository == 'slackhq/foundry'
+        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}

@@ -1,22 +1,18 @@
-slack-gradle-plugin
+foundry
 ===================
 
-This repository contains the core Gradle plugin and associated logic used for Slack's Android app.
+This repository contains much of Slack's Android/Kotlin/JVM tooling for Gradle, IntelliJ, CLIs, and more.
 
-This repo is effectively _read-only_ and does not publish artifacts to Maven Central. We [develop
+This repo is effectively for Slack's own used but publishes to Maven Central. We [develop
 these in the open](https://slack.engineering/developing-in-the-open/) to knowledge-share with the community.
 
-As such, our issue tracker is closed and we don't normally accept external PRs, but we welcome your
-questions in the discussions section of the project!
-
-We may later publish some of these components. If you're interested in this, feel free to raise in
-a discussions post or vote for existing suggestions.
+As such, we don't normally accept external PRs, but we welcome your questions in the discussions section of the project!
 
 ## Highlights
 
 ### Common project configuration
 
-The `slack.base` plugin offers common configuration for all projects implementing it, covering a
+The `foundry.base` plugin offers common configuration for all projects implementing it, covering a
 wide spectrum of Android, Kotlin, and Java configurations.
 
 This includes a whole host of things!
@@ -25,21 +21,21 @@ This includes a whole host of things!
 - Common Kotlin configuration (freeCompilerArgs, JVM target, etc).
 - Common Java configuration (toolchains, release versions, etc).
 - Common annotation processors.
-- SlackExtension (see next section).
+- `FoundryExtension` (see next section).
 - Formatting (via Spotless).
 - Platforms and BOM dependencies (see "Platform plugins" section below).
 - Common lint checks (both on Android and plain JVM projects).
 
-Full docs can be found in the [architecture](architecture) docs.
+Full docs can be found in the [architecture](platforms/gradle/architecture.md) docs.
 
 ### Feature DSL
 
-To ease use and configuration of common features in projects, we expose a `slack` DSL in projects
+To ease use and configuration of common features in projects, we expose a `foundry` DSL in projects
 that allows for configuration of these in a semantically easy and boilerplate-free way. This is
-controlled via `SlackExtension`.
+controlled via `FoundryExtension`.
 
 ```kotlin
-slack {
+foundry {
   features {
     dagger()
     moshi(codegen = true)
@@ -75,8 +71,7 @@ of our friends at Square).
 
 Gradle's built-in property support is limited and has surprising behavior, so we have our own
 system on top of it that has consistent precedence, `local.properties` support, project-local
-`gradle.properties`, and configuration caching support. Check out `safeProperty()` in
-`PropertyUtil.kt`.
+`gradle.properties`, and configuration caching support. Check out `PropertyResolver`.
 
 ### Dependency Rake
 
@@ -88,7 +83,7 @@ its advice to a project to automatically optimize it and _rake_ dependencies.
 As a part of our modularization efforts, we developed a scoring mechanism for modules that we could
 use as a measure of their "modularization". This includes a number of metrics and weighs them in a
 formula to compute a score. This includes LoC, language mixtures, and build graph centrality. This
-logic is under the `slack.stats` package.
+logic is under the `foundry.stats` package.
 
 ### Robolectric Jars Management
 
@@ -166,25 +161,25 @@ There are a _ton_ of miscellaneous tools, utilities, and glue code for Gradle (a
 SGP expects there to be a `libs` version catalog.
 
 The following versions are required to be set the above catalog.
-Their docs can be found in `SlackVersions.kt`.
+Their docs can be found in `FoundryVersions.kt`.
 
 For Android projects, some extra definitions need to be defined
 
 - `libs.versions.toml` libraries
     - `google-coreLibraryDesugaring` - the core library desugaring libraries to use with L8.
 - `gradle.properties` properties
-    - `slack.compileSdkVersion`
-    - `slack.targetSdkVersion`
-    - `slack.minSdkVersion`
+    - `foundry.compileSdkVersion`
+    - `foundry.targetSdkVersion`
+    - `foundry.minSdkVersion`
 
 The following plugins are applied by default but can be disabled if you don't need them.
 
-- Gradle's test retry – `slack.auto-apply.test-retry`
-    - By default, this uses the [Gradle test-retry plugin](https://github.com/gradle/test-retry-gradle-plugin), but can be configured to use the Gradle Enterprise plugin's implementation instead by setting the `slack.test.retry.pluginType` property to `GE`.
-- Spotless – `slack.auto-apply.spotless`
-- Detekt – `slack.auto-apply.detekt`
-- NullAway – `slack.auto-apply.nullaway`
-- Android Cache Fix – `slack.auto-apply.cache-fix`
+- Gradle's test retry – `foundry.auto-apply.test-retry`
+    - By default, this uses the [Gradle test-retry plugin](https://github.com/gradle/test-retry-gradle-plugin), but can be configured to use the Gradle Enterprise plugin's implementation instead by setting the `foundry.test.retry.pluginType` property to `GE`.
+- Spotless – `foundry.auto-apply.spotless`
+- Detekt – `foundry.auto-apply.detekt`
+- NullAway – `foundry.auto-apply.nullaway`
+- Android Cache Fix – `foundry.auto-apply.cache-fix`
 
 ## Commit hooks
 

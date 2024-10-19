@@ -19,11 +19,6 @@
         <ignore path="build" />
     </issue>
 
-<!--    <issue id="ComposeCompositionLocalUsage">-->
-<!--        <option name="allowed-composition-locals"-->
-<!--                value="LocalComposeDarkModeHelper,LocalImageLoader,LocalSKImageLoader,LocalSlackColors,LocalTypography,LocalTraceContext,LocalSKPalettes,LocalSKColorSet,LocalSKThemeColorSet,LocalSKUserThemeEmitter,LocalSlackCompositionLocalsState" />-->
-<!--    </issue>-->
-
     <issue id="ComposeNamingUppercase,ComposeNamingLowercase">
         <option name="allowed-composable-function-names" value=".*Presenter"/>
     </issue>
