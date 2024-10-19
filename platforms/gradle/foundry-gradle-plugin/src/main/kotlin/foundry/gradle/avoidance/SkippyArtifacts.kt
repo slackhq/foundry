@@ -15,8 +15,8 @@
  */
 package foundry.gradle.avoidance
 
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.capitalizeUS
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.publishWith
@@ -29,6 +29,6 @@ internal object SkippyArtifacts {
         name = "skipped${name.capitalizeUS()}",
         description = "Lifecycle task to run unit tests for ${project.path} (skipped).",
       )
-      .publishWith(Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_AVOIDED_TASKS))
+      .publishWith(Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_AVOIDED_TASKS))
   }
 }

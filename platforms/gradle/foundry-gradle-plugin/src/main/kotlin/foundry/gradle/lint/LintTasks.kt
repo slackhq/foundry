@@ -26,9 +26,9 @@ import com.android.build.gradle.internal.lint.VariantInputs
 import foundry.gradle.FoundryProperties
 import foundry.gradle.androidExtension
 import foundry.gradle.androidExtensionNullable
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.capitalizeUS
 import foundry.gradle.getByType
@@ -66,7 +66,7 @@ internal object LintTasks {
   }
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_LINT)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_LINT)
     SimpleFilesConsumerTask.registerOrConfigure(
       project,
       GLOBAL_CI_LINT_TASK_NAME,
@@ -257,7 +257,7 @@ internal object LintTasks {
       }
       SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
     } else {
-      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_LINT)
+      val publisher = Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_LINT)
       publisher.publish(ciLint)
     }
 

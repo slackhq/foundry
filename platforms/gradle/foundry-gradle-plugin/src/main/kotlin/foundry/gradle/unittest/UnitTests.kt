@@ -16,9 +16,9 @@
 package foundry.gradle.unittest
 
 import foundry.gradle.FoundryProperties
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.ciUnitTestAndroidVariant
 import foundry.gradle.configureEach
@@ -68,7 +68,7 @@ internal object UnitTests {
   }
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_UNIT_TESTS)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_UNIT_TESTS)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
       name = GLOBAL_CI_UNIT_TEST_TASK_NAME,
@@ -104,9 +104,9 @@ internal object UnitTests {
       project.pluginManager.apply("org.jetbrains.kotlinx.kover")
     }
 
-    val unitTestsPublisher: Publisher<SgpArtifact>? =
+    val unitTestsPublisher: Publisher<FoundryArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_UNIT_TESTS)
+        Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_UNIT_TESTS)
       } else {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)
@@ -142,7 +142,7 @@ internal object UnitTests {
 
   private fun createAndroidCiUnitTestTask(
     project: Project,
-    unitTestsPublisher: Publisher<SgpArtifact>?,
+    unitTestsPublisher: Publisher<FoundryArtifact>?,
   ) {
     val variant = project.ciUnitTestAndroidVariant()
     val variantUnitTestTaskName = "test${variant}UnitTest"
