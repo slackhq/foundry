@@ -13,7 +13,9 @@ Changelog
 - **New**: Extract `version-number` artifact. This contains a Kotlin, non-deprecated `VersionNumber` API. This is useful given that Gradle's is both deprecated and not available in standard JVM projects.
 - Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
 - **New**: Introduce `sgp.compose.global.stabilityConfigurationPath` to specify a global compose stability configuration file.
+- **New**: Introduce `foundry.kotlin.explicitApiMode` to specify an explicit API mode for kotlin projects. Default is null. Values correspond to the `ExplicitApiMode` enum in KGP.
 - **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
+- **Change**: Use KGP 2.1.0+'s new `KotlinBaseExtension` to configure most Kotlin compiler options.
 - Update to Kotlin `2.1.0`.
 - Build against KSP `2.1.0-TODO`
 

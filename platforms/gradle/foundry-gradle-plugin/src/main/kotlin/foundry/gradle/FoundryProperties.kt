@@ -26,6 +26,7 @@ import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 /**
@@ -251,6 +252,10 @@ internal constructor(
   /** Opt out for -Werror in tests. */
   public val allowWarningsInTests: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.allowWarningsInTests", defaultValue = false)
+
+  /** Opt-in for explicit API mode. Maps to [ExplicitApiMode] */
+  public val kotlinExplicitApiMode: Provider<String>
+    get() = resolver.optionalStringProvider("foundry.kotlin.explicitApiMode", defaultValue = null)
 
   /**
    * Anvil generator projects that should always be included when Anvil is enabled.
