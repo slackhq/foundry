@@ -11,7 +11,7 @@ compose-jb-stable = "1.7.0"
 coroutines = "1.9.0"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.9.0"
-dependencyAnalysisPlugin = "2.1.4"
+dependencyAnalysisPlugin = "2.2.0"
 detekt = "1.23.7"
 dokka = "2.0.0-Beta"
 errorproneGradle = "4.1.0"
