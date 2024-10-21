@@ -935,8 +935,14 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
 
+      if (foundryProperties.composeGlobalStabilityConfigurationPath.isPresent) {
+        extension.stabilityConfigurationFiles.add(
+          foundryProperties.composeGlobalStabilityConfigurationPath
+        )
+      }
+
       if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
-        extension.stabilityConfigurationFile.setDisallowChanges(
+        extension.stabilityConfigurationFiles.add(
           foundryProperties.composeStabilityConfigurationPath
         )
       }

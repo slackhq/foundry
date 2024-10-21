@@ -26,6 +26,7 @@ import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 /**
@@ -178,10 +179,17 @@ internal constructor(
         .orElse(emptyList())
 
   /** Relative path to a Compose stability configuration file from the _root_ project. */
+  public val composeGlobalStabilityConfigurationPath: Provider<RegularFile>
+    get() =
+      resolver.providerFor("foundry.compose.global.stabilityConfigurationPath").map {
+        project.rootProject.layout.projectDirectory.file(it)
+      }
+
+  /** Relative path to a Compose stability configuration file from the current project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
     get() =
       resolver.providerFor("foundry.compose.stabilityConfigurationPath").map {
-        project.rootProject.layout.projectDirectory.file(it)
+        project.layout.projectDirectory.file(it)
       }
 
   /**
@@ -244,6 +252,10 @@ internal constructor(
   /** Opt out for -Werror in tests. */
   public val allowWarningsInTests: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.allowWarningsInTests", defaultValue = false)
+
+  /** Opt-in for explicit API mode. Maps to [ExplicitApiMode] */
+  public val kotlinExplicitApiMode: Provider<String>
+    get() = resolver.optionalStringProvider("foundry.kotlin.explicitApiMode", defaultValue = null)
 
   /**
    * Anvil generator projects that should always be included when Anvil is enabled.
