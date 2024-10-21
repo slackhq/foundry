@@ -60,11 +60,12 @@ internal class Resolver<T : Serializable>(
 
   internal companion object {
     /**
-     * Convenience function for creating a [Resolver] for inter-project resolving of [SgpArtifact].
+     * Convenience function for creating a [Resolver] for inter-project resolving of
+     * [FoundryArtifact].
      */
     fun interProjectResolver(
       project: Project,
-      artifact: SgpArtifact,
+      artifact: FoundryArtifact,
       addDependencies: Boolean = true,
     ) =
       interProjectResolver(
