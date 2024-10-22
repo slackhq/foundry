@@ -954,13 +954,13 @@
 <li>Running standard subproject configurations via <code>StandardProjectConfigurations</code>.</li>
 <li>Configuring unit tests via <code>UnitTests</code>. This also includes configuring the Gradle test retry plugin, if enabled.</li>
 <li>Configuring NullAway, if enabled.</li>
-<li>Configuring <a href="/tools/skippy">Skippy</a>.</li>
-<li>Configuring <a href="../mod-score">Mod Score</a> tasks.</li>
+<li>Configuring <a href="../../../tools/skippy/">Skippy</a>.</li>
+<li>Configuring <a href="../mod-score/">Mod Score</a> tasks.</li>
 </ul>
 <h3 id="standardprojectconfigurations"><code>StandardProjectConfigurations</code><a class="headerlink" href="#standardprojectconfigurations" title="Permanent link">&para;</a></h3>
 <p>This class warrants special mention as it is responsible for the bulk of the configuration applied to projects SGP manages.</p>
 <ul>
-<li>Creates and exposes the <a href="../dsl"><code>foundry</code> extension DSL</a>.</li>
+<li>Creates and exposes the <a href="../dsl/"><code>foundry</code> extension DSL</a>.</li>
 <li>Applies common configurations.</li>
 <li>This largely just sets up the dependency sorter plugin.</li>
 <li>Applies common JVM configurations.</li>
@@ -972,7 +972,7 @@
 <ul>
 <li>Applies the repo&rsquo;s platform project, if any.</li>
 <li>Applies any BOM dependencies to platform-configurable configurations.</li>
-<li>Configures the dependency analysis gradle plugin and <a href="../dependency-rake"><code>DependencyRake</code></a>.</li>
+<li>Configures the dependency analysis gradle plugin and <a href="../dependency-rake/"><code>DependencyRake</code></a>.</li>
 <li>Applies common annotations and common test bundles from version catalogs.</li>
 <li>Fails on non-androidx support library dependencies.</li>
 <li>Configure common annotations processors.</li>
@@ -990,7 +990,7 @@
 </ul>
 <h5 id="android">Android<a class="headerlink" href="#android" title="Permanent link">&para;</a></h5>
 <ul>
-<li>Configures AndroidTest APK aggregation with <a href="/tools/skippy">Skippy</a> support.</li>
+<li>Configures AndroidTest APK aggregation with <a href="../../../tools/skippy/">Skippy</a> support.</li>
 <li>Applies the <a href="https://github.com/gradle/android-cache-fix-gradle-plugin">Android cache fix plugin</a>, if enabled.</li>
 <li>Configures common AGP extensions (both legacy extensions and new Component extensions).</li>
 <li>Disables unused/irrelevant variants. SGP is single-variant for library projects by default.</li>
