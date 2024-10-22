@@ -21,7 +21,7 @@ intellij-platform = "2.1.0"
 # Temporary until https://bugs.openjdk.org/browse/JDK-8331027 is fixed in 23
 jdk = "21"
 jvmTarget = "17"
-jewel = "0.25.0"
+jewel = "0.26.0"
 jna = "5.15.0"
 kaml = "0.61.0"
 kotlin = "2.0.21"
