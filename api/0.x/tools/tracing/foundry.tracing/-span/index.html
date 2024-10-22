@@ -1,0 +1,375 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Span</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            foundry
+                    </a>            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":tools:tracing/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="tracing::foundry.tracing/Span///PointingToDeclaration//1615284497">
+  <div class="breadcrumbs"><a href="../../index.html">tracing</a><span class="delimiter">/</span><a href="../index.html">foundry.tracing</a><span class="delimiter">/</span><span class="current">Span</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Span</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Span</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>parent_id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>trace_id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>start_timestamp_micros<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>duration_micros<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter ">tags<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-key-value/index.html">KeyValue</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyList()<span class="token punctuation">, </span></span><span class="parameter ">unknownFields<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY</span></span><span class="token punctuation">)</span> : <span data-unresolved-link="com.squareup.wire/Message///PointingToDeclaration/">Message</span><span class="token operator">&lt;</span><a href="index.html">Span</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">&gt; </span></div><p class="paragraph">A span defines a single event in a trace. This span format is inspired by the zipkin span design at: https://github.com/openzipkin/zipkin-api/blob/master/zipkin.proto</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="603594864%2FConstructors%2F1615284497" anchor-label="Span" id="603594864%2FConstructors%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-span.html"><span><span>Span</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="603594864%2FConstructors%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY<span class="token punctuation">, </span></span><span class="parameter ">parent_id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY<span class="token punctuation">, </span></span><span class="parameter ">trace_id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY<span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span><span class="token punctuation">, </span></span><span class="parameter ">start_timestamp_micros<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter ">duration_micros<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter ">tags<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-key-value/index.html">KeyValue</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyList()<span class="token punctuation">, </span></span><span class="parameter ">unknownFields<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>ByteString.EMPTY</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-1220009257%2FClasslikes%2F1615284497" anchor-label="Companion" id="-1220009257%2FClasslikes%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1220009257%2FClasslikes%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1321337559%2FProperties%2F1615284497" anchor-label="adapter" id="1321337559%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1321337559%2FProperties%2F1615284497"><span><span>adapter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1321337559%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#1321337559%2FProperties%2F1615284497">adapter</a><span class="token operator">: </span><span data-unresolved-link="com.squareup.wire/ProtoAdapter///PointingToDeclaration/">ProtoAdapter</span><span class="token operator">&lt;</span><a href="index.html">Span</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1467613526%2FProperties%2F1615284497" anchor-label="duration_micros" id="1467613526%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="duration_micros.html"><span>duration_</span><wbr><span>micros</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1467613526%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="duration_micros.html">duration_micros</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span></div><div class="brief "><p class="paragraph">This field stored the duration in microseconds for the event in the critical path. For example 150 milliseconds is 150000 microseconds. This field is required.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1422255247%2FProperties%2F1615284497" anchor-label="id" id="1422255247%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="id.html"><span><span>id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1422255247%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="id.html">id</a><span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span></div><div class="brief "><p class="paragraph">A field that uniquely identifies this event. This field usually contains a randomly generated UUID. This field is required and encoded as 8 or 16 bytes, in big endian byte order.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1888962015%2FProperties%2F1615284497" anchor-label="name" id="1888962015%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1888962015%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="name.html">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">A name for the event.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="467544768%2FProperties%2F1615284497" anchor-label="parent_id" id="467544768%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="parent_id.html"><span>parent_</span><wbr><span>id</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="467544768%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="parent_id.html">parent_id</a><span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span></div><div class="brief "><p class="paragraph">This field contains the parent id of this span.  It is useful to establish a parent-child relationships between spans. If empty, this span will be considered a root span.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-238349643%2FProperties%2F1615284497" anchor-label="start_timestamp_micros" id="-238349643%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="start_timestamp_micros.html"><span>start_</span><wbr><span>timestamp_</span><wbr><span>micros</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-238349643%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="start_timestamp_micros.html">start_timestamp_micros</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span></div><div class="brief "><p class="paragraph">The timestamp field stores the epoch microseconds at which this event happened. For example: a value of 1551849569000000 represents March 6, 2019 5:19:29 UTC. We use fixed64 since it is more wire efficient for than int64 for larger numbers. This field is required.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="712165393%2FProperties%2F1615284497" anchor-label="tags" id="712165393%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tags.html"><span><span>tags</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="712165393%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="tags.html">tags</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-key-value/index.html">KeyValue</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A list of key value pairs.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-854553899%2FProperties%2F1615284497" anchor-label="trace_id" id="-854553899%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="trace_id.html"><span>trace_</span><wbr><span>id</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-854553899%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="trace_id.html">trace_id</a><span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span></div><div class="brief "><p class="paragraph">A trace is a directed acyclic graph of spans. All spans with the same trace_id belong to the same transaction. This field is required.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="78490179%2FProperties%2F1615284497" anchor-label="unknownFields" id="78490179%2FProperties%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#78490179%2FProperties%2F1615284497"><span>unknown</span><wbr><span><span>Fields</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="78490179%2FProperties%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#78490179%2FProperties%2F1615284497">unknownFields</a><span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1159245189%2FFunctions%2F1615284497" anchor-label="copy" id="-1159245189%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="copy.html"><span><span>copy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1159245189%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="copy.html"><span class="token function">copy</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>this.id<span class="token punctuation">, </span></span><span class="parameter ">parent_id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>this.parent_id<span class="token punctuation">, </span></span><span class="parameter ">trace_id<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>this.trace_id<span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span>this.name<span class="token punctuation">, </span></span><span class="parameter ">start_timestamp_micros<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>this.start_timestamp_micros<span class="token punctuation">, </span></span><span class="parameter ">duration_micros<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>this.duration_micros<span class="token punctuation">, </span></span><span class="parameter ">tags<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-key-value/index.html">KeyValue</a><span class="token operator">&gt;</span><span class="token operator"> = </span>this.tags<span class="token punctuation">, </span></span><span class="parameter ">unknownFields<span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span><span class="token operator"> = </span>this.unknownFields</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Span</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="831623625%2FFunctions%2F1615284497" anchor-label="encode" id="831623625%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1567278658%2FFunctions%2F1615284497"><span><span>encode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="831623625%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-1567278658%2FFunctions%2F1615284497"><span class="token function">encode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html">ByteArray</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#728244385%2FFunctions%2F1615284497"><span class="token function">encode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">stream<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/OutputStream.html">OutputStream</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-1981433434%2FFunctions%2F1615284497"><span class="token function">encode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sink<span class="token operator">: </span><span data-unresolved-link="okio/BufferedSink///PointingToDeclaration/">BufferedSink</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-118354107%2FFunctions%2F1615284497" anchor-label="encodeByteString" id="-118354107%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-118354107%2FFunctions%2F1615284497"><span>encode</span><wbr><span>Byte</span><wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-118354107%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-118354107%2FFunctions%2F1615284497"><span class="token function">encodeByteString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="okio/ByteString///PointingToDeclaration/">ByteString</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1376835383%2FFunctions%2F1615284497" anchor-label="equals" id="1376835383%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="equals.html"><span><span>equals</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1376835383%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-885717041%2FFunctions%2F1615284497" anchor-label="hashCode" id="-885717041%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-885717041%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1063883106%2FFunctions%2F1615284497" anchor-label="toString" id="-1063883106%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1063883106%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-809329799%2FFunctions%2F1615284497" anchor-label="withoutUnknownFields" id="-809329799%2FFunctions%2F1615284497" data-filterable-set=":tools:tracing/main"></a>
+          <div class="table-row" data-filterable-current=":tools:tracing/main" data-filterable-set=":tools:tracing/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-809329799%2FFunctions%2F1615284497"><span>without</span><wbr><span>Unknown</span><wbr><span><span>Fields</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-809329799%2FFunctions%2F1615284497"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:tracing/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-809329799%2FFunctions%2F1615284497"><span class="token function">withoutUnknownFields</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Span</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

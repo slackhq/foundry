@@ -2,6 +2,19 @@ $dokka.format:html-v1
 $dokka.linkExtension:html
 $dokka.location:////PointingToDeclaration/foundry-gradle-plugin/[root]/index.html
 $dokka.location://foundry/org.gradle.api.Project#org.gradle.api.Action[foundry.gradle.FoundryExtension]/PointingToDeclaration/foundry-gradle-plugin/[root]/foundry.html
+module:agp-handler-api
+foundry.gradle.agp
+foundry.gradle.agp.internal
+module:better-gradle-properties
+foundry.gradle.properties
+module:foundry-gradle-plugin
+foundry.gradle
+foundry.gradle.anvil
+foundry.gradle.avoidance
+foundry.gradle.dependencies
+foundry.gradle.stats
+foundry.gradle.tasks
+foundry.gradle.util
 module:cli
 foundry.cli
 foundry.cli.buildkite
@@ -14,16 +27,8 @@ foundry.common
 module:skippy
 foundry.skippy
 module:tracing
+foundry.tracing
 foundry.tracing.model
 foundry.tracing.reporter
-module:foundry-gradle-plugin
-foundry.gradle
-foundry.gradle.anvil
-foundry.gradle.avoidance
-foundry.gradle.dependencies
-foundry.gradle.stats
-foundry.gradle.tasks
-foundry.gradle.util
-module:agp-handler-api
-foundry.gradle.agp
-foundry.gradle.agp.internal
+module:version-number
+foundry.common.versioning
