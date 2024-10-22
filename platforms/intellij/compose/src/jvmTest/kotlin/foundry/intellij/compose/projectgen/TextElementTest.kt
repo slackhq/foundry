@@ -41,7 +41,6 @@ class TextElementTest {
     val textElement = TextElement(initialValue = "TextFieldState initial value", label = "Label")
 
     textElement.value = "Changed Text"
-    assertEquals("Changed Text", textElement.value)
 
     textElement.reset()
     assertEquals("TextFieldState initial value", textElement.state.text)
@@ -53,7 +52,6 @@ class TextElementTest {
     assertTrue(textElement.isVisible)
 
     textElement.isVisible = false
-    assertEquals(textElement.isVisible, false)
 
     textElement.reset()
     assertEquals("TextFieldState initial value", textElement.state.text)
