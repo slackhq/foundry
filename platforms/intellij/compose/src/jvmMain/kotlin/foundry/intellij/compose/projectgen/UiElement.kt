@@ -81,7 +81,7 @@ internal class TextElement(
   val enabled by derivedStateOf { !readOnly && dependentElements.all { it.isChecked } }
 
   val isValid by derivedStateOf {
-    validationRegex?.let { state.text.isNotBlank() && state.text.toString().matches(it) } != false
+    validationRegex?.let { state.text.isNotBlank() && state.text.matches(it) } != false
   }
 
   override fun reset() {
