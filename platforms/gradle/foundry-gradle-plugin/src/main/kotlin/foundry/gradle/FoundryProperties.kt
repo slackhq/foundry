@@ -17,7 +17,7 @@ package foundry.gradle
 
 import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
-import foundry.gradle.artifacts.SgpArtifact
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
 import foundry.gradle.properties.getOrCreateExtra
 import foundry.gradle.properties.sneakyNull
@@ -635,8 +635,8 @@ internal constructor(
     get() = resolver.booleanValue("foundry.logging.thermals", defaultValue = false)
 
   /**
-   * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
-   * as a failsafe while we try different approaches to allow lenient resolution.
+   * Enables eager configuration of [FoundryArtifact] publishing in subprojects. This is behind a
+   * flag as a failsafe while we try different approaches to allow lenient resolution.
    *
    * @see StandardProjectConfigurations.setUpSubprojectArtifactPublishing
    */

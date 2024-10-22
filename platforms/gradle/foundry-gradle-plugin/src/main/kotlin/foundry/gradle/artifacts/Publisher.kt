@@ -62,15 +62,15 @@ internal class Publisher<T : Serializable>(
   companion object {
     /**
      * Convenience function for creating a [Publisher] for inter-project publishing of
-     * [SgpArtifact].
+     * [FoundryArtifact].
      */
-    fun interProjectPublisher(project: Project, sgpArtifact: SgpArtifact) =
+    fun interProjectPublisher(project: Project, foundryArtifact: FoundryArtifact) =
       interProjectPublisher(
         project,
-        sgpArtifact.attribute,
-        sgpArtifact,
-        sgpArtifact.declarableName,
-        sgpArtifact.category,
+        foundryArtifact.attribute,
+        foundryArtifact,
+        foundryArtifact.declarableName,
+        foundryArtifact.category,
       )
 
     fun <T : ShareableArtifact<T>> interProjectPublisher(

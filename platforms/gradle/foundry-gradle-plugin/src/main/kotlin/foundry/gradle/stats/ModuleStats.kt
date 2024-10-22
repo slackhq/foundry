@@ -24,9 +24,9 @@ import com.squareup.moshi.adapter
 import com.squareup.wire.gradle.WireTask
 import foundry.gradle.FoundryExtension
 import foundry.gradle.FoundryProperties
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.capitalizeUS
 import foundry.gradle.configure
 import foundry.gradle.convertProjectPathToAccessor
@@ -81,7 +81,7 @@ public object ModuleStatsTasks {
   internal fun configureRoot(rootProject: Project, foundryProperties: FoundryProperties) {
     if (!foundryProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
-    val resolver = Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
+    val resolver = Resolver.interProjectResolver(rootProject, FoundryArtifact.MOD_STATS_STATS_FILES)
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
       projectPathsToAccessors.setDisallowChanges(
@@ -150,7 +150,8 @@ public object ModuleStatsTasks {
           )
         }
 
-      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.MOD_STATS_STATS_FILES)
+      val publisher =
+        Publisher.interProjectPublisher(project, FoundryArtifact.MOD_STATS_STATS_FILES)
       publisher.publish(task.flatMap { it.outputFile })
       task
     }

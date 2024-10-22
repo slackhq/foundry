@@ -76,6 +76,8 @@ nav:
     #  - 'Thermals Logging': platforms/gradle/thermals-logging.md
   - 'Tools':
       - 'CLI': tools/cli.md
+      # TODO
+    #  - 'Skippy': tools/skippy.md
   - 'Discussions ⏏': https://github.com/slackhq/foundry/discussions
   - 'Change Log': changelog.md
   - 'API': api/0.x/

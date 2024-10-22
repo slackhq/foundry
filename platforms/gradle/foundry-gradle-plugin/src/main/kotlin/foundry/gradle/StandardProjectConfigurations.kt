@@ -33,8 +33,8 @@ import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import foundry.gradle.Configurations.isPlatformConfigurationName
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.dependencies.FoundryDependencies
 import foundry.gradle.dependencyrake.RakeDependencies
 import foundry.gradle.kgp.KgpTasks
@@ -53,7 +53,6 @@ import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -130,7 +129,7 @@ internal class StandardProjectConfigurations(
    * is behind a flag just as a failsafe.
    */
   private fun setUpSubprojectArtifactPublishing(project: Project) {
-    for (artifact in SgpArtifact::class.sealedSubclasses) {
+    for (artifact in FoundryArtifact::class.sealedSubclasses) {
       Publisher.interProjectPublisher(project, artifact.objectInstance!!)
     }
   }
@@ -234,7 +233,7 @@ internal class StandardProjectConfigurations(
                 registerPostProcessingTask(rakeDependencies)
               }
               val publisher =
-                Publisher.interProjectPublisher(project, SgpArtifact.DAGP_MISSING_IDENTIFIERS)
+                Publisher.interProjectPublisher(project, FoundryArtifact.DAGP_MISSING_IDENTIFIERS)
               publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
@@ -434,12 +433,12 @@ internal class StandardProjectConfigurations(
     val javaVersion = foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
-      Publisher.interProjectPublisher(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
+      Publisher.interProjectPublisher(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject =
       foundryTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
     val skippyAndroidTestProjectPublisher =
-      Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT)
+      Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
