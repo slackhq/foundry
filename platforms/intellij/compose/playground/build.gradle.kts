@@ -20,6 +20,7 @@ plugins {
   alias(libs.plugins.compose)
   alias(libs.plugins.kotlin.plugin.compose)
   alias(libs.plugins.lint)
+  alias(libs.plugins.roborazzi)
 }
 
 kotlin {
