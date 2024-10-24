@@ -48,12 +48,20 @@ kotlin {
         implementation(projects.platforms.intellij.compose)
       }
     }
+    jvmTest{
+      dependencies{
+        implementation(libs.junit)
+      }
+    }
   }
 }
+
 
 // Tell lint to only resolve the jvm attrs for our compose deps
 configurations
   .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
-dependencies { lintChecks(libs.composeLints) }
+dependencies {
+  lintChecks(libs.composeLints)
+}
