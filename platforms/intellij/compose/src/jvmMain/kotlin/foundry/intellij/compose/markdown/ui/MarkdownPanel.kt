@@ -148,9 +148,9 @@ private val JewelTheme.Companion.linkColor: Color
   @Composable
   get() {
     return if (isDark) {
-      colorPalette.blue.lastOrNull() ?: Color.Blue
+      colorPalette.blue.lastOrNull() ?: Color.White
     } else {
-      colorPalette.blue.firstOrNull() ?: Color.Blue
+      colorPalette.blue.firstOrNull() ?: Color.White
     }
   }
 
