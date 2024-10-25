@@ -31,7 +31,11 @@ import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.Text
 
-fun main() = singleWindowApplication {
+fun main() {
+  app()
+}
+
+fun app() = singleWindowApplication {
   var isDark by remember { mutableStateOf(false) }
   IntUiTheme(isDark) {
     Column(Modifier.background(JewelTheme.globalColors.panelBackground)) {
