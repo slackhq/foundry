@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
@@ -48,20 +49,22 @@ kotlin {
         implementation(projects.platforms.intellij.compose)
       }
     }
-    jvmTest{
-      dependencies{
+    jvmTest {
+      dependencies {
         implementation(libs.junit)
+        implementation(libs.roborazzi)
       }
     }
   }
 }
-
 
 // Tell lint to only resolve the jvm attrs for our compose deps
 configurations
   .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
-dependencies {
-  lintChecks(libs.composeLints)
+dependencies { lintChecks(libs.composeLints) }
+
+tasks.withType<KotlinCompile>().configureEach {
+  compilerOptions { freeCompilerArgs.add("-Xcontext-receivers") }
 }
