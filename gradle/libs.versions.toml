@@ -5,7 +5,7 @@ anvil = "2.5.0-beta11"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.7.1"
 bugsnagGradle = "8.1.0"
-circuit = "0.23.1"
+circuit = "0.25.0"
 compose-jb = "1.7.0"
 compose-jb-stable = "1.7.0"
 coroutines = "1.9.0"
