@@ -52,8 +52,10 @@ awk -v version="$version" '
 ./gradlew :platforms:intellij:skate:uploadPluginToArtifactory --no-configuration-cache --stacktrace
 
 # Prepare release
+git config user.name "OSS-Bot"
+git config user.email "svc-oss-bot@slack-corp.com"
 git commit -am "Prepare for Skate release $ORG_GRADLE_PROJECT_VERSION_NAME."
-git tag -a "skate-$ORG_GRADLE_PROJECT_VERSION_NAME" -m "Skate Version $ORG_GRADLE_PROJECT_VERSION_NAME"
+git tag -a "skate-$ORG_GRADLE_PROJECT_VERSION_NAME" -m "skate-$ORG_GRADLE_PROJECT_VERSION_NAME"
 
 # Push it all up
 git push && git push --tags
