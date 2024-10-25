@@ -159,5 +159,6 @@ private val SDKS =
       DefaultSdk(32, "12.1", "8229987", "REL", 9, -1),
       DefaultSdk(33, "13", "9030017", "Tiramisu", 9, -1),
       DefaultSdk(34, "14", "10818077", "REL", 17, -1),
+      DefaultSdk(35, "15", "12543294", "REL", 17, -1),
     )
     .associateBy { it.apiLevel }
