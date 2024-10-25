@@ -37,7 +37,7 @@ nullawayGradle = "2.1.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.1"
 retrofit = "2.11.0"
-roborazzi = "1.9.0"
+roborazzi = "1.6.0"
 slack-lint = "0.8.2"
 sortDependencies = "0.7"
 spotless = "7.0.0.BETA3"
@@ -142,7 +142,7 @@ okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", versio
 oshi = "com.github.oshi:oshi-core:6.6.5"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
-roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-gradle-plugin", version.ref = "roborazzi" }
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.9"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"
 slackLints-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slack-lint" }
