@@ -603,6 +603,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0210" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.21.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0202" class="md-nav__link">
     <span class="md-ellipsis">
       0.20.2
@@ -1948,6 +1957,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0210" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.21.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0202" class="md-nav__link">
     <span class="md-ellipsis">
       0.20.2
@@ -3209,6 +3227,8 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased"><strong>Unreleased</strong><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0210">0.21.0<a class="headerlink" href="#0210" title="Permanent link">&para;</a></h2>
+<p><em>2024-10-25</em></p>
 <ul>
 <li><strong>New</strong>: Extract <code>better-gradle-properties</code> artifact, which is our hierarchical Gradle properties solution that better handles properties in Gradle. This is what powers <code>FoundryProperties</code> but is now extracted to be more portable.</li>
 <li>This checks in the following order of priority<ul>
@@ -3219,7 +3239,18 @@
 </ul>
 </li>
 <li><strong>New</strong>: Extract <code>version-number</code> artifact. This contains a Kotlin, non-deprecated <code>VersionNumber</code> API. This is useful given that Gradle&rsquo;s is both deprecated and not available in standard JVM projects.</li>
-<li>Remove defunct <code>foundry.git.hooksPath</code> and <code>foundry.git.ignoreRevsFile</code> properties.</li>
+<li><strong>New</strong>: Support Robolectric 4.14.</li>
+<li><strong>Changed</strong>: Remove defunct <code>foundry.git.hooksPath</code> and <code>foundry.git.ignoreRevsFile</code> properties.</li>
+<li><strong>Changed</strong>: Rename <code>SgpArtifact</code> to <code>FoundryArtifact</code>.</li>
+<li>Misc doc fixes + reorganize docsite around new repo structure.</li>
+<li>Update xmlutil to <code>0.90.2</code>.</li>
+<li>Build against Spotless <code>7.0.0.BETA4</code>.</li>
+<li>Build against KSP <code>2.0.21-1.0.26</code>.</li>
+<li>Build against DAGP <code>2.2.0</code>.</li>
+<li>Build against nullaway-gradle <code>2.1.0</code>.</li>
+<li>Build against errorprone-gradle <code>4.1.0</code>.</li>
+<li>Build against Compose multiplatform <code>1.7.0</code>.</li>
+<li>Build against Dokka <code>2.0.0-Beta</code>.</li>
 </ul>
 <h2 id="0202">0.20.2<a class="headerlink" href="#0202" title="Permanent link">&para;</a></h2>
 <p><em>2024-10-14</em></p>
