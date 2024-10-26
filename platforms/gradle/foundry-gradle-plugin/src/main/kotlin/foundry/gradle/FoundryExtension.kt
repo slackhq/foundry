@@ -1098,6 +1098,8 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
     this.androidExtension = androidExtension
   }
 
+  internal fun viewBindingEnabled() = androidExtension?.buildFeatures?.viewBinding ?: false
+
   /**
    * Enables android instrumentation tests for this project.
    *

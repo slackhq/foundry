@@ -92,17 +92,11 @@ internal class StandardProjectConfigurations(
   private val versionCatalog: VersionCatalog,
   private val foundryTools: FoundryTools,
 ) {
-  fun applyTo(project: Project) {
-    val foundryProperties = FoundryProperties(project)
-    val foundryExtension =
-      project.extensions.create(
-        "foundry",
-        FoundryExtension::class.java,
-        globalProperties,
-        foundryProperties,
-        project,
-        versionCatalog,
-      )
+  fun applyTo(
+    project: Project,
+    foundryExtension: FoundryExtension,
+    foundryProperties: FoundryProperties,
+  ) {
     if (foundryProperties.eagerlyConfigureArtifactPublishing) {
       setUpSubprojectArtifactPublishing(project)
     }

@@ -20,6 +20,7 @@ import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import com.diffplug.spotless.LineEnding
 import foundry.gradle.develocity.NoOpBuildScanAdapter
 import foundry.gradle.develocity.findAdapter
+import foundry.gradle.model.ModuleTopographyTask
 import foundry.gradle.stats.ModuleStatsTasks
 import java.util.Locale
 import java.util.Optional
@@ -55,7 +56,16 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
       val foundryTools = target.foundryTools()
-      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryTools).applyTo(target)
+      val foundryExtension =
+        target.extensions.create(
+          "foundry",
+          FoundryExtension::class.java,
+          foundryProperties,
+          target,
+          versionCatalog,
+        )
+      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryTools)
+        .applyTo(target, foundryExtension, foundryProperties)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
@@ -83,6 +93,7 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
       }
 
       ModuleStatsTasks.configureSubproject(target, foundryProperties)
+      ModuleTopographyTask.register(target, foundryExtension)
     }
 
     // Everything in here applies to all projects
