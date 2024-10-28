@@ -35,7 +35,6 @@ class MarkdownPlaygroundKtTest {
       val roborazziOptions =
         RoborazziOptions(
           recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
-          compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0F),
         )
 
       onRoot().captureRoboImage(roborazziOptions = roborazziOptions)

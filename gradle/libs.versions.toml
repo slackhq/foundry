@@ -152,4 +152,3 @@ tikxml-htmlEscape = { module = "com.tickaroo.tikxml:converter-htmlescape", versi
 truth = "com.google.truth:truth:1.4.4"
 xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "xmlutil" }
 xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }
-junit-junit = { group = "junit", name = "junit", version.ref = "junit" }
