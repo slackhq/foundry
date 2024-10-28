@@ -39,10 +39,12 @@ fun main() {
 
 // created function for testing
 @Composable
-fun AppContent() {
+fun AppContent(
+  modifier: Modifier = Modifier
+) {
   var isDark by remember { mutableStateOf(false) }
   IntUiTheme(isDark) {
-    Column(Modifier.background(JewelTheme.globalColors.panelBackground)) {
+    Column(modifier.background(JewelTheme.globalColors.panelBackground)) {
       DefaultButton(
         modifier = Modifier.padding(16.dp).testTag("dark-mode-toggle"),
         onClick = { isDark = !isDark },
