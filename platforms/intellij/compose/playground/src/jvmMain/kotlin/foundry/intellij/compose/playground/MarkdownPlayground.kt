@@ -39,9 +39,7 @@ fun main() {
 
 // created function for testing
 @Composable
-fun AppContent(
-  modifier: Modifier = Modifier
-) {
+fun AppContent(modifier: Modifier = Modifier) {
   var isDark by remember { mutableStateOf(false) }
   IntUiTheme(isDark) {
     Column(modifier.background(JewelTheme.globalColors.panelBackground)) {
