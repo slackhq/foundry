@@ -169,6 +169,17 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         .toJson(it, featuresToRemove.toSortedSet(compareBy { it.name }))
     }
 
+    if (featuresToRemove.isNotEmpty()) {
+      logger.error(
+        """
+          ${featuresToRemove.joinToString("\n"){ "- ${it.removalMessage}" }}
+          
+          Validation errors written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}
+        """
+          .trimIndent()
+      )
+    }
+
     val featuresToValidate =
       if (validateAll.getOrElse(false)) {
         featuresToRemove
@@ -207,7 +218,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       .any { file ->
         file.useLines { lines ->
           for (line in lines) {
-            if (matchingAnnotations.any { it in line }) {
+            if (matchingText.any { it in line }) {
               return@any true
             }
           }
@@ -225,6 +236,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         project.provider { foundryExtension.androidHandler.featuresHandler.viewBindingEnabled() }
       val task =
         project.tasks.register<ModuleTopographyTask>("moduleTopography") {
+          projectName.set(project.name)
+          projectPath.set(project.path)
           projectDirProperty.setDisallowChanges(project.layout.projectDirectory)
           moshiCodeGenEnabled.setDisallowChanges(
             foundryExtension.featuresHandler.moshiHandler.moshiCodegen
@@ -249,8 +262,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
           )
 
           // Depend on compilations
-          mustRunAfter(project.tasks.withType(JavaCompile::class.java))
-          mustRunAfter(project.tasks.withType(KotlinCompile::class.java))
+          dependsOn(project.tasks.withType(JavaCompile::class.java))
+          dependsOn(project.tasks.withType(KotlinCompile::class.java))
         }
 
       project.pluginManager.withPlugin("dev.google.devtools.ksp") {
@@ -278,12 +291,13 @@ public data class ModuleFeature(
   /** Generated sources root dir, if any. Note that descendants are checked */
   val generatedSourcesDir: String? = null,
   val generatedSourcesExtensions: Set<String> = emptySet(),
-  val matchingAnnotations: Set<String> = emptySet(),
+  val matchingText: Set<String> = emptySet(),
   val matchingAnnotationsExtensions: Set<String> = emptySet(),
   /** If specified, looks for any sources in this dir */
   val matchingSourcesDir: String? = null,
 )
 
+// TODO eventually move these to JSON configs
 internal object Features {
   internal val AndroidTest =
     ModuleFeature(
@@ -296,7 +310,7 @@ internal object Features {
     ModuleFeature(
       name = "compose",
       removalMessage = "Remove foundry.features.compose from your build file",
-      matchingAnnotations = setOf("@Composable"),
+      matchingText = setOf("@Composable"),
       matchingAnnotationsExtensions = setOf("kt"),
     )
 
@@ -304,7 +318,7 @@ internal object Features {
     ModuleFeature(
       name = "dagger",
       removalMessage = "Remove foundry.features.dagger from your build file",
-      matchingAnnotations =
+      matchingText =
         setOf(
           "@Inject",
           "@AssistedInject",
@@ -314,6 +328,12 @@ internal object Features {
           "@Module",
           "@Component",
           "@Subcomponent",
+          "@MergeComponent",
+          "@MergeSubcomponent",
+          "@MergeModules",
+          "@MergeInterfaces",
+          "@ContributesSubcomponent",
+          "import dagger.",
         ),
       matchingAnnotationsExtensions = setOf("kt", "java"),
     )
@@ -322,7 +342,16 @@ internal object Features {
     ModuleFeature(
       name = "dagger-compiler",
       removalMessage = "Remove foundry.features.dagger.mergeComponents from your build file",
-      matchingAnnotations = setOf("@Component", "@Subcomponent"),
+      matchingText =
+        setOf(
+          "@Component",
+          "@Subcomponent",
+          "@MergeComponent",
+          "@MergeSubcomponent",
+          "@MergeModules",
+          "@MergeInterfaces",
+          "@ContributesSubcomponent",
+        ),
       matchingAnnotationsExtensions = setOf("kt", "java"),
       generatedSourcesDir = "build/generated/source/kapt",
       generatedSourcesExtensions = setOf("java"),
@@ -332,7 +361,7 @@ internal object Features {
     ModuleFeature(
       name = "moshi-codegen",
       removalMessage = "Remove foundry.features.moshi.codeGen from your build file",
-      matchingAnnotations = setOf("@JsonClass"),
+      matchingText = setOf("@JsonClass"),
       matchingAnnotationsExtensions = setOf("kt"),
     )
 
@@ -340,14 +369,14 @@ internal object Features {
     ModuleFeature(
       name = "circuit-inject",
       removalMessage = "Remove foundry.features.circuit.codeGen from your build file",
-      matchingAnnotations = setOf("@CircuitInject"),
+      matchingText = setOf("@CircuitInject"),
       matchingAnnotationsExtensions = setOf("kt"),
     )
 
   internal val Ksp =
     ModuleFeature(
       name = "ksp",
-      removalMessage = "Remove whatever is using KSP",
+      removalMessage = "Remove the KSP plugin (or whatever Foundry feature is requesting it)",
       generatedSourcesDir = "build/generated/ksp",
       // Don't specify extensions because KAPT can generate anything into resources
     )
@@ -355,7 +384,7 @@ internal object Features {
   internal val Kapt =
     ModuleFeature(
       name = "kapt",
-      removalMessage = "Remove whatever is using KAPT",
+      removalMessage = "Remove the KAPT plugin (or whatever Foundry feature is requesting it)",
       generatedSourcesDir = "build/generated/source/kapt",
       // Don't specify extensions because KSP can generate anything into resources
     )
