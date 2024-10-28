@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+0.21.0
+------
+
+_2024-10-25_
+
 - **New**: Extract `better-gradle-properties` artifact, which is our hierarchical Gradle properties solution that better handles properties in Gradle. This is what powers `FoundryProperties` but is now extracted to be more portable.
   - This checks in the following order of priority
     - project-local `local.properties`
@@ -11,7 +16,18 @@ Changelog
     - root-project `local.properties`
     - root-project/global `gradle.properties`
 - **New**: Extract `version-number` artifact. This contains a Kotlin, non-deprecated `VersionNumber` API. This is useful given that Gradle's is both deprecated and not available in standard JVM projects.
-- Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
+- **New**: Support Robolectric 4.14.
+- **Changed**: Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
+- **Changed**: Rename `SgpArtifact` to `FoundryArtifact`.
+- Misc doc fixes + reorganize docsite around new repo structure.
+- Update xmlutil to `0.90.2`.
+- Build against Spotless `7.0.0.BETA4`.
+- Build against KSP `2.0.21-1.0.26`.
+- Build against DAGP `2.2.0`.
+- Build against nullaway-gradle `2.1.0`.
+- Build against errorprone-gradle `4.1.0`.
+- Build against Compose multiplatform `1.7.0`.
+- Build against Dokka `2.0.0-Beta`.
 
 0.20.2
 ------

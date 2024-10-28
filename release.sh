@@ -2,11 +2,7 @@
 
 set -exo pipefail
 
-# Gets a property out of a .properties file
-# usage: getProperty $key $filename
-function getProperty() {
-    grep "${1}" "$2" | cut -d'=' -f2
-}
+source tools/scripts/scriptUtil.sh
 
 NEW_VERSION=$1
 SNAPSHOT_VERSION=$(getProperty 'VERSION_NAME' gradle.properties)
