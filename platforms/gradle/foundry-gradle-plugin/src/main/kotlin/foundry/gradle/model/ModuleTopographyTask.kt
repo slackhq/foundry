@@ -19,35 +19,27 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.options.Option
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@CacheableTask
+@DisableCachingByDefault
 public abstract class ModuleTopographyTask : DefaultTask() {
   @get:Input public abstract val projectName: Property<String>
 
   @get:Input public abstract val projectPath: Property<String>
 
-  @get:InputDirectory
-  @get:SkipWhenEmpty
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  public abstract val srcsDirProperty: DirectoryProperty
-
-  @get:InputDirectory
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  public abstract val buildDirProperty: DirectoryProperty
+  @get:Internal public abstract val projectDirProperty: DirectoryProperty
 
   @get:Input @get:Optional public abstract val moshiCodeGenEnabled: Property<Boolean>
+
   @get:Input @get:Optional public abstract val circuitCodeGenEnabled: Property<Boolean>
 
   @get:Input @get:Optional public abstract val daggerEnabled: Property<Boolean>
@@ -63,6 +55,16 @@ public abstract class ModuleTopographyTask : DefaultTask() {
   @get:Input @get:Optional public abstract val kaptEnabled: Property<Boolean>
 
   @get:Input @get:Optional public abstract val kspEnabled: Property<Boolean>
+
+  @get:Optional
+  @get:Option(option = "validate-all", description = "Validates all")
+  @get:Input
+  public abstract val validateAll: Property<Boolean>
+
+  @get:Optional
+  @get:Option(option = "validate", description = "Enables validation")
+  @get:Input
+  public abstract val validate: Property<String>
 
   // TODO source DAGP files to check usage of Android APIs?
 
@@ -80,7 +82,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
     val featuresEnabled = mutableSetOf<ModuleFeature>()
     val featuresToRemove = mutableSetOf<ModuleFeature>()
 
-    val srcsDir = srcsDirProperty.asFile.get().toPath()
+    val projectDir = projectDirProperty.asFile.get().toPath()
+    val srcsDir = projectDir.resolve("src")
 
     if (androidTestEnabled.getOrElse(false)) {
       featuresEnabled += Features.AndroidTest
@@ -89,7 +92,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       }
     }
 
-    val generatedSourcesDir = buildDirProperty.asFile.get().toPath().resolve("generated")
+    val buildDir = projectDir.resolve("build")
+    val generatedSourcesDir = buildDir.resolve("generated")
 
     if (kspEnabled.getOrElse(false)) {
       featuresEnabled += Features.Ksp
@@ -164,6 +168,28 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       MOSHI.adapter<Set<ModuleFeature>>()
         .toJson(it, featuresToRemove.toSortedSet(compareBy { it.name }))
     }
+
+    val featuresToValidate =
+      if (validateAll.getOrElse(false)) {
+        featuresToRemove
+      } else if (validate.orNull != null) {
+        val toValidate = validate.get()
+        featuresToRemove.filter { it.name == toValidate }
+      } else {
+        emptyList()
+      }
+    if (featuresToValidate.isNotEmpty()) {
+      error(
+        """
+          Validation failed for the following features:
+          
+          ${featuresToValidate.joinToString("\n", transform = ModuleFeature::removalMessage)}
+          
+          Full list written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}
+        """
+          .trimIndent()
+      )
+    }
   }
 
   @OptIn(ExperimentalPathApi::class)
@@ -199,8 +225,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         project.provider { foundryExtension.androidHandler.featuresHandler.viewBindingEnabled() }
       val task =
         project.tasks.register<ModuleTopographyTask>("moduleTopography") {
-          srcsDirProperty.setDisallowChanges(project.layout.projectDirectory.dir("src"))
-          buildDirProperty.setDisallowChanges(project.layout.buildDirectory)
+          projectDirProperty.setDisallowChanges(project.layout.projectDirectory)
           moshiCodeGenEnabled.setDisallowChanges(
             foundryExtension.featuresHandler.moshiHandler.moshiCodegen
           )
@@ -249,7 +274,7 @@ public data class ModuleTopography(
 @JsonClass(generateAdapter = true)
 public data class ModuleFeature(
   val name: String,
-  val removalMessage: String?,
+  val removalMessage: String,
   /** Generated sources root dir, if any. Note that descendants are checked */
   val generatedSourcesDir: String? = null,
   val generatedSourcesExtensions: Set<String> = emptySet(),
