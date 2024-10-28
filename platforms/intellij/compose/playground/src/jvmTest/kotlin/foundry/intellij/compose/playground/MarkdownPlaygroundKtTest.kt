@@ -16,11 +16,33 @@
 package foundry.intellij.compose.playground
 
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runDesktopComposeUiTest
+import com.github.takahirom.roborazzi.RoborazziOptions
+import io.github.takahirom.roborazzi.captureRoboImage
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class MarkdownPlaygroundKtTest {
   @OptIn(ExperimentalTestApi::class)
   @Test
-  fun test() = runDesktopComposeUiTest { setContent { app() } }
+  fun test() = runTest {
+    runDesktopComposeUiTest {
+      setContent { AppContent() }
+
+      val roborazziOptions =
+        RoborazziOptions(
+          recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
+          compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0F),
+        )
+
+      onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
+
+      onNodeWithTag("dark-mode-toggle").performClick()
+
+      onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
+    }
+  }
 }
