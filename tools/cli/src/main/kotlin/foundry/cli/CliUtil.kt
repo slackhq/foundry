@@ -29,6 +29,7 @@ import kotlin.io.path.FileVisitorBuilder
 import kotlin.io.path.extension
 import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.notExists
 import kotlin.io.path.visitFileTree
 
 /**
@@ -60,6 +61,7 @@ public fun Path.walkEachFile(
   followLinks: Boolean = false,
   builderAction: FileVisitorBuilder.() -> Unit = {},
 ): Sequence<Path> {
+  if (notExists()) return emptySequence()
   val files = mutableListOf<Path>()
   visitFileTree(maxDepth, followLinks) {
     builderAction()
