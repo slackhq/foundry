@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+* **Fix**: Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
+
 0.21.0
 ------
 
