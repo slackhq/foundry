@@ -83,6 +83,10 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
 
+  init {
+    @Suppress("LeakingThis") doNotTrackState("This task modifies build scripts in place.")
+  }
+
   @get:Input
   val modes: SetProperty<AnalysisMode> =
     objects
