@@ -41,7 +41,9 @@ import org.gradle.api.provider.Provider
 internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
   Plugin<Project> {
   override fun apply(target: Project) {
-    val foundryProperties = FoundryProperties(target)
+    val foundryToolsProvider = target.foundryToolsProvider()
+    val globalFoundryProperties = foundryToolsProvider.get().globalConfig.globalFoundryProperties
+    val foundryProperties = FoundryProperties(target, foundryToolsProvider)
 
     if (foundryProperties.relocateBuildDir && !target.isSyncing) {
       // <root-dir>/../<root-dir-name>-out/<project's relative path>
@@ -55,16 +57,16 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
     if (!target.isRootProject) {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
-      val foundryTools = target.foundryTools()
       val foundryExtension =
         target.extensions.create(
           "foundry",
           FoundryExtension::class.java,
+          globalFoundryProperties,
           foundryProperties,
           target,
           versionCatalog,
         )
-      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryTools)
+      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryToolsProvider.get())
         .applyTo(target, foundryExtension, foundryProperties)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
