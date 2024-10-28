@@ -18,11 +18,13 @@ package foundry.intellij.compose.playground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 import foundry.intellij.compose.markdown.ui.MarkdownContent
@@ -32,14 +34,19 @@ import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.Text
 
 fun main() {
-  app()
+  singleWindowApplication { AppContent() }
 }
 
-fun app() = singleWindowApplication {
+// created function for testing
+@Composable
+fun AppContent() {
   var isDark by remember { mutableStateOf(false) }
   IntUiTheme(isDark) {
     Column(Modifier.background(JewelTheme.globalColors.panelBackground)) {
-      DefaultButton(modifier = Modifier.padding(16.dp), onClick = { isDark = !isDark }) {
+      DefaultButton(
+        modifier = Modifier.padding(16.dp).testTag("dark-mode-toggle"),
+        onClick = { isDark = !isDark },
+      ) {
         Text("Toggle dark mode")
       }
       MarkdownContent { MARKDOWN }
