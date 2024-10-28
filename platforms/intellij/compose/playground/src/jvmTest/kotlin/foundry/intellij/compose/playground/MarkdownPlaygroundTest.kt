@@ -25,12 +25,12 @@ import io.github.takahirom.roborazzi.captureRoboImage
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
-class MarkdownPlaygroundKtTest {
+class MarkdownPlaygroundTest {
   @OptIn(ExperimentalTestApi::class)
   @Test
   fun test() = runTest {
     runDesktopComposeUiTest {
-      setContent { AppContent() }
+      setContent { MarkdownPlayground() }
 
       val roborazziOptions =
         RoborazziOptions(

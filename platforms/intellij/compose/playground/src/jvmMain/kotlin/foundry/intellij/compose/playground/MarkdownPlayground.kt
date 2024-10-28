@@ -34,12 +34,12 @@ import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.Text
 
 fun main() {
-  singleWindowApplication { AppContent() }
+  singleWindowApplication { MarkdownPlayground() }
 }
 
 // created function for testing
 @Composable
-fun AppContent(modifier: Modifier = Modifier) {
+fun MarkdownPlayground(modifier: Modifier = Modifier) {
   var isDark by remember { mutableStateOf(false) }
   IntUiTheme(isDark) {
     Column(modifier.background(JewelTheme.globalColors.panelBackground)) {
