@@ -16,6 +16,7 @@
 package foundry.intellij.compose.projectgen
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
@@ -69,17 +70,23 @@ internal class TextElement(
   private val dependentElements: List<CheckboxElement> = emptyList(),
   val validationRegex: Regex? = null,
 ) : UiElement {
-  val value = TextFieldState(initialValue)
+  val state = TextFieldState(initialValue)
+
+  var value: String
+    get() = state.text.toString()
+    set(newValue) {
+      state.setTextAndPlaceCursorAtEnd(newValue)
+    }
 
   val enabled by derivedStateOf { !readOnly && dependentElements.all { it.isChecked } }
 
   val isValid by derivedStateOf {
-    validationRegex?.let { value.text.isNotBlank() && value.text.matches(it) } != false
+    validationRegex?.let { state.text.isNotBlank() && state.text.matches(it) } != false
   }
 
   override fun reset() {
     isVisible = initialVisibility
-    value.edit { replace(0, length, initialValue) }
+    state.setTextAndPlaceCursorAtEnd(initialValue)
   }
 
   override var isVisible: Boolean by mutableStateOf(initialVisibility)
