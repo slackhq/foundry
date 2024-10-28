@@ -109,12 +109,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
     }
     if (viewBindingEnabled.getOrElse(false)) {
       featuresEnabled += Features.ViewBinding
-      if (
-        generatedSourcesDir
-          .resolve("source/data_binding_base_class_source_out")
-          .walkEachFile()
-          .none()
-      ) {
+      if (projectDir.resolve(Features.ViewBinding.generatedSourcesDir!!).walkEachFile().none()) {
         featuresToRemove += Features.ViewBinding
       }
     }
