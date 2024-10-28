@@ -53,6 +53,8 @@ kotlin {
       dependencies {
         implementation(libs.junit)
         implementation(libs.roborazzi)
+        implementation(compose.desktop.common)
+        implementation(compose.desktop.uiTestJUnit4)
       }
     }
   }
