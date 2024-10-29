@@ -15,6 +15,9 @@
  */
 package foundry.gradle.model
 
+import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
+import com.google.devtools.ksp.gradle.KspAATask
+import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.adapter
@@ -40,10 +43,10 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.options.Option
 import org.gradle.work.DisableCachingByDefault
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.internal.KaptTask
+import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
 
 @DisableCachingByDefault
 public abstract class ModuleTopographyTask : DefaultTask() {
@@ -57,6 +60,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
 
   @get:Input @get:Optional public abstract val circuitCodeGenEnabled: Property<Boolean>
 
+  @get:Input @get:Optional public abstract val parcelizeEnabled: Property<Boolean>
+
   @get:Input @get:Optional public abstract val daggerEnabled: Property<Boolean>
 
   @get:Input @get:Optional public abstract val daggerCompilerEnabled: Property<Boolean>
@@ -66,6 +71,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
   @get:Input @get:Optional public abstract val composeEnabled: Property<Boolean>
 
   @get:Input @get:Optional public abstract val androidTestEnabled: Property<Boolean>
+
+  @get:Input @get:Optional public abstract val robolectricEnabled: Property<Boolean>
 
   @get:Input @get:Optional public abstract val kaptEnabled: Property<Boolean>
 
@@ -104,6 +111,13 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       featuresEnabled += Features.AndroidTest
       if (srcsDir.resolve("androidTest").walkEachFile().none()) {
         featuresToRemove += Features.AndroidTest
+      }
+    }
+
+    if (robolectricEnabled.getOrElse(false)) {
+      featuresEnabled += Features.Robolectric
+      if (srcsDir.resolve("test").walkEachFile().none()) {
+        featuresToRemove += Features.Robolectric
       }
     }
 
@@ -161,6 +175,12 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       featuresEnabled += Features.CircuitInject
       if (!Features.CircuitInject.hasAnnotationsUsedIn(srcsDir)) {
         featuresToRemove += Features.CircuitInject
+      }
+    }
+    if (parcelizeEnabled.getOrElse(false)) {
+      featuresEnabled += Features.Parcelize
+      if (!Features.Parcelize.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += Features.Parcelize
       }
     }
 
@@ -263,6 +283,9 @@ public abstract class ModuleTopographyTask : DefaultTask() {
           androidTestEnabled.setDisallowChanges(
             foundryExtension.androidHandler.featuresHandler.androidTest
           )
+          robolectricEnabled.setDisallowChanges(
+            foundryExtension.androidHandler.featuresHandler.robolectric
+          )
           this.viewBindingEnabled.setDisallowChanges(viewBindingEnabled)
           topographyOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("foundry/topography/topography.json")
@@ -271,9 +294,16 @@ public abstract class ModuleTopographyTask : DefaultTask() {
             project.layout.buildDirectory.file("foundry/topography/featuresToRemove.json")
           )
 
-          // Depend on compilations
-          dependsOn(project.tasks.withType(JavaCompile::class.java))
-          dependsOn(project.tasks.withType(KotlinCompile::class.java))
+          // Depend on source-gen tasks
+
+          // Kapt
+          dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
+          dependsOn(project.tasks.withType(KaptTask::class.java))
+          // KSP
+          dependsOn(project.tasks.withType(KspTask::class.java))
+          dependsOn(project.tasks.withType(KspAATask::class.java))
+          // ViewBinding
+          dependsOn(project.tasks.withType(DataBindingGenBaseClassesTask::class.java))
         }
 
       project.pluginManager.withPlugin("dev.google.devtools.ksp") {
@@ -281,6 +311,9 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       }
       project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
         task.configure { kaptEnabled.set(true) }
+      }
+      project.pluginManager.withPlugin("org.jetbrains.kotlin.plugin.parcelize") {
+        task.configure { parcelizeEnabled.set(true) }
       }
       return task
     }
@@ -314,6 +347,13 @@ internal object Features {
       name = "androidTest",
       removalMessage = "Remove foundry.android.features.androidTest from your build file",
       matchingSourcesDir = "src/androidTest",
+    )
+
+  internal val Robolectric =
+    ModuleFeature(
+      name = "robolectric",
+      removalMessage = "Remove foundry.android.features.robolectric from your build file",
+      matchingSourcesDir = "src/test",
     )
 
   internal val Compose =
@@ -361,6 +401,12 @@ internal object Features {
           "@MergeModules",
           "@MergeInterfaces",
           "@ContributesSubcomponent",
+          // TODO configurable custom annotations? Or we just need to search generated sources too
+          "@CircuitInject",
+          "@FeatureFlags",
+          "@GuinnessApi",
+          "@SlackRemotePreferences",
+          "@WorkRequestIn",
         ),
       matchingAnnotationsExtensions = setOf("kt", "java"),
       generatedSourcesDir = "build/generated/source/kapt",
@@ -380,6 +426,14 @@ internal object Features {
       name = "circuit-inject",
       removalMessage = "Remove foundry.features.circuit.codeGen from your build file",
       matchingText = setOf("@CircuitInject"),
+      matchingAnnotationsExtensions = setOf("kt"),
+    )
+
+  internal val Parcelize =
+    ModuleFeature(
+      name = "parcelize",
+      removalMessage = "Remove the parcelize plugin from your build file",
+      matchingText = setOf("@Parcelize"),
       matchingAnnotationsExtensions = setOf("kt"),
     )
 
