@@ -607,11 +607,24 @@ constructor(
   }
 
   /**
+   * Enables Compose _runtime_ for this project and applies any version catalog bundle dependencies
+   * defined by [FoundryProperties.defaultComposeAndroidBundleAlias]. This explicitly does _not_
+   * enable the compose compiler.
+   */
+  public fun composeRuntimeOnly(
+    multiplatform: Boolean = false,
+    action: Action<ComposeHandler> = Action {},
+  ) {
+    composeHandler.enable(project = project, multiplatform = multiplatform, enableCompiler = false)
+    action.execute(composeHandler)
+  }
+
+  /**
    * Enables Compose for this project and applies any version catalog bundle dependencies defined by
    * [FoundryProperties.defaultComposeAndroidBundleAlias].
    */
   public fun compose(multiplatform: Boolean = false, action: Action<ComposeHandler> = Action {}) {
-    composeHandler.enable(project = project, multiplatform = multiplatform)
+    composeHandler.enable(project = project, multiplatform = multiplatform, enableCompiler = true)
     action.execute(composeHandler)
   }
 
@@ -851,6 +864,7 @@ constructor(
       versionCatalog.findBundle(alias).orElse(null)
     }
   internal val enabled = objects.property<Boolean>().convention(false)
+  internal val enableCompiler = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   private val compilerOptions: ListProperty<String> =
@@ -897,29 +911,32 @@ constructor(
     compilerOption("metricsDestination", metricsDestination.canonicalPath.toString())
   }
 
-  internal fun enable(project: Project, multiplatform: Boolean) {
+  internal fun enable(project: Project, multiplatform: Boolean, enableCompiler: Boolean) {
     enabled.setDisallowChanges(true)
-    project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
-    this.multiplatform.setDisallowChanges(multiplatform)
-    if (!multiplatform) {
-      val extension =
-        checkNotNull(androidExtension) {
-          "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
-        }
-      extension.apply {
-        // Don't need to set buildFeatures.compose = true as that defaults to true if the compose
-        // compiler gradle plugin is applied
-        if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
-          composeOptions {
-            // Disable live literals by default
-            @Suppress("DEPRECATION")
-            useLiveLiterals = foundryProperties.composeEnableLiveLiterals
+    this.enableCompiler.setDisallowChanges(enableCompiler)
+    if (enableCompiler) {
+      project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+      this.multiplatform.setDisallowChanges(multiplatform)
+      if (!multiplatform) {
+        val extension =
+          checkNotNull(androidExtension) {
+            "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
           }
-        } else if (foundryProperties.composeEnableLiveLiterals) {
-          project.logger.error(
-            "Live literals are disabled and deprecated in AGP 8.7+. " +
-              "Please remove the `foundry.compose.android.enableLiveLiterals` property."
-          )
+        extension.apply {
+          // Don't need to set buildFeatures.compose = true as that defaults to true if the compose
+          // compiler gradle plugin is applied
+          if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
+            composeOptions {
+              // Disable live literals by default
+              @Suppress("DEPRECATION")
+              useLiveLiterals = foundryProperties.composeEnableLiveLiterals
+            }
+          } else if (foundryProperties.composeEnableLiveLiterals) {
+            project.logger.error(
+              "Live literals are disabled and deprecated in AGP 8.7+. " +
+                "Please remove the `foundry.compose.android.enableLiveLiterals` property."
+            )
+          }
         }
       }
     }
@@ -927,7 +944,6 @@ constructor(
 
   internal fun applyTo(project: Project) {
     if (enabled.get()) {
-      val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
       val isMultiplatform = multiplatform.get()
       if (isMultiplatform) {
         project.pluginManager.apply("org.jetbrains.compose")
@@ -935,87 +951,91 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
 
-      if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
-        extension.stabilityConfigurationFile.setDisallowChanges(
-          foundryProperties.composeStabilityConfigurationPath
-        )
-      }
+      if (enableCompiler.get()) {
+        val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
 
-      // Because the Compose Compiler plugin auto applies common options for us, we need to know
-      // about those options and _avoid_ setting them a second time
-      val freeOptions = mutableListOf<String>()
-      var includeSourceInformation =
-        foundryProperties.composeIncludeSourceInformationEverywhereByDefault
-      for ((k, v) in compilerOptions.get().map { it.split('=') }) {
-        project.logger.debug("Processing compose option $k = $v")
-        when (k) {
-          "generateFunctionKeyMetaClasses" -> {
-            extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
-          }
+        if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
+          extension.stabilityConfigurationFile.setDisallowChanges(
+            foundryProperties.composeStabilityConfigurationPath
+          )
+        }
 
-          OPTION_SOURCE_INFORMATION -> {
-            includeSourceInformation = v.toBoolean()
-          }
+        // Because the Compose Compiler plugin auto applies common options for us, we need to know
+        // about those options and _avoid_ setting them a second time
+        val freeOptions = mutableListOf<String>()
+        var includeSourceInformation =
+          foundryProperties.composeIncludeSourceInformationEverywhereByDefault
+        for ((k, v) in compilerOptions.get().map { it.split('=') }) {
+          project.logger.debug("Processing compose option $k = $v")
+          when (k) {
+            "generateFunctionKeyMetaClasses" -> {
+              extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
+            }
 
-          "metricsDestination" -> {
-            extension.metricsDestination.set(project.file(v))
-          }
+            OPTION_SOURCE_INFORMATION -> {
+              includeSourceInformation = v.toBoolean()
+            }
 
-          "reportsDestination" -> {
-            extension.reportsDestination.set(project.file(v))
-          }
+            "metricsDestination" -> {
+              extension.metricsDestination.set(project.file(v))
+            }
 
-          "intrinsicRemember" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
+            "reportsDestination" -> {
+              extension.reportsDestination.set(project.file(v))
+            }
+
+            "intrinsicRemember" -> {
+              if (v.toBoolean()) {
+                extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
+              }
+            }
+
+            "nonSkippingGroupOptimization" -> {
+              if (v.toBoolean()) {
+                extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+              }
+            }
+
+            "suppressKotlinVersionCompatibilityCheck" -> {
+              error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
+            }
+
+            "strongSkipping" -> {
+              if (v.toBoolean()) {
+                extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
+              }
+            }
+
+            "stabilityConfigurationPath" -> {
+              error(
+                "Use the 'sgp.compose.stabilityConfigurationPath' Gradle property to specify a stability configuration path"
+              )
+            }
+
+            "traceMarkersEnabled" -> {
+              extension.includeTraceMarkers.set(v.toBoolean())
+            }
+
+            else -> {
+              freeOptions += "$k=$v"
             }
           }
+        }
 
-          "nonSkippingGroupOptimization" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
-            }
+        if (includeSourceInformation) {
+          if (androidExtension == null) {
+            extension.includeSourceInformation.set(true)
+          } else if (foundryProperties.composeUseIncludeInformationWorkaround) {
+            freeOptions += "$OPTION_SOURCE_INFORMATION=true"
           }
+        }
 
-          "suppressKotlinVersionCompatibilityCheck" -> {
-            error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
-          }
-
-          "strongSkipping" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
-            }
-          }
-
-          "stabilityConfigurationPath" -> {
-            error(
-              "Use the 'sgp.compose.stabilityConfigurationPath' Gradle property to specify a stability configuration path"
+        if (freeOptions.isNotEmpty()) {
+          project.tasks.configureKotlinCompilationTask {
+            compilerOptions.freeCompilerArgs.addAll(
+              freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
             )
           }
-
-          "traceMarkersEnabled" -> {
-            extension.includeTraceMarkers.set(v.toBoolean())
-          }
-
-          else -> {
-            freeOptions += "$k=$v"
-          }
-        }
-      }
-
-      if (includeSourceInformation) {
-        if (androidExtension == null) {
-          extension.includeSourceInformation.set(true)
-        } else if (foundryProperties.composeUseIncludeInformationWorkaround) {
-          freeOptions += "$OPTION_SOURCE_INFORMATION=true"
-        }
-      }
-
-      if (freeOptions.isNotEmpty()) {
-        project.tasks.configureKotlinCompilationTask {
-          compilerOptions.freeCompilerArgs.addAll(
-            freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
-          )
         }
       }
     }
