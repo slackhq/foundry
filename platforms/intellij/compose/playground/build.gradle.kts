@@ -24,6 +24,10 @@ plugins {
   alias(libs.plugins.roborazzi)
 }
 
+roborazzi {
+  outputDir = file("src/jvmTest/kotlin/foundry/intellij/compose/playground/screenshots")
+}
+
 kotlin {
   jvm()
 
@@ -55,13 +59,13 @@ kotlin {
     }
     jvmTest {
       dependencies {
+        api(libs.testing.roborazzi.rules)
+
         implementation(libs.junit)
         implementation(libs.roborazzi)
-        implementation(compose.desktop.common)
+        implementation(compose.desktop.currentOs)
         implementation(compose.desktop.uiTestJUnit4)
         implementation(libs.testing.roborazzi)
-        implementation(libs.testing.roborazzi.rules)
-        implementation(libs.testing.roborazzi.compose)
         implementation(libs.testing.roborazzi.core)
         implementation(libs.robolectric)
       }
@@ -77,5 +81,8 @@ configurations
 dependencies { lintChecks(libs.composeLints) }
 
 tasks.withType<KotlinCompile>().configureEach {
-  compilerOptions { freeCompilerArgs.add("-Xcontext-receivers") }
+  compilerOptions {
+    incremental = false
+    freeCompilerArgs.add("-Xcontext-receivers")
+  }
 }
