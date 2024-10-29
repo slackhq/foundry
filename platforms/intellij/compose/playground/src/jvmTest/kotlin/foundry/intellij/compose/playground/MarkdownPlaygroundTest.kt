@@ -24,7 +24,9 @@ import com.github.takahirom.roborazzi.RoborazziOptions
 import io.github.takahirom.roborazzi.captureRoboImage
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.robolectric.annotation.GraphicsMode
 
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MarkdownPlaygroundTest {
   @OptIn(ExperimentalTestApi::class)
   @Test

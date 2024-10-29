@@ -47,6 +47,10 @@ kotlin {
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
         implementation(projects.platforms.intellij.compose)
+        implementation(libs.testing.roborazzi)
+        implementation(libs.testing.roborazzi.rules)
+        implementation(libs.testing.roborazzi.compose)
+        implementation(libs.testing.roborazzi.core)
       }
     }
     jvmTest {
@@ -55,6 +59,11 @@ kotlin {
         implementation(libs.roborazzi)
         implementation(compose.desktop.common)
         implementation(compose.desktop.uiTestJUnit4)
+        implementation(libs.testing.roborazzi)
+        implementation(libs.testing.roborazzi.rules)
+        implementation(libs.testing.roborazzi.compose)
+        implementation(libs.testing.roborazzi.core)
+        implementation(libs.robolectric)
       }
     }
   }
