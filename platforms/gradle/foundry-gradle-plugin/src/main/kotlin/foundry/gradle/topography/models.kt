@@ -15,13 +15,19 @@ public data class ModuleTopography(
 public data class ModuleFeature(
   val name: String,
   val removalMessage: String,
-  /** Generated sources root dir, if any. Note that descendants are checked */
+  /**
+   * Generated sources root dir relative to the project dir, if any. Files are checked recursively.
+   */
   val generatedSourcesDir: String? = null,
   val generatedSourcesExtensions: Set<String> = emptySet(),
   val matchingText: Set<String> = emptySet(),
-  val matchingAnnotationsExtensions: Set<String> = emptySet(),
-  /** If specified, looks for any sources in this dir */
+  val matchingTextFileExtensions: Set<String> = emptySet(),
+  /**
+   * If specified, looks for any sources in this dir relative to the project dir. Files are checked
+   * recursively.
+   */
   val matchingSourcesDir: String? = null,
+  val matchingPlugin: String? = null,
 )
 
 // TODO eventually move these to JSON configs?
@@ -53,9 +59,10 @@ internal object KnownFeatures {
   internal val Compose =
     ModuleFeature(
       name = "compose",
-      removalMessage = "Remove foundry.features.compose from your build file",
+      removalMessage =
+        "Remove foundry.features.compose from your build file or use foundry.features.composeRuntimeOnly()",
       matchingText = setOf("@Composable"),
-      matchingAnnotationsExtensions = setOf("kt"),
+      matchingTextFileExtensions = setOf("kt"),
     )
 
   internal val Dagger =
@@ -79,7 +86,7 @@ internal object KnownFeatures {
           "@ContributesSubcomponent",
           "import dagger.",
         ),
-      matchingAnnotationsExtensions = setOf("kt", "java"),
+      matchingTextFileExtensions = setOf("kt", "java"),
     )
 
   internal val DaggerCompiler =
@@ -102,7 +109,7 @@ internal object KnownFeatures {
           "@SlackRemotePreferences",
           "@WorkRequestIn",
         ),
-      matchingAnnotationsExtensions = setOf("kt", "java"),
+      matchingTextFileExtensions = setOf("kt", "java"),
       generatedSourcesDir = "build/generated/source/kapt",
       generatedSourcesExtensions = setOf("java"),
     )
@@ -112,7 +119,7 @@ internal object KnownFeatures {
       name = "moshi-codegen",
       removalMessage = "Remove foundry.features.moshi.codeGen from your build file",
       matchingText = setOf("@JsonClass"),
-      matchingAnnotationsExtensions = setOf("kt"),
+      matchingTextFileExtensions = setOf("kt"),
     )
 
   internal val CircuitInject =
@@ -120,7 +127,7 @@ internal object KnownFeatures {
       name = "circuit-inject",
       removalMessage = "Remove foundry.features.circuit.codeGen from your build file",
       matchingText = setOf("@CircuitInject"),
-      matchingAnnotationsExtensions = setOf("kt"),
+      matchingTextFileExtensions = setOf("kt"),
     )
 
   internal val Parcelize =
@@ -128,7 +135,8 @@ internal object KnownFeatures {
       name = "parcelize",
       removalMessage = "Remove the parcelize plugin from your build file",
       matchingText = setOf("@Parcelize"),
-      matchingAnnotationsExtensions = setOf("kt"),
+      matchingTextFileExtensions = setOf("kt"),
+      matchingPlugin = "org.jetbrains.kotlin.plugin.parcelize",
     )
 
   internal val Ksp =
@@ -136,6 +144,7 @@ internal object KnownFeatures {
       name = "ksp",
       removalMessage = "Remove the KSP plugin (or whatever Foundry feature is requesting it)",
       generatedSourcesDir = "build/generated/ksp",
+      matchingPlugin = "com.google.devtools.ksp",
       // Don't specify extensions because KAPT can generate anything into resources
     )
 
@@ -144,6 +153,7 @@ internal object KnownFeatures {
       name = "kapt",
       removalMessage = "Remove the KAPT plugin (or whatever Foundry feature is requesting it)",
       generatedSourcesDir = "build/generated/source/kapt",
+      matchingPlugin = "org.jetbrains.kotlin.kapt",
       // Don't specify extensions because KSP can generate anything into resources
     )
 

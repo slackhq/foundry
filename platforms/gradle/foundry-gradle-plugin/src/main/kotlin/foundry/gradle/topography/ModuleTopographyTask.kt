@@ -127,7 +127,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
             )
           )
           features.putAll(
-            foundryExtension.featuresHandler.composeHandler.enabled.associateWithFeature(
+            foundryExtension.featuresHandler.composeHandler.enableCompiler.associateWithFeature(
               KnownFeatures.Compose
             )
           )
@@ -221,75 +221,23 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     val projectDir = projectDirProperty.asFile.get().toPath()
     val srcsDir = projectDir.resolve("src")
 
-    if (KnownFeatures.AndroidTest in features) {
-      if (srcsDir.resolve("androidTest").walkEachFile().none()) {
-        featuresToRemove += KnownFeatures.AndroidTest
+    for (feature in features) {
+      feature.matchingSourcesDir?.let { matchingSrcsDir ->
+        if (projectDir.resolve(matchingSrcsDir).walkEachFile().none()) {
+          featuresToRemove += feature
+        }
       }
-    }
 
-    if (KnownFeatures.Robolectric in features) {
-      if (srcsDir.resolve("test").walkEachFile().none()) {
-        featuresToRemove += KnownFeatures.Robolectric
+      feature.generatedSourcesDir?.let { generatedSrcsDir ->
+        if (projectDir.resolve(generatedSrcsDir).walkEachFile().none()) {
+          featuresToRemove += feature
+        }
       }
-    }
 
-    val buildDir = projectDir.resolve("build")
-    val generatedSourcesDir = buildDir.resolve("generated")
-
-    val plugins = topography.plugins
-    val kspEnabled = "dev.google.devtools.ksp" in plugins
-    val kaptEnabled = "org.jetbrains.kotlin.kapt" in plugins
-    val parcelizeEnabled = "org.jetbrains.kotlin.plugin.parcelize" in plugins
-
-    if (kspEnabled) {
-      if (generatedSourcesDir.resolve("ksp").walkEachFile().none()) {
-        featuresToRemove += KnownFeatures.Ksp
-      }
-    }
-    if (kaptEnabled) {
-      if (generatedSourcesDir.resolve("source/kapt").walkEachFile().none()) {
-        featuresToRemove += KnownFeatures.Kapt
-      }
-    }
-    if (KnownFeatures.ViewBinding in features) {
-      if (
-        projectDir.resolve(KnownFeatures.ViewBinding.generatedSourcesDir!!).walkEachFile().none()
-      ) {
-        featuresToRemove += KnownFeatures.ViewBinding
-      }
-    }
-    if (KnownFeatures.DaggerCompiler in features) {
-      if (!KnownFeatures.DaggerCompiler.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += KnownFeatures.DaggerCompiler
-      }
-      if (generatedSourcesDir.resolve("source/kapt").walkEachFile().none()) {
-        featuresToRemove += KnownFeatures.DaggerCompiler
-      }
-    }
-
-    if (KnownFeatures.Compose in features) {
-      if (!KnownFeatures.Compose.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += KnownFeatures.Compose
-      }
-    }
-    if (KnownFeatures.Dagger in features) {
-      if (!KnownFeatures.Dagger.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += KnownFeatures.Dagger
-      }
-    }
-    if (KnownFeatures.MoshiCodeGen in features) {
-      if (!KnownFeatures.MoshiCodeGen.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += KnownFeatures.MoshiCodeGen
-      }
-    }
-    if (KnownFeatures.CircuitInject in features) {
-      if (!KnownFeatures.CircuitInject.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += KnownFeatures.CircuitInject
-      }
-    }
-    if (parcelizeEnabled) {
-      if (!KnownFeatures.Parcelize.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += KnownFeatures.Parcelize
+      if (feature.matchingText.isNotEmpty()) {
+        if (!feature.hasMatchingTextIn(srcsDir)) {
+          featuresToRemove += feature
+        }
       }
     }
 
@@ -313,13 +261,13 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   }
 
   @OptIn(ExperimentalPathApi::class)
-  private fun ModuleFeature.hasAnnotationsUsedIn(srcsDir: Path): Boolean {
+  private fun ModuleFeature.hasMatchingTextIn(srcsDir: Path): Boolean {
     logger.debug("Checking for $name annotation usages in sources")
     return srcsDir
       .walkEachFile()
       .run {
-        if (matchingAnnotationsExtensions.isNotEmpty()) {
-          filter { it.extension in KnownFeatures.Compose.matchingAnnotationsExtensions }
+        if (matchingTextFileExtensions.isNotEmpty()) {
+          filter { it.extension in matchingTextFileExtensions }
         } else {
           this
         }
