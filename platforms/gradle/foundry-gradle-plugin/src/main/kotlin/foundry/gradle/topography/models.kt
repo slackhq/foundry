@@ -2,6 +2,7 @@ package foundry.gradle.topography
 
 import com.squareup.moshi.JsonClass
 import kotlin.reflect.full.declaredMemberProperties
+import org.intellij.lang.annotations.Language
 
 @JsonClass(generateAdapter = true)
 public data class ModuleTopography(
@@ -15,6 +16,7 @@ public data class ModuleTopography(
 public data class ModuleFeature(
   val name: String,
   val removalMessage: String,
+  @Language("RegExp") val removalRegex: String?,
   /**
    * Generated sources root dir relative to the project dir, if any. Files are checked recursively.
    */
@@ -46,6 +48,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "androidTest",
       removalMessage = "Remove foundry.android.features.androidTest from your build file",
+      removalRegex = "\\bandroidTest\\(\\)",
       matchingSourcesDir = "src/androidTest",
     )
 
@@ -53,6 +56,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "robolectric",
       removalMessage = "Remove foundry.android.features.robolectric from your build file",
+      removalRegex = "\\brobolectric\\(\\)",
       matchingSourcesDir = "src/test",
     )
 
@@ -61,6 +65,7 @@ internal object KnownFeatures {
       name = "compose",
       removalMessage =
         "Remove foundry.features.compose from your build file or use foundry.features.composeRuntimeOnly()",
+      removalRegex = "\\bcompose\\(\\)",
       matchingText = setOf("@Composable"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -69,6 +74,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "dagger",
       removalMessage = "Remove foundry.features.dagger from your build file",
+      removalRegex = "\\bdagger\\(\\)",
       matchingText =
         setOf(
           "@Inject",
@@ -93,6 +99,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "dagger-compiler",
       removalMessage = "Remove foundry.features.dagger.mergeComponents from your build file",
+      removalRegex = "\\bmergeComponents\\(\\)",
       matchingText =
         setOf(
           "@Component",
@@ -118,6 +125,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "moshi-codegen",
       removalMessage = "Remove foundry.features.moshi.codeGen from your build file",
+      removalRegex = null,
       matchingText = setOf("@JsonClass"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -126,6 +134,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "circuit-inject",
       removalMessage = "Remove foundry.features.circuit.codeGen from your build file",
+      removalRegex = null,
       matchingText = setOf("@CircuitInject"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -134,6 +143,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "parcelize",
       removalMessage = "Remove the parcelize plugin from your build file",
+      removalRegex = "\\balias\\(libs\\.plugins\\.kotlin\\.plugin\\.parcelize\\)",
       matchingText = setOf("@Parcelize"),
       matchingTextFileExtensions = setOf("kt"),
       matchingPlugin = "org.jetbrains.kotlin.plugin.parcelize",
@@ -143,6 +153,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "ksp",
       removalMessage = "Remove the KSP plugin (or whatever Foundry feature is requesting it)",
+      removalRegex = "\\balias\\(libs\\.plugins\\.ksp\\)",
       generatedSourcesDir = "build/generated/ksp",
       matchingPlugin = "com.google.devtools.ksp",
       // Don't specify extensions because KAPT can generate anything into resources
@@ -152,6 +163,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "kapt",
       removalMessage = "Remove the KAPT plugin (or whatever Foundry feature is requesting it)",
+      removalRegex = "\\balias\\(libs\\.plugins\\.kotlin\\.kapt\\)",
       generatedSourcesDir = "build/generated/source/kapt",
       matchingPlugin = "org.jetbrains.kotlin.kapt",
       // Don't specify extensions because KSP can generate anything into resources
@@ -161,6 +173,7 @@ internal object KnownFeatures {
     ModuleFeature(
       name = "viewbinding",
       removalMessage = "Remove android.buildFeatures.viewBinding from your build file",
+      removalRegex = "\\viewBinding = true",
       generatedSourcesDir = "build/generated/data_binding_base_class_source_out",
       generatedSourcesExtensions = setOf("java"),
     )

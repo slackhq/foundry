@@ -29,7 +29,9 @@ import foundry.gradle.util.JsonTools.MOSHI
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.extension
+import kotlin.io.path.readText
 import kotlin.io.path.useLines
+import kotlin.io.path.writeText
 import kotlin.jvm.optionals.getOrNull
 import okio.buffer
 import okio.sink
@@ -209,19 +211,28 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
   @OptIn(ExperimentalPathApi::class)
   @TaskAction
-  public fun compute() {
+  public fun validate() {
     val topography =
       topographyJson.get().asFile.source().buffer().use {
         MOSHI.adapter<ModuleTopography>().fromJson(it)
       }!!
     val knownFeatures = KnownFeatures.load()
-    val features = topography.features.map { featureKey -> knownFeatures.getValue(featureKey) }
+    val features = buildSet {
+      addAll(topography.features.map { featureKey -> knownFeatures.getValue(featureKey) })
+      // Include plugin-specific features to the check here
+      addAll(knownFeatures.filterValues { it.matchingPlugin in topography.plugins }.values)
+    }
     val featuresToRemove = mutableSetOf<ModuleFeature>()
 
     val projectDir = projectDirProperty.asFile.get().toPath()
     val srcsDir = projectDir.resolve("src")
 
+    val buildFile = projectDir.resolve("build.gradle.kts")
+    var buildFileModified = false
+    var buildFileText = buildFile.readText()
+
     for (feature in features) {
+      val initialRemoveSize = featuresToRemove.size
       feature.matchingSourcesDir?.let { matchingSrcsDir ->
         if (projectDir.resolve(matchingSrcsDir).walkEachFile().none()) {
           featuresToRemove += feature
@@ -239,11 +250,23 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
           featuresToRemove += feature
         }
       }
+
+      val isRemoving = featuresToRemove.size != initialRemoveSize
+      if (isRemoving) {
+        feature.removalRegex?.let(::Regex)?.let { removalRegex ->
+          buildFileModified = true
+          buildFileText = buildFileText.replace(removalRegex, "").removeEmptyBraces()
+        }
+      }
     }
 
     JsonWriter.of(featuresToRemoveOutputFile.asFile.get().sink().buffer()).use {
       MOSHI.adapter<Set<ModuleFeature>>()
         .toJson(it, featuresToRemove.toSortedSet(compareBy { it.name }))
+    }
+
+    if (buildFileModified) {
+      buildFile.writeText(buildFileText)
     }
 
     if (featuresToRemove.isNotEmpty()) {
@@ -283,4 +306,21 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
         false
       }
   }
+}
+
+//// Usage
+// var code = "foundry { features { compose() } }"
+// code = code.replace(Regex("\\bcompose\\(\\)"), "") // remove compose()
+// code = removeEmptyBraces(code) // recursively remove empty braces
+//
+// println(code) // Should print "<nothing>"
+// TODO write tests for this
+private val EMPTY_DSL_BLOCK = "(\\w*)\\s*\\{\\s*\\}".toRegex()
+
+internal fun String.removeEmptyBraces(): String {
+  var result = this
+  while (EMPTY_DSL_BLOCK.containsMatchIn(result)) {
+    result = EMPTY_DSL_BLOCK.replace(result, "")
+  }
+  return result
 }
