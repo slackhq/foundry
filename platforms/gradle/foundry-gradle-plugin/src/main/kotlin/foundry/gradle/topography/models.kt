@@ -7,6 +7,7 @@ public data class ModuleTopography(
   val name: String,
   val gradlePath: String,
   val features: Set<ModuleFeature>,
+  val plugins: Set<String>,
 )
 
 @JsonClass(generateAdapter = true)
