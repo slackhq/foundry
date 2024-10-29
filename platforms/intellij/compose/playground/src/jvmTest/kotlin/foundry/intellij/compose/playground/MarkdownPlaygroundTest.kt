@@ -23,18 +23,17 @@ import androidx.compose.ui.test.runDesktopComposeUiTest
 import com.github.takahirom.roborazzi.RoborazziOptions
 import io.github.takahirom.roborazzi.captureRoboImage
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.Test
 import org.robolectric.annotation.GraphicsMode
-import java.io.File
 
-const val OUTPUT_DIRECTORY_PATH = "src/jvmTest/kotlin/foundry/intellij/compose/playground/screenshots"
+const val OUTPUT_DIRECTORY_PATH =
+  "src/jvmTest/kotlin/foundry/intellij/compose/playground/screenshots"
 
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MarkdownPlaygroundTest {
-//  @get:Rule
-//  val roborazziRule =
-//    RoborazziRule(options = RoborazziRule.Options(outputDirectoryPath = OUTPUT_DIRECTORY_PATH))
+  //  @get:Rule
+  //  val roborazziRule =
+  //    RoborazziRule(options = RoborazziRule.Options(outputDirectoryPath = OUTPUT_DIRECTORY_PATH))
 
   @OptIn(ExperimentalTestApi::class)
   @Test
@@ -42,10 +41,12 @@ class MarkdownPlaygroundTest {
     runDesktopComposeUiTest {
       setContent { MarkdownPlayground() }
 
-      val roborazziOptions = RoborazziOptions(
-        recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
-        compareOptions = RoborazziOptions.CompareOptions(outputDirectoryPath = OUTPUT_DIRECTORY_PATH)
-      )
+      val roborazziOptions =
+        RoborazziOptions(
+          recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
+          compareOptions =
+            RoborazziOptions.CompareOptions(outputDirectoryPath = OUTPUT_DIRECTORY_PATH),
+        )
 
       onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
 
