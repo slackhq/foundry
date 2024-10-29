@@ -45,6 +45,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
@@ -64,6 +65,7 @@ private fun Provider<Boolean>.associateWithFeature(
   return map { mapOf(feature.name to it) }
 }
 
+@CacheableTask
 public abstract class ModuleTopographyTask : DefaultTask() {
   @get:Input public abstract val projectName: Property<String>
 
