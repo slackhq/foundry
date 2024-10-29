@@ -20,8 +20,8 @@ import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import com.diffplug.spotless.LineEnding
 import foundry.gradle.develocity.NoOpBuildScanAdapter
 import foundry.gradle.develocity.findAdapter
-import foundry.gradle.model.ModuleTopographyTask
 import foundry.gradle.stats.ModuleStatsTasks
+import foundry.gradle.topography.ModuleTopographyTask
 import java.util.Locale
 import java.util.Optional
 import javax.inject.Inject
