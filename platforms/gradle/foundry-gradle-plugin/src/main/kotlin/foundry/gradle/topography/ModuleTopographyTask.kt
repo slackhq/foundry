@@ -55,6 +55,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.options.Option
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
@@ -192,6 +193,11 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         featuresToRemoveOutputFile.setDisallowChanges(
           project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
         )
+        modifiedBuildFile.setDisallowChanges(
+          project.layout.buildDirectory.file(
+            "foundry/topography/validate/modified-build.gradle.kts"
+          )
+        )
       }
     }
   }
@@ -203,8 +209,14 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   @get:PathSensitive(PathSensitivity.NONE)
   public abstract val topographyJson: RegularFileProperty
 
+  @get:Optional
+  @get:Option(option = "auto-fix", description = "Enables auto-fixing build files")
+  @get:Input
+  public abstract val autoFix: Property<Boolean>
+
   @get:Internal public abstract val projectDirProperty: DirectoryProperty
 
+  @get:OutputFile public abstract val modifiedBuildFile: RegularFileProperty
   @get:OutputFile public abstract val featuresToRemoveOutputFile: RegularFileProperty
 
   init {
@@ -268,7 +280,11 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     }
 
     if (buildFileModified) {
-      buildFile.writeText(buildFileText)
+      if (autoFix.getOrElse(false)) {
+        buildFile.writeText(buildFileText)
+      } else {
+        modifiedBuildFile.asFile.get().writeText(buildFileText)
+      }
     }
 
     if (featuresToRemove.isNotEmpty()) {
