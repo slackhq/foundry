@@ -39,7 +39,9 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.plugins.PluginRegistry
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -50,31 +52,22 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.options.Option
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
+
+private fun Provider<Boolean>.associateWithFeature(
+  feature: ModuleFeature
+): Provider<Map<String, Boolean>> {
+  return map { mapOf(feature.name to it) }
+}
 
 public abstract class ModuleTopographyTask : DefaultTask() {
   @get:Input public abstract val projectName: Property<String>
 
   @get:Input public abstract val projectPath: Property<String>
 
-  @get:Input @get:Optional public abstract val moshiCodeGenEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val circuitCodeGenEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val daggerEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val daggerCompilerEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val viewBindingEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val composeEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val androidTestEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val robolectricEnabled: Property<Boolean>
+  @get:Input @get:Optional public abstract val features: MapProperty<String, Boolean>
 
   @get:Input @get:Optional public abstract val pluginsProperty: SetProperty<String>
 
@@ -88,42 +81,14 @@ public abstract class ModuleTopographyTask : DefaultTask() {
 
   @TaskAction
   public fun compute() {
-    val featuresEnabled = mutableSetOf<ModuleFeature>()
-
-    if (androidTestEnabled.getOrElse(false)) {
-      featuresEnabled += Features.AndroidTest
-    }
-
-    if (robolectricEnabled.getOrElse(false)) {
-      featuresEnabled += Features.Robolectric
-    }
-
     val plugins = pluginsProperty.getOrElse(emptySet())
-
-    if (viewBindingEnabled.getOrElse(false)) {
-      featuresEnabled += Features.ViewBinding
-    }
-    if (daggerCompilerEnabled.getOrElse(false)) {
-      featuresEnabled += Features.DaggerCompiler
-    }
-    if (composeEnabled.getOrElse(false)) {
-      featuresEnabled += Features.Compose
-    }
-    if (daggerEnabled.getOrElse(false)) {
-      featuresEnabled += Features.Dagger
-    }
-    if (moshiCodeGenEnabled.getOrElse(false)) {
-      featuresEnabled += Features.MoshiCodeGen
-    }
-    if (circuitCodeGenEnabled.getOrElse(false)) {
-      featuresEnabled += Features.CircuitInject
-    }
 
     val topography =
       ModuleTopography(
         name = projectName.get(),
         gradlePath = projectPath.get(),
-        features = featuresEnabled.toSortedSet(compareBy { it.name }),
+        features =
+          features.getOrElse(emptyMap()).filterValues { enabled -> enabled }.keys.toSortedSet(),
         plugins = plugins.toSortedSet(),
       )
 
@@ -137,30 +102,50 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       project: Project,
       foundryExtension: FoundryExtension,
     ): TaskProvider<ModuleTopographyTask> {
-      val viewBindingEnabled =
-        project.provider { foundryExtension.androidHandler.featuresHandler.viewBindingEnabled() }
       val task =
         project.tasks.register<ModuleTopographyTask>("moduleTopography") {
           projectName.set(project.name)
           projectPath.set(project.path)
-          moshiCodeGenEnabled.setDisallowChanges(
-            foundryExtension.featuresHandler.moshiHandler.moshiCodegen
+          features.putAll(
+            foundryExtension.featuresHandler.moshiHandler.moshiCodegen.associateWithFeature(
+              KnownFeatures.MoshiCodeGen
+            )
           )
-          circuitCodeGenEnabled.setDisallowChanges(
-            foundryExtension.featuresHandler.circuitHandler.codegen
+          features.putAll(
+            foundryExtension.featuresHandler.circuitHandler.codegen.associateWithFeature(
+              KnownFeatures.CircuitInject
+            )
           )
-          daggerEnabled.setDisallowChanges(foundryExtension.featuresHandler.daggerHandler.enabled)
-          daggerCompilerEnabled.setDisallowChanges(
-            foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler
+          features.putAll(
+            foundryExtension.featuresHandler.daggerHandler.enabled.associateWithFeature(
+              KnownFeatures.Dagger
+            )
           )
-          composeEnabled.setDisallowChanges(foundryExtension.featuresHandler.composeHandler.enabled)
-          androidTestEnabled.setDisallowChanges(
-            foundryExtension.androidHandler.featuresHandler.androidTest
+          features.putAll(
+            foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler.associateWithFeature(
+              KnownFeatures.DaggerCompiler
+            )
           )
-          robolectricEnabled.setDisallowChanges(
-            foundryExtension.androidHandler.featuresHandler.robolectric
+          features.putAll(
+            foundryExtension.featuresHandler.composeHandler.enabled.associateWithFeature(
+              KnownFeatures.Compose
+            )
           )
-          this.viewBindingEnabled.setDisallowChanges(viewBindingEnabled)
+          features.putAll(
+            foundryExtension.androidHandler.featuresHandler.androidTest.associateWithFeature(
+              KnownFeatures.AndroidTest
+            )
+          )
+          features.putAll(
+            foundryExtension.androidHandler.featuresHandler.robolectric.associateWithFeature(
+              KnownFeatures.Robolectric
+            )
+          )
+          features.putAll(
+            project
+              .provider { foundryExtension.androidHandler.featuresHandler.viewBindingEnabled() }
+              .associateWithFeature(KnownFeatures.ViewBinding)
+          )
           topographyOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("foundry/topography/model/topography.json")
           )
@@ -216,16 +201,6 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
   @get:Internal public abstract val projectDirProperty: DirectoryProperty
 
-  @get:Optional
-  @get:Option(option = "validate-all", description = "Validates all")
-  @get:Input
-  public abstract val validateAll: Property<Boolean>
-
-  @get:Optional
-  @get:Option(option = "validate", description = "Enables validation")
-  @get:Input
-  public abstract val validate: Property<String>
-
   @get:OutputFile public abstract val featuresToRemoveOutputFile: RegularFileProperty
 
   init {
@@ -239,21 +214,22 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
       topographyJson.get().asFile.source().buffer().use {
         MOSHI.adapter<ModuleTopography>().fromJson(it)
       }!!
-    val features = topography.features
+    val knownFeatures = KnownFeatures.load()
+    val features = topography.features.map { featureKey -> knownFeatures.getValue(featureKey) }
     val featuresToRemove = mutableSetOf<ModuleFeature>()
 
     val projectDir = projectDirProperty.asFile.get().toPath()
     val srcsDir = projectDir.resolve("src")
 
-    if (Features.AndroidTest in features) {
+    if (KnownFeatures.AndroidTest in features) {
       if (srcsDir.resolve("androidTest").walkEachFile().none()) {
-        featuresToRemove += Features.AndroidTest
+        featuresToRemove += KnownFeatures.AndroidTest
       }
     }
 
-    if (Features.Robolectric in features) {
+    if (KnownFeatures.Robolectric in features) {
       if (srcsDir.resolve("test").walkEachFile().none()) {
-        featuresToRemove += Features.Robolectric
+        featuresToRemove += KnownFeatures.Robolectric
       }
     }
 
@@ -267,51 +243,53 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
     if (kspEnabled) {
       if (generatedSourcesDir.resolve("ksp").walkEachFile().none()) {
-        featuresToRemove += Features.Ksp
+        featuresToRemove += KnownFeatures.Ksp
       }
     }
     if (kaptEnabled) {
       if (generatedSourcesDir.resolve("source/kapt").walkEachFile().none()) {
-        featuresToRemove += Features.Kapt
+        featuresToRemove += KnownFeatures.Kapt
       }
     }
-    if (Features.ViewBinding in features) {
-      if (projectDir.resolve(Features.ViewBinding.generatedSourcesDir!!).walkEachFile().none()) {
-        featuresToRemove += Features.ViewBinding
+    if (KnownFeatures.ViewBinding in features) {
+      if (
+        projectDir.resolve(KnownFeatures.ViewBinding.generatedSourcesDir!!).walkEachFile().none()
+      ) {
+        featuresToRemove += KnownFeatures.ViewBinding
       }
     }
-    if (Features.DaggerCompiler in features) {
-      if (!Features.DaggerCompiler.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += Features.DaggerCompiler
+    if (KnownFeatures.DaggerCompiler in features) {
+      if (!KnownFeatures.DaggerCompiler.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += KnownFeatures.DaggerCompiler
       }
       if (generatedSourcesDir.resolve("source/kapt").walkEachFile().none()) {
-        featuresToRemove += Features.DaggerCompiler
+        featuresToRemove += KnownFeatures.DaggerCompiler
       }
     }
 
-    if (Features.Compose in features) {
-      if (!Features.Compose.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += Features.Compose
+    if (KnownFeatures.Compose in features) {
+      if (!KnownFeatures.Compose.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += KnownFeatures.Compose
       }
     }
-    if (Features.Dagger in features) {
-      if (!Features.Dagger.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += Features.Dagger
+    if (KnownFeatures.Dagger in features) {
+      if (!KnownFeatures.Dagger.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += KnownFeatures.Dagger
       }
     }
-    if (Features.MoshiCodeGen in features) {
-      if (!Features.MoshiCodeGen.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += Features.MoshiCodeGen
+    if (KnownFeatures.MoshiCodeGen in features) {
+      if (!KnownFeatures.MoshiCodeGen.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += KnownFeatures.MoshiCodeGen
       }
     }
-    if (Features.CircuitInject in features) {
-      if (!Features.CircuitInject.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += Features.CircuitInject
+    if (KnownFeatures.CircuitInject in features) {
+      if (!KnownFeatures.CircuitInject.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += KnownFeatures.CircuitInject
       }
     }
     if (parcelizeEnabled) {
-      if (!Features.Parcelize.hasAnnotationsUsedIn(srcsDir)) {
-        featuresToRemove += Features.Parcelize
+      if (!KnownFeatures.Parcelize.hasAnnotationsUsedIn(srcsDir)) {
+        featuresToRemove += KnownFeatures.Parcelize
       }
     }
 
@@ -321,31 +299,11 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     }
 
     if (featuresToRemove.isNotEmpty()) {
-      logger.error(
-        """
-          ${featuresToRemove.joinToString("\n"){ "- ${it.removalMessage}" }}
-
-          Validation errors written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}
-        """
-          .trimIndent()
-      )
-    }
-
-    val featuresToValidate =
-      if (validateAll.getOrElse(false)) {
-        featuresToRemove
-      } else if (validate.orNull != null) {
-        val toValidate = validate.get()
-        featuresToRemove.filter { it.name == toValidate }
-      } else {
-        emptyList()
-      }
-    if (featuresToValidate.isNotEmpty()) {
-      error(
+      throw AssertionError(
         """
           Validation failed for the following features:
 
-          ${featuresToValidate.joinToString("\n", transform = ModuleFeature::removalMessage)}
+          ${featuresToRemove.joinToString("\n", transform = ModuleFeature::removalMessage)}
 
           Full list written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}
         """
@@ -361,7 +319,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
       .walkEachFile()
       .run {
         if (matchingAnnotationsExtensions.isNotEmpty()) {
-          filter { it.extension in Features.Compose.matchingAnnotationsExtensions }
+          filter { it.extension in KnownFeatures.Compose.matchingAnnotationsExtensions }
         } else {
           this
         }

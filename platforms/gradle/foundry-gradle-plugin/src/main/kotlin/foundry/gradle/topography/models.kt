@@ -1,12 +1,13 @@
 package foundry.gradle.topography
 
 import com.squareup.moshi.JsonClass
+import kotlin.reflect.full.declaredMemberProperties
 
 @JsonClass(generateAdapter = true)
 public data class ModuleTopography(
   val name: String,
   val gradlePath: String,
-  val features: Set<ModuleFeature>,
+  val features: Set<String>,
   val plugins: Set<String>,
 )
 
@@ -23,8 +24,18 @@ public data class ModuleFeature(
   val matchingSourcesDir: String? = null,
 )
 
-// TODO eventually move these to JSON configs
-internal object Features {
+// TODO eventually move these to JSON configs?
+internal object KnownFeatures {
+  fun load(): Map<String, ModuleFeature> {
+    return KnownFeatures::class
+      .declaredMemberProperties
+      .filter { it.returnType.classifier == ModuleFeature::class }
+      .associate {
+        val feature = it.get(KnownFeatures) as ModuleFeature
+        feature.name to feature
+      }
+  }
+
   internal val AndroidTest =
     ModuleFeature(
       name = "androidTest",
