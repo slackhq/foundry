@@ -25,18 +25,22 @@ import foundry.cli.walkEachFile
 import foundry.gradle.FoundryExtension
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
+import foundry.gradle.serviceOf
 import foundry.gradle.util.JsonTools.MOSHI
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.extension
 import kotlin.io.path.useLines
+import kotlin.jvm.optionals.getOrNull
 import okio.buffer
 import okio.sink
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.internal.plugins.PluginRegistry
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
@@ -60,8 +64,6 @@ public abstract class ModuleTopographyTask : DefaultTask() {
 
   @get:Input @get:Optional public abstract val circuitCodeGenEnabled: Property<Boolean>
 
-  @get:Input @get:Optional public abstract val parcelizeEnabled: Property<Boolean>
-
   @get:Input @get:Optional public abstract val daggerEnabled: Property<Boolean>
 
   @get:Input @get:Optional public abstract val daggerCompilerEnabled: Property<Boolean>
@@ -74,9 +76,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
 
   @get:Input @get:Optional public abstract val robolectricEnabled: Property<Boolean>
 
-  @get:Input @get:Optional public abstract val kaptEnabled: Property<Boolean>
-
-  @get:Input @get:Optional public abstract val kspEnabled: Property<Boolean>
+  @get:Input @get:Optional public abstract val pluginsProperty: SetProperty<String>
 
   @get:Optional
   @get:Option(option = "validate-all", description = "Validates all")
@@ -124,13 +124,18 @@ public abstract class ModuleTopographyTask : DefaultTask() {
     val buildDir = projectDir.resolve("build")
     val generatedSourcesDir = buildDir.resolve("generated")
 
-    if (kspEnabled.getOrElse(false)) {
+    val plugins = pluginsProperty.getOrElse(emptySet())
+    val kspEnabled = "dev.google.devtools.ksp" in plugins
+    val kaptEnabled = "org.jetbrains.kotlin.kapt" in plugins
+    val parcelizeEnabled = "org.jetbrains.kotlin.plugin.parcelize" in plugins
+
+    if (kspEnabled) {
       featuresEnabled += Features.Ksp
       if (generatedSourcesDir.resolve("ksp").walkEachFile().none()) {
         featuresToRemove += Features.Ksp
       }
     }
-    if (kaptEnabled.getOrElse(false)) {
+    if (kaptEnabled) {
       featuresEnabled += Features.Kapt
       if (generatedSourcesDir.resolve("source/kapt").walkEachFile().none()) {
         featuresToRemove += Features.Kapt
@@ -177,7 +182,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         featuresToRemove += Features.CircuitInject
       }
     }
-    if (parcelizeEnabled.getOrElse(false)) {
+    if (parcelizeEnabled) {
       featuresEnabled += Features.Parcelize
       if (!Features.Parcelize.hasAnnotationsUsedIn(srcsDir)) {
         featuresToRemove += Features.Parcelize
@@ -306,14 +311,17 @@ public abstract class ModuleTopographyTask : DefaultTask() {
           dependsOn(project.tasks.withType(DataBindingGenBaseClassesTask::class.java))
         }
 
-      project.pluginManager.withPlugin("dev.google.devtools.ksp") {
-        task.configure { kspEnabled.set(true) }
-      }
-      project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
-        task.configure { kaptEnabled.set(true) }
-      }
-      project.pluginManager.withPlugin("org.jetbrains.kotlin.plugin.parcelize") {
-        task.configure { parcelizeEnabled.set(true) }
+      // No easy way to query all plugin IDs, so we use an internal Gradle API
+      val pluginRegistry = project.serviceOf<PluginRegistry>()
+      project.plugins.configureEach {
+        val pluginType = this::class.java
+        val id = pluginRegistry.findPluginForClass(pluginType).getOrNull()?.id
+        if (id == null) {
+          project.logger.debug("Could not read plugin ID for type '$pluginType'")
+          return@configureEach
+        }
+        project.logger.debug("Reading plugin ID '$id' for type '$pluginType'")
+        project.pluginManager.withPlugin(id) { task.configure { pluginsProperty.add(id) } }
       }
       return task
     }
