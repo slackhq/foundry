@@ -190,6 +190,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
     ) {
       project.tasks.register<ValidateModuleTopographyTask>("validateModuleTopography") {
         topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
+        projectDirProperty.set(project.layout.projectDirectory)
         featuresToRemoveOutputFile.setDisallowChanges(
           project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
         )
