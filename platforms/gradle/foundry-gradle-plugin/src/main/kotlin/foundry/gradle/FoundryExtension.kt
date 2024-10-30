@@ -864,7 +864,7 @@ constructor(
       versionCatalog.findBundle(alias).orElse(null)
     }
   internal val enabled = objects.property<Boolean>().convention(false)
-  internal val enableCompiler = objects.property<Boolean>().convention(true)
+  internal val enableCompiler = objects.property<Boolean>().convention(false)
   internal val multiplatform = objects.property<Boolean>().convention(false)
 
   private val compilerOptions: ListProperty<String> =
