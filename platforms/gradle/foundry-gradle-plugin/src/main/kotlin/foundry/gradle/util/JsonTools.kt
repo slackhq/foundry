@@ -27,14 +27,19 @@ import java.time.ZoneId
 internal object JsonTools {
   val MOSHI =
     Moshi.Builder()
-      // Used in SlackTools for thermals data
+      .addAdapter<Regex>(RegexJsonAdapter())
       .addAdapter<LocalDateTime>(LocalDateTimeJsonAdapter())
       .build()
 }
 
+// Used in FoundryTools for thermals data
 private class LocalDateTimeJsonAdapter : JsonAdapter<LocalDateTime>() {
 
-  override fun fromJson(reader: JsonReader): LocalDateTime {
+  override fun fromJson(reader: JsonReader): LocalDateTime? {
+    if (reader.peek() == JsonReader.Token.NULL) {
+      reader.skipValue()
+      return null
+    }
     val timestamp = reader.nextLong()
     return LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.systemDefault())
   }
@@ -47,5 +52,24 @@ private class LocalDateTimeJsonAdapter : JsonAdapter<LocalDateTime>() {
 
     val timestamp = value.atZone(ZoneId.systemDefault()).toEpochSecond()
     writer.value(timestamp)
+  }
+}
+
+// Used in ModuleTopography
+private class RegexJsonAdapter : JsonAdapter<Regex>() {
+  override fun fromJson(reader: JsonReader): Regex? {
+    if (reader.peek() == JsonReader.Token.NULL) {
+      reader.skipValue()
+      return null
+    }
+    return Regex(reader.nextString())
+  }
+
+  override fun toJson(writer: JsonWriter, value: Regex?) {
+    if (value == null) {
+      writer.nullValue()
+      return
+    }
+    writer.value(value.pattern)
   }
 }
