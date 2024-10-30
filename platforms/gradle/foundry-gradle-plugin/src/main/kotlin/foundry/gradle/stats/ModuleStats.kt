@@ -162,8 +162,10 @@ public object ModuleStatsTasks {
 
     val generatedSourcesAdded = AtomicBoolean()
     val addGeneratedSources = {
-      if (locTask != null && generatedSourcesAdded.compareAndSet(false, true)) {
-        locTask.configure {
+      val shouldConfigure =
+        locTask != null && generatedSourcesAdded.compareAndSet(false, true) && includeGenerated
+      if (shouldConfigure) {
+        locTask!!.configure {
           generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
         }
       }
