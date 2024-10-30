@@ -80,6 +80,11 @@ dependencies { lintChecks(libs.composeLints) }
 
 // Roborazzi Desktop support uses Context Receivers
 // This setup is for JVM test builds only
-tasks.withType<KotlinCompile>().configureEach {
-  compilerOptions { freeCompilerArgs.add("-Xcontext-receivers") }
-}
+tasks.withType<KotlinCompile>()
+  .matching { it.name == ("jvmTestClasses") }
+  .configureEach {
+    compilerOptions {
+      incremental = false
+      freeCompilerArgs.add("-Xcontext-receivers")
+    }
+  }
