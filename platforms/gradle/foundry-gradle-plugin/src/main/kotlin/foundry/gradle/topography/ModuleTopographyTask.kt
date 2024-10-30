@@ -16,6 +16,9 @@
 package foundry.gradle.topography
 
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
+import com.github.ajalt.mordant.markdown.Markdown
+import com.github.ajalt.mordant.rendering.AnsiLevel
+import com.github.ajalt.mordant.terminal.Terminal
 import com.google.devtools.ksp.gradle.KspAATask
 import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.JsonWriter
@@ -235,8 +238,8 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     val srcsDir = projectDir.resolve("src")
 
     val buildFile = projectDir.resolve("build.gradle.kts")
-    var buildFileModified = false
     var buildFileText = buildFile.readText()
+    val initialBuildFileHash = buildFileText.hashCode()
 
     for (feature in features) {
       val initialRemoveSize = featuresToRemove.size
@@ -260,37 +263,65 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
       val isRemoving = featuresToRemove.size != initialRemoveSize
       if (isRemoving) {
-        feature.removalRegex?.let(::Regex)?.let { removalRegex ->
-          buildFileModified = true
-          buildFileText = buildFileText.replace(removalRegex, "").removeEmptyBraces()
+        feature.removalPatterns?.let { removalPatterns ->
+          for (removalRegex in removalPatterns) {
+            buildFileText = buildFileText.replace(removalRegex, "").removeEmptyBraces()
+          }
         }
       }
     }
 
-    JsonWriter.of(featuresToRemoveOutputFile.asFile.get().sink().buffer()).use {
-      MOSHI.adapter<Set<ModuleFeature>>()
-        .toJson(it, featuresToRemove.toSortedSet(compareBy { it.name }))
-    }
+    JsonWriter.of(featuresToRemoveOutputFile.asFile.get().sink().buffer())
+      .apply { indent = "  " }
+      .use {
+        MOSHI.adapter<Set<ModuleFeature>>()
+          .toJson(it, featuresToRemove.toSortedSet(compareBy { it.name }))
+      }
 
-    if (buildFileModified) {
-      if (autoFix.getOrElse(false)) {
+    val hasBuildFileChanges = initialBuildFileHash != buildFileText.hashCode()
+    val shouldAutoFix = autoFix.getOrElse(false)
+    if (hasBuildFileChanges) {
+      if (shouldAutoFix) {
         buildFile.writeText(buildFileText)
       } else {
         modifiedBuildFile.asFile.get().writeText(buildFileText)
       }
     }
 
+    val allAutoFixed = featuresToRemove.all { !it.removalPatterns.isNullOrEmpty() }
     if (featuresToRemove.isNotEmpty()) {
-      throw AssertionError(
-        """
-          Validation failed for the following features:
-
-          ${featuresToRemove.joinToString("\n", transform = ModuleFeature::removalMessage)}
-
-          Full list written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}
-        """
-          .trimIndent()
-      )
+      val message = buildString {
+        appendLine(
+          "**Validation failed! The following features appear to be unused and can be removed.**"
+        )
+        appendLine()
+        var first = true
+        featuresToRemove.forEach {
+          if (first) {
+            first = false
+          } else {
+            appendLine()
+            appendLine()
+          }
+          appendLine("- **${it.name}:** ${it.explanation}")
+          appendLine()
+          appendLine("  - **Advice:** ${it.advice}")
+        }
+        appendLine()
+        appendLine("Full list written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}")
+      }
+      val t = Terminal(AnsiLevel.TRUECOLOR, interactive = true)
+      val md = Markdown(message)
+      t.println(md, stderr = true)
+      if (shouldAutoFix) {
+        if (allAutoFixed) {
+          logger.lifecycle("All issues auto-fixed")
+        } else {
+          throw AssertionError("Not all issues could be fixed automatically")
+        }
+      } else {
+        throw AssertionError()
+      }
     }
   }
 
