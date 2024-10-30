@@ -31,10 +31,6 @@ const val OUTPUT_DIRECTORY_PATH =
 
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MarkdownPlaygroundTest {
-  //  @get:Rule
-  //  val roborazziRule =
-  //    RoborazziRule(options = RoborazziRule.Options(outputDirectoryPath = OUTPUT_DIRECTORY_PATH))
-
   @OptIn(ExperimentalTestApi::class)
   @Test
   fun test() = runTest {

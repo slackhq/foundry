@@ -61,11 +61,12 @@ kotlin {
 
         implementation(libs.junit)
         implementation(libs.roborazzi)
-        implementation(compose.desktop.currentOs)
-        implementation(compose.desktop.uiTestJUnit4)
         implementation(libs.testing.roborazzi)
         implementation(libs.testing.roborazzi.core)
         implementation(libs.robolectric)
+
+        implementation(compose.desktop.currentOs)
+        implementation(compose.desktop.uiTestJUnit4)
       }
     }
   }
