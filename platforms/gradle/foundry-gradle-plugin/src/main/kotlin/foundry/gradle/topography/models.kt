@@ -123,20 +123,23 @@ internal object KnownFeatures {
       matchingText =
         buildSet {
           addAll(DaggerCompiler.matchingText)
-          setOf(
-            "@Inject",
-            "@AssistedInject",
-            "@ContributesTo",
-            "@ContributesBinding",
-            "@ContributesMultibinding",
-            "@Module",
-            "import dagger.",
-            // TODO configurable custom annotations? Or we just need to search generated sources too
-            "@CircuitInject",
-            "@FeatureFlags",
-            "@GuinnessApi",
-            "@SlackRemotePreferences",
-            "@WorkRequestIn",
+          addAll(
+            setOf(
+              "@Inject",
+              "@AssistedInject",
+              "@ContributesTo",
+              "@ContributesBinding",
+              "@ContributesMultibinding",
+              "@Module",
+              "import dagger.",
+              // TODO configurable custom annotations? Or we just need to search generated sources
+              // too
+              "@CircuitInject",
+              "@FeatureFlags",
+              "@GuinnessApi",
+              "@SlackRemotePreferences",
+              "@WorkRequestIn",
+            )
           )
         },
       matchingTextFileExtensions = setOf("kt", "java"),

@@ -25,6 +25,7 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.adapter
 import foundry.cli.walkEachFile
 import foundry.gradle.FoundryExtension
+import foundry.gradle.FoundryProperties
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.serviceOf
@@ -107,6 +108,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
     fun register(
       project: Project,
       foundryExtension: FoundryExtension,
+      foundryProperties: FoundryProperties,
     ): TaskProvider<ModuleTopographyTask> {
       val task =
         project.tasks.register<ModuleTopographyTask>("moduleTopography") {
@@ -172,17 +174,19 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         project.pluginManager.withPlugin(id) { task.configure { pluginsProperty.add(id) } }
       }
 
-      registerValidationTask(project, task)
+      registerValidationTask(project, task, foundryProperties)
       return task
     }
 
     fun registerValidationTask(
       project: Project,
       topographyTask: TaskProvider<ModuleTopographyTask>,
+      foundryProperties: FoundryProperties,
     ) {
       project.tasks.register<ValidateModuleTopographyTask>("validateModuleTopography") {
         topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
         projectDirProperty.set(project.layout.projectDirectory)
+        autoFix.convention(foundryProperties.topographyAutoFix)
         featuresToRemoveOutputFile.setDisallowChanges(
           project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
         )
