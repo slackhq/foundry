@@ -63,12 +63,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: 'true'
 
       - name: Export JDK version
         shell: bash
         run: |
           JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
           echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
+
+      - name: Check LFS files
+        uses: actionsdesk/lfs-warning@v3.2
 
       - name: Install JDK ${{ env.JDK_VERSION }}
         uses: actions/setup-java@v4
