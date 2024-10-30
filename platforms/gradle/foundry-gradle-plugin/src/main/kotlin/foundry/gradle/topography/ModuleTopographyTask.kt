@@ -60,10 +60,8 @@ import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
 
-private fun Provider<Boolean>.associateWithFeature(
-  feature: ModuleFeature
-): Provider<Map<String, Boolean>> {
-  return map { mapOf(feature.name to it) }
+private fun MapProperty<String, Boolean>.put(feature: ModuleFeature, provider: Provider<Boolean>) {
+  put(feature.name, provider.orElse(false))
 }
 
 @CacheableTask
@@ -97,9 +95,9 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         plugins = plugins.toSortedSet(),
       )
 
-    JsonWriter.of(topographyOutputFile.asFile.get().sink().buffer()).use {
-      MOSHI.adapter<ModuleTopography>().toJson(it, topography)
-    }
+    JsonWriter.of(topographyOutputFile.asFile.get().sink().buffer())
+      .apply { indent = "  " }
+      .use { MOSHI.adapter<ModuleTopography>().toJson(it, topography) }
   }
 
   internal companion object {
@@ -111,45 +109,36 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         project.tasks.register<ModuleTopographyTask>("moduleTopography") {
           projectName.set(project.name)
           projectPath.set(project.path)
-          features.putAll(
-            foundryExtension.featuresHandler.moshiHandler.moshiCodegen.associateWithFeature(
-              KnownFeatures.MoshiCodeGen
-            )
+          features.put(
+            KnownFeatures.MoshiCodeGen,
+            foundryExtension.featuresHandler.moshiHandler.moshiCodegen,
           )
-          features.putAll(
-            foundryExtension.featuresHandler.circuitHandler.codegen.associateWithFeature(
-              KnownFeatures.CircuitInject
-            )
+          features.put(
+            KnownFeatures.CircuitInject,
+            foundryExtension.featuresHandler.circuitHandler.codegen,
           )
-          features.putAll(
-            foundryExtension.featuresHandler.daggerHandler.enabled.associateWithFeature(
-              KnownFeatures.Dagger
-            )
+          features.put(KnownFeatures.Dagger, foundryExtension.featuresHandler.daggerHandler.enabled)
+          features.put(
+            KnownFeatures.DaggerCompiler,
+            foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler,
           )
-          features.putAll(
-            foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler.associateWithFeature(
-              KnownFeatures.DaggerCompiler
-            )
+          features.put(
+            KnownFeatures.Compose,
+            foundryExtension.featuresHandler.composeHandler.enableCompiler,
           )
-          features.putAll(
-            foundryExtension.featuresHandler.composeHandler.enableCompiler.associateWithFeature(
-              KnownFeatures.Compose
-            )
+          features.put(
+            KnownFeatures.AndroidTest,
+            foundryExtension.androidHandler.featuresHandler.androidTest,
           )
-          features.putAll(
-            foundryExtension.androidHandler.featuresHandler.androidTest.associateWithFeature(
-              KnownFeatures.AndroidTest
-            )
+          features.put(
+            KnownFeatures.Robolectric,
+            foundryExtension.androidHandler.featuresHandler.robolectric,
           )
-          features.putAll(
-            foundryExtension.androidHandler.featuresHandler.robolectric.associateWithFeature(
-              KnownFeatures.Robolectric
-            )
-          )
-          features.putAll(
-            project
-              .provider { foundryExtension.androidHandler.featuresHandler.viewBindingEnabled() }
-              .associateWithFeature(KnownFeatures.ViewBinding)
+          features.put(
+            KnownFeatures.ViewBinding,
+            project.provider {
+              foundryExtension.androidHandler.featuresHandler.viewBindingEnabled()
+            },
           )
           topographyOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("foundry/topography/model/topography.json")
@@ -222,6 +211,9 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
   init {
     group = "foundry"
+    @Suppress("LeakingThis")
+    notCompatibleWithConfigurationCache("This task modified build files in place")
+    @Suppress("LeakingThis") doNotTrackState("This task modified build files in place")
   }
 
   @OptIn(ExperimentalPathApi::class)
