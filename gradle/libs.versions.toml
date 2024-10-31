@@ -37,7 +37,6 @@ nullawayGradle = "2.1.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.1"
 retrofit = "2.11.0"
-robolectric = "4.11.1"
 roborazzi = "1.6.0"
 slack-lint = "0.8.2"
 sortDependencies = "0.7"
@@ -143,7 +142,6 @@ okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", versio
 oshi = "com.github.oshi:oshi-core:6.6.5"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
-robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.9"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"

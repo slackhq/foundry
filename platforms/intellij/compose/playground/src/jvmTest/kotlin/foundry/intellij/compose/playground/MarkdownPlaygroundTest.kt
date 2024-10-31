@@ -23,9 +23,7 @@ import androidx.compose.ui.test.runDesktopComposeUiTest
 import com.github.takahirom.roborazzi.RoborazziOptions
 import io.github.takahirom.roborazzi.captureRoboImage
 import kotlin.test.Test
-import org.robolectric.annotation.GraphicsMode
 
-@GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MarkdownPlaygroundTest {
   @OptIn(ExperimentalTestApi::class)
   @Test

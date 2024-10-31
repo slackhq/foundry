@@ -62,7 +62,6 @@ kotlin {
         implementation(libs.testing.roborazzi)
         implementation(libs.testing.roborazzi.core)
         implementation(libs.testing.roborazzi.compose)
-        implementation(libs.robolectric)
         implementation(compose.desktop.currentOs)
         implementation(compose.desktop.uiTestJUnit4)
       }

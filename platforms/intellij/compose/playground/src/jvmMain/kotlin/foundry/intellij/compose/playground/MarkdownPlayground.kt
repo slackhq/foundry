@@ -37,7 +37,6 @@ fun main() {
   singleWindowApplication { MarkdownPlayground() }
 }
 
-// created function for testing
 @Composable
 fun MarkdownPlayground(modifier: Modifier = Modifier) {
   var isDark by remember { mutableStateOf(false) }
