@@ -25,7 +25,11 @@ plugins {
 }
 
 roborazzi {
-  outputDir = file("src/jvmTest/kotlin/foundry/intellij/compose/playground/snapshots/images")
+  outputDir.set(
+    layout.projectDirectory.dir(
+      "src/jvmTest/kotlin/foundry/intellij/compose/playground/snapshots/images"
+    )
+  )
 }
 
 kotlin {
@@ -79,8 +83,5 @@ dependencies { lintChecks(libs.composeLints) }
 // Roborazzi Desktop support uses Context Receivers
 // This setup is for JVM test builds only
 tasks.named<KotlinCompile>("compileTestKotlinJvm").configure {
-  compilerOptions {
-    incremental = false
-    freeCompilerArgs.add("-Xcontext-receivers")
-  }
+  compilerOptions { freeCompilerArgs.add("-Xcontext-receivers") }
 }
