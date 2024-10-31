@@ -55,6 +55,9 @@ jobs:
           path: |
             **/build/reports/**
 
+      - name: Check LFS files
+        uses: actionsdesk/lfs-warning@v3.2
+
   publish-snapshot:
     name: 'Publish snapshot (main only)'
     if: github.ref == 'refs/heads/main'
@@ -71,9 +74,6 @@ jobs:
         run: |
           JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
           echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
-
-      - name: Check LFS files
-        uses: actionsdesk/lfs-warning@v3.2
 
       - name: Install JDK ${{ env.JDK_VERSION }}
         uses: actions/setup-java@v4
