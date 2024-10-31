@@ -178,7 +178,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       return task
     }
 
-    fun registerValidationTask(
+    private fun registerValidationTask(
       project: Project,
       topographyTask: TaskProvider<ModuleTopographyTask>,
       foundryProperties: FoundryProperties,
