@@ -94,8 +94,9 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
         }
       }
 
-      ModuleStatsTasks.configureSubproject(target, foundryProperties)
-      ModuleTopographyTask.register(target, foundryExtension, foundryProperties)
+      val topographyTask =
+        ModuleTopographyTask.register(target, foundryExtension, foundryProperties)
+      ModuleStatsTasks.configureSubproject(target, foundryProperties, topographyTask)
     }
 
     // Everything in here applies to all projects
