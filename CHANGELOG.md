@@ -4,7 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
-* **Fix**: Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
+- [gradle] Introduce new `moduleTopography` task. This is a general task that attempts to validate project configurations by looking for features that are enabled but unused. Currently covers a few core features like kapt, ksp, moshi code gen, dagger/anvil, and viewbinding. Outputs are printed and written to a JSON file. Add `--validate-all` to make the tasks fail on validation issues.
+- [gradle] Cache global `FoundryProperties` instance for subproject use.
+- [gradle] Add `composeRuntimeOnly()` DSL feature.
+- [cli] Check for non-existent paths before traversing in `Path.walkEachFile()`.
+- [gradle] Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
 
 0.21.0
 ------

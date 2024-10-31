@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.1)" variant="all" version="8.8.0-alpha01">
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      .map { codeOwnershipMap[it]!! }"
+        errorLine2="                                 ~~">
+        <location
+            file="src/main/kotlin/foundry/intellij/skate/codeowners/CodeOwnerRepository.kt"
+            line="77"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(translatorWarning!!.description).isEqualTo(warningDescription)"
+        errorLine2="                                ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorAnnotatorTest.kt"
+            line="168"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(body!!.text)"
+        errorLine2="                   ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="42"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(body!!.text)"
+        errorLine2="                   ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="64"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(body!!.text)"
+        errorLine2="                   ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="86"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(body!!.text)"
+        errorLine2="                   ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="108"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(body!!.text)"
+        errorLine2="                   ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="125"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    assertThat(body!!.text)"
+        errorLine2="                   ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="142"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="  private fun getNamedFunction() = file.findDescendantOfType&lt;KtNamedFunction>()!!"
+        errorLine2="                                                                               ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="153"
+            column="80"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    return TranslatorHelper.generateBody(TranslatorHelper.extractBundle(getNamedFunction())!!)"
+        errorLine2="                                                                                           ~~">
+        <location
+            file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
+            line="156"
+            column="92"/>
+    </issue>
+
+</issues>
