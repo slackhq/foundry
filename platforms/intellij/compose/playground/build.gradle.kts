@@ -49,22 +49,18 @@ kotlin {
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
         implementation(projects.platforms.intellij.compose)
-        implementation(libs.testing.roborazzi)
-        implementation(libs.testing.roborazzi.rules)
-        implementation(libs.testing.roborazzi.compose)
-        implementation(libs.testing.roborazzi.core)
       }
     }
     jvmTest {
       dependencies {
         api(libs.testing.roborazzi.rules)
 
-        implementation(libs.junit)
+        implementation(kotlin("test"))
         implementation(libs.roborazzi)
         implementation(libs.testing.roborazzi)
         implementation(libs.testing.roborazzi.core)
+        implementation(libs.testing.roborazzi.compose)
         implementation(libs.robolectric)
-
         implementation(compose.desktop.currentOs)
         implementation(compose.desktop.uiTestJUnit4)
       }

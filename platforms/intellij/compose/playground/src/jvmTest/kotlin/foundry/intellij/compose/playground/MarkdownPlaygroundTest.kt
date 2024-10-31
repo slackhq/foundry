@@ -22,8 +22,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runDesktopComposeUiTest
 import com.github.takahirom.roborazzi.RoborazziOptions
 import io.github.takahirom.roborazzi.captureRoboImage
-import kotlinx.coroutines.test.runTest
-import org.junit.Test
+import kotlin.test.Test
 import org.robolectric.annotation.GraphicsMode
 
 const val OUTPUT_DIRECTORY_PATH =
@@ -33,22 +32,20 @@ const val OUTPUT_DIRECTORY_PATH =
 class MarkdownPlaygroundTest {
   @OptIn(ExperimentalTestApi::class)
   @Test
-  fun test() = runTest {
-    runDesktopComposeUiTest {
-      setContent { MarkdownPlayground() }
+  fun test() = runDesktopComposeUiTest {
+    setContent { MarkdownPlayground() }
 
-      val roborazziOptions =
-        RoborazziOptions(
-          recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
-          compareOptions =
-            RoborazziOptions.CompareOptions(outputDirectoryPath = OUTPUT_DIRECTORY_PATH),
-        )
+    val roborazziOptions =
+      RoborazziOptions(
+        recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
+        compareOptions =
+          RoborazziOptions.CompareOptions(outputDirectoryPath = OUTPUT_DIRECTORY_PATH),
+      )
 
-      onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
+    onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
 
-      onNodeWithTag("dark-mode-toggle").performClick()
+    onNodeWithTag("dark-mode-toggle").performClick()
 
-      onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
-    }
+    onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
   }
 }
