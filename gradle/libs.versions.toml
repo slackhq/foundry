@@ -124,6 +124,7 @@ kotlin-gradlePlugins-bom = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinShell = "eu.jrie.jetbrains:kotlin-shell-core:0.2.1"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jewel-bridge = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-242", version.ref = "jewel" }

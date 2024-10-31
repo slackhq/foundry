@@ -24,6 +24,9 @@ import com.github.takahirom.roborazzi.RoborazziOptions
 import io.github.takahirom.roborazzi.captureRoboImage
 import kotlin.test.Test
 
+const val OUTPUT_DIRECTORY_PATH =
+  "src/jvmTest/kotlin/foundry/intellij/compose/playground/snapshots/images"
+
 class MarkdownPlaygroundTest {
   @OptIn(ExperimentalTestApi::class)
   @Test
@@ -31,7 +34,11 @@ class MarkdownPlaygroundTest {
     setContent { MarkdownPlayground() }
 
     val roborazziOptions =
-      RoborazziOptions(recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5))
+      RoborazziOptions(
+        recordOptions = RoborazziOptions.RecordOptions(resizeScale = 0.5),
+        compareOptions =
+          RoborazziOptions.CompareOptions(outputDirectoryPath = OUTPUT_DIRECTORY_PATH),
+      )
 
     onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
 

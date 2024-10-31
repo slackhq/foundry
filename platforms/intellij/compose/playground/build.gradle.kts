@@ -61,12 +61,12 @@ kotlin {
       dependencies {
         api(libs.testing.roborazzi.rules)
 
-        implementation(kotlin("test"))
+        implementation(libs.kotlin.test)
         implementation(libs.roborazzi)
         implementation(libs.testing.roborazzi)
         implementation(libs.testing.roborazzi.core)
         implementation(libs.testing.roborazzi.compose)
-        implementation(compose.desktop.currentOs)
+        implementation(compose.desktop.common)
         implementation(compose.desktop.uiTestJUnit4)
       }
     }
