@@ -57,6 +57,7 @@ jobs:
           name: reports
           path: |
             **/build/reports/**
+            **/src/jvmTest/snapshots/**/*_compare.png
 
   publish-snapshot:
     name: 'Publish snapshot (main only)'
