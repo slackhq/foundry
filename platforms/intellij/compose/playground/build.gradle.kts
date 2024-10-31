@@ -24,7 +24,9 @@ plugins {
   alias(libs.plugins.roborazzi)
 }
 
-roborazzi { outputDir = file("src/jvmTest/kotlin/foundry/intellij/compose/playground/snapshots") }
+roborazzi {
+  outputDir = file("src/jvmTest/kotlin/foundry/intellij/compose/playground/snapshots/images")
+}
 
 kotlin {
   jvm()
