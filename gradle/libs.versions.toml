@@ -44,7 +44,7 @@ spotless = "7.0.0.BETA4"
 sqldelight = "2.0.2"
 versionsPlugin = "0.51.0"
 wire = "5.1.0"
-xmlutil = "0.90.2"
+xmlutil = "0.90.3"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
