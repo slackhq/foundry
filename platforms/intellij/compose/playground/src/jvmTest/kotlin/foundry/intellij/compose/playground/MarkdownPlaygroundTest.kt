@@ -31,7 +31,6 @@ class MarkdownPlaygroundTest {
   @Test
   fun test() = runDesktopComposeUiTest {
     setContent { MarkdownPlayground() }
-    print(DEFAULT_ROBORAZZI_OUTPUT_DIR_PATH)
 
     val roborazziOptions =
       RoborazziOptions(
