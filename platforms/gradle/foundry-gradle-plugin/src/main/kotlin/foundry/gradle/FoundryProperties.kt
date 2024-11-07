@@ -737,6 +737,10 @@ internal constructor(
   public val kotlinProgressive: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.progressive", defaultValue = true)
 
+  /** Property to enable auto-fixing in topography validation. */
+  public val topographyAutoFix: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.topography.validation.autoFix", defaultValue = false)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")

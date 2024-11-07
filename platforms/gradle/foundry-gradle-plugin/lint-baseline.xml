@@ -1,5 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.6.1)" variant="all" version="8.8.0-alpha01">
+<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.1)" variant="all" version="8.8.0-alpha01">
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="  val segmentName = this::class.simpleName!!"
+        errorLine2="                                          ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/dependencies/DependencyCollection.kt"
+            line="111"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    gradleProperty ?: this::class.simpleName!!.lowercase(Locale.US)"
+        errorLine2="                                            ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/dependencies/DependencyGroup.kt"
+            line="43"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="                    var newConfiguration = advice.toConfiguration!!"
+        errorLine2="                                                                 ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/dependencyrake/DependencyRake.kt"
+            line="231"
+            column="66"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="              val oldConfiguration = abiDep.fromConfiguration!!"
+        errorLine2="                                                             ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/dependencyrake/DependencyRake.kt"
+            line="300"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="              var newConfiguration = abiDep.toConfiguration!!"
+        errorLine2="                                                           ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/dependencyrake/DependencyRake.kt"
+            line="301"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true"
+        errorLine2="                    ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
+            line="1142"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    optionalStringProperty(key, defaultValue)!!"
+        errorLine2="                                             ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
+            line="59"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      statsFiles.map { it.source().buffer().use(adapter::fromJson)!! }.sortedBy { it.modulePath }"
+        errorLine2="                                                                  ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/stats/ModuleStats.kt"
+            line="314"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="          JsonTools.MOSHI.adapter&lt;LocTask.LocData>().fromJson(it)!!"
+        errorLine2="                                                                 ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/stats/ModuleStats.kt"
+            line="411"
+            column="66"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      }!!"
+        errorLine2="       ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/topography/ModuleTopographyTask.kt"
+            line="232"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="        path.source().buffer().use { JsonTools.MOSHI.adapter&lt;VersionsOutput>().fromJson(it)!! }"
+        errorLine2="                                                                                           ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/Platforms.kt"
+            line="173"
+            column="92"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      Publisher.interProjectPublisher(project, artifact.objectInstance!!)"
+        errorLine2="                                                                      ~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
+            line="127"
+            column="71"/>
+    </issue>
+
+    <issue
+        id="MoshiUsageNonMoshiClassPlatform"
+        message="Platform type &apos;Regex&apos; is not natively supported by Moshi."
+        errorLine1="  val removalPatterns: Set&lt;Regex>?,"
+        errorLine2="                       ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/topography/models.kt"
+            line="34"
+            column="24"/>
+    </issue>
 
     <issue
         id="GradleProjectIsolation"
@@ -85,7 +228,7 @@
         errorLine2="                ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="175"
+            line="184"
             column="17"/>
     </issue>
 
@@ -96,7 +239,7 @@
         errorLine2="                               ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="69"
+            line="67"
             column="32"/>
     </issue>
 
@@ -107,7 +250,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="489"
+            line="441"
             column="14"/>
     </issue>
 
@@ -118,7 +261,7 @@
         errorLine2="                               ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/GlobalConfig.kt"
-            line="32"
+            line="33"
             column="32"/>
     </issue>
 
@@ -290,6 +433,17 @@
     <issue
         id="InternalAgpApiUsage"
         message="Avoid using internal Android Gradle Plugin APIs"
+        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/topography/ModuleTopographyTask.kt"
+            line="18"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalAgpApiUsage"
+        message="Avoid using internal Android Gradle Plugin APIs"
         errorLine1="import com.android.build.gradle.internal.dsl.BaseAppModuleExtension"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -356,11 +510,22 @@
     <issue
         id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.plugins.PluginRegistry"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/topography/ModuleTopographyTask.kt"
+            line="47"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
         errorLine1="import org.gradle.api.internal.provider.MissingValueException"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/Platforms.kt"
-            line="33"
+            line="32"
             column="1"/>
     </issue>
 
@@ -404,7 +569,7 @@
         errorLine2="        ~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryGradleUtil.kt"
-            line="270"
+            line="257"
             column="9"/>
     </issue>
 
@@ -415,7 +580,7 @@
         errorLine2="                                                    ~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/Platforms.kt"
-            line="269"
+            line="187"
             column="53"/>
     </issue>
 
