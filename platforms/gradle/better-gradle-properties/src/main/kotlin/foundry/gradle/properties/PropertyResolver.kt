@@ -15,8 +15,10 @@
  */
 package foundry.gradle.properties
 
+import java.util.concurrent.Callable
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 
 /**
  * A property resolver that handles multiple property sources in a hierarchical fashion for
@@ -28,19 +30,41 @@ import org.gradle.api.provider.Provider
  * - root-project `local.properties`
  * - root-project/global `gradle.properties`
  *
- * @property project The project to resolve properties for.
  * @property startParameterProperty A provider of a property _only_ contained in the project's start
  *   parameters.
  * @property globalLocalProperty A provider of a property _only_ contained in the root project's
  *   `local.properties`.
  */
 public class PropertyResolver(
-  private val project: Project,
-  private val startParameterProperty: (String) -> Provider<String> = project.emptyStringProvider(),
-  private val globalLocalProperty: (String) -> Provider<String> = project.emptyStringProvider(),
+  private val providers: SimpleProviderFactory,
+  private val localPropertyProvider: (String) -> Provider<String>,
+  private val localGradlePropertyProvider: (String) -> Provider<String>,
+  private val startParameterProperty: (String) -> Provider<String>,
+  private val globalLocalProperty: (String) -> Provider<String>,
+  private val globalGradleLocalProperty: (String) -> Provider<String>,
 ) {
 
-  private val providers = project.providers
+  /** @property project The project to resolve properties for. */
+  public constructor(
+    project: Project,
+    startParameterProperty: (String) -> Provider<String> = project.providers.emptyStringProvider(),
+    globalLocalProperty: (String) -> Provider<String> = project.providers.emptyStringProvider(),
+  ) : this(
+    object : SimpleProviderFactory {
+      override fun <T : Any> provider(callable: Callable<T>): Provider<T> {
+        return project.providers.provider(callable)
+      }
+    },
+    project::localProperty,
+    project::localGradleProperty,
+    startParameterProperty,
+    globalLocalProperty,
+    project.providers::gradleProperty,
+  )
+
+  public interface SimpleProviderFactory {
+    public fun <T : Any> provider(callable: Callable<T>): Provider<T>
+  }
 
   /**
    * Returns a "safe" property [Provider] mechanism that handles multiple property sources in a
@@ -54,10 +78,10 @@ public class PropertyResolver(
    */
   public fun providerFor(key: String): Provider<String> =
     startParameterProperty(key) // start parameters
-      .orElse(project.localProperty(key)) // project-local `local.properties`
-      .orElse(project.localGradleProperty(key)) // project-local `gradle.properties`
+      .orElse(localPropertyProvider(key)) // project-local `local.properties`
+      .orElse(localGradlePropertyProvider(key)) // project-local `gradle.properties`
       .orElse(globalLocalProperty(key)) // root-project `local.properties`
-      .orElse(project.providers.gradleProperty(key)) // root-project/global `gradle.properties`
+      .orElse(globalGradleLocalProperty(key)) // root-project/global `gradle.properties`
 
   public fun booleanValue(key: String, defaultValue: Boolean = false): Boolean {
     return booleanProvider(key, defaultValue).get()
@@ -118,4 +142,6 @@ public class PropertyResolver(
   }
 }
 
-private fun Project.emptyStringProvider(): (String) -> Provider<String> = { provider { null } }
+public fun ProviderFactory.emptyStringProvider(): (String) -> Provider<String> = {
+  provider { null }
+}

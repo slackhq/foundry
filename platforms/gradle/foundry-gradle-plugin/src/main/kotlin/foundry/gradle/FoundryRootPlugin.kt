@@ -18,8 +18,8 @@ package foundry.gradle
 import com.autonomousapps.DependencyAnalysisExtension
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
-import com.squareup.moshi.adapter
 import foundry.cli.AppleSiliconCompat
+import foundry.common.json.JsonTools
 import foundry.common.versioning.VersionNumber
 import foundry.gradle.avoidance.ComputeAffectedProjectsTask
 import foundry.gradle.avoidance.GenerateAndroidTestProjectPathsTask
@@ -202,9 +202,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
               val text = thermalsLogJsonFile.readText()
               if (text.isNotEmpty()) {
                 try {
-                  thermals =
-                    foundry.gradle.util.JsonTools.MOSHI.adapter<Thermals>()
-                      .fromJson(thermalsLogJsonFile.readText())
+                  thermals = JsonTools.fromJson<Thermals>(thermalsLogJsonFile)
                 } catch (e: Exception) {
                   Logging.getLogger("SGP").error("Failed to parse thermals log", e)
                 }

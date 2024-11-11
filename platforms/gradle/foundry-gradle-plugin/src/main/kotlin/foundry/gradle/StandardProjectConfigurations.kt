@@ -355,7 +355,7 @@ internal class StandardProjectConfigurations(
       val nullawayBaseline = foundryProperties.nullawayBaseline
 
       val nullawayDep =
-        foundryProperties.versions.catalog.findLibrary("errorProne-nullaway").orElseThrow {
+        foundryProperties.versions.getOptionalValue("errorProne-nullaway").orElseThrow {
           IllegalStateException("Could not find errorProne-nullaway in the catalog")
         }
       dependencies.apply { add("errorprone", nullawayDep) }

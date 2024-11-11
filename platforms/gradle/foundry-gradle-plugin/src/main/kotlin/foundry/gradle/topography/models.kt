@@ -16,7 +16,11 @@
 package foundry.gradle.topography
 
 import com.squareup.moshi.JsonClass
+import foundry.common.json.JsonTools
+import java.nio.file.Path
 import kotlin.reflect.full.declaredMemberProperties
+import org.gradle.api.file.FileSystemLocation
+import org.gradle.api.provider.Provider
 
 @JsonClass(generateAdapter = true)
 public data class ModuleTopography(
@@ -24,7 +28,22 @@ public data class ModuleTopography(
   val gradlePath: String,
   val features: Set<String>,
   val plugins: Set<String>,
-)
+) {
+  public fun writeJsonTo(property: Provider<out FileSystemLocation>, prettyPrint: Boolean = false) {
+    writeJsonTo(property.get().asFile.toPath(), prettyPrint)
+  }
+
+  public fun writeJsonTo(path: Path, prettyPrint: Boolean = false) {
+    JsonTools.toJson(path, this, prettyPrint)
+  }
+
+  public companion object {
+    public fun from(provider: Provider<out FileSystemLocation>): ModuleTopography =
+      from(provider.get().asFile.toPath())
+
+    public fun from(path: Path): ModuleTopography = JsonTools.fromJson<ModuleTopography>(path)
+  }
+}
 
 @JsonClass(generateAdapter = true)
 public data class ModuleFeature(

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  alias(libs.plugins.kotlin.jvm)
-  alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.lint)
-}
+package foundry.gradle.util
 
-dependencies {
-  api(platform(libs.coroutines.bom))
-  api(libs.moshi)
-  api(libs.okio)
+import foundry.common.json.JsonTools
+import org.gradle.api.file.FileSystemLocation
+import org.gradle.api.provider.Provider
 
-  implementation(libs.coroutines.core)
+internal inline fun <reified T : Any> JsonTools.toJson(
+  provider: Provider<out FileSystemLocation>,
+  value: T?,
+  prettyPrint: Boolean = false,
+) {
+  return toJson(provider.get().asFile, value, prettyPrint)
 }
