@@ -16,11 +16,10 @@
 package foundry.skippy
 
 import com.jraska.module.graph.DependencyGraph
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import foundry.common.FoundryLogger
 import foundry.common.flatMapToSet
 import foundry.common.flip
+import foundry.common.json.JsonTools
 import foundry.common.parallelMapNotNull
 import foundry.common.readLines
 import foundry.common.writeLines
@@ -42,7 +41,6 @@ public class SkippyRunner(
   private val dependencyGraph: DependencyGraph.SerializableGraph,
   private val changedFilesPath: Path,
   private val originalConfigMap: Map<String, SkippyConfig>,
-  private val moshi: Moshi,
   private val parallelism: Int = originalConfigMap.size,
   private val fs: FileSystem = FileSystem.SYSTEM,
   private val debug: Boolean = false,
@@ -198,7 +196,7 @@ public class SkippyRunner(
       }
     return logTimedValue(tool, "SkippyRunner computation") {
       // Write the config to a diagnostic file
-      diagnostics.write("config.json") { moshi.adapter<SkippyConfig>().indent("  ").toJson(config) }
+      diagnostics.write("config.json") { JsonTools.toJson(config, prettyPrint = true) }
 
       val (affectedProjects, focusProjects, affectedAndroidTestProjects) =
         AffectedProjectsComputer(

@@ -21,15 +21,14 @@ import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
 import com.google.devtools.ksp.gradle.KspAATask
 import com.google.devtools.ksp.gradle.KspTask
-import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.adapter
 import foundry.cli.walkEachFile
+import foundry.common.json.JsonTools
 import foundry.gradle.FoundryExtension
 import foundry.gradle.FoundryProperties
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.serviceOf
-import foundry.gradle.util.JsonTools.MOSHI
+import foundry.gradle.util.toJson
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.extension
@@ -37,9 +36,6 @@ import kotlin.io.path.readText
 import kotlin.io.path.useLines
 import kotlin.io.path.writeText
 import kotlin.jvm.optionals.getOrNull
-import okio.buffer
-import okio.sink
-import okio.source
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
@@ -99,9 +95,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         plugins = plugins.toSortedSet(),
       )
 
-    JsonWriter.of(topographyOutputFile.asFile.get().sink().buffer())
-      .apply { indent = "  " }
-      .use { MOSHI.adapter<ModuleTopography>().toJson(it, topography) }
+    topography.writeJsonTo(topographyOutputFile, prettyPrint = true)
   }
 
   internal companion object {
@@ -226,10 +220,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   @OptIn(ExperimentalPathApi::class)
   @TaskAction
   public fun validate() {
-    val topography =
-      topographyJson.get().asFile.source().buffer().use {
-        MOSHI.adapter<ModuleTopography>().fromJson(it)
-      }!!
+    val topography = ModuleTopography.from(topographyJson)
     val knownFeatures = KnownFeatures.load()
     val features = buildSet {
       addAll(topography.features.map { featureKey -> knownFeatures.getValue(featureKey) })
@@ -275,12 +266,10 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
       }
     }
 
-    JsonWriter.of(featuresToRemoveOutputFile.asFile.get().sink().buffer())
-      .apply { indent = "  " }
-      .use {
-        MOSHI.adapter<Set<ModuleFeature>>()
-          .toJson(it, featuresToRemove.toSortedSet(compareBy { it.name }))
-      }
+    JsonTools.toJson<Set<ModuleFeature>>(
+      featuresToRemoveOutputFile,
+      featuresToRemove.toSortedSet(compareBy { it.name }),
+    )
 
     val hasBuildFileChanges = initialBuildFileHash != buildFileText.hashCode()
     val shouldAutoFix = autoFix.getOrElse(false)

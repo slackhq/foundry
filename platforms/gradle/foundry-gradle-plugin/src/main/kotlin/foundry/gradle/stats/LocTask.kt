@@ -16,12 +16,10 @@
 package foundry.gradle.stats
 
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.adapter
+import foundry.common.json.JsonTools
 import foundry.gradle.stats.LocTask.LocData
-import foundry.gradle.util.JsonTools
+import foundry.gradle.util.toJson
 import java.io.File
-import okio.buffer
-import okio.sink
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -75,9 +73,7 @@ internal abstract class LocTask : DefaultTask() {
       } else {
         emptyMap()
       }
-    outputFile.asFile.get().sink().buffer().use { sink ->
-      JsonTools.MOSHI.adapter<LocData>().toJson(sink, LocData(srcs, generatedSrcs))
-    }
+    JsonTools.toJson(outputFile, LocData(srcs, generatedSrcs))
   }
 
   private fun processDir(dir: File, logger: (String) -> Unit): Map<String, LanguageStats> {
@@ -220,7 +216,7 @@ internal abstract class LocTask : DefaultTask() {
   ) {
     companion object {
       val EMPTY = LocData(emptyMap(), emptyMap())
-      val EMPTY_JSON by lazy { JsonTools.MOSHI.adapter<LocData>().toJson(EMPTY) }
+      val EMPTY_JSON by lazy { JsonTools.toJson<LocData>(EMPTY) }
     }
   }
 }
