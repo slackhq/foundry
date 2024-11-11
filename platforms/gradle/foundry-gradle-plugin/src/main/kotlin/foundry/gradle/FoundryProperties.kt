@@ -33,17 +33,32 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
  *
  * Order attempted as described by [PropertyResolver.providerFor].
  */
+// TODO allow sourcing from a custom resolver or Properties
 public class FoundryProperties
 internal constructor(
-  private val project: Project,
-  startParameterProperty: (String) -> Provider<String>,
-  globalLocalProperty: (String) -> Provider<String>,
+  private val projectName: String,
+  private val resolver: PropertyResolver,
+  private val fileProvider: (String) -> RegularFile,
+  private val rootDirFileProvider: (String) -> RegularFile,
+  internal val versions: FoundryVersions,
 ) {
-  private val resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty)
+
+  internal constructor(
+    project: Project,
+    startParameterProperty: (String) -> Provider<String>,
+    globalLocalProperty: (String) -> Provider<String>,
+  ) : this(
+    projectName = project.name,
+    resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty),
+    fileProvider = project.layout.projectDirectory::file,
+    rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
+    versions = FoundryVersions(project.getVersionsCatalog()),
+  )
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
-  private fun fileProperty(key: String): File? = optionalStringProperty(key)?.let(project::file)
+  private fun fileProperty(key: String): File? =
+    optionalStringProperty(key)?.let(fileProvider)?.asFile
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -66,8 +81,6 @@ internal constructor(
     resolver.optionalStringValue(key, defaultValue = defaultValue)?.takeUnless {
       blankIsNull && it.isBlank()
     }
-
-  internal val versions: FoundryVersions by lazy { FoundryVersions(project.getVersionsCatalog()) }
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
@@ -180,9 +193,7 @@ internal constructor(
   /** Relative path to a Compose stability configuration file from the _root_ project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
     get() =
-      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map {
-        project.rootProject.layout.projectDirectory.file(it)
-      }
+      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map(rootDirFileProvider)
 
   /**
    * Use a workaround for compose-compiler's `includeInformation` option on android projects.
@@ -350,7 +361,7 @@ internal constructor(
    * etc).
    */
   public val isTestLibrary: Boolean
-    get() = booleanProperty("foundry.isTestLibrary", false) || project.name == "test-fixtures"
+    get() = booleanProperty("foundry.isTestLibrary", false) || projectName == "test-fixtures"
 
   /**
    * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
