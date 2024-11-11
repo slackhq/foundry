@@ -68,6 +68,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
+import org.jgrapht.graph.GraphCycleProhibitedException
 
 public object ModuleStatsTasks {
   public const val AGGREGATOR_NAME: String = "aggregateModuleStats"
@@ -330,16 +331,21 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
         graph.addVertex(dependency)
         try {
           graph.addEdge(subproject, dependency)
-        } catch (e: IllegalArgumentException) {
+        } catch (e: GraphCycleProhibitedException) {
           // Surprisingly, not unexpected. This can happen when project A has a compileOnly
           // dependency on project B and project B has a testImplementation dependency on project A.
-          // This _only_ happens with model and test-model, which we should just modularize out to a
-          // third "model-tests" module
           if ("model" !in subproject || "model" !in dependency) {
-            throw RuntimeException(
-              "Cycle from $subproject to $dependency. Please modularize this better!",
-              e,
-            )
+            if (subproject.contains("test-fixtures") xor dependency.contains("test-fixtures")) {
+              // This is a big bandaid over the ability for projects to depend own their own test
+              // fixtures, which breaks the cycle in these scenarios.
+              // We allow this specific case, ideally in the future with native testFixtures()
+              // support this would just go away.
+            } else {
+              throw RuntimeException(
+                "Cycle from $subproject to $dependency. Please modularize this better!",
+                e,
+              )
+            }
           }
         }
       }
