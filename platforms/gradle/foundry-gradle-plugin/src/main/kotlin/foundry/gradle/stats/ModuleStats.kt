@@ -378,7 +378,6 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
         LocTask.LocData.EMPTY
       }
 
-    // TODO use this
     val topography = ModuleTopography.from(topographyJson)
     val finalTags = tags.getOrElse(emptySet()).toMutableSet()
 
