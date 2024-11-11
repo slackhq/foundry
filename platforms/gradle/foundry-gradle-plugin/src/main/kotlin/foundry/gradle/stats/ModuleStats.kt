@@ -149,9 +149,7 @@ public object ModuleStatsTasks {
             locDataFiles.from(locTask.flatMap { it.outputFile })
           }
           this.includeGenerated.setDisallowChanges(includeGenerated)
-          this.isMultiVariantAndroidLibrary.setDisallowChanges(
-            foundryProperties.libraryWithVariants
-          )
+          this.multiVariantAndroidLibrary.setDisallowChanges(foundryProperties.libraryWithVariants)
           topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
           outputFile.setDisallowChanges(
             project.layout.buildDirectory.file("reports/foundry/moduleStats.json")
@@ -343,7 +341,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
   @get:Input abstract val includeGenerated: Property<Boolean>
 
   // TODO eventually pull this from ModuleTopography too once it has properties
-  @get:Input @get:Optional abstract val isMultiVariantAndroidLibrary: Property<Boolean>
+  @get:Input @get:Optional abstract val multiVariantAndroidLibrary: Property<Boolean>
 
   @get:Input abstract val tags: SetProperty<String>
 
@@ -414,7 +412,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
         }
 
         "com.android.library" -> {
-          val multiVariant = isMultiVariantAndroidLibrary.getOrElse(false)
+          val multiVariant = multiVariantAndroidLibrary.getOrElse(false)
           finalTags.add(TAG_ANDROID)
           if (multiVariant) {
             finalTags.add(TAG_VARIANTS)
