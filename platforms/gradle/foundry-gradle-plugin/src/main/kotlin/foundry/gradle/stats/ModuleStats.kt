@@ -339,11 +339,9 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
           if ("model" !in subproject || "model" !in dependency) {
             if (subproject.contains("test-fixtures") xor dependency.contains("test-fixtures")) {
               // This is a big bandaid over the ability for projects to depend own their own test
-              // fixtures, which
-              // breaks the cycle in these scenarios.
+              // fixtures, which breaks the cycle in these scenarios.
               // We allow this specific case, ideally in the future with native testFixtures()
-              // support this
-              // would just go away.
+              // support this would just go away.
             } else {
               throw RuntimeException(
                 "Cycle from $subproject to $dependency. Please modularize this better!",
