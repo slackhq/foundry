@@ -20,8 +20,6 @@ plugins {
 }
 
 dependencies {
-  lintChecks(libs.gradleLints)
-
   implementation(projects.tools.versionNumber)
 
   compileOnly(gradleApi())
@@ -31,4 +29,6 @@ dependencies {
   testImplementation(libs.agp)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
+  lintChecks(libs.gradleLints)
 }
