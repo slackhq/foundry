@@ -193,8 +193,9 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
 
   @Suppress("LongMethod", "ComplexMethod")
   private fun Project.configureClasspath(foundryProperties: FoundryProperties) {
-    val hamcrestDep = foundryProperties.versions.catalog.findLibrary("testing-hamcrest")
-    val checkerDep = foundryProperties.versions.catalog.findLibrary("checkerFrameworkQual")
+    val catalog = getVersionsCatalog()
+    val hamcrestDep = catalog.findLibrary("testing-hamcrest")
+    val checkerDep = catalog.findLibrary("checkerFrameworkQual")
     val isTestProject = "test" in name || "test" in path
     configurations.configureEach {
       configureConfigurationResolutionStrategies(this, isTestProject, hamcrestDep, checkerDep)
