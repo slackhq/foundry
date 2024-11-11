@@ -43,7 +43,7 @@ fun MarkdownPlayground(modifier: Modifier = Modifier) {
   IntUiTheme(isDark) {
     Column(modifier.background(JewelTheme.globalColors.panelBackground)) {
       DefaultButton(
-        modifier = Modifier.padding(16.dp).testTag("dark-mode-toggle"),
+        modifier = Modifier.padding(16.dp).testTag(TestTags.DARK_MODE_TOGGLE),
         onClick = { isDark = !isDark },
       ) {
         Text("Toggle dark mode")
@@ -51,6 +51,10 @@ fun MarkdownPlayground(modifier: Modifier = Modifier) {
       MarkdownContent { MARKDOWN }
     }
   }
+}
+
+object TestTags {
+  const val DARK_MODE_TOGGLE = "dark-mode-toggle"
 }
 
 private const val MARKDOWN =

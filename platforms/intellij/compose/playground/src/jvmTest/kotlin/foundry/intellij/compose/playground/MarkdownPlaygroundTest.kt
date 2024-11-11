@@ -29,7 +29,7 @@ import kotlin.test.Test
 class MarkdownPlaygroundTest {
   @OptIn(ExperimentalTestApi::class, ExperimentalRoborazziApi::class)
   @Test
-  fun test() = runDesktopComposeUiTest {
+  fun snapshot() = runDesktopComposeUiTest {
     setContent { MarkdownPlayground() }
 
     val roborazziOptions =
@@ -41,7 +41,7 @@ class MarkdownPlaygroundTest {
 
     onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
 
-    onNodeWithTag("dark-mode-toggle").performClick()
+    onNodeWithTag(TestTags.DARK_MODE_TOGGLE).performClick()
 
     onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
   }
