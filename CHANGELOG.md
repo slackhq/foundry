@@ -9,6 +9,8 @@ Changelog
 - [gradle] Add `composeRuntimeOnly()` DSL feature.
 - [cli] Check for non-existent paths before traversing in `Path.walkEachFile()`.
 - [gradle] Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
+- [gradle] Source module topography in mod score stats collecting
+- [gradle] Build against Gradle `8.11`.
 
 0.21.0
 ------
