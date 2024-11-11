@@ -260,6 +260,8 @@ private fun jewelMarkdownTypography(
   ordered: TextStyle = text,
   bullet: TextStyle = text,
   list: TextStyle = text,
+  inlineCode: TextStyle = code,
+  link: TextStyle = text,
 ): MarkdownTypography =
   DefaultMarkdownTypography(
     h1 = h1,
@@ -275,4 +277,6 @@ private fun jewelMarkdownTypography(
     ordered = ordered,
     bullet = bullet,
     list = list,
+    inlineCode = inlineCode,
+    link = link,
   )
