@@ -334,8 +334,6 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
         } catch (e: GraphCycleProhibitedException) {
           // Surprisingly, not unexpected. This can happen when project A has a compileOnly
           // dependency on project B and project B has a testImplementation dependency on project A.
-          // This _only_ happens with model and test-model, which we should just modularize out to a
-          // third "model-tests" module
           if ("model" !in subproject || "model" !in dependency) {
             if (subproject.contains("test-fixtures") xor dependency.contains("test-fixtures")) {
               // This is a big bandaid over the ability for projects to depend own their own test
