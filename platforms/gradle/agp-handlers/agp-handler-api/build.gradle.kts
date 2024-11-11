@@ -21,6 +21,7 @@ plugins {
 
 dependencies {
   lintChecks(libs.gradleLints)
+
   implementation(projects.tools.versionNumber)
 
   compileOnly(gradleApi())
