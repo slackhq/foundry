@@ -17,7 +17,6 @@ package foundry.skippy
 
 import com.google.common.truth.Truth.assertThat
 import com.jraska.module.graph.DependencyGraph
-import com.squareup.moshi.Moshi
 import foundry.common.FoundryLogger
 import foundry.common.readLines
 import foundry.common.writeLines
@@ -59,7 +58,6 @@ class SkippyRunnerTest {
         dependencyGraph = dependencyGraph.serializableGraph(),
         changedFilesPath = changedFilesPath,
         originalConfigMap = configs.associateBy { it.tool },
-        moshi = Moshi.Builder().build(),
         debug = true,
         logger = FoundryLogger.system(),
         mergeOutputs = true,

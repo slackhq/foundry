@@ -64,20 +64,21 @@ original_partially_staged_chksum=$(partially_staged_chksum)
 original_partially_staged_filenames=$(echo "$original_partially_staged_chksum" | grep -oE '[^ ]+$')
 
 #### Sort Dependencies section
+# Enable this if you use gradle-dependency-sorter
 # Get a list of staged build.gradle.kts files
-kts_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*" | grep -Ei "build\.gradle\.kts$" )"
-if [[ ! -z ${kts_files_list} ]]; then
-    # We have some build files! Join them to a string delimited on space. We'll pass these to sortDependencies
-    kts_files_list="$(echo ${kts_files_list} | paste -sd " " -)"
-    "${REPO_ROOT_DIR}/config/bin/sort-dependencies" ${kts_files_list} &> /dev/null
-    if [[ $? != 0 ]]; then
-        # Something it couldn't handle came up. Show the command and run verbosely for local debugging.
-        echo -e "${RED}sort-dependencies failed, re-running verbosely. Alternatively, you can run the command locally" >&2
-        echo -e "Running format command: './config/bin/sort-dependencies --verbose ${kts_files_list}'${NC}" >&2
-        "${REPO_ROOT_DIR}/config/bin/sort-dependencies --verbose" ${kts_files_list} >&2
-        exit $?
-    fi
-fi
+#kts_files_list="$(git diff --cached --name-only --diff-filter=ACMR "-G.*" | grep -Ei "build\.gradle\.kts$" )"
+#if [[ ! -z ${kts_files_list} ]]; then
+#    # We have some build files! Join them to a string delimited on space. We'll pass these to sortDependencies
+#    kts_files_list="$(echo ${kts_files_list} | paste -sd " " -)"
+#    "${REPO_ROOT_DIR}/config/bin/sort-dependencies" ${kts_files_list} &> /dev/null
+#    if [[ $? != 0 ]]; then
+#        # Something it couldn't handle came up. Show the command and run verbosely for local debugging.
+#        echo -e "${RED}sort-dependencies failed, re-running verbosely. Alternatively, you can run the command locally" >&2
+#        echo -e "Running format command: './config/bin/sort-dependencies --verbose ${kts_files_list}'${NC}" >&2
+#        "${REPO_ROOT_DIR}/config/bin/sort-dependencies --verbose" ${kts_files_list} >&2
+#        exit $?
+#    fi
+#fi
 
 # TODO eventually support detekt here too once we can wire baseline and config files
 #### ktfmt

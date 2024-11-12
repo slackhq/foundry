@@ -16,18 +16,45 @@
 package foundry.gradle
 
 import java.util.Optional
+import java.util.concurrent.ConcurrentHashMap
 import org.gradle.api.artifacts.ExternalModuleDependencyBundle
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionConstraint
 import org.gradle.api.provider.Provider
 
-/**
- * A set of properties corresponding to *version* aliases in a [catalog]. The keys should be written
- * as they appear in the toml file.
- */
+/** TODO */
 // TODO generate something to map these in the future? Or with reflection?
-internal class FoundryVersions(val catalog: VersionCatalog) {
+internal class FoundryVersions(
+  private val libResolver: (String) -> Optional<String>,
+  bundleResolver: (String) -> Optional<Provider<ExternalModuleDependencyBundle>>,
+  val boms: Set<Provider<MinimalExternalModuleDependency>>,
+) {
+
+  /**
+   * A set of properties corresponding to *version* aliases in a [catalog]. The keys should be
+   * written as they appear in the toml file.
+   */
+  constructor(
+    catalog: VersionCatalog
+  ) : this(
+    { catalog.findVersion(it).map(VersionConstraint::toString) },
+    catalog::findBundle,
+    boms =
+      catalog.libraryAliases
+        .filter {
+          // Library alias is as it appears in usage, not as it appears in the toml
+          // So, "coroutines-bom" in the toml is "coroutines.bom" in usage
+          it.endsWith(".bom")
+        }
+        .mapTo(LinkedHashSet()) { catalog.findLibrary(it).get() },
+  )
+
+  // Have to use Optional because ConcurrentHashMap doesn't allow nulls for absence
+  private val cache = ConcurrentHashMap<String, Optional<String>>()
+
+  val bundles = Bundles(bundleResolver)
+
   val agp: String?
     get() = getOptionalValue("agp").orElse(null)
 
@@ -78,21 +105,23 @@ internal class FoundryVersions(val catalog: VersionCatalog) {
 
   fun lookupVersion(key: String) = getOptionalValue(key)
 
-  val bundles = Bundles()
+  class Bundles(
+    private val bundleResolver: (String) -> Optional<Provider<ExternalModuleDependencyBundle>>
+  ) {
+    private val cache =
+      ConcurrentHashMap<String, Optional<Provider<ExternalModuleDependencyBundle>>>()
 
-  inner class Bundles {
-    val commonAnnotations: Optional<Provider<ExternalModuleDependencyBundle>> by lazy {
-      catalog.findBundle("common-annotations")
-    }
-    val commonLint: Optional<Provider<ExternalModuleDependencyBundle>> by lazy {
-      catalog.findBundle("common-lint")
-    }
-    val commonTest: Optional<Provider<ExternalModuleDependencyBundle>> by lazy {
-      catalog.findBundle("common-test")
-    }
-    val commonCircuit: Optional<Provider<ExternalModuleDependencyBundle>> by lazy {
-      catalog.findBundle("common-circuit")
-    }
+    val commonAnnotations: Optional<Provider<ExternalModuleDependencyBundle>>
+      get() = cache.getOrPut("common-annotations") { bundleResolver("common-annotations") }
+
+    val commonLint: Optional<Provider<ExternalModuleDependencyBundle>>
+      get() = cache.getOrPut("common-lint") { bundleResolver("common-lint") }
+
+    val commonTest: Optional<Provider<ExternalModuleDependencyBundle>>
+      get() = cache.getOrPut("common-test") { bundleResolver("common-test") }
+
+    val commonCircuit: Optional<Provider<ExternalModuleDependencyBundle>>
+      get() = cache.getOrPut("common-circuit") { bundleResolver("common-circuit") }
   }
 
   internal fun getValue(key: String): String {
@@ -101,17 +130,7 @@ internal class FoundryVersions(val catalog: VersionCatalog) {
     }
   }
 
-  private fun getOptionalValue(key: String): Optional<String> {
-    return catalog.findVersion(key).map(VersionConstraint::toString)
-  }
-
-  internal val boms: Set<Provider<MinimalExternalModuleDependency>> by lazy {
-    catalog.libraryAliases
-      .filter {
-        // Library alias is as it appears in usage, not as it appears in the toml
-        // So, "coroutines-bom" in the toml is "coroutines.bom" in usage
-        it.endsWith(".bom")
-      }
-      .mapTo(LinkedHashSet()) { catalog.findLibrary(it).get() }
+  internal fun getOptionalValue(key: String): Optional<String> {
+    return cache.getOrPut(key) { libResolver(key) }
   }
 }
