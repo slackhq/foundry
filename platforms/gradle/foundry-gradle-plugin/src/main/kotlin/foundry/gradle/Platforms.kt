@@ -16,16 +16,13 @@
 package foundry.gradle
 
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.adapter
+import foundry.common.json.JsonTools
 import foundry.gradle.dependencies.DependencyCollection
 import foundry.gradle.dependencies.DependencyDef
 import foundry.gradle.dependencies.flattenedPlatformCoordinates
 import foundry.gradle.dependencies.identifierMap
-import foundry.gradle.util.JsonTools
-import foundry.gradle.util.sneakyNull
+import foundry.gradle.properties.sneakyNull
 import java.io.File
-import okio.buffer
-import okio.source
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
@@ -170,7 +167,7 @@ public object Platforms {
       project.providers.provider {
         val path = foundryProperties.versionsJson ?: return@provider sneakyNull()
         println("Parsing versions json at $path")
-        path.source().buffer().use { JsonTools.MOSHI.adapter<VersionsOutput>().fromJson(it)!! }
+        JsonTools.fromJson<VersionsOutput>(path)
       }
 
     val providers = project.providers

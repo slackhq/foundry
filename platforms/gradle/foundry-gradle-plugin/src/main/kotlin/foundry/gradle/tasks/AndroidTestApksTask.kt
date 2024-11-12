@@ -15,10 +15,10 @@
  */
 package foundry.gradle.tasks
 
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.util.setDisallowChanges
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
@@ -72,7 +72,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
     public const val NAME: String = "aggregateAndroidTestApks"
 
     internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
-      val resolver = Resolver.interProjectResolver(project, SgpArtifact.ANDROID_TEST_APK_DIRS)
+      val resolver = Resolver.interProjectResolver(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
       return project.tasks.register<AndroidTestApksTask>(NAME) {
         androidTestApkDirs.from(resolver.artifactView())
         outputFile.setDisallowChanges(

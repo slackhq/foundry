@@ -49,6 +49,7 @@ kotlin {
         implementation(projects.tools.foundryCommon)
       }
     }
+    jvmTest { dependencies { implementation(libs.junit) } }
   }
 }
 

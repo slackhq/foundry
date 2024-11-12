@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.gradle.agp
+package foundry.common.versioning
 
 import com.google.common.collect.Ordering
 import java.util.Locale
@@ -101,7 +101,7 @@ private constructor(
 
   private abstract class AbstractScheme protected constructor(val depth: Int) : Scheme {
     override fun parse(value: String?): VersionNumber {
-      if (value == null || value.isEmpty()) {
+      if (value.isNullOrEmpty()) {
         return UNKNOWN
       }
       val scanner = Scanner(value)

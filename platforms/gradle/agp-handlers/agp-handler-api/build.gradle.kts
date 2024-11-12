@@ -21,6 +21,7 @@ plugins {
 
 dependencies {
   implementation(libs.guava)
+  implementation(projects.tools.versionNumber)
 
   compileOnly(gradleApi())
   compileOnly(libs.agp)

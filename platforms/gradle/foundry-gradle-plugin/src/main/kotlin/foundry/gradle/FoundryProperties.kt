@@ -17,10 +17,10 @@ package foundry.gradle
 
 import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
-import foundry.gradle.artifacts.SgpArtifact
-import foundry.gradle.util.PropertyResolver
-import foundry.gradle.util.getOrCreateExtra
-import foundry.gradle.util.sneakyNull
+import foundry.gradle.artifacts.FoundryArtifact
+import foundry.gradle.properties.PropertyResolver
+import foundry.gradle.properties.getOrCreateExtra
+import foundry.gradle.properties.sneakyNull
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
@@ -33,17 +33,32 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
  *
  * Order attempted as described by [PropertyResolver.providerFor].
  */
+// TODO allow sourcing from a custom resolver or Properties
 public class FoundryProperties
 internal constructor(
-  private val project: Project,
-  startParameterProperty: (String) -> Provider<String>,
-  globalLocalProperty: (String) -> Provider<String>,
+  private val projectName: String,
+  private val resolver: PropertyResolver,
+  private val fileProvider: (String) -> RegularFile,
+  private val rootDirFileProvider: (String) -> RegularFile,
+  internal val versions: FoundryVersions,
 ) {
-  private val resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty)
+
+  internal constructor(
+    project: Project,
+    startParameterProperty: (String) -> Provider<String>,
+    globalLocalProperty: (String) -> Provider<String>,
+  ) : this(
+    projectName = project.name,
+    resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty),
+    fileProvider = project.layout.projectDirectory::file,
+    rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
+    versions = FoundryVersions(project.getVersionsCatalog()),
+  )
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
-  private fun fileProperty(key: String): File? = optionalStringProperty(key)?.let(project::file)
+  private fun fileProperty(key: String): File? =
+    optionalStringProperty(key)?.let(fileProvider)?.asFile
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -66,8 +81,6 @@ internal constructor(
     resolver.optionalStringValue(key, defaultValue = defaultValue)?.takeUnless {
       blankIsNull && it.isBlank()
     }
-
-  internal val versions: FoundryVersions by lazy { FoundryVersions(project.getVersionsCatalog()) }
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
@@ -180,9 +193,7 @@ internal constructor(
   /** Relative path to a Compose stability configuration file from the _root_ project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
     get() =
-      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map {
-        project.rootProject.layout.projectDirectory.file(it)
-      }
+      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map(rootDirFileProvider)
 
   /**
    * Use a workaround for compose-compiler's `includeInformation` option on android projects.
@@ -350,7 +361,7 @@ internal constructor(
    * etc).
    */
   public val isTestLibrary: Boolean
-    get() = booleanProperty("foundry.isTestLibrary", false) || project.name == "test-fixtures"
+    get() = booleanProperty("foundry.isTestLibrary", false) || projectName == "test-fixtures"
 
   /**
    * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
@@ -386,13 +397,21 @@ internal constructor(
     get() = optionalStringProperty("foundry.android.disabledVariants")
 
   /**
-   * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
+   * The project-specific kotlin.daemon.jvmargs computed by bootstrap.
    *
    * We don't just blanket use `kotlin.daemon.jvmargs` alone because we don't want to pollute other
    * projects.
    */
-  public val kotlinDaemonArgs: String
-    get() = stringProperty(KOTLIN_DAEMON_ARGS_KEY, defaultValue = "")
+  public val kotlinDaemonArgs: List<String>?
+    get() =
+      optionalStringProperty(
+          KOTLIN_DAEMON_ARGS_KEY,
+          defaultValue = optionalStringProperty(KOTLIN_DAEMON_ARGS_KEY_OLD, defaultValue = null),
+        )
+        ?.split(" ")
+        ?.map(String::trim)
+        ?.filterNot(String::isBlank)
+        ?.takeUnless(List<*>::isEmpty)
 
   /**
    * Flag to enable ciUnitTest on this project. Default is true.
@@ -467,24 +486,6 @@ internal constructor(
    */
   public val platformProjectPath: String?
     get() = optionalStringProperty("foundry.location.foundry-platform")
-
-  /**
-   * Opt-in path for commit hooks in the consuming repo that should be automatically installed
-   * automatically. This is passed into [org.gradle.api.Project.file] from the root project.
-   *
-   * Corresponds to git's `core.hooksPath`.
-   */
-  public val gitHooksFile: File?
-    get() = fileProperty("foundry.git.hooksPath")
-
-  /**
-   * Opt-in path for a pre-commit hook in the consuming repo that should be automatically installed
-   * automatically. This is passed into [org.gradle.api.Project.file] from the root project.
-   *
-   * Corresponds to git's `blame.ignoreRevsFile`.
-   */
-  public val gitIgnoreRevsFile: File?
-    get() = fileProperty("foundry.git.ignoreRevsFile")
 
   /**
    * Optional file location for an `affected_projects.txt` file that contains a list of projects
@@ -645,8 +646,8 @@ internal constructor(
     get() = resolver.booleanValue("foundry.logging.thermals", defaultValue = false)
 
   /**
-   * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
-   * as a failsafe while we try different approaches to allow lenient resolution.
+   * Enables eager configuration of [FoundryArtifact] publishing in subprojects. This is behind a
+   * flag as a failsafe while we try different approaches to allow lenient resolution.
    *
    * @see StandardProjectConfigurations.setUpSubprojectArtifactPublishing
    */
@@ -654,7 +655,7 @@ internal constructor(
     get() = resolver.booleanValue("foundry.artifacts.configure-eagerly", defaultValue = false)
 
   /**
-   * Force-disables Anvil regardless of `SlackExtension.dagger()` settings, useful for K2 testing
+   * Force-disables Anvil regardless of `FoundryExtension.dagger()` settings, useful for K2 testing
    * where Anvil is unsupported.
    */
   public val disableAnvilForK2Testing: Boolean
@@ -747,6 +748,10 @@ internal constructor(
   public val kotlinProgressive: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.progressive", defaultValue = true)
 
+  /** Property to enable auto-fixing in topography validation. */
+  public val topographyAutoFix: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.topography.validation.autoFix", defaultValue = false)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
@@ -774,12 +779,13 @@ internal constructor(
 
   public companion object {
     /**
-     * The Slack-specific kotlin.daemon.jvmargs computed by bootstrap.
+     * The project-specific kotlin.daemon.jvmargs computed by bootstrap.
      *
      * We don't just blanket use `kotlin.daemon.jvmargs` alone because we don't want to pollute
      * other projects.
      */
     public const val KOTLIN_DAEMON_ARGS_KEY: String = "foundry.kotlin.daemon.jvmargs"
+    public const val KOTLIN_DAEMON_ARGS_KEY_OLD: String = "slack.kotlin.daemon.jvmargs"
 
     /** Minimum xmx value for the Gradle daemon. Value is an integer and unit is gigabytes. */
     // Key-only because it's used in a task init without a project instance

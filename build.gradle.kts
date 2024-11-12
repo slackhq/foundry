@@ -23,10 +23,10 @@ import dev.bmac.gradle.intellij.PluginUploader
 import dev.bmac.gradle.intellij.UploadPluginTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import java.net.URI
 import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
@@ -154,9 +154,22 @@ allprojects {
   }
 }
 
-tasks.dokkaHtmlMultiModule {
-  outputDirectory.set(rootDir.resolve("docs/api/0.x"))
-  includes.from(project.layout.projectDirectory.file("README.md"))
+dokka {
+  dokkaPublications.html {
+    outputDirectory.set(rootDir.resolve("docs/api/0.x"))
+    includes.from(project.layout.projectDirectory.file("README.md"))
+  }
+}
+
+dependencies {
+  dokka(projects.tools.cli)
+  dokka(projects.tools.foundryCommon)
+  dokka(projects.tools.skippy)
+  dokka(projects.tools.tracing)
+  dokka(projects.tools.versionNumber)
+  dokka(projects.platforms.gradle.betterGradleProperties)
+  dokka(projects.platforms.gradle.foundryGradlePlugin)
+  dokka(projects.platforms.gradle.agpHandlers.agpHandlerApi)
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
@@ -268,43 +281,37 @@ subprojects {
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
     apply(plugin = "org.jetbrains.dokka")
 
-    tasks.withType<DokkaTaskPartial>().configureEach {
-      outputDirectory.set(layout.buildDirectory.dir("docs/partial"))
+    configure<DokkaExtension> {
+      dokkaPublicationDirectory.set(layout.buildDirectory.dir("dokkaDir"))
       dokkaSourceSets.configureEach {
         val readMeProvider = project.layout.projectDirectory.file("README.md")
         if (readMeProvider.asFile.exists()) {
           includes.from(readMeProvider)
         }
+        documentedVisibilities.add(VisibilityModifier.Public)
         skipDeprecated.set(true)
         if (isForGradle) {
           // Gradle docs
-          externalDocumentationLink {
-            url.set(
-              URI("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/index.html").toURL()
-            )
+          externalDocumentationLinks.register("Gradle") {
+            packageListUrl("https://docs.gradle.org/${gradle.gradleVersion}/javadoc/element-list")
+            url("https://docs.gradle.org/${gradle.gradleVersion}/javadoc")
           }
           // AGP docs
-          externalDocumentationLink {
+          externalDocumentationLinks.register("AGP") {
             val agpVersionNumber = VersionNumber.parse(libs.versions.agp.get()).baseVersion
             val simpleApi = "${agpVersionNumber.major}.${agpVersionNumber.minor}"
-            packageListUrl.set(
-              URI(
-                  "https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list"
-                )
-                .toURL()
+            packageListUrl(
+              "https://developer.android.com/reference/tools/gradle-api/$simpleApi/package-list"
             )
-            url.set(
-              URI("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
-                .toURL()
-            )
+            url("https://developer.android.com/reference/tools/gradle-api/$simpleApi/classes")
           }
         }
         sourceLink {
-          localDirectory.set(layout.projectDirectory.dir("src").asFile)
+          localDirectory.set(layout.projectDirectory.dir("src"))
           val relPath = rootProject.projectDir.toPath().relativize(projectDir.toPath())
-          remoteUrl.set(
+          remoteUrl(
             providers.gradleProperty("POM_SCM_URL").map { scmUrl ->
-              URI("$scmUrl/tree/main/$relPath/src").toURL()
+              "$scmUrl/tree/main/$relPath/src"
             }
           )
           remoteLineSuffix.set("#L")
@@ -355,7 +362,7 @@ subprojects {
         configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.1") }
       }
 
-      if (hasProperty("SgpIntellijArtifactoryBaseUrl")) {
+      if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {
         pluginManager.apply(libs.plugins.pluginUploader.get().pluginId)
         val archive = project.tasks.named<BuildPluginTask>("buildPlugin").flatMap { it.archiveFile }
         val blockMapTask =
@@ -366,11 +373,13 @@ subprojects {
             file.set(archive)
             blockmapFile.set(
               project.layout.buildDirectory.file(
-                "blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
+                "blockmap/blockmap${GenerateBlockMapTask.BLOCKMAP_FILE_SUFFIX}"
               )
             )
             blockmapHashFile.set(
-              project.layout.buildDirectory.file("blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}")
+              project.layout.buildDirectory.file(
+                "blockmap/blockmap${GenerateBlockMapTask.HASH_FILE_SUFFIX}"
+              )
             )
           }
 
@@ -380,9 +389,12 @@ subprojects {
           notCompatibleWithConfigurationCache(
             "UploadPluginTask is not compatible with the configuration cache"
           )
+          // TODO why doesn't the flatmap below automatically handle this dependency?
+          dependsOn(blockMapTask)
           blockmapFile.set(blockMapTask.flatMap { it.blockmapFile })
+          blockmapHashFile.set(blockMapTask.flatMap { it.blockmapHashFile })
           url.set(
-            providers.gradleProperty("SgpIntellijArtifactoryBaseUrl").map { baseUrl ->
+            providers.gradleProperty("FoundryIntellijArtifactoryBaseUrl").map { baseUrl ->
               "$baseUrl/${pluginDetails.urlSuffix}"
             }
           )
@@ -398,9 +410,9 @@ subprojects {
           }
           sinceBuild.set(pluginDetails.sinceBuild)
           authentication.set(
-            // Sip the username and token together to create an appropriate encoded auth header
-            providers.gradleProperty("SgpIntellijArtifactoryUsername").zip(
-              providers.gradleProperty("SgpIntellijArtifactoryToken")
+            // Zip the username and token together to create an appropriate encoded auth header
+            providers.gradleProperty("FoundryIntellijArtifactoryUsername").zip(
+              providers.gradleProperty("FoundryIntellijArtifactoryToken")
             ) { username, token ->
               "Basic ${"$username:$token".encode().base64()}"
             }

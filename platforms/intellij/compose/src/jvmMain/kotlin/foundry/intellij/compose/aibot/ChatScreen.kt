@@ -20,8 +20,11 @@ import com.slack.circuit.runtime.CircuitUiState
 import com.slack.circuit.runtime.screen.Screen
 
 object ChatScreen : Screen {
-  data class State(val messages: List<Message>, val eventSink: (Event) -> Unit = {}) :
-    CircuitUiState
+  data class State(
+    val messages: List<Message>,
+    val isLoading: Boolean,
+    val eventSink: (Event) -> Unit = {},
+  ) : CircuitUiState
 
   sealed class Event : CircuitUiEvent {
     data class SendMessage(val message: String) : Event()

@@ -21,6 +21,7 @@ import com.diffplug.spotless.LineEnding
 import foundry.gradle.develocity.NoOpBuildScanAdapter
 import foundry.gradle.develocity.findAdapter
 import foundry.gradle.stats.ModuleStatsTasks
+import foundry.gradle.topography.ModuleTopographyTask
 import java.util.Locale
 import java.util.Optional
 import javax.inject.Inject
@@ -40,7 +41,9 @@ import org.gradle.api.provider.Provider
 internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: BuildFeatures) :
   Plugin<Project> {
   override fun apply(target: Project) {
-    val foundryProperties = FoundryProperties(target)
+    val foundryToolsProvider = target.foundryToolsProvider()
+    val globalFoundryProperties = foundryToolsProvider.get().globalConfig.globalFoundryProperties
+    val foundryProperties = FoundryProperties(target, foundryToolsProvider)
 
     if (foundryProperties.relocateBuildDir && !target.isSyncing) {
       // <root-dir>/../<root-dir-name>-out/<project's relative path>
@@ -54,8 +57,17 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
     if (!target.isRootProject) {
       val versionCatalog =
         target.getVersionsCatalogOrNull() ?: error("SGP requires use of version catalogs!")
-      val foundryTools = target.foundryTools()
-      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryTools).applyTo(target)
+      val foundryExtension =
+        target.extensions.create(
+          "foundry",
+          FoundryExtension::class.java,
+          globalFoundryProperties,
+          foundryProperties,
+          target,
+          versionCatalog,
+        )
+      StandardProjectConfigurations(foundryProperties, versionCatalog, foundryToolsProvider.get())
+        .applyTo(target, foundryExtension, foundryProperties)
 
       // Configure Gradle's test-retry plugin for insights on build scans on CI only
       // Thinking here is that we don't want them to retry when iterating since failure
@@ -82,7 +94,9 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
         }
       }
 
-      ModuleStatsTasks.configureSubproject(target, foundryProperties)
+      val topographyTask =
+        ModuleTopographyTask.register(target, foundryExtension, foundryProperties)
+      ModuleStatsTasks.configureSubproject(target, foundryProperties, topographyTask)
     }
 
     // Everything in here applies to all projects
@@ -179,8 +193,9 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
 
   @Suppress("LongMethod", "ComplexMethod")
   private fun Project.configureClasspath(foundryProperties: FoundryProperties) {
-    val hamcrestDep = foundryProperties.versions.catalog.findLibrary("testing-hamcrest")
-    val checkerDep = foundryProperties.versions.catalog.findLibrary("checkerFrameworkQual")
+    val catalog = getVersionsCatalog()
+    val hamcrestDep = catalog.findLibrary("testing-hamcrest")
+    val checkerDep = catalog.findLibrary("checkerFrameworkQual")
     val isTestProject = "test" in name || "test" in path
     configurations.configureEach {
       configureConfigurationResolutionStrategies(this, isTestProject, hamcrestDep, checkerDep)

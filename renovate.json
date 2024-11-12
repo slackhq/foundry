@@ -26,13 +26,22 @@
       "automerge": true
     },
     {
-      "matchPackageNames": [
+      "matchDepNames": [
+        "org.jetbrains.compose:compose-gradle-plugin",
+        "org.jetbrains.compose"
+      ],
+      "versioning": "Compose semver",
+      "description": "Allow versions like 1.7.1 and 1.7.0-rc1 but not wild compose versions like 1.7.1+build1910-release-1.7.1",
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+(-[a-zA-Z]+(\\.\\d+)?)?$/"
+    },
+    {
+      "matchDepNames": [
         "com.google.guava:guava"
       ],
       "allowedVersions": "!/\\-android$/"
     },
     {
-      "matchPackageNames": ["renovatebot/github-action"],
+      "matchDepNames": ["renovatebot/github-action"],
       "extends": ["schedule:monthly"]
     }
   ]

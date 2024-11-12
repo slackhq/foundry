@@ -148,6 +148,7 @@ rootProject.name = "foundry"
 // Please keep these in alphabetical order!
 include(
   ":platforms:gradle:agp-handlers:agp-handler-api",
+  ":platforms:gradle:better-gradle-properties",
   ":platforms:gradle:foundry-gradle-plugin",
   ":platforms:intellij:artifactory-authenticator",
   ":platforms:intellij:compose",
@@ -157,6 +158,7 @@ include(
   ":tools:foundry-common",
   ":tools:skippy",
   ":tools:tracing",
+  ":tools:version-number",
 )
 
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance

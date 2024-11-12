@@ -17,46 +17,47 @@ package foundry.gradle.artifacts
 
 import org.gradle.api.attributes.Attribute
 
-internal sealed class SgpArtifact(override val declarableName: String, val category: String) :
-  ShareableArtifact<SgpArtifact> {
-  final override val attribute: Attribute<SgpArtifact>
-    get() = SGP_ARTIFACTS_ATTRIBUTE
+internal sealed class FoundryArtifact(override val declarableName: String, val category: String) :
+  ShareableArtifact<FoundryArtifact> {
+  final override val attribute: Attribute<FoundryArtifact>
+    get() = FOUNDRY_ARTIFACTS_ATTRIBUTE
 
   companion object {
     @JvmField
-    val SGP_ARTIFACTS_ATTRIBUTE: Attribute<SgpArtifact> =
-      Attribute.of("sgp.internal.artifacts", SgpArtifact::class.java)
+    val FOUNDRY_ARTIFACTS_ATTRIBUTE: Attribute<FoundryArtifact> =
+      Attribute.of("foundry.internal.artifacts", FoundryArtifact::class.java)
   }
 
-  data object SKIPPY_UNIT_TESTS : SgpArtifact("skippyUnitTests", "skippy") {
+  data object SKIPPY_UNIT_TESTS : FoundryArtifact("skippyUnitTests", "skippy") {
     private fun readResolve(): Any = SKIPPY_UNIT_TESTS
   }
 
-  data object SKIPPY_LINT : SgpArtifact("skippyLint", "skippy") {
+  data object SKIPPY_LINT : FoundryArtifact("skippyLint", "skippy") {
     private fun readResolve(): Any = SKIPPY_LINT
   }
 
-  data object SKIPPY_AVOIDED_TASKS : SgpArtifact("skippyAvoidedTasks", "skippy") {
+  data object SKIPPY_AVOIDED_TASKS : FoundryArtifact("skippyAvoidedTasks", "skippy") {
     private fun readResolve(): Any = SKIPPY_AVOIDED_TASKS
   }
 
-  data object SKIPPY_ANDROID_TEST_PROJECT : SgpArtifact("skippyAndroidTestProject", "skippy") {
+  data object SKIPPY_ANDROID_TEST_PROJECT : FoundryArtifact("skippyAndroidTestProject", "skippy") {
     private fun readResolve(): Any = SKIPPY_ANDROID_TEST_PROJECT
   }
 
-  data object SKIPPY_DETEKT : SgpArtifact("skippyDetekt", "skippy") {
+  data object SKIPPY_DETEKT : FoundryArtifact("skippyDetekt", "skippy") {
     private fun readResolve(): Any = SKIPPY_DETEKT
   }
 
-  data object ANDROID_TEST_APK_DIRS : SgpArtifact("androidTestApkDirs", "androidTest") {
+  data object ANDROID_TEST_APK_DIRS : FoundryArtifact("androidTestApkDirs", "androidTest") {
     private fun readResolve(): Any = ANDROID_TEST_APK_DIRS
   }
 
-  data object DAGP_MISSING_IDENTIFIERS : SgpArtifact("dagpMissingIdentifiers", "dependencyRake") {
+  data object DAGP_MISSING_IDENTIFIERS :
+    FoundryArtifact("dagpMissingIdentifiers", "dependencyRake") {
     private fun readResolve(): Any = DAGP_MISSING_IDENTIFIERS
   }
 
-  data object MOD_STATS_STATS_FILES : SgpArtifact("modStatsFiles", "modscore") {
+  data object MOD_STATS_STATS_FILES : FoundryArtifact("modStatsFiles", "modscore") {
     private fun readResolve(): Any = MOD_STATS_STATS_FILES
   }
 }

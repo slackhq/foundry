@@ -135,24 +135,3 @@ dependencies {
 
   lintChecks(libs.composeLints)
 }
-
-// Can't nest this inside of dependencies {} because otherwise the dependency sorter will remove it
-dependencies.intellijPlatform {
-  // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
-  // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
-  // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
-  plugin("org.jetbrains.android:242.21829.142")
-  bundledPlugins(
-    "com.intellij.java",
-    "org.intellij.plugins.markdown",
-    "org.jetbrains.plugins.terminal",
-    "org.jetbrains.kotlin",
-  )
-
-  pluginVerifier()
-  zipSigner()
-  instrumentationTools()
-
-  testFramework(TestFrameworkType.Platform)
-  testFramework(TestFrameworkType.Bundled)
-}

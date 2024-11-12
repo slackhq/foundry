@@ -15,10 +15,10 @@
  */
 package foundry.gradle.avoidance
 
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.util.setDisallowChanges
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -61,7 +61,7 @@ internal abstract class GenerateAndroidTestProjectPathsTask : DefaultTask() {
 
     fun register(rootProject: Project): TaskProvider<GenerateAndroidTestProjectPathsTask> {
       val androidTestApksResolver =
-        Resolver.interProjectResolver(rootProject, SgpArtifact.SKIPPY_ANDROID_TEST_PROJECT)
+        Resolver.interProjectResolver(rootProject, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
       return rootProject.tasks.register<GenerateAndroidTestProjectPathsTask>(NAME) {
         androidTestProjectInputs.from(androidTestApksResolver.artifactView())
         outputFile.setDisallowChanges(

@@ -18,10 +18,9 @@ package foundry.gradle.avoidance
 import com.jraska.module.graph.DependencyGraph
 import foundry.common.FoundryLogger
 import foundry.gradle.FoundryProperties
+import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.property
-import foundry.gradle.util.JsonTools
 import foundry.gradle.util.gradle
-import foundry.gradle.util.setDisallowChanges
 import foundry.skippy.AffectedProjectsComputer
 import foundry.skippy.SkippyRunner
 import java.io.ObjectInputStream
@@ -134,7 +133,6 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
           outputsDir = outputsDir.get().asFile.toOkioPath(),
           androidTestProjects = androidTestProjects,
           rootDir = rootDirPath,
-          moshi = JsonTools.MOSHI,
           parallelism = parallelism,
           fs = FileSystem.SYSTEM,
           dependencyGraph = dependencyGraph,

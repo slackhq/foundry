@@ -23,11 +23,11 @@ import com.autonomousapps.model.IncludedBuildCoordinates
 import com.autonomousapps.model.ModuleCoordinates
 import com.autonomousapps.model.PluginAdvice
 import com.autonomousapps.model.ProjectCoordinates
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.convertProjectPathToAccessor
+import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.property
-import foundry.gradle.util.mapToBoolean
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -82,6 +82,10 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : AbstractPostPr
   @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:InputFile
   abstract val buildFileProperty: RegularFileProperty
+
+  init {
+    @Suppress("LeakingThis") doNotTrackState("This task modifies build scripts in place.")
+  }
 
   @get:Input
   val modes: SetProperty<AnalysisMode> =
@@ -462,7 +466,7 @@ internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
 
     fun register(rootProject: Project): TaskProvider<MissingIdentifiersAggregatorTask> {
       val resolver =
-        Resolver.interProjectResolver(rootProject, SgpArtifact.DAGP_MISSING_IDENTIFIERS)
+        Resolver.interProjectResolver(rootProject, FoundryArtifact.DAGP_MISSING_IDENTIFIERS)
       return rootProject.tasks.register(NAME, MissingIdentifiersAggregatorTask::class.java) {
         inputFiles.from(resolver.artifactView())
         outputFile.set(

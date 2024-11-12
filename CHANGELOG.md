@@ -4,6 +4,73 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.0
+------
+
+_2024-11-12_
+
+- [gradle] Introduce new `moduleTopography` task. This is a general task that attempts to validate project configurations by looking for features that are enabled but unused. Currently covers a few core features like kapt, ksp, moshi code gen, dagger/anvil, and viewbinding. Outputs are printed and written to a JSON file. Add `--validate-all` to make the tasks fail on validation issues.
+- [gradle] Cache global `FoundryProperties` instance for subproject use.
+- [gradle] Add `composeRuntimeOnly()` DSL feature.
+- [cli] Check for non-existent paths before traversing in `Path.walkEachFile()`.
+- [gradle] Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
+- [gradle] Source module topography in mod score stats collecting
+- [gradle] Build against Gradle `8.11`.
+- [gradle] Do not track state in `RakeDependencies` task.
+- Update to KotlinPoet `2.0.0`.
+- Update to xmlutil `0.90.3`.
+- Update to kaml `0.62.2`.
+- Update to Mordant `3.0.1`.
+- Build against gradle-dependency-sorter `0.12`.
+- Build against KSP `2.0.21-1.0.27`.
+- Build against DAGP `2.4.2`.
+- Build against Compose Multiplatform `1.7.0`.
+
+0.21.0
+------
+
+_2024-10-25_
+
+- **New**: Extract `better-gradle-properties` artifact, which is our hierarchical Gradle properties solution that better handles properties in Gradle. This is what powers `FoundryProperties` but is now extracted to be more portable.
+  - This checks in the following order of priority
+    - project-local `local.properties`
+    - project-local `gradle.properties`
+    - root-project `local.properties`
+    - root-project/global `gradle.properties`
+- **New**: Extract `version-number` artifact. This contains a Kotlin, non-deprecated `VersionNumber` API. This is useful given that Gradle's is both deprecated and not available in standard JVM projects.
+- **New**: Support Robolectric 4.14.
+- **Changed**: Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
+- **Changed**: Rename `SgpArtifact` to `FoundryArtifact`.
+- Misc doc fixes + reorganize docsite around new repo structure.
+- Update xmlutil to `0.90.2`.
+- Build against Spotless `7.0.0.BETA4`.
+- Build against KSP `2.0.21-1.0.26`.
+- Build against DAGP `2.2.0`.
+- Build against nullaway-gradle `2.1.0`.
+- Build against errorprone-gradle `4.1.0`.
+- Build against Compose multiplatform `1.7.0`.
+- Build against Dokka `2.0.0-Beta`.
+
+0.20.2
+------
+
+_2024-10-14_
+
+- **Fix**: Fall back to old property name for kotlin JVM args if the new one isn't found.
+- **Enhancement**: Don't try to apply kotlin JVM args if there are none.
+
+0.20.1
+------
+
+_2024-10-14_
+
+Don't use this release! We goofed on something.
+
+0.20.0
+------
+
+_2024-10-11_
+
 ### Project Restructuring
 
 We've restructured this project! Since its early days as a simple Gradle convention plugin it's expanded into IntelliJ plugins, CLIs, CI tooling, and more. To better capture this, we've renamed the project to *Foundry*, restructured its artifacts into a more cohesive setup, moved kotlin-cli-util into this repo, and will likely split out some more artifacts down the line.
@@ -17,6 +84,7 @@ We've restructured this project! Since its early days as a simple Gradle convent
     - Download `mapping.txt`
     - Download `property_migration.sh`
     - Run `./property_migration.sh mapping.txt <path to target project>`.
+      - Note this only covers `*.kts` and `*.properties` files. This does not cover args passed via CLI or envs.
 
 - Package names have all aligned to `foundry.*`. In most cases it should be simple enough to replace `import com.slack.*` with `import foundry.*`.
 - Gradle coordinates group have moved to the `com.slack.foundry` group name.

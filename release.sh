@@ -2,11 +2,7 @@
 
 set -exo pipefail
 
-# Gets a property out of a .properties file
-# usage: getProperty $key $filename
-function getProperty() {
-    grep "${1}" "$2" | cut -d'=' -f2
-}
+source tools/scripts/scriptUtil.sh
 
 NEW_VERSION=$1
 SNAPSHOT_VERSION=$(getProperty 'VERSION_NAME' gradle.properties)
@@ -19,7 +15,7 @@ git commit -am "Prepare for release $NEW_VERSION."
 git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION"
 
 # Publish
-./gradlew publish -x dokkaHtml --no-configuration-cache
+./gradlew publish --no-configuration-cache -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300
 
 # Prepare next snapshot
 echo "Restoring snapshot version $SNAPSHOT_VERSION"

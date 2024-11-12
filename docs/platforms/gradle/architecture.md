@@ -38,14 +38,14 @@ Its responsibilities include:
 - Running standard subproject configurations via `StandardProjectConfigurations`.
 - Configuring unit tests via `UnitTests`. This also includes configuring the Gradle test retry plugin, if enabled.
 - Configuring NullAway, if enabled.
-- Configuring [Skippy](/tools/skippy).
-- Configuring [Mod Score](/mod-score) tasks.
+- Configuring [Skippy](../../tools/skippy.md).
+- Configuring [Mod Score](mod-score.md) tasks.
 
 ### `StandardProjectConfigurations`
 
 This class warrants special mention as it is responsible for the bulk of the configuration applied to projects SGP manages.
 
-- Creates and exposes the [`foundry` extension DSL](/dsl).
+- Creates and exposes the [`foundry` extension DSL](dsl.md).
 - Applies common configurations.
   - This largely just sets up the dependency sorter plugin.
 - Applies common JVM configurations.
@@ -59,7 +59,7 @@ All JVM projects (Android, Java, Kotlin) receive some common configuration for t
 
 - Applies the repo's platform project, if any.
 - Applies any BOM dependencies to platform-configurable configurations.
-- Configures the dependency analysis gradle plugin and [`DependencyRake`](/dependency-rake).
+- Configures the dependency analysis gradle plugin and [`DependencyRake`](dependency-rake.md).
 - Applies common annotations and common test bundles from version catalogs.
 - Fails on non-androidx support library dependencies.
 - Configure common annotations processors.
@@ -78,7 +78,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 
 ##### Android
 
-- Configures AndroidTest APK aggregation with [Skippy](/tools/skippy) support.
+- Configures AndroidTest APK aggregation with [Skippy](../../tools/skippy.md) support.
 - Applies the [Android cache fix plugin](https://github.com/gradle/android-cache-fix-gradle-plugin), if enabled.
 - Configures common AGP extensions (both legacy extensions and new Component extensions).
   - Disables unused/irrelevant variants. SGP is single-variant for library projects by default.
@@ -96,7 +96,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 - Application projects...
   - have their packaging config set up with some convenience common exclusions and handling common `jniLibs` handling.
   - have v3 and v4 signing enabled by default.
-  - are configured with [`PermissionChecks`](/utilities/#permissionchecks).
+  - are configured with [`PermissionChecks`](utilities.md#permissionchecks).
   - are configured with the Bugsnag gradle plugin, if enabled.
 - Library projects...
   - are configured with an automatic `android.namespace`, if none is manually specified in the buildscript. The namespace is inferred from the project's Gradle path.
