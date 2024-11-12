@@ -603,6 +603,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0220" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.22.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0210" class="md-nav__link">
     <span class="md-ellipsis">
       0.21.0
@@ -1957,6 +1966,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0220" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.22.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0210" class="md-nav__link">
     <span class="md-ellipsis">
       0.21.0
@@ -3227,6 +3245,26 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased"><strong>Unreleased</strong><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0220">0.22.0<a class="headerlink" href="#0220" title="Permanent link">&para;</a></h2>
+<p><em>2024-11-12</em></p>
+<ul>
+<li>[gradle] Introduce new <code>moduleTopography</code> task. This is a general task that attempts to validate project configurations by looking for features that are enabled but unused. Currently covers a few core features like kapt, ksp, moshi code gen, dagger/anvil, and viewbinding. Outputs are printed and written to a JSON file. Add <code>--validate-all</code> to make the tasks fail on validation issues.</li>
+<li>[gradle] Cache global <code>FoundryProperties</code> instance for subproject use.</li>
+<li>[gradle] Add <code>composeRuntimeOnly()</code> DSL feature.</li>
+<li>[cli] Check for non-existent paths before traversing in <code>Path.walkEachFile()</code>.</li>
+<li>[gradle] Don&rsquo;t depend on build sources in mod score if <code>MODULE_SCORE_INCLUDE_GENERATED</code> is false</li>
+<li>[gradle] Source module topography in mod score stats collecting</li>
+<li>[gradle] Build against Gradle <code>8.11</code>.</li>
+<li>[gradle] Do not track state in <code>RakeDependencies</code> task.</li>
+<li>Update to KotlinPoet <code>2.0.0</code>.</li>
+<li>Update to xmlutil <code>0.90.3</code>.</li>
+<li>Update to kaml <code>0.62.2</code>.</li>
+<li>Update to Mordant <code>3.0.1</code>.</li>
+<li>Build against gradle-dependency-sorter <code>0.12</code>.</li>
+<li>Build against KSP <code>2.0.21-1.0.27</code>.</li>
+<li>Build against DAGP <code>2.4.2</code>.</li>
+<li>Build against Compose Multiplatform <code>1.7.0</code>.</li>
+</ul>
 <h2 id="0210">0.21.0<a class="headerlink" href="#0210" title="Permanent link">&para;</a></h2>
 <p><em>2024-10-25</em></p>
 <ul>
