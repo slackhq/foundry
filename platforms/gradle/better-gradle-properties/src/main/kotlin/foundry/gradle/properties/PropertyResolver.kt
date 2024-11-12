@@ -44,24 +44,6 @@ public class PropertyResolver(
   private val globalGradleLocalProperty: (String) -> Provider<String>,
 ) {
 
-  /** @property project The project to resolve properties for. */
-  public constructor(
-    project: Project,
-    startParameterProperty: (String) -> Provider<String> = project.providers.emptyStringProvider(),
-    globalLocalProperty: (String) -> Provider<String> = project.providers.emptyStringProvider(),
-  ) : this(
-    object : SimpleProviderFactory {
-      override fun <T : Any> provider(callable: Callable<T>): Provider<T> {
-        return project.providers.provider(callable)
-      }
-    },
-    project::localProperty,
-    project::localGradleProperty,
-    startParameterProperty,
-    globalLocalProperty,
-    project.providers::gradleProperty,
-  )
-
   public interface SimpleProviderFactory {
     public fun <T : Any> provider(callable: Callable<T>): Provider<T>
   }
@@ -139,6 +121,79 @@ public class PropertyResolver(
 
   public fun optionalStringProvider(key: String, defaultValue: String? = null): Provider<String> {
     return providerFor(key).let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
+  }
+
+  public companion object {
+    /** @property project The project to resolve properties for. */
+    public operator fun invoke(
+      project: Project,
+      startParameterProperty: (String) -> Provider<String> =
+        project.providers.emptyStringProvider(),
+      globalLocalProperty: (String) -> Provider<String> = project.providers.emptyStringProvider(),
+      localPropertyProvider: (String) -> Provider<String> = project::localProperty,
+      localGradlePropertyProvider: (String) -> Provider<String> = project::localGradleProperty,
+      globalGradleLocalProperty: (String) -> Provider<String> = project.providers::gradleProperty,
+    ): PropertyResolver =
+      PropertyResolver(
+        providers =
+          object : SimpleProviderFactory {
+            override fun <T : Any> provider(callable: Callable<T>): Provider<T> {
+              return project.providers.provider(callable)
+            }
+          },
+        startParameterProperty = startParameterProperty,
+        globalLocalProperty = globalLocalProperty,
+        localPropertyProvider = localPropertyProvider,
+        localGradlePropertyProvider = localGradlePropertyProvider,
+        globalGradleLocalProperty = globalGradleLocalProperty,
+      )
+
+    /** @property project The project to resolve properties for. */
+    public operator fun invoke(
+      project: Project,
+      globalResolver: PropertyResolver,
+      localPropertyProvider: (String) -> Provider<String> = project::localProperty,
+      localGradlePropertyProvider: (String) -> Provider<String> = project::localGradleProperty,
+    ): PropertyResolver =
+      PropertyResolver(
+        providers =
+          object : SimpleProviderFactory {
+            override fun <T : Any> provider(callable: Callable<T>): Provider<T> {
+              return project.providers.provider(callable)
+            }
+          },
+        startParameterProperty = globalResolver.startParameterProperty,
+        globalLocalProperty = globalResolver.globalLocalProperty,
+        globalGradleLocalProperty = globalResolver.globalGradleLocalProperty,
+        localPropertyProvider = localPropertyProvider,
+        localGradlePropertyProvider = localGradlePropertyProvider,
+      )
+
+    /** @property project The project to resolve properties for. */
+    public fun createForRootProject(
+      project: Project,
+      startParameterProperty: (String) -> Provider<String> =
+        project.providers.emptyStringProvider(),
+      globalLocalProperty: (String) -> Provider<String> = project.providers.emptyStringProvider(),
+    ): PropertyResolver {
+      check(project.rootProject == project) {
+        "Project '${project.path}' should be the root project"
+      }
+      val gradlePropertyProvider: (String) -> Provider<String> = project.providers::gradleProperty
+      return PropertyResolver(
+        providers =
+          object : SimpleProviderFactory {
+            override fun <T : Any> provider(callable: Callable<T>): Provider<T> {
+              return project.providers.provider(callable)
+            }
+          },
+        startParameterProperty = startParameterProperty,
+        globalLocalProperty = globalLocalProperty,
+        localPropertyProvider = globalLocalProperty,
+        localGradlePropertyProvider = gradlePropertyProvider,
+        globalGradleLocalProperty = gradlePropertyProvider,
+      )
+    }
   }
 }
 

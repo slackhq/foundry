@@ -92,7 +92,7 @@ internal fun robolectricJars(gradleUserHomeDir: File, createDirsIfMissing: Boole
 }
 
 public fun Project.supportedLanguages(supportedLanguages: SupportedLanguagesEnum): List<String> {
-  val foundryProperties = FoundryProperties(project)
+  val foundryProperties = project.foundryProperties
   val gaLanguages = foundryProperties.supportedLanguages.split(",")
 
   val internalLanguages = foundryProperties.supportedLanguagesInternal.split(",")
@@ -141,7 +141,7 @@ public val Project.jenkinsHome: Provider<String>
 
 public val Project.usePrototypeAppId: Boolean
   get() {
-    return FoundryProperties(this).usePrototypeAppId
+    return project.foundryProperties.usePrototypeAppId
   }
 
 public fun String.decapitalizeUS(): String {
@@ -155,7 +155,7 @@ public fun String.capitalizeUS(): String {
 
 /** Returns the variant used for `ciUnitTest` tasks on this (presumably) Android project. */
 internal fun Project.ciUnitTestAndroidVariant(): String {
-  val ciUnitTestVariant = FoundryProperties(this).ciUnitTestVariant
+  val ciUnitTestVariant = project.foundryProperties.ciUnitTestVariant
   return ciUnitTestVariant.capitalizeUS()
 }
 

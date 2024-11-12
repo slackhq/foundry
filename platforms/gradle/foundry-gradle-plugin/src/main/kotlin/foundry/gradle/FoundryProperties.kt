@@ -16,6 +16,7 @@
 package foundry.gradle
 
 import foundry.common.FoundryKeys
+import foundry.gradle.FoundryProperties.Companion.CACHED_PROVIDER_EXT_NAME
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
@@ -42,18 +43,6 @@ internal constructor(
   private val rootDirFileProvider: (String) -> RegularFile,
   internal val versions: FoundryVersions,
 ) {
-
-  internal constructor(
-    project: Project,
-    startParameterProperty: (String) -> Provider<String>,
-    globalLocalProperty: (String) -> Provider<String>,
-  ) : this(
-    projectName = project.name,
-    resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty),
-    fileProvider = project.layout.projectDirectory::file,
-    rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
-    versions = FoundryVersions(project.getVersionsCatalog()),
-  )
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
@@ -795,24 +784,55 @@ internal constructor(
     // Key-only because it's used in a task init without a project instance
     public const val MIN_GRADLE_XMS: String = "foundry.bootstrap.minGradleXms"
 
-    private const val CACHED_PROVIDER_EXT_NAME = "foundry.properties.provider"
+    internal const val CACHED_PROVIDER_EXT_NAME = "foundry.properties.provider"
 
-    public operator fun invoke(
+    public operator fun invoke(project: Project): FoundryProperties = project.foundryProperties
+
+    public fun getOrCreateRoot(
       project: Project,
-      foundryTools: Provider<FoundryTools>? = project.foundryToolsProvider(),
+      startParameterProperty: (String) -> Provider<String>,
+      globalLocalProperty: (String) -> Provider<String>,
+    ): FoundryProperties {
+      check(project.isRootProject) { "getOrCreate can only run in the root project!" }
+      return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
+        val resolver =
+          PropertyResolver.createForRootProject(
+            p,
+            startParameterProperty = startParameterProperty,
+            globalLocalProperty = globalLocalProperty,
+          )
+        val versions = FoundryVersions(p.getVersionsCatalog())
+        create(p, resolver, versions)
+      }
+    }
+
+    public fun getOrCreate(
+      project: Project,
+      foundryTools: Provider<FoundryTools> = project.foundryToolsProvider(),
     ): FoundryProperties {
       return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
-        FoundryProperties(
-          project = p,
-          startParameterProperty = { key ->
-            foundryTools?.flatMap { tools -> tools.globalStartParameterProperty(key) }
-              ?: p.provider { null }
-          },
-          globalLocalProperty = { key ->
-            foundryTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
-          },
-        )
+        val globalProperties = foundryTools.get().globalConfig.globalFoundryProperties
+        val resolver = PropertyResolver(project, globalResolver = globalProperties.resolver)
+        val versions = globalProperties.versions
+        create(p, resolver, versions)
       }
+    }
+
+    private fun create(
+      project: Project,
+      resolver: PropertyResolver,
+      versions: FoundryVersions,
+    ): FoundryProperties {
+      return FoundryProperties(
+        projectName = project.name,
+        resolver = resolver,
+        fileProvider = project.layout.projectDirectory::file,
+        rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
+        versions = versions,
+      )
     }
   }
 }
+
+public val Project.foundryProperties: FoundryProperties
+  get() = FoundryProperties.getOrCreate(project)

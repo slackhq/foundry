@@ -43,7 +43,7 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
   override fun apply(target: Project) {
     val foundryToolsProvider = target.foundryToolsProvider()
     val globalFoundryProperties = foundryToolsProvider.get().globalConfig.globalFoundryProperties
-    val foundryProperties = FoundryProperties(target, foundryToolsProvider)
+    val foundryProperties = FoundryProperties.getOrCreate(target, foundryToolsProvider)
 
     if (foundryProperties.relocateBuildDir && !target.isSyncing) {
       // <root-dir>/../<root-dir-name>-out/<project's relative path>

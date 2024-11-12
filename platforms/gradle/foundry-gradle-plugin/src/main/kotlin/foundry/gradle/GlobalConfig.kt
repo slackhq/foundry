@@ -31,7 +31,8 @@ private constructor(
   internal companion object {
     operator fun invoke(project: Project): GlobalConfig {
       check(project == project.rootProject) { "Project is not root project!" }
-      val globalFoundryProperties = FoundryProperties(project)
+      // Properties should already be installed by this point
+      val globalFoundryProperties = project.foundryProperties
       return GlobalConfig(
         globalFoundryProperties = globalFoundryProperties,
         kotlinDaemonArgs = globalFoundryProperties.kotlinDaemonArgs,

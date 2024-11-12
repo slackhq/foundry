@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- [gradle] Fix FoundryProperties hierarchical init.
+
 0.22.0
 ------
 

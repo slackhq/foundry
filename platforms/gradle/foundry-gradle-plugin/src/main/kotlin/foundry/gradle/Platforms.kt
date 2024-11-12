@@ -156,13 +156,12 @@ public object Platforms {
     }
 
     val logger = project.logger
-    val foundryProperties = FoundryProperties(project)
+    val foundryProperties = project.foundryProperties
     val snapshotsEnabled = foundryProperties.enableSnapshots
 
     // Overrides provider, used when testing newer dependency versions on shadow builds
     // TODO We should just make the shadow build replace the versions in gradle.properties and
-    // remove all this extra
-    //  logic
+    //  remove all this extra logic
     val overridesProvider =
       project.providers.provider {
         val path = foundryProperties.versionsJson ?: return@provider sneakyNull()
