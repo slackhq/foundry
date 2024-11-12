@@ -83,7 +83,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
       localProperties.map { sneakyNull(it[key]) }
     }
     val foundryProperties =
-      FoundryProperties(
+      FoundryProperties.getOrCreateRoot(
         project,
         startParameterProperty = startParameterProperty,
         globalLocalProperty = globalLocalProperty,
@@ -342,6 +342,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
               // natural order. We just use -jre every time so we reject all -android versions.
               return@rejectVersionIf "-android" in candidate.version
             }
+
             candidate.group.startsWith("androidx.test") -> {
               // We do allow non-stable test dependencies because they're
               // - Not shipped in prod, we can immediately mitigate if something is wrong
@@ -349,18 +350,22 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
               //   - Alphas tend to have critical bugfixes introduced by the previous stable 🤦‍
               return@rejectVersionIf false
             }
+
             candidate.moduleIdentifier.toString() == "com.slack.android:analytics" -> {
               // These use git shas as version suffixes, which aren't reliable for semver checks
               return@rejectVersionIf true
             }
+
             candidate.moduleIdentifier.toString() == "com.slack.data:client-thrifty" -> {
               // These use an exotic type of semver
               return@rejectVersionIf true
             }
+
             candidate.group == "com.slack.android.chime" -> {
               // Chime uses unconventional version names, which aren't reliable for semver checks
               return@rejectVersionIf true
             }
+
             !foundryProperties.versionsPluginAllowUnstable -> {
               val currentIsStable = isStable(currentVersion)
               val candidateIsStable = isStable(candidate.version)
@@ -398,6 +403,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
               }
               return@rejectVersionIf !candidateIsStable && currentIsStable
             }
+
             else -> return@rejectVersionIf false
           }
         }

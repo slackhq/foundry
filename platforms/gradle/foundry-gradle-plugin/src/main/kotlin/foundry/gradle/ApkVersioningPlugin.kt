@@ -52,7 +52,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       val versionMinor = project.localGradleProperty("versionMinor")
       val versionPatch = project.localGradleProperty("versionPatch")
 
-      val foundryProperties = FoundryProperties(project)
+      val foundryProperties = FoundryProperties.getOrCreate(project)
 
       val debugVersionNameProvider =
         versionNameProvider(
@@ -76,7 +76,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
         )
 
       val debugVersionCodeProvider: Provider<Int> =
-        project.provider { FoundryProperties(project).debugVersionCode }
+        project.provider { foundryProperties.debugVersionCode }
 
       val ciVersionFileProvider =
         project.rootProject.layout.projectDirectory.file("ci/release.version")
