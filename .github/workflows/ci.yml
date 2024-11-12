@@ -46,7 +46,7 @@ jobs:
       - name: Build and run tests
         id: gradle
         timeout-minutes: 10
-        run: ./gradlew check
+        run: ./gradlew check verifyRoborazzi
 
       - name: Print build scan url
         if: always()
