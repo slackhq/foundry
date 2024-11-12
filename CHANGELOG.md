@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.0
+------
+
+_2024-11-12_
+
 - [gradle] Introduce new `moduleTopography` task. This is a general task that attempts to validate project configurations by looking for features that are enabled but unused. Currently covers a few core features like kapt, ksp, moshi code gen, dagger/anvil, and viewbinding. Outputs are printed and written to a JSON file. Add `--validate-all` to make the tasks fail on validation issues.
 - [gradle] Cache global `FoundryProperties` instance for subproject use.
 - [gradle] Add `composeRuntimeOnly()` DSL feature.
@@ -11,6 +16,15 @@ Changelog
 - [gradle] Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
 - [gradle] Source module topography in mod score stats collecting
 - [gradle] Build against Gradle `8.11`.
+- [gradle] Do not track state in `RakeDependencies` task.
+- Update to KotlinPoet `2.0.0`.
+- Update to xmlutil `0.90.3`.
+- Update to kaml `0.62.2`.
+- Update to Mordant `3.0.1`.
+- Build against gradle-dependency-sorter `0.12`.
+- Build against KSP `2.0.21-1.0.27`.
+- Build against DAGP `2.4.2`.
+- Build against Compose Multiplatform `1.7.0`.
 
 0.21.0
 ------
