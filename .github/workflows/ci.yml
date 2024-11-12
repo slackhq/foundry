@@ -22,6 +22,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: 'true'
+
+      - name: Check LFS files
+        uses: actionsdesk/lfs-warning@v3.2
 
       - name: Export JDK version
         shell: bash
@@ -54,6 +59,7 @@ jobs:
           name: reports
           path: |
             **/build/reports/**
+            **/src/jvmTest/snapshots/**/*_compare.png
 
   publish-snapshot:
     name: 'Publish snapshot (main only)'
