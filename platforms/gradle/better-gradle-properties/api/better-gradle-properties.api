@@ -27,9 +27,8 @@ public abstract interface class foundry/gradle/properties/LocalProperties$Parame
 }
 
 public final class foundry/gradle/properties/PropertyResolver {
+	public static final field Companion Lfoundry/gradle/properties/PropertyResolver$Companion;
 	public fun <init> (Lfoundry/gradle/properties/PropertyResolver$SimpleProviderFactory;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
-	public fun <init> (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
-	public synthetic fun <init> (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun booleanProvider (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
 	public final fun booleanProvider (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
 	public final fun booleanProvider (Ljava/lang/String;Z)Lorg/gradle/api/provider/Provider;
@@ -51,6 +50,15 @@ public final class foundry/gradle/properties/PropertyResolver {
 	public final fun providerFor (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
 	public final fun stringValue (Ljava/lang/String;)Ljava/lang/String;
 	public final fun stringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class foundry/gradle/properties/PropertyResolver$Companion {
+	public final fun createForRootProject (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lfoundry/gradle/properties/PropertyResolver;
+	public static synthetic fun createForRootProject$default (Lfoundry/gradle/properties/PropertyResolver$Companion;Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lfoundry/gradle/properties/PropertyResolver;
+	public final fun invoke (Lorg/gradle/api/Project;Lfoundry/gradle/properties/PropertyResolver;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lfoundry/gradle/properties/PropertyResolver;
+	public final fun invoke (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lfoundry/gradle/properties/PropertyResolver;
+	public static synthetic fun invoke$default (Lfoundry/gradle/properties/PropertyResolver$Companion;Lorg/gradle/api/Project;Lfoundry/gradle/properties/PropertyResolver;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lfoundry/gradle/properties/PropertyResolver;
+	public static synthetic fun invoke$default (Lfoundry/gradle/properties/PropertyResolver$Companion;Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lfoundry/gradle/properties/PropertyResolver;
 }
 
 public abstract interface class foundry/gradle/properties/PropertyResolver$SimpleProviderFactory {
