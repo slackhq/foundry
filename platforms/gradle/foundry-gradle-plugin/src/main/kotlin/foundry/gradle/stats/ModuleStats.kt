@@ -34,6 +34,7 @@ import foundry.gradle.namedLazy
 import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
+import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
 import foundry.gradle.topography.KnownFeatures
 import foundry.gradle.topography.ModuleTopography
 import foundry.gradle.topography.ModuleTopographyTask
@@ -62,9 +63,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.internal.KaptTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
@@ -178,10 +177,7 @@ public object ModuleStatsTasks {
       }
     }
 
-    linkToLocTask {
-      it.mustRunAfter(project.tasks.withType(JavaCompile::class.java))
-      it.mustRunAfter(project.tasks.withType(KotlinCompilationTask::class.java))
-    }
+    locTask?.mustRunAfterSourceGeneratingTasks(project)
 
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.kapt") {

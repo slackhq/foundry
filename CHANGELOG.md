@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.2
+------
+
+_2024-11-13_
+
+- [gradle] Fix dependencies on source-generating tasks in module stats and topography.
+
 0.22.1
 ------
 
