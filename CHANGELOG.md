@@ -4,6 +4,20 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.3
+------
+
+_2024-11-13_
+
+- [gradle] Only make `LocTask` depend on source-generating tasks if `MODULE_SCORE_INCLUDE_GENERATED` is true.
+
+0.22.2
+------
+
+_2024-11-13_
+
+- [gradle] Fix dependencies on source-generating tasks in module stats and topography.
+
 0.22.1
 ------
 

@@ -15,12 +15,9 @@
  */
 package foundry.gradle.topography
 
-import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.github.ajalt.mordant.markdown.Markdown
 import com.github.ajalt.mordant.rendering.AnsiLevel
 import com.github.ajalt.mordant.terminal.Terminal
-import com.google.devtools.ksp.gradle.KspAATask
-import com.google.devtools.ksp.gradle.KspTask
 import foundry.cli.walkEachFile
 import foundry.common.json.JsonTools
 import foundry.gradle.FoundryExtension
@@ -28,6 +25,7 @@ import foundry.gradle.FoundryProperties
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.serviceOf
+import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
 import foundry.gradle.util.toJson
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -57,8 +55,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.options.Option
 import org.gradle.work.DisableCachingByDefault
-import org.jetbrains.kotlin.gradle.internal.KaptTask
-import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
 
 private fun MapProperty<String, Boolean>.put(feature: ModuleFeature, provider: Provider<Boolean>) {
   put(feature.name, provider.orElse(false))
@@ -142,18 +138,10 @@ public abstract class ModuleTopographyTask : DefaultTask() {
           topographyOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("foundry/topography/model/topography.json")
           )
-
-          // Depend on source-gen tasks
-
-          // Kapt
-          dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
-          dependsOn(project.tasks.withType(KaptTask::class.java))
-          // KSP
-          dependsOn(project.tasks.withType(KspTask::class.java))
-          dependsOn(project.tasks.withType(KspAATask::class.java))
-          // ViewBinding
-          dependsOn(project.tasks.withType(DataBindingGenBaseClassesTask::class.java))
         }
+
+      // Depend on source-gen tasks
+      task.mustRunAfterSourceGeneratingTasks(project)
 
       // No easy way to query all plugin IDs, so we use an internal Gradle API
       val pluginRegistry = project.serviceOf<PluginRegistry>()

@@ -4,12 +4,12 @@
     <issue
         id="AvoidUsingNotNullOperator"
         message="Avoid using the `!!` operator"
-        errorLine1="  return filterKeys { it != null }.mapKeys { it.key!! }"
-        errorLine2="                                                   ~~">
+        errorLine1="    return source.use { MOSHI.adapter&lt;T>().fromJson(it)!! }"
+        errorLine2="                                                       ~~">
         <location
-            file="src/main/kotlin/foundry/skippy/AffectedProjectsComputer.kt"
-            line="338"
-            column="52"/>
+            file="src/main/kotlin/foundry/common/json/JsonTools.kt"
+            line="52"
+            column="56"/>
     </issue>
 
 </issues>
