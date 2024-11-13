@@ -168,16 +168,16 @@ public object ModuleStatsTasks {
 
     val generatedSourcesAdded = AtomicBoolean()
     val addGeneratedSources = {
-      val shouldConfigure =
-        locTask != null && generatedSourcesAdded.compareAndSet(false, true) && includeGenerated
-      if (shouldConfigure) {
-        locTask!!.configure {
-          generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
+      locTask?.let { locTask ->
+        val shouldConfigure = generatedSourcesAdded.compareAndSet(false, true) && includeGenerated
+        if (shouldConfigure) {
+          locTask.configure {
+            generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
+          }
+          locTask.mustRunAfterSourceGeneratingTasks(project)
         }
       }
     }
-
-    locTask?.mustRunAfterSourceGeneratingTasks(project)
 
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.kapt") {
