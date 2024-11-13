@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.1)" variant="all" version="8.8.0-alpha01">
+<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.2)" variant="all" version="8.8.0-alpha01">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -10,17 +10,6 @@
             file="src/main/kotlin/foundry/skippy/AffectedProjectsComputer.kt"
             line="338"
             column="52"/>
-    </issue>
-
-    <issue
-        id="AvoidUsingNotNullOperator"
-        message="Avoid using the `!!` operator"
-        errorLine1="      moshi.adapter&lt;List&lt;SkippyConfig>>().fromJson(config.readText())!!.associateBy { it.tool }"
-        errorLine2="                                                                     ~~">
-        <location
-            file="src/main/kotlin/foundry/skippy/ComputeAffectedProjectsCli.kt"
-            line="113"
-            column="70"/>
     </issue>
 
 </issues>
