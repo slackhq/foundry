@@ -25,9 +25,6 @@ jobs:
         with:
           lfs: 'true'
 
-      - name: Check LFS files
-        uses: actionsdesk/lfs-warning@v3.2
-
       - name: Export JDK version
         shell: bash
         run: |
@@ -59,7 +56,40 @@ jobs:
           name: reports
           path: |
             **/build/reports/**
-            **/src/jvmTest/snapshots/**/*_compare.png
+
+  snapshots:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            lfs: 'true'
+
+        - name: Check LFS files
+          uses: actionsdesk/lfs-warning@v3.2
+
+        - name: Install JDK ${{ env.JDK_VERSION }}
+          uses: actions/setup-java@v4
+          with:
+            distribution: 'zulu'
+            java-version: '22'
+
+        - name: Setup Gradle
+          uses: gradle/actions/setup-gradle@v4
+
+        - name: Build and run tests
+          id: gradle
+          timeout-minutes: 10
+          run: ./gradlew check verifyRoborazzi
+
+        - name: (Fail-only) Upload build reports
+          if: failure()
+          uses: actions/upload-artifact@v4
+          with:
+            name: reports
+            path: |
+              **/build/reports/**
+              **/src/jvmTest/snapshots/**/*_compare.png
 
   publish-snapshot:
     name: 'Publish snapshot (main only)'
