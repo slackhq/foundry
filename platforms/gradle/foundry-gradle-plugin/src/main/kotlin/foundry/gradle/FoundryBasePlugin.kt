@@ -21,7 +21,7 @@ import com.diffplug.spotless.LineEnding
 import foundry.gradle.develocity.NoOpBuildScanAdapter
 import foundry.gradle.develocity.findAdapter
 import foundry.gradle.stats.ModuleStatsTasks
-import foundry.gradle.topography.ModuleTopographyTask
+import foundry.gradle.topography.ModuleTopographyTasks
 import java.util.Locale
 import java.util.Optional
 import javax.inject.Inject
@@ -96,7 +96,7 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
       }
 
       val topographyTask =
-        ModuleTopographyTask.register(
+        ModuleTopographyTasks.configureSubproject(
           target,
           foundryExtension,
           foundryProperties,
@@ -105,7 +105,7 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
       ModuleStatsTasks.configureSubproject(target, foundryProperties, topographyTask)
     } else {
       // Root-only
-      ModuleTopographyTask.registerGlobalTask(target)
+      ModuleTopographyTasks.configureRootProject(target)
     }
 
     // Everything in here applies to all projects
