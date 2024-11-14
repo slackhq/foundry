@@ -90,7 +90,7 @@ jobs:
           if: failure()
           uses: actions/upload-artifact@v4
           with:
-            name: reports
+            name: snapshot-reports
             path: |
               **/build/reports/**
               **/src/jvmTest/snapshots/**/*_compare.png
