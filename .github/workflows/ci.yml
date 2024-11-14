@@ -22,11 +22,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          lfs: 'true'
-
-      - name: Check LFS files
-        uses: actionsdesk/lfs-warning@v3.3
 
       - name: Export JDK version
         shell: bash
@@ -59,7 +54,46 @@ jobs:
           name: reports
           path: |
             **/build/reports/**
-            **/src/jvmTest/snapshots/**/*_compare.png
+
+  snapshots:
+    runs-on: macos-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            lfs: 'true'
+
+        - name: Check LFS files
+          uses: actionsdesk/lfs-warning@v3.3
+
+        - name: Export JDK version
+          shell: bash
+          run: |
+            JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
+            echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
+
+        - name: Install JDK ${{ env.JDK_VERSION }}
+          uses: actions/setup-java@v4
+          with:
+            distribution: 'zulu'
+            java-version: '${{ env.JDK_VERSION }}'
+
+        - name: Setup Gradle
+          uses: gradle/actions/setup-gradle@v4
+
+        - name: Build and run tests
+          id: gradle
+          timeout-minutes: 10
+          run: ./gradlew verifyRoborazzi
+
+        - name: (Fail-only) Upload build reports
+          if: failure()
+          uses: actions/upload-artifact@v4
+          with:
+            name: reports
+            path: |
+              **/build/reports/**
+              **/src/jvmTest/snapshots/**/*_compare.png
 
   publish-snapshot:
     name: 'Publish snapshot (main only)'
