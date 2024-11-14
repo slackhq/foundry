@@ -42,7 +42,8 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
   Plugin<Project> {
   override fun apply(target: Project) {
     val foundryToolsProvider = target.foundryToolsProvider()
-    val globalFoundryProperties = foundryToolsProvider.get().globalConfig.globalFoundryProperties
+    val globalConfig = foundryToolsProvider.get().globalConfig
+    val globalFoundryProperties = globalConfig.globalFoundryProperties
     val foundryProperties = FoundryProperties.getOrCreate(target, foundryToolsProvider)
 
     if (foundryProperties.relocateBuildDir && !target.isSyncing) {
@@ -95,8 +96,16 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
       }
 
       val topographyTask =
-        ModuleTopographyTask.register(target, foundryExtension, foundryProperties)
+        ModuleTopographyTask.register(
+          target,
+          foundryExtension,
+          foundryProperties,
+          globalConfig.affectedProjects,
+        )
       ModuleStatsTasks.configureSubproject(target, foundryProperties, topographyTask)
+    } else {
+      // Root-only
+      ModuleTopographyTask.registerGlobalTask(target)
     }
 
     // Everything in here applies to all projects

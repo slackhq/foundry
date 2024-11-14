@@ -22,10 +22,18 @@ import foundry.cli.walkEachFile
 import foundry.common.json.JsonTools
 import foundry.gradle.FoundryExtension
 import foundry.gradle.FoundryProperties
+import foundry.gradle.artifacts.FoundryArtifact
+import foundry.gradle.artifacts.Publisher
+import foundry.gradle.artifacts.Resolver
+import foundry.gradle.avoidance.SkippyArtifacts
+import foundry.gradle.capitalizeUS
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.serviceOf
+import foundry.gradle.tasks.SimpleFileProducerTask
+import foundry.gradle.tasks.SimpleFilesConsumerTask
 import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
+import foundry.gradle.tasks.publish
 import foundry.gradle.util.toJson
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -54,6 +62,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.options.Option
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.work.DisableCachingByDefault
 
 private fun MapProperty<String, Boolean>.put(feature: ModuleFeature, provider: Provider<Boolean>) {
@@ -95,10 +104,22 @@ public abstract class ModuleTopographyTask : DefaultTask() {
   }
 
   internal companion object {
+    fun registerGlobalTask(project: Project) {
+      val resolver =
+        Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_VALIDATE_TOPOGRAPHY)
+      SimpleFilesConsumerTask.registerOrConfigure(
+        project,
+        "globalValidateModuleTopography",
+        description = "Global lifecycle task to run all dependent validateModuleTopography tasks.",
+        inputFiles = resolver.artifactView(),
+      )
+    }
+
     fun register(
       project: Project,
       foundryExtension: FoundryExtension,
       foundryProperties: FoundryProperties,
+      affectedProjects: Set<String>?,
     ): TaskProvider<ModuleTopographyTask> {
       val task =
         project.tasks.register<ModuleTopographyTask>("moduleTopography") {
@@ -156,7 +177,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
         project.pluginManager.withPlugin(id) { task.configure { pluginsProperty.add(id) } }
       }
 
-      registerValidationTask(project, task, foundryProperties)
+      registerValidationTask(project, task, foundryProperties, affectedProjects)
       return task
     }
 
@@ -164,20 +185,48 @@ public abstract class ModuleTopographyTask : DefaultTask() {
       project: Project,
       topographyTask: TaskProvider<ModuleTopographyTask>,
       foundryProperties: FoundryProperties,
+      affectedProjects: Set<String>?,
     ) {
-      project.tasks.register<ValidateModuleTopographyTask>("validateModuleTopography") {
-        topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
-        projectDirProperty.set(project.layout.projectDirectory)
-        autoFix.convention(foundryProperties.topographyAutoFix)
-        featuresToRemoveOutputFile.setDisallowChanges(
-          project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
-        )
-        modifiedBuildFile.setDisallowChanges(
-          project.layout.buildDirectory.file(
-            "foundry/topography/validate/modified-build.gradle.kts"
+      val logTag = "[ValidateModuleTopography]"
+      val name = "validateModuleTopography"
+      val publisher =
+        if (affectedProjects == null || project.path in affectedProjects) {
+          Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_VALIDATE_TOPOGRAPHY)
+        } else {
+          val log = "$logTag Skipping ${project.path}:$name because it is not affected."
+          if (foundryProperties.debug) {
+            project.logger.lifecycle(log)
+          } else {
+            project.logger.debug(log)
+          }
+          SkippyArtifacts.publishSkippedTask(project, name)
+          null
+        }
+
+      val validateModuleTopographyTask =
+        project.tasks.register<ValidateModuleTopographyTask>(name) {
+          topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
+          projectDirProperty.set(project.layout.projectDirectory)
+          autoFix.convention(foundryProperties.topographyAutoFix)
+          featuresToRemoveOutputFile.setDisallowChanges(
+            project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
           )
-        )
-      }
+          modifiedBuildFile.setDisallowChanges(
+            project.layout.buildDirectory.file(
+              "foundry/topography/validate/modified-build.gradle.kts"
+            )
+          )
+        }
+      val ciValidateModuleTopographyTask =
+        SimpleFileProducerTask.registerOrConfigure(
+          project,
+          "ci${name.capitalizeUS()}",
+          description = "Lifecycle task to run $name for ${project.path}.",
+          group = LifecycleBasePlugin.VERIFICATION_GROUP,
+        ) {
+          dependsOn(validateModuleTopographyTask)
+        }
+      publisher?.publish(ciValidateModuleTopographyTask)
     }
   }
 }
