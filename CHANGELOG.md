@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- [gradle] Improve Detekt configuration to better ignore generated source files.
+
 0.22.3
 ------
 

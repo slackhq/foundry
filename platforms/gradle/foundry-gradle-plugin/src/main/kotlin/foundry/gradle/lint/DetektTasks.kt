@@ -111,15 +111,16 @@ internal object DetektTasks {
         }
 
       // Duplicate configs due to https://github.com/detekt/detekt/issues/5940
+      val buildDir = project.layout.buildDirectory.asFile.get().canonicalPath
       project.tasks.configureEach<Detekt> {
         this.jvmTarget = foundryProperties.versions.jvmTarget.get().toString()
-        exclude("**/build/**")
+        exclude { it.file.canonicalPath.startsWith(buildDir) }
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
         this.jvmTarget = foundryProperties.versions.jvmTarget.get().toString()
-        exclude("**/build/**")
+        exclude { it.file.canonicalPath.startsWith(buildDir) }
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
       }
