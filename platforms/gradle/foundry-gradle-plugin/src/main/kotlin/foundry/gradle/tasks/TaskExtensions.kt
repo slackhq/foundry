@@ -15,6 +15,7 @@
  */
 package foundry.gradle.tasks
 
+import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspAATask
@@ -30,27 +31,30 @@ internal fun TaskProvider<*>.mustRunAfterSourceGeneratingTasks(project: Project)
   // Kapt
   project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
     configure {
-      dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
-      dependsOn(project.tasks.withType(KaptTask::class.java))
+      mustRunAfter(project.tasks.withType(KaptGenerateStubs::class.java))
+      mustRunAfter(project.tasks.withType(KaptTask::class.java))
     }
   }
   // KSP
   project.pluginManager.withPlugin("com.google.devtools.ksp") {
     configure {
-      dependsOn(project.tasks.withType(KspTask::class.java))
-      dependsOn(project.tasks.withType(KspAATask::class.java))
+      mustRunAfter(project.tasks.withType(KspTask::class.java))
+      mustRunAfter(project.tasks.withType(KspAATask::class.java))
     }
   }
   // ViewBinding
   project.pluginManager.withPlugin("com.android.base") {
-    configure { dependsOn(project.tasks.withType(DataBindingGenBaseClassesTask::class.java)) }
+    configure { mustRunAfter(project.tasks.withType(DataBindingGenBaseClassesTask::class.java)) }
   }
   // SqlDelight
   project.pluginManager.withPlugin("app.cash.sqldelight") {
-    configure { dependsOn(project.tasks.withType(SqlDelightTask::class.java)) }
+    configure {
+      mustRunAfter(project.tasks.withType(SqlDelightTask::class.java))
+      mustRunAfter(project.tasks.withType(GenerateSchemaTask::class.java))
+    }
   }
   // Wire
   project.pluginManager.withPlugin("com.squareup.wire") {
-    configure { dependsOn(project.tasks.withType(WireTask::class.java)) }
+    configure { mustRunAfter(project.tasks.withType(WireTask::class.java)) }
   }
 }
