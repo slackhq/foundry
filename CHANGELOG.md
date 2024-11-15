@@ -5,6 +5,12 @@ Changelog
 --------------
 
 - [gradle] Improve Detekt configuration to better ignore generated source files.
+- [gradle] Add skippy support to validateModuleTopography. Now there are `globalCiValidateModuleTopography` and `ciValidateModuleTopography` tasks.
+- [gradle] Use `mustRunAfter` for depending on source gen tasks + add back sqldelight's schema task as a source-generating task.
+- [gradle] Improve compose matching text to include `.setContent {`.
+- Update kaml to `0.65.0`.
+- Build against develocity plugin `3.18.2`.
+- Build against Roborazzi plugin `1.32.2`.
 
 0.22.3
 ------
