@@ -75,7 +75,10 @@ public object JsonTools {
     return toJson(file.sink().buffer(), value, prettyPrint)
   }
 
-  public inline fun <reified T : Any> toJsonBuffer(value: T?, prettyPrint: Boolean = false): Buffer {
+  public inline fun <reified T : Any> toJsonBuffer(
+    value: T?,
+    prettyPrint: Boolean = false,
+  ): Buffer {
     val buffer = Buffer()
     toJson(buffer, value, prettyPrint)
     return buffer

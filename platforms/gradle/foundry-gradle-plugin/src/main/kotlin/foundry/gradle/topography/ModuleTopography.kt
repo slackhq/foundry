@@ -43,4 +43,3 @@ public data class ModuleTopography(
     public fun from(path: Path): ModuleTopography = JsonTools.fromJson<ModuleTopography>(path)
   }
 }
-

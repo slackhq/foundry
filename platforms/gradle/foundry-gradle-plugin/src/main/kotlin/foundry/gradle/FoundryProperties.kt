@@ -48,8 +48,8 @@ internal constructor(
   private fun fileProperty(key: String): File? =
     optionalStringProperty(key)?.let(regularFileProvider)?.asFile
 
-  private fun fileProvider(key: String): Provider<RegularFile> = resolver.optionalStringProvider(key)
-    .map(regularFileProvider)
+  private fun fileProvider(key: String): Provider<RegularFile> =
+    resolver.optionalStringProvider(key).map(regularFileProvider)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -743,7 +743,10 @@ internal constructor(
   public val topographyAutoFix: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.topography.validation.autoFix", defaultValue = false)
 
-  /** Property pointing at a features config JSON file for [foundry.gradle.topography.ModuleFeaturesConfig]. */
+  /**
+   * Property pointing at a features config JSON file for
+   * [foundry.gradle.topography.ModuleFeaturesConfig].
+   */
   public val topographyFeaturesConfig: Provider<RegularFile>
     get() = fileProvider("foundry.topography.features.config")
 
