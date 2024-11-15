@@ -16,7 +16,6 @@
 package foundry.gradle
 
 import foundry.common.FoundryKeys
-import foundry.gradle.FoundryProperties.Companion.CACHED_PROVIDER_EXT_NAME
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
