@@ -35,14 +35,13 @@ import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
-import foundry.gradle.topography.KnownFeatures
+import foundry.gradle.topography.DefaultFeatures
 import foundry.gradle.topography.ModuleTopography
 import foundry.gradle.topography.ModuleTopographyTask
 import foundry.gradle.util.toJson
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import okio.source
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -425,7 +424,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
     for (feature in topography.features) {
       when (feature) {
-        KnownFeatures.DaggerCompiler.name -> finalTags.add(TAG_DAGGER_COMPILER)
+        DefaultFeatures.DaggerCompiler.name -> finalTags.add(TAG_DAGGER_COMPILER)
       }
     }
 

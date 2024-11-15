@@ -39,7 +39,7 @@ public class FoundryProperties
 internal constructor(
   private val projectName: String,
   private val resolver: PropertyResolver,
-  private val fileProvider: (String) -> RegularFile,
+  private val regularFileProvider: (String) -> RegularFile,
   private val rootDirFileProvider: (String) -> RegularFile,
   internal val versions: FoundryVersions,
 ) {
@@ -47,7 +47,10 @@ internal constructor(
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
   private fun fileProperty(key: String): File? =
-    optionalStringProperty(key)?.let(fileProvider)?.asFile
+    optionalStringProperty(key)?.let(regularFileProvider)?.asFile
+
+  private fun fileProvider(key: String): Provider<RegularFile> = resolver.optionalStringProvider(key)
+    .map(regularFileProvider)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -741,6 +744,10 @@ internal constructor(
   public val topographyAutoFix: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.topography.validation.autoFix", defaultValue = false)
 
+  /** Property pointing at a features config JSON file for [foundry.gradle.topography.ModuleFeaturesConfig]. */
+  public val topographyFeaturesConfig: Provider<RegularFile>
+    get() = fileProvider("foundry.topography.features.config")
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
@@ -826,7 +833,7 @@ internal constructor(
       return FoundryProperties(
         projectName = project.name,
         resolver = resolver,
-        fileProvider = project.layout.projectDirectory::file,
+        regularFileProvider = project.layout.projectDirectory::file,
         rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
         versions = versions,
       )
