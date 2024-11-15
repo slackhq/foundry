@@ -16,7 +16,6 @@
 package foundry.gradle
 
 import foundry.common.FoundryKeys
-import foundry.gradle.FoundryProperties.Companion.CACHED_PROVIDER_EXT_NAME
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
@@ -39,15 +38,22 @@ public class FoundryProperties
 internal constructor(
   private val projectName: String,
   private val resolver: PropertyResolver,
-  private val fileProvider: (String) -> RegularFile,
+  private val regularFileProvider: (String) -> RegularFile,
   private val rootDirFileProvider: (String) -> RegularFile,
   internal val versions: FoundryVersions,
 ) {
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
-  private fun fileProperty(key: String): File? =
-    optionalStringProperty(key)?.let(fileProvider)?.asFile
+  private fun fileProperty(key: String, useRoot: Boolean = false): File? =
+    optionalStringProperty(key)
+      ?.let(if (useRoot) rootDirFileProvider else regularFileProvider)
+      ?.asFile
+
+  private fun fileProvider(key: String, useRoot: Boolean = false): Provider<RegularFile> =
+    resolver
+      .optionalStringProvider(key)
+      .map(if (useRoot) rootDirFileProvider else regularFileProvider)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -149,7 +155,7 @@ internal constructor(
    * dependencies shadow jobs.
    */
   public val versionsJson: File?
-    get() = fileProperty("foundry.versionsJson")
+    get() = fileProperty("foundry.versionsJson", useRoot = true)
 
   /**
    * An alias name to a libs.versions.toml bundle for common Android Compose dependencies that
@@ -481,7 +487,7 @@ internal constructor(
    * affected in this build.
    */
   public val affectedProjects: File?
-    get() = fileProperty("foundry.avoidance.affectedProjectsFile")
+    get() = fileProperty("foundry.avoidance.affectedProjectsFile", useRoot = true)
 
   /* Controls for Java/JVM/JDK versions uses in compilations and execution of tests. */
 
@@ -741,6 +747,13 @@ internal constructor(
   public val topographyAutoFix: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.topography.validation.autoFix", defaultValue = false)
 
+  /**
+   * Property pointing at a features config JSON file for
+   * [foundry.gradle.topography.ModuleFeaturesConfig].
+   */
+  public val topographyFeaturesConfig: Provider<RegularFile>
+    get() = fileProvider("foundry.topography.features.config", useRoot = true)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
@@ -826,7 +839,7 @@ internal constructor(
       return FoundryProperties(
         projectName = project.name,
         resolver = resolver,
-        fileProvider = project.layout.projectDirectory::file,
+        regularFileProvider = project.layout.projectDirectory::file,
         rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
         versions = versions,
       )

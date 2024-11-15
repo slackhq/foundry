@@ -92,32 +92,32 @@ internal object ModuleTopographyTasks {
         projectName.set(project.name)
         projectPath.set(project.path)
         features.put(
-          KnownFeatures.MoshiCodeGen,
+          DefaultFeatures.MoshiCodeGen,
           foundryExtension.featuresHandler.moshiHandler.moshiCodegen,
         )
         features.put(
-          KnownFeatures.CircuitInject,
+          DefaultFeatures.CircuitInject,
           foundryExtension.featuresHandler.circuitHandler.codegen,
         )
-        features.put(KnownFeatures.Dagger, foundryExtension.featuresHandler.daggerHandler.enabled)
+        features.put(DefaultFeatures.Dagger, foundryExtension.featuresHandler.daggerHandler.enabled)
         features.put(
-          KnownFeatures.DaggerCompiler,
+          DefaultFeatures.DaggerCompiler,
           foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler,
         )
         features.put(
-          KnownFeatures.Compose,
+          DefaultFeatures.Compose,
           foundryExtension.featuresHandler.composeHandler.enableCompiler,
         )
         features.put(
-          KnownFeatures.AndroidTest,
+          DefaultFeatures.AndroidTest,
           foundryExtension.androidHandler.featuresHandler.androidTest,
         )
         features.put(
-          KnownFeatures.Robolectric,
+          DefaultFeatures.Robolectric,
           foundryExtension.androidHandler.featuresHandler.robolectric,
         )
         features.put(
-          KnownFeatures.ViewBinding,
+          DefaultFeatures.ViewBinding,
           project.provider { foundryExtension.androidHandler.featuresHandler.viewBindingEnabled() },
         )
         topographyOutputFile.setDisallowChanges(
@@ -185,6 +185,11 @@ public abstract class ModuleTopographyTask : DefaultTask() {
 public abstract class ValidateModuleTopographyTask : DefaultTask() {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
+  @get:Optional
+  public abstract val featuresConfigFile: RegularFileProperty
+
+  @get:InputFile
+  @get:PathSensitive(PathSensitivity.NONE)
   public abstract val topographyJson: RegularFileProperty
 
   @get:Optional
@@ -208,11 +213,15 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   @TaskAction
   public fun validate() {
     val topography = ModuleTopography.from(topographyJson)
-    val knownFeatures = KnownFeatures.load()
+    val loadedFeatures =
+      featuresConfigFile.asFile
+        .map { ModuleFeaturesConfig.load(it.toPath()) }
+        .getOrElse(ModuleFeaturesConfig.DEFAULT)
+        .loadFeatures()
     val features = buildSet {
-      addAll(topography.features.map { featureKey -> knownFeatures.getValue(featureKey) })
+      addAll(topography.features.map { featureKey -> loadedFeatures.getValue(featureKey) })
       // Include plugin-specific features to the check here
-      addAll(knownFeatures.filterValues { it.matchingPlugin in topography.plugins }.values)
+      addAll(loadedFeatures.filterValues { it.matchingPlugin in topography.plugins }.values)
     }
     val featuresToRemove = mutableSetOf<ModuleFeature>()
 
@@ -358,6 +367,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
       val validateModuleTopographyTask =
         project.tasks.register<ValidateModuleTopographyTask>(NAME) {
           topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
+          featuresConfigFile.convention(foundryProperties.topographyFeaturesConfig)
           projectDirProperty.set(project.layout.projectDirectory)
           autoFix.convention(foundryProperties.topographyAutoFix)
           featuresToRemoveOutputFile.setDisallowChanges(

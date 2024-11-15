@@ -52,6 +52,15 @@ public object JsonTools {
     return source.use { MOSHI.adapter<T>().fromJson(it)!! }
   }
 
+  public inline fun <reified T : Any> fromJsonValue(value: Any): T {
+    return MOSHI.adapter<T>().fromJsonValue(value)!!
+  }
+
+  public fun Buffer.readJsonValueMap(): Map<String, Any> {
+    @Suppress("UNCHECKED_CAST")
+    return JsonReader.of(this).use { it.readJsonValue() } as Map<String, Any>
+  }
+
   public inline fun <reified T : Any> toJson(value: T?, prettyPrint: Boolean = false): String {
     val buffer = Buffer()
     toJson(buffer, value, prettyPrint)
@@ -64,6 +73,15 @@ public object JsonTools {
 
   public inline fun <reified T : Any> toJson(file: File, value: T?, prettyPrint: Boolean = false) {
     return toJson(file.sink().buffer(), value, prettyPrint)
+  }
+
+  public inline fun <reified T : Any> toJsonBuffer(
+    value: T?,
+    prettyPrint: Boolean = false,
+  ): Buffer {
+    val buffer = Buffer()
+    toJson(buffer, value, prettyPrint)
+    return buffer
   }
 
   public inline fun <reified T : Any> toJson(

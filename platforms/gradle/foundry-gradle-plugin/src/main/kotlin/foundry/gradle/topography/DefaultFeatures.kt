@@ -15,68 +15,20 @@
  */
 package foundry.gradle.topography
 
-import com.squareup.moshi.JsonClass
-import foundry.common.json.JsonTools
-import java.nio.file.Path
 import kotlin.reflect.full.declaredMemberProperties
-import org.gradle.api.file.FileSystemLocation
-import org.gradle.api.provider.Provider
 
-@JsonClass(generateAdapter = true)
-public data class ModuleTopography(
-  val name: String,
-  val gradlePath: String,
-  val features: Set<String>,
-  val plugins: Set<String>,
-) {
-  public fun writeJsonTo(property: Provider<out FileSystemLocation>, prettyPrint: Boolean = false) {
-    writeJsonTo(property.get().asFile.toPath(), prettyPrint)
-  }
-
-  public fun writeJsonTo(path: Path, prettyPrint: Boolean = false) {
-    JsonTools.toJson(path, this, prettyPrint)
-  }
-
-  public companion object {
-    public fun from(provider: Provider<out FileSystemLocation>): ModuleTopography =
-      from(provider.get().asFile.toPath())
-
-    public fun from(path: Path): ModuleTopography = JsonTools.fromJson<ModuleTopography>(path)
-  }
-}
-
-@JsonClass(generateAdapter = true)
-public data class ModuleFeature(
-  val name: String,
-  val explanation: String,
-  val advice: String,
-  val removalPatterns: Set<Regex>?,
-  /**
-   * Generated sources root dir relative to the project dir, if any. Files are checked recursively.
-   */
-  val generatedSourcesDir: String? = null,
-  val generatedSourcesExtensions: Set<String> = emptySet(),
-  val matchingText: Set<String> = emptySet(),
-  val matchingTextFileExtensions: Set<String> = emptySet(),
-  /**
-   * If specified, looks for any sources in this dir relative to the project dir. Files are checked
-   * recursively.
-   */
-  val matchingSourcesDir: String? = null,
-  val matchingPlugin: String? = null,
-)
-
-// TODO eventually move these to JSON configs?
-internal object KnownFeatures {
-  fun load(): Map<String, ModuleFeature> {
-    return KnownFeatures::class
+internal object DefaultFeatures {
+  private val cachedValue by lazy {
+    DefaultFeatures::class
       .declaredMemberProperties
       .filter { it.returnType.classifier == ModuleFeature::class }
       .associate {
-        val feature = it.get(KnownFeatures) as ModuleFeature
+        val feature = it.get(DefaultFeatures) as ModuleFeature
         feature.name to feature
       }
   }
+
+  fun load(): Map<String, ModuleFeature> = cachedValue
 
   internal val AndroidTest =
     ModuleFeature(
