@@ -106,7 +106,7 @@ internal object KnownFeatures {
       advice =
         "Remove `foundry.features.compose` from your build file or use `foundry.features.composeRuntimeOnly()`",
       removalPatterns = setOf("\\bcompose\\(\\)".toRegex()),
-      matchingText = setOf("@Composable"),
+      matchingText = setOf("@Composable", "setContent {"),
       matchingTextFileExtensions = setOf("kt"),
     )
 
