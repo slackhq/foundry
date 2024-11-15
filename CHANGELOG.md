@@ -4,10 +4,16 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.4
+------
+
+_2024-11-15_
+
 - [gradle] Improve Detekt configuration to better ignore generated source files.
 - [gradle] Add skippy support to validateModuleTopography. Now there are `globalCiValidateModuleTopography` and `ciValidateModuleTopography` tasks.
 - [gradle] Use `mustRunAfter` for depending on source gen tasks + add back sqldelight's schema task as a source-generating task.
 - [gradle] Improve compose matching text to include `.setContent {`.
+- [gradle] Support custom configurations and overrides of ModuleTopography features via JSON file specified by the `foundry.topography.features.config` property.
 - Update kaml to `0.65.0`.
 - Build against develocity plugin `3.18.2`.
 - Build against Roborazzi plugin `1.32.2`.
