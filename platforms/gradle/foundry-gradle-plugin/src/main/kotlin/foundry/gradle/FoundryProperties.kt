@@ -45,11 +45,15 @@ internal constructor(
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
-  private fun fileProperty(key: String): File? =
-    optionalStringProperty(key)?.let(regularFileProvider)?.asFile
+  private fun fileProperty(key: String, useRoot: Boolean = false): File? =
+    optionalStringProperty(key)
+      ?.let(if (useRoot) rootDirFileProvider else regularFileProvider)
+      ?.asFile
 
-  private fun fileProvider(key: String): Provider<RegularFile> =
-    resolver.optionalStringProvider(key).map(regularFileProvider)
+  private fun fileProvider(key: String, useRoot: Boolean = false): Provider<RegularFile> =
+    resolver
+      .optionalStringProvider(key)
+      .map(if (useRoot) rootDirFileProvider else regularFileProvider)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -151,7 +155,7 @@ internal constructor(
    * dependencies shadow jobs.
    */
   public val versionsJson: File?
-    get() = fileProperty("foundry.versionsJson")
+    get() = fileProperty("foundry.versionsJson", useRoot = true)
 
   /**
    * An alias name to a libs.versions.toml bundle for common Android Compose dependencies that
@@ -483,7 +487,7 @@ internal constructor(
    * affected in this build.
    */
   public val affectedProjects: File?
-    get() = fileProperty("foundry.avoidance.affectedProjectsFile")
+    get() = fileProperty("foundry.avoidance.affectedProjectsFile", useRoot = true)
 
   /* Controls for Java/JVM/JDK versions uses in compilations and execution of tests. */
 
@@ -748,7 +752,7 @@ internal constructor(
    * [foundry.gradle.topography.ModuleFeaturesConfig].
    */
   public val topographyFeaturesConfig: Provider<RegularFile>
-    get() = fileProvider("foundry.topography.features.config")
+    get() = fileProvider("foundry.topography.features.config", useRoot = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
