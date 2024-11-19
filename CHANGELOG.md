@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.5
+------
+
+_2024-11-19_
+
+- [gradle] Make `LocTask.generatedSrcsDir` `@Internal` to avoid depending implicitly on outputs of tasks that sometimes only just make empty dirs with no files.
+
 0.22.4
 ------
 

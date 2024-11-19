@@ -126,7 +126,9 @@ internal object ModuleTopographyTasks {
       }
 
     // Depend on source-gen tasks
-    task.mustRunAfterSourceGeneratingTasks(project)
+    // Don't depend on compiler tasks. Technically doesn't cover javac apt but tbh we don't really
+    // support that
+    task.mustRunAfterSourceGeneratingTasks(project, includeCompilerTasks = false)
 
     // No easy way to query all plugin IDs, so we use an internal Gradle API
     val pluginRegistry = project.serviceOf<PluginRegistry>()

@@ -23,11 +23,21 @@ import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.wire.gradle.WireTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-/** Makes this task depend on commonly known source-generating tasks. */
-internal fun TaskProvider<*>.mustRunAfterSourceGeneratingTasks(project: Project) {
+/**
+ * Makes this task depend on commonly known source-generating tasks.
+ *
+ * @param includeCompilerTasks some compiler tasks like javac and kotlinc can produce new source
+ *   files too, namely during annotation processing.
+ */
+internal fun TaskProvider<*>.mustRunAfterSourceGeneratingTasks(
+  project: Project,
+  includeCompilerTasks: Boolean,
+) {
   // Kapt
   project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
     configure {
@@ -56,5 +66,16 @@ internal fun TaskProvider<*>.mustRunAfterSourceGeneratingTasks(project: Project)
   // Wire
   project.pluginManager.withPlugin("com.squareup.wire") {
     configure { mustRunAfter(project.tasks.withType(WireTask::class.java)) }
+  }
+
+  if (includeCompilerTasks) {
+    project.pluginManager.withPlugin("org.jetbrains.kotlin.base") {
+      configure { mustRunAfter(project.tasks.withType(KotlinCompile::class.java)) }
+      // KGP may create JavaCompile tasks
+      configure { mustRunAfter(project.tasks.withType(JavaCompile::class.java)) }
+    }
+    project.pluginManager.withPlugin("java") {
+      configure { mustRunAfter(project.tasks.withType(JavaCompile::class.java)) }
+    }
   }
 }

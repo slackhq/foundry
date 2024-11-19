@@ -173,7 +173,9 @@ public object ModuleStatsTasks {
           locTask.configure {
             generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
           }
-          locTask.mustRunAfterSourceGeneratingTasks(project)
+          // Don't depend on compiler tasks. Technically doesn't cover javac apt but tbh we don't
+          // really support that
+          locTask.mustRunAfterSourceGeneratingTasks(project, includeCompilerTasks = false)
         }
       }
     }
