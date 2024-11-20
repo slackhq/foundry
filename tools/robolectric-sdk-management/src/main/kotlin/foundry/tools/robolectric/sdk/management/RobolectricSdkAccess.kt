@@ -31,7 +31,14 @@ public object RobolectricSdkAccess {
     return apis.map { sdkInt ->
       val sdk = sdks[sdkInt] ?: error("No robolectric jar coordinates found for $sdkInt.")
       // The full dep
-      "org.robolectric:android-all-instrumented:${sdk.androidVersion}-robolectric-${ROBO_VERSION_FIELD.get(sdk) as Int}-i$${IVERSION_FIELD.get(null)}"
+      buildString {
+        append("org.robolectric:android-all-instrumented:")
+        append(sdk.androidVersion)
+        append("-robolectric-")
+        append(ROBO_VERSION_FIELD.get(sdk) as Int)
+        append("-i")
+        I_VERSION
+      }
     }
   }
 
@@ -42,10 +49,12 @@ public object RobolectricSdkAccess {
       }
     }
 
-  private val IVERSION_FIELD =
-    DefaultSdkProvider::class.java.getDeclaredField("PREINSTRUMENTED_VERSION").apply {
-      isAccessible = true
-    }
+  private val I_VERSION =
+    DefaultSdkProvider::class
+      .java
+      .getDeclaredField("PREINSTRUMENTED_VERSION")
+      .apply { isAccessible = true }
+      .get(null) as Int
 
   private val ROBO_VERSION_FIELD =
     DefaultSdkProvider.DefaultSdk::class.java.getField("robolectricVersion").apply {
