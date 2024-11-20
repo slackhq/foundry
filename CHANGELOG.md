@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.22.6
+------
+
+_2024-11-20_
+
+- [gradle] Make Robolectric jar downloads more dynamic for future-proofing. Will continue to work on improving this, but for now it should be possible to force a newer `org.robolectric:robolectric` version on your buildscript classpath to force a newer version and have it update JAR coordinates automatically.
+
 0.22.5
 ------
 
