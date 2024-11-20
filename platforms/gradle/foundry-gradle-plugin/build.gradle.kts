@@ -95,6 +95,7 @@ dependencies {
   implementation(projects.platforms.gradle.betterGradleProperties)
   implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
+  implementation(projects.tools.robolectricSdkManagement)
   implementation(projects.tools.skippy)
 
   compileOnly(platform(libs.kotlin.bom))
