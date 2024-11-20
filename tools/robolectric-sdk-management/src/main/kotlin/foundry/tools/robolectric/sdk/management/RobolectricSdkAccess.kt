@@ -37,7 +37,7 @@ public object RobolectricSdkAccess {
         append("-robolectric-")
         append(ROBO_VERSION_FIELD.get(sdk) as Int)
         append("-i")
-        I_VERSION
+        append(I_VERSION)
       }
     }
   }
