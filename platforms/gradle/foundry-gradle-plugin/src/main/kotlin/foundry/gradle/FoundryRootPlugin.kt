@@ -182,8 +182,8 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
       androidTestProjectPathsProvider = generateAndroidTestProjectsTask.flatMap { it.outputFile },
     )
     // Register robolectric jar downloads if requested
-    foundryProperties.versions.robolectric?.let {
-      UpdateRobolectricJarsTask.register(project, foundryProperties)
+    foundryProperties.versions.robolectric?.let { robolectricVersion ->
+      UpdateRobolectricJarsTask.register(project, robolectricVersion, foundryProperties)
     }
 
     val scanApi = findAdapter(project)

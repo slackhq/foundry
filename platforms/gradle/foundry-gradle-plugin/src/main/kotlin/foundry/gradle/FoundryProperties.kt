@@ -239,10 +239,6 @@ internal constructor(
         .map { it.toInt() }
         .toList()
 
-  /** Property corresponding to the preinstrumented jars version (the `-i2` suffix in jars). */
-  public val robolectricIVersion: Int
-    get() = intProperty("foundry.android.robolectric.iVersion")
-
   /** Opt out for -Werror. */
   public val allowWarnings: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.allowWarnings", defaultValue = false)
