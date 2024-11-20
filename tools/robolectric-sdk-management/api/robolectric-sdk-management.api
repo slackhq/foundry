@@ -1,0 +1,5 @@
+public final class foundry/tools/robolectric/sdk/management/RobolectricSdkAccess {
+	public static final field INSTANCE Lfoundry/tools/robolectric/sdk/management/RobolectricSdkAccess;
+	public final fun loadSdks (Ljava/util/Collection;)Ljava/util/List;
+}
+

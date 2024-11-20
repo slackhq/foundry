@@ -156,6 +156,7 @@ include(
   ":platforms:intellij:skate",
   ":tools:cli",
   ":tools:foundry-common",
+  ":tools:robolectric-sdk-management",
   ":tools:skippy",
   ":tools:tracing",
   ":tools:version-number",

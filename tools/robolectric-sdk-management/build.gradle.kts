@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.gradle.tasks.robolectric
-
-import java.io.Serializable
-
-// Serializable for Gradle use
-internal data class DependencyJar(
-  val groupId: String,
-  val artifactId: String,
-  val version: String,
-  val classifier: String? = null,
-) : Serializable {
-  val name: String = "$artifactId-$version.jar"
+plugins {
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.dokka)
+  alias(libs.plugins.detekt)
+  alias(libs.plugins.lint)
+  alias(libs.plugins.mavenPublish)
 }
+
+dependencies { implementation(libs.robolectric) }
