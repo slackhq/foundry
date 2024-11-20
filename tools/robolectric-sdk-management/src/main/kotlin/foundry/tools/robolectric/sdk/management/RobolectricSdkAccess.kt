@@ -35,7 +35,7 @@ public object RobolectricSdkAccess {
         append("org.robolectric:android-all-instrumented:")
         append(sdk.androidVersion)
         append("-robolectric-")
-        append(ROBO_VERSION_FIELD.get(sdk) as Int)
+        append(ROBO_VERSION_FIELD.get(sdk) as String)
         append("-i")
         append(I_VERSION)
       }
@@ -57,7 +57,7 @@ public object RobolectricSdkAccess {
       .get(null) as Int
 
   private val ROBO_VERSION_FIELD =
-    DefaultSdkProvider.DefaultSdk::class.java.getField("robolectricVersion").apply {
+    DefaultSdkProvider.DefaultSdk::class.java.getDeclaredField("robolectricVersion").apply {
       isAccessible = true
     }
 }
