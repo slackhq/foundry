@@ -15,6 +15,7 @@
  */
 package foundry.gradle.topography
 
+import foundry.common.json.regexpMapOf
 import kotlin.reflect.full.declaredMemberProperties
 
 internal object DefaultFeatures {
@@ -36,7 +37,7 @@ internal object DefaultFeatures {
       explanation =
         "The `androidTest()` feature was requested but no sources were found at `src/androidTest/**`",
       advice = "Remove `foundry.android.features.androidTest` from your build file",
-      replacementPatterns = mapOf("\\bandroidTest\\(\\)".toRegex() to ""),
+      replacementPatterns = regexpMapOf("\\bandroidTest\\(\\)".toRegex() to ""),
       matchingSourcesDir = "src/androidTest",
     )
 
@@ -46,7 +47,7 @@ internal object DefaultFeatures {
       explanation =
         "The `robolectric()` feature was requested but no sources were found at `src/test/**`",
       advice = "Remove `foundry.android.features.robolectric` from your build file",
-      replacementPatterns = mapOf("\\brobolectric\\(\\)".toRegex() to ""),
+      replacementPatterns = regexpMapOf("\\brobolectric\\(\\)".toRegex() to ""),
       matchingSourcesDir = "src/test",
     )
 
@@ -57,7 +58,7 @@ internal object DefaultFeatures {
         "The `compose()` feature (and thus compose-compiler) was requested but no `@Composable` annotations were found in sources",
       advice =
         "Remove `foundry.features.compose` from your build file or use `foundry.features.composeRuntimeOnly()`",
-      replacementPatterns = mapOf("\\bcompose\\(\\)".toRegex() to ""),
+      replacementPatterns = regexpMapOf("\\bcompose\\(\\)".toRegex() to ""),
       matchingText = setOf("@Composable", "setContent {"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -68,7 +69,7 @@ internal object DefaultFeatures {
       explanation =
         "The `mergeComponents()` feature (and thus dagger-compiler/KAPT) was requested but no corresponding Merge*/*Component annotations were found in sources",
       advice = "Remove `foundry.features.dagger.mergeComponents` from your build file",
-      replacementPatterns = mapOf("\\bmergeComponents\\(\\)".toRegex() to ""),
+      replacementPatterns = regexpMapOf("\\bmergeComponents\\(\\)".toRegex() to ""),
       matchingText =
         setOf(
           "@Component",
@@ -90,7 +91,7 @@ internal object DefaultFeatures {
       explanation =
         "The `dagger()` feature (and thus Anvil/KSP) was requested but no Dagger/Anvil annotations were found in sources",
       advice = "Remove `foundry.features.dagger` from your build file",
-      replacementPatterns = mapOf("\\bdagger\\(\\)".toRegex() to ""),
+      replacementPatterns = regexpMapOf("\\bdagger\\(\\)".toRegex() to ""),
       matchingText =
         buildSet {
           addAll(DaggerCompiler.matchingText)
@@ -122,7 +123,8 @@ internal object DefaultFeatures {
       explanation =
         "The `moshi(codegen = true)` feature (and thus the moshi-ir compiler plugin) was requested but no `@JsonClass` annotations were found in sources",
       advice = "Remove `foundry.features.moshi.codegen` from your build file",
-      replacementPatterns = mapOf("\\bmoshi\\(codegen = true".toRegex() to "moshi(codegen = false"),
+      replacementPatterns =
+        regexpMapOf("\\bmoshi\\(codegen = true".toRegex() to "moshi(codegen = false"),
       matchingText = setOf("@JsonClass"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -134,7 +136,7 @@ internal object DefaultFeatures {
         "The `circuit(codegen = true)` feature (and thus the KSP) was requested but no `@CircuitInject` annotations were found in sources",
       advice =
         "Remove `foundry.features.circuit.codegen` from your build file or set codegen to false (i.e. `circuit(codegen = false)`)",
-      replacementPatterns = mapOf("\\bcircuit\\(\\)".toRegex() to "circuit(codegen = false)"),
+      replacementPatterns = regexpMapOf("\\bcircuit\\(\\)".toRegex() to "circuit(codegen = false)"),
       matchingText = setOf("@CircuitInject"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -146,7 +148,7 @@ internal object DefaultFeatures {
         "The parcelize plugin (and thus its compiler plugin) was requested but no `@Parcelize` annotations were found in sources",
       advice = "Remove the parcelize plugin from your build file",
       replacementPatterns =
-        mapOf("\\balias\\(libs\\.plugins\\.kotlin\\.plugin\\.parcelize\\)".toRegex() to ""),
+        regexpMapOf("\\balias\\(libs\\.plugins\\.kotlin\\.plugin\\.parcelize\\)".toRegex() to ""),
       matchingText = setOf("@Parcelize"),
       matchingTextFileExtensions = setOf("kt"),
       matchingPlugin = "org.jetbrains.kotlin.plugin.parcelize",
@@ -159,7 +161,7 @@ internal object DefaultFeatures {
         "The KSP plugin was requested but no generated files were found in `build/generated/ksp`",
       advice = "Remove the KSP plugin (or whatever Foundry feature is requesting it)",
       replacementPatterns =
-        mapOf(
+        regexpMapOf(
           "\\balias\\(libs\\.plugins\\.ksp\\)".toRegex() to "",
           "\\bksp\\([a-zA-Z.-]*\\)".toRegex() to "",
         ),
@@ -175,7 +177,7 @@ internal object DefaultFeatures {
         "The KAPT plugin was requested but no generated files were found in `build/generated/source/kapt`",
       advice = "Remove the KAPT plugin (or whatever Foundry feature is requesting it)",
       replacementPatterns =
-        mapOf(
+        regexpMapOf(
           "\\balias\\(libs\\.plugins\\.kotlin\\.kapt\\)".toRegex() to "",
           "\\bkapt\\([a-zA-Z.-]*\\)".toRegex() to "",
         ),
@@ -190,7 +192,7 @@ internal object DefaultFeatures {
       explanation =
         "Android ViewBinding was enabled but no generated viewbinding sources were found in `build/generated/data_binding_base_class_source_out`",
       advice = "Remove android.buildFeatures.viewBinding from your build file",
-      replacementPatterns = mapOf("\\bviewBinding = true".toRegex() to ""),
+      replacementPatterns = regexpMapOf("\\bviewBinding = true".toRegex() to ""),
       generatedSourcesDir = "build/generated/data_binding_base_class_source_out",
       generatedSourcesExtensions = setOf("java"),
     )

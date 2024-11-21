@@ -23,12 +23,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.addAdapter
 import com.squareup.moshi.rawType
-import okio.Buffer
-import okio.BufferedSink
-import okio.BufferedSource
-import okio.buffer
-import okio.sink
-import okio.source
 import java.io.File
 import java.lang.reflect.Type
 import java.nio.file.Path
@@ -36,6 +30,12 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.TreeMap
+import okio.Buffer
+import okio.BufferedSink
+import okio.BufferedSource
+import okio.buffer
+import okio.sink
+import okio.source
 
 public object JsonTools {
   public val MOSHI: Moshi =
@@ -149,6 +149,9 @@ private class RegexJsonAdapter : JsonAdapter<Regex>() {
 /** A [MutableMap] that can have [Regex] keys. */
 public class RegexMap() :
   MutableMap<Regex, String> by TreeMap<Regex, String>(compareBy { it.pattern })
+
+public fun regexpMapOf(vararg entries: Pair<Regex, String>): RegexMap =
+  RegexMap().apply { putAll(entries.toMap()) }
 
 private class RegexMapJsonAdapter(private val stringAdapter: JsonAdapter<String>) :
   JsonAdapter<RegexMap>() {
