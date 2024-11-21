@@ -16,28 +16,33 @@
 package foundry.common.json
 
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.addAdapter
-import java.io.File
-import java.nio.file.Path
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
+import com.squareup.moshi.rawType
 import okio.Buffer
 import okio.BufferedSink
 import okio.BufferedSource
 import okio.buffer
 import okio.sink
 import okio.source
+import java.io.File
+import java.lang.reflect.Type
+import java.nio.file.Path
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.TreeMap
 
 public object JsonTools {
   public val MOSHI: Moshi =
     Moshi.Builder()
       .addAdapter<Regex>(RegexJsonAdapter())
       .addAdapter<LocalDateTime>(LocalDateTimeJsonAdapter())
+      .add(RegexMapJsonAdapter.Factory())
       .build()
 
   public inline fun <reified T : Any> fromJson(path: Path): T {
@@ -138,5 +143,46 @@ private class RegexJsonAdapter : JsonAdapter<Regex>() {
       return
     }
     writer.value(value.pattern)
+  }
+}
+
+/** A [MutableMap] that can have [Regex] keys. */
+public class RegexMap() :
+  MutableMap<Regex, String> by TreeMap<Regex, String>(compareBy { it.pattern })
+
+private class RegexMapJsonAdapter(private val stringAdapter: JsonAdapter<String>) :
+  JsonAdapter<RegexMap>() {
+
+  class Factory : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? {
+      if (type.rawType != RegexMap::class.java) return null
+      val stringAdapter = moshi.adapter<String>()
+      return RegexMapJsonAdapter(stringAdapter).nullSafe()
+    }
+  }
+
+  override fun fromJson(reader: JsonReader): RegexMap? {
+    reader.beginObject()
+    val map = RegexMap()
+    while (reader.hasNext()) {
+      reader.promoteNameToValue()
+      val key = stringAdapter.fromJson(reader) ?: error("Null key at ${reader.path}")
+      val value = stringAdapter.fromJson(reader) ?: error("Null value at ${reader.path}")
+      val replaced = map.put(key.toRegex(), value)
+      if (replaced != null) {
+        throw JsonDataException("Duplicate element '$key' with value '$replaced' at ${reader.path}")
+      }
+    }
+    reader.endObject()
+    return map
+  }
+
+  override fun toJson(writer: JsonWriter, value: RegexMap?) {
+    writer.beginObject()
+    for ((key, value) in value!!) {
+      writer.name(key.pattern)
+      writer.value(value)
+    }
+    writer.endObject()
   }
 }
