@@ -122,7 +122,7 @@ internal object DefaultFeatures {
       explanation =
         "The `moshi(codegen = true)` feature (and thus the moshi-ir compiler plugin) was requested but no `@JsonClass` annotations were found in sources",
       advice = "Remove `foundry.features.moshi.codegen` from your build file",
-      replacementPatterns = mapOf("\\bcircuit\\(\\)".toRegex() to "circuit(codegen = false)"),
+      replacementPatterns = mapOf("\\bmoshi\\(codegen = true".toRegex() to "moshi(codegen = false"),
       matchingText = setOf("@JsonClass"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -134,7 +134,7 @@ internal object DefaultFeatures {
         "The `circuit(codegen = true)` feature (and thus the KSP) was requested but no `@CircuitInject` annotations were found in sources",
       advice =
         "Remove `foundry.features.circuit.codegen` from your build file or set codegen to false (i.e. `circuit(codegen = false)`)",
-      replacementPatterns = mapOf("\\bmoshi\\(codegen = true".toRegex() to "moshi(codegen = false"),
+      replacementPatterns = mapOf("\\bcircuit\\(\\)".toRegex() to "circuit(codegen = false)"),
       matchingText = setOf("@CircuitInject"),
       matchingTextFileExtensions = setOf("kt"),
     )
