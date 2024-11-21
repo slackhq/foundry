@@ -16,20 +16,20 @@
 package foundry.common.json
 
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.addAdapter
 import com.squareup.moshi.rawType
+import foundry.common.RegexMap
+import foundry.common.buildRegexMap
 import java.io.File
 import java.lang.reflect.Type
 import java.nio.file.Path
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.TreeMap
 import okio.Buffer
 import okio.BufferedSink
 import okio.BufferedSource
@@ -146,13 +146,6 @@ private class RegexJsonAdapter : JsonAdapter<Regex>() {
   }
 }
 
-/** A [MutableMap] that can have [Regex] keys. */
-public class RegexMap() :
-  MutableMap<Regex, String> by TreeMap<Regex, String>(compareBy { it.pattern })
-
-public fun regexpMapOf(vararg entries: Pair<Regex, String>): RegexMap =
-  RegexMap().apply { putAll(entries.toMap()) }
-
 private class RegexMapJsonAdapter(private val stringAdapter: JsonAdapter<String>) :
   JsonAdapter<RegexMap>() {
 
@@ -166,14 +159,13 @@ private class RegexMapJsonAdapter(private val stringAdapter: JsonAdapter<String>
 
   override fun fromJson(reader: JsonReader): RegexMap? {
     reader.beginObject()
-    val map = RegexMap()
-    while (reader.hasNext()) {
-      reader.promoteNameToValue()
-      val key = stringAdapter.fromJson(reader) ?: error("Null key at ${reader.path}")
-      val value = stringAdapter.fromJson(reader) ?: error("Null value at ${reader.path}")
-      val replaced = map.put(key.toRegex(), value)
-      if (replaced != null) {
-        throw JsonDataException("Duplicate element '$key' with value '$replaced' at ${reader.path}")
+    val map = buildRegexMap {
+      while (reader.hasNext()) {
+        reader.promoteNameToValue()
+        val key = stringAdapter.fromJson(reader) ?: error("Null key at ${reader.path}")
+        val value = stringAdapter.fromJson(reader) ?: error("Null value at ${reader.path}")
+        // We don't check for duplicate keys in this implementation
+        replace(key, value)
       }
     }
     reader.endObject()
