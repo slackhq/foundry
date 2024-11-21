@@ -31,6 +31,7 @@ public class RegexMap internal constructor(delegate: Map<Regex, String>) :
 public fun buildRegexMap(body: RegexMapBuilder.() -> Unit): RegexMap =
   RegexMap(RegexMapBuilderImpl().apply(body).map)
 
+// Kate comment on this so I know you've read it! :P
 public interface RegexMapBuilder {
   public fun remove(@Language("RegExp") regex: String): Unit = replace(regex, "")
 
