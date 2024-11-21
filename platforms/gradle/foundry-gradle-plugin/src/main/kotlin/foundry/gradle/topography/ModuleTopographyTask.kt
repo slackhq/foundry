@@ -256,11 +256,14 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
       val isRemoving = featuresToRemove.size != initialRemoveSize
       if (isRemoving) {
-        feature.replacementPatterns.takeUnless { it.isEmpty() }?.let { replacementPatterns ->
-          for ((replacementPattern, replacement) in replacementPatterns) {
-            buildFileText = buildFileText.replace(replacementPattern, replacement).removeEmptyBraces()
+        feature.replacementPatterns
+          .takeUnless { it.isEmpty() }
+          ?.let { replacementPatterns ->
+            for ((replacementPattern, replacement) in replacementPatterns) {
+              buildFileText =
+                buildFileText.replace(replacementPattern, replacement).removeEmptyBraces()
+            }
           }
-        }
       }
     }
 

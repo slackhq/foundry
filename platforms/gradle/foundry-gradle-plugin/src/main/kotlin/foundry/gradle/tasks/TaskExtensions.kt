@@ -15,7 +15,6 @@
  */
 package foundry.gradle.tasks
 
-import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspAATask
@@ -61,9 +60,7 @@ internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
 
   // SqlDelight
   project.pluginManager.withPlugin("app.cash.sqldelight") {
-    configure {
-      dependsOn(project.tasks.withType(SqlDelightTask::class.java))
-    }
+    configure { dependsOn(project.tasks.withType(SqlDelightTask::class.java)) }
   }
 
   // Wire
