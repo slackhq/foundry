@@ -189,7 +189,9 @@ internal constructor(
   /** Relative path to a Compose stability configuration file from the _root_ project. */
   public val composeGlobalStabilityConfigurationPath: Provider<RegularFile>
     get() =
-      resolver.providerFor("foundry.compose.global.stabilityConfigurationPath").map(rootDirFileProvider)
+      resolver
+        .providerFor("foundry.compose.global.stabilityConfigurationPath")
+        .map(rootDirFileProvider)
 
   /** Relative path to a Compose stability configuration file from the current project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
