@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +39,21 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only save Gradle User Home state for builds on the 'main' branch.
+          # Builds on other branches will only read existing entries from the cache.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+          # Don't reuse cache entries from any other Job.
+          gradle-home-cache-strict-match: true
+
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+          # Limit the size of the cache entry.
+          # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
+          gradle-home-cache-excludes: |
+            caches/jars-9
+            caches/transforms-3
 
       - name: Build and run tests
         id: gradle
@@ -57,6 +74,8 @@ jobs:
 
   snapshots:
     runs-on: macos-latest
+    env:
+      GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
     steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -80,6 +99,21 @@ jobs:
 
         - name: Setup Gradle
           uses: gradle/actions/setup-gradle@v4
+          with:
+            # Only save Gradle User Home state for builds on the 'main' branch.
+            # Builds on other branches will only read existing entries from the cache.
+            cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+            # Don't reuse cache entries from any other Job.
+            gradle-home-cache-strict-match: true
+
+            cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+            # Limit the size of the cache entry.
+            # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
+            gradle-home-cache-excludes: |
+              caches/jars-9
+              caches/transforms-3
 
         - name: Build and run tests
           id: gradle
