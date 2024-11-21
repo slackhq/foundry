@@ -22,7 +22,7 @@ public data class ModuleFeature(
   val name: String,
   val explanation: String,
   val advice: String,
-  val removalPatterns: Set<Regex>?,
+  val replacementPatterns: Map<Regex, String> = emptyMap(),
   /**
    * Generated sources root dir relative to the project dir, if any. Files are checked recursively.
    */

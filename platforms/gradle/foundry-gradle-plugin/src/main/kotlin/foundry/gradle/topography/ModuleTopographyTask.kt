@@ -256,9 +256,9 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
       val isRemoving = featuresToRemove.size != initialRemoveSize
       if (isRemoving) {
-        feature.removalPatterns?.let { removalPatterns ->
-          for (removalRegex in removalPatterns) {
-            buildFileText = buildFileText.replace(removalRegex, "").removeEmptyBraces()
+        feature.replacementPatterns.takeUnless { it.isEmpty() }?.let { replacementPatterns ->
+          for ((replacementPattern, replacement) in replacementPatterns) {
+            buildFileText = buildFileText.replace(replacementPattern, replacement).removeEmptyBraces()
           }
         }
       }
@@ -279,7 +279,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
       }
     }
 
-    val allAutoFixed = featuresToRemove.all { !it.removalPatterns.isNullOrEmpty() }
+    val allAutoFixed = featuresToRemove.all { it.replacementPatterns.isNotEmpty() }
     if (featuresToRemove.isNotEmpty()) {
       val message = buildString {
         appendLine(
