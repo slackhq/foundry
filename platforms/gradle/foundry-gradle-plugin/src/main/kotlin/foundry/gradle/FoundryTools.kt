@@ -16,10 +16,9 @@
 package foundry.gradle
 
 import com.google.common.collect.Sets
-import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import foundry.cli.AppleSiliconCompat
+import foundry.common.json.JsonTools
 import foundry.gradle.FoundryTools.Companion.SERVICE_NAME
 import foundry.gradle.FoundryTools.Parameters
 import foundry.gradle.agp.AgpHandler
@@ -27,18 +26,16 @@ import foundry.gradle.agp.AgpHandlers
 import foundry.gradle.properties.LocalProperties
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.properties.sneakyNull
-import foundry.gradle.util.JsonTools
 import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsWatcher
 import foundry.gradle.util.shutdown
+import foundry.gradle.util.toJson
 import java.io.File
 import java.util.ServiceLoader
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.streams.asSequence
 import okhttp3.OkHttpClient
-import okio.buffer
-import okio.sink
 import org.gradle.StartParameter
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
@@ -56,6 +53,8 @@ import org.gradle.internal.os.OperatingSystem
 public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
 
   public val agpHandler: AgpHandler by lazy { AgpHandlers.createHandler() }
+
+  @Deprecated("Use JsonTools directly", level = DeprecationLevel.HIDDEN)
   public val moshi: Moshi
     get() = JsonTools.MOSHI
 
@@ -210,9 +209,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
         }
         thermalsJsonFile.parentFile.mkdirs()
         thermalsJsonFile.createNewFile()
-        JsonWriter.of(thermalsJsonFile.sink().buffer()).use { writer ->
-          moshi.adapter<Thermals>().toJson(writer, thermalsAtClose)
-        }
+        JsonTools.toJson(thermalsJsonFile, thermalsAtClose)
         if (!parameters.offline.get()) {
           thermalsReporter?.reportThermals(thermalsAtClose)
         }
@@ -314,6 +311,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
   public interface Parameters : BuildServiceParameters {
     /** An output file that the thermals process (continuously) writes to during the build. */
     public val thermalsOutputFile: RegularFileProperty
+
     /** A structured version of [thermalsOutputFile] using JSON. */
     public val thermalsOutputJsonFile: RegularFileProperty
     public val offline: Property<Boolean>
@@ -321,6 +319,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
     public val logThermals: Property<Boolean>
     public val configurationCacheEnabled: Property<Boolean>
     public val enableSkippyDiagnostics: Property<Boolean>
+
     /** An output file of skippy diagnostics. */
     public val skippyDiagnosticsOutputFile: RegularFileProperty
     public val logVerbosely: Property<Boolean>

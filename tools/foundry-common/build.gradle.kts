@@ -21,6 +21,7 @@ plugins {
 
 dependencies {
   api(platform(libs.coroutines.bom))
+  api(libs.moshi)
   api(libs.okio)
 
   implementation(libs.coroutines.core)

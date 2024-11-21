@@ -20,29 +20,28 @@ import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.adapter
 import com.squareup.wire.gradle.WireTask
-import foundry.gradle.FoundryExtension
+import foundry.common.json.JsonTools
 import foundry.gradle.FoundryProperties
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.capitalizeUS
 import foundry.gradle.configure
 import foundry.gradle.convertProjectPathToAccessor
 import foundry.gradle.dependsOn
-import foundry.gradle.getByType
 import foundry.gradle.namedLazy
 import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.util.JsonTools
+import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
+import foundry.gradle.topography.DefaultFeatures
+import foundry.gradle.topography.ModuleTopography
+import foundry.gradle.topography.ModuleTopographyTask
+import foundry.gradle.util.toJson
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import okio.buffer
-import okio.sink
-import okio.source
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -56,18 +55,18 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.internal.KaptTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
+import org.jgrapht.graph.GraphCycleProhibitedException
 
 public object ModuleStatsTasks {
   public const val AGGREGATOR_NAME: String = "aggregateModuleStats"
@@ -81,7 +80,7 @@ public object ModuleStatsTasks {
   internal fun configureRoot(rootProject: Project, foundryProperties: FoundryProperties) {
     if (!foundryProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
-    val resolver = Resolver.interProjectResolver(rootProject, SgpArtifact.MOD_STATS_STATS_FILES)
+    val resolver = Resolver.interProjectResolver(rootProject, FoundryArtifact.MOD_STATS_STATS_FILES)
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
       projectPathsToAccessors.setDisallowChanges(
@@ -105,7 +104,11 @@ public object ModuleStatsTasks {
     return MAIN_SRC_DIRS.firstOrNull { File(this@findMainSourceDir, it).exists() }
   }
 
-  internal fun configureSubproject(project: Project, foundryProperties: FoundryProperties) {
+  internal fun configureSubproject(
+    project: Project,
+    foundryProperties: FoundryProperties,
+    topographyTask: TaskProvider<ModuleTopographyTask>,
+  ) {
     if (!foundryProperties.modScoreGlobalEnabled) return
     if (!project.buildFile.exists()) return
 
@@ -145,12 +148,15 @@ public object ModuleStatsTasks {
             locDataFiles.from(locTask.flatMap { it.outputFile })
           }
           this.includeGenerated.setDisallowChanges(includeGenerated)
+          this.multiVariantAndroidLibrary.setDisallowChanges(foundryProperties.libraryWithVariants)
+          topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
           outputFile.setDisallowChanges(
             project.layout.buildDirectory.file("reports/foundry/moduleStats.json")
           )
         }
 
-      val publisher = Publisher.interProjectPublisher(project, SgpArtifact.MOD_STATS_STATS_FILES)
+      val publisher =
+        Publisher.interProjectPublisher(project, FoundryArtifact.MOD_STATS_STATS_FILES)
       publisher.publish(task.flatMap { it.outputFile })
       task
     }
@@ -161,51 +167,34 @@ public object ModuleStatsTasks {
 
     val generatedSourcesAdded = AtomicBoolean()
     val addGeneratedSources = {
-      if (locTask != null && generatedSourcesAdded.compareAndSet(false, true)) {
-        locTask.configure {
-          generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
+      locTask?.let { locTask ->
+        val shouldConfigure = generatedSourcesAdded.compareAndSet(false, true) && includeGenerated
+        if (shouldConfigure) {
+          locTask.configure {
+            generatedSrcsDir.setDisallowChanges(project.layout.buildDirectory.dir("generated"))
+          }
+          // Don't depend on compiler tasks. Technically doesn't cover javac apt but tbh we don't
+          // really support that
+          locTask.mustRunAfterSourceGeneratingTasks(project, includeCompilerTasks = false)
         }
       }
     }
 
-    linkToLocTask {
-      it.mustRunAfter(project.tasks.withType(JavaCompile::class.java))
-      it.mustRunAfter(project.tasks.withType(KotlinCompile::class.java))
-    }
     project.pluginManager.apply {
-      withPlugin("org.jetbrains.kotlin.jvm") {
-        addCollectorTag(ModuleStatsCollectorTask.TAG_KOTLIN)
-        if (includeGenerated) {
-          linkToLocTask {
-            it.dependsOn(project.tasks.withType(JavaCompile::class.java))
-            it.dependsOn(project.tasks.withType(KotlinCompile::class.java))
-          }
-        }
-      }
       withPlugin("org.jetbrains.kotlin.kapt") {
         addGeneratedSources()
-        addCollectorTag(ModuleStatsCollectorTask.TAG_KAPT)
         linkToLocTask { it.mustRunAfter(project.tasks.withType(KaptTask::class.java)) }
       }
       withPlugin("com.google.devtools.ksp") {
         addGeneratedSources()
-        addCollectorTag(ModuleStatsCollectorTask.TAG_KSP)
         linkToLocTask { it.mustRunAfter(project.tasks.withType(KspTask::class.java)) }
-      }
-      withPlugin("org.jetbrains.kotlin.android") {
-        addCollectorTag(ModuleStatsCollectorTask.TAG_KOTLIN)
-      }
-      withPlugin("org.jetbrains.kotlin.plugin.parcelize") {
-        addCollectorTag(ModuleStatsCollectorTask.TAG_PARCELIZE)
       }
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
-        addCollectorTag(ModuleStatsCollectorTask.TAG_WIRE)
         linkToLocTask { it.mustRunAfter(project.tasks.withType(WireTask::class.java)) }
       }
       withPlugin("app.cash.sqldelight") {
         addGeneratedSources()
-        addCollectorTag(ModuleStatsCollectorTask.TAG_SQLDELIGHT)
         linkToLocTask {
           it.mustRunAfter(
             project.tasks.withType(GenerateSchemaTask::class.java),
@@ -213,24 +202,8 @@ public object ModuleStatsTasks {
           )
         }
       }
-      withPlugin("com.android.application") {
-        addCollectorTag(ModuleStatsCollectorTask.TAG_ANDROID)
-        //          val multiVariant =
-        // project.booleanProperty(SlackPluginConfigs.LIBRARY_WITH_VARIANTS, false, local = true)
-        //          afterEvaluate {
-        //            val targetVariant = if (multiVariant) "internalDebug" else "release"
-        //            val compileLifecycleTask =
-        // tasks.named("compile${targetVariant.safeCapitalize()}Sources")
-        //            moduleStatsCollector.dependsOn(compileLifecycleTask)
-        //          }
-      }
       withPlugin("com.android.library") {
         val multiVariant = foundryProperties.libraryWithVariants
-        addCollectorTag(ModuleStatsCollectorTask.TAG_ANDROID)
-        if (multiVariant) {
-          addCollectorTag(ModuleStatsCollectorTask.TAG_VARIANTS)
-        }
-
         project.configure<LibraryAndroidComponentsExtension> {
           finalizeDsl { extension ->
             val targetVariant =
@@ -249,6 +222,7 @@ public object ModuleStatsTasks {
             }
 
             // TODO do we need to check the gradle properties too?
+            // TODO move to the task action once we have these in ModuleTopography
             val androidResources = extension.buildFeatures.androidResources == true
             val viewBinding = extension.buildFeatures.viewBinding == true
             if (viewBinding) {
@@ -260,20 +234,6 @@ public object ModuleStatsTasks {
             if (viewBinding) {
               addCollectorTag(ModuleStatsCollectorTask.TAG_VIEW_BINDING)
             }
-          }
-        }
-      }
-
-      // TODO would be nice if we could drop autovalue into this
-      project.afterEvaluate {
-        val extension = project.extensions.getByType<FoundryExtension>()
-        val daggerConfig =
-          extension.featuresHandler.daggerHandler.computeConfig(
-            extension.featuresHandler.testFixturesUseDagger.getOrElse(false)
-          )
-        if (daggerConfig != null) {
-          if (daggerConfig.useDaggerCompiler) {
-            addCollectorTag(ModuleStatsCollectorTask.TAG_DAGGER_COMPILER)
           }
         }
       }
@@ -308,9 +268,7 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
 
   @TaskAction
   internal fun dumpStats() {
-    val adapter = JsonTools.MOSHI.adapter<ModuleStats>()
-    val allStats =
-      statsFiles.map { it.source().buffer().use(adapter::fromJson)!! }.sortedBy { it.modulePath }
+    val allStats = statsFiles.map<File, ModuleStats>(JsonTools::fromJson).sortedBy { it.modulePath }
 
     val globalStats = allStats.map { it.totalSource }.reduce(Map<String, LanguageStats>::mergeWith)
 
@@ -327,16 +285,21 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
         graph.addVertex(dependency)
         try {
           graph.addEdge(subproject, dependency)
-        } catch (e: IllegalArgumentException) {
+        } catch (e: GraphCycleProhibitedException) {
           // Surprisingly, not unexpected. This can happen when project A has a compileOnly
           // dependency on project B and project B has a testImplementation dependency on project A.
-          // This _only_ happens with model and test-model, which we should just modularize out to a
-          // third "model-tests" module
           if ("model" !in subproject || "model" !in dependency) {
-            throw RuntimeException(
-              "Cycle from $subproject to $dependency. Please modularize this better!",
-              e,
-            )
+            if (subproject.contains("test-fixtures") xor dependency.contains("test-fixtures")) {
+              // This is a big bandaid over the ability for projects to depend own their own test
+              // fixtures, which breaks the cycle in these scenarios.
+              // We allow this specific case, ideally in the future with native testFixtures()
+              // support this would just go away.
+            } else {
+              throw RuntimeException(
+                "Cycle from $subproject to $dependency. Please modularize this better!",
+                e,
+              )
+            }
           }
         }
       }
@@ -354,9 +317,7 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
         .sortedByDescending { it.score }
 
     logger.debug("Scores are ${scores.joinToString("\n")}")
-    outputFile.asFile.get().sink().buffer().use { sink ->
-      JsonTools.MOSHI.adapter<AggregateModuleScore>().toJson(sink, AggregateModuleScore(scores))
-    }
+    JsonTools.toJson(outputFile, AggregateModuleScore(scores))
   }
 }
 
@@ -382,7 +343,14 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
   @get:Input abstract val includeGenerated: Property<Boolean>
 
+  // TODO eventually pull this from ModuleTopography too once it has properties
+  @get:Input @get:Optional abstract val multiVariantAndroidLibrary: Property<Boolean>
+
   @get:Input abstract val tags: SetProperty<String>
+
+  @get:PathSensitive(PathSensitivity.NONE)
+  @get:InputFile
+  abstract val topographyJson: RegularFileProperty
 
   @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:InputFile
@@ -406,23 +374,69 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
     val locSrcFiles = locDataFiles.files
     val (sources, generatedSources) =
       if (locSrcFiles.isNotEmpty()) {
-        locDataFiles.singleFile.source().buffer().use {
-          JsonTools.MOSHI.adapter<LocTask.LocData>().fromJson(it)!!
-        }
+        JsonTools.fromJson<LocTask.LocData>(locDataFiles.singleFile)
       } else {
         LocTask.LocData.EMPTY
       }
 
+    val topography = ModuleTopography.from(topographyJson)
+    val finalTags = tags.getOrElse(emptySet()).toMutableSet()
+
+    for (plugin in topography.plugins) {
+      when (plugin) {
+        "org.jetbrains.kotlin.jvm",
+        "org.jetbrains.kotlin.android",
+        "org.jetbrains.kotlin.multiplatform" -> {
+          finalTags.add(TAG_KOTLIN)
+        }
+
+        "org.jetbrains.kotlin.kapt" -> {
+          finalTags.add(TAG_KAPT)
+        }
+
+        "com.google.devtools.ksp" -> {
+          finalTags.add(TAG_KSP)
+        }
+
+        "org.jetbrains.kotlin.plugin.parcelize" -> {
+          finalTags.add(TAG_PARCELIZE)
+        }
+
+        "com.squareup.wire" -> {
+          finalTags.add(TAG_WIRE)
+        }
+
+        "app.cash.sqldelight" -> {
+          finalTags.add(TAG_SQLDELIGHT)
+        }
+
+        "com.android.application" -> {
+          finalTags.add(TAG_ANDROID)
+        }
+
+        "com.android.library" -> {
+          val multiVariant = multiVariantAndroidLibrary.getOrElse(false)
+          finalTags.add(TAG_ANDROID)
+          if (multiVariant) {
+            finalTags.add(TAG_VARIANTS)
+          }
+        }
+      }
+    }
+
+    for (feature in topography.features) {
+      when (feature) {
+        DefaultFeatures.DaggerCompiler.name -> finalTags.add(TAG_DAGGER_COMPILER)
+      }
+    }
+
     val dependencies = StatsUtils.parseProjectDeps(buildFileProperty.asFile.get())
 
     logger.debug("Writing stats to ${outputFile.asFile.get()}")
-    outputFile.asFile.get().sink().buffer().use { sink ->
-      JsonTools.MOSHI.adapter<ModuleStats>()
-        .toJson(
-          sink,
-          ModuleStats(modulePath.get(), sources, generatedSources, tags.get(), dependencies),
-        )
-    }
+    JsonTools.toJson(
+      outputFile,
+      ModuleStats(modulePath.get(), sources, generatedSources, finalTags, dependencies),
+    )
   }
 }
 

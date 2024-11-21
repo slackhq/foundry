@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.2)" variant="all" version="8.8.0-alpha01">
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="  return filterKeys { it != null }.mapKeys { it.key!! }"
+        errorLine2="                                                   ~~">
+        <location
+            file="src/main/kotlin/foundry/skippy/AffectedProjectsComputer.kt"
+            line="338"
+            column="52"/>
+    </issue>
+
+</issues>

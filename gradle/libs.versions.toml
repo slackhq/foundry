@@ -1,54 +1,56 @@
 [versions]
-agp = "8.7.1"
-agpAlpha = "8.8.0-alpha06"
+agp = "8.7.2"
+agpAlpha = "8.9.0-alpha02"
 anvil = "2.5.0-beta11"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.7.1"
 bugsnagGradle = "8.1.0"
-circuit = "0.23.1"
-compose-jb = "1.7.0"
-compose-jb-stable = "1.6.11"
+circuit = "0.25.0"
+compose-jb = "1.7.1"
+compose-jb-stable = "1.7.1"
 coroutines = "1.9.0"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.9.0"
-dependencyAnalysisPlugin = "2.1.4"
+dependencyAnalysisPlugin = "2.4.2"
 detekt = "1.23.7"
 dokka = "2.0.0-Beta"
-errorproneGradle = "4.0.1"
+errorproneGradle = "4.1.0"
 gradle-retry = "1.6.0"
 graph-assert = "2.7.1"
 intellij-platform = "2.1.0"
 # Temporary until https://bugs.openjdk.org/browse/JDK-8331027 is fixed in 23
 jdk = "21"
 jvmTarget = "17"
-jewel = "0.25.0"
+jewel = "0.26.2"
 jna = "5.15.0"
-kaml = "0.61.0"
+kaml = "0.65.0"
 kotlin = "2.1.0-Beta2"
 kotlinx-serialization = "1.7.3"
 ksp = "2.1.0-Beta2-1.0.25"
-kotlinPoet = "1.18.1"
-ktfmt = "0.52"
-markdown = "0.26.0"
+kotlinPoet = "2.0.0"
+ktfmt = "0.53"
+markdown = "0.27.0"
 mavenPublish = "0.30.0"
+mordant = "3.0.1"
 moshi = "1.15.1"
 moshix = "0.29.0-alpha01"
-nullawayGradle = "2.0.0"
+nullawayGradle = "2.1.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.1"
 retrofit = "2.11.0"
+roborazzi = "1.32.2"
 slack-lint = "0.8.2"
-sortDependencies = "0.7"
-spotless = "7.0.0.BETA3"
+sortDependencies = "0.13"
+spotless = "7.0.0.BETA4"
 sqldelight = "2.0.2"
 versionsPlugin = "0.51.0"
 wire = "5.1.0"
-xmlutil = "0.90.1"
+xmlutil = "0.90.3"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.16.3" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.5.0" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.5.1" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
@@ -68,6 +70,7 @@ moshiGradlePlugin = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 moshix = { id = "dev.zacsweers.moshix", version.ref = "moshix" }
 pluginUploader = { id = "dev.bmac.intellij.plugin-uploader", version = "1.3.5" }
 retry = { id = "org.gradle.test-retry", version.ref = "gradle-retry" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 sortDependencies = { id = "com.squareup.sort-dependencies", version.ref = "sortDependencies" }
 versionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
@@ -83,7 +86,7 @@ bugsnag = "com.bugsnag:bugsnag:3.7.2"
 clikt = "com.github.ajalt.clikt:clikt:5.0.1"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.12.0"
-composeLints = "com.slack.lint.compose:compose-lint-checks:1.4.1"
+composeLints = "com.slack.lint.compose:compose-lint-checks:1.4.2"
 compose-markdown = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown" }
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }
@@ -98,7 +101,7 @@ gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
-gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:3.18.1"
+gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:3.18.2"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = { module = "com.jraska.module.graph.assertion:plugin", version.ref = "graph-assert" }
@@ -121,6 +124,7 @@ kotlin-gradlePlugins-bom = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinShell = "eu.jrie.jetbrains:kotlin-shell-core:0.2.1"
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
 jewel-bridge = { module = "org.jetbrains.jewel:jewel-ide-laf-bridge-242", version.ref = "jewel" }
@@ -130,6 +134,9 @@ jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 junit = "junit:junit:4.13.2"
 markdown = "org.jetbrains:markdown:0.7.3"
+mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
+mordant-coroutines = { module = "com.github.ajalt.mordant:mordant-coroutines", version.ref = "mordant" }
+mordant-markdown = { module = "com.github.ajalt.mordant:mordant-markdown", version.ref = "mordant" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
@@ -139,11 +146,17 @@ okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", versio
 oshi = "com.github.oshi:oshi-core:6.6.5"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
+robolectric = "org.robolectric:robolectric:4.14"
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.9"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"
 slackLints-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slack-lint" }
 slackLints-annotations = { module = "com.slack.lint:slack-lint-annotations", version.ref = "slack-lint" }
 slf4jNop = "org.slf4j:slf4j-nop:2.0.16"
+testing-roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
+testing-roborazzi-rules = { module = "io.github.takahirom.roborazzi:roborazzi-junit-rule", version.ref = "roborazzi" }
+testing-roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
+testing-roborazzi-core = { module = "io.github.takahirom.roborazzi:roborazzi-core", version.ref = "roborazzi" }
 tikxml-htmlEscape = { module = "com.tickaroo.tikxml:converter-htmlescape", version = "0.8.15" }
 truth = "com.google.truth:truth:1.4.4"
 xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "xmlutil" }

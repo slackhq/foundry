@@ -20,6 +20,7 @@ import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.robolectricJars
 import foundry.gradle.tasks.BootstrapTask
+import foundry.tools.robolectric.sdk.management.RobolectricSdkAccess
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -28,7 +29,14 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.UntrackedTask
 
 /**
  * Updates the Robolectric android-all jars. Is declared as a task dependency of all
@@ -100,12 +108,8 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
       foundryProperties: FoundryProperties,
     ): TaskProvider<UpdateRobolectricJarsTask> {
       return project.tasks.register<UpdateRobolectricJarsTask>(NAME) {
-        val iVersion = foundryProperties.robolectricIVersion
-        for (sdkInt in foundryProperties.robolectricTestSdks) {
-          // Create a new configuration
-          val sdk = sdkFor(sdkInt, iVersion)
-          // Add relevant dep
-          val depCoordinates = sdk.dependencyCoordinates
+        for (depCoordinates in
+          RobolectricSdkAccess.loadSdks(foundryProperties.robolectricTestSdks)) {
           val configuration =
             project.configurations.detachedConfiguration(
               project.dependencies.create(depCoordinates)
@@ -134,30 +138,3 @@ private fun Configuration.artifactView(): Provider<Set<File>> {
     .resolvedArtifacts
     .map { it.asSequence().map { it.file }.toSet() }
 }
-
-private fun sdkFor(api: Int, iVersion: Int): DefaultSdk {
-  val sdk = SDKS[api] ?: error("No robolectric jar coordinates found for $api.")
-  return sdk.copy(iVersion = iVersion)
-}
-
-// Sourced from
-// https://github.com/robolectric/robolectric/blob/master/robolectric/src/main/java/org/robolectric/plugins/DefaultSdkProvider.java
-// TODO depend on it directly? compileOnly though
-private val SDKS =
-  listOf(
-      DefaultSdk(21, "5.0.2_r3", "r0", "REL", 8, -1),
-      DefaultSdk(22, "5.1.1_r9", "r2", "REL", 8, -1),
-      DefaultSdk(23, "6.0.1_r3", "r1", "REL", 8, -1),
-      DefaultSdk(24, "7.0.0_r1", "r1", "REL", 8, -1),
-      DefaultSdk(25, "7.1.0_r7", "r1", "REL", 8, -1),
-      DefaultSdk(26, "8.0.0_r4", "r1", "REL", 8, -1),
-      DefaultSdk(27, "8.1.0", "4611349", "REL", 8, -1),
-      DefaultSdk(28, "9", "4913185-2", "REL", 8, -1),
-      DefaultSdk(29, "10", "5803371", "REL", 9, -1),
-      DefaultSdk(30, "11", "6757853", "REL", 9, -1),
-      DefaultSdk(31, "12", "7732740", "REL", 9, -1),
-      DefaultSdk(32, "12.1", "8229987", "REL", 9, -1),
-      DefaultSdk(33, "13", "9030017", "Tiramisu", 9, -1),
-      DefaultSdk(34, "14", "10818077", "REL", 17, -1),
-    )
-    .associateBy { it.apiLevel }

@@ -4,6 +4,89 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Introduce `sgp.compose.global.stabilityConfigurationPath` to specify a global compose stability configuration file.
+- **New**: Introduce `foundry.kotlin.explicitApiMode` to specify an explicit API mode for kotlin projects. Default is null. Values correspond to the `ExplicitApiMode` enum in KGP.
+- **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
+- **Change**: Use KGP 2.1.0+'s new `KotlinBaseExtension` to configure most Kotlin compiler options.
+- Update to Kotlin `2.1.0`.
+- Build against KSP `2.1.0-TODO`
+
+0.22.6
+------
+
+_2024-11-20_
+
+- [gradle] Make Robolectric jar downloads more dynamic for future-proofing. Will continue to work on improving this, but for now it should be possible to force a newer `org.robolectric:robolectric` version on your buildscript classpath to force a newer version and have it update JAR coordinates automatically.
+
+0.22.5
+------
+
+_2024-11-19_
+
+- [gradle] Make `LocTask.generatedSrcsDir` `@Internal` to avoid depending implicitly on outputs of tasks that sometimes only just make empty dirs with no files.
+
+0.22.4
+------
+
+_2024-11-15_
+
+- [gradle] Improve Detekt configuration to better ignore generated source files.
+- [gradle] Add skippy support to validateModuleTopography. Now there are `globalCiValidateModuleTopography` and `ciValidateModuleTopography` tasks.
+- [gradle] Use `mustRunAfter` for depending on source gen tasks + add back sqldelight's schema task as a source-generating task.
+- [gradle] Improve compose matching text to include `.setContent {`.
+- [gradle] Support custom configurations and overrides of ModuleTopography features via JSON file specified by the `foundry.topography.features.config` property.
+- Update kaml to `0.65.0`.
+- Build against develocity plugin `3.18.2`.
+- Build against Roborazzi plugin `1.32.2`.
+
+0.22.3
+------
+
+_2024-11-13_
+
+- [gradle] Only make `LocTask` depend on source-generating tasks if `MODULE_SCORE_INCLUDE_GENERATED` is true.
+
+0.22.2
+------
+
+_2024-11-13_
+
+- [gradle] Fix dependencies on source-generating tasks in module stats and topography.
+
+0.22.1
+------
+
+_2024-11-12_
+
+- [gradle] Fix FoundryProperties hierarchical init.
+
+0.22.0
+------
+
+_2024-11-12_
+
+- [gradle] Introduce new `moduleTopography` task. This is a general task that attempts to validate project configurations by looking for features that are enabled but unused. Currently covers a few core features like kapt, ksp, moshi code gen, dagger/anvil, and viewbinding. Outputs are printed and written to a JSON file. Add `--validate-all` to make the tasks fail on validation issues.
+- [gradle] Cache global `FoundryProperties` instance for subproject use.
+- [gradle] Add `composeRuntimeOnly()` DSL feature.
+- [cli] Check for non-existent paths before traversing in `Path.walkEachFile()`.
+- [gradle] Don't depend on build sources in mod score if `MODULE_SCORE_INCLUDE_GENERATED` is false
+- [gradle] Source module topography in mod score stats collecting
+- [gradle] Build against Gradle `8.11`.
+- [gradle] Do not track state in `RakeDependencies` task.
+- Update to KotlinPoet `2.0.0`.
+- Update to xmlutil `0.90.3`.
+- Update to kaml `0.62.2`.
+- Update to Mordant `3.0.1`.
+- Build against gradle-dependency-sorter `0.12`.
+- Build against KSP `2.0.21-1.0.27`.
+- Build against DAGP `2.4.2`.
+- Build against Compose Multiplatform `1.7.0`.
+
+0.21.0
+------
+
+_2024-10-25_
+
 - **New**: Extract `better-gradle-properties` artifact, which is our hierarchical Gradle properties solution that better handles properties in Gradle. This is what powers `FoundryProperties` but is now extracted to be more portable.
   - This checks in the following order of priority
     - project-local `local.properties`
@@ -11,13 +94,18 @@ Changelog
     - root-project `local.properties`
     - root-project/global `gradle.properties`
 - **New**: Extract `version-number` artifact. This contains a Kotlin, non-deprecated `VersionNumber` API. This is useful given that Gradle's is both deprecated and not available in standard JVM projects.
-- Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
-- **New**: Introduce `sgp.compose.global.stabilityConfigurationPath` to specify a global compose stability configuration file.
-- **New**: Introduce `foundry.kotlin.explicitApiMode` to specify an explicit API mode for kotlin projects. Default is null. Values correspond to the `ExplicitApiMode` enum in KGP.
-- **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
-- **Change**: Use KGP 2.1.0+'s new `KotlinBaseExtension` to configure most Kotlin compiler options.
-- Update to Kotlin `2.1.0`.
-- Build against KSP `2.1.0-TODO`
+- **New**: Support Robolectric 4.14.
+- **Changed**: Remove defunct `foundry.git.hooksPath` and `foundry.git.ignoreRevsFile` properties.
+- **Changed**: Rename `SgpArtifact` to `FoundryArtifact`.
+- Misc doc fixes + reorganize docsite around new repo structure.
+- Update xmlutil to `0.90.2`.
+- Build against Spotless `7.0.0.BETA4`.
+- Build against KSP `2.0.21-1.0.26`.
+- Build against DAGP `2.2.0`.
+- Build against nullaway-gradle `2.1.0`.
+- Build against errorprone-gradle `4.1.0`.
+- Build against Compose multiplatform `1.7.0`.
+- Build against Dokka `2.0.0-Beta`.
 
 0.20.2
 ------

@@ -148,9 +148,9 @@ private val JewelTheme.Companion.linkColor: Color
   @Composable
   get() {
     return if (isDark) {
-      colorPalette.blue.last()
+      colorPalette.blue.lastOrNull() ?: contentColor
     } else {
-      colorPalette.blue.first()
+      colorPalette.blue.firstOrNull() ?: contentColor
     }
   }
 
@@ -260,6 +260,8 @@ private fun jewelMarkdownTypography(
   ordered: TextStyle = text,
   bullet: TextStyle = text,
   list: TextStyle = text,
+  inlineCode: TextStyle = code,
+  link: TextStyle = text,
 ): MarkdownTypography =
   DefaultMarkdownTypography(
     h1 = h1,
@@ -275,4 +277,6 @@ private fun jewelMarkdownTypography(
     ordered = ordered,
     bullet = bullet,
     list = list,
+    inlineCode = inlineCode,
+    link = link,
   )

@@ -17,7 +17,7 @@ package foundry.gradle
 
 import foundry.common.FoundryKeys
 import foundry.gradle.anvil.AnvilMode
-import foundry.gradle.artifacts.SgpArtifact
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
 import foundry.gradle.properties.getOrCreateExtra
 import foundry.gradle.properties.sneakyNull
@@ -34,17 +34,27 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
  *
  * Order attempted as described by [PropertyResolver.providerFor].
  */
+// TODO allow sourcing from a custom resolver or Properties
 public class FoundryProperties
 internal constructor(
-  private val project: Project,
-  startParameterProperty: (String) -> Provider<String>,
-  globalLocalProperty: (String) -> Provider<String>,
+  private val projectName: String,
+  private val resolver: PropertyResolver,
+  private val regularFileProvider: (String) -> RegularFile,
+  private val rootDirFileProvider: (String) -> RegularFile,
+  internal val versions: FoundryVersions,
 ) {
-  private val resolver = PropertyResolver(project, startParameterProperty, globalLocalProperty)
 
   private fun presenceProperty(key: String): Boolean = optionalStringProperty(key) != null
 
-  private fun fileProperty(key: String): File? = optionalStringProperty(key)?.let(project::file)
+  private fun fileProperty(key: String, useRoot: Boolean = false): File? =
+    optionalStringProperty(key)
+      ?.let(if (useRoot) rootDirFileProvider else regularFileProvider)
+      ?.asFile
+
+  private fun fileProvider(key: String, useRoot: Boolean = false): Provider<RegularFile> =
+    resolver
+      .optionalStringProvider(key)
+      .map(if (useRoot) rootDirFileProvider else regularFileProvider)
 
   private fun intProperty(key: String, defaultValue: Int = -1): Int =
     resolver.intValue(key, defaultValue = defaultValue)
@@ -67,8 +77,6 @@ internal constructor(
     resolver.optionalStringValue(key, defaultValue = defaultValue)?.takeUnless {
       blankIsNull && it.isBlank()
     }
-
-  internal val versions: FoundryVersions by lazy { FoundryVersions(project.getVersionsCatalog()) }
 
   /** Indicates that this android library project has variants. Flag-only, value is ignored. */
   public val libraryWithVariants: Boolean
@@ -148,7 +156,7 @@ internal constructor(
    * dependencies shadow jobs.
    */
   public val versionsJson: File?
-    get() = fileProperty("foundry.versionsJson")
+    get() = fileProperty("foundry.versionsJson", useRoot = true)
 
   /**
    * An alias name to a libs.versions.toml bundle for common Android Compose dependencies that
@@ -181,16 +189,12 @@ internal constructor(
   /** Relative path to a Compose stability configuration file from the _root_ project. */
   public val composeGlobalStabilityConfigurationPath: Provider<RegularFile>
     get() =
-      resolver.providerFor("foundry.compose.global.stabilityConfigurationPath").map {
-        project.rootProject.layout.projectDirectory.file(it)
-      }
+      resolver.providerFor("foundry.compose.global.stabilityConfigurationPath").map(rootDirFileProvider)
 
   /** Relative path to a Compose stability configuration file from the current project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
     get() =
-      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map {
-        project.layout.projectDirectory.file(it)
-      }
+      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map(regularFileProvider)
 
   /**
    * Use a workaround for compose-compiler's `includeInformation` option on android projects.
@@ -240,10 +244,6 @@ internal constructor(
         .splitToSequence(",")
         .map { it.toInt() }
         .toList()
-
-  /** Property corresponding to the preinstrumented jars version (the `-i2` suffix in jars). */
-  public val robolectricIVersion: Int
-    get() = intProperty("foundry.android.robolectric.iVersion")
 
   /** Opt out for -Werror. */
   public val allowWarnings: Provider<Boolean>
@@ -362,7 +362,7 @@ internal constructor(
    * etc).
    */
   public val isTestLibrary: Boolean
-    get() = booleanProperty("foundry.isTestLibrary", false) || project.name == "test-fixtures"
+    get() = booleanProperty("foundry.isTestLibrary", false) || projectName == "test-fixtures"
 
   /**
    * At the time of writing, AGP does not support running lint on `com.android.test` projects. This
@@ -493,7 +493,7 @@ internal constructor(
    * affected in this build.
    */
   public val affectedProjects: File?
-    get() = fileProperty("foundry.avoidance.affectedProjectsFile")
+    get() = fileProperty("foundry.avoidance.affectedProjectsFile", useRoot = true)
 
   /* Controls for Java/JVM/JDK versions uses in compilations and execution of tests. */
 
@@ -647,8 +647,8 @@ internal constructor(
     get() = resolver.booleanValue("foundry.logging.thermals", defaultValue = false)
 
   /**
-   * Enables eager configuration of [SgpArtifact] publishing in subprojects. This is behind a flag
-   * as a failsafe while we try different approaches to allow lenient resolution.
+   * Enables eager configuration of [FoundryArtifact] publishing in subprojects. This is behind a
+   * flag as a failsafe while we try different approaches to allow lenient resolution.
    *
    * @see StandardProjectConfigurations.setUpSubprojectArtifactPublishing
    */
@@ -749,6 +749,17 @@ internal constructor(
   public val kotlinProgressive: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.progressive", defaultValue = true)
 
+  /** Property to enable auto-fixing in topography validation. */
+  public val topographyAutoFix: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.topography.validation.autoFix", defaultValue = false)
+
+  /**
+   * Property pointing at a features config JSON file for
+   * [foundry.gradle.topography.ModuleFeaturesConfig].
+   */
+  public val topographyFeaturesConfig: Provider<RegularFile>
+    get() = fileProvider("foundry.topography.features.config", useRoot = true)
+
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
     val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
@@ -792,24 +803,55 @@ internal constructor(
     // Key-only because it's used in a task init without a project instance
     public const val MIN_GRADLE_XMS: String = "foundry.bootstrap.minGradleXms"
 
-    private const val CACHED_PROVIDER_EXT_NAME = "foundry.properties.provider"
+    internal const val CACHED_PROVIDER_EXT_NAME = "foundry.properties.provider"
 
-    public operator fun invoke(
+    public operator fun invoke(project: Project): FoundryProperties = project.foundryProperties
+
+    public fun getOrCreateRoot(
       project: Project,
-      foundryTools: Provider<FoundryTools>? = project.foundryToolsProvider(),
+      startParameterProperty: (String) -> Provider<String>,
+      globalLocalProperty: (String) -> Provider<String>,
+    ): FoundryProperties {
+      check(project.isRootProject) { "getOrCreate can only run in the root project!" }
+      return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
+        val resolver =
+          PropertyResolver.createForRootProject(
+            p,
+            startParameterProperty = startParameterProperty,
+            globalLocalProperty = globalLocalProperty,
+          )
+        val versions = FoundryVersions(p.getVersionsCatalog())
+        create(p, resolver, versions)
+      }
+    }
+
+    public fun getOrCreate(
+      project: Project,
+      foundryTools: Provider<FoundryTools> = project.foundryToolsProvider(),
     ): FoundryProperties {
       return project.getOrCreateExtra(CACHED_PROVIDER_EXT_NAME) { p ->
-        FoundryProperties(
-          project = p,
-          startParameterProperty = { key ->
-            foundryTools?.flatMap { tools -> tools.globalStartParameterProperty(key) }
-              ?: p.provider { null }
-          },
-          globalLocalProperty = { key ->
-            foundryTools?.flatMap { tools -> tools.globalLocalProperty(key) } ?: p.provider { null }
-          },
-        )
+        val globalProperties = foundryTools.get().globalConfig.globalFoundryProperties
+        val resolver = PropertyResolver(project, globalResolver = globalProperties.resolver)
+        val versions = globalProperties.versions
+        create(p, resolver, versions)
       }
+    }
+
+    private fun create(
+      project: Project,
+      resolver: PropertyResolver,
+      versions: FoundryVersions,
+    ): FoundryProperties {
+      return FoundryProperties(
+        projectName = project.name,
+        resolver = resolver,
+        regularFileProvider = project.layout.projectDirectory::file,
+        rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
+        versions = versions,
+      )
     }
   }
 }
+
+public val Project.foundryProperties: FoundryProperties
+  get() = FoundryProperties.getOrCreate(project)

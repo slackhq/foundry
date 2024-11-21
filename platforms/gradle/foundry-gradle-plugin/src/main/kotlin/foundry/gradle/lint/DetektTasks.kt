@@ -16,9 +16,9 @@
 package foundry.gradle.lint
 
 import foundry.gradle.FoundryProperties
+import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.artifacts.SgpArtifact
 import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.configure
 import foundry.gradle.configureEach
@@ -52,7 +52,7 @@ internal object DetektTasks {
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/detekt"))
       }
 
-      val resolver = Resolver.interProjectResolver(project, SgpArtifact.SKIPPY_DETEKT)
+      val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_DETEKT)
       SimpleFilesConsumerTask.registerOrConfigure(
         project,
         GLOBAL_CI_DETEKT_TASK_NAME,
@@ -98,7 +98,7 @@ internal object DetektTasks {
 
       val publisher =
         if (affectedProjects == null || project.path in affectedProjects) {
-          Publisher.interProjectPublisher(project, SgpArtifact.SKIPPY_DETEKT)
+          Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_DETEKT)
         } else {
           val log = "$LOG Skipping ${project.path}:detekt because it is not affected."
           if (foundryProperties.debug) {
@@ -111,15 +111,16 @@ internal object DetektTasks {
         }
 
       // Duplicate configs due to https://github.com/detekt/detekt/issues/5940
+      val buildDir = project.layout.buildDirectory.asFile.get().canonicalPath
       project.tasks.configureEach<Detekt> {
         this.jvmTarget = foundryProperties.versions.jvmTarget.get().toString()
-        exclude("**/build/**")
+        exclude { it.file.canonicalPath.startsWith(buildDir) }
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
       }
       project.tasks.configureEach<DetektCreateBaselineTask> {
         this.jvmTarget = foundryProperties.versions.jvmTarget.get().toString()
-        exclude("**/build/**")
+        exclude { it.file.canonicalPath.startsWith(buildDir) }
         // Cannot use setDisallowChanges because this property is set without a convention in Detekt
         jdkHome.set(sneakyNull<Directory>())
       }

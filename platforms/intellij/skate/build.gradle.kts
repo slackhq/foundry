@@ -118,19 +118,6 @@ configurations
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
 dependencies {
-  lintChecks(libs.composeLints)
-
-  compileOnly(libs.coroutines.core.ij)
-
-  implementation(libs.bugsnag)
-  implementation(libs.okio)
-  implementation(libs.kaml)
-  implementation(libs.kotlinx.serialization.core)
-  implementation(libs.okhttp)
-  implementation(libs.okhttp.loggingInterceptor)
-  implementation(projects.platforms.intellij.compose, exclusions)
-  implementation(projects.tools.tracing, exclusions)
-
   intellijPlatform {
     // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
     // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
@@ -151,6 +138,20 @@ dependencies {
     testFramework(TestFrameworkType.Bundled)
   }
 
+  implementation(projects.platforms.intellij.compose, exclusions)
+  implementation(projects.tools.tracing, exclusions)
+
+  implementation(libs.bugsnag)
+  implementation(libs.kaml)
+  implementation(libs.kotlinx.serialization.core)
+  implementation(libs.okhttp)
+  implementation(libs.okhttp.loggingInterceptor)
+  implementation(libs.okio)
+
+  compileOnly(libs.coroutines.core.ij)
+
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+
+  lintChecks(libs.composeLints)
 }

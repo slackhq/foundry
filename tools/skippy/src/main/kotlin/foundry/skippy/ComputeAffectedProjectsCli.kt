@@ -22,15 +22,13 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import com.jraska.module.graph.DependencyGraph
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import foundry.common.FoundryLogger
+import foundry.common.json.JsonTools
 import java.io.ObjectInputStream
 import java.nio.file.Path
 import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.inputStream
 import kotlin.io.path.readLines
-import kotlin.io.path.readText
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -103,14 +101,12 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
 
   @OptIn(DelicateCoroutinesApi::class)
   override suspend fun run() {
-    val moshi = Moshi.Builder().build()
     val dependencyGraph =
       ObjectInputStream(serializedDependencyGraph.inputStream()).use {
         it.readObject() as DependencyGraph.SerializableGraph
       }
     val rootDirPath = rootDir.toOkioPath()
-    val configs =
-      moshi.adapter<List<SkippyConfig>>().fromJson(config.readText())!!.associateBy { it.tool }
+    val configs = JsonTools.fromJson<List<SkippyConfig>>(config).associateBy { it.tool }
     val parallelism =
       if (computeInParallel && configs.size > 1) {
         configs.size
@@ -126,7 +122,6 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
           outputsDir = outputsDir.toOkioPath(),
           androidTestProjects = androidTestProjects,
           rootDir = rootDirPath,
-          moshi = moshi,
           parallelism = parallelism,
           fs = FileSystem.SYSTEM,
           dependencyGraph = dependencyGraph,

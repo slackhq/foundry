@@ -69,8 +69,6 @@ dependencies.constraints {
 }
 
 dependencies {
-  lintChecks(libs.gradleLints)
-
   api(platform(libs.okhttp.bom))
   api(libs.okhttp)
   // Better I/O
@@ -88,12 +86,16 @@ dependencies {
   implementation(libs.jgrapht)
   implementation(libs.jna)
   implementation(libs.jna.platform)
+  implementation(libs.mordant)
+  implementation(libs.mordant.coroutines)
+  implementation(libs.mordant.markdown)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
   implementation(projects.platforms.gradle.betterGradleProperties)
   implementation(projects.tools.cli)
   implementation(projects.tools.foundryCommon)
+  implementation(projects.tools.robolectricSdkManagement)
   implementation(projects.tools.skippy)
 
   compileOnly(platform(libs.kotlin.bom))
@@ -131,4 +133,6 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)
+
+  lintChecks(libs.gradleLints)
 }

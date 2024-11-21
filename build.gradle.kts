@@ -284,10 +284,6 @@ subprojects {
     configure<DokkaExtension> {
       dokkaPublicationDirectory.set(layout.buildDirectory.dir("dokkaDir"))
       dokkaSourceSets.configureEach {
-        val readMeProvider = project.layout.projectDirectory.file("README.md")
-        if (readMeProvider.asFile.exists()) {
-          includes.from(readMeProvider)
-        }
         documentedVisibilities.add(VisibilityModifier.Public)
         skipDeprecated.set(true)
         if (isForGradle) {
