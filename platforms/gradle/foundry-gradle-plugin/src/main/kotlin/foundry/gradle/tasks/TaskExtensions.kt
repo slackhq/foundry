@@ -63,7 +63,6 @@ internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
   project.pluginManager.withPlugin("app.cash.sqldelight") {
     configure {
       dependsOn(project.tasks.withType(SqlDelightTask::class.java))
-      dependsOn(project.tasks.withType(GenerateSchemaTask::class.java))
     }
   }
 
