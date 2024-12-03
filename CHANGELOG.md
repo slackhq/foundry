@@ -8,8 +8,9 @@ Changelog
 - **New**: Introduce `foundry.kotlin.explicitApiMode` to specify an explicit API mode for kotlin projects. Default is null. Values correspond to the `ExplicitApiMode` enum in KGP.
 - **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
 - **Change**: Use KGP 2.1.0+'s new `KotlinBaseExtension` to configure most Kotlin compiler options.
+- **Change**: `foundry.kotlin.allowWarningsInTests` now defaults to the value of `foundry.kotlin.allowWarnings`.
 - Update to Kotlin `2.1.0`.
-- Build against KSP `2.1.0-TODO`
+- Build against KSP `2.1.0-1.0.29`
 
 0.22.6
 ------
