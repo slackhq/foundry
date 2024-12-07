@@ -32,7 +32,7 @@ import foundry.gradle.register
 import foundry.gradle.serviceOf
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.SimpleFilesConsumerTask
-import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
+import foundry.gradle.tasks.dependsOnSourceGeneratingTasks
 import foundry.gradle.tasks.publish
 import foundry.gradle.util.toJson
 import java.nio.file.Path
@@ -128,7 +128,7 @@ internal object ModuleTopographyTasks {
     // Depend on source-gen tasks
     // Don't depend on compiler tasks. Technically doesn't cover javac apt but tbh we don't really
     // support that
-    task.mustRunAfterSourceGeneratingTasks(project, includeCompilerTasks = false)
+    task.dependsOnSourceGeneratingTasks(project, includeCompilerTasks = false)
 
     // No easy way to query all plugin IDs, so we use an internal Gradle API
     val pluginRegistry = project.serviceOf<PluginRegistry>()
@@ -256,11 +256,14 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
       val isRemoving = featuresToRemove.size != initialRemoveSize
       if (isRemoving) {
-        feature.removalPatterns?.let { removalPatterns ->
-          for (removalRegex in removalPatterns) {
-            buildFileText = buildFileText.replace(removalRegex, "").removeEmptyBraces()
+        feature.replacementPatterns
+          .takeUnless { it.isEmpty() }
+          ?.let { replacementPatterns ->
+            for ((replacementPattern, replacement) in replacementPatterns) {
+              buildFileText =
+                buildFileText.replace(replacementPattern, replacement).removeEmptyBraces()
+            }
           }
-        }
       }
     }
 
@@ -279,7 +282,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
       }
     }
 
-    val allAutoFixed = featuresToRemove.all { !it.removalPatterns.isNullOrEmpty() }
+    val allAutoFixed = featuresToRemove.all { it.replacementPatterns.isNotEmpty() }
     if (featuresToRemove.isNotEmpty()) {
       val message = buildString {
         appendLine(
