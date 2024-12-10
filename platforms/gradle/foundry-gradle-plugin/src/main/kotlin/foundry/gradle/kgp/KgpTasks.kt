@@ -26,7 +26,6 @@ import foundry.gradle.getByType
 import foundry.gradle.lint.DetektTasks
 import foundry.gradle.not
 import foundry.gradle.onFirst
-import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.util.configureKotlinCompilationTask
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
@@ -116,10 +115,12 @@ internal object KgpTasks {
       project.tasks.configureKotlinCompilationTask {
         compilerOptions {
           // These are set here because they're task-specific
+          // Don't use setDisallowChanges because KGP may sync conventions later and that blocks
+          // that
           if (this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)) {
-            allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarningsInTests.not())
+            allWarningsAsErrors.set(foundryProperties.allowWarningsInTests.not())
           } else {
-            allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarnings.not())
+            allWarningsAsErrors.set(foundryProperties.allowWarnings.not())
           }
         }
       }

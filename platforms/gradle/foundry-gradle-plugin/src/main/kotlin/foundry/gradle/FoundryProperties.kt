@@ -376,6 +376,20 @@ internal constructor(
   public val enableLintInAndroidTestProjects: Boolean
     get() = booleanProperty("foundry.lint.enableOnAndroidTestProjects", false)
 
+  /** If enabled, enables emulator.wtf for androidTest() uses. */
+  public val enableEmulatorWtfForAndroidTest: Boolean
+    get() = booleanProperty("foundry.emulatorwtf.enable", false)
+
+  /**
+   * If enabled, enables per-test videos for emulator.wtf.
+   *
+   * https://github.com/emulator-wtf/test-runtime-android
+   */
+  public val enableEmulatorWtfPerTestVideo: Boolean
+    get() =
+      enableEmulatorWtfForAndroidTest &&
+        booleanProperty("foundry.emulatorwtf.enablePerTestVideo", true)
+
   /** Flag to enable/disable KSP. */
   public val enableKsp: Boolean
     get() = booleanProperty("foundry.ksp.enable")
@@ -469,8 +483,8 @@ internal constructor(
     get() = optionalStringProperty("foundry.ci-lint.variants")
 
   /** Flag for enabling test orchestrator. */
-  public val useOrchestrator: Boolean
-    get() = booleanProperty("foundry.android.test.orchestrator")
+  public val useOrchestrator: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.test.orchestrator", false)
 
   /**
    * Flag for compressing androidTest APks with legacy packaging.

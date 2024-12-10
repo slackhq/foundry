@@ -1110,7 +1110,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
 @FoundryExtensionMarker
 public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val androidTest: Property<Boolean>
-  internal abstract val androidTestExcludeFromFladle: Property<Boolean>
+  internal abstract val androidTestExcludeFromAggregation: Property<Boolean>
   internal abstract val androidTestAllowedVariants: SetProperty<String>
   internal abstract val robolectric: Property<Boolean>
 
@@ -1126,15 +1126,16 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   /**
    * Enables android instrumentation tests for this project.
    *
-   * @param excludeFromFladle If true, the test will be excluded from Flank/Fladle tests.
+   * @param excludeFromAggregation If true, the test will be excluded from Flank/Fladle/emulator.wtf
+   *   test aggregation.
    * @param allowedVariants If set, the allowed variants to enable android tests for.
    */
   public fun androidTest(
-    excludeFromFladle: Boolean = false,
+    excludeFromAggregation: Boolean = false,
     allowedVariants: Iterable<String>? = null,
   ) {
     androidTest.setDisallowChanges(true)
-    androidTestExcludeFromFladle.setDisallowChanges(excludeFromFladle)
+    androidTestExcludeFromAggregation.setDisallowChanges(excludeFromAggregation)
     androidTestAllowedVariants.setDisallowChanges(allowedVariants)
   }
 

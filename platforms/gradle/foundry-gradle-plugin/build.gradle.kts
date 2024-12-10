@@ -114,6 +114,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.detekt)
   compileOnly(libs.gradlePlugins.develocity)
   compileOnly(libs.gradlePlugins.doctor)
+  compileOnly(libs.gradlePlugins.emulatorWtf)
   compileOnly(libs.gradlePlugins.errorProne)
   compileOnly(libs.gradlePlugins.kgp)
   compileOnly(libs.gradlePlugins.ksp)
