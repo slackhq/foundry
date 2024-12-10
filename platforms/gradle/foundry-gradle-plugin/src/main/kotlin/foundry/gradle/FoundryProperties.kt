@@ -472,6 +472,26 @@ internal constructor(
     get() = booleanProperty("foundry.android.test.orchestrator")
 
   /**
+   * Flag for compressing androidTest APks with legacy packaging.
+   *
+   * See:
+   * - https://issuetracker.google.com/issues/259832799
+   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
+   */
+  public val compressAndroidTestApksWithLegacyPackaging: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
+
+  /**
+   * Flag for minifying androidTest APks with R8. This just tree shakes.
+   *
+   * See:
+   * - https://issuetracker.google.com/issues/259832799
+   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
+   */
+  public val minifyAndroidTestApks: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.test.minifyEnabled", false)
+
+  /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
    *
