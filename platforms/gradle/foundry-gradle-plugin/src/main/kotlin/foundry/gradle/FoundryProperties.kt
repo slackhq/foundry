@@ -375,7 +375,7 @@ internal constructor(
   public val enableEmulatorWtfPerTestVideo: Boolean
     get() =
       enableEmulatorWtfForAndroidTest &&
-        booleanProperty("foundry.emulatorwtf.enablePerTestVideo", false)
+        booleanProperty("foundry.emulatorwtf.enablePerTestVideo", true)
 
   /** Flag to enable/disable KSP. */
   public val enableKsp: Boolean
