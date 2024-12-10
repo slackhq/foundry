@@ -4,8 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
-- Add a `foundry.android.test.compressWithLegacyPackaging` flag to compress androidTest APKs with legacy packaging.
-- Support emulator.wtf for `androidTest()`. This feature is gated by the `foundry.emulatorwtf.enable` feature flag.
+- **New**: Introduce `sgp.compose.global.stabilityConfigurationPath` to specify a global compose stability configuration file.
+- **New**: Introduce `foundry.kotlin.explicitApiMode` to specify an explicit API mode for kotlin projects. Default is null. Values correspond to the `ExplicitApiMode` enum in KGP.
+- **Change**: `sgp.compose.stabilityConfigurationPath` should now be relative from the _project_'s directory, not the root project.
+- **Change**: Use KGP 2.1.0+'s new `KotlinBaseExtension` to configure most Kotlin compiler options.
+- **Change**: `foundry.kotlin.allowWarningsInTests` now defaults to the value of `foundry.kotlin.allowWarnings`.
+- **New**: Add a `foundry.android.test.compressWithLegacyPackaging` flag to compress androidTest APKs with legacy packaging.
+- **New**: Support emulator.wtf for `androidTest()`. This feature is gated by the `foundry.emulatorwtf.enable` feature flag.
+- Update to Kotlin `2.1.0`.
+- Build against KSP `2.1.0-1.0.29`
 
 0.22.6
 ------

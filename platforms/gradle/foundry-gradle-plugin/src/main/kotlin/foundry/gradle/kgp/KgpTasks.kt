@@ -15,7 +15,6 @@
  */
 package foundry.gradle.kgp
 
-import com.android.build.api.AndroidPluginVersion
 import com.android.build.gradle.BaseExtension
 import foundry.gradle.Configurations
 import foundry.gradle.Configurations.isKnownConfiguration
@@ -23,6 +22,7 @@ import foundry.gradle.FoundryProperties
 import foundry.gradle.FoundryTools
 import foundry.gradle.asProvider
 import foundry.gradle.configure
+import foundry.gradle.getByType
 import foundry.gradle.lint.DetektTasks
 import foundry.gradle.not
 import foundry.gradle.onFirst
@@ -32,13 +32,16 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ListProperty
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
@@ -51,14 +54,7 @@ internal object KgpTasks {
       "org.jetbrains.kotlin.android",
     )
 
-  /**
-   * Surprisingly, AGP only wants to use its _own_ `android.kotlinOptions` for any `KotlinCompile`
-   * tasks it creates. This is really annoying and means AGP will override any we set in certain
-   * cases. To work around this, we run it in an afterEvaluate until AGP 8.8
-   * https://issuetracker.google.com/issues/364331837
-   */
-  private val FIXED_KOTLIN_OPTIONS_AGP_VERSION = AndroidPluginVersion(8, 8)
-
+  @OptIn(ExperimentalKotlinGradlePluginApi::class)
   @Suppress("LongMethod")
   fun configure(
     project: Project,
@@ -66,7 +62,7 @@ internal object KgpTasks {
     foundryProperties: FoundryProperties,
   ) {
     project.pluginManager.onFirst(KGP_PLUGINS) {
-      val kotlinExtension = project.kotlinExtension
+      val kotlinExtension = project.extensions.getByType<KotlinBaseExtension>()
       kotlinExtension.apply {
         foundryTools.globalConfig.kotlinDaemonArgs?.let { kotlinDaemonJvmArgs = it }
         foundryProperties.versions.jdk.ifPresent { jdkVersion ->
@@ -84,14 +80,48 @@ internal object KgpTasks {
           .map { JvmTarget.fromTarget(it.toString()) }
           .asProvider(project.providers)
 
-      if (
-        isKotlinAndroid && foundryTools.agpHandler.agpVersion < FIXED_KOTLIN_OPTIONS_AGP_VERSION
-      ) {
-        project.afterEvaluate {
-          configureKotlinCompileTasks(project, foundryProperties, jvmTargetProvider, true)
+      kotlinExtension.explicitApi =
+        foundryProperties.kotlinExplicitApiMode.orNull?.let(ExplicitApiMode::valueOf)
+      if (kotlinExtension is HasConfigurableKotlinCompilerOptions<*>) {
+        kotlinExtension.compilerOptions {
+          progressiveMode.set(foundryProperties.kotlinProgressive)
+          optIn.addAll(foundryProperties.kotlinOptIn)
+          if (foundryProperties.kotlinLanguageVersionOverride.isPresent) {
+            languageVersion.set(
+              foundryProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
+            )
+          }
+          freeCompilerArgs.addAll(foundryProperties.kotlinFreeArgs)
+          project.configureFreeKotlinCompilerArgs(freeCompilerArgs)
+
+          if (this is KotlinJvmCompilerOptions) {
+            jvmTarget.set(jvmTargetProvider)
+
+            // Potentially useful for static analysis or annotation processors
+            javaParameters.set(true)
+
+            freeCompilerArgs.addAll(foundryProperties.kotlinJvmFreeArgs)
+
+            // Set the module name to a dashified version of the project path to ensure uniqueness
+            // in created .kotlin_module files
+            moduleName.set(project.path.replace(":", "-"))
+
+            if (!isKotlinAndroid) {
+              // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+              freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
+            }
+          }
         }
-      } else {
-        configureKotlinCompileTasks(project, foundryProperties, jvmTargetProvider, isKotlinAndroid)
+      }
+      project.tasks.configureKotlinCompilationTask {
+        compilerOptions {
+          // These are set here because they're task-specific
+          if (this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)) {
+            allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarningsInTests.not())
+          } else {
+            allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarnings.not())
+          }
+        }
       }
 
       if (foundryProperties.autoApplyDetekt) {
@@ -172,56 +202,11 @@ internal object KgpTasks {
     }
   }
 
-  private fun configureKotlinCompileTasks(
-    project: Project,
-    foundryProperties: FoundryProperties,
-    jvmTargetProvider: Provider<JvmTarget>,
-    isKotlinAndroid: Boolean,
-  ) {
-    project.tasks.configureKotlinCompilationTask {
-      compilerOptions {
-        progressiveMode.set(foundryProperties.kotlinProgressive)
-        optIn.addAll(foundryProperties.kotlinOptIn)
-        if (foundryProperties.kotlinLanguageVersionOverride.isPresent) {
-          languageVersion.set(
-            foundryProperties.kotlinLanguageVersionOverride.map(KotlinVersion::fromVersion)
-          )
-        }
-        if (this@configureKotlinCompilationTask.name.contains("test", ignoreCase = true)) {
-          allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarningsInTests.not())
-        } else {
-          allWarningsAsErrors.setDisallowChanges(foundryProperties.allowWarnings.not())
-        }
-        freeCompilerArgs.addAll(foundryProperties.kotlinFreeArgs)
-
-        if (this is KotlinJvmCompilerOptions) {
-          jvmTarget.set(jvmTargetProvider)
-
-          // Potentially useful for static analysis or annotation processors
-          javaParameters.set(true)
-
-          freeCompilerArgs.addAll(foundryProperties.kotlinJvmFreeArgs)
-
-          // Set the module name to a dashified version of the project path to ensure uniqueness
-          // in created .kotlin_module files
-          moduleName.set(project.path.replace(":", "-"))
-
-          if (!isKotlinAndroid) {
-            // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-            freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
-          }
-        }
-      }
-    }
-
-    project.configureFreeKotlinCompilerArgs()
-  }
-
   /**
    * Configures per-dependency free Kotlin compiler args. This is necessary because otherwise
    * kotlinc will emit angry warnings.
    */
-  private fun Project.configureFreeKotlinCompilerArgs() {
+  private fun Project.configureFreeKotlinCompilerArgs(freeCompilerArgs: ListProperty<String>) {
     logger.debug("Configuring specific Kotlin compiler args on $path")
     val once = AtomicBoolean()
     configurations.configureEach {
@@ -230,9 +215,7 @@ internal object KgpTasks {
           dependencies.forEach { dependency ->
             KotlinArgConfigs.ALL[dependency.name]?.let { config ->
               if (once.compareAndSet(false, true)) {
-                tasks.configureKotlinCompilationTask {
-                  compilerOptions { freeCompilerArgs.addAll(config.args) }
-                }
+                freeCompilerArgs.addAll(config.args)
               }
             }
           }
