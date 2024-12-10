@@ -603,6 +603,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0230" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.23.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0226" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.22.6
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0225" class="md-nav__link">
     <span class="md-ellipsis">
       0.22.5
@@ -2011,6 +2029,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0230" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.23.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0226" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.22.6
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0225" class="md-nav__link">
     <span class="md-ellipsis">
       0.22.5
@@ -3335,6 +3371,33 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased"><strong>Unreleased</strong><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0230">0.23.0<a class="headerlink" href="#0230" title="Permanent link">&para;</a></h2>
+<p><em>2024-12-10</em></p>
+<ul>
+<li><strong>New</strong>: Introduce <code>foundry.compose.global.stabilityConfigurationPath</code> to specify a global compose stability configuration file.</li>
+<li><strong>New</strong>: Introduce <code>foundry.kotlin.explicitApiMode</code> to specify an explicit API mode for kotlin projects. Default is null. Values correspond to the <code>ExplicitApiMode</code> enum in KGP.</li>
+<li><strong>Change</strong>: <code>foundry.compose.stabilityConfigurationPath</code> should now be relative from the <em>project</em>&rsquo;s directory, not the root project.</li>
+<li><strong>Change</strong>: Use KGP 2.1.0+&rsquo;s new <code>KotlinBaseExtension</code> to configure most Kotlin compiler options.</li>
+<li><strong>Change</strong>: <code>foundry.kotlin.allowWarningsInTests</code> now defaults to the value of <code>foundry.kotlin.allowWarnings</code>.</li>
+<li><strong>New</strong>: Add a <code>foundry.android.test.compressWithLegacyPackaging</code> flag to compress androidTest APKs with legacy packaging.</li>
+<li><strong>New</strong>: Support emulator.wtf for <code>androidTest()</code>. This feature is gated by the <code>foundry.emulatorwtf.enable</code> feature flag.</li>
+<li><strong>Enhancement</strong>: Module topography validation now supports custom replacements for matching regexes.</li>
+<li>Update to Kotlin <code>2.1.0</code>.</li>
+<li>Update to Clikt <code>5.0.2</code>.</li>
+<li>Update to Kaml <code>0.66.0</code>.</li>
+<li>Update to RxJava <code>3.1.10</code>.</li>
+<li>Build against Gradle <code>8.11.1</code>.</li>
+<li>Build against KSP <code>2.1.0-1.0.29</code>.</li>
+<li>Build against Roborazzi <code>1.36.0</code>.</li>
+<li>Build against DAGP <code>2.6.0</code>.</li>
+<li>Build against AGP <code>8.7.3</code>.</li>
+<li>Build against redacted compiler plugin <code>1.11.0</code>.</li>
+</ul>
+<h2 id="0226">0.22.6<a class="headerlink" href="#0226" title="Permanent link">&para;</a></h2>
+<p><em>2024-11-20</em></p>
+<ul>
+<li>[gradle] Make Robolectric jar downloads more dynamic for future-proofing. Will continue to work on improving this, but for now it should be possible to force a newer <code>org.robolectric:robolectric</code> version on your buildscript classpath to force a newer version and have it update JAR coordinates automatically.</li>
+</ul>
 <h2 id="0225">0.22.5<a class="headerlink" href="#0225" title="Permanent link">&para;</a></h2>
 <p><em>2024-11-19</em></p>
 <ul>
