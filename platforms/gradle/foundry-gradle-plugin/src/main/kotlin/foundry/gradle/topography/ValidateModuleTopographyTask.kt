@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2024 Slack Technologies, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package foundry.gradle.topography
 
 import com.github.ajalt.mordant.markdown.Markdown
@@ -15,6 +30,12 @@ import foundry.gradle.register
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.publish
 import foundry.gradle.util.toJson
+import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.extension
+import kotlin.io.path.readText
+import kotlin.io.path.useLines
+import kotlin.io.path.writeText
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
@@ -32,12 +53,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.options.Option
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.work.DisableCachingByDefault
-import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.extension
-import kotlin.io.path.readText
-import kotlin.io.path.useLines
-import kotlin.io.path.writeText
 
 @DisableCachingByDefault
 public abstract class ValidateModuleTopographyTask : DefaultTask() {
@@ -55,13 +70,10 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   @get:Input
   public abstract val autoFix: Property<Boolean>
 
-  @get:Internal
-  public abstract val projectDirProperty: DirectoryProperty
+  @get:Internal public abstract val projectDirProperty: DirectoryProperty
 
-  @get:OutputFile
-  public abstract val modifiedBuildFile: RegularFileProperty
-  @get:OutputFile
-  public abstract val featuresToRemoveOutputFile: RegularFileProperty
+  @get:OutputFile public abstract val modifiedBuildFile: RegularFileProperty
+  @get:OutputFile public abstract val featuresToRemoveOutputFile: RegularFileProperty
 
   init {
     group = "foundry"
@@ -213,7 +225,10 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     ) {
       val publisher =
         if (affectedProjects == null || project.path in affectedProjects) {
-          Publisher.Companion.interProjectPublisher(project, FoundryArtifact.SKIPPY_VALIDATE_TOPOGRAPHY)
+          Publisher.Companion.interProjectPublisher(
+            project,
+            FoundryArtifact.SKIPPY_VALIDATE_TOPOGRAPHY,
+          )
         } else {
           val log = "$LOG Skipping ${project.path}:$CI_NAME because it is not affected."
           if (foundryProperties.debug) {
