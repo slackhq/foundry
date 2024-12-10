@@ -15,6 +15,7 @@
  */
 package foundry.gradle.topography
 
+import foundry.common.buildRegexMap
 import kotlin.reflect.full.declaredMemberProperties
 
 internal object DefaultFeatures {
@@ -36,7 +37,7 @@ internal object DefaultFeatures {
       explanation =
         "The `androidTest()` feature was requested but no sources were found at `src/androidTest/**`",
       advice = "Remove `foundry.android.features.androidTest` from your build file",
-      removalPatterns = setOf("\\bandroidTest\\(\\)".toRegex()),
+      replacementPatterns = buildRegexMap { remove("\\bandroidTest\\(\\)") },
       matchingSourcesDir = "src/androidTest",
     )
 
@@ -46,7 +47,7 @@ internal object DefaultFeatures {
       explanation =
         "The `robolectric()` feature was requested but no sources were found at `src/test/**`",
       advice = "Remove `foundry.android.features.robolectric` from your build file",
-      removalPatterns = setOf("\\brobolectric\\(\\)".toRegex()),
+      replacementPatterns = buildRegexMap { remove("\\brobolectric\\(\\)") },
       matchingSourcesDir = "src/test",
     )
 
@@ -57,7 +58,7 @@ internal object DefaultFeatures {
         "The `compose()` feature (and thus compose-compiler) was requested but no `@Composable` annotations were found in sources",
       advice =
         "Remove `foundry.features.compose` from your build file or use `foundry.features.composeRuntimeOnly()`",
-      removalPatterns = setOf("\\bcompose\\(\\)".toRegex()),
+      replacementPatterns = buildRegexMap { remove("\\bcompose\\(\\)") },
       matchingText = setOf("@Composable", "setContent {"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -68,7 +69,7 @@ internal object DefaultFeatures {
       explanation =
         "The `mergeComponents()` feature (and thus dagger-compiler/KAPT) was requested but no corresponding Merge*/*Component annotations were found in sources",
       advice = "Remove `foundry.features.dagger.mergeComponents` from your build file",
-      removalPatterns = setOf("\\bmergeComponents\\(\\)".toRegex()),
+      replacementPatterns = buildRegexMap { remove("\\bmergeComponents\\(\\)") },
       matchingText =
         setOf(
           "@Component",
@@ -90,7 +91,7 @@ internal object DefaultFeatures {
       explanation =
         "The `dagger()` feature (and thus Anvil/KSP) was requested but no Dagger/Anvil annotations were found in sources",
       advice = "Remove `foundry.features.dagger` from your build file",
-      removalPatterns = setOf("\\bdagger\\(\\)".toRegex()),
+      replacementPatterns = buildRegexMap { remove("\\bdagger\\(\\)") },
       matchingText =
         buildSet {
           addAll(DaggerCompiler.matchingText)
@@ -120,9 +121,10 @@ internal object DefaultFeatures {
     ModuleFeature(
       name = "moshi-codegen",
       explanation =
-        "The `moshi(codeGen = true)` feature (and thus the moshi-ir compiler plugin) was requested but no `@JsonClass` annotations were found in sources",
-      advice = "Remove `foundry.features.moshi.codeGen` from your build file",
-      removalPatterns = null,
+        "The `moshi(codegen = true)` feature (and thus the moshi-ir compiler plugin) was requested but no `@JsonClass` annotations were found in sources",
+      advice = "Remove `foundry.features.moshi.codegen` from your build file",
+      replacementPatterns =
+        buildRegexMap { replace("\\bmoshi\\(codegen = true", "moshi(codegen = false") },
       matchingText = setOf("@JsonClass"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -134,7 +136,8 @@ internal object DefaultFeatures {
         "The `circuit(codegen = true)` feature (and thus the KSP) was requested but no `@CircuitInject` annotations were found in sources",
       advice =
         "Remove `foundry.features.circuit.codegen` from your build file or set codegen to false (i.e. `circuit(codegen = false)`)",
-      removalPatterns = null,
+      replacementPatterns =
+        buildRegexMap { replace("\\bcircuit\\(\\)", "circuit(codegen = false)") },
       matchingText = setOf("@CircuitInject"),
       matchingTextFileExtensions = setOf("kt"),
     )
@@ -145,8 +148,8 @@ internal object DefaultFeatures {
       explanation =
         "The parcelize plugin (and thus its compiler plugin) was requested but no `@Parcelize` annotations were found in sources",
       advice = "Remove the parcelize plugin from your build file",
-      removalPatterns =
-        setOf("\\balias\\(libs\\.plugins\\.kotlin\\.plugin\\.parcelize\\)".toRegex()),
+      replacementPatterns =
+        buildRegexMap { remove("\\balias\\(libs\\.plugins\\.kotlin\\.plugin\\.parcelize\\)") },
       matchingText = setOf("@Parcelize"),
       matchingTextFileExtensions = setOf("kt"),
       matchingPlugin = "org.jetbrains.kotlin.plugin.parcelize",
@@ -158,8 +161,11 @@ internal object DefaultFeatures {
       explanation =
         "The KSP plugin was requested but no generated files were found in `build/generated/ksp`",
       advice = "Remove the KSP plugin (or whatever Foundry feature is requesting it)",
-      removalPatterns =
-        setOf("\\balias\\(libs\\.plugins\\.ksp\\)".toRegex(), "\\bksp\\([a-zA-Z.-]*\\)".toRegex()),
+      replacementPatterns =
+        buildRegexMap {
+          remove("\\balias\\(libs\\.plugins\\.ksp\\)")
+          remove("\\bksp\\([a-zA-Z.-]*\\)")
+        },
       generatedSourcesDir = "build/generated/ksp",
       matchingPlugin = "com.google.devtools.ksp",
       // Don't specify extensions because KAPT can generate anything into resources
@@ -171,11 +177,11 @@ internal object DefaultFeatures {
       explanation =
         "The KAPT plugin was requested but no generated files were found in `build/generated/source/kapt`",
       advice = "Remove the KAPT plugin (or whatever Foundry feature is requesting it)",
-      removalPatterns =
-        setOf(
-          "\\balias\\(libs\\.plugins\\.kotlin\\.kapt\\)".toRegex(),
-          "\\bkapt\\([a-zA-Z.-]*\\)".toRegex(),
-        ),
+      replacementPatterns =
+        buildRegexMap {
+          remove("\\balias\\(libs\\.plugins\\.kotlin\\.kapt\\)")
+          remove("\\bkapt\\([a-zA-Z.-]*\\)")
+        },
       generatedSourcesDir = "build/generated/source/kapt",
       matchingPlugin = "org.jetbrains.kotlin.kapt",
       // Don't specify file extensions because KSP can generate anything into resources
@@ -187,7 +193,7 @@ internal object DefaultFeatures {
       explanation =
         "Android ViewBinding was enabled but no generated viewbinding sources were found in `build/generated/data_binding_base_class_source_out`",
       advice = "Remove android.buildFeatures.viewBinding from your build file",
-      removalPatterns = setOf("\\bviewBinding = true".toRegex()),
+      replacementPatterns = buildRegexMap { remove("\\bviewBinding = true") },
       generatedSourcesDir = "build/generated/data_binding_base_class_source_out",
       generatedSourcesExtensions = setOf("java"),
     )

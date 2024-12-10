@@ -10,6 +10,7 @@ Changelog
 - **Change**: Use KGP 2.1.0+'s new `KotlinBaseExtension` to configure most Kotlin compiler options.
 - **Change**: `foundry.kotlin.allowWarningsInTests` now defaults to the value of `foundry.kotlin.allowWarnings`.
 - **New**: Add a `foundry.android.test.compressWithLegacyPackaging` flag to compress androidTest APKs with legacy packaging.
+- **Enhancement**: Module topography validation now supports custom replacements for matching regexes.
 - Update to Kotlin `2.1.0`.
 - Build against KSP `2.1.0-1.0.29`
 
