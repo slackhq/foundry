@@ -510,8 +510,15 @@ internal class StandardProjectConfigurations(
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
               // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we aggregate
-              // to their
-              // root project dep
+              // to their root project dep
+              if (isLibraryVariant) {
+                val libraryVariant = variant as LibraryVariant
+                libraryVariant.androidTest?.apply {
+                  packaging.dex.useLegacyPackaging.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
+                }
+              }
               if (
                 foundryProperties.enableEmulatorWtfForAndroidTest &&
                   pluginManager.hasPlugin("wtf.emulator.gradle")
@@ -536,14 +543,11 @@ internal class StandardProjectConfigurations(
                   )
                   .publishWith(skippyAndroidTestProjectPublisher)
                 if (isLibraryVariant) {
-                  (variant as LibraryVariant)
-                    .androidTest
-                    ?.artifacts
-                    ?.get(SingleArtifact.APK)
-                    ?.let { apkArtifactsDir ->
-                      // Wire this up to the aggregator. No need for an intermediate task here.
-                      androidTestApksPublisher.publishDirs(apkArtifactsDir)
-                    }
+                  val libraryVariant = variant as LibraryVariant
+                  libraryVariant.androidTest?.apply {
+                    // Wire this up to the aggregator. No need for an intermediate task here.
+                    androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
+                  }
                 }
               }
             } else {
