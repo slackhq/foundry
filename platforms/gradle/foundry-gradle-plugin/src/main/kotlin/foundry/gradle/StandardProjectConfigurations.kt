@@ -473,7 +473,7 @@ internal class StandardProjectConfigurations(
           val isLibraryVariant = variant is LibraryVariant
           val excluded =
             isLibraryVariant &&
-              foundryExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle
+              foundryExtension.androidHandler.featuresHandler.androidTestExcludeFromAggregation
                 .getOrElse(false)
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
