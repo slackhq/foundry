@@ -15,7 +15,6 @@
  */
 package foundry.gradle.tasks
 
-import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspAATask
@@ -34,48 +33,49 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * @param includeCompilerTasks some compiler tasks like javac and kotlinc can produce new source
  *   files too, namely during annotation processing.
  */
-internal fun TaskProvider<*>.mustRunAfterSourceGeneratingTasks(
+internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
   project: Project,
   includeCompilerTasks: Boolean,
 ) {
   // Kapt
   project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
     configure {
-      mustRunAfter(project.tasks.withType(KaptGenerateStubs::class.java))
-      mustRunAfter(project.tasks.withType(KaptTask::class.java))
+      dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
+      dependsOn(project.tasks.withType(KaptTask::class.java))
     }
   }
+
   // KSP
   project.pluginManager.withPlugin("com.google.devtools.ksp") {
     configure {
-      mustRunAfter(project.tasks.withType(KspTask::class.java))
-      mustRunAfter(project.tasks.withType(KspAATask::class.java))
+      dependsOn(project.tasks.withType(KspTask::class.java))
+      dependsOn(project.tasks.withType(KspAATask::class.java))
     }
   }
+
   // ViewBinding
   project.pluginManager.withPlugin("com.android.base") {
-    configure { mustRunAfter(project.tasks.withType(DataBindingGenBaseClassesTask::class.java)) }
+    configure { dependsOn(project.tasks.withType(DataBindingGenBaseClassesTask::class.java)) }
   }
+
   // SqlDelight
   project.pluginManager.withPlugin("app.cash.sqldelight") {
-    configure {
-      mustRunAfter(project.tasks.withType(SqlDelightTask::class.java))
-      mustRunAfter(project.tasks.withType(GenerateSchemaTask::class.java))
-    }
+    configure { dependsOn(project.tasks.withType(SqlDelightTask::class.java)) }
   }
+
   // Wire
   project.pluginManager.withPlugin("com.squareup.wire") {
-    configure { mustRunAfter(project.tasks.withType(WireTask::class.java)) }
+    configure { dependsOn(project.tasks.withType(WireTask::class.java)) }
   }
 
   if (includeCompilerTasks) {
     project.pluginManager.withPlugin("org.jetbrains.kotlin.base") {
-      configure { mustRunAfter(project.tasks.withType(KotlinCompile::class.java)) }
+      configure { dependsOn(project.tasks.withType(KotlinCompile::class.java)) }
       // KGP may create JavaCompile tasks
-      configure { mustRunAfter(project.tasks.withType(JavaCompile::class.java)) }
+      configure { dependsOn(project.tasks.withType(JavaCompile::class.java)) }
     }
     project.pluginManager.withPlugin("java") {
-      configure { mustRunAfter(project.tasks.withType(JavaCompile::class.java)) }
+      configure { dependsOn(project.tasks.withType(JavaCompile::class.java)) }
     }
   }
 }

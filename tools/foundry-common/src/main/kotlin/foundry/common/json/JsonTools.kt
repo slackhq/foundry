@@ -21,7 +21,11 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.addAdapter
+import com.squareup.moshi.rawType
+import foundry.common.RegexMap
+import foundry.common.buildRegexMap
 import java.io.File
+import java.lang.reflect.Type
 import java.nio.file.Path
 import java.time.Instant
 import java.time.LocalDateTime
@@ -38,6 +42,7 @@ public object JsonTools {
     Moshi.Builder()
       .addAdapter<Regex>(RegexJsonAdapter())
       .addAdapter<LocalDateTime>(LocalDateTimeJsonAdapter())
+      .add(RegexMapJsonAdapter.Factory())
       .build()
 
   public inline fun <reified T : Any> fromJson(path: Path): T {
@@ -138,5 +143,41 @@ private class RegexJsonAdapter : JsonAdapter<Regex>() {
       return
     }
     writer.value(value.pattern)
+  }
+}
+
+private class RegexMapJsonAdapter(private val stringAdapter: JsonAdapter<String>) :
+  JsonAdapter<RegexMap>() {
+
+  class Factory : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? {
+      if (type.rawType != RegexMap::class.java) return null
+      val stringAdapter = moshi.adapter<String>()
+      return RegexMapJsonAdapter(stringAdapter).nullSafe()
+    }
+  }
+
+  override fun fromJson(reader: JsonReader): RegexMap? {
+    reader.beginObject()
+    val map = buildRegexMap {
+      while (reader.hasNext()) {
+        reader.promoteNameToValue()
+        val key = stringAdapter.fromJson(reader) ?: error("Null key at ${reader.path}")
+        val value = stringAdapter.fromJson(reader) ?: error("Null value at ${reader.path}")
+        // We don't check for duplicate keys in this implementation
+        replace(key, value)
+      }
+    }
+    reader.endObject()
+    return map
+  }
+
+  override fun toJson(writer: JsonWriter, value: RegexMap?) {
+    writer.beginObject()
+    for ((key, value) in value!!) {
+      writer.name(key.pattern)
+      writer.value(value)
+    }
+    writer.endObject()
   }
 }

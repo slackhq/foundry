@@ -34,7 +34,7 @@ import foundry.gradle.namedLazy
 import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
-import foundry.gradle.tasks.mustRunAfterSourceGeneratingTasks
+import foundry.gradle.tasks.dependsOnSourceGeneratingTasks
 import foundry.gradle.topography.DefaultFeatures
 import foundry.gradle.topography.ModuleTopography
 import foundry.gradle.topography.ModuleTopographyTask
@@ -175,7 +175,7 @@ public object ModuleStatsTasks {
           }
           // Don't depend on compiler tasks. Technically doesn't cover javac apt but tbh we don't
           // really support that
-          locTask.mustRunAfterSourceGeneratingTasks(project, includeCompilerTasks = false)
+          locTask.dependsOnSourceGeneratingTasks(project, includeCompilerTasks = false)
         }
       }
     }
