@@ -450,23 +450,23 @@ public final class foundry/cli/buildkite/BlockedState$Companion {
 public final class foundry/cli/buildkite/Build {
 	public static final field Companion Lfoundry/cli/buildkite/Build$Companion;
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component3 ()Ljava/util/Map;
 	public final fun component4 ()Ljava/lang/String;
 	public final fun component5 ()Ljava/lang/String;
 	public final fun component6 ()Lkotlinx/serialization/json/JsonObject;
 	public final fun component7 ()Ljava/lang/String;
 	public final fun component8 ()Ljava/lang/String;
 	public final fun component9 ()Lfoundry/cli/buildkite/BuildType;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;)Lfoundry/cli/buildkite/Build;
-	public static synthetic fun copy$default (Lfoundry/cli/buildkite/Build;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;ILjava/lang/Object;)Lfoundry/cli/buildkite/Build;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;)Lfoundry/cli/buildkite/Build;
+	public static synthetic fun copy$default (Lfoundry/cli/buildkite/Build;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/BuildType;ILjava/lang/Object;)Lfoundry/cli/buildkite/Build;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBranch ()Ljava/lang/String;
 	public final fun getCommit ()Ljava/lang/String;
-	public final fun getEnv ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getEnv ()Ljava/util/Map;
 	public final fun getLabel ()Ljava/lang/String;
 	public final fun getMessage ()Ljava/lang/String;
 	public final fun getMetaData ()Lkotlinx/serialization/json/JsonObject;
@@ -1997,8 +1997,8 @@ public final class foundry/cli/buildkite/MultiChannelMessage$Companion {
 public final class foundry/cli/buildkite/NestedBlockStepClass : foundry/cli/buildkite/Keyable {
 	public static final field Companion Lfoundry/cli/buildkite/NestedBlockStepClass$Companion;
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lkotlinx/serialization/json/JsonObject;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;)V
-	public synthetic fun <init> (Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lkotlinx/serialization/json/JsonObject;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Ljava/util/Map;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Ljava/util/Map;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/Boolean;
 	public final fun component10 ()Ljava/lang/String;
 	public final fun component11 ()Ljava/lang/String;
@@ -2015,7 +2015,7 @@ public final class foundry/cli/buildkite/NestedBlockStepClass : foundry/cli/buil
 	public final fun component21 ()Ljava/lang/Long;
 	public final fun component22 ()Ljava/lang/String;
 	public final fun component23 ()Lfoundry/cli/buildkite/ConcurrencyMethod;
-	public final fun component24 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component24 ()Ljava/util/Map;
 	public final fun component25 ()Lfoundry/cli/buildkite/MatrixUnion;
 	public final fun component26 ()Ljava/util/List;
 	public final fun component27 ()Ljava/lang/Long;
@@ -2042,8 +2042,8 @@ public final class foundry/cli/buildkite/NestedBlockStepClass : foundry/cli/buil
 	public final fun component7 ()Ljava/lang/String;
 	public final fun component8 ()Ljava/lang/String;
 	public final fun component9 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lkotlinx/serialization/json/JsonObject;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;)Lfoundry/cli/buildkite/NestedBlockStepClass;
-	public static synthetic fun copy$default (Lfoundry/cli/buildkite/NestedBlockStepClass;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lkotlinx/serialization/json/JsonObject;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;IILjava/lang/Object;)Lfoundry/cli/buildkite/NestedBlockStepClass;
+	public final fun copy (Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Ljava/util/Map;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;)Lfoundry/cli/buildkite/NestedBlockStepClass;
+	public static synthetic fun copy$default (Lfoundry/cli/buildkite/NestedBlockStepClass;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Block;Lfoundry/cli/buildkite/BlockedState;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/DependsOn;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/NestedBlockStepType;Lfoundry/cli/buildkite/Input;Lfoundry/cli/buildkite/Agents;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Commands;Lfoundry/cli/buildkite/Commands;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Ljava/util/Map;Lfoundry/cli/buildkite/MatrixUnion;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptStep;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Wait;Lfoundry/cli/buildkite/Wait;Ljava/lang/Boolean;Lfoundry/cli/buildkite/Build;Lfoundry/cli/buildkite/Trigger;Ljava/lang/String;Ljava/util/List;IILjava/lang/Object;)Lfoundry/cli/buildkite/NestedBlockStepClass;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAgents ()Lfoundry/cli/buildkite/Agents;
 	public final fun getAllowDependencyFailure ()Ljava/lang/Boolean;
@@ -2061,7 +2061,7 @@ public final class foundry/cli/buildkite/NestedBlockStepClass : foundry/cli/buil
 	public final fun getConcurrencyMethod ()Lfoundry/cli/buildkite/ConcurrencyMethod;
 	public final fun getContinueOnFailure ()Ljava/lang/Boolean;
 	public final fun getDependsOn ()Lfoundry/cli/buildkite/DependsOn;
-	public final fun getEnv ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getEnv ()Ljava/util/Map;
 	public final fun getFields ()Ljava/util/List;
 	public final fun getGroup ()Ljava/lang/String;
 	public final fun getId ()Ljava/lang/String;
@@ -2234,17 +2234,17 @@ public final class foundry/cli/buildkite/Option$Companion {
 
 public final class foundry/cli/buildkite/Pipeline {
 	public static final field Companion Lfoundry/cli/buildkite/Pipeline$Companion;
-	public fun <init> (Ljava/util/List;Lfoundry/cli/buildkite/Agents;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;)V
-	public synthetic fun <init> (Ljava/util/List;Lfoundry/cli/buildkite/Agents;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/util/List;Lfoundry/cli/buildkite/Agents;Ljava/util/Map;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;Lfoundry/cli/buildkite/Agents;Ljava/util/Map;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/util/List;
 	public final fun component2 ()Lfoundry/cli/buildkite/Agents;
-	public final fun component3 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component3 ()Ljava/util/Map;
 	public final fun component4 ()Ljava/util/List;
-	public final fun copy (Ljava/util/List;Lfoundry/cli/buildkite/Agents;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;)Lfoundry/cli/buildkite/Pipeline;
-	public static synthetic fun copy$default (Lfoundry/cli/buildkite/Pipeline;Ljava/util/List;Lfoundry/cli/buildkite/Agents;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;ILjava/lang/Object;)Lfoundry/cli/buildkite/Pipeline;
+	public final fun copy (Ljava/util/List;Lfoundry/cli/buildkite/Agents;Ljava/util/Map;Ljava/util/List;)Lfoundry/cli/buildkite/Pipeline;
+	public static synthetic fun copy$default (Lfoundry/cli/buildkite/Pipeline;Ljava/util/List;Lfoundry/cli/buildkite/Agents;Ljava/util/Map;Ljava/util/List;ILjava/lang/Object;)Lfoundry/cli/buildkite/Pipeline;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAgents ()Lfoundry/cli/buildkite/Agents;
-	public final fun getEnv ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getEnv ()Ljava/util/Map;
 	public final fun getNotify ()Ljava/util/List;
 	public final fun getSteps ()Ljava/util/List;
 	public fun hashCode ()I
@@ -2440,12 +2440,12 @@ public final class foundry/cli/buildkite/Retry$Companion {
 public final class foundry/cli/buildkite/ScriptStep : foundry/cli/buildkite/Keyable {
 	public static final field Companion Lfoundry/cli/buildkite/ScriptStep$Companion;
 	public fun <init> ()V
-	public fun <init> (Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;)V
-	public synthetic fun <init> (Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;)V
+	public synthetic fun <init> (Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lfoundry/cli/buildkite/Agents;
 	public final fun component10 ()Lfoundry/cli/buildkite/ConcurrencyMethod;
 	public final fun component11 ()Lfoundry/cli/buildkite/DependsOn;
-	public final fun component12 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component12 ()Ljava/util/Map;
 	public final fun component13 ()Ljava/lang/String;
 	public final fun component14 ()Ljava/lang/String;
 	public final fun component15 ()Ljava/lang/String;
@@ -2471,8 +2471,8 @@ public final class foundry/cli/buildkite/ScriptStep : foundry/cli/buildkite/Keya
 	public final fun component7 ()Lfoundry/cli/buildkite/SimpleStringValue;
 	public final fun component8 ()Ljava/lang/Long;
 	public final fun component9 ()Ljava/lang/String;
-	public final fun copy (Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;)Lfoundry/cli/buildkite/ScriptStep;
-	public static synthetic fun copy$default (Lfoundry/cli/buildkite/ScriptStep;Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;ILjava/lang/Object;)Lfoundry/cli/buildkite/ScriptStep;
+	public final fun copy (Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;)Lfoundry/cli/buildkite/ScriptStep;
+	public static synthetic fun copy$default (Lfoundry/cli/buildkite/ScriptStep;Lfoundry/cli/buildkite/Agents;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Boolean;Lfoundry/cli/buildkite/SimpleStringValue;Lfoundry/cli/buildkite/SimpleStringValue;Ljava/lang/Long;Ljava/lang/String;Lfoundry/cli/buildkite/ConcurrencyMethod;Lfoundry/cli/buildkite/DependsOn;Ljava/util/Map;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lfoundry/cli/buildkite/MatrixUnion;Ljava/lang/String;Ljava/util/List;Ljava/lang/Long;Lfoundry/cli/buildkite/Plugins;Ljava/lang/Long;Lfoundry/cli/buildkite/Retry;Lfoundry/cli/buildkite/Signature;Lfoundry/cli/buildkite/Skip;Lfoundry/cli/buildkite/SoftFail;Ljava/lang/Long;Lfoundry/cli/buildkite/ScriptType;ILjava/lang/Object;)Lfoundry/cli/buildkite/ScriptStep;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAgents ()Lfoundry/cli/buildkite/Agents;
 	public final fun getAllowDependencyFailure ()Ljava/lang/Boolean;
@@ -2486,7 +2486,7 @@ public final class foundry/cli/buildkite/ScriptStep : foundry/cli/buildkite/Keya
 	public final fun getConcurrencyGroup ()Ljava/lang/String;
 	public final fun getConcurrencyMethod ()Lfoundry/cli/buildkite/ConcurrencyMethod;
 	public final fun getDependsOn ()Lfoundry/cli/buildkite/DependsOn;
-	public final fun getEnv ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getEnv ()Ljava/util/Map;
 	public final fun getId ()Ljava/lang/String;
 	public final fun getIdentifier ()Ljava/lang/String;
 	public fun getKey ()Ljava/lang/String;
