@@ -59,7 +59,7 @@ constructor(
   project: Project,
   versionCatalog: VersionCatalog,
 ) {
-  internal val androidHandler = objects.newInstance<AndroidHandler>(foundryProperties)
+  public val androidHandler: AndroidHandler = objects.newInstance<AndroidHandler>(foundryProperties)
   internal val featuresHandler =
     objects.newInstance<FeaturesHandler>(
       globalFoundryProperties,
@@ -1055,8 +1055,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
   internal val libraryHandler = objects.newInstance<FoundryAndroidLibraryExtension>()
   internal val appHandler = objects.newInstance<FoundryAndroidAppExtension>()
 
-  @Suppress("MemberVisibilityCanBePrivate")
-  internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
+  public val featuresHandler: AndroidFeaturesHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [FoundryExtension.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
@@ -1106,7 +1105,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
 
 @FoundryExtensionMarker
 public abstract class AndroidFeaturesHandler @Inject constructor() {
-  internal abstract val androidTest: Property<Boolean>
+  public abstract val androidTest: Property<Boolean>
   internal abstract val androidTestExcludeFromAggregation: Property<Boolean>
   internal abstract val androidTestAllowedVariants: SetProperty<String>
   internal abstract val robolectric: Property<Boolean>
