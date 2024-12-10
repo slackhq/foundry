@@ -519,17 +519,14 @@ internal class StandardProjectConfigurations(
                   )
                 }
               }
-              if (
-                foundryProperties.enableEmulatorWtfForAndroidTest &&
-                  pluginManager.hasPlugin("wtf.emulator.gradle")
-              ) {
+              if (foundryProperties.enableEmulatorWtfForAndroidTest) {
                 // Aggregate to emulator.wtf's configuration instead
-                // TODO This is not project-isolation safe but we can deal with that later
-                @Suppress("GradleProjectIsolation")
-                project.rootProject.dependencies.add(
-                  "emulatorwtf",
-                  project.rootProject.project(project.path),
-                )
+                // TODO this doesn't work yet, toe-hold for the future
+                // @Suppress("GradleProjectIsolation")
+                // project.rootProject.dependencies.add(
+                //   "emulatorwtf",
+                //   project.rootProject.project(project.path),
+                // )
               } else {
                 // Note this intentionally just uses the same task each time as they always produce
                 // the same output
