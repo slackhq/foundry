@@ -76,7 +76,7 @@ public data class Pipeline(
   /** A list of steps */
   val steps: List<GroupStep>,
   val agents: Agents? = null,
-  val env: JsonObject? = null,
+  val env: Map<String, String>? = null,
   val notify: List<Notification>? = null,
 )
 
@@ -296,7 +296,7 @@ public data class NestedBlockStepClass(
    * attribute, you must also define concurrency_group and concurrency.
    */
   @SerialName("concurrency_method") val concurrencyMethod: ConcurrencyMethod? = null,
-  val env: JsonObject? = null,
+  val env: Map<String, String>? = null,
   val matrix: MatrixUnion? = null,
 
   /** Array of notification options for this step */
@@ -525,7 +525,7 @@ public data class Build(
 
   /** The commit hash for the build */
   val commit: String? = null,
-  val env: JsonObject? = null,
+  val env: Map<String, String>? = null,
   val label: String? = null,
 
   /** The message for the build (supports emoji) */
@@ -601,7 +601,7 @@ public data class ScriptStep(
    */
   @SerialName("concurrency_method") val concurrencyMethod: ConcurrencyMethod? = null,
   @SerialName("depends_on") val dependsOn: DependsOn? = null,
-  val env: JsonObject? = null,
+  val env: Map<String, String>? = null,
   val id: String? = null,
   val identifier: String? = null,
   @SerialName("if") val commandStepIf: String? = null,
