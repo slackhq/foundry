@@ -16,7 +16,7 @@
 package foundry.gradle.topography
 
 import com.squareup.moshi.JsonClass
-import foundry.common.json.RegexMap
+import foundry.common.RegexMap
 
 @JsonClass(generateAdapter = true)
 public data class ModuleFeature(
