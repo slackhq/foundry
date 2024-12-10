@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Support emulator.wtf for `androidTest()`. This feature is gated by the `foundry.emulatorwtf.enable` feature flag.
+
 0.22.6
 ------
 
