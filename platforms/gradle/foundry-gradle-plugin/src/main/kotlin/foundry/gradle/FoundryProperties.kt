@@ -253,7 +253,8 @@ internal constructor(
 
   /** Opt out for -Werror in tests. */
   public val allowWarningsInTests: Provider<Boolean>
-    get() = resolver.booleanProvider("foundry.kotlin.allowWarningsInTests", defaultValue = allowWarnings)
+    get() =
+      resolver.booleanProvider("foundry.kotlin.allowWarningsInTests", defaultValue = allowWarnings)
 
   /** Opt-in for explicit API mode. Maps to [ExplicitApiMode] */
   public val kotlinExplicitApiMode: Provider<String>
