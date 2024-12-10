@@ -25,6 +25,7 @@ import com.android.build.api.variant.HasAndroidTestBuilder
 import com.android.build.api.variant.HasUnitTestBuilder
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.LibraryVariant
+import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
@@ -66,6 +67,7 @@ import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import wtf.emulator.EwExtension
 
 private const val LOG = "Foundry:"
 private const val FIVE_MINUTES_MS = 300_000L
@@ -235,7 +237,6 @@ internal class StandardProjectConfigurations(
       }
     }
 
-    // TODO always configure compileOptions here
     configureAndroidProjects(foundryExtension, foundryProperties)
     configureJavaProject(foundryProperties)
     foundryExtension.applyTo(this)
@@ -430,7 +431,7 @@ internal class StandardProjectConfigurations(
       Publisher.interProjectPublisher(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject =
-      foundryTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
+      foundryTools.globalConfig.affectedProjects?.contains(projectPath) != false
     val skippyAndroidTestProjectPublisher =
       Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
@@ -468,32 +469,82 @@ internal class StandardProjectConfigurations(
           }
         }
 
+        finalizeDsl {
+          val androidTestEnabled =
+            foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+          if (androidTestEnabled && foundryProperties.enableEmulatorWtfForAndroidTest) {
+            project.pluginManager.apply("wtf.emulator.gradle")
+            project.configure<EwExtension> {
+              // whether to enable Android orchestrator, if your app has orchestrator
+              // configured this will get picked up automatically, however you can
+              // force-change the value here if you want to
+              useOrchestrator.set(foundryProperties.useOrchestrator)
+
+              // whether to clear package data before running each test (orchestrator only)
+              // if your app has this configured via testInstrumentationRunnerArguments then
+              // it will get picked up automatically
+              clearPackageData.set(foundryProperties.useOrchestrator)
+            }
+            if (foundryProperties.enableEmulatorWtfPerTestVideo) {
+              when (this) {
+                is LibraryAndroidComponentsExtension,
+                is ApplicationAndroidComponentsExtension -> {
+                  dependencies.add("androidTestImplementation", "wtf.emulator:test-runtime-android")
+                }
+                is TestAndroidComponentsExtension -> {
+                  dependencies.add("implementation", "wtf.emulator:test-runtime-android")
+                }
+              }
+            }
+          }
+        }
+
         // Configure androidTest
         onVariants { variant ->
           val isLibraryVariant = variant is LibraryVariant
           val excluded =
             isLibraryVariant &&
-              foundryExtension.androidHandler.featuresHandler.androidTestExcludeFromFladle
+              foundryExtension.androidHandler.featuresHandler.androidTestExcludeFromAggregation
                 .getOrElse(false)
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
-              // Note this intentionally just uses the same task each time as they always produce
-              // the same output
-              SimpleFileProducerTask.registerOrConfigure(
-                  project,
-                  name = "androidTestProjectMetadata",
-                  description =
-                    "Produces a metadata artifact indicating this project path produces an androidTest APK.",
-                  input = projectPath,
-                  group = "skippy",
-                )
-                .publishWith(skippyAndroidTestProjectPublisher)
+              // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we aggregate
+              // to their root project dep
               if (isLibraryVariant) {
-                (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
-                  apkArtifactsDir ->
-                  // Wire this up to the aggregator. No need for an intermediate task here.
-                  androidTestApksPublisher.publishDirs(apkArtifactsDir)
+                val libraryVariant = variant as LibraryVariant
+                libraryVariant.androidTest?.apply {
+                  packaging.dex.useLegacyPackaging.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
+                }
+              }
+              if (foundryProperties.enableEmulatorWtfForAndroidTest) {
+                // Aggregate to emulator.wtf's configuration instead
+                // TODO this doesn't work yet, toe-hold for the future
+                // @Suppress("GradleProjectIsolation")
+                // project.rootProject.dependencies.add(
+                //   "emulatorwtf",
+                //   project.rootProject.project(project.path),
+                // )
+              } else {
+                // Note this intentionally just uses the same task each time as they always produce
+                // the same output
+                SimpleFileProducerTask.registerOrConfigure(
+                    project,
+                    name = "androidTestProjectMetadata",
+                    description =
+                      "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                    input = projectPath,
+                    group = "skippy",
+                  )
+                  .publishWith(skippyAndroidTestProjectPublisher)
+                if (isLibraryVariant) {
+                  val libraryVariant = variant as LibraryVariant
+                  libraryVariant.androidTest?.apply {
+                    // Wire this up to the aggregator. No need for an intermediate task here.
+                    androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
+                  }
                 }
               }
             } else {
@@ -545,7 +596,7 @@ internal class StandardProjectConfigurations(
           testOptions {
             animationsDisabled = true
 
-            if (foundryProperties.useOrchestrator) {
+            if (foundryProperties.useOrchestrator.getOrElse(false)) {
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -628,9 +679,6 @@ internal class StandardProjectConfigurations(
       prepareAndroidTestConfigurations()
       configure<ApplicationAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
-        // TODO maybe we want to disable release androidTest by default? (i.e. for slack kit
-        //  playground, samples, etc)
-        // TODO would be nice if we could query just non-debuggable build types.
         // Disable androidTest tasks unless they opt-in
         beforeVariants { builder ->
           // Disable unit tests on release variants, since it's unused
@@ -645,7 +693,7 @@ internal class StandardProjectConfigurations(
           val variantEnabled =
             androidTestEnabled &&
               foundryExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.name) ?: true
+                ?.contains(builder.name) != false
           logger.debug("$LOG AndroidTest for ${builder.name} enabled? $variantEnabled")
           builder.androidTest.enable = variantEnabled
         }
@@ -786,7 +834,7 @@ internal class StandardProjectConfigurations(
           val variantEnabled =
             androidTestEnabled &&
               foundryExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
-                ?.contains(builder.name) ?: true
+                ?.contains(builder.name) != false
           builder.androidTest.enable = variantEnabled
           if (variantEnabled) {
             // Ensure there's a manifest file present and has its debuggable flag set correctly

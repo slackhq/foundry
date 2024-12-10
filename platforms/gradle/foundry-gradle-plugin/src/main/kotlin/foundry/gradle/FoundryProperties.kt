@@ -26,6 +26,7 @@ import java.util.Locale
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 /**
@@ -186,9 +187,16 @@ internal constructor(
         .orElse(emptyList())
 
   /** Relative path to a Compose stability configuration file from the _root_ project. */
+  public val composeGlobalStabilityConfigurationPath: Provider<RegularFile>
+    get() =
+      resolver
+        .providerFor("foundry.compose.global.stabilityConfigurationPath")
+        .map(rootDirFileProvider)
+
+  /** Relative path to a Compose stability configuration file from the current project. */
   public val composeStabilityConfigurationPath: Provider<RegularFile>
     get() =
-      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map(rootDirFileProvider)
+      resolver.providerFor("foundry.compose.stabilityConfigurationPath").map(regularFileProvider)
 
   /**
    * Use a workaround for compose-compiler's `includeInformation` option on android projects.
@@ -245,7 +253,12 @@ internal constructor(
 
   /** Opt out for -Werror in tests. */
   public val allowWarningsInTests: Provider<Boolean>
-    get() = resolver.booleanProvider("foundry.kotlin.allowWarningsInTests", defaultValue = false)
+    get() =
+      resolver.booleanProvider("foundry.kotlin.allowWarningsInTests", defaultValue = allowWarnings)
+
+  /** Opt-in for explicit API mode. Maps to [ExplicitApiMode] */
+  public val kotlinExplicitApiMode: Provider<String>
+    get() = resolver.optionalStringProvider("foundry.kotlin.explicitApiMode", defaultValue = null)
 
   /**
    * Anvil generator projects that should always be included when Anvil is enabled.
@@ -363,6 +376,20 @@ internal constructor(
   public val enableLintInAndroidTestProjects: Boolean
     get() = booleanProperty("foundry.lint.enableOnAndroidTestProjects", false)
 
+  /** If enabled, enables emulator.wtf for androidTest() uses. */
+  public val enableEmulatorWtfForAndroidTest: Boolean
+    get() = booleanProperty("foundry.emulatorwtf.enable", false)
+
+  /**
+   * If enabled, enables per-test videos for emulator.wtf.
+   *
+   * https://github.com/emulator-wtf/test-runtime-android
+   */
+  public val enableEmulatorWtfPerTestVideo: Boolean
+    get() =
+      enableEmulatorWtfForAndroidTest &&
+        booleanProperty("foundry.emulatorwtf.enablePerTestVideo", true)
+
   /** Flag to enable/disable KSP. */
   public val enableKsp: Boolean
     get() = booleanProperty("foundry.ksp.enable")
@@ -456,8 +483,28 @@ internal constructor(
     get() = optionalStringProperty("foundry.ci-lint.variants")
 
   /** Flag for enabling test orchestrator. */
-  public val useOrchestrator: Boolean
-    get() = booleanProperty("foundry.android.test.orchestrator")
+  public val useOrchestrator: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.test.orchestrator", false)
+
+  /**
+   * Flag for compressing androidTest APks with legacy packaging.
+   *
+   * See:
+   * - https://issuetracker.google.com/issues/259832799
+   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
+   */
+  public val compressAndroidTestApksWithLegacyPackaging: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
+
+  /**
+   * Flag for minifying androidTest APks with R8. This just tree shakes.
+   *
+   * See:
+   * - https://issuetracker.google.com/issues/259832799
+   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
+   */
+  public val minifyAndroidTestApks: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.test.minifyEnabled", false)
 
   /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution

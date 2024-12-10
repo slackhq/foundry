@@ -1,7 +1,7 @@
 [versions]
 agp = "8.7.3"
 agpAlpha = "8.9.0-alpha04"
-anvil = "2.5.0-beta11"
+anvil = "0.4.0"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.7.1"
 bugsnagGradle = "8.1.0"
@@ -23,9 +23,8 @@ jdk = "21"
 jvmTarget = "17"
 jewel = "0.27.0"
 jna = "5.15.0"
-junit = "4.13.1"
 kaml = "0.66.0"
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 kotlinx-serialization = "1.7.3"
 ksp = "2.1.0-1.0.29"
 kotlinPoet = "2.0.0"
@@ -34,7 +33,7 @@ markdown = "0.27.0"
 mavenPublish = "0.30.0"
 mordant = "3.0.1"
 moshi = "1.15.2"
-moshix = "0.28.0"
+moshix = "0.29.0"
 nullawayGradle = "2.1.0"
 okhttp = "5.0.0-alpha.12"
 okio = "3.9.1"
@@ -96,7 +95,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
 develocity-agent-adapters = "com.gradle:develocity-gradle-plugin-adapters:1.0.4"
 gradleLints = "androidx.lint:lint-gradle:1.0.0-alpha02"
-gradlePlugins-anvil = { module = "com.squareup.anvil:gradle-plugin", version.ref = "anvil" }
+gradlePlugins-anvil = { module = "dev.zacsweers.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
 gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb-stable" }
 gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
@@ -104,6 +103,7 @@ gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-ana
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:3.18.2"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
+gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:0.18.1"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = { module = "com.jraska.module.graph.assertion:plugin", version.ref = "graph-assert" }
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

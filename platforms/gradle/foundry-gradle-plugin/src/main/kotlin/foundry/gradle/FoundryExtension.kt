@@ -951,91 +951,94 @@ constructor(
         composeBundleAlias?.let { project.dependencies.add("implementation", it) }
       }
 
-      if (enableCompiler.get()) {
-        val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
+      val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
+      if (foundryProperties.composeGlobalStabilityConfigurationPath.isPresent) {
+        extension.stabilityConfigurationFiles.add(
+          foundryProperties.composeGlobalStabilityConfigurationPath
+        )
+      }
 
-        if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
-          extension.stabilityConfigurationFile.setDisallowChanges(
-            foundryProperties.composeStabilityConfigurationPath
-          )
-        }
+      if (foundryProperties.composeStabilityConfigurationPath.isPresent) {
+        extension.stabilityConfigurationFiles.add(
+          foundryProperties.composeStabilityConfigurationPath
+        )
+      }
 
-        // Because the Compose Compiler plugin auto applies common options for us, we need to know
-        // about those options and _avoid_ setting them a second time
-        val freeOptions = mutableListOf<String>()
-        var includeSourceInformation =
-          foundryProperties.composeIncludeSourceInformationEverywhereByDefault
-        for ((k, v) in compilerOptions.get().map { it.split('=') }) {
-          project.logger.debug("Processing compose option $k = $v")
-          when (k) {
-            "generateFunctionKeyMetaClasses" -> {
-              extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
-            }
+      // Because the Compose Compiler plugin auto applies common options for us, we need to know
+      // about those options and _avoid_ setting them a second time
+      val freeOptions = mutableListOf<String>()
+      var includeSourceInformation =
+        foundryProperties.composeIncludeSourceInformationEverywhereByDefault
+      for ((k, v) in compilerOptions.get().map { it.split('=') }) {
+        project.logger.debug("Processing compose option $k = $v")
+        when (k) {
+          "generateFunctionKeyMetaClasses" -> {
+            extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
+          }
 
-            OPTION_SOURCE_INFORMATION -> {
-              includeSourceInformation = v.toBoolean()
-            }
+          OPTION_SOURCE_INFORMATION -> {
+            includeSourceInformation = v.toBoolean()
+          }
 
-            "metricsDestination" -> {
-              extension.metricsDestination.set(project.file(v))
-            }
+          "metricsDestination" -> {
+            extension.metricsDestination.set(project.file(v))
+          }
 
-            "reportsDestination" -> {
-              extension.reportsDestination.set(project.file(v))
-            }
+          "reportsDestination" -> {
+            extension.reportsDestination.set(project.file(v))
+          }
 
-            "intrinsicRemember" -> {
-              if (v.toBoolean()) {
-                extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
-              }
-            }
-
-            "nonSkippingGroupOptimization" -> {
-              if (v.toBoolean()) {
-                extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
-              }
-            }
-
-            "suppressKotlinVersionCompatibilityCheck" -> {
-              error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
-            }
-
-            "strongSkipping" -> {
-              if (v.toBoolean()) {
-                extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
-              }
-            }
-
-            "stabilityConfigurationPath" -> {
-              error(
-                "Use the 'sgp.compose.stabilityConfigurationPath' Gradle property to specify a stability configuration path"
-              )
-            }
-
-            "traceMarkersEnabled" -> {
-              extension.includeTraceMarkers.set(v.toBoolean())
-            }
-
-            else -> {
-              freeOptions += "$k=$v"
+          "intrinsicRemember" -> {
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
             }
           }
-        }
 
-        if (includeSourceInformation) {
-          if (androidExtension == null) {
-            extension.includeSourceInformation.set(true)
-          } else if (foundryProperties.composeUseIncludeInformationWorkaround) {
-            freeOptions += "$OPTION_SOURCE_INFORMATION=true"
+          "nonSkippingGroupOptimization" -> {
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+            }
           }
-        }
 
-        if (freeOptions.isNotEmpty()) {
-          project.tasks.configureKotlinCompilationTask {
-            compilerOptions.freeCompilerArgs.addAll(
-              freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+          "suppressKotlinVersionCompatibilityCheck" -> {
+            error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
+          }
+
+          "strongSkipping" -> {
+            if (v.toBoolean()) {
+              extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
+            }
+          }
+
+          "stabilityConfigurationPath" -> {
+            error(
+              "Use the 'sgp.compose.stabilityConfigurationPath' Gradle property to specify a stability configuration path"
             )
           }
+
+          "traceMarkersEnabled" -> {
+            extension.includeTraceMarkers.set(v.toBoolean())
+          }
+
+          else -> {
+            freeOptions += "$k=$v"
+          }
+        }
+      }
+
+      if (includeSourceInformation) {
+        if (androidExtension == null) {
+          extension.includeSourceInformation.set(true)
+        } else if (foundryProperties.composeUseIncludeInformationWorkaround) {
+          freeOptions += "$OPTION_SOURCE_INFORMATION=true"
+        }
+      }
+
+      if (freeOptions.isNotEmpty()) {
+        project.tasks.configureKotlinCompilationTask {
+          compilerOptions.freeCompilerArgs.addAll(
+            freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+          )
         }
       }
     }
@@ -1107,7 +1110,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
 @FoundryExtensionMarker
 public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val androidTest: Property<Boolean>
-  internal abstract val androidTestExcludeFromFladle: Property<Boolean>
+  internal abstract val androidTestExcludeFromAggregation: Property<Boolean>
   internal abstract val androidTestAllowedVariants: SetProperty<String>
   internal abstract val robolectric: Property<Boolean>
 
@@ -1123,15 +1126,16 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   /**
    * Enables android instrumentation tests for this project.
    *
-   * @param excludeFromFladle If true, the test will be excluded from Flank/Fladle tests.
+   * @param excludeFromAggregation If true, the test will be excluded from Flank/Fladle/emulator.wtf
+   *   test aggregation.
    * @param allowedVariants If set, the allowed variants to enable android tests for.
    */
   public fun androidTest(
-    excludeFromFladle: Boolean = false,
+    excludeFromAggregation: Boolean = false,
     allowedVariants: Iterable<String>? = null,
   ) {
     androidTest.setDisallowChanges(true)
-    androidTestExcludeFromFladle.setDisallowChanges(excludeFromFladle)
+    androidTestExcludeFromAggregation.setDisallowChanges(excludeFromAggregation)
     androidTestAllowedVariants.setDisallowChanges(allowedVariants)
   }
 

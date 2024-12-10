@@ -16,13 +16,14 @@
 package foundry.gradle.topography
 
 import com.squareup.moshi.JsonClass
+import foundry.common.RegexMap
 
 @JsonClass(generateAdapter = true)
 public data class ModuleFeature(
   val name: String,
   val explanation: String,
   val advice: String,
-  val removalPatterns: Set<Regex>?,
+  val replacementPatterns: RegexMap = RegexMap(),
   /**
    * Generated sources root dir relative to the project dir, if any. Files are checked recursively.
    */
