@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Add a `foundry.android.test.compressWithLegacyPackaging` flag to compress androidTest APKs with legacy packaging.
+
 0.22.6
 ------
 
