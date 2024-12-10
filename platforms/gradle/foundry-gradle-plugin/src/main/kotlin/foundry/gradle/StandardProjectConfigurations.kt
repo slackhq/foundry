@@ -490,10 +490,13 @@ internal class StandardProjectConfigurations(
                 )
                 .publishWith(skippyAndroidTestProjectPublisher)
               if (isLibraryVariant) {
-                (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
-                  apkArtifactsDir ->
+                val libraryVariant = variant as LibraryVariant
+                libraryVariant.androidTest?.apply {
+                  packaging.dex.useLegacyPackaging.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
                   // Wire this up to the aggregator. No need for an intermediate task here.
-                  androidTestApksPublisher.publishDirs(apkArtifactsDir)
+                  androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
                 }
               }
             } else {
