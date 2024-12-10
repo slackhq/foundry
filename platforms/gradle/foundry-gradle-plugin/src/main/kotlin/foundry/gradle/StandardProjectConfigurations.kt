@@ -518,6 +518,7 @@ internal class StandardProjectConfigurations(
               ) {
                 // Aggregate to emulator.wtf's configuration instead
                 // TODO This is not project-isolation safe but we can deal with that later
+                @Suppress("GradleProjectIsolation")
                 project.rootProject.dependencies.add(
                   "emulatorwtf",
                   project.rootProject.project(project.path),
