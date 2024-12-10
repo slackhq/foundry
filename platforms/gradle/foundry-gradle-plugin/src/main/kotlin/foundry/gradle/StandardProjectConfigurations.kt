@@ -430,7 +430,7 @@ internal class StandardProjectConfigurations(
       Publisher.interProjectPublisher(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
     val projectPath = project.path
     val isAffectedProject =
-      foundryTools.globalConfig.affectedProjects?.contains(projectPath) ?: true
+      foundryTools.globalConfig.affectedProjects?.contains(projectPath) != false
     val skippyAndroidTestProjectPublisher =
       Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
 
@@ -478,22 +478,30 @@ internal class StandardProjectConfigurations(
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
             if (!excluded && isAffectedProject) {
-              // Note this intentionally just uses the same task each time as they always produce
-              // the same output
-              SimpleFileProducerTask.registerOrConfigure(
-                  project,
-                  name = "androidTestProjectMetadata",
-                  description =
-                    "Produces a metadata artifact indicating this project path produces an androidTest APK.",
-                  input = projectPath,
-                  group = "skippy",
-                )
-                .publishWith(skippyAndroidTestProjectPublisher)
-              if (isLibraryVariant) {
-                (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
-                  apkArtifactsDir ->
-                  // Wire this up to the aggregator. No need for an intermediate task here.
-                  androidTestApksPublisher.publishDirs(apkArtifactsDir)
+              // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we aggregate to their
+              // root project dep
+              if (pluginManager.hasPlugin("wtf.emulator.gradle")) {
+                // Aggregate to emulator.wtf's configuration instead
+                // TODO This is not project-isolation safe but we can deal with that later
+                project.rootProject.dependencies.add("emulatorwtf", project.rootProject.project(project.path))
+              } else {
+                // Note this intentionally just uses the same task each time as they always produce
+                // the same output
+                SimpleFileProducerTask.registerOrConfigure(
+                    project,
+                    name = "androidTestProjectMetadata",
+                    description =
+                      "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                    input = projectPath,
+                    group = "skippy",
+                  )
+                  .publishWith(skippyAndroidTestProjectPublisher)
+                if (isLibraryVariant) {
+                  (variant as LibraryVariant).androidTest?.artifacts?.get(SingleArtifact.APK)?.let {
+                    apkArtifactsDir ->
+                    // Wire this up to the aggregator. No need for an intermediate task here.
+                    androidTestApksPublisher.publishDirs(apkArtifactsDir)
+                  }
                 }
               }
             } else {
