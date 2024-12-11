@@ -9,6 +9,7 @@ module:better-gradle-properties
 foundry.gradle.properties
 module:foundry-gradle-plugin
 foundry.gradle
+foundry.gradle.android
 foundry.gradle.anvil
 foundry.gradle.avoidance
 foundry.gradle.dependencies
