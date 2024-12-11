@@ -21,18 +21,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.slack.circuit.runtime.presenter.Presenter
+import java.nio.file.Path
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import slack.tooling.aibot.ChatBotActionService
 
-class ChatPresenter : Presenter<ChatScreen.State> {
+class ChatPresenter(private val scriptPath: Path, apiLink: String) : Presenter<ChatScreen.State> {
+  val user = "user"
+  val bot = "bot"
+  private val chatBotActionService = ChatBotActionService(scriptPath, apiLink)
+
   @Composable
   override fun present(): ChatScreen.State {
     var messages by remember { mutableStateOf(emptyList<Message>()) }
     var isLoading by remember { mutableStateOf(false) }
 
+    println("print script path $scriptPath")
+
     return ChatScreen.State(messages = messages, isLoading = isLoading) { event ->
       when (event) {
         is ChatScreen.Event.SendMessage -> {
-          val newMessage = Message(event.message, isMe = true)
+          val newMessage = Message(role = user, event.message)
           messages = messages + newMessage
+          CoroutineScope(Dispatchers.IO).launch {
+            val response = chatBotActionService.executeCommand(event.message)
+            messages = messages + Message(role = bot, response)
+          }
           isLoading = true
           val response = Message(callApi(event.message), isMe = false)
           messages = messages + response
@@ -40,11 +55,5 @@ class ChatPresenter : Presenter<ChatScreen.State> {
         }
       }
     }
-  }
-
-  private fun callApi(message: String): String {
-    // function set up to call the DevXP API in the future.
-    // right now, just sends back the user input message
-    return ("I am a bot. You said \"${message}\"")
   }
 }
