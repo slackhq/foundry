@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.1
+------
+
+_2024-12-11_
+
+- Make `foundry.android.test.compressWithLegacyPackaging` flag also apply to jniLibs compression.
+
 0.23.0
 ------
 

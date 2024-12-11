@@ -517,6 +517,12 @@ internal class StandardProjectConfigurations(
                   packaging.dex.useLegacyPackaging.set(
                     foundryProperties.compressAndroidTestApksWithLegacyPackaging
                   )
+                  packaging.jniLibs.useLegacyPackaging.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
+                  packaging.jniLibs.useLegacyPackagingFromBundle.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
                 }
               }
               if (foundryProperties.enableEmulatorWtfForAndroidTest) {

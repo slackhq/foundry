@@ -496,13 +496,7 @@ internal constructor(
   public val compressAndroidTestApksWithLegacyPackaging: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
 
-  /**
-   * Flag for minifying androidTest APks with R8. This just tree shakes.
-   *
-   * See:
-   * - https://issuetracker.google.com/issues/259832799
-   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
-   */
+  /** Flag for minifying androidTest APks with R8. This just tree shakes. */
   public val minifyAndroidTestApks: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.android.test.minifyEnabled", false)
 
