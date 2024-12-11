@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.4
+------
+
+_2024-12-11_
+
+- Non-GA supported languages properties can now be empty/optional.
+
 0.23.3
 ------
 

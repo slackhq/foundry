@@ -97,9 +97,11 @@ public fun Project.supportedLanguages(
   val foundryProperties = project.foundryProperties
   val gaLanguages = foundryProperties.supportedLanguages.map { it.split(",") }
 
-  val internalLanguages = foundryProperties.supportedLanguagesInternal.map { it.split(",") }
+  val internalLanguages =
+    foundryProperties.supportedLanguagesInternal.map { it.split(",") }.orElse(emptyList())
 
-  val betaLanguages = foundryProperties.supportedLanguagesBeta.map { it.split(",") }
+  val betaLanguages =
+    foundryProperties.supportedLanguagesBeta.map { it.split(",") }.orElse(emptyList())
 
   return when (supportedLanguages) {
     SupportedLanguagesEnum.GA -> gaLanguages

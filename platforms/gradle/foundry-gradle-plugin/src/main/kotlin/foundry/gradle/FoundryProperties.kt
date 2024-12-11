@@ -146,11 +146,19 @@ internal constructor(
 
   /** Property corresponding to the supported languages in Internal builds */
   public val supportedLanguagesInternal: Provider<String>
-    get() = resolver.requiredStringProvider("foundry.android.supportedLanguagesInternal")
+    get() =
+      resolver.optionalStringProvider(
+        "foundry.android.supportedLanguagesInternal",
+        blankBehavior = PropertyResolver.BlankBehavior.FILTER,
+      )
 
   /** Property corresponding to the supported languages in Beta builds */
   public val supportedLanguagesBeta: Provider<String>
-    get() = resolver.requiredStringProvider("foundry.android.supportedLanguagesBeta")
+    get() =
+      resolver.optionalStringProvider(
+        "foundry.android.supportedLanguagesBeta",
+        blankBehavior = PropertyResolver.BlankBehavior.FILTER,
+      )
 
   /**
    * Property corresponding to the file path of a custom versions.json file for use with
