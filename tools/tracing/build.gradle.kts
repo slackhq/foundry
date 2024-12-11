@@ -29,9 +29,6 @@ wire {
 }
 
 dependencies {
-  api(platform(libs.coroutines.bom))
-  api(platform(libs.okhttp.bom))
-
   implementation(libs.coroutines.core)
   implementation(libs.okhttp)
   implementation(libs.okio)
