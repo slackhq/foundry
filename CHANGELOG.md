@@ -4,7 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.3
+------
+
+_2024-12-11_
+
 - Add blank behavior parameters to `PropertyResolver.optionalStringProvider` overloads to specify behavior for blank property values. Default behavior now is to error.
+- Make supported language locales properties instead of string values.
+- Make coroutines-core dep explicitly versioned in the skippy artifact.
+- Update to OkHttp `5.0.0-alpha.14`.
 
 0.23.2
 ------
