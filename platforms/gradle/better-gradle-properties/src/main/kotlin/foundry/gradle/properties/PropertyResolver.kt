@@ -111,6 +111,15 @@ public class PropertyResolver(
       ?: error("No property for '$key' found and no default value was provided.")
   }
 
+  public fun requiredStringProvider(key: String): Provider<String> {
+    return optionalStringProvider(key)
+      .orElse(
+        providers.provider {
+          error("No property for '$key' found and no default value was provided.")
+        }
+      )
+  }
+
   public fun optionalStringValue(key: String, defaultValue: String? = null): String? {
     return providerFor(key).orNull ?: defaultValue
   }
