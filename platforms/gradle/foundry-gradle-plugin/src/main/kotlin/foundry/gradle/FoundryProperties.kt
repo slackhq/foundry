@@ -141,16 +141,16 @@ internal constructor(
     get() = booleanProperty("foundry.config.noPlatform")
 
   /** Property corresponding to the supported languages in GA builds */
-  public val supportedLanguages: String
-    get() = stringProperty("foundry.android.supportedLanguages")
+  public val supportedLanguages: Provider<String>
+    get() = resolver.requiredStringProvider("foundry.android.supportedLanguages")
 
   /** Property corresponding to the supported languages in Internal builds */
-  public val supportedLanguagesInternal: String
-    get() = stringProperty("foundry.android.supportedLanguagesInternal")
+  public val supportedLanguagesInternal: Provider<String>
+    get() = resolver.requiredStringProvider("foundry.android.supportedLanguagesInternal")
 
   /** Property corresponding to the supported languages in Beta builds */
-  public val supportedLanguagesBeta: String
-    get() = stringProperty("foundry.android.supportedLanguagesBeta")
+  public val supportedLanguagesBeta: Provider<String>
+    get() = resolver.requiredStringProvider("foundry.android.supportedLanguagesBeta")
 
   /**
    * Property corresponding to the file path of a custom versions.json file for use with

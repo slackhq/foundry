@@ -48,6 +48,7 @@ public final class foundry/gradle/properties/PropertyResolver {
 	public final fun optionalStringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 	public static synthetic fun optionalStringValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
 	public final fun providerFor (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public final fun requiredStringProvider (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
 	public final fun stringValue (Ljava/lang/String;)Ljava/lang/String;
 	public final fun stringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 }
