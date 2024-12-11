@@ -16,6 +16,7 @@
 package foundry.gradle
 
 import foundry.common.FoundryKeys
+import foundry.gradle.android.AndroidArchitecture
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
@@ -495,6 +496,17 @@ internal constructor(
    */
   public val compressAndroidTestApksWithLegacyPackaging: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
+
+  /**
+   * Option to specify which architecture to target for androidTest APKs. These are universal by
+   * default, which can be quite bloated. This allows for targeting a subset of arches by excluding
+   * jni libs from other ones.
+   */
+  public val targetAndroidTestApksArch: Provider<AndroidArchitecture>
+    get() =
+      resolver.optionalStringProvider("foundry.android.test.targetApkArch").map {
+        AndroidArchitecture.valueOf(it)
+      }
 
   /** Flag for minifying androidTest APks with R8. This just tree shakes. */
   public val minifyAndroidTestApks: Provider<Boolean>

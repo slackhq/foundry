@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.2
+------
+
+_2024-12-11_
+
+- Add `foundry.android.test.targetApkArch` property to specify a target architecture for androidTest APKs. This allows us to exclude jni libs from unmatched architectures to shrink APK size.
+
 0.23.1
 ------
 

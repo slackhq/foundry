@@ -34,6 +34,7 @@ import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import foundry.gradle.Configurations.isPlatformConfigurationName
+import foundry.gradle.android.AndroidArchitecture
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.dependencies.FoundryDependencies
@@ -523,6 +524,14 @@ internal class StandardProjectConfigurations(
                   packaging.jniLibs.useLegacyPackagingFromBundle.set(
                     foundryProperties.compressAndroidTestApksWithLegacyPackaging
                   )
+                  foundryProperties.targetAndroidTestApksArch.orNull?.let { targetArch ->
+                    packaging.jniLibs.excludes.addAll(
+                      // Exclude out non-targeted architectures
+                      AndroidArchitecture.entries
+                        .filterNot { it == targetArch }
+                        .map { "**/${it.jniLibsPath}/*.so" }
+                    )
+                  }
                 }
               }
               if (foundryProperties.enableEmulatorWtfForAndroidTest) {
