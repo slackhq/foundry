@@ -115,12 +115,40 @@ public class PropertyResolver(
     return providerFor(key).orNull ?: defaultValue
   }
 
-  public fun optionalStringProvider(key: String): Provider<String> {
-    return optionalStringProvider(key, null)
+  public fun optionalStringProvider(
+    key: String,
+    blankBehavior: BlankBehavior = BlankBehavior.ERROR,
+  ): Provider<String> {
+    return optionalStringProvider(key, null, blankBehavior)
   }
 
-  public fun optionalStringProvider(key: String, defaultValue: String? = null): Provider<String> {
-    return providerFor(key).let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
+  public fun optionalStringProvider(
+    key: String,
+    defaultValue: String? = null,
+    blankBehavior: BlankBehavior = BlankBehavior.ERROR,
+  ): Provider<String> {
+    return providerFor(key)
+      .let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
+      .filter {
+        when (blankBehavior) {
+          BlankBehavior.FILTER -> {
+            it.isNotBlank()
+          }
+          BlankBehavior.ERROR -> {
+            it.ifBlank { error("Unexpected blank value for property '$key'") }
+            true
+          }
+          BlankBehavior.NONE -> {
+            true
+          }
+        }
+      }
+  }
+
+  public enum class BlankBehavior {
+    FILTER,
+    ERROR,
+    NONE,
   }
 
   public companion object {

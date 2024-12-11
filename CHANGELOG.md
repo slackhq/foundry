@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Add blank behavior parameters to `PropertyResolver.optionalStringProvider` overloads to specify behavior for blank property values. Default behavior now is to error.
+
 0.23.2
 ------
 
