@@ -103,6 +103,9 @@ internal class FoundryVersions(
   val robolectric: String?
     get() = getOptionalValue("robolectric").orElse(null)
 
+  val roborazzi: Optional<String>
+    get() = getOptionalValue("roborazzi")
+
   fun lookupVersion(key: String) = getOptionalValue(key)
 
   class Bundles(
@@ -119,6 +122,9 @@ internal class FoundryVersions(
 
     val commonTest: Optional<Provider<ExternalModuleDependencyBundle>>
       get() = cache.getOrPut("common-test") { bundleResolver("common-test") }
+
+    val commonRoborazzi: Optional<Provider<ExternalModuleDependencyBundle>>
+      get() = cache.getOrPut("common-roborazzi") { bundleResolver("common-roborazzi") }
 
     val commonCircuit: Optional<Provider<ExternalModuleDependencyBundle>>
       get() = cache.getOrPut("common-circuit") { bundleResolver("common-circuit") }
