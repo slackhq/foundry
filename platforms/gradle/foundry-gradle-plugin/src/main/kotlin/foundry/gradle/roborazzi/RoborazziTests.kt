@@ -35,7 +35,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 internal object RoborazziTests {
   private const val GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME = "globalCiVerifyRoborazzi"
   private const val CI_VERIFY_ROBORAZZI_TASK_NAME = "ciVerifyRoborazzi"
-  private const val VERIFY_ROBORAZZI_TASK_NAME = "ciVerifyRoborazzi"
+  private const val VERIFY_ROBORAZZI_TASK_NAME = "verifyRoborazzi"
   private const val LOG = "FoundryRoborazziTests:"
 
   fun configureRootProject(project: Project) {

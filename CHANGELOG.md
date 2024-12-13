@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.7
+------
+
+_2024-12-13_
+
+- Fix verifyRoborazzi task name.
+
 0.23.6
 ------
 
