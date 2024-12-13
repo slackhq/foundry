@@ -22,21 +22,24 @@ import com.slack.circuit.foundation.Circuit
 import com.slack.circuit.foundation.CircuitContent
 import foundry.intellij.compose.projectgen.FoundryDesktopTheme
 import java.awt.Dimension
+import java.nio.file.Path
 import javax.swing.JComponent
 
 object ChatPanel {
-  fun createPanel(): JComponent {
+  fun createPanel(scriptPath: Path, apiLink: String): JComponent {
     return ComposePanel().apply {
       preferredSize = Dimension(400, 600)
-      setContent { FoundryDesktopTheme { ChatApp() } }
+      setContent { FoundryDesktopTheme { ChatApp(scriptPath, apiLink) } }
     }
   }
 
   @Composable
-  private fun ChatApp() {
+  private fun ChatApp(scriptPath: Path, apiLink: String) {
+    println("ChatApp Script Path $scriptPath")
+    println("ChatApp Script Path absolutely ${scriptPath.toAbsolutePath()}")
     val circuit = remember {
       Circuit.Builder()
-        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter())
+        .addPresenter<ChatScreen, ChatScreen.State>(ChatPresenter(scriptPath, apiLink))
         .addUi<ChatScreen, ChatScreen.State> { state, modifier -> ChatWindowUi(state, modifier) }
         .build()
     }
