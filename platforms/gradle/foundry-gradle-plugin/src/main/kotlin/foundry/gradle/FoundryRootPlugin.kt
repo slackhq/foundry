@@ -172,9 +172,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     DetektTasks.configureRootProject(project, foundryProperties)
     project.configureMisc(foundryProperties)
     UnitTests.configureRootProject(project)
-    foundryProperties.versions.roborazzi.ifPresent {
-      RoborazziTests.configureRootProject(project)
-    }
+    foundryProperties.versions.roborazzi.ifPresent { RoborazziTests.configureRootProject(project) }
     ModuleStatsTasks.configureRoot(project, foundryProperties)
     val generateDependencyGraphTask =
       GenerateDependencyGraphTask.register(project, foundryProperties)
