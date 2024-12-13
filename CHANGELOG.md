@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.5
+------
+
+_2024-12-12_
+
+- Don't apply checkDependencies in test projects' lint.
+
 0.23.4
 ------
 
