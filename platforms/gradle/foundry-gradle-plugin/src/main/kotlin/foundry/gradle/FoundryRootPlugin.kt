@@ -33,6 +33,7 @@ import foundry.gradle.properties.StartParameterProperties
 import foundry.gradle.properties.createPropertiesProvider
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.properties.sneakyNull
+import foundry.gradle.roborazzi.RoborazziTests
 import foundry.gradle.stats.ModuleStatsTasks
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CoreBootstrapTask
@@ -171,6 +172,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     DetektTasks.configureRootProject(project, foundryProperties)
     project.configureMisc(foundryProperties)
     UnitTests.configureRootProject(project)
+    foundryProperties.versions.roborazzi.ifPresent { RoborazziTests.configureRootProject(project) }
     ModuleStatsTasks.configureRoot(project, foundryProperties)
     val generateDependencyGraphTask =
       GenerateDependencyGraphTask.register(project, foundryProperties)

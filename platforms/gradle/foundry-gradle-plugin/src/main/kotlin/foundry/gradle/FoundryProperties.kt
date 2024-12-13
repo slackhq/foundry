@@ -385,9 +385,7 @@ internal constructor(
   public val enableLintInAndroidTestProjects: Boolean
     get() = booleanProperty("foundry.lint.enableOnAndroidTestProjects", false)
 
-  /**
-   * Proxy flag for lint.checkDependencies. Usually enabled for application projects.
-   */
+  /** Proxy flag for lint.checkDependencies. Usually enabled for application projects. */
   public val lintCheckDependencies: Boolean
     get() = booleanProperty("foundry.lint.checkDependencies", false)
 

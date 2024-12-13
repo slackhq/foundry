@@ -32,6 +32,10 @@ internal sealed class FoundryArtifact(override val declarableName: String, val c
     private fun readResolve(): Any = SKIPPY_UNIT_TESTS
   }
 
+  data object SKIPPY_ROBORAZZI_TESTS : FoundryArtifact("skippyRoborazziTests", "skippy") {
+    private fun readResolve(): Any = SKIPPY_ROBORAZZI_TESTS
+  }
+
   data object SKIPPY_LINT : FoundryArtifact("skippyLint", "skippy") {
     private fun readResolve(): Any = SKIPPY_LINT
   }

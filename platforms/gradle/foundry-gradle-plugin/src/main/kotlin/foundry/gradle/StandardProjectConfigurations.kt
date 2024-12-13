@@ -43,6 +43,7 @@ import foundry.gradle.kgp.KgpTasks
 import foundry.gradle.lint.LintTasks
 import foundry.gradle.permissionchecks.PermissionChecks
 import foundry.gradle.properties.setDisallowChanges
+import foundry.gradle.roborazzi.RoborazziTests
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CheckManifestPermissionsTask
 import foundry.gradle.tasks.SimpleFileProducerTask
@@ -917,6 +918,17 @@ internal class StandardProjectConfigurations(
       }
 
       foundryExtension.androidHandler.applyTo(project)
+    }
+
+    foundryProperties.versions.roborazzi.ifPresent {
+      pluginManager.withPlugin("io.github.takahirom.roborazzi") {
+        RoborazziTests.configureSubproject(
+          project,
+          foundryProperties,
+          foundryTools.globalConfig.affectedProjects,
+          foundryTools::logAvoidedTask,
+        )
+      }
     }
   }
 

@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Add support for skippy to Roborazzi tests. These can be invoked by `globalCiVerifyRoborazzi` and `ciVerifyRoborazzi` (per-project) tasks.
+- Add support for defining common roborazzi dependency bundles via `common-roborazzi` key in version catalog bundles.
+
 0.23.5
 ------
 
