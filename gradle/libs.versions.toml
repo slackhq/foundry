@@ -146,6 +146,7 @@ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 oshi = "com.github.oshi:oshi-core:6.6.5"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit"}
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
 robolectric = "org.robolectric:robolectric:4.14.1"
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
