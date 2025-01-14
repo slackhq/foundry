@@ -44,7 +44,7 @@ sortDependencies = "0.14"
 spotless = "7.0.1"
 sqldelight = "2.0.2"
 versionsPlugin = "0.51.0"
-wire = "5.1.0"
+wire = "5.2.1"
 xmlutil = "0.90.3"
 
 [plugins]
