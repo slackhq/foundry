@@ -510,7 +510,9 @@ internal class StandardProjectConfigurations(
                 .getOrElse(false)
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
-            dependencies.add("androidTestUtil", "androidx.test:orchestrator")
+            if (foundryProperties.useOrchestrator.getOrElse(false)) {
+              dependencies.add("androidTestUtil", "androidx.test:orchestrator")
+            }
             if (!excluded && isAffectedProject) {
               // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we aggregate
               // to their root project dep
