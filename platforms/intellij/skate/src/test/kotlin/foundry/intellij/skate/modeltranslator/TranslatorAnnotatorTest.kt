@@ -23,7 +23,6 @@ import foundry.intellij.skate.DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
 import foundry.intellij.skate.DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
 import foundry.intellij.skate.SkateBundle
 import foundry.intellij.skate.util.settings
-import org.junit.Ignore
 import org.junit.Test
 
 class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
@@ -141,7 +140,6 @@ class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
-
   @Test
   fun testAnnotator_NoDestination() {
     myFixture.configureByFiles("CallObjectTranslator.kt", "Call.kt")
@@ -150,7 +148,6 @@ class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
       myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
     assertThat(translatorWarning).isNull()
   }
-
 
   @Test
   fun testAnnotator_NoBodyExpression() {
@@ -161,7 +158,6 @@ class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
     assertThat(translatorWarning).isNull()
   }
 
-
   @Test
   fun testAnnotator_HasReturnExpression() {
     myFixture.configureByFiles("NullableCallTranslator.kt", "Call.kt")
@@ -170,7 +166,6 @@ class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
       myFixture.doHighlighting().firstOrNull { it.severity == HighlightSeverity.WEAK_WARNING }
     assertThat(translatorWarning).isNull()
   }
-
 
   @Test
   fun testAnnotator_StringSource_NonEnumDestination() {
