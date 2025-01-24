@@ -4,6 +4,59 @@ Changelog
 **Unreleased**
 --------------
 
+0.23.7
+------
+
+_2024-12-13_
+
+- Fix verifyRoborazzi task name.
+
+0.23.6
+------
+
+_2024-12-13_
+
+- Add support for skippy to Roborazzi tests. These can be invoked by `globalCiVerifyRoborazzi` and `ciVerifyRoborazzi` (per-project) tasks.
+- Add support for defining common roborazzi dependency bundles via `common-roborazzi` key in version catalog bundles.
+
+0.23.5
+------
+
+_2024-12-12_
+
+- Don't apply checkDependencies in test projects' lint.
+
+0.23.4
+------
+
+_2024-12-11_
+
+- Non-GA supported languages properties can now be empty/optional.
+
+0.23.3
+------
+
+_2024-12-11_
+
+- Add blank behavior parameters to `PropertyResolver.optionalStringProvider` overloads to specify behavior for blank property values. Default behavior now is to error.
+- Make supported language locales properties instead of string values.
+- Make coroutines-core dep explicitly versioned in the skippy artifact.
+- Update to OkHttp `5.0.0-alpha.14`.
+
+0.23.2
+------
+
+_2024-12-11_
+
+- Add `foundry.android.test.targetApkArch` property to specify a target architecture for androidTest APKs. This allows us to exclude jni libs from unmatched architectures to shrink APK size.
+
+0.23.1
+------
+
+_2024-12-11_
+
+- Make `foundry.android.test.compressWithLegacyPackaging` flag also apply to jniLibs compression.
+
 0.23.0
 ------
 

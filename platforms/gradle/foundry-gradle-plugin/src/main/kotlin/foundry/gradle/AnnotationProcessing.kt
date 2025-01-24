@@ -194,6 +194,8 @@ internal object AptOptionsConfigs {
         "dagger.fastInit" to "enabled",
         // https://dagger.dev/dev-guide/compiler-options#ignore-provision-key-wildcards
         "dagger.ignoreProvisionKeyWildcards" to "ENABLED",
+        // https://dagger.dev/dev-guide/compiler-options#useBindingGraphFix
+        "dagger.useBindingGraphFix" to "ENABLED",
       )
   }
 

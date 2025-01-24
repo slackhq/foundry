@@ -324,7 +324,10 @@ internal object LintTasks {
       // see https://issuetracker.google.com/issues/265962219
       disable += "EnsureInitializerMetadata"
 
-      if (androidExtensionNullable is ApplicationAndroidComponentsExtension) {
+      if (
+        androidExtensionNullable is ApplicationAndroidComponentsExtension &&
+          !foundryProperties.isTestLibrary
+      ) {
         checkDependencies = true
       }
 

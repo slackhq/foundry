@@ -34,6 +34,7 @@ import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import foundry.gradle.Configurations.isPlatformConfigurationName
+import foundry.gradle.android.AndroidArchitecture
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.dependencies.FoundryDependencies
@@ -42,6 +43,7 @@ import foundry.gradle.kgp.KgpTasks
 import foundry.gradle.lint.LintTasks
 import foundry.gradle.permissionchecks.PermissionChecks
 import foundry.gradle.properties.setDisallowChanges
+import foundry.gradle.roborazzi.RoborazziTests
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CheckManifestPermissionsTask
 import foundry.gradle.tasks.SimpleFileProducerTask
@@ -508,6 +510,9 @@ internal class StandardProjectConfigurations(
                 .getOrElse(false)
           val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
           if (isAndroidTestEnabled) {
+            if (foundryProperties.useOrchestrator.getOrElse(false)) {
+              dependencies.add("androidTestUtil", "androidx.test:orchestrator")
+            }
             if (!excluded && isAffectedProject) {
               // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we aggregate
               // to their root project dep
@@ -517,6 +522,20 @@ internal class StandardProjectConfigurations(
                   packaging.dex.useLegacyPackaging.set(
                     foundryProperties.compressAndroidTestApksWithLegacyPackaging
                   )
+                  packaging.jniLibs.useLegacyPackaging.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
+                  packaging.jniLibs.useLegacyPackagingFromBundle.set(
+                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                  )
+                  foundryProperties.targetAndroidTestApksArch.orNull?.let { targetArch ->
+                    packaging.jniLibs.excludes.addAll(
+                      // Exclude out non-targeted architectures
+                      AndroidArchitecture.entries
+                        .filterNot { it == targetArch }
+                        .map { "**/${it.jniLibsPath}/*.so" }
+                    )
+                  }
                 }
               }
               if (foundryProperties.enableEmulatorWtfForAndroidTest) {
@@ -902,6 +921,17 @@ internal class StandardProjectConfigurations(
       }
 
       foundryExtension.androidHandler.applyTo(project)
+    }
+
+    foundryProperties.versions.roborazzi.ifPresent {
+      pluginManager.withPlugin("io.github.takahirom.roborazzi") {
+        RoborazziTests.configureSubproject(
+          project,
+          foundryProperties,
+          foundryTools.globalConfig.affectedProjects,
+          foundryTools::logAvoidedTask,
+        )
+      }
     }
   }
 

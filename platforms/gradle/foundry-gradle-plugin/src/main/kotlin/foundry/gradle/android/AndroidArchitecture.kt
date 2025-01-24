@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2024 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  alias(libs.plugins.kotlin.jvm)
-  alias(libs.plugins.wire)
-  alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.lint)
-}
+package foundry.gradle.android
 
-wire {
-  kotlin {}
-  sourcePath {
-    srcDir(layout.projectDirectory.dir("src/main/proto"))
-    include("trace.proto")
-  }
-}
-
-dependencies {
-  implementation(libs.coroutines.core)
-  implementation(libs.okhttp)
-  implementation(libs.okio)
-  implementation(libs.retrofit)
-  implementation(libs.retrofit.converters.wire)
+/** Represents possible Android architectures. */
+public enum class AndroidArchitecture(public val jniLibsPath: String) {
+  ARM64_V8A("arm64-v8a"),
+  ARMEABI_V7A("armeabi-v7a"),
+  X86("x86"),
+  X86_64("x86_64"),
 }

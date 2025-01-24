@@ -42,14 +42,25 @@ public final class foundry/gradle/properties/PropertyResolver {
 	public final fun intValue (Ljava/lang/String;I)I
 	public final fun intValue (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)I
 	public static synthetic fun intValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;IILjava/lang/Object;)I
-	public final fun optionalStringProvider (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
-	public final fun optionalStringProvider (Ljava/lang/String;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
-	public static synthetic fun optionalStringProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
+	public final fun optionalStringProvider (Ljava/lang/String;Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;)Lorg/gradle/api/provider/Provider;
+	public final fun optionalStringProvider (Ljava/lang/String;Ljava/lang/String;Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;)Lorg/gradle/api/provider/Provider;
+	public static synthetic fun optionalStringProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;ILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
+	public static synthetic fun optionalStringProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Ljava/lang/String;Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;ILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
 	public final fun optionalStringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 	public static synthetic fun optionalStringValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
 	public final fun providerFor (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public final fun requiredStringProvider (Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
 	public final fun stringValue (Ljava/lang/String;)Ljava/lang/String;
 	public final fun stringValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class foundry/gradle/properties/PropertyResolver$BlankBehavior : java/lang/Enum {
+	public static final field ERROR Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;
+	public static final field FILTER Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;
+	public static final field NONE Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;
+	public static fun values ()[Lfoundry/gradle/properties/PropertyResolver$BlankBehavior;
 }
 
 public final class foundry/gradle/properties/PropertyResolver$Companion {

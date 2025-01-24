@@ -16,6 +16,7 @@
 package foundry.gradle
 
 import foundry.common.FoundryKeys
+import foundry.gradle.android.AndroidArchitecture
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
@@ -140,16 +141,24 @@ internal constructor(
     get() = booleanProperty("foundry.config.noPlatform")
 
   /** Property corresponding to the supported languages in GA builds */
-  public val supportedLanguages: String
-    get() = stringProperty("foundry.android.supportedLanguages")
+  public val supportedLanguages: Provider<String>
+    get() = resolver.requiredStringProvider("foundry.android.supportedLanguages")
 
   /** Property corresponding to the supported languages in Internal builds */
-  public val supportedLanguagesInternal: String
-    get() = stringProperty("foundry.android.supportedLanguagesInternal")
+  public val supportedLanguagesInternal: Provider<String>
+    get() =
+      resolver.optionalStringProvider(
+        "foundry.android.supportedLanguagesInternal",
+        blankBehavior = PropertyResolver.BlankBehavior.FILTER,
+      )
 
   /** Property corresponding to the supported languages in Beta builds */
-  public val supportedLanguagesBeta: String
-    get() = stringProperty("foundry.android.supportedLanguagesBeta")
+  public val supportedLanguagesBeta: Provider<String>
+    get() =
+      resolver.optionalStringProvider(
+        "foundry.android.supportedLanguagesBeta",
+        blankBehavior = PropertyResolver.BlankBehavior.FILTER,
+      )
 
   /**
    * Property corresponding to the file path of a custom versions.json file for use with
@@ -376,6 +385,10 @@ internal constructor(
   public val enableLintInAndroidTestProjects: Boolean
     get() = booleanProperty("foundry.lint.enableOnAndroidTestProjects", false)
 
+  /** Proxy flag for lint.checkDependencies. Usually enabled for application projects. */
+  public val lintCheckDependencies: Boolean
+    get() = booleanProperty("foundry.lint.checkDependencies", false)
+
   /** If enabled, enables emulator.wtf for androidTest() uses. */
   public val enableEmulatorWtfForAndroidTest: Boolean
     get() = booleanProperty("foundry.emulatorwtf.enable", false)
@@ -497,12 +510,17 @@ internal constructor(
     get() = resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
 
   /**
-   * Flag for minifying androidTest APks with R8. This just tree shakes.
-   *
-   * See:
-   * - https://issuetracker.google.com/issues/259832799
-   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
+   * Option to specify which architecture to target for androidTest APKs. These are universal by
+   * default, which can be quite bloated. This allows for targeting a subset of arches by excluding
+   * jni libs from other ones.
    */
+  public val targetAndroidTestApksArch: Provider<AndroidArchitecture>
+    get() =
+      resolver.optionalStringProvider("foundry.android.test.targetApkArch").map {
+        AndroidArchitecture.valueOf(it)
+      }
+
+  /** Flag for minifying androidTest APks with R8. This just tree shakes. */
   public val minifyAndroidTestApks: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.android.test.minifyEnabled", false)
 

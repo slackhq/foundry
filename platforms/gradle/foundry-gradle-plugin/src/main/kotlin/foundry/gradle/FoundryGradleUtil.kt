@@ -91,21 +91,23 @@ internal fun robolectricJars(gradleUserHomeDir: File, createDirsIfMissing: Boole
   }
 }
 
-public fun Project.supportedLanguages(supportedLanguages: SupportedLanguagesEnum): List<String> {
+public fun Project.supportedLanguages(
+  supportedLanguages: SupportedLanguagesEnum
+): Provider<List<String>> {
   val foundryProperties = project.foundryProperties
-  val gaLanguages = foundryProperties.supportedLanguages.split(",")
+  val gaLanguages = foundryProperties.supportedLanguages.map { it.split(",") }
 
-  val internalLanguages = foundryProperties.supportedLanguagesInternal.split(",")
+  val internalLanguages =
+    foundryProperties.supportedLanguagesInternal.map { it.split(",") }.orElse(emptyList())
 
-  val betaLanguages = foundryProperties.supportedLanguagesBeta.split(",")
+  val betaLanguages =
+    foundryProperties.supportedLanguagesBeta.map { it.split(",") }.orElse(emptyList())
 
   return when (supportedLanguages) {
-    SupportedLanguagesEnum.GA -> gaLanguages.toList().filter { it.isNotBlank() }
-    SupportedLanguagesEnum.INTERNAL ->
-      internalLanguages.union(gaLanguages).toList().filter { it.isNotBlank() }
-    SupportedLanguagesEnum.BETA ->
-      betaLanguages.union(gaLanguages).toList().filter { it.isNotBlank() }
-  }
+    SupportedLanguagesEnum.GA -> gaLanguages
+    SupportedLanguagesEnum.INTERNAL -> internalLanguages.zip(gaLanguages, List<String>::union)
+    SupportedLanguagesEnum.BETA -> betaLanguages.zip(gaLanguages, List<String>::union)
+  }.map { it.filter { it.isNotBlank() } }
 }
 
 public enum class SupportedLanguagesEnum {
