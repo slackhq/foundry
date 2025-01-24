@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 @file:Suppress("invisible_reference", "invisible_member")
-@file:OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class, SealedSerializationApi::class)
+@file:OptIn(
+  InternalSerializationApi::class,
+  ExperimentalSerializationApi::class,
+  SealedSerializationApi::class,
+)
 
 package foundry.cli.buildkite
 
