@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 @file:Suppress("invisible_reference", "invisible_member")
-@file:OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
+@file:OptIn(
+  InternalSerializationApi::class,
+  ExperimentalSerializationApi::class,
+  SealedSerializationApi::class,
+)
 
 package foundry.cli.buildkite
 
@@ -22,6 +26,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SealedSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer

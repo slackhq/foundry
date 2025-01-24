@@ -86,7 +86,6 @@ public synthetic class foundry/cli/buildkite/Adjustment$$serializer : kotlinx/se
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Adjustment;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Adjustment$Companion {
@@ -120,7 +119,6 @@ public synthetic class foundry/cli/buildkite/Agents$AnythingMapValue$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-DjOvQFY (Lkotlinx/serialization/encoding/Encoder;Lkotlinx/serialization/json/JsonObject;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Agents$AnythingMapValue$Companion {
@@ -156,7 +154,6 @@ public synthetic class foundry/cli/buildkite/Agents$StringArrayValue$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-yVXvlSo (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Agents$StringArrayValue$Companion {
@@ -190,7 +187,6 @@ public synthetic class foundry/cli/buildkite/Automatic$AutomaticElementArrayValu
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-5WtRdPk (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Automatic$AutomaticElementArrayValue$Companion {
@@ -220,7 +216,6 @@ public synthetic class foundry/cli/buildkite/Automatic$AutomaticElementValue$$se
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-VAh1uYI (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/AutomaticElement;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Automatic$AutomaticElementValue$Companion {
@@ -250,7 +245,6 @@ public synthetic class foundry/cli/buildkite/Automatic$BoolValue$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-C9Dd30E (Lkotlinx/serialization/encoding/Encoder;Z)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Automatic$BoolValue$Companion {
@@ -289,7 +283,6 @@ public synthetic class foundry/cli/buildkite/AutomaticElement$$serializer : kotl
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/AutomaticElement;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/AutomaticElement$Companion {
@@ -323,7 +316,6 @@ public synthetic class foundry/cli/buildkite/Block$BlockStepValue$$serializer : 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-M8G9ei8 (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/BlockStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Block$BlockStepValue$Companion {
@@ -357,7 +349,6 @@ public synthetic class foundry/cli/buildkite/Block$StringValue$$serializer : kot
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-396SBzQ (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Block$StringValue$Companion {
@@ -412,7 +403,6 @@ public synthetic class foundry/cli/buildkite/BlockStep$$serializer : kotlinx/ser
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/BlockStep;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/BlockStep$Companion {
@@ -485,7 +475,6 @@ public synthetic class foundry/cli/buildkite/Build$$serializer : kotlinx/seriali
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Build;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Build$Companion {
@@ -607,7 +596,6 @@ public synthetic class foundry/cli/buildkite/CommandStep$$serializer : kotlinx/s
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/CommandStep;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/CommandStep$Companion {
@@ -649,7 +637,6 @@ public synthetic class foundry/cli/buildkite/Commands$ScriptStepValue$$serialize
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-peGt2Mw (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ScriptStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Commands$ScriptStepValue$Companion {
@@ -679,7 +666,6 @@ public synthetic class foundry/cli/buildkite/Commands$StringArrayValue$$serializ
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-3YFfp78 (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Commands$StringArrayValue$Companion {
@@ -709,7 +695,6 @@ public synthetic class foundry/cli/buildkite/Commands$StringValue$$serializer : 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-oxRJBig (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Commands$StringValue$Companion {
@@ -780,7 +765,6 @@ public synthetic class foundry/cli/buildkite/DependsOn$StringValue$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-iGndBwM (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/DependsOn$StringValue$Companion {
@@ -810,7 +794,6 @@ public synthetic class foundry/cli/buildkite/DependsOn$UnionArrayValue$$serializ
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-6S4q26Q (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/DependsOn$UnionArrayValue$Companion {
@@ -841,7 +824,6 @@ public synthetic class foundry/cli/buildkite/DependsOnClass$$serializer : kotlin
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/DependsOnClass;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/DependsOnClass$Companion {
@@ -881,7 +863,6 @@ public synthetic class foundry/cli/buildkite/DependsOnElement$DependsOnClassValu
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-qapXi24 (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/DependsOnClass;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/DependsOnElement$DependsOnClassValue$Companion {
@@ -911,7 +892,6 @@ public synthetic class foundry/cli/buildkite/DependsOnElement$StringValue$$seria
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-4SLohPA (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/DependsOnElement$StringValue$Companion {
@@ -964,7 +944,6 @@ public synthetic class foundry/cli/buildkite/ExitStatusUnion$EnumValue$$serializ
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-R00Dzss (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ExitStatusEnum;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ExitStatusUnion$EnumValue$Companion {
@@ -994,7 +973,6 @@ public synthetic class foundry/cli/buildkite/ExitStatusUnion$LongValue$$serializ
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-jxTY6aI (Lkotlinx/serialization/encoding/Encoder;J)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ExitStatusUnion$LongValue$Companion {
@@ -1048,7 +1026,6 @@ public synthetic class foundry/cli/buildkite/ExternalNotification$$serializer : 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ExternalNotification;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ExternalNotification$Companion {
@@ -1090,7 +1067,6 @@ public synthetic class foundry/cli/buildkite/FieldElement$$serializer : kotlinx/
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/FieldElement;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/FieldElement$Companion {
@@ -1119,7 +1095,6 @@ public synthetic class foundry/cli/buildkite/GithubCheck$$serializer : kotlinx/s
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/GithubCheck;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GithubCheck$Companion {
@@ -1148,7 +1123,6 @@ public synthetic class foundry/cli/buildkite/GithubCommitStatus$$serializer : ko
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/GithubCommitStatus;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GithubCommitStatus$Companion {
@@ -1198,7 +1172,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$AnythingArrayValue$$seria
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-lV6B9CE (Lkotlinx/serialization/encoding/Encoder;Lkotlinx/serialization/json/JsonArray;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$AnythingArrayValue$Companion {
@@ -1230,7 +1203,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$BlockStepValue$$serialize
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-ltSYSgA (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/BlockStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$BlockStepValue$Companion {
@@ -1262,7 +1234,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$BoolValue$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-B2MItqE (Lkotlinx/serialization/encoding/Encoder;Z)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$BoolValue$Companion {
@@ -1294,7 +1265,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$CommandStepValue$$seriali
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-3UE2meQ (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/CommandStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$CommandStepValue$Companion {
@@ -1339,7 +1309,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$DoubleValue$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-GE5wHq0 (Lkotlinx/serialization/encoding/Encoder;D)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$DoubleValue$Companion {
@@ -1371,7 +1340,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$IntegerValue$$serializer 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-e7HpNv8 (Lkotlinx/serialization/encoding/Encoder;J)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$IntegerValue$Companion {
@@ -1403,7 +1371,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$NestedBlockStepClassValue
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-w-Z3PfM (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/NestedBlockStepClass;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$NestedBlockStepClassValue$Companion {
@@ -1444,7 +1411,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$StringValue$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-_XEcwdc (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$StringValue$Companion {
@@ -1476,7 +1442,6 @@ public synthetic class foundry/cli/buildkite/GroupStep$WaitStepValue$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-pxN5_Wo (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Wait;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/GroupStep$WaitStepValue$Companion {
@@ -1514,7 +1479,6 @@ public synthetic class foundry/cli/buildkite/Input$InputStepValue$$serializer : 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-d6LlfBg (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/InputStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Input$InputStepValue$Companion {
@@ -1544,7 +1508,6 @@ public synthetic class foundry/cli/buildkite/Input$StringValue$$serializer : kot
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-8Gsf-RM (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Input$StringValue$Companion {
@@ -1597,7 +1560,6 @@ public synthetic class foundry/cli/buildkite/InputStep$$serializer : kotlinx/ser
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/InputStep;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/InputStep$Companion {
@@ -1692,7 +1654,6 @@ public synthetic class foundry/cli/buildkite/ManualClass$$serializer : kotlinx/s
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ManualClass;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ManualClass$Companion {
@@ -1726,7 +1687,6 @@ public synthetic class foundry/cli/buildkite/ManualUnion$BoolValue$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-jhgHrzc (Lkotlinx/serialization/encoding/Encoder;Z)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ManualUnion$BoolValue$Companion {
@@ -1760,7 +1720,6 @@ public synthetic class foundry/cli/buildkite/ManualUnion$ManualClassValue$$seria
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-BKqARSo (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ManualClass;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ManualUnion$ManualClassValue$Companion {
@@ -1790,7 +1749,6 @@ public synthetic class foundry/cli/buildkite/MatrixClass$$serializer : kotlinx/s
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/MatrixClass;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MatrixClass$Companion {
@@ -1824,7 +1782,6 @@ public synthetic class foundry/cli/buildkite/MatrixElement$BoolValue$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-WJlKGko (Lkotlinx/serialization/encoding/Encoder;Z)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MatrixElement$BoolValue$Companion {
@@ -1858,7 +1815,6 @@ public synthetic class foundry/cli/buildkite/MatrixElement$IntegerValue$$seriali
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-VdNJnCM (Lkotlinx/serialization/encoding/Encoder;J)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MatrixElement$IntegerValue$Companion {
@@ -1888,7 +1844,6 @@ public synthetic class foundry/cli/buildkite/MatrixElement$StringValue$$serializ
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-FTeFY-U (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MatrixElement$StringValue$Companion {
@@ -1926,7 +1881,6 @@ public synthetic class foundry/cli/buildkite/MatrixUnion$MatrixClassValue$$seria
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-K6Aa5lo (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/MatrixClass;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MatrixUnion$MatrixClassValue$Companion {
@@ -1956,7 +1910,6 @@ public synthetic class foundry/cli/buildkite/MatrixUnion$UnionArrayValue$$serial
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-wZWYBsY (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MatrixUnion$UnionArrayValue$Companion {
@@ -1987,7 +1940,6 @@ public synthetic class foundry/cli/buildkite/MultiChannelMessage$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/MultiChannelMessage;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/MultiChannelMessage$Companion {
@@ -2100,7 +2052,6 @@ public synthetic class foundry/cli/buildkite/NestedBlockStepClass$$serializer : 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/NestedBlockStepClass;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/NestedBlockStepClass$Companion {
@@ -2161,7 +2112,6 @@ public synthetic class foundry/cli/buildkite/Notification$External$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-5V10pNo (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ExternalNotification;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Notification$External$Companion {
@@ -2191,7 +2141,6 @@ public synthetic class foundry/cli/buildkite/Notification$GitHub$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-sAW7yBE (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/GithubNotification;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Notification$GitHub$Companion {
@@ -2225,7 +2174,6 @@ public synthetic class foundry/cli/buildkite/Option$$serializer : kotlinx/serial
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Option;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Option$Companion {
@@ -2259,7 +2207,6 @@ public synthetic class foundry/cli/buildkite/Pipeline$$serializer : kotlinx/seri
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Pipeline;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Pipeline$Companion {
@@ -2293,7 +2240,6 @@ public synthetic class foundry/cli/buildkite/Plugin$AnythingMapValue$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-5UQzH8o (Lkotlinx/serialization/encoding/Encoder;Lkotlinx/serialization/json/JsonObject;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Plugin$AnythingMapValue$Companion {
@@ -2329,7 +2275,6 @@ public synthetic class foundry/cli/buildkite/Plugin$StringValue$$serializer : ko
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-iWWlMEk (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Plugin$StringValue$Companion {
@@ -2363,7 +2308,6 @@ public synthetic class foundry/cli/buildkite/Plugins$AnythingMapValue$$serialize
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-6LLXuQk (Lkotlinx/serialization/encoding/Encoder;Lkotlinx/serialization/json/JsonObject;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Plugins$AnythingMapValue$Companion {
@@ -2399,7 +2343,6 @@ public synthetic class foundry/cli/buildkite/Plugins$UnionArrayValue$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-8SGkzcc (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Plugins$UnionArrayValue$Companion {
@@ -2430,7 +2373,6 @@ public synthetic class foundry/cli/buildkite/Retry$$serializer : kotlinx/seriali
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Retry;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Retry$Companion {
@@ -2515,7 +2457,6 @@ public synthetic class foundry/cli/buildkite/ScriptStep$$serializer : kotlinx/se
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/ScriptStep;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/ScriptStep$Companion {
@@ -2568,7 +2509,6 @@ public synthetic class foundry/cli/buildkite/Setup$UnionArrayMapValue$$serialize
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-GOtXzCQ (Lkotlinx/serialization/encoding/Encoder;Ljava/util/Map;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Setup$UnionArrayMapValue$Companion {
@@ -2598,7 +2538,6 @@ public synthetic class foundry/cli/buildkite/Setup$UnionArrayValue$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-zSCAvqA (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Setup$UnionArrayValue$Companion {
@@ -2649,7 +2588,6 @@ public synthetic class foundry/cli/buildkite/Signature$$serializer : kotlinx/ser
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/Signature;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Signature$Companion {
@@ -2690,7 +2628,6 @@ public synthetic class foundry/cli/buildkite/SimpleStringValue$ListValue$$serial
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-dxLtXtw (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SimpleStringValue$ListValue$Companion {
@@ -2720,7 +2657,6 @@ public synthetic class foundry/cli/buildkite/SimpleStringValue$SingleValue$$seri
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-tEAfSrU (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SimpleStringValue$SingleValue$Companion {
@@ -2754,7 +2690,6 @@ public synthetic class foundry/cli/buildkite/Skip$BoolValue$$serializer : kotlin
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-eEyIRGo (Lkotlinx/serialization/encoding/Encoder;Z)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Skip$BoolValue$Companion {
@@ -2788,7 +2723,6 @@ public synthetic class foundry/cli/buildkite/Skip$StringValue$$serializer : kotl
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-Yuyze8g (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Skip$StringValue$Companion {
@@ -2826,7 +2760,6 @@ public synthetic class foundry/cli/buildkite/SlackNotification$Conversation$$ser
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-lnI-uZk (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SlackNotification$Conversation$Companion {
@@ -2856,7 +2789,6 @@ public synthetic class foundry/cli/buildkite/SlackNotification$Multi$$serializer
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-nQx9sqw (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/MultiChannelMessage;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SlackNotification$Multi$Companion {
@@ -2890,7 +2822,6 @@ public synthetic class foundry/cli/buildkite/SoftFail$BoolValue$$serializer : ko
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-7NOsw5c (Lkotlinx/serialization/encoding/Encoder;Z)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SoftFail$BoolValue$Companion {
@@ -2926,7 +2857,6 @@ public synthetic class foundry/cli/buildkite/SoftFail$Multiple$$serializer : kot
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-yEslW70 (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SoftFail$Multiple$Companion {
@@ -2955,7 +2885,6 @@ public synthetic class foundry/cli/buildkite/SoftFailElement$$serializer : kotli
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/SoftFailElement;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/SoftFailElement$Companion {
@@ -2991,7 +2920,6 @@ public synthetic class foundry/cli/buildkite/Step$CommandStepValue$$serializer :
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-pphRORI (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/CommandStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Step$CommandStepValue$Companion {
@@ -3030,7 +2958,6 @@ public synthetic class foundry/cli/buildkite/Step$EnumValue$$serializer : kotlin
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-K_Ggjdg (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/StringStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Step$EnumValue$Companion {
@@ -3062,7 +2989,6 @@ public synthetic class foundry/cli/buildkite/Step$InputStepValue$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-YMSyn_k (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/InputStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Step$InputStepValue$Companion {
@@ -3138,7 +3064,6 @@ public synthetic class foundry/cli/buildkite/Trigger$StringValue$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-t7xtdOM (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Trigger$StringValue$Companion {
@@ -3170,7 +3095,6 @@ public synthetic class foundry/cli/buildkite/Trigger$TriggerStepValue$$serialize
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-I01kKN4 (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/TriggerStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Trigger$TriggerStepValue$Companion {
@@ -3227,7 +3151,6 @@ public synthetic class foundry/cli/buildkite/TriggerStep$$serializer : kotlinx/s
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/TriggerStep;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/TriggerStep$Companion {
@@ -3276,7 +3199,6 @@ public synthetic class foundry/cli/buildkite/Wait$StringValue$$serializer : kotl
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-O9Q-27I (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/String;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Wait$StringValue$Companion {
@@ -3308,7 +3230,6 @@ public synthetic class foundry/cli/buildkite/Wait$WaitStepValue$$serializer : ko
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-nt2aL5Y (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/WaitStep;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/Wait$WaitStepValue$Companion {
@@ -3355,7 +3276,6 @@ public synthetic class foundry/cli/buildkite/WaitStep$$serializer : kotlinx/seri
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lfoundry/cli/buildkite/WaitStep;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/WaitStep$Companion {
@@ -3407,7 +3327,6 @@ public synthetic class foundry/cli/buildkite/With$StringMapValue$$serializer : k
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-_1DNUO4 (Lkotlinx/serialization/encoding/Encoder;Ljava/util/Map;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/With$StringMapValue$Companion {
@@ -3437,7 +3356,6 @@ public synthetic class foundry/cli/buildkite/With$UnionArrayValue$$serializer : 
 	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 	public final fun serialize-7nSYvPE (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
-	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class foundry/cli/buildkite/With$UnionArrayValue$Companion {
