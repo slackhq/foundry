@@ -16,21 +16,23 @@
 package foundry.intellij.skate.modeltranslator
 
 import com.google.common.truth.Truth.assertThat
-import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
 import foundry.intellij.skate.modeltranslator.helper.TranslatorHelper
 import foundry.intellij.skate.util.settings
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
+import org.junit.Test
 
 private const val ASSIGNMENTS =
   "id = id, dateStart = dateStart, dateEnded = dateEnd, activeParticipantCount = activeParticipantCount, title = title.toDomainModel(), customTitle = customTitle, outgoingToUser = outgoing.toDomainModel(), incomingFromUser = incoming.toDomainModel(), activeParticipants = activeParticipants, actions = actions.map { it.toDomainModel() }, retryText = retryText.toDomainModel()"
 
-class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
+class TranslatorHelperTest : LightPlatformCodeInsightFixture4TestCase() {
   override fun getTestDataPath(): String {
     return "src/test/testData"
   }
 
+  @Test
   fun testGenerateBody_String_Enum() {
     val settings = project.settings()
     settings.translatorEnumIdentifier = "getSerializedName()"
@@ -55,6 +57,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
       )
   }
 
+  @Test
   fun testGenerateBody_Enum() {
     myFixture.configureByFiles("ActionTranslator.kt", "Call.kt")
 
@@ -77,6 +80,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
       )
   }
 
+  @Test
   fun testGenerateBody_Enum_FqNameDestination() {
     myFixture.configureByFiles("FullyQualifiedActionTranslator.kt", "Call.kt")
 
@@ -99,6 +103,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
       )
   }
 
+  @Test
   fun testGenerateBody_Model() {
     myFixture.configureByFiles("CallTranslator.kt", "Call.kt")
 
@@ -116,6 +121,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
       )
   }
 
+  @Test
   fun testGenerateBody_Model_FqNameDestination() {
     myFixture.configureByFiles("FullyQualifiedCallTranslator.kt", "Call.kt")
 
@@ -133,6 +139,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
       )
   }
 
+  @Test
   fun testGenerateBody_Model_ImportAlias() {
     myFixture.configureByFiles("ImportAliasCallTranslator.kt", "Call.kt")
 
@@ -150,7 +157,7 @@ class TranslatorHelperTest : LightJavaCodeInsightFixtureTestCase() {
       )
   }
 
-  private fun getNamedFunction() = file.findDescendantOfType<KtNamedFunction>()!!
+  private fun getNamedFunction() = myFixture.file.findDescendantOfType<KtNamedFunction>()!!
 
   private fun generateBody(): KtBlockExpression? {
     return TranslatorHelper.generateBody(TranslatorHelper.extractBundle(getNamedFunction())!!)

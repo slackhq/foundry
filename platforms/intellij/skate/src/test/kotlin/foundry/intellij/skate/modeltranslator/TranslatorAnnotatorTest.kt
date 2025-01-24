@@ -18,15 +18,14 @@ package foundry.intellij.skate.modeltranslator
 import com.google.common.truth.Truth.assertThat
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
 import foundry.intellij.skate.DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
 import foundry.intellij.skate.DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
 import foundry.intellij.skate.SkateBundle
 import foundry.intellij.skate.util.settings
-import org.junit.Ignore
+import org.junit.Test
 
-@Ignore("TranslatorAnnotator doesn't appear to work in 241+")
-class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
+class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
 
   private val warningDescription = SkateBundle.message("skate.modelTranslator.description")
 
@@ -43,6 +42,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     settings.translatorFileNameSuffix = DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
   }
 
+  @Test
   fun testAnnotator() {
     myFixture.configureByFiles("CallTranslator.kt", "Call.kt")
 
@@ -51,6 +51,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_StringSource_EnumDestination() {
     myFixture.configureByFiles("StatusStringTranslator.kt", "Call.kt")
 
@@ -59,6 +60,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_NestedSource() {
     myFixture.configureByFiles("ActionTranslator.kt", "Call.kt")
 
@@ -67,6 +69,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_FqNameSource() {
     myFixture.configureByFiles("FullyQualifiedCallTranslator.kt", "Call.kt")
 
@@ -75,6 +78,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_ImportAlias() {
     myFixture.configureByFiles("ImportAliasCallTranslator.kt", "Call.kt")
 
@@ -83,6 +87,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_WrongFileName() {
     myFixture.configureByFiles("CallExtensions.kt", "Call.kt")
 
@@ -91,6 +96,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  @Test
   fun testAnnotator_AlternativeFileNameSuffix() {
     val settings = project.settings()
     settings.translatorFileNameSuffix = "Extensions.kt"
@@ -103,6 +109,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_NoTranslator() {
     myFixture.configureByFiles("Call.kt")
 
@@ -111,6 +118,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  @Test
   fun testAnnotator_SourceHasWrongPackageName() {
     myFixture.configureByFiles("CallObjectsTranslator.kt", "Call.kt")
 
@@ -119,6 +127,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  @Test
   fun testAnnotator_AlternativeSourcePackageName() {
     val settings = project.settings()
     settings.translatorSourceModelsPackageName = "slack.api"
@@ -131,6 +140,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertTranslatorWarning(translatorWarning)
   }
 
+  @Test
   fun testAnnotator_NoDestination() {
     myFixture.configureByFiles("CallObjectTranslator.kt", "Call.kt")
 
@@ -139,6 +149,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  @Test
   fun testAnnotator_NoBodyExpression() {
     myFixture.configureByFiles("SingleLineCallTranslator.kt", "Call.kt")
 
@@ -147,6 +158,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  @Test
   fun testAnnotator_HasReturnExpression() {
     myFixture.configureByFiles("NullableCallTranslator.kt", "Call.kt")
 
@@ -155,6 +167,7 @@ class TranslatorAnnotatorTest : LightJavaCodeInsightFixtureTestCase() {
     assertThat(translatorWarning).isNull()
   }
 
+  @Test
   fun testAnnotator_StringSource_NonEnumDestination() {
     myFixture.configureByFiles("TranscriptionStringTranslator.kt", "Call.kt")
 

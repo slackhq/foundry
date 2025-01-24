@@ -40,8 +40,6 @@ intellijPlatform {
 }
 
 dependencies {
-  intellijPlatform { instrumentationTools() }
-
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 }
