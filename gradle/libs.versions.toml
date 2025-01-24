@@ -94,7 +94,7 @@ coroutines-core-ij = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
 develocity-agent-adapters = "com.gradle:develocity-gradle-plugin-adapters:1.1"
-gradleLints = "androidx.lint:lint-gradle:1.0.0-alpha02"
+gradleLints = "androidx.lint:lint-gradle:1.0.0-alpha03"
 gradlePlugins-anvil = { module = "dev.zacsweers.anvil:gradle-plugin", version.ref = "anvil" }
 gradlePlugins-bugsnag = { module = "com.bugsnag:bugsnag-android-gradle-plugin", version.ref = "bugsnagGradle" }
 gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb-stable" }
