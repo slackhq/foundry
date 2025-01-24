@@ -140,6 +140,8 @@ private fun jewelMarkdownColor(
     codeBackground = codeBackground,
     inlineCodeBackground = inlineCodeBackground,
     dividerColor = dividerColor,
+    tableText = codeText,
+    tableBackground = codeBackground,
   )
 }
 
