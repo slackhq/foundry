@@ -282,7 +282,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka")
 
     configure<DokkaExtension> {
-      dokkaPublicationDirectory.set(layout.buildDirectory.dir("dokkaDir"))
+      basePublicationsDirectory.set(layout.buildDirectory.dir("dokkaDir"))
       dokkaSourceSets.configureEach {
         documentedVisibilities.add(VisibilityModifier.Public)
         skipDeprecated.set(true)
