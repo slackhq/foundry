@@ -4,6 +4,39 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.0
+------
+
+_2025-01-24_
+
+Happy new year!
+
+- Add orchestrator dep by default when `androidTest()` feature is enabled.
+- Automatically enable Dagger's new `dagger.useBindingGraphFix` option in 2.55.
+- Update to Develocity adapters plugin `1.1`.
+- Update to graph assert `2.7.3`.
+- Update to Wire `5.2.1`.
+- Update to Okio `3.10.2`.
+- Update to kotlinx coroutines `1.10.1`.
+- Update to kotlinx serialization `1.8.0`.
+- Update to JNA `5.16.0`.
+- Update to KAML `0.67.0`.
+- Update to guava `33.4.0-jre`.
+- Update to apache commons text `1.13.0`.
+- Build against AGP `8.8.0`.
+- Build against Anvil `0.4.1`.
+- Build against Dokka `2.0.0`.
+- Build against compose gradle plugin `1.7.3`.
+- Build against Develocity plugin `3.19.1`.
+- Build against gradle retry plugin `1.6.1`.
+- Build against Spotless plugin `7.0.1`.
+- Build against nullaway gradle plugin `2.2.0`.
+- Build against Roborazzi gradle plugin `1.38.0`.
+- Build against DAGP `2.7.0`.
+- Build against sort dependencies plugin `0.14`.
+- Build against gradle `8.12.1`.
+- Build against redacted gradle plugin `1.12.0`.
+
 0.23.7
 ------
 
