@@ -31,33 +31,63 @@
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../index.html">
-                            foundry
-                    </a>            </div>
-            <div class="library-version">
+                    foundry
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":tools:cli/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":tools:cli/main" data-filter=":tools:cli/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":tools:cli/main">jvm</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    foundry
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="cli::foundry.cli.gradle/GradleProjectFlattenerCli///PointingToDeclaration//-125946513">
@@ -119,7 +149,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#985153169%2FProperties%2F-125946513">allowMultipleSubcommands</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#985153169%2FProperties%2F-125946513">allowMultipleSubcommands</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -134,7 +164,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1169986178%2FProperties%2F-125946513">autoCompleteEnvvar</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1169986178%2FProperties%2F-125946513">autoCompleteEnvvar</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -149,7 +179,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#883554468%2FProperties%2F-125946513">commandName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#883554468%2FProperties%2F-125946513">commandName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -179,7 +209,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1514800506%2FProperties%2F-125946513">helpTags</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1514800506%2FProperties%2F-125946513">helpTags</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -194,7 +224,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1134881227%2FProperties%2F-125946513">hiddenFromHelp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1134881227%2FProperties%2F-125946513">hiddenFromHelp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -209,7 +239,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#195594975%2FProperties%2F-125946513">invokeWithoutSubcommand</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#195594975%2FProperties%2F-125946513">invokeWithoutSubcommand</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -224,7 +254,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-89995148%2FProperties%2F-125946513">messages</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-89995148%2FProperties%2F-125946513">messages</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -239,7 +269,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1671505373%2FProperties%2F-125946513">printHelpOnEmptyArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1671505373%2FProperties%2F-125946513">printHelpOnEmptyArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -254,7 +284,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1568021693%2FProperties%2F-125946513">treatUnknownOptionsAsArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1568021693%2FProperties%2F-125946513">treatUnknownOptionsAsArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -273,7 +303,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-314074724%2FFunctions%2F-125946513"><span class="token function">aliases</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-314074724%2FFunctions%2F-125946513"><span class="token function">aliases</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -288,7 +318,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1183625586%2FFunctions%2F-125946513"><span class="token function">allHelpParams</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.output/HelpFormatter.ParameterHelp///PointingToDeclaration/">HelpFormatter.ParameterHelp</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1183625586%2FFunctions%2F-125946513"><span class="token function">allHelpParams</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.output/HelpFormatter.ParameterHelp///PointingToDeclaration/">HelpFormatter.ParameterHelp</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -303,7 +333,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#70230306%2FFunctions%2F-125946513"><span class="token function">configureContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/Context.Builder///PointingToDeclaration/">Context.Builder</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#70230306%2FFunctions%2F-125946513"><span class="token function">configureContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/Context.Builder///PointingToDeclaration/">Context.Builder</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -318,7 +348,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">CliktCommand</span><span class="token punctuation">.</span><a href="../../foundry.cli/dry-run-option.html"><span class="token function">dryRunOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>names<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span>arrayOf("--dry-run")<span class="token punctuation">, </span></span><span class="parameter ">help<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">"Runs this as a dry run, no modifications."</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.parameters.options/OptionWithValues///PointingToDeclaration/">OptionWithValues</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A dry run option for <span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">clikt commands</span>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">CliktCommand</span><span class="token punctuation">.</span><a href="../../foundry.cli/dry-run-option.html"><span class="token function">dryRunOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>names<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span>arrayOf("--dry-run")<span class="token punctuation">, </span></span><span class="parameter ">help<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">"Runs this as a dry run, no modifications."</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.parameters.options/OptionWithValues///PointingToDeclaration/">OptionWithValues</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A dry run option for <span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">clikt commands</span>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -333,7 +363,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#349409083%2FFunctions%2F-125946513"><span class="token function">echo</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1925549273%2FFunctions%2F-125946513"><span class="token function">echo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">trailingNewline<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">err<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#349409083%2FFunctions%2F-125946513"><span class="token function">echo</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1925549273%2FFunctions%2F-125946513"><span class="token function">echo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">trailingNewline<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">err<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -363,7 +393,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1347318567%2FFunctions%2F-125946513"><span class="token function">getFormattedHelp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">error<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/CliktError///PointingToDeclaration/">CliktError</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1347318567%2FFunctions%2F-125946513"><span class="token function">getFormattedHelp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">error<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/CliktError///PointingToDeclaration/">CliktError</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -378,7 +408,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="help.html"><span class="token function">help</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/Context///PointingToDeclaration/">Context</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="help.html"><span class="token function">help</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/Context///PointingToDeclaration/">Context</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -393,7 +423,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1092020760%2FFunctions%2F-125946513"><span class="token function">helpEpilog</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/Context///PointingToDeclaration/">Context</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1092020760%2FFunctions%2F-125946513"><span class="token function">helpEpilog</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.core/Context///PointingToDeclaration/">Context</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -408,7 +438,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#643849394%2FFunctions%2F-125946513"><span class="token function">issueMessage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#643849394%2FFunctions%2F-125946513"><span class="token function">issueMessage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -423,7 +453,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">CliktCommand</span><span class="token punctuation">.</span><a href="../../foundry.cli/project-dir-option.html"><span class="token function">projectDirOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>names<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span>arrayOf("--project-dir")<span class="token punctuation">, </span></span><span class="parameter ">help<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">"The project directory. Defaults to the current working directory."</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.parameters.options/OptionDelegate///PointingToDeclaration/">OptionDelegate</span><span class="token operator">&lt;</span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html">Path</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A project dir option for <span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">clikt commands</span>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">CliktCommand</span><span class="token punctuation">.</span><a href="../../foundry.cli/project-dir-option.html"><span class="token function">projectDirOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>names<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span>arrayOf("--project-dir")<span class="token punctuation">, </span></span><span class="parameter ">help<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">"The project directory. Defaults to the current working directory."</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.github.ajalt.clikt.parameters.options/OptionDelegate///PointingToDeclaration/">OptionDelegate</span><span class="token operator">&lt;</span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html">Path</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A project dir option for <span data-unresolved-link="com.github.ajalt.clikt.core/CliktCommand///PointingToDeclaration/">clikt commands</span>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -453,7 +483,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1884027110%2FFunctions%2F-125946513"><span class="token function">registeredArguments</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.parameters.arguments/Argument///PointingToDeclaration/">Argument</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#1884027110%2FFunctions%2F-125946513"><span class="token function">registeredArguments</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.parameters.arguments/Argument///PointingToDeclaration/">Argument</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -468,7 +498,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1434628002%2FFunctions%2F-125946513"><span class="token function">registeredOptions</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.parameters.options/Option///PointingToDeclaration/">Option</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1434628002%2FFunctions%2F-125946513"><span class="token function">registeredOptions</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.parameters.options/Option///PointingToDeclaration/">Option</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -483,7 +513,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1667561985%2FFunctions%2F-125946513"><span class="token function">registeredParameterGroups</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.parameters.groups/ParameterGroup///PointingToDeclaration/">ParameterGroup</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1667561985%2FFunctions%2F-125946513"><span class="token function">registeredParameterGroups</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.parameters.groups/ParameterGroup///PointingToDeclaration/">ParameterGroup</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -498,7 +528,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-903330849%2FFunctions%2F-125946513"><span class="token function">registeredSubcommandNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-903330849%2FFunctions%2F-125946513"><span class="token function">registeredSubcommandNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -513,7 +543,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#620714484%2FFunctions%2F-125946513"><span class="token function">registeredSubcommands</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.core/CoreCliktCommand///PointingToDeclaration/">CoreCliktCommand</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#620714484%2FFunctions%2F-125946513"><span class="token function">registeredSubcommands</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="com.github.ajalt.clikt.core/CoreCliktCommand///PointingToDeclaration/">CoreCliktCommand</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -573,7 +603,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/-experimental-path-api/index.html"><span class="token annotation builtin">ExperimentalPathApi</span></a></div></div><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="run.html"><span class="token function">run</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.io.path/-experimental-path-api/index.html"><span class="token annotation builtin">ExperimentalPathApi</span></a></div></div><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="run.html"><span class="token function">run</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -588,7 +618,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1365705900%2FFunctions%2F-125946513"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../../foundry.cli.shellsentry/-shell-sentry-cli/index.html#-1365705900%2FFunctions%2F-125946513"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -600,7 +630,7 @@
 </div>
     <div class="footer">
         <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2024 Copyright</span>
+        <span>© 2025 Copyright</span>
         <span class="pull-right">
             <span>Generated by </span>
             <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">

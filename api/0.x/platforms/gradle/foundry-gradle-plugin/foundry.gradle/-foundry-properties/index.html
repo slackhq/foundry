@@ -31,33 +31,63 @@
 <script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../../index.html">
-                            foundry
-                    </a>            </div>
-            <div class="library-version">
+                    foundry
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":platforms:gradle:foundry-gradle-plugin/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":platforms:gradle:foundry-gradle-plugin/main" data-filter=":platforms:gradle:foundry-gradle-plugin/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":platforms:gradle:foundry-gradle-plugin/main">jvm</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    foundry
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="foundry-gradle-plugin::foundry.gradle/FoundryProperties///PointingToDeclaration//-1866425956">
@@ -96,7 +126,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-test-retry-plugin-type/index.html">TestRetryPluginType</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-test-retry-plugin-type/index.html">FoundryProperties.TestRetryPluginType</a><span class="token operator">&gt; </span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-test-retry-plugin-type/index.html">TestRetryPluginType</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-test-retry-plugin-type/index.html">FoundryProperties.TestRetryPluginType</a><span class="token operator">&gt; </span></div></div></div>
                 </div>
               </div>
             </div>
@@ -115,7 +145,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="affected-project-configurations.html">affectedProjectConfigurations</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">A comma-separated list of configurations to use in affected project detection.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="affected-project-configurations.html">affectedProjectConfigurations</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">A comma-separated list of configurations to use in affected project detection.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -145,7 +175,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="allow-warnings.html">allowWarnings</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt out for -Werror.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="allow-warnings.html">allowWarnings</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt out for -Werror.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -160,7 +190,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="allow-warnings-in-tests.html">allowWarningsInTests</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt out for -Werror in tests.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="allow-warnings-in-tests.html">allowWarningsInTests</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt out for -Werror in tests.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -175,7 +205,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="always-enable-resources-in-tests.html">alwaysEnableResourcesInTests</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Always enables resources in android unit tests. Only present for benchmarking purposes and should otherwise be off.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="always-enable-resources-in-tests.html">alwaysEnableResourcesInTests</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Always enables resources in android unit tests. Only present for benchmarking purposes and should otherwise be off.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -190,7 +220,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="anvil-generator-projects.html">anvilGeneratorProjects</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Anvil generator projects that should always be included when Anvil is enabled.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="anvil-generator-projects.html">anvilGeneratorProjects</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Anvil generator projects that should always be included when Anvil is enabled.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -220,7 +250,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="anvil-runtime-projects.html">anvilRuntimeProjects</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Anvil runtime projects that should always be included when Anvil is enabled.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="anvil-runtime-projects.html">anvilRuntimeProjects</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Anvil runtime projects that should always be included when Anvil is enabled.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -235,7 +265,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="anvil-use-ksp-fork.html">anvilUseKspFork</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable use of the Anvil KSP fork. https://github.com/ZacSweers/anvil</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="anvil-use-ksp-fork.html">anvilUseKspFork</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable use of the Anvil KSP fork. https://github.com/ZacSweers/anvil</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -250,7 +280,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-cache-fix.html">autoApplyCacheFix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-cache-fix.html">autoApplyCacheFix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -265,7 +295,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-detekt.html">autoApplyDetekt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-detekt.html">autoApplyDetekt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -280,7 +310,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-nullaway.html">autoApplyNullaway</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-nullaway.html">autoApplyNullaway</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -295,7 +325,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-sort-dependencies.html">autoApplySortDependencies</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-sort-dependencies.html">autoApplySortDependencies</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -310,7 +340,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-spotless.html">autoApplySpotless</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-spotless.html">autoApplySpotless</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -325,7 +355,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-test-retry.html">autoApplyTestRetry</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="auto-apply-test-retry.html">autoApplyTestRetry</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -340,7 +370,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="bugsnag-enabled.html">bugsnagEnabled</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Global toggle to enable bugsnag. Note this still respects variant filters.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="bugsnag-enabled.html">bugsnagEnabled</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Global toggle to enable bugsnag. Note this still respects variant filters.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -355,7 +385,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="bugsnag-enabled-branch-pattern.html">bugsnagEnabledBranchPattern</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Branch pattern for git branches Bugsnag should be enabled on.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="bugsnag-enabled-branch-pattern.html">bugsnagEnabledBranchPattern</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Branch pattern for git branches Bugsnag should be enabled on.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -370,7 +400,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="build-tools-version-override.html">buildToolsVersionOverride</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Optional override for buildToolsVersion in Android projects. Sometimes temporarily necessary to pick up new fixes.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="build-tools-version-override.html">buildToolsVersionOverride</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Optional override for buildToolsVersion in Android projects. Sometimes temporarily necessary to pick up new fixes.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -385,7 +415,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="build-upon-default-affected-project-configurations.html">buildUponDefaultAffectedProjectConfigurations</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to, when true, makes <a href="affected-project-configurations.html">affectedProjectConfigurations</a> build upon the defaults rather than replace them.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="build-upon-default-affected-project-configurations.html">buildUponDefaultAffectedProjectConfigurations</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to, when true, makes <a href="affected-project-configurations.html">affectedProjectConfigurations</a> build upon the defaults rather than replace them.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -400,7 +430,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-lint-enabled.html">ciLintEnabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable ciLint on a project. Default is true.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-lint-enabled.html">ciLintEnabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable ciLint on a project. Default is true.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -415,7 +445,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-lint-variants.html">ciLintVariants</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Comma-separated list of CI lint variants to run (Android only). Default when unspecified will lint all variants.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-lint-variants.html">ciLintVariants</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Comma-separated list of CI lint variants to run (Android only). Default when unspecified will lint all variants.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -430,7 +460,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-unit-test-enabled.html">ciUnitTestEnabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable ciUnitTest on this project. Default is true.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-unit-test-enabled.html">ciUnitTestEnabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable ciUnitTest on this project. Default is true.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -445,7 +475,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-unit-test-enable-kover.html">ciUnitTestEnableKover</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If enabled, applies the kotlinx-kover plugin to projects using ciUnitTest.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-unit-test-enable-kover.html">ciUnitTestEnableKover</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If enabled, applies the kotlinx-kover plugin to projects using ciUnitTest.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -460,7 +490,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-unit-test-variant.html">ciUnitTestVariant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">CI unit test variant (Android only). Defaults to <code class="lang-kotlin">release</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ci-unit-test-variant.html">ciUnitTestVariant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">CI unit test variant (Android only). Defaults to <code class="lang-kotlin">release</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -475,7 +505,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compile-sdk-version.html">compileSdkVersion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compile-sdk-version.html">compileSdkVersion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -490,7 +520,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-common-compiler-options.html">composeCommonCompilerOptions</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Common compose compiler options.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-common-compiler-options.html">composeCommonCompilerOptions</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Common compose compiler options.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -505,7 +535,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-enable-live-literals.html">composeEnableLiveLiterals</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables live literals. Note that they are disabled by default due to https://issuetracker.google.com/issues/274207650 and https://issuetracker.google.com/issues/274231394.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-enable-live-literals.html">composeEnableLiveLiterals</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables live literals. Note that they are disabled by default due to https://issuetracker.google.com/issues/274207650 and https://issuetracker.google.com/issues/274231394.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -520,7 +550,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-global-stability-configuration-path.html">composeGlobalStabilityConfigurationPath</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/file/RegularFile.html">RegularFile</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Relative path to a Compose stability configuration file from the <i>root</i> project.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-global-stability-configuration-path.html">composeGlobalStabilityConfigurationPath</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/file/RegularFile.html">RegularFile</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Relative path to a Compose stability configuration file from the <i>root</i> project.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -535,7 +565,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-include-source-information-everywhere-by-default.html">composeIncludeSourceInformationEverywhereByDefault</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">By default, Compose on android only enables source information in debug variants. This is a bit silly in large projects because we generally make all libraries single-variant as "release", and can result in libraries not having source information. Instead, we rely on R8 to strip out this information in release builds as needed.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-include-source-information-everywhere-by-default.html">composeIncludeSourceInformationEverywhereByDefault</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">By default, Compose on android only enables source information in debug variants. This is a bit silly in large projects because we generally make all libraries single-variant as "release", and can result in libraries not having source information. Instead, we rely on R8 to strip out this information in release builds as needed.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -550,7 +580,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-stability-configuration-path.html">composeStabilityConfigurationPath</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/file/RegularFile.html">RegularFile</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Relative path to a Compose stability configuration file from the current project.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-stability-configuration-path.html">composeStabilityConfigurationPath</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/file/RegularFile.html">RegularFile</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Relative path to a Compose stability configuration file from the current project.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -565,7 +595,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-use-include-information-workaround.html">composeUseIncludeInformationWorkaround</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Use a workaround for compose-compiler's <code class="lang-kotlin">includeInformation</code> option on android projects.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compose-use-include-information-workaround.html">composeUseIncludeInformationWorkaround</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Use a workaround for compose-compiler's <code class="lang-kotlin">includeInformation</code> option on android projects.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -580,7 +610,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compress-android-test-apks-with-legacy-packaging.html">compressAndroidTestApksWithLegacyPackaging</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flag for compressing androidTest APks with legacy packaging.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="compress-android-test-apks-with-legacy-packaging.html">compressAndroidTestApksWithLegacyPackaging</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flag for compressing androidTest APks with legacy packaging.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -595,7 +625,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="debug.html">debug</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables verbose debug logging across the plugin.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="debug.html">debug</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables verbose debug logging across the plugin.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -610,7 +640,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="debug-user-string.html">debugUserString</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">User string used for debug APK outputs.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="debug-user-string.html">debugUserString</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">User string used for debug APK outputs.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -625,7 +655,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="debug-version-code.html">debugVersionCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Version code used for debug APK outputs.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="debug-version-code.html">debugVersionCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Version code used for debug APK outputs.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -640,7 +670,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-compose-android-bundle-alias.html">defaultComposeAndroidBundleAlias</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">An alias name to a libs.versions.toml bundle for common Android Compose dependencies that should be added to android projects with compose enabled</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-compose-android-bundle-alias.html">defaultComposeAndroidBundleAlias</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">An alias name to a libs.versions.toml bundle for common Android Compose dependencies that should be added to android projects with compose enabled</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -655,7 +685,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-namespace-prefix.html">defaultNamespacePrefix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Default namespace prefix for android projects if one isn't specified.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-namespace-prefix.html">defaultNamespacePrefix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Default namespace prefix for android projects if one isn't specified.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -670,7 +700,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-package-prefix.html">defaultPackagePrefix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Default package prefix for JVM projects if one isn't specified.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="default-package-prefix.html">defaultPackagePrefix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Default package prefix for JVM projects if one isn't specified.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -685,7 +715,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="detekt-baseline-file-name.html">detektBaselineFileName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Detekt baseline file, evaluated from project.layout.projectDirectory.file(...).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="detekt-baseline-file-name.html">detektBaselineFileName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Detekt baseline file, evaluated from project.layout.projectDirectory.file(...).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -700,7 +730,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="detekt-configs.html">detektConfigs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Detekt config files, evaluated from rootProject.file(...).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="detekt-configs.html">detektConfigs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Detekt config files, evaluated from rootProject.file(...).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -715,7 +745,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="disable-anvil-for-k2-testing.html">disableAnvilForK2Testing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Force-disables Anvil regardless of <code class="lang-kotlin">FoundryExtension.dagger()</code> settings, useful for K2 testing where Anvil is unsupported.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="disable-anvil-for-k2-testing.html">disableAnvilForK2Testing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Force-disables Anvil regardless of <code class="lang-kotlin">FoundryExtension.dagger()</code> settings, useful for K2 testing where Anvil is unsupported.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -730,7 +760,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="disabled-variants.html">disabledVariants</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Variants that should be disabled in a given subproject.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="disabled-variants.html">disabledVariants</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Variants that should be disabled in a given subproject.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -745,7 +775,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="eagerly-configure-artifact-publishing.html">eagerlyConfigureArtifactPublishing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables eager configuration of <span data-unresolved-link="foundry.gradle.artifacts/FoundryArtifact///PointingToDeclaration/">FoundryArtifact</span> publishing in subprojects. This is behind a flag as a failsafe while we try different approaches to allow lenient resolution.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="eagerly-configure-artifact-publishing.html">eagerlyConfigureArtifactPublishing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables eager configuration of <span data-unresolved-link="foundry.gradle.artifacts/FoundryArtifact///PointingToDeclaration/">FoundryArtifact</span> publishing in subprojects. This is behind a flag as a failsafe while we try different approaches to allow lenient resolution.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -760,7 +790,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-analysis-plugin.html">enableAnalysisPlugin</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable the Gradle Dependency Analysis Plugin, which is disabled by default due to https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/204</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-analysis-plugin.html">enableAnalysisPlugin</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable the Gradle Dependency Analysis Plugin, which is disabled by default due to https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin/issues/204</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -775,7 +805,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-android-cache-fix.html">enableAndroidCacheFix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Android cache fix plugin.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-android-cache-fix.html">enableAndroidCacheFix</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Android cache fix plugin.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -790,7 +820,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-beta-features.html">enableBetaFeatures</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-in for beta SGP features.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-beta-features.html">enableBetaFeatures</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-in for beta SGP features.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -805,7 +835,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-emulator-wtf-for-android-test.html">enableEmulatorWtfForAndroidTest</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If enabled, enables emulator.wtf for androidTest() uses.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-emulator-wtf-for-android-test.html">enableEmulatorWtfForAndroidTest</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If enabled, enables emulator.wtf for androidTest() uses.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -820,7 +850,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-emulator-wtf-per-test-video.html">enableEmulatorWtfPerTestVideo</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If enabled, enables per-test videos for emulator.wtf.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-emulator-wtf-per-test-video.html">enableEmulatorWtfPerTestVideo</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If enabled, enables per-test videos for emulator.wtf.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -835,7 +865,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-full-detekt.html">enableFullDetekt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables full detekt mode (with type resolution). Off by default due to performance issues.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-full-detekt.html">enableFullDetekt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables full detekt mode (with type resolution). Off by default due to performance issues.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -850,7 +880,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-kapt-in-tests.html">enableKaptInTests</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable kapt in tests. By default these are disabled due to this undesirable (but surprisingly intented) behavior of running kapt + stub generation even if no processors are present.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-kapt-in-tests.html">enableKaptInTests</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable kapt in tests. By default these are disabled due to this undesirable (but surprisingly intented) behavior of running kapt + stub generation even if no processors are present.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -865,7 +895,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-ksp.html">enableKsp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable/disable KSP.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-ksp.html">enableKsp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable/disable KSP.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -880,7 +910,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-lint-in-android-test-projects.html">enableLintInAndroidTestProjects</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">At the time of writing, AGP does not support running lint on <code class="lang-kotlin">com.android.test</code> projects. This is a flag to eventually support this in the future.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-lint-in-android-test-projects.html">enableLintInAndroidTestProjects</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">At the time of writing, AGP does not support running lint on <code class="lang-kotlin">com.android.test</code> projects. This is a flag to eventually support this in the future.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -895,7 +925,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-maven-local.html">enableMavenLocal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-in flag to enable mavenLocal repos, used for local testing.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-maven-local.html">enableMavenLocal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-in flag to enable mavenLocal repos, used for local testing.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -910,7 +940,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-moshi-ir.html">enableMoshiIr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable/disable Moshi-IR.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-moshi-ir.html">enableMoshiIr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable/disable Moshi-IR.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -925,7 +955,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-snapshots.html">enableSnapshots</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-in flag to enable snapshots repos, used for the dependencies build shadow job.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="enable-snapshots.html">enableSnapshots</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-in flag to enable snapshots repos, used for the dependencies build shadow job.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -940,7 +970,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="error-prone-auto-patch.html">errorProneAutoPatch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag for Error-Prone auto-patching. Enable when running an auto-patch of EP, such as when it's being introduced to a new module or upgrading EP itself.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="error-prone-auto-patch.html">errorProneAutoPatch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag for Error-Prone auto-patching. Enable when running an auto-patch of EP, such as when it's being introduced to a new module or upgrading EP itself.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -955,7 +985,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="error-prone-check-names-as-errors.html">errorProneCheckNamesAsErrors</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Error-Prone checks that should be considered errors.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="error-prone-check-names-as-errors.html">errorProneCheckNamesAsErrors</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Error-Prone checks that should be considered errors.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -970,7 +1000,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="foundry-extension-verbose.html">foundryExtensionVerbose</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Log Foundry extension configuration state verbosely.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="foundry-extension-verbose.html">foundryExtensionVerbose</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Log Foundry extension configuration state verbosely.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -985,7 +1015,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-test-library.html">isTestLibrary</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to indicate whether this project is a test library (such as test utils, test fixtures, etc).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-test-library.html">isTestLibrary</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to indicate whether this project is a test library (such as test utils, test fixtures, etc).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1000,7 +1030,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jdk-docs-link.html">jdkDocsLink</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Optional link to JDK configuration</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jdk-docs-link.html">jdkDocsLink</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Optional link to JDK configuration</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1015,7 +1045,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jdk-error-message.html">jdkErrorMessage</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Optional error message to show when the JDK configuration is invalid.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jdk-error-message.html">jdkErrorMessage</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Optional error message to show when the JDK configuration is invalid.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1030,7 +1060,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jvm-vendor.html">jvmVendor</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Defines a required vendor for JDK toolchains.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jvm-vendor.html">jvmVendor</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Defines a required vendor for JDK toolchains.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1045,7 +1075,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jvm-vendor-opt-out.html">jvmVendorOptOut</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to disable JVM vendor setting locally.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="jvm-vendor-opt-out.html">jvmVendorOptOut</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to disable JVM vendor setting locally.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1060,7 +1090,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kapt-language-version.html">kaptLanguageVersion</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><span data-unresolved-link="org.jetbrains.kotlin.gradle.dsl/KotlinVersion///PointingToDeclaration/">KotlinVersion</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Overrides the kotlin language version if present.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kapt-language-version.html">kaptLanguageVersion</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><span data-unresolved-link="org.jetbrains.kotlin.gradle.dsl/KotlinVersion///PointingToDeclaration/">KotlinVersion</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Overrides the kotlin language version if present.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1075,7 +1105,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-daemon-args.html">kotlinDaemonArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The project-specific kotlin.daemon.jvmargs computed by bootstrap.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-daemon-args.html">kotlinDaemonArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The project-specific kotlin.daemon.jvmargs computed by bootstrap.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1090,7 +1120,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-explicit-api-mode.html">kotlinExplicitApiMode</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt-in for explicit API mode. Maps to <span data-unresolved-link="org.jetbrains.kotlin.gradle.dsl/ExplicitApiMode///PointingToDeclaration/">ExplicitApiMode</span></p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-explicit-api-mode.html">kotlinExplicitApiMode</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt-in for explicit API mode. Maps to <span data-unresolved-link="org.jetbrains.kotlin.gradle.dsl/ExplicitApiMode///PointingToDeclaration/">ExplicitApiMode</span></p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1105,7 +1135,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-free-args.html">kotlinFreeArgs</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Free compiler arguments to pass to Kotlin's <code class="lang-kotlin">freeCompilerArgs</code> property in all compilations. Should not include opt-in arguments or <code class="lang-kotlin">-progressive</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-free-args.html">kotlinFreeArgs</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Free compiler arguments to pass to Kotlin's <code class="lang-kotlin">freeCompilerArgs</code> property in all compilations. Should not include opt-in arguments or <code class="lang-kotlin">-progressive</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1120,7 +1150,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-jvm-free-args.html">kotlinJvmFreeArgs</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Free compiler arguments to pass to Kotlin's <code class="lang-kotlin">freeCompilerArgs</code> property in JVM compilations. Should not include opt-in arguments or <code class="lang-kotlin">-progressive</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-jvm-free-args.html">kotlinJvmFreeArgs</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Free compiler arguments to pass to Kotlin's <code class="lang-kotlin">freeCompilerArgs</code> property in JVM compilations. Should not include opt-in arguments or <code class="lang-kotlin">-progressive</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1135,7 +1165,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-language-version-override.html">kotlinLanguageVersionOverride</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Option to force a specific kotlin language version. By default defers to the KGP default the build is running with.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-language-version-override.html">kotlinLanguageVersionOverride</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Option to force a specific kotlin language version. By default defers to the KGP default the build is running with.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1150,7 +1180,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-opt-in.html">kotlinOptIn</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt-in annotations to pass to Kotlin's <code class="lang-kotlin">optIn</code> property.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-opt-in.html">kotlinOptIn</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Opt-in annotations to pass to Kotlin's <code class="lang-kotlin">optIn</code> property.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1165,7 +1195,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-progressive.html">kotlinProgressive</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Default for Kotlin's <code class="lang-kotlin">progressive</code> mode. Defaults to enabled.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="kotlin-progressive.html">kotlinProgressive</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Default for Kotlin's <code class="lang-kotlin">progressive</code> mode. Defaults to enabled.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1180,7 +1210,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ksp-connect-sql-delight.html">kspConnectSqlDelight</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to connect SqlDelight sources to KSP.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ksp-connect-sql-delight.html">kspConnectSqlDelight</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to connect SqlDelight sources to KSP.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1195,7 +1225,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ksp-connect-view-binding.html">kspConnectViewBinding</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to connect ViewBinding sources to KSP.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ksp-connect-view-binding.html">kspConnectViewBinding</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to connect ViewBinding sources to KSP.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1210,7 +1240,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="library-with-variants.html">libraryWithVariants</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Indicates that this android library project has variants. Flag-only, value is ignored.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="library-with-variants.html">libraryWithVariants</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Indicates that this android library project has variants. Flag-only, value is ignored.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1225,7 +1255,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-baseline-file-name.html">lintBaselineFileName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">File name to use for a project's lint baseline.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-baseline-file-name.html">lintBaselineFileName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">File name to use for a project's lint baseline.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1240,7 +1270,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-check-dependencies.html">lintCheckDependencies</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Proxy flag for lint.checkDependencies. Usually enabled for application projects.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-check-dependencies.html">lintCheckDependencies</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Proxy flag for lint.checkDependencies. Usually enabled for application projects.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1255,7 +1285,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-check-test-sources.html">lintCheckTestSources</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to control whether or not lint checks test sources.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-check-test-sources.html">lintCheckTestSources</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to control whether or not lint checks test sources.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1270,7 +1300,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-errors-only.html">lintErrorsOnly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable errors only in lint checks.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-errors-only.html">lintErrorsOnly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable errors only in lint checks.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1285,7 +1315,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-ignore-test-sources.html">lintIgnoreTestSources</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to control whether or not lint checks ignores test sources.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-ignore-test-sources.html">lintIgnoreTestSources</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to control whether or not lint checks ignores test sources.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1300,7 +1330,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-version-override.html">lintVersionOverride</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Flag to control which agp version should be used for lint. Optional. Value should be a version key in <code class="lang-kotlin">libs.versions.toml</code>,</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="lint-version-override.html">lintVersionOverride</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Flag to control which agp version should be used for lint. Optional. Value should be a version key in <code class="lang-kotlin">libs.versions.toml</code>,</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1315,7 +1345,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="log-thermals.html">logThermals</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Experimental flag to enable logging thermal throttling on macOS devices.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="log-thermals.html">logThermals</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Experimental flag to enable logging thermal throttling on macOS devices.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1330,7 +1360,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="minify-android-test-apks.html">minifyAndroidTestApks</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flag for minifying androidTest APks with R8. This just tree shakes.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="minify-android-test-apks.html">minifyAndroidTestApks</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flag for minifying androidTest APks with R8. This just tree shakes.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1345,7 +1375,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="mod-score-global-enabled.html">modScoreGlobalEnabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Global boolean that controls whether mod score is enabled on this project.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="mod-score-global-enabled.html">modScoreGlobalEnabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Global boolean that controls whether mod score is enabled on this project.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1360,7 +1390,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="mod-score-ignore.html">modScoreIgnore</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Per-project boolean that allows for excluding this project from mod score.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="mod-score-ignore.html">modScoreIgnore</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Per-project boolean that allows for excluding this project from mod score.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1375,7 +1405,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="moshix-generate-proguard-rules.html">moshixGenerateProguardRules</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable/disable moshi proguard rule gen.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="moshix-generate-proguard-rules.html">moshixGenerateProguardRules</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable/disable moshi proguard rule gen.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1390,7 +1420,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ndk-version.html">ndkVersion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Ndk version to use for android projects.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ndk-version.html">ndkVersion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Ndk version to use for android projects.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1405,7 +1435,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="no-platform.html">noPlatform</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to indicate this project should be exempted from platforms, usually platform projects themselves.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="no-platform.html">noPlatform</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to indicate this project should be exempted from platforms, usually platform projects themselves.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1420,7 +1450,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="nullaway-baseline.html">nullawayBaseline</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag for Nullaway baselining. When enabled along with <a href="error-prone-auto-patch.html">errorProneAutoPatch</a>, existing nullability issues will be baselined with a <code class="lang-kotlin">castToNonNull</code> call to wrap it.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="nullaway-baseline.html">nullawayBaseline</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag for Nullaway baselining. When enabled along with <a href="error-prone-auto-patch.html">errorProneAutoPatch</a>, existing nullability issues will be baselined with a <code class="lang-kotlin">castToNonNull</code> call to wrap it.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1435,7 +1465,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="platform-project-path.html">platformProjectPath</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gradle path to a platform project to be referenced by other projects.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="platform-project-path.html">platformProjectPath</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gradle path to a platform project to be referenced by other projects.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1450,7 +1480,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="rake-no-api.html">rakeNoApi</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to indicate that this project should have no api dependencies, such as if it's solely an annotation processor.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="rake-no-api.html">rakeNoApi</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to indicate that this project should have no api dependencies, such as if it's solely an annotation processor.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1465,7 +1495,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="relocate-build-dir.html">relocateBuildDir</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Performance optimization to relocate the entire project build directory to a location outside the IDE's view. This prevents the IDE from tracking these files and improves IDE performance.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="relocate-build-dir.html">relocateBuildDir</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Performance optimization to relocate the entire project build directory to a location outside the IDE's view. This prevents the IDE from tracking these files and improves IDE performance.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1480,7 +1510,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="robolectric-core-project.html">robolectricCoreProject</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Location for robolectric-core to be referenced by app. Temporary till we have a better solution for "always add these" type of deps.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="robolectric-core-project.html">robolectricCoreProject</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Location for robolectric-core to be referenced by app. Temporary till we have a better solution for "always add these" type of deps.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1495,7 +1525,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="robolectric-test-sdks.html">robolectricTestSdks</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the SDK versions we test in Robolectric tests. Its value should be a comma-separated list of SDK ints to download.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="robolectric-test-sdks.html">robolectricTestSdks</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the SDK versions we test in Robolectric tests. Its value should be a comma-separated list of SDK ints to download.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1510,7 +1540,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="skip-androidx-check.html">skipAndroidxCheck</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-out flag to skip the androidx dependency check. Should only be used for debugging.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="skip-androidx-check.html">skipAndroidxCheck</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Opt-out flag to skip the androidx dependency check. Should only be used for debugging.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1525,7 +1555,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="sort-dependencies-ignore.html">sortDependenciesIgnore</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Comma-separated set of projects to ignore in sorting dependencies.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="sort-dependencies-ignore.html">sortDependenciesIgnore</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Comma-separated set of projects to ignore in sorting dependencies.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1540,7 +1570,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="strict-jdk.html">strictJdk</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable strict JDK mode, forcing some things like JAVA_HOME.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="strict-jdk.html">strictJdk</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable strict JDK mode, forcing some things like JAVA_HOME.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1555,7 +1585,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="strict-mode.html">strictMode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Global control for enabling stricter validation of projects, such as ensuring Kotlin projects have at least one <code class="lang-kotlin">.kt</code> source file.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="strict-mode.html">strictMode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Global control for enabling stricter validation of projects, such as ensuring Kotlin projects have at least one <code class="lang-kotlin">.kt</code> source file.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1570,7 +1600,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="strict-validate-android-test-manifest.html">strictValidateAndroidTestManifest</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Specific toggle for validating manifests in androidTest sources.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="strict-validate-android-test-manifest.html">strictValidateAndroidTestManifest</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Specific toggle for validating manifests in androidTest sources.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1585,7 +1615,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="supported-languages.html">supportedLanguages</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the supported languages in GA builds</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="supported-languages.html">supportedLanguages</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the supported languages in GA builds</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1600,7 +1630,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="supported-languages-beta.html">supportedLanguagesBeta</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the supported languages in Beta builds</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="supported-languages-beta.html">supportedLanguagesBeta</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the supported languages in Beta builds</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1615,7 +1645,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="supported-languages-internal.html">supportedLanguagesInternal</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the supported languages in Internal builds</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="supported-languages-internal.html">supportedLanguagesInternal</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property corresponding to the supported languages in Internal builds</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1630,7 +1660,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="target-android-test-apks-arch.html">targetAndroidTestApksArch</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="../../foundry.gradle.android/-android-architecture/index.html">AndroidArchitecture</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Option to specify which architecture to target for androidTest APKs. These are universal by default, which can be quite bloated. This allows for targeting a subset of arches by excluding jni libs from other ones.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="target-android-test-apks-arch.html">targetAndroidTestApksArch</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="../../foundry.gradle.android/-android-architecture/index.html">AndroidArchitecture</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Option to specify which architecture to target for androidTest APKs. These are universal by default, which can be quite bloated. This allows for targeting a subset of arches by excluding jni libs from other ones.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1645,7 +1675,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-retry-fail-on-passed-after-retry.html">testRetryFailOnPassedAfterRetry</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-retry-fail-on-passed-after-retry.html">testRetryFailOnPassedAfterRetry</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -1660,7 +1690,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-retry-max-failures.html">testRetryMaxFailures</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-retry-max-failures.html">testRetryMaxFailures</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -1675,7 +1705,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-retry-max-retries.html">testRetryMaxRetries</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-retry-max-retries.html">testRetryMaxRetries</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -1705,7 +1735,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-verbose-logging.html">testVerboseLogging</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable verbose logging in unit tests.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="test-verbose-logging.html">testVerboseLogging</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Flag to enable verbose logging in unit tests.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1720,7 +1750,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="topography-auto-fix.html">topographyAutoFix</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property to enable auto-fixing in topography validation.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="topography-auto-fix.html">topographyAutoFix</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property to enable auto-fixing in topography validation.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1735,7 +1765,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="topography-features-config.html">topographyFeaturesConfig</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/file/RegularFile.html">RegularFile</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property pointing at a features config JSON file for <a href="../../../../../platforms/gradle/foundry-gradle-plugin/foundry.gradle.topography/-module-features-config/index.html">foundry.gradle.topography.ModuleFeaturesConfig</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="topography-features-config.html">topographyFeaturesConfig</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/file/RegularFile.html">RegularFile</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Property pointing at a features config JSON file for <a href="../../../../../platforms/gradle/foundry-gradle-plugin/foundry.gradle.topography/-module-features-config/index.html">foundry.gradle.topography.ModuleFeaturesConfig</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1750,7 +1780,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="unit-test-fork-every.html">unitTestForkEvery</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Controls how often to fork the JVM in unit tests. Default is 1000.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="unit-test-fork-every.html">unitTestForkEvery</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Controls how often to fork the JVM in unit tests. Default is 1000.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1765,7 +1795,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="unit-test-parallelism-multiplier.html">unitTestParallelismMultiplier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">Parallelism multiplier to use for unit tests. This should be a float value that is multiplied by the number of cores. The value can be a fraction. Default is 0.5.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="unit-test-parallelism-multiplier.html">unitTestParallelismMultiplier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">Parallelism multiplier to use for unit tests. This should be a float value that is multiplied by the number of cores. The value can be a fraction. Default is 0.5.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1780,7 +1810,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="use-orchestrator.html">useOrchestrator</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.11.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flag for enabling test orchestrator.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="use-orchestrator.html">useOrchestrator</a><span class="token operator">: </span><a href="https://docs.gradle.org/8.12.1/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Flag for enabling test orchestrator.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1795,7 +1825,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="use-prototype-app-id.html">usePrototypeAppId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">When this property is present, the "internalRelease" build variant will have an application id of "com.Slack.prototype", instead of "com.Slack.internal".</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="use-prototype-app-id.html">usePrototypeAppId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">When this property is present, the "internalRelease" build variant will have an application id of "com.Slack.prototype", instead of "com.Slack.internal".</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1810,7 +1840,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="verbose-logging.html">verboseLogging</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables verbose logging in miscellaneous places of SGP. This is intended to be a less noisy alternative to running gradle with <code class="lang-kotlin">--info</code> or <code class="lang-kotlin">--debug</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="verbose-logging.html">verboseLogging</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Enables verbose logging in miscellaneous places of SGP. This is intended to be a less noisy alternative to running gradle with <code class="lang-kotlin">--info</code> or <code class="lang-kotlin">--debug</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1840,7 +1870,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="versions-plugin-allow-unstable.html">versionsPluginAllowUnstable</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Indicates that the gradle versions plugin should allow unstable versions. By default, unstable versions are excluded due to the frequent androidx alpha/beta/rc cycle noise. Flag-only, value is ignored.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="versions-plugin-allow-unstable.html">versionsPluginAllowUnstable</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Indicates that the gradle versions plugin should allow unstable versions. By default, unstable versions are excluded due to the frequent androidx alpha/beta/rc cycle noise. Flag-only, value is ignored.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -1859,7 +1889,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="latest-compile-sdk-with-sources.html"><span class="token function">latestCompileSdkWithSources</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="latest-compile-sdk-with-sources.html"><span class="token function">latestCompileSdkWithSources</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1871,7 +1901,7 @@
 </div>
     <div class="footer">
         <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2024 Copyright</span>
+        <span>© 2025 Copyright</span>
         <span class="pull-right">
             <span>Generated by </span>
             <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
