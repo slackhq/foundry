@@ -35,13 +35,6 @@ import foundry.gradle.tasks.SimpleFilesConsumerTask
 import foundry.gradle.tasks.dependsOnSourceGeneratingTasks
 import foundry.gradle.tasks.publish
 import foundry.gradle.util.toJson
-import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.extension
-import kotlin.io.path.readText
-import kotlin.io.path.useLines
-import kotlin.io.path.writeText
-import kotlin.jvm.optionals.getOrNull
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
@@ -64,6 +57,13 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.options.Option
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.work.DisableCachingByDefault
+import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.extension
+import kotlin.io.path.readText
+import kotlin.io.path.useLines
+import kotlin.io.path.writeText
+import kotlin.jvm.optionals.getOrNull
 
 private fun MapProperty<String, Boolean>.put(feature: ModuleFeature, provider: Provider<Boolean>) {
   put(feature.name, provider.orElse(false))
@@ -317,6 +317,18 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
         throw AssertionError()
       }
     }
+  }
+
+  @OptIn(ExperimentalPathApi::class)
+  private fun validateSourceSetLocations(srcsDir: Path) {
+    // Ensure that all .java and .kt files are under a src/*/kotlin directory structure
+    // TODO move somewhere shared
+    val regex = Regex("^src/[^/]+/kotlin/.*\\.(java|kt)$")
+    srcsDir.walkEachFile()
+      .filter { it.extension == "java" || it.extension == "kt" }
+      .any { file ->
+        !regex.matches(file.toString().replace("\\", "/"))
+      }
   }
 
   @OptIn(ExperimentalPathApi::class)
