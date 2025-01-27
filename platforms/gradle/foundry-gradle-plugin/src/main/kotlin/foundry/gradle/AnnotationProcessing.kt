@@ -93,15 +93,16 @@ internal interface AptOptionsConfig {
  * ```
  */
 internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
-  private val rawAptCompilerOptions by lazy {
-    globalOptions.map { (option, value) -> "-A$option=$value" }
-  }
-
   open val name: String = this::class.java.simpleName
-  open val globalOptions: Map<String, String> = emptyMap()
 
-  val javaCompileAptAction =
-    Action<JavaCompile> { options.compilerArgs.addAll(rawAptCompilerOptions) }
+  open fun globalOptions(properties: FoundryProperties): Map<String, String> = emptyMap()
+
+  fun javaCompileAptAction(foundryProperties: FoundryProperties) =
+    Action<JavaCompile> {
+      options.compilerArgs.addAll(
+        globalOptions(foundryProperties).map { (option, value) -> "-A$option=$value" }
+      )
+    }
 
   final override fun newConfigurer(project: Project): AptOptionsConfigurer {
     return newConfigurer(project, BasicAptOptionsConfigurer(project, this))
@@ -128,18 +129,21 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
           "${baseConfig.name}: Adding javac apt options to android project " +
             "${project.path} at buildType $name"
         )
-        baseConfig.globalOptions.forEach { (key, value) ->
+        baseConfig.globalOptions(project.foundryProperties).forEach { (key, value) ->
           javaCompileOptions.annotationProcessorOptions.arguments[key] = value
         }
       }
 
-    private val javaLibraryAction =
+    private fun javaLibraryAction(foundryProperties: FoundryProperties) =
       Action<Any> {
         // Implicitly not using Kotlin because we would have to use Kapt
         project.logger.debug(
           "${baseConfig.name}: Adding javac apt options to android project ${project.path}"
         )
-        project.tasks.withType(JavaCompile::class.java, baseConfig.javaCompileAptAction)
+        project.tasks.withType(
+          JavaCompile::class.java,
+          baseConfig.javaCompileAptAction(foundryProperties),
+        )
       }
 
     override fun configure(configurationContext: ConfigurationContext) =
@@ -147,7 +151,11 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
         if (configurationContext.isKaptConfiguration) {
           logger.debug("${baseConfig.name}: Adding kapt arguments to $path")
           configure<KaptExtension> {
-            arguments { baseConfig.globalOptions.forEach { (key, value) -> arg(key, value) } }
+            arguments {
+              baseConfig.globalOptions(foundryProperties).forEach { (key, value) ->
+                arg(key, value)
+              }
+            }
           }
         } else {
           project.pluginManager.withPlugin("com.android.application") {
@@ -162,8 +170,8 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
             )
             configure<LibraryExtension> { buildTypes.configureEach(baseBuildTypeAction) }
           }
-          project.pluginManager.withPlugin("java", javaLibraryAction)
-          project.pluginManager.withPlugin("java-library", javaLibraryAction)
+          project.pluginManager.withPlugin("java", javaLibraryAction(foundryProperties))
+          project.pluginManager.withPlugin("java-library", javaLibraryAction(foundryProperties))
         }
       }
   }
@@ -184,7 +192,11 @@ internal object AptOptionsConfigs {
 
   object Dagger : BasicAptOptionsConfig() {
     override val targetDependency: String = "dagger-compiler"
-    override val globalOptions: Map<String, String> =
+
+    override fun globalOptions(foundryProperties: FoundryProperties): Map<String, String> =
+      foundryProperties.daggerOptions.getOrElse(DEFAULT_ARGS)
+
+    private val DEFAULT_ARGS =
       mapOf(
         "dagger.warnIfInjectionFactoryNotGeneratedUpstream" to "enabled",
         // New error messages. Feedback should go to https://github.com/google/dagger/issues/1769
@@ -201,7 +213,8 @@ internal object AptOptionsConfigs {
 
   object Moshi : BasicAptOptionsConfig() {
     override val targetDependency: String = "moshi-kotlin-codegen"
-    override val globalOptions: Map<String, String> =
+
+    override fun globalOptions(foundryProperties: FoundryProperties): Map<String, String> =
       mapOf("moshi.generated" to "javax.annotation.Generated")
   }
 }
