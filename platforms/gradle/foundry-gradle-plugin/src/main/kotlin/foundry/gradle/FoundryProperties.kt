@@ -727,6 +727,19 @@ internal constructor(
         AnvilMode.valueOf(it.uppercase(Locale.US))
       }
 
+  /**
+   * Defines Dagger processing options. The structure of this is a comma-separated list of key=value
+   * pairs. i.e.
+   *
+   * `foundry.dagger.options=dagger.useBindingGraphFix=ENABLED,dagger.ignoreProvisionKeyWildcards=ENABLED`
+   */
+  public val daggerOptions: Provider<Map<String, String>>
+    get() =
+      resolver.optionalStringProvider("foundry.dagger.options", defaultValue = "").map { value ->
+        if (value.isBlank()) return@map emptyMap<String, String>()
+        value.splitToSequence(',').associate { kv -> kv.trim().split('=').let { it[0] to it[1] } }
+      }
+
   /** Overrides the kotlin language version if present. */
   public val kaptLanguageVersion: Provider<KotlinVersion>
     get() =
