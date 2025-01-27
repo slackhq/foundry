@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.1
+------
+
+_2025-01-27_
+
 - Gate Dagger's processing options on a new `foundry.dagger.options` property. The structure of this is a comma-separated list of key=value pairs. i.e. `foundry.dagger.options=dagger.useBindingGraphFix=ENABLED,dagger.ignoreProvisionKeyWildcards=ENABLED`.
 
 0.24.0
