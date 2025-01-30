@@ -735,10 +735,14 @@ internal constructor(
    */
   public val daggerOptions: Provider<Map<String, String>>
     get() =
-      resolver.optionalStringProvider("foundry.dagger.options", defaultValue = "").map { value ->
-        if (value.isBlank()) return@map emptyMap<String, String>()
-        value.splitToSequence(',').associate { kv -> kv.trim().split('=').let { it[0] to it[1] } }
-      }
+      resolver
+        .optionalStringProvider(
+          key = "foundry.dagger.options",
+          blankBehavior = PropertyResolver.BlankBehavior.FILTER,
+        )
+        .map { value ->
+          value.splitToSequence(',').associate { kv -> kv.trim().split('=').let { it[0] to it[1] } }
+        }
 
   /** Overrides the kotlin language version if present. */
   public val kaptLanguageVersion: Provider<KotlinVersion>
