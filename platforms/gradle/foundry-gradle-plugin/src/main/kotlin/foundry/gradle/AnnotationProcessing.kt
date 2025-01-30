@@ -153,6 +153,7 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
           configure<KaptExtension> {
             arguments {
               baseConfig.globalOptions(foundryProperties).forEach { (key, value) ->
+                logger.lifecycle("Adding kapt args to $path: $key=$value")
                 arg(key, value)
               }
             }
@@ -193,8 +194,8 @@ internal object AptOptionsConfigs {
   object Dagger : BasicAptOptionsConfig() {
     override val targetDependency: String = "dagger-compiler"
 
-    override fun globalOptions(foundryProperties: FoundryProperties): Map<String, String> =
-      foundryProperties.daggerOptions.getOrElse(DEFAULT_ARGS)
+    override fun globalOptions(properties: FoundryProperties): Map<String, String> =
+      properties.daggerOptions.getOrElse(DEFAULT_ARGS)
 
     private val DEFAULT_ARGS =
       mapOf(
@@ -214,7 +215,7 @@ internal object AptOptionsConfigs {
   object Moshi : BasicAptOptionsConfig() {
     override val targetDependency: String = "moshi-kotlin-codegen"
 
-    override fun globalOptions(foundryProperties: FoundryProperties): Map<String, String> =
+    override fun globalOptions(properties: FoundryProperties): Map<String, String> =
       mapOf("moshi.generated" to "javax.annotation.Generated")
   }
 }

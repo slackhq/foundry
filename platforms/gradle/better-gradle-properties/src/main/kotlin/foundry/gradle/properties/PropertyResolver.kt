@@ -137,7 +137,9 @@ public class PropertyResolver(
     blankBehavior: BlankBehavior = BlankBehavior.ERROR,
   ): Provider<String> {
     return providerFor(key)
-      .let { defaultValue?.let { providers.provider { defaultValue } } ?: it }
+      .let { provider ->
+        defaultValue?.let { provider.orElse(providers.provider { defaultValue }) } ?: provider
+      }
       .filter {
         when (blankBehavior) {
           BlankBehavior.FILTER -> {

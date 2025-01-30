@@ -4,6 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.2
+------
+
+_2025-01-30_
+
+- Fix loading of optional properties with defined default values.
+- Update to Kotlin `2.1.10`.
+- Build against KSP `2.1.10-1.0.29`.
+
 0.24.1
 ------
 
