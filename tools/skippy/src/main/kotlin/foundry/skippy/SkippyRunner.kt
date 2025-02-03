@@ -61,12 +61,12 @@ public class SkippyRunner(
     }
 
     val configMap = originalConfigMap.toMutableMap()
-    // Extract the global config and apply it to each of the tools
     val configs =
       if (configMap.size == 1) {
+        // No per-service configs, just use the global one
         configMap.values
       } else {
-        // No per-service configs, just use the global one
+        // Extract the global config and apply it to each of the tools
         val globalConfig = configMap.remove(GLOBAL_TOOL) ?: error("No global config!")
         configMap.values.map { config -> config.overlayWith(globalConfig) }
       }
