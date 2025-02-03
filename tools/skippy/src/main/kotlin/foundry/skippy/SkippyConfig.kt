@@ -57,7 +57,7 @@ public data class SkippyConfig(
     }
   }
 
-  public fun overlayWith(other: SkippyConfig): SkippyConfig {
+  public fun mergeWith(other: SkippyConfig): SkippyConfig {
     return copy(
       _includePatterns = includePatterns + other.includePatterns,
       _excludePatterns = excludePatterns + other.excludePatterns,

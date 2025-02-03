@@ -68,7 +68,9 @@ public class SkippyRunner(
       } else {
         // Extract the global config and apply it to each of the tools
         val globalConfig = configMap.remove(GLOBAL_TOOL) ?: error("No global config!")
-        configMap.values.map { config -> config.overlayWith(globalConfig) }
+        configMap.values.map { config ->
+          config.mergeWith(globalConfig)
+        }
       }
 
     val baseOutputDir = outputsDir
