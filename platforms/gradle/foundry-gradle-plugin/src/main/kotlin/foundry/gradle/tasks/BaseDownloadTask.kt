@@ -102,10 +102,39 @@ internal abstract class BaseDownloadTask(
   }
 }
 
+/**
+ * An executable prefix to locate JAVA_HOME and a java executable to run with. Inspired by Gradle's
+ * wrapper
+ */
+// language=bash
 private val EXEC_PREFIX =
   """#!/bin/sh
 
-     exec java \
+    if [ -n "${'$'}JAVA_HOME" ] ; then
+        if [ -x "${'$'}JAVA_HOME/jre/sh/java" ] ; then
+            # IBM's JDK on AIX uses strange locations for the executables
+            JAVACMD=${'$'}JAVA_HOME/jre/sh/java
+        else
+            JAVACMD=${'$'}JAVA_HOME/bin/java
+        fi
+        if [ ! -x "${'$'}JAVACMD" ] ; then
+            die "ERROR: JAVA_HOME is set to an invalid directory: ${'$'}JAVA_HOME
+
+    Please set the JAVA_HOME variable in your environment to match the
+    location of your Java installation."
+        fi
+    else
+        JAVACMD=java
+        if ! command -v java >/dev/null 2>&1
+        then
+            die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+    Please set the JAVA_HOME variable in your environment to match the
+    location of your Java installation."
+        fi
+    fi
+
+     exec "${'$'}JAVACMD" \
        -Xmx512m \
        --add-opens java.base/java.lang=ALL-UNNAMED \
        --add-opens java.base/java.util=ALL-UNNAMED \
@@ -119,7 +148,7 @@ private val EXEC_PREFIX =
        --add-opens jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED \
        --add-opens jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
        --add-opens jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED \
-       -jar ${'$'}0 "${'$'}@"
+       -jar $0 "$@"
 
 
   """
