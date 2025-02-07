@@ -153,7 +153,6 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
           configure<KaptExtension> {
             arguments {
               baseConfig.globalOptions(foundryProperties).forEach { (key, value) ->
-                logger.lifecycle("Adding kapt args to $path: $key=$value")
                 arg(key, value)
               }
             }
