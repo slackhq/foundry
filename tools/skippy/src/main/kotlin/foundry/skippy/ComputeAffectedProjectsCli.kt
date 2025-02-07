@@ -95,7 +95,6 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
           "Path to a file that contains a newline-delimited list of project paths that produce androidTest APKs.",
       )
       .path(mustExist = true, canBeDir = false, mustBeReadable = true)
-      .required()
 
   private val logger = FoundryLogger.clikt(this)
 
@@ -113,7 +112,7 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
       } else {
         1
       }
-    val androidTestProjects = androidTestProjectPaths.readLines().toSet()
+    val androidTestProjects = androidTestProjectPaths?.readLines().orEmpty().toSet()
     val body: suspend (context: CoroutineContext) -> Unit = { context ->
       SkippyRunner(
           debug = debug,
