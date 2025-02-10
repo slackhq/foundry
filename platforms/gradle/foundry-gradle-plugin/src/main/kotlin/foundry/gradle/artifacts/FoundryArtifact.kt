@@ -28,44 +28,43 @@ internal sealed class FoundryArtifact(override val declarableName: String, val c
       Attribute.of("foundry.internal.artifacts", FoundryArtifact::class.java)
   }
 
-  data object SKIPPY_UNIT_TESTS : FoundryArtifact("skippyUnitTests", "skippy") {
-    private fun readResolve(): Any = SKIPPY_UNIT_TESTS
+  data object SkippyUnitTests : FoundryArtifact("skippyUnitTests", "skippy") {
+    private fun readResolve(): Any = SkippyUnitTests
   }
 
-  data object SKIPPY_ROBORAZZI_TESTS : FoundryArtifact("skippyRoborazziTests", "skippy") {
-    private fun readResolve(): Any = SKIPPY_ROBORAZZI_TESTS
+  data object SkippyRoborazziTests : FoundryArtifact("skippyRoborazziTests", "skippy") {
+    private fun readResolve(): Any = SkippyRoborazziTests
   }
 
-  data object SKIPPY_LINT : FoundryArtifact("skippyLint", "skippy") {
-    private fun readResolve(): Any = SKIPPY_LINT
+  data object SkippyLint : FoundryArtifact("skippyLint", "skippy") {
+    private fun readResolve(): Any = SkippyLint
   }
 
-  data object SKIPPY_AVOIDED_TASKS : FoundryArtifact("skippyAvoidedTasks", "skippy") {
-    private fun readResolve(): Any = SKIPPY_AVOIDED_TASKS
+  data object SkippyAvoidedTasks : FoundryArtifact("skippyAvoidedTasks", "skippy") {
+    private fun readResolve(): Any = SkippyAvoidedTasks
   }
 
-  data object SKIPPY_ANDROID_TEST_PROJECT : FoundryArtifact("skippyAndroidTestProject", "skippy") {
-    private fun readResolve(): Any = SKIPPY_ANDROID_TEST_PROJECT
+  data object SkippyAndroidTestProject : FoundryArtifact("skippyAndroidTestProject", "skippy") {
+    private fun readResolve(): Any = SkippyAndroidTestProject
   }
 
-  data object SKIPPY_DETEKT : FoundryArtifact("skippyDetekt", "skippy") {
-    private fun readResolve(): Any = SKIPPY_DETEKT
+  data object SkippyDetekt : FoundryArtifact("skippyDetekt", "skippy") {
+    private fun readResolve(): Any = SkippyDetekt
   }
 
-  data object SKIPPY_VALIDATE_TOPOGRAPHY : FoundryArtifact("skippyValidateTopography", "skippy") {
-    private fun readResolve(): Any = SKIPPY_VALIDATE_TOPOGRAPHY
+  data object SkippyValidateTopography : FoundryArtifact("skippyValidateTopography", "skippy") {
+    private fun readResolve(): Any = SkippyValidateTopography
   }
 
-  data object ANDROID_TEST_APK_DIRS : FoundryArtifact("androidTestApkDirs", "androidTest") {
-    private fun readResolve(): Any = ANDROID_TEST_APK_DIRS
+  data object AndroidTestApkDirs : FoundryArtifact("androidTestApkDirs", "androidTest") {
+    private fun readResolve(): Any = AndroidTestApkDirs
   }
 
-  data object DAGP_MISSING_IDENTIFIERS :
-    FoundryArtifact("dagpMissingIdentifiers", "dependencyRake") {
-    private fun readResolve(): Any = DAGP_MISSING_IDENTIFIERS
+  data object DagpMissingIdentifiers : FoundryArtifact("dagpMissingIdentifiers", "dependencyRake") {
+    private fun readResolve(): Any = DagpMissingIdentifiers
   }
 
-  data object MOD_STATS_STATS_FILES : FoundryArtifact("modStatsFiles", "modscore") {
-    private fun readResolve(): Any = MOD_STATS_STATS_FILES
+  data object ModStatsFiles : FoundryArtifact("modStatsFiles", "modscore") {
+    private fun readResolve(): Any = ModStatsFiles
   }
 }

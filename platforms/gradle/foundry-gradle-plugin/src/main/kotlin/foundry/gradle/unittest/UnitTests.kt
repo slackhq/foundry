@@ -68,7 +68,7 @@ internal object UnitTests {
   }
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_UNIT_TESTS)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyUnitTests)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
       name = GLOBAL_CI_UNIT_TEST_TASK_NAME,
@@ -106,7 +106,7 @@ internal object UnitTests {
 
     val unitTestsPublisher: Publisher<FoundryArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_UNIT_TESTS)
+        Publisher.interProjectPublisher(project, FoundryArtifact.SkippyUnitTests)
       } else {
         val taskPath = "${project.path}:$CI_UNIT_TEST_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_UNIT_TEST_TASK_NAME, taskPath)

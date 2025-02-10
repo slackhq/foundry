@@ -52,7 +52,7 @@ internal object DetektTasks {
         outputFile.setDisallowChanges(project.layout.projectDirectory.file("config/bin/detekt"))
       }
 
-      val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_DETEKT)
+      val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyDetekt)
       SimpleFilesConsumerTask.registerOrConfigure(
         project,
         GLOBAL_CI_DETEKT_TASK_NAME,
@@ -98,7 +98,7 @@ internal object DetektTasks {
 
       val publisher =
         if (affectedProjects == null || project.path in affectedProjects) {
-          Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_DETEKT)
+          Publisher.interProjectPublisher(project, FoundryArtifact.SkippyDetekt)
         } else {
           val log = "$LOG Skipping ${project.path}:detekt because it is not affected."
           if (foundryProperties.debug) {

@@ -231,7 +231,7 @@ internal class StandardProjectConfigurations(
                 registerPostProcessingTask(rakeDependencies)
               }
               val publisher =
-                Publisher.interProjectPublisher(project, FoundryArtifact.DAGP_MISSING_IDENTIFIERS)
+                Publisher.interProjectPublisher(project, FoundryArtifact.DagpMissingIdentifiers)
               publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
@@ -430,12 +430,12 @@ internal class StandardProjectConfigurations(
     val javaVersion = foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
-      Publisher.interProjectPublisher(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
+      Publisher.interProjectPublisher(project, FoundryArtifact.AndroidTestApkDirs)
     val projectPath = project.path
     val isAffectedProject =
       foundryTools.globalConfig.affectedProjects?.contains(projectPath) != false
     val skippyAndroidTestProjectPublisher =
-      Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
+      Publisher.interProjectPublisher(project, FoundryArtifact.SkippyAndroidTestProject)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {

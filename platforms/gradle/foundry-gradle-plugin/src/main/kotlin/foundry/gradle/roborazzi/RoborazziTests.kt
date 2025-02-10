@@ -39,7 +39,7 @@ internal object RoborazziTests {
   private const val LOG = "FoundryRoborazziTests:"
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_ROBORAZZI_TESTS)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyRoborazziTests)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
       name = GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME,
@@ -60,7 +60,7 @@ internal object RoborazziTests {
     }
     val verifyRoborazziPublisher: Publisher<FoundryArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ROBORAZZI_TESTS)
+        Publisher.interProjectPublisher(project, FoundryArtifact.SkippyRoborazziTests)
       } else {
         val taskPath = "${project.path}:$VERIFY_ROBORAZZI_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME, taskPath)
