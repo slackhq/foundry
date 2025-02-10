@@ -56,6 +56,10 @@ internal sealed class FoundryArtifact(override val declarableName: String, val c
     private fun readResolve(): Any = SkippyValidateTopography
   }
 
+  data object SkippyEw : FoundryArtifact("skippyEw", "skippy") {
+    private fun readResolve(): Any = SkippyEw
+  }
+
   data object AndroidTestApkDirs : FoundryArtifact("androidTestApkDirs", "androidTest") {
     private fun readResolve(): Any = AndroidTestApkDirs
   }
