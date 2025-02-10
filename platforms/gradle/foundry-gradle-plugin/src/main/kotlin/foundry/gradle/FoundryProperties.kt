@@ -542,6 +542,20 @@ internal constructor(
     get() = optionalStringProperty("foundry.location.roborazzi-core")
 
   /**
+   * Flag to only run the snapshot tests.
+   */
+  public val snapshotTestFlag: Boolean
+    get() = booleanProperty("foundry.test.snapshot", false)
+
+  /**
+   * Category for the snapshot tests.
+   *
+   * Should be `slack.test.android.roborazzi.ScreenshotTest` format.
+   */
+  public val snapshotTestCategory: String?
+    get() = optionalStringProperty("foundry.test.snapshot.category")
+
+  /**
    * Gradle path to a platform project to be referenced by other projects.
    *
    * Should be `:path:to:foundry-platform` format

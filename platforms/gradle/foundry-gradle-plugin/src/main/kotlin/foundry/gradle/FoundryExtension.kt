@@ -1113,7 +1113,6 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
         checkNotNull(foundryProperties.versions.roborazzi.isPresent) {
           "Roborazzi support requested in ${project.path} but no version was specified in the version catalog."
         }
-        project.pluginManager.apply("io.github.takahirom.roborazzi")
         project.dependencies.apply {
           foundryProperties.roborazziCoreProject?.let { add("testImplementation", project(it)) }
         }
@@ -1121,6 +1120,18 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
           // Enable hardware rendering mode for Roborazzi snapshot testing.
           // https://github.com/takahirom/roborazzi/issues/296#issuecomment-2171248355
           systemProperty("robolectric.pixelCopyRenderMode", "hardware")
+          // Filter out snapshot tests based on category.
+          useJUnit {
+            val isSnapshotTest = foundryProperties.snapshotTestFlag
+            val category = foundryProperties.snapshotTestCategory ?: return@useJUnit
+            if (isSnapshotTest) {
+              // Run snapshot tests with the given category.
+              includeCategories(category)
+            } else {
+              // Exclude snapshot tests with the given category.
+              excludeCategories(category)
+            }
+          }
         }
       }
     }
