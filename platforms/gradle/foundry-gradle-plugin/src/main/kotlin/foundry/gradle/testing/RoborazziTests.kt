@@ -1,19 +1,4 @@
-/*
- * Copyright (C) 2022 Slack Technologies, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package foundry.gradle.roborazzi
+package foundry.gradle.testing
 
 import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.FoundryArtifact
@@ -28,10 +13,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
-/**
- * Sets up Roborazzi tests with skippy support. Similar to how [foundry.gradle.unittest.UnitTests]
- * works.
- */
+/** Sets up Roborazzi tests with skippy support. Similar to how [UnitTests] works. */
 internal object RoborazziTests {
   private const val GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME = "globalCiVerifyRoborazzi"
   private const val CI_VERIFY_ROBORAZZI_TASK_NAME = "ciVerifyRoborazzi"

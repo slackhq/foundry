@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.gradle.unittest
+package foundry.gradle.testing
 
 import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.FoundryArtifact
