@@ -48,6 +48,7 @@ import foundry.gradle.tasks.CheckManifestPermissionsTask
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.publishWith
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
+import foundry.gradle.testing.EmulatorWtfTests
 import foundry.gradle.testing.RoborazziTests
 import foundry.gradle.testing.UnitTests
 import net.ltgt.gradle.errorprone.CheckSeverity
@@ -926,6 +927,17 @@ internal class StandardProjectConfigurations(
     foundryProperties.versions.roborazzi.ifPresent {
       pluginManager.withPlugin("io.github.takahirom.roborazzi") {
         RoborazziTests.configureSubproject(
+          project,
+          foundryProperties,
+          foundryTools.globalConfig.affectedProjects,
+          foundryTools::logAvoidedTask,
+        )
+      }
+    }
+
+    foundryProperties.versions.emulatorWtf.ifPresent {
+      pluginManager.withPlugin("wtf.emulator.gradle") {
+        EmulatorWtfTests.configureSubproject(
           project,
           foundryProperties,
           foundryTools.globalConfig.affectedProjects,

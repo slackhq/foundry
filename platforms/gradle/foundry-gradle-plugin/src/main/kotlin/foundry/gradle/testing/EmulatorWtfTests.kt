@@ -28,20 +28,20 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
-/** Sets up Roborazzi tests with skippy support. Similar to how [UnitTests] works. */
-internal object RoborazziTests {
-  private const val GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME = "globalCiVerifyRoborazzi"
-  private const val CI_VERIFY_ROBORAZZI_TASK_NAME = "ciVerifyRoborazzi"
-  private const val VERIFY_ROBORAZZI_TASK_NAME = "verifyRoborazzi"
-  private const val LOG = "FoundryRoborazziTests:"
+/** Sets up EW tests with skippy support. Similar to how [UnitTests] works. */
+internal object EmulatorWtfTests {
+  private const val GLOBAL_CI_VERIFY_EW_TASK_NAME = "globalCiTestWithEmulatorWtf"
+  private const val CI_VERIFY_EW_TASK_NAME = "ciTestWithEmulatorWtf"
+  private const val VERIFY_EW_TASK_NAME = "testWithEmulatorWtf"
+  private const val LOG = "FoundryEwTests:"
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyRoborazziTests)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyEwTests)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
-      name = GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME,
+      name = GLOBAL_CI_VERIFY_EW_TASK_NAME,
       group = LifecycleBasePlugin.VERIFICATION_GROUP,
-      description = "Global lifecycle task to run all verifyRoborazzi tasks.",
+      description = "Global lifecycle task to run all verifyEw tasks.",
       inputFiles = resolver.artifactView(),
     )
   }
@@ -52,48 +52,42 @@ internal object RoborazziTests {
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) {
-    foundryProperties.versions.bundles.commonRoborazzi.ifPresent {
-      project.dependencies.add("testImplementation", it)
-    }
-    val verifyRoborazziPublisher: Publisher<FoundryArtifact>? =
+    val verifyEwPublisher: Publisher<FoundryArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, FoundryArtifact.SkippyRoborazziTests)
+        Publisher.interProjectPublisher(project, FoundryArtifact.SkippyEwTests)
       } else {
-        val taskPath = "${project.path}:$VERIFY_ROBORAZZI_TASK_NAME"
-        onProjectSkipped(GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME, taskPath)
+        val taskPath = "${project.path}:$VERIFY_EW_TASK_NAME"
+        onProjectSkipped(GLOBAL_CI_VERIFY_EW_TASK_NAME, taskPath)
         val log = "$LOG Skipping $taskPath because it is not affected."
         if (foundryProperties.debug) {
           project.logger.lifecycle(log)
         } else {
           project.logger.debug(log)
         }
-        SkippyArtifacts.publishSkippedTask(project, VERIFY_ROBORAZZI_TASK_NAME)
+        SkippyArtifacts.publishSkippedTask(project, VERIFY_EW_TASK_NAME)
         null
       }
 
-    findVerifyRoborazziTask(project, verifyRoborazziPublisher)
+    findVerifyEwTask(project, verifyEwPublisher)
   }
 
-  private fun findVerifyRoborazziTask(
-    project: Project,
-    roborazziPublisher: Publisher<FoundryArtifact>?,
-  ) {
+  private fun findVerifyEwTask(project: Project, ewPublisher: Publisher<FoundryArtifact>?) {
     val variant = project.ciUnitTestAndroidVariant()
-    val variantVerifyRoborazziTaskName = "$VERIFY_ROBORAZZI_TASK_NAME$variant"
-    project.logger.debug("$LOG Creating CI verifyRoborazzi tasks for variant '$variant'")
-    val ciVerifyRoborazzi = registerCiVerifyRoborazzi(project, variantVerifyRoborazziTaskName)
-    roborazziPublisher?.publish(ciVerifyRoborazzi)
+    val variantVerifyEwTaskName = "$VERIFY_EW_TASK_NAME$variant"
+    project.logger.debug("$LOG Creating CI testWithEmulatorWtf tasks for variant '$variant'")
+    val ciVerifyEw = registerCiVerifyEw(project, variantVerifyEwTaskName)
+    ewPublisher?.publish(ciVerifyEw)
   }
 
-  private fun registerCiVerifyRoborazzi(
+  private fun registerCiVerifyEw(
     project: Project,
     dependencyTaskName: String,
   ): TaskProvider<SimpleFileProducerTask> {
     return SimpleFileProducerTask.registerOrConfigure(
       project,
-      name = CI_VERIFY_ROBORAZZI_TASK_NAME,
+      name = CI_VERIFY_EW_TASK_NAME,
       group = LifecycleBasePlugin.VERIFICATION_GROUP,
-      description = "Lifecycle task to run verifyRoborazzi for ${project.path}.",
+      description = "Lifecycle task to run testWithEmulatorWtf for ${project.path}.",
     ) {
       dependsOn(dependencyTaskName)
     }
