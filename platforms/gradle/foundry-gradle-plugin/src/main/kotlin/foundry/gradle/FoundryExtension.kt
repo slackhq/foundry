@@ -43,6 +43,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.utils.named
@@ -1102,6 +1103,25 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
           add("testImplementation", FoundryDependencies.Testing.Robolectric.robolectric)
           foundryProperties.robolectricCoreProject?.let { add("testImplementation", project(it)) }
         }
+        project.tasks.withType(Test::class.java).configureEach {
+          // Enable Robolectric's new NATIVE graphics mode.
+          // https://github.com/robolectric/robolectric/releases/tag/robolectric-4.10-alpha-1
+          systemProperty("robolectric.graphicsMode", "NATIVE")
+        }
+      }
+      if (featuresHandler.snapshotTests.getOrElse(false)) {
+        checkNotNull(foundryProperties.versions.roborazzi.isPresent) {
+          "Roborazzi support requested in ${project.path} but no version was specified in the version catalog."
+        }
+        project.pluginManager.apply("io.github.takahirom.roborazzi")
+        project.dependencies.apply {
+          foundryProperties.roborazziCoreProject?.let { add("testImplementation", project(it)) }
+        }
+        project.tasks.withType(Test::class.java).configureEach {
+          // Enable hardware rendering mode for Roborazzi snapshot testing.
+          // https://github.com/takahirom/roborazzi/issues/296#issuecomment-2171248355
+          systemProperty("robolectric.pixelCopyRenderMode", "hardware")
+        }
       }
     }
   }
@@ -1113,6 +1133,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val androidTestExcludeFromAggregation: Property<Boolean>
   internal abstract val androidTestAllowedVariants: SetProperty<String>
   internal abstract val robolectric: Property<Boolean>
+  internal abstract val snapshotTests: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
   private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
@@ -1144,7 +1165,15 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   public fun robolectric() {
     // Required for Robolectric to work.
     androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
-    robolectric.setDisallowChanges(true)
+    robolectric.set(true)
+  }
+
+  /**
+   * Enable snapshot testing with Roborazzi on this project.
+   */
+  public fun snapshotTests() {
+    robolectric()
+    snapshotTests.set(true)
   }
 
   /**

@@ -528,10 +528,18 @@ internal constructor(
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
    *
-   * Should be `:path:to:robolectric-core` format
+   * Should be `:path:to:robolectric-core` format.
    */
   public val robolectricCoreProject: String?
     get() = optionalStringProperty("foundry.location.robolectric-core")
+
+  /**
+   * Location for roborazzi-core to be referenced by app.
+   *
+   * Should be `:path:to:roborazzi-core` format
+   */
+  public val roborazziCoreProject: String?
+    get() = optionalStringProperty("foundry.location.roborazzi-core")
 
   /**
    * Gradle path to a platform project to be referenced by other projects.
