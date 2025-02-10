@@ -4,6 +4,19 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.3
+------
+
+_2025-02-10_
+
+- Fix noisy kapt args log.
+- Make `--android-test-project-paths` optional in Skippy.
+- Change exec prefixes added to CLI jars to use `JAVA_HOME` envs.
+- Update clikt to `5.0.3`.
+- Update kaml to `0.71.0`.
+- Build against gradle retry `1.6.2`.
+- Build against DAGP `2.8.1`.
+
 0.24.2
 ------
 
