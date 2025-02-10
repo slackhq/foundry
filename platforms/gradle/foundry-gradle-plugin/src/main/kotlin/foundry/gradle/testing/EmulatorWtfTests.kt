@@ -41,7 +41,7 @@ internal object EmulatorWtfTests {
       project = project,
       name = GLOBAL_CI_VERIFY_EW_TASK_NAME,
       group = LifecycleBasePlugin.VERIFICATION_GROUP,
-      description = "Global lifecycle task to run all verifyEw tasks.",
+      description = "Global lifecycle task to run all testWithEmulatorWtf tasks.",
       inputFiles = resolver.artifactView(),
     )
   }
