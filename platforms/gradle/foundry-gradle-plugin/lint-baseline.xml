@@ -85,7 +85,7 @@
         errorLine2="                                                                      ~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="131"
+            line="132"
             column="71"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                                      ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="904"
+            line="921"
             column="39"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="                               ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="68"
+            line="69"
             column="32"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="447"
+            line="451"
             column="14"/>
     </issue>
 
@@ -282,7 +282,7 @@
         errorLine1="            else -> project.rootProject.projectDir.absolutePath"
         errorLine2="                            ~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/foundry/gradle/unittest/UnitTests.kt"
+            file="src/main/kotlin/foundry/gradle/testing/UnitTests.kt"
             line="229"
             column="29"/>
     </issue>
@@ -499,11 +499,11 @@
     <issue
         id="WithTypeWithoutConfigureEach"
         message="Avoid passing a closure to withType, use withType().configureEach instead"
-        errorLine1="        project.tasks.withType(JavaCompile::class.java, baseConfig.javaCompileAptAction)"
+        errorLine1="        project.tasks.withType("
         errorLine2="                      ~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/AnnotationProcessing.kt"
-            line="142"
+            line="143"
             column="23"/>
     </issue>
 
