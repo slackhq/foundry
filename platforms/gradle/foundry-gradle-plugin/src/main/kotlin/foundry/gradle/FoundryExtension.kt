@@ -1179,12 +1179,13 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
     robolectric.set(true)
   }
 
-  /**
-   * Enable snapshot testing with Roborazzi on this project.
-   */
-  public fun snapshotTests() {
+  /** Enable snapshot testing with Roborazzi on this project. */
+  public fun Project.snapshotTests() {
     robolectric()
     snapshotTests.set(true)
+    foundryProperties.versions.roborazzi.ifPresent {
+      pluginManager.apply("io.github.takahirom.roborazzi")
+    }
   }
 
   /**

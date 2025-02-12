@@ -541,9 +541,7 @@ internal constructor(
   public val roborazziCoreProject: String?
     get() = optionalStringProperty("foundry.location.roborazzi-core")
 
-  /**
-   * Flag to only run the snapshot tests.
-   */
+  /** Flag to only run the snapshot tests. */
   public val snapshotTestFlag: Boolean
     get() = booleanProperty("foundry.test.snapshot", false)
 
