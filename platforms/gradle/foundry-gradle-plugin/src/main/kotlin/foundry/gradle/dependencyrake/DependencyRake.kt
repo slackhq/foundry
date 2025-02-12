@@ -466,7 +466,7 @@ internal abstract class MissingIdentifiersAggregatorTask : DefaultTask() {
 
     fun register(rootProject: Project): TaskProvider<MissingIdentifiersAggregatorTask> {
       val resolver =
-        Resolver.interProjectResolver(rootProject, FoundryArtifact.DAGP_MISSING_IDENTIFIERS)
+        Resolver.interProjectResolver(rootProject, FoundryArtifact.DagpMissingIdentifiers)
       return rootProject.tasks.register(NAME, MissingIdentifiersAggregatorTask::class.java) {
         inputFiles.from(resolver.artifactView())
         outputFile.set(

@@ -29,6 +29,6 @@ internal object SkippyArtifacts {
         name = "skipped${name.capitalizeUS()}",
         description = "Lifecycle task to run unit tests for ${project.path} (skipped).",
       )
-      .publishWith(Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_AVOIDED_TASKS))
+      .publishWith(Publisher.interProjectPublisher(project, FoundryArtifact.SkippyAvoidedTasks))
   }
 }

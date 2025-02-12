@@ -61,7 +61,7 @@ internal abstract class GenerateAndroidTestProjectPathsTask : DefaultTask() {
 
     fun register(rootProject: Project): TaskProvider<GenerateAndroidTestProjectPathsTask> {
       val androidTestApksResolver =
-        Resolver.interProjectResolver(rootProject, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
+        Resolver.interProjectResolver(rootProject, FoundryArtifact.SkippyAndroidTestProject)
       return rootProject.tasks.register<GenerateAndroidTestProjectPathsTask>(NAME) {
         androidTestProjectInputs.from(androidTestApksResolver.artifactView())
         outputFile.setDisallowChanges(

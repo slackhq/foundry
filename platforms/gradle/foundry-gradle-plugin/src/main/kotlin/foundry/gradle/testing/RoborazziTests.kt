@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2025 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.gradle.roborazzi
+package foundry.gradle.testing
 
 import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.FoundryArtifact
@@ -28,10 +28,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
-/**
- * Sets up Roborazzi tests with skippy support. Similar to how [foundry.gradle.unittest.UnitTests]
- * works.
- */
+/** Sets up Roborazzi tests with skippy support. Similar to how [UnitTests] works. */
 internal object RoborazziTests {
   private const val GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME = "globalCiVerifyRoborazzi"
   private const val CI_VERIFY_ROBORAZZI_TASK_NAME = "ciVerifyRoborazzi"
@@ -39,7 +36,7 @@ internal object RoborazziTests {
   private const val LOG = "FoundryRoborazziTests:"
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_ROBORAZZI_TESTS)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyRoborazziTests)
     SimpleFilesConsumerTask.registerOrConfigure(
       project = project,
       name = GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME,
@@ -60,7 +57,7 @@ internal object RoborazziTests {
     }
     val verifyRoborazziPublisher: Publisher<FoundryArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
-        Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ROBORAZZI_TESTS)
+        Publisher.interProjectPublisher(project, FoundryArtifact.SkippyRoborazziTests)
       } else {
         val taskPath = "${project.path}:$VERIFY_ROBORAZZI_TASK_NAME"
         onProjectSkipped(GLOBAL_CI_VERIFY_ROBORAZZI_TASK_NAME, taskPath)

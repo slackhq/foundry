@@ -66,7 +66,7 @@ internal object LintTasks {
   }
 
   fun configureRootProject(project: Project) {
-    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_LINT)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyLint)
     SimpleFilesConsumerTask.registerOrConfigure(
       project,
       GLOBAL_CI_LINT_TASK_NAME,
@@ -257,7 +257,7 @@ internal object LintTasks {
       }
       SkippyArtifacts.publishSkippedTask(project, CI_LINT_TASK_NAME)
     } else {
-      val publisher = Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_LINT)
+      val publisher = Publisher.interProjectPublisher(project, FoundryArtifact.SkippyLint)
       publisher.publish(ciLint)
     }
 
