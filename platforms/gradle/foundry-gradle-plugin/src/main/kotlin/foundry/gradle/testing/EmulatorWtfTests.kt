@@ -20,6 +20,7 @@ import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.avoidance.SkippyArtifacts
+import foundry.gradle.capitalizeUS
 import foundry.gradle.ciUnitTestAndroidVariant
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.SimpleFilesConsumerTask
@@ -32,8 +33,10 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 internal object EmulatorWtfTests {
   private const val GLOBAL_CI_VERIFY_EW_TASK_NAME = "globalCiTestWithEmulatorWtf"
   private const val CI_VERIFY_EW_TASK_NAME = "ciTestWithEmulatorWtf"
-  private const val VERIFY_EW_TASK_NAME = "testWithEmulatorWtf"
   private const val LOG = "FoundryEwTests:"
+
+  private fun ewTestTaskName(variant: String?) =
+    "test${variant?.capitalizeUS().orEmpty()}WithEmulatorWtf"
 
   fun configureRootProject(project: Project) {
     val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyEwTests)
@@ -52,11 +55,13 @@ internal object EmulatorWtfTests {
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) {
+    val variant = project.ciUnitTestAndroidVariant()
+    val variantVerifyEwTaskName = ewTestTaskName(variant)
     val verifyEwPublisher: Publisher<FoundryArtifact>? =
       if (affectedProjects == null || project.path in affectedProjects) {
         Publisher.interProjectPublisher(project, FoundryArtifact.SkippyEwTests)
       } else {
-        val taskPath = "${project.path}:$VERIFY_EW_TASK_NAME"
+        val taskPath = "${project.path}:$variantVerifyEwTaskName"
         onProjectSkipped(GLOBAL_CI_VERIFY_EW_TASK_NAME, taskPath)
         val log = "$LOG Skipping $taskPath because it is not affected."
         if (foundryProperties.debug) {
@@ -64,17 +69,19 @@ internal object EmulatorWtfTests {
         } else {
           project.logger.debug(log)
         }
-        SkippyArtifacts.publishSkippedTask(project, VERIFY_EW_TASK_NAME)
+        SkippyArtifacts.publishSkippedTask(project, variantVerifyEwTaskName)
         null
       }
 
-    findVerifyEwTask(project, verifyEwPublisher)
+    project.logger.debug("$LOG Creating CI testWithEmulatorWtf tasks for variant '$variant'")
+    findVerifyEwTask(project, variantVerifyEwTaskName, verifyEwPublisher)
   }
 
-  private fun findVerifyEwTask(project: Project, ewPublisher: Publisher<FoundryArtifact>?) {
-    val variant = project.ciUnitTestAndroidVariant()
-    val variantVerifyEwTaskName = "$VERIFY_EW_TASK_NAME$variant"
-    project.logger.debug("$LOG Creating CI testWithEmulatorWtf tasks for variant '$variant'")
+  private fun findVerifyEwTask(
+    project: Project,
+    variantVerifyEwTaskName: String,
+    ewPublisher: Publisher<FoundryArtifact>?,
+  ) {
     val ciVerifyEw = registerCiVerifyEw(project, variantVerifyEwTaskName)
     ewPublisher?.publish(ciVerifyEw)
   }
