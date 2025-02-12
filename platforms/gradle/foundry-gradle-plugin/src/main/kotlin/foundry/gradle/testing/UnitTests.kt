@@ -203,11 +203,6 @@ internal object UnitTests {
         "-Xss1m", // Stack size
       )
 
-      // TODO would be nice to some day only conditionally apply robolectric args
-      // Enable Robolectric's new NATIVE graphics mode.
-      // https://github.com/robolectric/robolectric/releases/tag/robolectric-4.10-alpha-1
-      systemProperty("robolectric.graphicsMode", "NATIVE")
-
       if (foundryProperties.testVerboseLogging) {
         // Add additional logging on Jenkins to help debug hanging or OOM-ing unit tests.
         testLogging {
