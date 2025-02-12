@@ -80,7 +80,7 @@ public object ModuleStatsTasks {
   internal fun configureRoot(rootProject: Project, foundryProperties: FoundryProperties) {
     if (!foundryProperties.modScoreGlobalEnabled) return
     val includeGenerated = rootProject.includeGenerated()
-    val resolver = Resolver.interProjectResolver(rootProject, FoundryArtifact.MOD_STATS_STATS_FILES)
+    val resolver = Resolver.interProjectResolver(rootProject, FoundryArtifact.ModStatsFiles)
 
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
       projectPathsToAccessors.setDisallowChanges(
@@ -155,8 +155,7 @@ public object ModuleStatsTasks {
           )
         }
 
-      val publisher =
-        Publisher.interProjectPublisher(project, FoundryArtifact.MOD_STATS_STATS_FILES)
+      val publisher = Publisher.interProjectPublisher(project, FoundryArtifact.ModStatsFiles)
       publisher.publish(task.flatMap { it.outputFile })
       task
     }

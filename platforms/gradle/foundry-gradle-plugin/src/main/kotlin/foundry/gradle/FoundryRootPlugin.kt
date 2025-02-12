@@ -33,7 +33,6 @@ import foundry.gradle.properties.StartParameterProperties
 import foundry.gradle.properties.createPropertiesProvider
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.properties.sneakyNull
-import foundry.gradle.roborazzi.RoborazziTests
 import foundry.gradle.stats.ModuleStatsTasks
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CoreBootstrapTask
@@ -43,7 +42,9 @@ import foundry.gradle.tasks.KtLintDownloadTask
 import foundry.gradle.tasks.KtfmtDownloadTask
 import foundry.gradle.tasks.SortDependenciesDownloadTask
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
-import foundry.gradle.unittest.UnitTests
+import foundry.gradle.testing.EmulatorWtfTests
+import foundry.gradle.testing.RoborazziTests
+import foundry.gradle.testing.UnitTests
 import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsData
 import java.util.Locale
@@ -173,6 +174,9 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     project.configureMisc(foundryProperties)
     UnitTests.configureRootProject(project)
     foundryProperties.versions.roborazzi.ifPresent { RoborazziTests.configureRootProject(project) }
+    foundryProperties.versions.emulatorWtf.ifPresent {
+      EmulatorWtfTests.configureRootProject(project)
+    }
     ModuleStatsTasks.configureRoot(project, foundryProperties)
     val generateDependencyGraphTask =
       GenerateDependencyGraphTask.register(project, foundryProperties)

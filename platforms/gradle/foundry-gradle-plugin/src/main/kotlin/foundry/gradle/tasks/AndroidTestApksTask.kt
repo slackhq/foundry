@@ -72,7 +72,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
     public const val NAME: String = "aggregateAndroidTestApks"
 
     internal fun register(project: Project): TaskProvider<AndroidTestApksTask> {
-      val resolver = Resolver.interProjectResolver(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
+      val resolver = Resolver.interProjectResolver(project, FoundryArtifact.AndroidTestApkDirs)
       return project.tasks.register<AndroidTestApksTask>(NAME) {
         androidTestApkDirs.from(resolver.artifactView())
         outputFile.setDisallowChanges(

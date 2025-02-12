@@ -43,13 +43,14 @@ import foundry.gradle.kgp.KgpTasks
 import foundry.gradle.lint.LintTasks
 import foundry.gradle.permissionchecks.PermissionChecks
 import foundry.gradle.properties.setDisallowChanges
-import foundry.gradle.roborazzi.RoborazziTests
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CheckManifestPermissionsTask
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.publishWith
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
-import foundry.gradle.unittest.UnitTests
+import foundry.gradle.testing.EmulatorWtfTests
+import foundry.gradle.testing.RoborazziTests
+import foundry.gradle.testing.UnitTests
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
@@ -231,7 +232,7 @@ internal class StandardProjectConfigurations(
                 registerPostProcessingTask(rakeDependencies)
               }
               val publisher =
-                Publisher.interProjectPublisher(project, FoundryArtifact.DAGP_MISSING_IDENTIFIERS)
+                Publisher.interProjectPublisher(project, FoundryArtifact.DagpMissingIdentifiers)
               publisher.publish(rakeDependencies.flatMap { it.missingIdentifiersFile })
             }
           }
@@ -430,12 +431,12 @@ internal class StandardProjectConfigurations(
     val javaVersion = foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
-      Publisher.interProjectPublisher(project, FoundryArtifact.ANDROID_TEST_APK_DIRS)
+      Publisher.interProjectPublisher(project, FoundryArtifact.AndroidTestApkDirs)
     val projectPath = project.path
     val isAffectedProject =
       foundryTools.globalConfig.affectedProjects?.contains(projectPath) != false
     val skippyAndroidTestProjectPublisher =
-      Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_ANDROID_TEST_PROJECT)
+      Publisher.interProjectPublisher(project, FoundryArtifact.SkippyAndroidTestProject)
 
     val commonComponentsExtension =
       Action<AndroidComponentsExtension<*, *, *>> {
@@ -592,12 +593,21 @@ internal class StandardProjectConfigurations(
         compileSdkVersion(sdkVersions.value.compileSdk)
         foundryProperties.ndkVersion?.let { ndkVersion = it }
         foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
+        val useOrchestrator = foundryProperties.useOrchestrator.getOrElse(false)
         defaultConfig {
-          // TODO this won't work with SDK previews but will fix in a followup
           minSdk = sdkVersions.value.minSdk
           vectorDrawables.useSupportLibrary = true
-          // Default to the standard android runner, but note this is overridden in :app
-          testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+          if (applyTestOptions) {
+            testInstrumentationRunner = foundryProperties.testInstrumentationRunner
+
+            if (useOrchestrator) {
+              // The following argument makes the Android Test Orchestrator run its
+              // "pm clear" command after each test invocation. This command ensures
+              // that the app's state is completely cleared between tests.
+              testInstrumentationRunnerArguments.putAll(mapOf("clearPackageData" to "true"))
+            }
+          }
         }
 
         compileOptions {
@@ -615,7 +625,7 @@ internal class StandardProjectConfigurations(
           testOptions {
             animationsDisabled = true
 
-            if (foundryProperties.useOrchestrator.getOrElse(false)) {
+            if (useOrchestrator) {
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -659,9 +669,9 @@ internal class StandardProjectConfigurations(
       }
 
     val objenesis2Version = foundryProperties.versions.objenesis
-    val prepareAndroidTestConfigurations = {
+    val prepareAndroidTestConfigurations = { configToMatch: String ->
       configurations.configureEach {
-        if (name.contains("androidTest", ignoreCase = true)) {
+        if (name.contains(configToMatch, ignoreCase = true)) {
           // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
           exclude(mapOf("group" to "org.jetbrains.kotlinx", "module" to "kotlinx-coroutines-debug"))
           objenesis2Version?.let {
@@ -686,16 +696,8 @@ internal class StandardProjectConfigurations(
       }
     }
 
-    pluginManager.withPlugin("com.android.test") {
-      configure<TestExtension> {
-        foundryExtension.setAndroidExtension(this)
-        commonBaseExtensionConfig(false)
-        defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-      }
-    }
-
     pluginManager.withPlugin("com.android.application") {
-      prepareAndroidTestConfigurations()
+      prepareAndroidTestConfigurations("androidTest")
       configure<ApplicationAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
         // Disable androidTest tasks unless they opt-in
@@ -829,7 +831,7 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.library") {
-      prepareAndroidTestConfigurations()
+      prepareAndroidTestConfigurations("androidTest")
       val isLibraryWithVariants = foundryProperties.libraryWithVariants
 
       configure<LibraryAndroidComponentsExtension> {
@@ -923,9 +925,64 @@ internal class StandardProjectConfigurations(
       foundryExtension.androidHandler.applyTo(project)
     }
 
+    pluginManager.withPlugin("com.android.test") {
+      prepareAndroidTestConfigurations("implementation")
+
+      configure<TestAndroidComponentsExtension> {
+        commonComponentsExtension.execute(this)
+
+        // namespace is not a property but we can hook into DSL finalizing to set it at the end
+        // if the build script didn't declare one prior
+        finalizeDsl { testExtension ->
+          if (testExtension.namespace == null) {
+            testExtension.namespace =
+              foundryProperties.defaultNamespacePrefix +
+                projectPath
+                  .asSequence()
+                  .mapNotNull {
+                    when (it) {
+                      // Skip dashes and underscores. We could camelcase but it looks weird in a
+                      // package name
+                      '-',
+                      '_' -> null
+                      // Use the project path as the real dot namespacing
+                      ':' -> '.'
+                      else -> it
+                    }
+                  }
+                  .joinToString("")
+          }
+        }
+      }
+      configure<TestExtension> {
+        foundryExtension.setAndroidExtension(this)
+        commonBaseExtensionConfig(true)
+        defaultConfig { targetSdk = sdkVersions.value.targetSdk }
+        buildTypes {
+          getByName("debug") {
+            // For upstream android libraries that just have a single release variant, use that.
+            matchingFallbacks += "release"
+          }
+        }
+      }
+
+      foundryExtension.androidHandler.applyTo(project)
+    }
+
     foundryProperties.versions.roborazzi.ifPresent {
       pluginManager.withPlugin("io.github.takahirom.roborazzi") {
         RoborazziTests.configureSubproject(
+          project,
+          foundryProperties,
+          foundryTools.globalConfig.affectedProjects,
+          foundryTools::logAvoidedTask,
+        )
+      }
+    }
+
+    foundryProperties.versions.emulatorWtf.ifPresent {
+      pluginManager.withPlugin("wtf.emulator.gradle") {
+        EmulatorWtfTests.configureSubproject(
           project,
           foundryProperties,
           foundryTools.globalConfig.affectedProjects,

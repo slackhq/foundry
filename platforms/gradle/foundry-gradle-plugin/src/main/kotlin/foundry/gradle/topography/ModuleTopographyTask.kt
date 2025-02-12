@@ -71,8 +71,7 @@ private fun MapProperty<String, Boolean>.put(feature: ModuleFeature, provider: P
 
 internal object ModuleTopographyTasks {
   fun configureRootProject(project: Project) {
-    val resolver =
-      Resolver.interProjectResolver(project, FoundryArtifact.SKIPPY_VALIDATE_TOPOGRAPHY)
+    val resolver = Resolver.interProjectResolver(project, FoundryArtifact.SkippyValidateTopography)
     SimpleFilesConsumerTask.registerOrConfigure(
       project,
       ValidateModuleTopographyTask.GLOBAL_CI_NAME,
@@ -357,7 +356,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     ) {
       val publisher =
         if (affectedProjects == null || project.path in affectedProjects) {
-          Publisher.interProjectPublisher(project, FoundryArtifact.SKIPPY_VALIDATE_TOPOGRAPHY)
+          Publisher.interProjectPublisher(project, FoundryArtifact.SkippyValidateTopography)
         } else {
           val log = "$LOG Skipping ${project.path}:$CI_NAME because it is not affected."
           if (foundryProperties.debug) {

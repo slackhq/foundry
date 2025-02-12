@@ -106,6 +106,9 @@ internal class FoundryVersions(
   val roborazzi: Optional<String>
     get() = getOptionalValue("roborazzi")
 
+  val emulatorWtf: Optional<String>
+    get() = getOptionalValue("emulatorWtf")
+
   fun lookupVersion(key: String) = getOptionalValue(key)
 
   class Bundles(
