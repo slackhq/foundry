@@ -499,6 +499,14 @@ internal constructor(
   public val useOrchestrator: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.android.test.orchestrator", false)
 
+  /** FQCN of the testInstrumentationRunner to use */
+  public val testInstrumentationRunner: String
+    get() =
+      stringProperty(
+        "foundry.android.test.instrumentationRunner",
+        "androidx.test.runner.AndroidJUnitRunner",
+      )
+
   /**
    * Flag for compressing androidTest APks with legacy packaging.
    *

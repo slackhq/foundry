@@ -593,12 +593,21 @@ internal class StandardProjectConfigurations(
         compileSdkVersion(sdkVersions.value.compileSdk)
         foundryProperties.ndkVersion?.let { ndkVersion = it }
         foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
+        val useOrchestrator = foundryProperties.useOrchestrator.getOrElse(false)
         defaultConfig {
-          // TODO this won't work with SDK previews but will fix in a followup
           minSdk = sdkVersions.value.minSdk
           vectorDrawables.useSupportLibrary = true
-          // Default to the standard android runner, but note this is overridden in :app
-          testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+          if (applyTestOptions) {
+            testInstrumentationRunner = foundryProperties.testInstrumentationRunner
+
+            if (useOrchestrator) {
+              // The following argument makes the Android Test Orchestrator run its
+              // "pm clear" command after each test invocation. This command ensures
+              // that the app's state is completely cleared between tests.
+              testInstrumentationRunnerArguments.putAll(mapOf("clearPackageData" to "true"))
+            }
+          }
         }
 
         compileOptions {
@@ -616,7 +625,7 @@ internal class StandardProjectConfigurations(
           testOptions {
             animationsDisabled = true
 
-            if (foundryProperties.useOrchestrator.getOrElse(false)) {
+            if (useOrchestrator) {
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -660,9 +669,9 @@ internal class StandardProjectConfigurations(
       }
 
     val objenesis2Version = foundryProperties.versions.objenesis
-    val prepareAndroidTestConfigurations = {
+    val prepareAndroidTestConfigurations = { configToMatch: String ->
       configurations.configureEach {
-        if (name.contains("androidTest", ignoreCase = true)) {
+        if (name.contains(configToMatch, ignoreCase = true)) {
           // Cover for https://github.com/Kotlin/kotlinx.coroutines/issues/2023
           exclude(mapOf("group" to "org.jetbrains.kotlinx", "module" to "kotlinx-coroutines-debug"))
           objenesis2Version?.let {
@@ -687,16 +696,8 @@ internal class StandardProjectConfigurations(
       }
     }
 
-    pluginManager.withPlugin("com.android.test") {
-      configure<TestExtension> {
-        foundryExtension.setAndroidExtension(this)
-        commonBaseExtensionConfig(false)
-        defaultConfig { targetSdk = sdkVersions.value.targetSdk }
-      }
-    }
-
     pluginManager.withPlugin("com.android.application") {
-      prepareAndroidTestConfigurations()
+      prepareAndroidTestConfigurations("androidTest")
       configure<ApplicationAndroidComponentsExtension> {
         commonComponentsExtension.execute(this)
         // Disable androidTest tasks unless they opt-in
@@ -830,7 +831,7 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.library") {
-      prepareAndroidTestConfigurations()
+      prepareAndroidTestConfigurations("androidTest")
       val isLibraryWithVariants = foundryProperties.libraryWithVariants
 
       configure<LibraryAndroidComponentsExtension> {
@@ -919,6 +920,50 @@ internal class StandardProjectConfigurations(
           testBuildType = "release"
         }
         // We don't set targetSdkVersion in libraries since this is controlled by the app.
+      }
+
+      foundryExtension.androidHandler.applyTo(project)
+    }
+
+    pluginManager.withPlugin("com.android.test") {
+      prepareAndroidTestConfigurations("implementation")
+
+      configure<TestAndroidComponentsExtension> {
+        commonComponentsExtension.execute(this)
+
+        // namespace is not a property but we can hook into DSL finalizing to set it at the end
+        // if the build script didn't declare one prior
+        finalizeDsl { testExtension ->
+          if (testExtension.namespace == null) {
+            testExtension.namespace =
+              foundryProperties.defaultNamespacePrefix +
+                projectPath
+                  .asSequence()
+                  .mapNotNull {
+                    when (it) {
+                      // Skip dashes and underscores. We could camelcase but it looks weird in a
+                      // package name
+                      '-',
+                      '_' -> null
+                      // Use the project path as the real dot namespacing
+                      ':' -> '.'
+                      else -> it
+                    }
+                  }
+                  .joinToString("")
+          }
+        }
+      }
+      configure<TestExtension> {
+        foundryExtension.setAndroidExtension(this)
+        commonBaseExtensionConfig(true)
+        defaultConfig { targetSdk = sdkVersions.value.targetSdk }
+        buildTypes {
+          getByName("debug") {
+            // For upstream android libraries that just have a single release variant, use that.
+            matchingFallbacks += "release"
+          }
+        }
       }
 
       foundryExtension.androidHandler.applyTo(project)
