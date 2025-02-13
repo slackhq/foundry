@@ -409,8 +409,7 @@ internal class StandardProjectConfigurations(
           // Enable autopatching via "-PepAutoPatch=true". This patches in-place and requires a
           // recompilation after.
           // This could be useful to enable on CI + a git porcelain check to see if there's any
-          // patchable error prone
-          // fixes.
+          // patchable error prone fixes.
           if (autoPatchEnabled) {
             // Always log this verbosely
             logger.lifecycle("Enabling error-prone auto-patching on ${project.path}:$name")
@@ -514,7 +513,6 @@ internal class StandardProjectConfigurations(
           val isAndroidTestEnabled =
             (variant is HasAndroidTest && variant.androidTest != null) || variant is TestVariant
           if (isAndroidTestEnabled) {
-            logger.lifecycle("Applying variant options to $projectPath.${variant.name}")
             if (foundryProperties.useOrchestrator.getOrElse(false)) {
               dependencies.add("androidTestUtil", "androidx.test:orchestrator")
             }
@@ -610,11 +608,9 @@ internal class StandardProjectConfigurations(
           vectorDrawables.useSupportLibrary = true
 
           if (applyTestOptions) {
-            logger.lifecycle("Applying test options runner to $projectPath")
             testInstrumentationRunner = foundryProperties.testInstrumentationRunner
 
             if (useOrchestrator) {
-              logger.lifecycle("Applying orchestrator args to $projectPath")
               // The following argument makes the Android Test Orchestrator run its
               // "pm clear" command after each test invocation. This command ensures
               // that the app's state is completely cleared between tests.
@@ -636,11 +632,9 @@ internal class StandardProjectConfigurations(
 
         if (applyTestOptions) {
           testOptions {
-            logger.lifecycle("Applying test options to $projectPath")
             animationsDisabled = true
 
             if (useOrchestrator) {
-              logger.lifecycle("Applying orchestrator to $projectPath")
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -941,7 +935,6 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.test") {
-      logger.lifecycle("Configuring android test project $projectPath")
       prepareAndroidTestConfigurations("implementation")
 
       configure<TestAndroidComponentsExtension> {
@@ -971,7 +964,6 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<TestExtension> {
-        logger.lifecycle("Configuring TestExtension in $projectPath")
         foundryExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }

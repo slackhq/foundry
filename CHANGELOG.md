@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.6
+------
+
+_2025-02-13_
+
+- Remove noisy test configuration logs.
+
 0.24.5
 ------
 
