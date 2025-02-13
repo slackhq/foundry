@@ -26,6 +26,7 @@ import com.android.build.api.variant.HasUnitTestBuilder
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.LibraryVariant
 import com.android.build.api.variant.TestAndroidComponentsExtension
+import com.android.build.api.variant.TestVariant
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
@@ -474,7 +475,8 @@ internal class StandardProjectConfigurations(
 
         finalizeDsl {
           val androidTestEnabled =
-            foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+            this is TestAndroidComponentsExtension ||
+              foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
           if (androidTestEnabled && foundryProperties.enableEmulatorWtfForAndroidTest) {
             project.pluginManager.apply("wtf.emulator.gradle")
             project.configure<EwExtension> {
@@ -509,65 +511,74 @@ internal class StandardProjectConfigurations(
             isLibraryVariant &&
               foundryExtension.androidHandler.featuresHandler.androidTestExcludeFromAggregation
                 .getOrElse(false)
-          val isAndroidTestEnabled = variant is HasAndroidTest && variant.androidTest != null
+          val isAndroidTestEnabled =
+            (variant is HasAndroidTest && variant.androidTest != null) || variant is TestVariant
           if (isAndroidTestEnabled) {
+            logger.lifecycle("Applying variant options to $projectPath.${variant.name}")
             if (foundryProperties.useOrchestrator.getOrElse(false)) {
               dependencies.add("androidTestUtil", "androidx.test:orchestrator")
             }
-            if (!excluded && isAffectedProject) {
-              // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we aggregate
-              // to their root project dep
-              if (isLibraryVariant) {
-                val libraryVariant = variant as LibraryVariant
-                libraryVariant.androidTest?.apply {
-                  packaging.dex.useLegacyPackaging.set(
-                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
+            if (!excluded) {
+              val packaging =
+                (variant as? LibraryVariant)?.androidTest?.packaging
+                  ?: (variant as? TestVariant)?.packaging
+              packaging?.apply {
+                dex.useLegacyPackaging.set(
+                  foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                )
+                jniLibs.useLegacyPackaging.set(
+                  foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                )
+                jniLibs.useLegacyPackagingFromBundle.set(
+                  foundryProperties.compressAndroidTestApksWithLegacyPackaging
+                )
+                foundryProperties.targetAndroidTestApksArch.orNull?.let { targetArch ->
+                  jniLibs.excludes.addAll(
+                    // Exclude out non-targeted architectures
+                    AndroidArchitecture.entries
+                      .filterNot { it == targetArch }
+                      .map { "**/${it.jniLibsPath}/*.so" }
                   )
-                  packaging.jniLibs.useLegacyPackaging.set(
-                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
-                  )
-                  packaging.jniLibs.useLegacyPackagingFromBundle.set(
-                    foundryProperties.compressAndroidTestApksWithLegacyPackaging
-                  )
-                  foundryProperties.targetAndroidTestApksArch.orNull?.let { targetArch ->
-                    packaging.jniLibs.excludes.addAll(
-                      // Exclude out non-targeted architectures
-                      AndroidArchitecture.entries
-                        .filterNot { it == targetArch }
-                        .map { "**/${it.jniLibsPath}/*.so" }
+                }
+              }
+
+              if (isAffectedProject) {
+                // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we
+                // aggregate
+                // to their root project dep
+                if (foundryProperties.enableEmulatorWtfForAndroidTest) {
+                  // Aggregate to emulator.wtf's configuration instead
+                  // TODO this doesn't work yet, toe-hold for the future
+                  // @Suppress("GradleProjectIsolation")
+                  // project.rootProject.dependencies.add(
+                  //   "emulatorwtf",
+                  //   project.rootProject.project(project.path),
+                  // )
+                } else {
+                  // Note this intentionally just uses the same task each time as they always
+                  // produce
+                  // the same output
+                  SimpleFileProducerTask.registerOrConfigure(
+                      project,
+                      name = "androidTestProjectMetadata",
+                      description =
+                        "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                      input = projectPath,
+                      group = "skippy",
                     )
+                    .publishWith(skippyAndroidTestProjectPublisher)
+                  if (isLibraryVariant) {
+                    val libraryVariant = variant as LibraryVariant
+                    libraryVariant.androidTest?.apply {
+                      // Wire this up to the aggregator. No need for an intermediate task here.
+                      androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
+                    }
                   }
                 }
               }
-              if (foundryProperties.enableEmulatorWtfForAndroidTest) {
-                // Aggregate to emulator.wtf's configuration instead
-                // TODO this doesn't work yet, toe-hold for the future
-                // @Suppress("GradleProjectIsolation")
-                // project.rootProject.dependencies.add(
-                //   "emulatorwtf",
-                //   project.rootProject.project(project.path),
-                // )
-              } else {
-                // Note this intentionally just uses the same task each time as they always produce
-                // the same output
-                SimpleFileProducerTask.registerOrConfigure(
-                    project,
-                    name = "androidTestProjectMetadata",
-                    description =
-                      "Produces a metadata artifact indicating this project path produces an androidTest APK.",
-                    input = projectPath,
-                    group = "skippy",
-                  )
-                  .publishWith(skippyAndroidTestProjectPublisher)
-                if (isLibraryVariant) {
-                  val libraryVariant = variant as LibraryVariant
-                  libraryVariant.androidTest?.apply {
-                    // Wire this up to the aggregator. No need for an intermediate task here.
-                    androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
-                  }
-                }
-              }
-            } else {
+            }
+
+            if (excluded || !isAffectedProject) {
               val reason = if (excluded) "excluded" else "not affected"
               val taskPath = "${projectPath}:androidTest"
               val log = "$LOG Skipping $taskPath because it is $reason."
@@ -599,9 +610,11 @@ internal class StandardProjectConfigurations(
           vectorDrawables.useSupportLibrary = true
 
           if (applyTestOptions) {
+            logger.lifecycle("Applying test options runner to $projectPath")
             testInstrumentationRunner = foundryProperties.testInstrumentationRunner
 
             if (useOrchestrator) {
+              logger.lifecycle("Applying orchestrator args to $projectPath")
               // The following argument makes the Android Test Orchestrator run its
               // "pm clear" command after each test invocation. This command ensures
               // that the app's state is completely cleared between tests.
@@ -623,9 +636,11 @@ internal class StandardProjectConfigurations(
 
         if (applyTestOptions) {
           testOptions {
+            logger.lifecycle("Applying test options to $projectPath")
             animationsDisabled = true
 
             if (useOrchestrator) {
+              logger.lifecycle("Applying orchestrator to $projectPath")
               logger.info(
                 "[android.testOptions]: Configured to run tests with Android Test Orchestrator"
               )
@@ -926,6 +941,7 @@ internal class StandardProjectConfigurations(
     }
 
     pluginManager.withPlugin("com.android.test") {
+      logger.lifecycle("Configuring android test project $projectPath")
       prepareAndroidTestConfigurations("implementation")
 
       configure<TestAndroidComponentsExtension> {
@@ -955,6 +971,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<TestExtension> {
+        logger.lifecycle("Configuring TestExtension in $projectPath")
         foundryExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
