@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.5
+------
+
+_2025-02-13_
+
+- Fix `com.android.test` test configuration.
+
 0.24.4
 ------
 
