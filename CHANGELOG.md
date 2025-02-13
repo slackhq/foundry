@@ -4,6 +4,17 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.4
+------
+
+_2025-02-13_
+
+- **New:** `foundry.android.features.snapshotTests` DSL to enable snapshot tests on a subproject. This will pick roborazzi if defined in `libs.versions.toml`.
+- Add Skippy support for emulator.wtf tasks.
+- Build against JDK 23.
+- Build against DAGP `2.8.2`.
+- Build against Roborazzi `1.41.0`.
+
 0.24.3
 ------
 
