@@ -33,6 +33,12 @@ import com.squareup.moshi.JsonClass
  *   useful for globally-affecting things like root build files, `libs.versions.toml`, etc.
  *   **NOTE**: This list is always merged with [includePatterns] as these are implicitly relevant
  *   files.
+ * @property overlayGlobalIncludes Whether to include global default include patterns when
+ *   overlaying configurations.
+ * @property overlayGlobalExcludes Whether to include global default exclude patterns when
+ *   overlaying configurations.
+ * @property overlayGlobalSkips Whether to include global default never-skip patterns when
+ *   overlaying configurations.
  */
 @JsonClass(generateAdapter = true)
 public data class SkippyConfig(
@@ -41,7 +47,13 @@ public data class SkippyConfig(
   @Json(name = "includePatterns") internal val _includePatterns: Set<String> = emptySet(),
   @Json(name = "excludePatterns") internal val _excludePatterns: Set<String> = emptySet(),
   @Json(name = "neverSkipPatterns") internal val _neverSkipPatterns: Set<String> = emptySet(),
+  internal val overlayGlobalIncludes: Boolean = true,
+  internal val overlayGlobalExcludes: Boolean = true,
+  internal val overlayGlobalSkips: Boolean = true,
 ) {
+
+  public val isGlobal: Boolean
+    get() = tool == GLOBAL_TOOL
 
   public val includePatterns: Set<String> = buildSet {
     addAll(_includePatterns)
@@ -59,9 +71,24 @@ public data class SkippyConfig(
 
   public fun overlayWith(other: SkippyConfig): SkippyConfig {
     return copy(
-      _includePatterns = includePatterns + other.includePatterns,
-      _excludePatterns = excludePatterns + other.excludePatterns,
-      _neverSkipPatterns = neverSkipPatterns + other.neverSkipPatterns,
+      _includePatterns =
+        if (!other.isGlobal || overlayGlobalIncludes) {
+          includePatterns + other.includePatterns
+        } else {
+          includePatterns
+        },
+      _excludePatterns =
+        if (!other.isGlobal || overlayGlobalExcludes) {
+          excludePatterns + other.excludePatterns
+        } else {
+          excludePatterns
+        },
+      _neverSkipPatterns =
+        if (!other.isGlobal || overlayGlobalSkips) {
+          neverSkipPatterns + other.neverSkipPatterns
+        } else {
+          neverSkipPatterns
+        },
     )
   }
 

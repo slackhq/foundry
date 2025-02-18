@@ -106,7 +106,8 @@ public class AffectedProjectsComputer(
     log("changedFilePaths: $changedFilePaths")
 
     log("includePatterns: $includePatterns")
-    // Merge include patterns with never-skip patterns. This is because
+    // Merge include patterns with never-skip patterns. This ensures we treat never-skip as always
+    // included
     val mergedIncludePatterns = (includePatterns + neverSkipPatterns).toSet()
     log("mergedIncludePatterns: $mergedIncludePatterns")
 
