@@ -66,7 +66,7 @@ buildscript {
 }
 
 plugins {
-  id("com.gradle.develocity") version "3.19.1"
+  id("com.gradle.develocity") version "3.19.2"
   id("org.jetbrains.intellij.platform.settings") version "2.2.1"
   id("org.jetbrains.intellij.platform") version "2.2.1" apply false
 }
