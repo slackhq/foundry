@@ -4,6 +4,19 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.7
+------
+
+_2025-02-21_
+
+- Add skippy overlay controls. This allows you to exclude overlaying of global settings onto local tool configs.
+- Update Kaml to `0.72.0`.
+- Update Mordant to `3.0.2`.
+- Build against Develocity `3.19.2`.
+- Build against Roborazzi `1.42.0`.
+- Build against KSP `2.1.10-1.0.30`.
+- Build against AGP `8.8.1`.
+
 0.24.6
 ------
 
