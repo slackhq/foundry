@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.10
+------
+
+_2025-02-22_
+
+- Remove yet another noisy log.
+
 0.24.9
 ------
 
