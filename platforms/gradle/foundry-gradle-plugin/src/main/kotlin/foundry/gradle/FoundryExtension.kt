@@ -1038,7 +1038,9 @@ constructor(
       if (freeOptions.isNotEmpty()) {
         project.tasks.configureKotlinCompilationTask {
           compilerOptions.freeCompilerArgs.addAll(
-            freeOptions.flatMap { listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$it") }
+            freeOptions.flatMap { option ->
+              logger.lifecycle("Adding free compose compiler option: $option")
+              listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$option") }
           )
         }
       }

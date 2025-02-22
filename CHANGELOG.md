@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.8
+------
+
+_2025-02-22_
+
+- Fix applying common JVM compiler options in KMP projects.
+
 0.24.7
 ------
 

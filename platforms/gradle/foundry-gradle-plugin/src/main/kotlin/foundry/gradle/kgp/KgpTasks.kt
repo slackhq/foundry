@@ -40,9 +40,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 /** Common configuration for Kotlin projects. */
 internal object KgpTasks {
@@ -81,6 +83,26 @@ internal object KgpTasks {
 
       kotlinExtension.explicitApi =
         foundryProperties.kotlinExplicitApiMode.orNull?.let(ExplicitApiMode::valueOf)
+
+      val jvmConfig: KotlinJvmCompilerOptions.() -> Unit = {
+        project.logger.lifecycle("Configuring jvm compiler options for ${project.path}")
+        jvmTarget.set(jvmTargetProvider)
+
+        // Potentially useful for static analysis or annotation processors
+        javaParameters.set(true)
+
+        freeCompilerArgs.addAll(foundryProperties.kotlinJvmFreeArgs)
+
+        // Set the module name to a dashified version of the project path to ensure uniqueness
+        // in created .kotlin_module files
+        moduleName.set(project.path.replace(":", "-"))
+
+        if (!isKotlinAndroid) {
+          // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+          freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
+        }
+      }
+
       if (kotlinExtension is HasConfigurableKotlinCompilerOptions<*>) {
         kotlinExtension.compilerOptions {
           progressiveMode.set(foundryProperties.kotlinProgressive)
@@ -94,24 +116,24 @@ internal object KgpTasks {
           project.configureFreeKotlinCompilerArgs(freeCompilerArgs)
 
           if (this is KotlinJvmCompilerOptions) {
-            jvmTarget.set(jvmTargetProvider)
+            jvmConfig()
+          }
+        }
+      }
 
-            // Potentially useful for static analysis or annotation processors
-            javaParameters.set(true)
-
-            freeCompilerArgs.addAll(foundryProperties.kotlinJvmFreeArgs)
-
-            // Set the module name to a dashified version of the project path to ensure uniqueness
-            // in created .kotlin_module files
-            moduleName.set(project.path.replace(":", "-"))
-
-            if (!isKotlinAndroid) {
-              // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-              freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
+      // In KMP projects, compiler options are per-target
+      if (kotlinExtension is KotlinMultiplatformExtension) {
+        kotlinExtension.targets.configureEach {
+          if (this is HasConfigurableKotlinCompilerOptions<*>) {
+            compilerOptions {
+              if (this is KotlinJvmCompilerOptions) {
+                jvmConfig()
+              }
             }
           }
         }
       }
+
       project.tasks.configureKotlinCompilationTask {
         compilerOptions {
           // These are set here because they're task-specific
