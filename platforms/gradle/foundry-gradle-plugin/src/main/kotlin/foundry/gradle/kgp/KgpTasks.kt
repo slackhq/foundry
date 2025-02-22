@@ -85,7 +85,6 @@ internal object KgpTasks {
         foundryProperties.kotlinExplicitApiMode.orNull?.let(ExplicitApiMode::valueOf)
 
       val jvmConfig: KotlinJvmCompilerOptions.() -> Unit = {
-        project.logger.lifecycle("Configuring jvm compiler options for ${project.path}")
         jvmTarget.set(jvmTargetProvider)
 
         // Potentially useful for static analysis or annotation processors
