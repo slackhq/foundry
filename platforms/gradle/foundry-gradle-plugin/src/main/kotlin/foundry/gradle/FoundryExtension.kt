@@ -1039,7 +1039,8 @@ constructor(
         project.tasks.configureKotlinCompilationTask {
           compilerOptions.freeCompilerArgs.addAll(
             freeOptions.flatMap { option ->
-              listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$option") }
+              listOf("-P", "$COMPOSE_COMPILER_OPTION_PREFIX:$option")
+            }
           )
         }
       }
