@@ -31,11 +31,13 @@ import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDepende
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 plugins {
@@ -222,13 +224,16 @@ subprojects {
   }
 
   plugins.withType<KotlinBasePlugin>().configureEach {
-    tasks.withType<KotlinCompile>().configureEach {
+    tasks.withType<KotlinCompilationTask<*>>().configureEach {
       compilerOptions {
         val kotlinVersion =
           if (isForIntelliJPlugin) {
+            // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+            // Note this needs to support the latest stable Studio version.
             KOTLIN_1_9
           } else if (isForGradle) {
-            KOTLIN_1_9
+            // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+            KOTLIN_2_0
           } else {
             DEFAULT
           }
@@ -247,6 +252,7 @@ subprojects {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
           freeCompilerArgs.add("-Xsam-conversions=class")
         }
+        check(this is KotlinJvmCompilerOptions)
         this.jvmTarget.set(projectJvmTarget)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
