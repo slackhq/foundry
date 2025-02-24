@@ -191,20 +191,6 @@ subprojects {
 
   val projectJvmTarget = if (isForIntelliJPlugin) jvmTargetIdeaVersion else jvmTargetVersion
 
-  pluginManager.withPlugin("java") {
-    configure<JavaPluginExtension> {
-      toolchain {
-        languageVersion.set(
-          JavaLanguageVersion.of(libs.versions.jdk.get().removeSuffix("-ea").toInt())
-        )
-      }
-    }
-
-    tasks.withType<JavaCompile>().configureEach {
-      options.release.set(projectJvmTarget.map(JvmTarget::target).map(String::toInt))
-    }
-  }
-
   val isForGradle =
     project.hasProperty("GRADLE_PLUGIN") || project.path.startsWith(":platforms:gradle")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
@@ -224,6 +210,18 @@ subprojects {
   }
 
   plugins.withType<KotlinBasePlugin>().configureEach {
+    configure<JavaPluginExtension> {
+      toolchain {
+        languageVersion.set(
+          JavaLanguageVersion.of(libs.versions.jdk.get().removeSuffix("-ea").toInt())
+        )
+      }
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+      options.release.set(projectJvmTarget.map(JvmTarget::target).map(String::toInt))
+    }
+
     tasks.withType<KotlinCompilationTask<*>>().configureEach {
       compilerOptions {
         val kotlinVersion =
