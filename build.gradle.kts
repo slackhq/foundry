@@ -175,6 +175,7 @@ dependencies {
 val kotlinVersion = libs.versions.kotlin.get()
 
 val jvmTargetVersion = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
+val jvmTargetIdeaVersion = libs.versions.jvmTargetIdea.map(JvmTarget::fromTarget)
 
 subprojects {
   project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
@@ -182,6 +183,11 @@ subprojects {
       buildConfigField("String", "KOTLIN_VERSION", "\"$kotlinVersion\"")
     }
   }
+
+  val isForIntelliJPlugin =
+    project.hasProperty("INTELLIJ_PLUGIN") || project.path.startsWith(":platforms:intellij")
+
+  val projectJvmTarget = if (isForIntelliJPlugin) jvmTargetIdeaVersion else jvmTargetVersion
 
   pluginManager.withPlugin("java") {
     configure<JavaPluginExtension> {
@@ -193,12 +199,10 @@ subprojects {
     }
 
     tasks.withType<JavaCompile>().configureEach {
-      options.release.set(libs.versions.jvmTarget.map(String::toInt))
+      options.release.set(projectJvmTarget.map(JvmTarget::target).map(String::toInt))
     }
   }
 
-  val isForIntelliJPlugin =
-    project.hasProperty("INTELLIJ_PLUGIN") || project.path.startsWith(":platforms:intellij")
   val isForGradle =
     project.hasProperty("GRADLE_PLUGIN") || project.path.startsWith(":platforms:gradle")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
@@ -243,7 +247,7 @@ subprojects {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
           freeCompilerArgs.add("-Xsam-conversions=class")
         }
-        this.jvmTarget.set(jvmTargetVersion)
+        this.jvmTarget.set(projectJvmTarget)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
           // (@NotNull T => T & Any)
@@ -265,7 +269,7 @@ subprojects {
           "-Xjspecify-annotations=strict",
         )
         // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-        freeCompilerArgs.add(jvmTargetVersion.map { "-Xjdk-release=${it.target}" })
+        freeCompilerArgs.add(projectJvmTarget.map { "-Xjdk-release=${it.target}" })
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
@@ -275,7 +279,7 @@ subprojects {
       }
     }
 
-    tasks.withType<Detekt>().configureEach { this.jvmTarget = jvmTargetVersion.get().target }
+    tasks.withType<Detekt>().configureEach { this.jvmTarget = projectJvmTarget.get().target }
   }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
