@@ -25,7 +25,11 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
-kotlin { compilerOptions { optIn.addAll("kotlin.ExperimentalStdlibApi") } }
+kotlin {
+  compilerOptions {
+    optIn.addAll("kotlin.ExperimentalStdlibApi", "kotlinx.coroutines.ExperimentalCoroutinesApi")
+  }
+}
 
 lint { baseline = file("lint-baseline.xml") }
 
@@ -54,6 +58,7 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.okio)
   implementation(libs.sarif4k)
+  implementation(projects.tools.foundryCommon)
   // To silence this stupid log https://www.slf4j.org/codes.html#StaticLoggerBinder
   implementation(libs.slf4jNop)
   implementation(libs.tikxml.htmlEscape)
@@ -61,6 +66,7 @@ dependencies {
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+  testImplementation(libs.kaml)
 
   ksp(libs.autoService.ksp)
 }

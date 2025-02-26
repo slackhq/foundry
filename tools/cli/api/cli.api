@@ -127,6 +127,7 @@ public final class foundry/cli/buildkite/Agents$AnythingMapValue$Companion {
 
 public final class foundry/cli/buildkite/Agents$Companion {
 	public final fun invoke (Ljava/util/List;)Lfoundry/cli/buildkite/Agents;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/Agents;
 	public final fun invoke (Lkotlinx/serialization/json/JsonObject;)Lfoundry/cli/buildkite/Agents;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
@@ -158,6 +159,14 @@ public synthetic class foundry/cli/buildkite/Agents$StringArrayValue$$serializer
 
 public final class foundry/cli/buildkite/Agents$StringArrayValue$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class foundry/cli/buildkite/AgentsBuilder {
+	public fun <init> ()V
+	public final fun agent (Lkotlin/jvm/functions/Function1;)V
+	public final fun array (Ljava/util/List;)V
+	public final fun build ()Lfoundry/cli/buildkite/Agents;
+	public final fun json (Lkotlinx/serialization/json/JsonObject;)V
 }
 
 public abstract interface class foundry/cli/buildkite/Automatic {
@@ -255,6 +264,12 @@ public final class foundry/cli/buildkite/Automatic$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class foundry/cli/buildkite/AutomaticBuilder {
+	public fun <init> ()V
+	public final fun build ()Lfoundry/cli/buildkite/Automatic;
+	public final fun condition (Lkotlin/jvm/functions/Function1;)V
+}
+
 public final class foundry/cli/buildkite/AutomaticElement {
 	public static final field Companion Lfoundry/cli/buildkite/AutomaticElement$Companion;
 	public fun <init> ()V
@@ -287,6 +302,19 @@ public synthetic class foundry/cli/buildkite/AutomaticElement$$serializer : kotl
 
 public final class foundry/cli/buildkite/AutomaticElement$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class foundry/cli/buildkite/AutomaticElementBuilder {
+	public fun <init> ()V
+	public final fun build ()Lfoundry/cli/buildkite/AutomaticElement;
+	public final fun getExitStatus ()Ljava/lang/Long;
+	public final fun getLimit ()Ljava/lang/Long;
+	public final fun getSignal ()Ljava/lang/String;
+	public final fun getSignalReason ()Lfoundry/cli/buildkite/SignalReason;
+	public final fun setExitStatus (Ljava/lang/Long;)V
+	public final fun setLimit (Ljava/lang/Long;)V
+	public final fun setSignal (Ljava/lang/String;)V
+	public final fun setSignalReason (Lfoundry/cli/buildkite/SignalReason;)V
 }
 
 public abstract interface class foundry/cli/buildkite/Block {
@@ -494,6 +522,21 @@ public final class foundry/cli/buildkite/BuildType$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public abstract interface annotation class foundry/cli/buildkite/BuildkiteDsl : java/lang/annotation/Annotation {
+}
+
+public final class foundry/cli/buildkite/BuildkitePipelineDslKt {
+	public static final fun automaticElement (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/AutomaticElement;
+	public static final fun buildCommandStep (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/CommandStep;
+	public static final fun buildGroupStep (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/GroupStep;
+	public static synthetic fun buildGroupStep$default (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lfoundry/cli/buildkite/GroupStep;
+	public static final fun dependsOn (Lfoundry/cli/buildkite/StepWithDependencies;Ljava/util/List;)V
+	public static final fun jsonArray ([Lkotlinx/serialization/json/JsonElement;)Lkotlinx/serialization/json/JsonArray;
+	public static final fun jsonObject (Lkotlin/jvm/functions/Function1;)Lkotlinx/serialization/json/JsonObject;
+	public static final fun pipeline (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/Pipeline;
+	public static final fun retry (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/Retry;
+}
+
 public final class foundry/cli/buildkite/CommandStep : foundry/cli/buildkite/Keyable {
 	public static final field Companion Lfoundry/cli/buildkite/CommandStep$Companion;
 	public fun <init> ()V
@@ -600,6 +643,101 @@ public synthetic class foundry/cli/buildkite/CommandStep$$serializer : kotlinx/s
 
 public final class foundry/cli/buildkite/CommandStep$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class foundry/cli/buildkite/CommandStepBuilder : foundry/cli/buildkite/EnvOwner, foundry/cli/buildkite/StepWithDependencies {
+	public fun <init> ()V
+	public final fun artifacts ([Ljava/lang/String;)V
+	public final fun branches ([Ljava/lang/String;)V
+	public final fun build ()Lfoundry/cli/buildkite/CommandStep;
+	public final fun commands (Ljava/lang/String;)V
+	public final fun commands ([Ljava/lang/String;)V
+	public fun dependsOn (Lfoundry/cli/buildkite/Keyable;)V
+	public fun dependsOn (Ljava/lang/String;)V
+	public fun dependsOn (Ljava/util/List;)V
+	public fun dependsOn ([Lfoundry/cli/buildkite/Keyable;)V
+	public fun dependsOn ([Ljava/lang/String;)V
+	public fun env (Lkotlin/jvm/functions/Function1;)V
+	public fun env ([Lkotlin/Pair;)V
+	public final fun getAgents ()Lfoundry/cli/buildkite/Agents;
+	public final fun getAllowDependencyFailure ()Ljava/lang/Boolean;
+	public final fun getAsync ()Ljava/lang/Boolean;
+	public final fun getBlock ()Ljava/lang/String;
+	public final fun getBlockedState ()Lfoundry/cli/buildkite/BlockedState;
+	public final fun getBranch ()Ljava/lang/String;
+	public final fun getBuild ()Lfoundry/cli/buildkite/Build;
+	public final fun getCancelOnBuildFailing ()Ljava/lang/Boolean;
+	public final fun getCommand ()Ljava/lang/String;
+	public final fun getCommands ()Lfoundry/cli/buildkite/Commands;
+	public final fun getConcurrency ()Ljava/lang/Long;
+	public final fun getConcurrencyGroup ()Ljava/lang/String;
+	public final fun getConcurrencyMethod ()Lfoundry/cli/buildkite/ConcurrencyMethod;
+	public final fun getContinueOnFailure ()Ljava/lang/Boolean;
+	public fun getDependsOn ()Lfoundry/cli/buildkite/DependsOn;
+	public fun getEnv ()Ljava/util/Map;
+	public final fun getFields ()Ljava/util/List;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getIdentifier ()Ljava/lang/String;
+	public final fun getInput ()Lfoundry/cli/buildkite/Input;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getMatrix ()Lfoundry/cli/buildkite/MatrixUnion;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getNotify ()Ljava/util/List;
+	public final fun getParallelism ()Ljava/lang/Long;
+	public final fun getPlugins ()Lfoundry/cli/buildkite/Plugins;
+	public final fun getPriority ()Ljava/lang/Long;
+	public final fun getPrompt ()Ljava/lang/String;
+	public final fun getRetry ()Lfoundry/cli/buildkite/Retry;
+	public final fun getScript ()Lfoundry/cli/buildkite/ScriptStep;
+	public final fun getSignature ()Lfoundry/cli/buildkite/Signature;
+	public final fun getSkip ()Lfoundry/cli/buildkite/Skip;
+	public final fun getStepIf ()Ljava/lang/String;
+	public final fun getTimeoutInMinutes ()Ljava/lang/Long;
+	public final fun getType ()Lfoundry/cli/buildkite/StepType;
+	public final fun getWait ()Lfoundry/cli/buildkite/Wait;
+	public final fun getWaiter ()Lfoundry/cli/buildkite/Wait;
+	public final fun notify (Lfoundry/cli/buildkite/Notification;)V
+	public final fun setAgents (Lfoundry/cli/buildkite/Agents;)V
+	public final fun setAllowDependencyFailure (Ljava/lang/Boolean;)V
+	public final fun setAsync (Ljava/lang/Boolean;)V
+	public final fun setBlock (Ljava/lang/String;)V
+	public final fun setBlockedState (Lfoundry/cli/buildkite/BlockedState;)V
+	public final fun setBranch (Ljava/lang/String;)V
+	public final fun setBuild (Lfoundry/cli/buildkite/Build;)V
+	public final fun setCancelOnBuildFailing (Ljava/lang/Boolean;)V
+	public final fun setCommand (Ljava/lang/String;)V
+	public final fun setCommands (Lfoundry/cli/buildkite/Commands;)V
+	public final fun setConcurrency (Ljava/lang/Long;)V
+	public final fun setConcurrencyGroup (Ljava/lang/String;)V
+	public final fun setConcurrencyMethod (Lfoundry/cli/buildkite/ConcurrencyMethod;)V
+	public final fun setContinueOnFailure (Ljava/lang/Boolean;)V
+	public final fun setFields (Ljava/util/List;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setIdentifier (Ljava/lang/String;)V
+	public final fun setInput (Lfoundry/cli/buildkite/Input;)V
+	public final fun setKey (Ljava/lang/String;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setMatrix (Lfoundry/cli/buildkite/MatrixUnion;)V
+	public final fun setName (Ljava/lang/String;)V
+	public final fun setNotify (Ljava/util/List;)V
+	public final fun setParallelism (Ljava/lang/Long;)V
+	public final fun setPlugins (Lfoundry/cli/buildkite/Plugins;)V
+	public final fun setPriority (Ljava/lang/Long;)V
+	public final fun setPrompt (Ljava/lang/String;)V
+	public final fun setRetry (Lfoundry/cli/buildkite/Retry;)V
+	public final fun setScript (Lfoundry/cli/buildkite/ScriptStep;)V
+	public final fun setSignature (Lfoundry/cli/buildkite/Signature;)V
+	public final fun setSkip (Lfoundry/cli/buildkite/Skip;)V
+	public final fun setStepIf (Ljava/lang/String;)V
+	public final fun setTimeoutInMinutes (Ljava/lang/Long;)V
+	public final fun setType (Lfoundry/cli/buildkite/StepType;)V
+	public final fun setWait (Lfoundry/cli/buildkite/Wait;)V
+	public final fun setWaiter (Lfoundry/cli/buildkite/Wait;)V
+	public final fun softFail ()V
+	public final fun softFail (I)V
+	public final fun softFail ([I)V
+	public final fun trigger (Ljava/lang/String;)V
 }
 
 public abstract interface class foundry/cli/buildkite/Commands {
@@ -898,6 +1036,18 @@ public final class foundry/cli/buildkite/DependsOnElement$StringValue$Companion 
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class foundry/cli/buildkite/EnvBuilder {
+	public fun <init> ()V
+	public final fun to (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun to (Ljava/lang/String;Z)V
+}
+
+public abstract interface class foundry/cli/buildkite/EnvOwner {
+	public abstract fun env (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun env ([Lkotlin/Pair;)V
+	public abstract fun getEnv ()Ljava/util/Map;
+}
+
 public final class foundry/cli/buildkite/ExitStatusEnum : java/lang/Enum {
 	public static final field Companion Lfoundry/cli/buildkite/ExitStatusEnum$Companion;
 	public static final field Empty Lfoundry/cli/buildkite/ExitStatusEnum;
@@ -983,6 +1133,7 @@ public final class foundry/cli/buildkite/ExtensionsKt {
 	public static final fun artifacts ([Ljava/lang/String;)Lfoundry/cli/buildkite/SimpleStringValue;
 	public static final fun coalesceToList (Lfoundry/cli/buildkite/SimpleStringValue;)Ljava/util/List;
 	public static final fun envMap ([Lkotlin/Pair;)Ljava/util/Map;
+	public static final fun githubStatus (Lfoundry/cli/buildkite/CommandStepBuilder;Ljava/lang/String;)V
 	public static final fun githubStatusNotif (Ljava/lang/String;Ljava/lang/String;)Lfoundry/cli/buildkite/Notification;
 	public static synthetic fun githubStatusNotif$default (Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lfoundry/cli/buildkite/Notification;
 	public static final fun withAddedArtifacts (Lfoundry/cli/buildkite/CommandStep;[Ljava/lang/String;)Lfoundry/cli/buildkite/CommandStep;
@@ -1141,6 +1292,20 @@ public final class foundry/cli/buildkite/GithubNotification : java/lang/Enum {
 
 public final class foundry/cli/buildkite/GithubNotification$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class foundry/cli/buildkite/GroupBuilder : foundry/cli/buildkite/StepBuilder {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun addStep (Lfoundry/cli/buildkite/CommandStep;)V
+	public fun addStep (Lfoundry/cli/buildkite/Step;)V
+	public final fun build ()Lfoundry/cli/buildkite/NestedBlockStepClass;
+	public fun commandStep (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/CommandStep;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public fun getSteps ()Ljava/util/List;
+	public final fun setKey (Ljava/lang/String;)V
+	public fun step (Lfoundry/cli/buildkite/Step;)V
 }
 
 public abstract interface class foundry/cli/buildkite/GroupStep : foundry/cli/buildkite/Keyable {
@@ -1606,6 +1771,16 @@ public final class foundry/cli/buildkite/JsonNullSerializer : kotlinx/serializat
 	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lkotlinx/serialization/json/JsonNull;)V
 }
 
+public final class foundry/cli/buildkite/JsonObjectBuilder {
+	public fun <init> ()V
+	public final fun build ()Lkotlinx/serialization/json/JsonObject;
+	public final fun to (Ljava/lang/String;Ljava/lang/Number;)V
+	public final fun to (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun to (Ljava/lang/String;Lkotlinx/serialization/json/JsonArray;)V
+	public final fun to (Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;)V
+	public final fun to (Ljava/lang/String;Z)V
+}
+
 public final class foundry/cli/buildkite/JsonObjectSerializer : kotlinx/serialization/KSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/JsonObjectSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1658,6 +1833,17 @@ public synthetic class foundry/cli/buildkite/ManualClass$$serializer : kotlinx/s
 
 public final class foundry/cli/buildkite/ManualClass$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class foundry/cli/buildkite/ManualClassBuilder {
+	public fun <init> ()V
+	public final fun build ()Lfoundry/cli/buildkite/ManualClass;
+	public final fun getAllowed ()Ljava/lang/Boolean;
+	public final fun getPermitOnPassed ()Ljava/lang/Boolean;
+	public final fun getReason ()Ljava/lang/String;
+	public final fun setAllowed (Ljava/lang/Boolean;)V
+	public final fun setPermitOnPassed (Ljava/lang/Boolean;)V
+	public final fun setReason (Ljava/lang/String;)V
 }
 
 public abstract interface class foundry/cli/buildkite/ManualUnion {
@@ -2147,6 +2333,13 @@ public final class foundry/cli/buildkite/Notification$GitHub$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class foundry/cli/buildkite/NotificationBuilder {
+	public fun <init> ()V
+	public final fun build ()Ljava/util/List;
+	public final fun external (Lfoundry/cli/buildkite/ExternalNotification;)V
+	public final fun github (Lfoundry/cli/buildkite/GithubNotification;)V
+}
+
 public final class foundry/cli/buildkite/Option {
 	public static final field Companion Lfoundry/cli/buildkite/Option$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;)V
@@ -2213,6 +2406,22 @@ public final class foundry/cli/buildkite/Pipeline$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class foundry/cli/buildkite/PipelineBuilder : foundry/cli/buildkite/EnvOwner {
+	public fun <init> ()V
+	public final fun addStep (Lfoundry/cli/buildkite/GroupStep;)V
+	public final fun agents (Lkotlin/jvm/functions/Function1;)V
+	public final fun build ()Lfoundry/cli/buildkite/Pipeline;
+	public final fun commandStep (Lkotlin/jvm/functions/Function1;)V
+	public fun env (Lkotlin/jvm/functions/Function1;)V
+	public fun env ([Lkotlin/Pair;)V
+	public fun getEnv ()Ljava/util/Map;
+	public final fun group (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun group$default (Lfoundry/cli/buildkite/PipelineBuilder;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public final fun notify (Lkotlin/jvm/functions/Function1;)V
+	public final fun waitStep (Z)V
+	public static synthetic fun waitStep$default (Lfoundry/cli/buildkite/PipelineBuilder;ZILjava/lang/Object;)V
+}
+
 public abstract interface class foundry/cli/buildkite/Plugin {
 	public static final field Companion Lfoundry/cli/buildkite/Plugin$Companion;
 }
@@ -2248,6 +2457,7 @@ public final class foundry/cli/buildkite/Plugin$AnythingMapValue$Companion {
 
 public final class foundry/cli/buildkite/Plugin$Companion {
 	public final fun invoke (Ljava/lang/String;)Lfoundry/cli/buildkite/Plugin;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/Plugin;
 	public final fun invoke (Lkotlinx/serialization/json/JsonObject;)Lfoundry/cli/buildkite/Plugin;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
@@ -2317,6 +2527,7 @@ public final class foundry/cli/buildkite/Plugins$AnythingMapValue$Companion {
 public final class foundry/cli/buildkite/Plugins$Companion {
 	public final fun invoke (Ljava/util/List;)Lfoundry/cli/buildkite/Plugins;
 	public final fun invoke (Lkotlinx/serialization/json/JsonObject;)Lfoundry/cli/buildkite/Plugins;
+	public final fun invoke ([Lfoundry/cli/buildkite/Plugin;)Lfoundry/cli/buildkite/Plugins;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
@@ -2377,6 +2588,14 @@ public synthetic class foundry/cli/buildkite/Retry$$serializer : kotlinx/seriali
 
 public final class foundry/cli/buildkite/Retry$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class foundry/cli/buildkite/RetryBuilder {
+	public fun <init> ()V
+	public final fun automatic (Lkotlin/jvm/functions/Function1;)V
+	public final fun build ()Lfoundry/cli/buildkite/Retry;
+	public final fun manual (Lkotlin/jvm/functions/Function1;)V
+	public final fun manual (Z)V
 }
 
 public final class foundry/cli/buildkite/ScriptStep : foundry/cli/buildkite/Keyable {
@@ -2995,6 +3214,14 @@ public final class foundry/cli/buildkite/Step$InputStepValue$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public abstract interface class foundry/cli/buildkite/StepBuilder {
+	public fun addStep (Lfoundry/cli/buildkite/CommandStep;)V
+	public abstract fun addStep (Lfoundry/cli/buildkite/Step;)V
+	public abstract fun commandStep (Lkotlin/jvm/functions/Function1;)Lfoundry/cli/buildkite/CommandStep;
+	public abstract fun getSteps ()Ljava/util/List;
+	public abstract fun step (Lfoundry/cli/buildkite/Step;)V
+}
+
 public final class foundry/cli/buildkite/StepType : java/lang/Enum {
 	public static final field Block Lfoundry/cli/buildkite/StepType;
 	public static final field Command Lfoundry/cli/buildkite/StepType;
@@ -3013,6 +3240,15 @@ public final class foundry/cli/buildkite/StepType : java/lang/Enum {
 
 public final class foundry/cli/buildkite/StepType$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class foundry/cli/buildkite/StepWithDependencies {
+	public fun dependsOn (Lfoundry/cli/buildkite/Keyable;)V
+	public abstract fun dependsOn (Ljava/lang/String;)V
+	public abstract fun dependsOn (Ljava/util/List;)V
+	public fun dependsOn ([Lfoundry/cli/buildkite/Keyable;)V
+	public fun dependsOn ([Ljava/lang/String;)V
+	public abstract fun getDependsOn ()Lfoundry/cli/buildkite/DependsOn;
 }
 
 public final class foundry/cli/buildkite/StringStep : java/lang/Enum {

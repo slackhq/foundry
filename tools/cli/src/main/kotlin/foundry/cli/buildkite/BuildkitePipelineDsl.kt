@@ -123,7 +123,6 @@ public class EnvBuilder {
   internal fun build() = env.toMap()
 }
 
-// Agents Builder
 @BuildkiteDsl
 public class AgentsBuilder {
   private var anythingMapValue: JsonObject? = null
@@ -131,6 +130,10 @@ public class AgentsBuilder {
 
   public fun json(value: JsonObject) {
     anythingMapValue = value
+  }
+
+  public fun agent(value: JsonObjectBuilder.() -> Unit) {
+    anythingMapValue = jsonObject(value)
   }
 
   public fun array(value: List<String>) {
@@ -265,7 +268,7 @@ public class CommandStepBuilder :
       agents = agents,
       artifactPaths = artifactPaths,
       cancelOnBuildFailing = cancelOnBuildFailing,
-      //      command = command?.let { Commands(it) },
+      command = command?.let { Commands.single(it) },
       commands = commands,
       concurrency = concurrency,
       concurrencyGroup = concurrencyGroup,
