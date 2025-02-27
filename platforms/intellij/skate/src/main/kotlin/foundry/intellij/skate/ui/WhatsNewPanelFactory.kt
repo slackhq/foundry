@@ -70,7 +70,6 @@ class WhatsNewPanelFactory : DumbAware {
     parentDisposable: Disposable,
   ) {
     private val logger = logger<WhatsNewPanelContent>()
-
     // Actual panel box for "What's New in Slack!"
     val contentPanel = createWhatsNewPanel(project, changeLogContent, parentDisposable)
 
@@ -93,17 +92,18 @@ class WhatsNewPanelFactory : DumbAware {
 
       // We can't use JBCefApp because Studio blocks it, so instead we do this in compose.
       // https://issuetracker.google.com/issues/159933628#comment19
-      val panel = if (true) { // Always use JBCEF
-        logger.info("Using JCEFHtmlPanelProvider")
-        MarkdownJCEFHtmlPanel(project, file)
-          .apply {
-            Disposer.register(parentDisposable, this)
-          }
-          .component
-      } else {
-        logger.info("Falling back to Compose MarkdownPanel")
-        MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
-      }
+      val panel =
+        if (JBCefApp.isSupported()) {
+          logger.debug("Using JCEFHtmlPanelProvider")
+          MarkdownJCEFHtmlPanel(project, file)
+            .apply {
+              Disposer.register(parentDisposable, this)
+              setHtml(html, 0)
+            }
+            .component
+        } else {
+          MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
+        }
       return panel
     }
   }
