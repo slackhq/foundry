@@ -49,7 +49,7 @@ class WhatsNewPanelFactory : DumbAware {
     changeLogContent: ChangelogParser.PresentedChangelog,
     parentDisposable: Disposable,
   ) {
-    val toolWindowContent = WhatsNewPanelContent(project, changeLogContent)
+    val toolWindowContent = WhatsNewPanelContent(project, changeLogContent, parentDisposable)
     val content =
       ContentFactory.getInstance().createContent(toolWindowContent.contentPanel, "", false)
     toolWindow.contentManager.addContent(content)
@@ -69,6 +69,7 @@ class WhatsNewPanelFactory : DumbAware {
     changeLogContent: ChangelogParser.PresentedChangelog,
     parentDisposable: Disposable,
   ) {
+    private val logger = logger<WhatsNewPanelContent>()
     // Actual panel box for "What's New in Slack!"
     val contentPanel = createWhatsNewPanel(project, changeLogContent, parentDisposable)
 
