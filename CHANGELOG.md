@@ -4,6 +4,34 @@ Changelog
 **Unreleased**
 --------------
 
+0.24.11
+-------
+
+_2025-02-27_
+
+- **New**: Introduce a Buildkite Kotlin DSL to make it easier to write buildkite pipelines.
+
+```kotlin
+val pipeline = pipeline {
+  commandStep {
+    label = "Run tests"
+    command = "run-tests.sh"
+    env {
+      "ENV_VAR" to "value"
+    }
+  }
+}
+```
+
+- Update oshi to `6.7.0`.
+- Update KotlinPoet to `2.1.0`.
+- Update slf4j-nop to `2.0.17`.
+- Build against RCP `1.12.1`.
+- Build against Detekt `1.23.8`.
+- Build against Gradle `8.13`.
+- Build against AGP `8.8.2`.
+- Build against Roborazzi `1.43.0`.
+
 0.24.10
 ------
 
