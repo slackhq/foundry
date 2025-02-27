@@ -28,8 +28,12 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.AlignY
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.jcef.JBCefApp
-import foundry.intellij.compose.markdown.ui.MarkdownPanel
+import com.intellij.util.ui.HtmlPanel
+import com.intellij.util.ui.JBUI
 import foundry.intellij.skate.ChangelogJournal
 import foundry.intellij.skate.ChangelogParser
 import javax.swing.JComponent
@@ -71,17 +75,18 @@ class WhatsNewPanelFactory : DumbAware {
     parentDisposable: Disposable,
   ) {
     private val logger = logger<WhatsNewPanelContent>()
+
     // Actual panel box for "What's New in Slack!"
     val contentPanel = createWhatsNewPanel(project, changeLogContent, parentDisposable)
 
-    // Control Panel that takes in the current project, parsed string, and a Disposable.
     private fun createWhatsNewPanel(
       project: Project,
       changeLogContent: ChangelogParser.PresentedChangelog,
       parentDisposable: Disposable,
     ): JComponent {
 
-      val file: VirtualFile = LightVirtualFile("CHANGELOG.md", changeLogContent.changeLogString ?: "")
+      val file: VirtualFile =
+        LightVirtualFile("CHANGELOG.md", changeLogContent.changeLogString ?: "")
       val html = runReadAction {
         MarkdownUtil.generateMarkdownHtml(file, changeLogContent.changeLogString ?: "", project)
       }
@@ -90,16 +95,11 @@ class WhatsNewPanelFactory : DumbAware {
 
       changelogJournal.lastReadDate = changeLogContent.lastReadDate
 
-//      println("changelog journal ${changelogJournal.lastReadDate}")
-//      println("changelog content ${changeLogContent.changeLogString}")
-
-      // We can't use JBCefApp because Studio blocks it, so instead we do this in compose.
+      // JBCefApp works on Studio now, so we are adding this check back in.
       // https://issuetracker.google.com/issues/159933628#comment19
       val panel =
         if (JBCefApp.isSupported()) {
           logger.debug("Using JCEFHtmlPanelProvider")
-//          println("using jcef")
-//          println("html is $html")
           MarkdownJCEFHtmlPanel(project, file)
             .apply {
               Disposer.register(parentDisposable, this)
@@ -107,8 +107,23 @@ class WhatsNewPanelFactory : DumbAware {
             }
             .component
         } else {
-//          println("not using jcef")
-          MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
+          logger.debug("Using HtmlPanel")
+          val htmlPanel =
+            object : HtmlPanel() {
+              init {
+                isVisible = true
+                // Padding
+                border = JBUI.Borders.empty(16)
+                update()
+              }
+
+              override fun getBody(): String {
+                return html
+              }
+            }
+          panel {
+            row { scrollCell(htmlPanel).align(AlignX.FILL).align(AlignY.FILL) }.resizableRow()
+          }
         }
       return panel
     }
