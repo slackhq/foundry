@@ -1,0 +1,881 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CommandStepBuilder</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../../index.html">
+                    foundry
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":tools:cli/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":tools:cli/main" data-filter=":tools:cli/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    foundry
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="cli::foundry.cli.buildkite/CommandStepBuilder///PointingToDeclaration//-125946513">
+  <div class="breadcrumbs"><a href="../../index.html">cli</a><span class="delimiter">/</span><a href="../index.html">foundry.cli.buildkite</a><span class="delimiter">/</span><span class="current">CommandStepBuilder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Command</span><wbr><span>Step</span><wbr><span><span>Builder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CommandStepBuilder</a> : <a href="../-env-owner/index.html">EnvOwner</a>, <a href="../-step-with-dependencies/index.html">StepWithDependencies</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/slackhq/foundry//tree/main/tools/cli/src/main/kotlin/foundry/cli/buildkite/BuildkitePipelineDsl.kt#L169">source</a>)</span></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-1126140717%2FConstructors%2F-125946513" anchor-label="CommandStepBuilder" id="-1126140717%2FConstructors%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-command-step-builder.html"><span>Command</span><wbr><span>Step</span><wbr><span><span>Builder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1126140717%2FConstructors%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1660561417%2FProperties%2F-125946513" anchor-label="agents" id="1660561417%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="agents.html"><span><span>agents</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1660561417%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="agents.html">agents</a><span class="token operator">: </span><a href="../-agents/index.html">Agents</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="403768225%2FProperties%2F-125946513" anchor-label="allowDependencyFailure" id="403768225%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="allow-dependency-failure.html"><span>allow</span><wbr><span>Dependency</span><wbr><span><span>Failure</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="403768225%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="allow-dependency-failure.html">allowDependencyFailure</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-765488409%2FProperties%2F-125946513" anchor-label="async" id="-765488409%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="async.html"><span><span>async</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-765488409%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="async.html">async</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-503212554%2FProperties%2F-125946513" anchor-label="block" id="-503212554%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="block.html"><span><span>block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-503212554%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="block.html">block</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-672122766%2FProperties%2F-125946513" anchor-label="blockedState" id="-672122766%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="blocked-state.html"><span>blocked</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-672122766%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="blocked-state.html">blockedState</a><span class="token operator">: </span><a href="../-blocked-state/index.html">BlockedState</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-145355019%2FProperties%2F-125946513" anchor-label="branch" id="-145355019%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="branch.html"><span><span>branch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-145355019%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="branch.html">branch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1479359691%2FProperties%2F-125946513" anchor-label="build" id="-1479359691%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="build.html"><span><span>build</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1479359691%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="build.html">build</a><span class="token operator">: </span><a href="../-build/index.html">Build</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2142059160%2FProperties%2F-125946513" anchor-label="cancelOnBuildFailing" id="-2142059160%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cancel-on-build-failing.html"><span>cancel</span><wbr><span>On</span><wbr><span>Build</span><wbr><span><span>Failing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2142059160%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="cancel-on-build-failing.html">cancelOnBuildFailing</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-745702536%2FProperties%2F-125946513" anchor-label="command" id="-745702536%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="command.html"><span><span>command</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-745702536%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="command.html">command</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-75687345%2FProperties%2F-125946513" anchor-label="commands" id="-75687345%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="commands.html"><span><span>commands</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-75687345%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="commands.html">commands</a><span class="token operator">: </span><a href="../-commands/index.html">Commands</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-183949008%2FProperties%2F-125946513" anchor-label="concurrency" id="-183949008%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="concurrency.html"><span><span>concurrency</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-183949008%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="concurrency.html">concurrency</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-548855637%2FProperties%2F-125946513" anchor-label="concurrencyGroup" id="-548855637%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="concurrency-group.html"><span>concurrency</span><wbr><span><span>Group</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-548855637%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="concurrency-group.html">concurrencyGroup</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="449527055%2FProperties%2F-125946513" anchor-label="concurrencyMethod" id="449527055%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="concurrency-method.html"><span>concurrency</span><wbr><span><span>Method</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="449527055%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="concurrency-method.html">concurrencyMethod</a><span class="token operator">: </span><a href="../-concurrency-method/index.html">ConcurrencyMethod</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="347560863%2FProperties%2F-125946513" anchor-label="continueOnFailure" id="347560863%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="continue-on-failure.html"><span>continue</span><wbr><span>On</span><wbr><span><span>Failure</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="347560863%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="continue-on-failure.html">continueOnFailure</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-640878938%2FProperties%2F-125946513" anchor-label="dependsOn" id="-640878938%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-step-with-dependencies/depends-on.html"><span>depends</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-640878938%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="../-step-with-dependencies/depends-on.html">dependsOn</a><span class="token operator">: </span><a href="../-depends-on/index.html">DependsOn</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1642271028%2FProperties%2F-125946513" anchor-label="env" id="1642271028%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-env-owner/env.html"><span><span>env</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1642271028%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="../-env-owner/env.html">env</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1445744062%2FProperties%2F-125946513" anchor-label="fields" id="1445744062%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fields.html"><span><span>fields</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1445744062%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="fields.html">fields</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-field-element/index.html">FieldElement</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1926672028%2FProperties%2F-125946513" anchor-label="id" id="1926672028%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="id.html"><span><span>id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1926672028%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="id.html">id</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1849872590%2FProperties%2F-125946513" anchor-label="identifier" id="1849872590%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="identifier.html"><span><span>identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1849872590%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="identifier.html">identifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1115828569%2FProperties%2F-125946513" anchor-label="input" id="1115828569%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="input.html"><span><span>input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1115828569%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="input.html">input</a><span class="token operator">: </span><a href="../-input/index.html">Input</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1801805284%2FProperties%2F-125946513" anchor-label="key" id="1801805284%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="key.html"><span><span>key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1801805284%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="key.html">key</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1546620271%2FProperties%2F-125946513" anchor-label="label" id="1546620271%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="label.html"><span><span>label</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1546620271%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="label.html">label</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="462220726%2FProperties%2F-125946513" anchor-label="matrix" id="462220726%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="matrix.html"><span><span>matrix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="462220726%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="matrix.html">matrix</a><span class="token operator">: </span><a href="../-matrix-union/index.html">MatrixUnion</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1302184108%2FProperties%2F-125946513" anchor-label="name" id="1302184108%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1302184108%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="name.html">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="410253102%2FProperties%2F-125946513" anchor-label="notify" id="410253102%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="notify.html"><span><span>notify</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="410253102%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="notify.html">notify</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="../-notification/index.html">Notification</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-784090169%2FProperties%2F-125946513" anchor-label="parallelism" id="-784090169%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="parallelism.html"><span><span>parallelism</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-784090169%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="parallelism.html">parallelism</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="789609667%2FProperties%2F-125946513" anchor-label="plugins" id="789609667%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="plugins.html"><span><span>plugins</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="789609667%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="plugins.html">plugins</a><span class="token operator">: </span><a href="../-plugins/index.html">Plugins</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1343922867%2FProperties%2F-125946513" anchor-label="priority" id="1343922867%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="priority.html"><span><span>priority</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1343922867%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="priority.html">priority</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1827420531%2FProperties%2F-125946513" anchor-label="prompt" id="1827420531%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="prompt.html"><span><span>prompt</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1827420531%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="prompt.html">prompt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-178996165%2FProperties%2F-125946513" anchor-label="retry" id="-178996165%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="retry.html"><span><span>retry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-178996165%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="retry.html">retry</a><span class="token operator">: </span><a href="../-retry/index.html">Retry</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1513362412%2FProperties%2F-125946513" anchor-label="script" id="1513362412%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="script.html"><span><span>script</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1513362412%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="script.html">script</a><span class="token operator">: </span><a href="../-script-step/index.html">ScriptStep</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="918795563%2FProperties%2F-125946513" anchor-label="signature" id="918795563%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="signature.html"><span><span>signature</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="918795563%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="signature.html">signature</a><span class="token operator">: </span><a href="../-signature/index.html">Signature</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1284911048%2FProperties%2F-125946513" anchor-label="skip" id="-1284911048%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="skip.html"><span><span>skip</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1284911048%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="skip.html">skip</a><span class="token operator">: </span><a href="../-skip/index.html">Skip</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="219674990%2FProperties%2F-125946513" anchor-label="stepIf" id="219674990%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="step-if.html"><span>step</span><wbr><span><span>If</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="219674990%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="step-if.html">stepIf</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-503366562%2FProperties%2F-125946513" anchor-label="timeoutInMinutes" id="-503366562%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="timeout-in-minutes.html"><span>timeout</span><wbr><span>In</span><wbr><span><span>Minutes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-503366562%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="timeout-in-minutes.html">timeoutInMinutes</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2063008035%2FProperties%2F-125946513" anchor-label="type" id="-2063008035%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="type.html"><span><span>type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2063008035%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="type.html">type</a><span class="token operator">: </span><a href="../-step-type/index.html">StepType</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-136026878%2FProperties%2F-125946513" anchor-label="wait" id="-136026878%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="wait.html"><span><span>wait</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-136026878%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="wait.html">wait</a><span class="token operator">: </span><a href="../-wait/index.html">Wait</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="393988021%2FProperties%2F-125946513" anchor-label="waiter" id="393988021%2FProperties%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="waiter.html"><span><span>waiter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="393988021%2FProperties%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">var </span><a href="waiter.html">waiter</a><span class="token operator">: </span><a href="../-wait/index.html">Wait</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-267493966%2FFunctions%2F-125946513" anchor-label="artifacts" id="-267493966%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="artifacts.html"><span><span>artifacts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-267493966%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="artifacts.html"><span class="token function">artifacts</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>paths<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1398016941%2FFunctions%2F-125946513" anchor-label="branches" id="1398016941%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="branches.html"><span><span>branches</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1398016941%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="branches.html"><span class="token function">branches</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>branches<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1479359691%2FFunctions%2F-125946513" anchor-label="build" id="-1479359691%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="build.html"><span><span>build</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1479359691%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="build.html"><span class="token function">build</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-command-step/index.html">CommandStep</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-676642212%2FFunctions%2F-125946513" anchor-label="commands" id="-676642212%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="commands.html"><span><span>commands</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-676642212%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="commands.html"><span class="token function">commands</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>commands<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="commands.html"><span class="token function">commands</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">command<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1160881624%2FFunctions%2F-125946513" anchor-label="dependsOn" id="1160881624%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-step-with-dependencies/depends-on.html"><span>depends</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1160881624%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-step-with-dependencies/depends-on.html"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="../-keyable/index.html">Keyable</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-step-with-dependencies/depends-on.html"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>values<span class="token operator">: </span><a href="../-keyable/index.html">Keyable</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-step-with-dependencies/depends-on.html"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>values<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-step-with-dependencies/depends-on.html"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-step-with-dependencies/depends-on.html"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-depends-on-element/index.html">DependsOnElement</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="509642273%2FFunctions%2F-125946513" anchor-label="dependsOn" id="509642273%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../depends-on.html"><span>depends</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="509642273%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="../-step-with-dependencies/index.html">StepWithDependencies</a><span class="token punctuation">.</span><a href="../depends-on.html"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-keyable/index.html">Keyable</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-685079838%2FFunctions%2F-125946513" anchor-label="env" id="-685079838%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-env-owner/env.html"><span><span>env</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-685079838%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-env-owner/env.html"><span class="token function">env</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>pairs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-env-owner/env.html"><span class="token function">env</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="../-env-builder/index.html">EnvBuilder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-621070882%2FFunctions%2F-125946513" anchor-label="githubStatus" id="-621070882%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../github-status.html"><span>github</span><wbr><span><span>Status</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-621070882%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html">CommandStepBuilder</a><span class="token punctuation">.</span><a href="../github-status.html"><span class="token function">githubStatus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-789883105%2FFunctions%2F-125946513" anchor-label="notify" id="-789883105%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="notify.html"><span><span>notify</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-789883105%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="notify.html"><span class="token function">notify</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notification<span class="token operator">: </span><a href="../-notification/index.html">Notification</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1437889768%2FFunctions%2F-125946513" anchor-label="softFail" id="-1437889768%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="soft-fail.html"><span>soft</span><wbr><span><span>Fail</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1437889768%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="soft-fail.html"><span class="token function">softFail</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="soft-fail.html"><span class="token function">softFail</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">exitCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="soft-fail.html"><span class="token function">softFail</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>exitCodes<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="642987321%2FFunctions%2F-125946513" anchor-label="trigger" id="642987321%2FFunctions%2F-125946513" data-filterable-set=":tools:cli/main"></a>
+          <div class="table-row" data-filterable-current=":tools:cli/main" data-filterable-set=":tools:cli/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="trigger.html"><span><span>trigger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="642987321%2FFunctions%2F-125946513"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools:cli/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="trigger.html"><span class="token function">trigger</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">trigger<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
