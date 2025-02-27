@@ -39,6 +39,13 @@ intellijPlatform {
       email = "oss@slack-corp.com"
     }
   }
+  val runLocalIde by
+    intellijPlatformTesting.runIde.registering {
+      // https://plugins.jetbrains.com/docs/intellij/android-studio.html#configuring-the-plugin-gradle-build-script
+      providers.gradleProperty("intellijPlatformTesting.idePath").orNull?.let {
+        localPath.set(file(it))
+      }
+    }
 }
 
 fun isGitHash(hash: String): Boolean {
