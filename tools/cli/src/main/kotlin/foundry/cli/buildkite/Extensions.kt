@@ -76,3 +76,7 @@ public fun githubStatusNotif(
 public fun CommandStep.withGithubStatus(context: String): CommandStep {
   return copy(notify = listOf(githubStatusNotif(context)))
 }
+
+public fun CommandStepBuilder.githubStatus(context: String) {
+  notify(githubStatusNotif(context))
+}

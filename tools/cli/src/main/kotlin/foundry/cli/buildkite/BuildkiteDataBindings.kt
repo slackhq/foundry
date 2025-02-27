@@ -91,9 +91,12 @@ public sealed interface Agents {
   public value class StringArrayValue(public val value: List<String>) : Agents
 
   public companion object {
-    public operator fun invoke(value: JsonObject): Agents = AnythingMapValue(value)
+    public operator fun invoke(agents: JsonObject): Agents = AnythingMapValue(agents)
 
-    public operator fun invoke(value: List<String>): Agents = StringArrayValue(value)
+    public operator fun invoke(block: JsonObjectBuilder.() -> Unit): Agents =
+      invoke(jsonObject(block))
+
+    public operator fun invoke(agents: List<String>): Agents = StringArrayValue(agents)
   }
 }
 
@@ -771,9 +774,11 @@ public sealed interface Plugins {
   public value class UnionArrayValue(public val value: List<Plugin>) : Plugins
 
   public companion object {
-    public operator fun invoke(value: JsonObject): Plugins = AnythingMapValue(value)
+    public operator fun invoke(plugin: JsonObject): Plugins = AnythingMapValue(plugin)
 
-    public operator fun invoke(value: List<Plugin>): Plugins = UnionArrayValue(value)
+    public operator fun invoke(vararg plugins: Plugin): Plugins = invoke(plugins.toList())
+
+    public operator fun invoke(plugins: List<Plugin>): Plugins = UnionArrayValue(plugins)
   }
 }
 
@@ -790,6 +795,9 @@ public sealed interface Plugin {
     public operator fun invoke(value: JsonObject): Plugin = AnythingMapValue(value)
 
     public operator fun invoke(value: String): Plugin = StringValue(value)
+
+    public operator fun invoke(block: JsonObjectBuilder.() -> Unit): Plugin =
+      invoke(jsonObject(block))
   }
 }
 
