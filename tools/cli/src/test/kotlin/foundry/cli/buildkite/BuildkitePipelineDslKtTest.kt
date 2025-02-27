@@ -171,6 +171,9 @@ class BuildkitePipelineDslKtTest {
         .replace(exitStatusFixRegex) { matchResult ->
           "${matchResult.groupValues[1]}${matchResult.groupValues[2]}"
         }
+        .lineSequence()
+        .map { it.trimEnd() }
+        .joinToString("\n")
     return yamlText
   }
 }
