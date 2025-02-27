@@ -116,7 +116,7 @@ class WhatsNewPanelFactory : DumbAware {
       } else {
         MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
       }
+      return panel
     }
-
   }
 }
