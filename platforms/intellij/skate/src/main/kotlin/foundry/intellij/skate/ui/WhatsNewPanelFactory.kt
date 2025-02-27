@@ -92,18 +92,24 @@ class WhatsNewPanelFactory : DumbAware {
 
       // We can't use JBCefApp because Studio blocks it, so instead we do this in compose.
       // https://issuetracker.google.com/issues/159933628#comment19
-      val panel =
-        if (JBCefApp.isSupported()) {
-          logger.debug("Using JCEFHtmlPanelProvider")
-          MarkdownJCEFHtmlPanel(project, file)
-            .apply {
-              Disposer.register(parentDisposable, this)
-              setHtml(html, 0)
-            }
-            .component
-        } else {
-          MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
-        }
+
+      val panel = if (JBCefApp.isSupported()) {
+        logger.debug("Using JCEFHtmlPanelProvider")
+        MarkdownJCEFHtmlPanel(project, file)
+          .apply {
+            Disposer.register(parentDisposable, this)
+            setHtml(html, 0)
+          }
+          .component
+      } else {
+        MarkdownJCEFHtmlPanel(project, file)
+          .apply {
+            Disposer.register(parentDisposable, this)
+            setHtml(html, 0)
+          }
+          .component
+      }
+
       return panel
     }
   }
