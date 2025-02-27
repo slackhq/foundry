@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
@@ -73,28 +74,32 @@ class WhatsNewPanelFactory : DumbAware {
     // Actual panel box for "What's New in Slack!"
     val contentPanel = createWhatsNewPanel(project, changeLogContent, parentDisposable)
 
-    val file = LightVirtualFile("changelog.md", changeLogContent.changeLogString ?: "")
-
-    val html = runReadAction {
-      MarkdownUtil.generateMarkdownHtml(file, changeLogContent.changeLogString ?: "", project)
-    }
-
     // Control Panel that takes in the current project, parsed string, and a Disposable.
     private fun createWhatsNewPanel(
       project: Project,
       changeLogContent: ChangelogParser.PresentedChangelog,
       parentDisposable: Disposable,
     ): JComponent {
-      // to take in the parsed Changelog:
+
+      val file: VirtualFile = LightVirtualFile("CHANGELOG.md", changeLogContent.changeLogString ?: "")
+      val html = runReadAction {
+        MarkdownUtil.generateMarkdownHtml(file, changeLogContent.changeLogString ?: "", project)
+      }
+
       val changelogJournal = project.service<ChangelogJournal>()
 
       changelogJournal.lastReadDate = changeLogContent.lastReadDate
+
+//      println("changelog journal ${changelogJournal.lastReadDate}")
+//      println("changelog content ${changeLogContent.changeLogString}")
 
       // We can't use JBCefApp because Studio blocks it, so instead we do this in compose.
       // https://issuetracker.google.com/issues/159933628#comment19
       val panel =
         if (JBCefApp.isSupported()) {
           logger.debug("Using JCEFHtmlPanelProvider")
+//          println("using jcef")
+//          println("html is $html")
           MarkdownJCEFHtmlPanel(project, file)
             .apply {
               Disposer.register(parentDisposable, this)
@@ -102,6 +107,7 @@ class WhatsNewPanelFactory : DumbAware {
             }
             .component
         } else {
+//          println("not using jcef")
           MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
         }
       return panel
