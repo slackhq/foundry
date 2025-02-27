@@ -465,9 +465,7 @@ internal class StandardProjectConfigurations(
           if (isApp) {
             beforeVariants { builder ->
               // AGP has confusing declaration mismatches about this deprecation so we cast it
-              if (builder is HasUnitTestBuilder) {
-                (builder as HasUnitTestBuilder).enableUnitTest = false
-              }
+              (builder as HasUnitTestBuilder).enableUnitTest = false
             }
           }
         }
@@ -566,8 +564,7 @@ internal class StandardProjectConfigurations(
                     )
                     .publishWith(skippyAndroidTestProjectPublisher)
                   if (isLibraryVariant) {
-                    val libraryVariant = variant as LibraryVariant
-                    libraryVariant.androidTest?.apply {
+                    variant.androidTest?.apply {
                       // Wire this up to the aggregator. No need for an intermediate task here.
                       androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
                     }
