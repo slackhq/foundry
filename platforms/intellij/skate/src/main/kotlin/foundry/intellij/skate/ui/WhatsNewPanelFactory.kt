@@ -15,17 +15,25 @@
  */
 package foundry.intellij.skate.ui
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
+import com.intellij.ui.jcef.JBCefApp
 import foundry.intellij.compose.markdown.ui.MarkdownPanel
 import foundry.intellij.skate.ChangelogJournal
 import foundry.intellij.skate.ChangelogParser
 import javax.swing.JComponent
+import org.intellij.plugins.markdown.ui.preview.html.MarkdownUtil
+import org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel
 
 /**
  * The WhatsNewPanelFactory class takes the markdown file string from SkateService and displays it
@@ -39,6 +47,7 @@ class WhatsNewPanelFactory : DumbAware {
     toolWindow: ToolWindow,
     project: Project,
     changeLogContent: ChangelogParser.PresentedChangelog,
+    parentDisposable: Disposable,
   ) {
     val toolWindowContent = WhatsNewPanelContent(project, changeLogContent)
     val content =
@@ -58,14 +67,22 @@ class WhatsNewPanelFactory : DumbAware {
   private class WhatsNewPanelContent(
     project: Project,
     changeLogContent: ChangelogParser.PresentedChangelog,
+    parentDisposable: Disposable,
   ) {
     // Actual panel box for "What's New in Slack!"
-    val contentPanel = createWhatsNewPanel(project, changeLogContent)
+    val contentPanel = createWhatsNewPanel(project, changeLogContent, parentDisposable)
+
+    val file = LightVirtualFile("changelog.md", changeLogContent.changeLogString ?: "")
+
+    val html = runReadAction {
+      MarkdownUtil.generateMarkdownHtml(file, changeLogContent.changeLogString ?: "", project)
+    }
 
     // Control Panel that takes in the current project, parsed string, and a Disposable.
     private fun createWhatsNewPanel(
       project: Project,
       changeLogContent: ChangelogParser.PresentedChangelog,
+      parentDisposable: Disposable,
     ): JComponent {
       // to take in the parsed Changelog:
       val changelogJournal = project.service<ChangelogJournal>()
@@ -74,8 +91,18 @@ class WhatsNewPanelFactory : DumbAware {
 
       // We can't use JBCefApp because Studio blocks it, so instead we do this in compose.
       // https://issuetracker.google.com/issues/159933628#comment19
-      val panel = MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
-
+      val panel =
+        if (JBCefApp.isSupported()) {
+          logger.debug("Using JCEFHtmlPanelProvider")
+          MarkdownJCEFHtmlPanel(project, file)
+            .apply {
+              Disposer.register(parentDisposable, this)
+              setHtml(html, 0)
+            }
+            .component
+        } else {
+          MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
+        }
       return panel
     }
   }

@@ -18,6 +18,7 @@ package foundry.intellij.skate
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
@@ -63,7 +64,11 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
           anchor = ToolWindowAnchor.RIGHT
         }
 
-      WhatsNewPanelFactory().createToolWindowContent(toolWindow, project, parsedChangelog)
+      // The Disposable is necessary to prevent a substantial memory leak while working with
+      // MarkdownJCEFHtmlPanel
+      val parentDisposable = Disposer.newDisposable()
+      WhatsNewPanelFactory()
+        .createToolWindowContent(toolWindow, project, parsedChangelog, parentDisposable)
 
       toolWindow.show()
     }
