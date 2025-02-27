@@ -25,7 +25,11 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
-kotlin { compilerOptions { optIn.addAll("kotlin.ExperimentalStdlibApi") } }
+kotlin {
+  compilerOptions {
+    optIn.addAll("kotlin.ExperimentalStdlibApi", "kotlinx.coroutines.ExperimentalCoroutinesApi")
+  }
+}
 
 lint { baseline = file("lint-baseline.xml") }
 
@@ -58,8 +62,10 @@ dependencies {
   implementation(libs.slf4jNop)
   implementation(libs.tikxml.htmlEscape)
   implementation(libs.xmlutil.serialization)
+  implementation(projects.tools.foundryCommon)
 
   testImplementation(libs.junit)
+  testImplementation(libs.kaml)
   testImplementation(libs.truth)
 
   ksp(libs.autoService.ksp)
