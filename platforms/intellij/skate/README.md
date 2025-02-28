@@ -16,7 +16,7 @@ We use this at Slack for several use cases:
 2. Add custom plugin repository link from "Manage Plugin Repositories"
 3. Search "Skate" in the plugins marketplace and install it
 
-#### Local testing with zip
+#### Local installation
 1. Build local version of the plugin with `./gradlew buildPlugin`
 2. Open IDE settings, then "Install Plugin from Disk..."
 
