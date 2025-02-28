@@ -20,7 +20,7 @@ We use this at Slack for several use cases:
 1. Build local version of the plugin with `./gradlew buildPlugin`
 2. Open IDE settings, then "Install Plugin from Disk..."
 
-#### Local testing from CLI
+#### Local testing with `runLocalIde`
 1. Add your local Android Studio path to your `~/.gradle/gradle.properties` file like this: `intellijPlatformTesting.idePath=/Users/username/Applications/Android Studio.app`
 2. Run `./gradlew :platforms:intellij:skate:runLocalIde` from the CLI and it will open an Android Studio instance
 
