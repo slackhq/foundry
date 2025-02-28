@@ -16,9 +16,13 @@ We use this at Slack for several use cases:
 2. Add custom plugin repository link from "Manage Plugin Repositories"
 3. Search "Skate" in the plugins marketplace and install it
 
-#### Local testing
+#### Local testing with zip
 1. Build local version of the plugin with `./gradlew buildPlugin`
 2. Open IDE settings, then "Install Plugin from Disk..."
+
+#### Local testing from CLI
+1. Add your local Android Studio path to your `~/.gradle/gradle.properties` file like this: `intellijPlatformTesting.idePath=/Users/username/Applications/Android Studio.app`
+2. Run `./gradlew :platforms:intellij:skate:runLocalIde` from the CLI and it will open an Android Studio instance
 
 ## Implementation
 All registered plugin actions can be found in `skate.xml` config file
