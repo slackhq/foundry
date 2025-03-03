@@ -47,6 +47,13 @@
     },
     {
       "matchDepNames": [
+        "org.jetbrains.intellij.platform",
+        "org.jetbrains.intellij.platform.settings"
+      ],
+      "groupName": "IntelliJ Platform"
+    },
+    {
+      "matchDepNames": [
         "renovatebot/github-action"
       ],
       "extends": [
