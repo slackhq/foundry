@@ -29,6 +29,7 @@ internal class FoundryVersions(
   private val libResolver: (String) -> Optional<String>,
   bundleResolver: (String) -> Optional<Provider<ExternalModuleDependencyBundle>>,
   val boms: Set<Provider<MinimalExternalModuleDependency>>,
+  val catalogName: String,
 ) {
 
   /**
@@ -48,6 +49,7 @@ internal class FoundryVersions(
           it.endsWith(".bom")
         }
         .mapTo(LinkedHashSet()) { catalog.findLibrary(it).get() },
+    catalogName = catalog.name,
   )
 
   // Have to use Optional because ConcurrentHashMap doesn't allow nulls for absence
