@@ -51,6 +51,7 @@ import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsData
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.jvm.optionals.getOrNull
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.configuration.BuildFeatures
@@ -170,7 +171,14 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     FoundryValidationTask.registerLifecycleTask(project)
 
     foundryProperties.javaVersionFilePath?.let { javaVersionFilePath ->
-      ValidateJavaVersionMatches.register(project, javaVersionFilePath, foundryProperties.versions)
+      foundryProperties.versions.jdk.getOrNull()?.let { catalogJdk ->
+        ValidateJavaVersionMatches.register(
+          project,
+          javaVersionFilePath,
+          catalogJdk,
+          foundryProperties.versions,
+        )
+      }
     }
 
     project.configureFoundryRootBuildscript(

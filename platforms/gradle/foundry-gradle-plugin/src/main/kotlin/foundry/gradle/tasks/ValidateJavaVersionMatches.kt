@@ -27,7 +27,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.kotlin.com.intellij.util.containers.orNull
 
 /**
  * A Gradle task that validates whether the Java version specified in a `.java_version` matches the
@@ -65,10 +64,15 @@ public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidat
   }
 
   internal companion object {
-    fun register(project: Project, javaVersionFilePath: String, foundryVersions: FoundryVersions) {
+    fun register(
+      project: Project,
+      javaVersionFilePath: String,
+      catalogJdk: Int,
+      foundryVersions: FoundryVersions,
+    ) {
       project.tasks.register<ValidateJavaVersionMatches>("validateJavaVersions") {
         javaVersionFile.set(project.layout.projectDirectory.file(javaVersionFilePath))
-        catalogJdkVersion.set(foundryVersions.jdk.orNull())
+        catalogJdkVersion.set(catalogJdk)
         catalogName.set(foundryVersions.catalogName)
         outputFile.set(
           project.layout.buildDirectory.file("foundry/validate_java_version/output.txt")
