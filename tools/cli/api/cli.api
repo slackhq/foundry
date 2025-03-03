@@ -650,6 +650,7 @@ public final class foundry/cli/buildkite/CommandStepBuilder : foundry/cli/buildk
 	public final fun artifacts ([Ljava/lang/String;)V
 	public final fun branches ([Ljava/lang/String;)V
 	public final fun build ()Lfoundry/cli/buildkite/CommandStep;
+	public final fun command (Ljava/lang/String;)V
 	public final fun commands (Ljava/lang/String;)V
 	public final fun commands ([Ljava/lang/String;)V
 	public fun dependsOn (Lfoundry/cli/buildkite/Keyable;)V

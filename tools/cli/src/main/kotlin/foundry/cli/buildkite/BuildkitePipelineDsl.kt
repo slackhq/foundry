@@ -213,8 +213,12 @@ public class CommandStepBuilder :
   public var wait: Wait? = null
   public var waiter: Wait? = null
 
-  public fun commands(command: String) {
+  public fun command(@Language("bash") command: String) {
     this.command = command
+  }
+
+  public fun commands(@Language("bash") command: String) {
+    this.commands = Commands.multiple(listOf(command))
   }
 
   public fun commands(@Language("bash") vararg commands: String) {
