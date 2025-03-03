@@ -21,6 +21,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
@@ -36,6 +37,7 @@ import org.gradle.api.tasks.TaskAction
  * This is useful for projects that define the JDK in both places, as some tools like Renovate and
  * github actions work well with a `.java_version` file.
  */
+@CacheableTask
 public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidationTask {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
