@@ -41,6 +41,7 @@ public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidat
   @get:PathSensitive(PathSensitivity.NONE)
   public abstract val javaVersionFile: RegularFileProperty
 
+  @get:Input public abstract val javaVersionFileRelativePath: Property<String>
   @get:Input public abstract val catalogName: Property<String>
   @get:Input public abstract val catalogJdkVersion: Property<Int>
 
@@ -56,8 +57,7 @@ public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidat
     val catalogVersion = catalogJdkVersion.get()
 
     check(javaVersion == catalogVersion) {
-      val filePath = javaVersionFile.asFile.get().absolutePath
-      "Java version ($javaVersion) in file '$filePath' does not match the JDK version in ${catalogName.get()}.versions.toml ($catalogVersion). Please ensure these are aligned"
+      "Java version ($javaVersion) in file '${javaVersionFileRelativePath.get()}' does not match the JDK version in ${catalogName.get()}.versions.toml ($catalogVersion). Please ensure these are aligned"
     }
 
     outputFile.asFile.get().writeText("valid")
@@ -72,6 +72,7 @@ public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidat
     ) {
       project.tasks.register<ValidateJavaVersionMatches>("validateJavaVersions") {
         javaVersionFile.set(project.layout.projectDirectory.file(javaVersionFilePath))
+        javaVersionFileRelativePath.set(javaVersionFilePath)
         catalogJdkVersion.set(catalogJdk)
         catalogName.set(foundryVersions.catalogName)
         outputFile.set(
