@@ -37,6 +37,7 @@ import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -264,6 +265,7 @@ private fun jewelMarkdownTypography(
   list: TextStyle = text,
   inlineCode: TextStyle = code,
   link: TextStyle = text,
+  textLink: TextLinkStyles = TextLinkStyles(style = text.toSpanStyle()),
 ): MarkdownTypography =
   DefaultMarkdownTypography(
     h1 = h1,
@@ -281,4 +283,5 @@ private fun jewelMarkdownTypography(
     list = list,
     inlineCode = inlineCode,
     link = link,
+    textLink = textLink,
   )

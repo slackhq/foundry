@@ -1,23 +1,23 @@
 [versions]
-agp = "8.8.1"
-agpAlpha = "8.9.0-rc02"
+agp = "8.8.2"
+agpAlpha = "8.9.0"
 anvil = "0.4.1"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.7.1"
 bugsnagGradle = "8.2.0"
-circuit = "0.26.1"
+circuit = "0.27.0"
 compose-jb = "1.7.3"
 compose-jb-stable = "1.7.3"
 coroutines = "1.10.1"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.10.1"
-dependencyAnalysisPlugin = "2.10.0"
-detekt = "1.23.7"
+dependencyAnalysisPlugin = "2.10.1"
+detekt = "1.23.8"
 dokka = "2.0.0"
 errorproneGradle = "4.1.0"
 gradle-retry = "1.6.2"
-graph-assert = "2.7.3"
-intellij-platform = "2.2.1"
+graph-assert = "2.8.0"
+intellij-platform = "2.3.0"
 jdk = "23"
 jvmTarget = "17"
 jvmTargetIdea = "21"
@@ -27,10 +27,10 @@ kaml = "0.72.0"
 kotlin = "2.1.20-RC2"
 kotlinx-serialization = "1.8.0"
 ksp = "2.1.20-RC2-1.0.31"
-kotlinPoet = "2.0.0"
+kotlinPoet = "2.1.0"
 ktfmt = "0.54"
-markdown = "0.30.0"
-mavenPublish = "0.30.0"
+markdown = "0.31.0"
+mavenPublish = "0.31.0"
 mordant = "3.0.2"
 moshi = "1.15.2"
 moshix = "0.29.0"
@@ -38,13 +38,13 @@ nullawayGradle = "2.2.0"
 okhttp = "5.0.0-alpha.14"
 okio = "3.10.2"
 retrofit = "2.11.0"
-roborazzi = "1.42.0"
+roborazzi = "1.43.0"
 slack-lint = "0.8.2"
 sortDependencies = "0.14"
 spotless = "7.0.2"
 sqldelight = "2.0.2"
 versionsPlugin = "0.52.0"
-wire = "5.3.0"
+wire = "5.3.1"
 xmlutil = "0.90.3"
 
 [plugins]
@@ -144,7 +144,7 @@ okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp
 okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
-oshi = "com.github.oshi:oshi-core:6.6.6"
+oshi = "com.github.oshi:oshi-core:6.7.0"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
 robolectric = "org.robolectric:robolectric:4.14.1"
@@ -153,7 +153,7 @@ rxjava = "io.reactivex.rxjava3:rxjava:3.1.10"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"
 slackLints-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slack-lint" }
 slackLints-annotations = { module = "com.slack.lint:slack-lint-annotations", version.ref = "slack-lint" }
-slf4jNop = "org.slf4j:slf4j-nop:2.0.16"
+slf4jNop = "org.slf4j:slf4j-nop:2.0.17"
 testing-roborazzi-core = { module = "io.github.takahirom.roborazzi:roborazzi-core", version.ref = "roborazzi" }
 testing-roborazzi-desktop = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 tikxml-htmlEscape = { module = "com.tickaroo.tikxml:converter-htmlescape", version = "0.8.15" }

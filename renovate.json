@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "branchPrefix": "test-renovate/",
   "gitAuthor": "OSS-Bot <svc-oss-bot@slack-corp.com>",
@@ -10,7 +10,9 @@
   "platformAutomerge": true,
   "packageRules": [
     {
-      "matchManagers": ["pip_requirements"],
+      "matchManagers": [
+        "pip_requirements"
+      ],
       "groupName": "Docsite Dependencies",
       "automerge": true,
       "extends": [
@@ -22,7 +24,10 @@
     },
     {
       "description": "Automerge non-major updates",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": true
     },
     {
@@ -41,8 +46,19 @@
       "allowedVersions": "!/\\-android$/"
     },
     {
-      "matchDepNames": ["renovatebot/github-action"],
-      "extends": ["schedule:monthly"]
+      "matchDepNames": [
+        "org.jetbrains.intellij.platform",
+        "org.jetbrains.intellij.platform.settings"
+      ],
+      "groupName": "IntelliJ Platform"
+    },
+    {
+      "matchDepNames": [
+        "renovatebot/github-action"
+      ],
+      "extends": [
+        "schedule:monthly"
+      ]
     }
   ]
 }
