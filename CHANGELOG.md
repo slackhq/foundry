@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Raise JVM target across all targets to 21.
+
 0.24.11
 -------
 
