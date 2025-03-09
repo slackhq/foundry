@@ -37,8 +37,9 @@ import org.gradle.api.services.BuildServiceRegistry
 /** A stub for the [Gradle] interface. It will return the [StartParameter] it is provided. */
 class GradleStub(private val startParameter: StartParameter) : Gradle {
 
-  override fun buildFinished(closure: Closure<*>) = Unit
+  @Deprecated("Deprecated in Java") override fun buildFinished(closure: Closure<*>) = Unit
 
+  @Deprecated("Deprecated in Java")
   override fun buildFinished(action: Action<in BuildResult>) = Unit
 
   override fun addProjectEvaluationListener(
@@ -87,7 +88,7 @@ class GradleStub(private val startParameter: StartParameter) : Gradle {
 
   override fun beforeSettings(action: Action<in Settings>) = Unit
 
-  override fun useLogger(logger: Any) = Unit
+  @Deprecated("Deprecated in Java") override fun useLogger(logger: Any) = Unit
 
   override fun getGradleUserHomeDir(): File = startParameter.gradleUserHomeDir
 
