@@ -36,11 +36,13 @@ import foundry.gradle.properties.sneakyNull
 import foundry.gradle.stats.ModuleStatsTasks
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CoreBootstrapTask
+import foundry.gradle.tasks.FoundryValidationTask
 import foundry.gradle.tasks.GjfDownloadTask
 import foundry.gradle.tasks.InstallCommitHooksTask
 import foundry.gradle.tasks.KtLintDownloadTask
 import foundry.gradle.tasks.KtfmtDownloadTask
 import foundry.gradle.tasks.SortDependenciesDownloadTask
+import foundry.gradle.tasks.ValidateJavaVersionMatches
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import foundry.gradle.testing.EmulatorWtfTests
 import foundry.gradle.testing.RoborazziTests
@@ -49,6 +51,7 @@ import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsData
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.jvm.optionals.getOrNull
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.configuration.BuildFeatures
@@ -164,6 +167,20 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
         AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
       }
     }
+
+    FoundryValidationTask.registerLifecycleTask(project)
+
+    foundryProperties.javaVersionFilePath?.let { javaVersionFilePath ->
+      foundryProperties.versions.jdk.getOrNull()?.let { catalogJdk ->
+        ValidateJavaVersionMatches.register(
+          project,
+          javaVersionFilePath,
+          catalogJdk,
+          foundryProperties.versions,
+        )
+      }
+    }
+
     project.configureFoundryRootBuildscript(
       foundryProperties.versions.jdk.asProvider(project.providers),
       foundryProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
