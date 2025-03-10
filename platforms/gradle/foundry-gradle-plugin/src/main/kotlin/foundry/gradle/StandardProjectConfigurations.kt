@@ -465,9 +465,7 @@ internal class StandardProjectConfigurations(
           if (isApp) {
             beforeVariants { builder ->
               // AGP has confusing declaration mismatches about this deprecation so we cast it
-              if (builder is HasUnitTestBuilder) {
-                (builder as HasUnitTestBuilder).enableUnitTest = false
-              }
+              (builder as HasUnitTestBuilder).enableUnitTest = false
             }
           }
         }

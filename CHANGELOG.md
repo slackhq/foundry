@@ -4,6 +4,10 @@ Changelog
 **Unreleased**
 --------------
 
+- Build against AGP `8.9.0`.
+- Raise JVM target across all targets to `21`.
+- Minimum supported Gradle version is `8.12`.
+
 0.24.11
 -------
 
