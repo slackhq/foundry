@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Add optional `validate(Kotlin|Java)VersionMatches` tasks to keep files like `.java_version` synced with version catalogs.
+
 0.24.11
 -------
 
