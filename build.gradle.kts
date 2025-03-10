@@ -48,7 +48,6 @@ plugins {
   alias(libs.plugins.mavenPublish) apply false
   alias(libs.plugins.dokka)
   alias(libs.plugins.ksp) apply false
-  alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.sortDependencies) apply false
   alias(libs.plugins.intellij) apply false
