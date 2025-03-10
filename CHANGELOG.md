@@ -4,10 +4,17 @@ Changelog
 **Unreleased**
 --------------
 
+0.25.1
+------
+
+_2025-03-10_
+
+- Remove automatic gradle versions plugin support
+
 0.25.0
 ------
 
-_2025-02-27_
+_2025-03-10_
 
 - Add optional `validate(Kotlin|Java)VersionMatches` tasks to keep files like `.java_version` synced with version catalogs.
 - Update Graph Assert to `2.8.0`.
