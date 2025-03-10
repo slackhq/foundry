@@ -9,7 +9,7 @@ Changelog
 
 _2025-03-10_
 
-- Remove automatic gradle versions plugin support
+- Remove automatic gradle versions plugin support.
 
 0.25.0
 ------
