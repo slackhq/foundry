@@ -5,6 +5,9 @@ Changelog
 --------------
 
 - Add optional `validate(Kotlin|Java)VersionMatches` tasks to keep files like `.java_version` synced with version catalogs.
+- Build against AGP `8.9.0`.
+- Raise JVM target across all targets to `21`.
+- Minimum supported Gradle version is `8.12`.
 
 0.24.11
 -------
