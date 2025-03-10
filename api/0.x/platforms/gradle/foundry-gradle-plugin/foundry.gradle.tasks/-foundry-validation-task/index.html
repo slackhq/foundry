@@ -1,0 +1,877 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>FoundryValidationTask</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../../../index.html">
+                    foundry
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":platforms:gradle:foundry-gradle-plugin/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":platforms:gradle:foundry-gradle-plugin/main" data-filter=":platforms:gradle:foundry-gradle-plugin/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    foundry
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="foundry-gradle-plugin::foundry.gradle.tasks/FoundryValidationTask///PointingToDeclaration//-1866425956">
+  <div class="breadcrumbs"><a href="../../index.html">foundry-gradle-plugin</a><span class="delimiter">/</span><a href="../index.html">foundry.gradle.tasks</a><span class="delimiter">/</span><span class="current">FoundryValidationTask</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Foundry</span><wbr><span>Validation</span><wbr><span><span>Task</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">FoundryValidationTask</a> : <a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/slackhq/foundry//tree/main/platforms/gradle/foundry-gradle-plugin/src/main/kotlin/foundry/gradle/tasks/FoundryValidationTask.kt#L23">source</a>)</span></span></div><p class="paragraph">Marker interface for Foundry validation tasks that can be depended on by type.</p><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-validate-versions-match/index.html">ValidateVersionsMatch</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="185130479%2FClasslikes%2F-1866425956" anchor-label="Companion" id="185130479%2FClasslikes%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="185130479%2FClasslikes%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1075354968%2FFunctions%2F-1866425956" anchor-label="compareTo" id="-1075354968%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1075354968%2FFunctions%2F-1866425956"><span>compare</span><wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1075354968%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="index.html#-1075354968%2FFunctions%2F-1866425956"><span class="token function">compareTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1886814229%2FFunctions%2F-1866425956" anchor-label="configure" id="1886814229%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1886814229%2FFunctions%2F-1866425956"><span><span>configure</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1886814229%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1886814229%2FFunctions%2F-1866425956"><span class="token function">configure</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">configureClosure<span class="token operator">: </span><span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1734954752%2FFunctions%2F-1866425956" anchor-label="dependsOn" id="1734954752%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1734954752%2FFunctions%2F-1866425956"><span>depends</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1734954752%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1734954752%2FFunctions%2F-1866425956"><span class="token function">dependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>paths<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1970347937%2FFunctions%2F-1866425956" anchor-label="doFirst" id="1970347937%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1589791980%2FFunctions%2F-1866425956"><span>do</span><wbr><span><span>First</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1970347937%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1589791980%2FFunctions%2F-1866425956"><span class="token function">doFirst</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="groovy.lang/DelegatesTo///PointingToDeclaration/"><span class="token annotation builtin">DelegatesTo</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task::class</a></span><wbr><span class="token punctuation">)</span>&nbsp;</span>action<span class="token operator">: </span><span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-2112619851%2FFunctions%2F-1866425956"><span class="token function">doFirst</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Action.html">Action</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1368558320%2FFunctions%2F-1866425956"><span class="token function">doFirst</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">actionName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Action.html">Action</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-463979931%2FFunctions%2F-1866425956" anchor-label="doLast" id="-463979931%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#270489760%2FFunctions%2F-1866425956"><span>do</span><wbr><span><span>Last</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-463979931%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#270489760%2FFunctions%2F-1866425956"><span class="token function">doLast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="groovy.lang/DelegatesTo///PointingToDeclaration/"><span class="token annotation builtin">DelegatesTo</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task::class</a></span><wbr><span class="token punctuation">)</span>&nbsp;</span>action<span class="token operator">: </span><span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1632609705%2FFunctions%2F-1866425956"><span class="token function">doLast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Action.html">Action</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-952239388%2FFunctions%2F-1866425956"><span class="token function">doLast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">actionName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Action.html">Action</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="608322429%2FFunctions%2F-1866425956" anchor-label="doNotTrackState" id="608322429%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#608322429%2FFunctions%2F-1866425956"><span>do</span><wbr><span>Not</span><wbr><span>Track</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="608322429%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#608322429%2FFunctions%2F-1866425956"><span class="token function">doNotTrackState</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">reasonNotToTrackState<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1934016855%2FFunctions%2F-1866425956" anchor-label="finalizedBy" id="-1934016855%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1934016855%2FFunctions%2F-1866425956"><span>finalized</span><wbr><span><span>By</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1934016855%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1934016855%2FFunctions%2F-1866425956"><span class="token function">finalizedBy</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>paths<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="161554942%2FFunctions%2F-1866425956" anchor-label="getActions" id="161554942%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#161554942%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Actions</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="161554942%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#161554942%2FFunctions%2F-1866425956"><span class="token function">getActions</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Action.html">Action</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1586435244%2FFunctions%2F-1866425956" anchor-label="getAnt" id="-1586435244%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1586435244%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Ant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1586435244%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1586435244%2FFunctions%2F-1866425956"><span class="token function">getAnt</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/AntBuilder.html">AntBuilder</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1501529045%2FFunctions%2F-1866425956" anchor-label="getDependsOn" id="1501529045%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1501529045%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Depends</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1501529045%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1501529045%2FFunctions%2F-1866425956"><span class="token function">getDependsOn</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1006466271%2FFunctions%2F-1866425956" anchor-label="getDescription" id="1006466271%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1006466271%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Description</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1006466271%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="javax.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1006466271%2FFunctions%2F-1866425956"><span class="token function">getDescription</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1725156320%2FFunctions%2F-1866425956" anchor-label="getDestroyables" id="-1725156320%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1725156320%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Destroyables</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1725156320%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1725156320%2FFunctions%2F-1866425956"><span class="token function">getDestroyables</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskDestroyables.html">TaskDestroyables</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="62353963%2FFunctions%2F-1866425956" anchor-label="getDidWork" id="62353963%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#62353963%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Did</span><wbr><span><span>Work</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="62353963%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#62353963%2FFunctions%2F-1866425956"><span class="token function">getDidWork</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-262523846%2FFunctions%2F-1866425956" anchor-label="getEnabled" id="-262523846%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-262523846%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-262523846%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-262523846%2FFunctions%2F-1866425956"><span class="token function">getEnabled</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1936611485%2FFunctions%2F-1866425956" anchor-label="getExtensions" id="-1936611485%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1936611485%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Extensions</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1936611485%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1936611485%2FFunctions%2F-1866425956"><span class="token function">getExtensions</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/plugins/ExtensionContainer.html">ExtensionContainer</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1233183998%2FFunctions%2F-1866425956" anchor-label="getFinalizedBy" id="1233183998%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1233183998%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Finalized</span><wbr><span><span>By</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1233183998%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1233183998%2FFunctions%2F-1866425956"><span class="token function">getFinalizedBy</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskDependency.html">TaskDependency</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="378853948%2FFunctions%2F-1866425956" anchor-label="getGroup" id="378853948%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#378853948%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Group</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="378853948%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="javax.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#378853948%2FFunctions%2F-1866425956"><span class="token function">getGroup</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1326751126%2FFunctions%2F-1866425956" anchor-label="getInputs" id="1326751126%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1326751126%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Inputs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1326751126%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1326751126%2FFunctions%2F-1866425956"><span class="token function">getInputs</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskInputs.html">TaskInputs</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1775732025%2FFunctions%2F-1866425956" anchor-label="getLocalState" id="1775732025%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1775732025%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Local</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1775732025%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1775732025%2FFunctions%2F-1866425956"><span class="token function">getLocalState</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskLocalState.html">TaskLocalState</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1851464753%2FFunctions%2F-1866425956" anchor-label="getLogger" id="-1851464753%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1851464753%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Logger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1851464753%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1851464753%2FFunctions%2F-1866425956"><span class="token function">getLogger</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/logging/Logger.html">Logger</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-937250340%2FFunctions%2F-1866425956" anchor-label="getLogging" id="-937250340%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-937250340%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Logging</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-937250340%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-937250340%2FFunctions%2F-1866425956"><span class="token function">getLogging</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/logging/LoggingManager.html">LoggingManager</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="847811557%2FFunctions%2F-1866425956" anchor-label="getMustRunAfter" id="847811557%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#847811557%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Must</span><wbr><span>Run</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="847811557%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#847811557%2FFunctions%2F-1866425956"><span class="token function">getMustRunAfter</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskDependency.html">TaskDependency</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="492756916%2FFunctions%2F-1866425956" anchor-label="getName" id="492756916%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#492756916%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="492756916%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#492756916%2FFunctions%2F-1866425956"><span class="token function">getName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="312378633%2FFunctions%2F-1866425956" anchor-label="getOutputs" id="312378633%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#312378633%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Outputs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="312378633%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#312378633%2FFunctions%2F-1866425956"><span class="token function">getOutputs</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskOutputs.html">TaskOutputs</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="113383258%2FFunctions%2F-1866425956" anchor-label="getPath" id="113383258%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#113383258%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Path</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="113383258%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#113383258%2FFunctions%2F-1866425956"><span class="token function">getPath</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2026080414%2FFunctions%2F-1866425956" anchor-label="getProject" id="-2026080414%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-2026080414%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Project</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2026080414%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-2026080414%2FFunctions%2F-1866425956"><span class="token function">getProject</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Project.html">Project</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-47092485%2FFunctions%2F-1866425956" anchor-label="getShouldRunAfter" id="-47092485%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-47092485%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Should</span><wbr><span>Run</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-47092485%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-47092485%2FFunctions%2F-1866425956"><span class="token function">getShouldRunAfter</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskDependency.html">TaskDependency</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-130636694%2FFunctions%2F-1866425956" anchor-label="getState" id="-130636694%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-130636694%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-130636694%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-130636694%2FFunctions%2F-1866425956"><span class="token function">getState</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskState.html">TaskState</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-634150575%2FFunctions%2F-1866425956" anchor-label="getTaskDependencies" id="-634150575%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-634150575%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Task</span><wbr><span><span>Dependencies</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-634150575%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-634150575%2FFunctions%2F-1866425956"><span class="token function">getTaskDependencies</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskDependency.html">TaskDependency</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1548527389%2FFunctions%2F-1866425956" anchor-label="getTemporaryDir" id="-1548527389%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1548527389%2FFunctions%2F-1866425956"><span>get</span><wbr><span>Temporary</span><wbr><span><span>Dir</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1548527389%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1548527389%2FFunctions%2F-1866425956"><span class="token function">getTemporaryDir</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/io/File.html">File</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1950149094%2FFunctions%2F-1866425956" anchor-label="getTimeout" id="-1950149094%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1950149094%2FFunctions%2F-1866425956"><span>get</span><wbr><span><span>Timeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1950149094%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/Internal.html"><span class="token annotation builtin">Internal</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1950149094%2FFunctions%2F-1866425956"><span class="token function">getTimeout</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/provider/Property.html">Property</a><span class="token operator">&lt;</span><a href="https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/time/Duration.html">Duration</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="225124062%2FFunctions%2F-1866425956" anchor-label="hasProperty" id="225124062%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#225124062%2FFunctions%2F-1866425956"><span>has</span><wbr><span><span>Property</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="225124062%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#225124062%2FFunctions%2F-1866425956"><span class="token function">hasProperty</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">propertyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-301707428%2FFunctions%2F-1866425956" anchor-label="mustRunAfter" id="-301707428%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-301707428%2FFunctions%2F-1866425956"><span>must</span><wbr><span>Run</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-301707428%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-301707428%2FFunctions%2F-1866425956"><span class="token function">mustRunAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>paths<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2031213384%2FFunctions%2F-1866425956" anchor-label="notCompatibleWithConfigurationCache" id="2031213384%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#2031213384%2FFunctions%2F-1866425956"><span>not</span><wbr><span>Compatible</span><wbr><span>With</span><wbr><span>Configuration</span><wbr><span><span>Cache</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2031213384%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#2031213384%2FFunctions%2F-1866425956"><span class="token function">notCompatibleWithConfigurationCache</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">reason<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-632618962%2FFunctions%2F-1866425956" anchor-label="onlyIf" id="-632618962%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1374204489%2FFunctions%2F-1866425956"><span>only</span><wbr><span><span>If</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-632618962%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1374204489%2FFunctions%2F-1866425956"><span class="token function">onlyIf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onlyIfClosure<span class="token operator">: </span><span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1435460708%2FFunctions%2F-1866425956"><span class="token function">onlyIf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onlyIfSpec<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/specs/Spec.html">Spec</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Incubating.html"><span class="token annotation builtin">Incubating</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-541327017%2FFunctions%2F-1866425956"><span class="token function">onlyIf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onlyIfReason<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">onlyIfSpec<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/specs/Spec.html">Spec</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-426323884%2FFunctions%2F-1866425956" anchor-label="property" id="-426323884%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-426323884%2FFunctions%2F-1866425956"><span><span>property</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-426323884%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="javax.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-426323884%2FFunctions%2F-1866425956"><span class="token function">property</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">propertyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="599705893%2FFunctions%2F-1866425956" anchor-label="setActions" id="599705893%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#599705893%2FFunctions%2F-1866425956"><span>set</span><wbr><span><span>Actions</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="599705893%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#599705893%2FFunctions%2F-1866425956"><span class="token function">setActions</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">actions<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Action.html">Action</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1796920005%2FFunctions%2F-1866425956" anchor-label="setDependsOn" id="1796920005%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1796920005%2FFunctions%2F-1866425956"><span>set</span><wbr><span>Depends</span><wbr><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1796920005%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1796920005%2FFunctions%2F-1866425956"><span class="token function">setDependsOn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dependsOnTasks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-667714806%2FFunctions%2F-1866425956" anchor-label="setDescription" id="-667714806%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-667714806%2FFunctions%2F-1866425956"><span>set</span><wbr><span><span>Description</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-667714806%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-667714806%2FFunctions%2F-1866425956"><span class="token function">setDescription</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span>&nbsp;</span>description<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="587328060%2FFunctions%2F-1866425956" anchor-label="setDidWork" id="587328060%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#587328060%2FFunctions%2F-1866425956"><span>set</span><wbr><span>Did</span><wbr><span><span>Work</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="587328060%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#587328060%2FFunctions%2F-1866425956"><span class="token function">setDidWork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">didWork<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-695966197%2FFunctions%2F-1866425956" anchor-label="setEnabled" id="-695966197%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-695966197%2FFunctions%2F-1866425956"><span>set</span><wbr><span><span>Enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-695966197%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-695966197%2FFunctions%2F-1866425956"><span class="token function">setEnabled</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-686319044%2FFunctions%2F-1866425956" anchor-label="setFinalizedBy" id="-686319044%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-686319044%2FFunctions%2F-1866425956"><span>set</span><wbr><span>Finalized</span><wbr><span><span>By</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-686319044%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-686319044%2FFunctions%2F-1866425956"><span class="token function">setFinalizedBy</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">finalizedBy<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-148557145%2FFunctions%2F-1866425956" anchor-label="setGroup" id="-148557145%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-148557145%2FFunctions%2F-1866425956"><span>set</span><wbr><span><span>Group</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-148557145%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-148557145%2FFunctions%2F-1866425956"><span class="token function">setGroup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span>&nbsp;</span>group<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1090007731%2FFunctions%2F-1866425956" anchor-label="setMustRunAfter" id="-1090007731%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1090007731%2FFunctions%2F-1866425956"><span>set</span><wbr><span>Must</span><wbr><span>Run</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1090007731%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1090007731%2FFunctions%2F-1866425956"><span class="token function">setMustRunAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">mustRunAfter<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1735509358%2FFunctions%2F-1866425956" anchor-label="setOnlyIf" id="1735509358%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-60475465%2FFunctions%2F-1866425956"><span>set</span><wbr><span>Only</span><wbr><span><span>If</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1735509358%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-60475465%2FFunctions%2F-1866425956"><span class="token function">setOnlyIf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onlyIfClosure<span class="token operator">: </span><span data-unresolved-link="groovy.lang/Closure///PointingToDeclaration/">Closure</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-2052114678%2FFunctions%2F-1866425956"><span class="token function">setOnlyIf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onlyIfSpec<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/specs/Spec.html">Spec</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Incubating.html"><span class="token annotation builtin">Incubating</span></a></div></div><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1407777723%2FFunctions%2F-1866425956"><span class="token function">setOnlyIf</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">onlyIfReason<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">onlyIfSpec<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/specs/Spec.html">Spec</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/Task.html">Task</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1033150374%2FFunctions%2F-1866425956" anchor-label="setProperty" id="-1033150374%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1033150374%2FFunctions%2F-1866425956"><span>set</span><wbr><span><span>Property</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1033150374%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1033150374%2FFunctions%2F-1866425956"><span class="token function">setProperty</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1384597769%2FFunctions%2F-1866425956" anchor-label="setShouldRunAfter" id="-1384597769%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1384597769%2FFunctions%2F-1866425956"><span>set</span><wbr><span>Should</span><wbr><span>Run</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1384597769%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1384597769%2FFunctions%2F-1866425956"><span class="token function">setShouldRunAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">shouldRunAfter<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1028186894%2FFunctions%2F-1866425956" anchor-label="shouldRunAfter" id="-1028186894%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1028186894%2FFunctions%2F-1866425956"><span>should</span><wbr><span>Run</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1028186894%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#-1028186894%2FFunctions%2F-1866425956"><span class="token function">shouldRunAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>paths<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/tasks/TaskDependency.html">TaskDependency</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1237082499%2FFunctions%2F-1866425956" anchor-label="usesService" id="1237082499%2FFunctions%2F-1866425956" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main"></a>
+          <div class="table-row" data-filterable-current=":platforms:gradle:foundry-gradle-plugin/main" data-filterable-set=":platforms:gradle:foundry-gradle-plugin/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1237082499%2FFunctions%2F-1866425956"><span>uses</span><wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1237082499%2FFunctions%2F-1866425956"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":platforms:gradle:foundry-gradle-plugin/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="index.html#1237082499%2FFunctions%2F-1866425956"><span class="token function">usesService</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">service<span class="token operator">: </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/provider/Provider.html">Provider</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="https://docs.gradle.org/8.13/javadoc/org/gradle/api/services/BuildService.html">BuildService</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
