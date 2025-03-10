@@ -4,7 +4,14 @@ Changelog
 **Unreleased**
 --------------
 
+0.25.0
+------
+
+_2025-02-27_
+
 - Add optional `validate(Kotlin|Java)VersionMatches` tasks to keep files like `.java_version` synced with version catalogs.
+- Update Graph Assert to `2.8.0`.
+- Update Wire to `5.3.1`.
 - Build against AGP `8.9.0`.
 - Raise JVM target across all targets to `21`.
 - Minimum supported Gradle version is `8.12`.
