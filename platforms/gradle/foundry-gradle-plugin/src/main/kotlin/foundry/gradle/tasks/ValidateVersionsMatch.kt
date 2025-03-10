@@ -16,6 +16,7 @@
 package foundry.gradle.tasks
 
 import foundry.gradle.FoundryVersions
+import foundry.gradle.capitalizeUS
 import foundry.gradle.register
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -30,22 +31,24 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 /**
- * A Gradle task that validates whether the Java version specified in a `.java_version` matches the
- * expected version defined in a version catalog. If the versions match, an output file is generated
- * with the status "valid". If they do not match, the task fails with a descriptive error message.
+ * A Gradle task that validates whether version specified in a given [versionFile] (for example:
+ * `.java_version`) matches the expected version defined in a version catalog ([catalogVersion]). If
+ * the versions match, an [outputFile] is generated with the status "valid". If they do not match,
+ * the task fails with a descriptive error message.
  *
- * This is useful for projects that define the JDK in both places, as some tools like Renovate and
- * github actions work well with a `.java_version` file.
+ * This is useful for projects that define the version in multiple places, as some tools like
+ * Renovate and GitHub actions work well with a `.java_version` file and some caching mechanisms
+ * want a single manifest file.
  */
 @CacheableTask
-public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidationTask {
+public abstract class ValidateVersionsMatch : DefaultTask(), FoundryValidationTask {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
-  public abstract val javaVersionFile: RegularFileProperty
+  public abstract val versionFile: RegularFileProperty
 
-  @get:Input public abstract val javaVersionFileRelativePath: Property<String>
+  @get:Input public abstract val versionFileRelativePath: Property<String>
   @get:Input public abstract val catalogName: Property<String>
-  @get:Input public abstract val catalogJdkVersion: Property<Int>
+  @get:Input public abstract val catalogVersion: Property<String>
 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
@@ -55,11 +58,11 @@ public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidat
 
   @TaskAction
   internal fun validate() {
-    val javaVersion = javaVersionFile.asFile.get().readText().trim().toInt()
-    val catalogVersion = catalogJdkVersion.get()
+    val fileVersion = versionFile.asFile.get().readText().trim()
+    val requiredVersion = catalogVersion.get()
 
-    check(javaVersion == catalogVersion) {
-      "Java version ($javaVersion) in file '${javaVersionFileRelativePath.get()}' does not match the JDK version in ${catalogName.get()}.versions.toml ($catalogVersion). Please ensure these are aligned"
+    check(fileVersion == requiredVersion) {
+      "Version ($fileVersion) in file '${versionFileRelativePath.get()}' does not match the version in ${catalogName.get()}.versions.toml ($requiredVersion). Please ensure these are aligned"
     }
 
     outputFile.asFile.get().writeText("valid")
@@ -68,17 +71,18 @@ public abstract class ValidateJavaVersionMatches : DefaultTask(), FoundryValidat
   internal companion object {
     fun register(
       project: Project,
-      javaVersionFilePath: String,
-      catalogJdk: Int,
+      type: String,
+      versionFilePath: String,
+      catalogVersion: String,
       foundryVersions: FoundryVersions,
     ) {
-      project.tasks.register<ValidateJavaVersionMatches>("validateJavaVersions") {
-        javaVersionFile.set(project.layout.projectDirectory.file(javaVersionFilePath))
-        javaVersionFileRelativePath.set(javaVersionFilePath)
-        catalogJdkVersion.set(catalogJdk)
+      project.tasks.register<ValidateVersionsMatch>("validate${type.capitalizeUS()}Matches") {
+        versionFile.set(project.layout.projectDirectory.file(versionFilePath))
+        versionFileRelativePath.set(versionFilePath)
+        this.catalogVersion.set(catalogVersion)
         catalogName.set(foundryVersions.catalogName)
         outputFile.set(
-          project.layout.buildDirectory.file("foundry/validate_java_version/output.txt")
+          project.layout.buildDirectory.file("foundry/version-matches/$type/valid.txt")
         )
       }
     }

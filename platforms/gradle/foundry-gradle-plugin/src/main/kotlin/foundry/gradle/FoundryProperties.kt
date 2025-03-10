@@ -779,7 +779,11 @@ internal constructor(
         KotlinVersion.fromVersion(it)
       }
 
-  /** Defines .java_version . */
+  /** Defines .kotlin_version. */
+  public val kotlinVersionFilePath: String?
+    get() = optionalStringProperty("foundry.kotlin.kotlin-version-file-path", blankIsNull = true)
+
+  /** Defines .java_version. */
   public val javaVersionFilePath: String?
     get() = optionalStringProperty("foundry.jvm.java-version-file-path", blankIsNull = true)
 

@@ -42,7 +42,7 @@ import foundry.gradle.tasks.InstallCommitHooksTask
 import foundry.gradle.tasks.KtLintDownloadTask
 import foundry.gradle.tasks.KtfmtDownloadTask
 import foundry.gradle.tasks.SortDependenciesDownloadTask
-import foundry.gradle.tasks.ValidateJavaVersionMatches
+import foundry.gradle.tasks.ValidateVersionsMatch
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import foundry.gradle.testing.EmulatorWtfTests
 import foundry.gradle.testing.RoborazziTests
@@ -171,14 +171,25 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
     FoundryValidationTask.registerLifecycleTask(project)
 
     foundryProperties.javaVersionFilePath?.let { javaVersionFilePath ->
-      foundryProperties.versions.jdk.getOrNull()?.let { catalogJdk ->
-        ValidateJavaVersionMatches.register(
-          project,
-          javaVersionFilePath,
-          catalogJdk,
-          foundryProperties.versions,
+      foundryProperties.versions.jdk.getOrNull()?.let { catalogVersion ->
+        ValidateVersionsMatch.register(
+          project = project,
+          type = "javaVersion",
+          versionFilePath = javaVersionFilePath,
+          catalogVersion = catalogVersion.toString(),
+          foundryVersions = foundryProperties.versions,
         )
       }
+    }
+
+    foundryProperties.kotlinVersionFilePath?.let { javaVersionFilePath ->
+      ValidateVersionsMatch.register(
+        project = project,
+        type = "kotlinVersion",
+        versionFilePath = javaVersionFilePath,
+        catalogVersion = foundryProperties.versions.kotlin,
+        foundryVersions = foundryProperties.versions,
+      )
     }
 
     project.configureFoundryRootBuildscript(
