@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.8.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.1)" variant="all" version="8.8.0-alpha01">
+<issues format="6" by="lint 8.10.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.0)" variant="all" version="8.10.0-alpha08">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -21,6 +21,28 @@
             file="src/main/kotlin/foundry/cli/sarif/ApplyBaselinesToSarifs.kt"
             line="99"
             column="56"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      anythingMapValue != null -> Agents(anythingMapValue!!)"
+        errorLine2="                                                         ~~">
+        <location
+            file="src/main/kotlin/foundry/cli/buildkite/BuildkitePipelineDsl.kt"
+            line="145"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      stringArrayValue != null -> Agents(stringArrayValue!!)"
+        errorLine2="                                                         ~~">
+        <location
+            file="src/main/kotlin/foundry/cli/buildkite/BuildkitePipelineDsl.kt"
+            line="146"
+            column="58"/>
     </issue>
 
     <issue

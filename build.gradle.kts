@@ -49,7 +49,6 @@ plugins {
   alias(libs.plugins.mavenPublish) apply false
   alias(libs.plugins.dokka)
   alias(libs.plugins.ksp) apply false
-  alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.sortDependencies) apply false
   alias(libs.plugins.intellij) apply false
@@ -248,7 +247,7 @@ subprojects {
         }
         if (isForGradle) {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
-          freeCompilerArgs.add("-Xsam-conversions=class")
+          freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
         }
         check(this is KotlinJvmCompilerOptions)
         this.jvmTarget.set(projectJvmTarget)

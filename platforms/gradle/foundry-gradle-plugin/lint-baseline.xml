@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.9.0-alpha02" type="baseline" client="gradle" dependencies="false" name="AGP (8.8.0)" variant="all" version="8.9.0-alpha02">
+<issues format="6" by="lint 8.10.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.0)" variant="all" version="8.10.0-alpha08">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -63,7 +63,7 @@
         errorLine2="                    ~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
-            line="1146"
+            line="1180"
             column="21"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                                                                      ~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="132"
+            line="133"
             column="71"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                                      ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="921"
+            line="949"
             column="39"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="                            ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/testing/UnitTests.kt"
-            line="229"
+            line="224"
             column="29"/>
     </issue>
 
@@ -393,7 +393,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="32"
+            line="33"
             column="1"/>
     </issue>
 

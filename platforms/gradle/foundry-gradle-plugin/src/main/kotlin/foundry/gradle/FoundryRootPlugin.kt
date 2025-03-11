@@ -16,11 +16,9 @@
 package foundry.gradle
 
 import com.autonomousapps.DependencyAnalysisExtension
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.osacky.doctor.DoctorExtension
 import foundry.cli.AppleSiliconCompat
 import foundry.common.json.JsonTools
-import foundry.common.versioning.VersionNumber
 import foundry.gradle.avoidance.ComputeAffectedProjectsTask
 import foundry.gradle.avoidance.GenerateAndroidTestProjectPathsTask
 import foundry.gradle.avoidance.GenerateDependencyGraphTask
@@ -36,19 +34,21 @@ import foundry.gradle.properties.sneakyNull
 import foundry.gradle.stats.ModuleStatsTasks
 import foundry.gradle.tasks.AndroidTestApksTask
 import foundry.gradle.tasks.CoreBootstrapTask
+import foundry.gradle.tasks.FoundryValidationTask
 import foundry.gradle.tasks.GjfDownloadTask
 import foundry.gradle.tasks.InstallCommitHooksTask
 import foundry.gradle.tasks.KtLintDownloadTask
 import foundry.gradle.tasks.KtfmtDownloadTask
 import foundry.gradle.tasks.SortDependenciesDownloadTask
+import foundry.gradle.tasks.ValidateVersionsMatch
 import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import foundry.gradle.testing.EmulatorWtfTests
 import foundry.gradle.testing.RoborazziTests
 import foundry.gradle.testing.UnitTests
 import foundry.gradle.util.Thermals
 import foundry.gradle.util.ThermalsData
-import java.util.Locale
 import javax.inject.Inject
+import kotlin.jvm.optionals.getOrNull
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.configuration.BuildFeatures
@@ -164,6 +164,31 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
         AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
       }
     }
+
+    FoundryValidationTask.registerLifecycleTask(project)
+
+    foundryProperties.javaVersionFilePath?.let { javaVersionFilePath ->
+      foundryProperties.versions.jdk.getOrNull()?.let { catalogVersion ->
+        ValidateVersionsMatch.register(
+          project = project,
+          type = "javaVersion",
+          versionFilePath = javaVersionFilePath,
+          catalogVersion = catalogVersion.toString(),
+          foundryVersions = foundryProperties.versions,
+        )
+      }
+    }
+
+    foundryProperties.kotlinVersionFilePath?.let { javaVersionFilePath ->
+      ValidateVersionsMatch.register(
+        project = project,
+        type = "kotlinVersion",
+        versionFilePath = javaVersionFilePath,
+        catalogVersion = foundryProperties.versions.kotlin,
+        foundryVersions = foundryProperties.versions,
+      )
+    }
+
     project.configureFoundryRootBuildscript(
       foundryProperties.versions.jdk.asProvider(project.providers),
       foundryProperties.jvmVendor.map(JvmVendorSpec::matching).orNull,
@@ -333,100 +358,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
       }
     }
 
-    project.pluginManager.withPlugin("com.github.ben-manes.versions") {
-      project.tasks.withType(DependencyUpdatesTask::class.java).configureEach {
-        // Disallow updating to unstable candidates from stable versions, but do allow suggesting
-        // newer unstable
-        // candidates if we're already on an unstable version. Note that we won't suggest a newer
-        // unstable version if
-        // it has a different base version (see doc + example below).
-        rejectVersionIf {
-          when {
-            candidate.moduleIdentifier.toString() == "com.google.guava:guava" -> {
-              // Guava has special rules because it adds -jre or -android as a suffix. These are
-              // misunderstood by the VersionNumber API as suffixes because it will use their
-              // natural order. We just use -jre every time so we reject all -android versions.
-              return@rejectVersionIf "-android" in candidate.version
-            }
-
-            candidate.group.startsWith("androidx.test") -> {
-              // We do allow non-stable test dependencies because they're
-              // - Not shipped in prod, we can immediately mitigate if something is wrong
-              // - About as reliable in alphas releases as they are in stable.
-              //   - Alphas tend to have critical bugfixes introduced by the previous stable 🤦‍
-              return@rejectVersionIf false
-            }
-
-            candidate.moduleIdentifier.toString() == "com.slack.android:analytics" -> {
-              // These use git shas as version suffixes, which aren't reliable for semver checks
-              return@rejectVersionIf true
-            }
-
-            candidate.moduleIdentifier.toString() == "com.slack.data:client-thrifty" -> {
-              // These use an exotic type of semver
-              return@rejectVersionIf true
-            }
-
-            candidate.group == "com.slack.android.chime" -> {
-              // Chime uses unconventional version names, which aren't reliable for semver checks
-              return@rejectVersionIf true
-            }
-
-            !foundryProperties.versionsPluginAllowUnstable -> {
-              val currentIsStable = isStable(currentVersion)
-              val candidateIsStable = isStable(candidate.version)
-              if (!currentIsStable) {
-                if (candidateIsStable) {
-                  // Always prefer stable candidates newer than a current unstable version
-                  return@rejectVersionIf false
-                } else {
-                  val candidateVersion = VersionNumber.parse(candidate.version)
-                  val currentVersion = VersionNumber.parse(currentVersion)
-
-                  @Suppress("ReplaceCallWithBinaryOperator") // Bug in groovy interop
-                  val bothAreUnstable =
-                    !candidateVersion.equals(VersionNumber.UNKNOWN) &&
-                      !currentVersion.equals(VersionNumber.UNKNOWN)
-                  if (bothAreUnstable) {
-                    // Both are unstable. Only accept a newer unstable version if it's the same
-                    // maj.min.patch. This is so we don't accidentally skip a more stable version in
-                    // between.
-                    // Example:
-                    //   - Current: 1.1.0-alpha01
-                    //   - Candidate: 1.2.0-alpha01
-                    //   - Other available: 1.1.0-alpha02, 1.1.1
-                    // In this case we want 1.1.1 and to reject the newer 1.2.0-alpha01
-                    val shouldReject = candidateVersion.baseVersion > currentVersion.baseVersion
-                    if (shouldReject) {
-                      project.logger.debug(
-                        "Rejecting unstable $candidate because its base version " +
-                          "is greater than $currentVersion."
-                      )
-                    }
-                    return@rejectVersionIf shouldReject
-                  }
-                }
-              }
-              return@rejectVersionIf !candidateIsStable && currentIsStable
-            }
-
-            else -> return@rejectVersionIf false
-          }
-        }
-      }
-    }
-
     AndroidTestApksTask.register(project)
-  }
-
-  private fun isStable(version: String): Boolean {
-    val stableKeyword =
-      listOf("RELEASE", "FINAL", "GA").any { version.uppercase(Locale.US).contains(it) }
-    return stableKeyword || STABLE_REGEX.matches(version)
-  }
-
-  private companion object {
-    private val STABLE_REGEX = "^[0-9,.v-]+(-android)?(-r)?$".toRegex()
   }
 }
 
