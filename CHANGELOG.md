@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.25.2
+------
+
+_2025-03-11_
+
+- Compile Gradle plugin code with `-Xlambdas=class` for Gradle compatibility.
+
 0.25.1
 ------
 

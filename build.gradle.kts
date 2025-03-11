@@ -241,7 +241,7 @@ subprojects {
         }
         if (isForGradle) {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
-          freeCompilerArgs.add("-Xsam-conversions=class")
+          freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
         }
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
