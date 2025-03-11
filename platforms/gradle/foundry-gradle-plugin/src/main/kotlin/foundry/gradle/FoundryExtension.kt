@@ -973,10 +973,6 @@ constructor(
       for ((k, v) in compilerOptions.get().map { it.split('=') }) {
         project.logger.debug("Processing compose option $k = $v")
         when (k) {
-          "generateFunctionKeyMetaClasses" -> {
-            extension.generateFunctionKeyMetaClasses.set(v.toBoolean())
-          }
-
           OPTION_SOURCE_INFORMATION -> {
             includeSourceInformation = v.toBoolean()
           }
