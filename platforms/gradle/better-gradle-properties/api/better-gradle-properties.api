@@ -36,6 +36,7 @@ public final class foundry/gradle/properties/PropertyResolver {
 	public final fun booleanValue (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)Z
 	public final fun booleanValue (Ljava/lang/String;Z)Z
 	public static synthetic fun booleanValue$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;ZILjava/lang/Object;)Z
+	public final fun gradleProviderOf (Ljava/util/Optional;)Lorg/gradle/api/provider/Provider;
 	public final fun intProvider (Ljava/lang/String;I)Lorg/gradle/api/provider/Provider;
 	public final fun intProvider (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)Lorg/gradle/api/provider/Provider;
 	public static synthetic fun intProvider$default (Lfoundry/gradle/properties/PropertyResolver;Ljava/lang/String;IILjava/lang/Object;)Lorg/gradle/api/provider/Provider;

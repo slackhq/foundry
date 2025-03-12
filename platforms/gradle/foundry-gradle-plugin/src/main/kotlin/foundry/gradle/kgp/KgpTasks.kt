@@ -20,7 +20,6 @@ import foundry.gradle.Configurations
 import foundry.gradle.Configurations.isKnownConfiguration
 import foundry.gradle.FoundryProperties
 import foundry.gradle.FoundryTools
-import foundry.gradle.asProvider
 import foundry.gradle.configure
 import foundry.gradle.getByType
 import foundry.gradle.lint.DetektTasks
@@ -76,9 +75,7 @@ internal object KgpTasks {
       val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
 
       val jvmTargetProvider =
-        foundryProperties.versions.jvmTarget
-          .map { JvmTarget.fromTarget(it.toString()) }
-          .asProvider(project.providers)
+        foundryProperties.jvmTarget.map { JvmTarget.fromTarget(it.toString()) }
 
       kotlinExtension.explicitApi =
         foundryProperties.kotlinExplicitApiMode.orNull?.let(ExplicitApiMode::valueOf)
