@@ -4,6 +4,11 @@ Changelog
 **Unreleased**
 --------------
 
+0.25.3
+------
+
+_2025-03-12_
+
 - Allow `jvmTarget` to be configurable per-project with the `foundry.jvm.target` property. Default is still the `jvmTarget` defined in `libs.versions.toml`.
 
 0.25.2
