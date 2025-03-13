@@ -397,19 +397,25 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   }
 }
 
-//// Usage
-// var code = "foundry { features { compose() } }"
-// code = code.replace(Regex("\\bcompose\\(\\)"), "") // remove compose()
-// code = removeEmptyBraces(code) // recursively remove empty braces
-//
-// println(code) // Should print "<nothing>"
-// TODO write tests for this
-private val EMPTY_DSL_BLOCK = "(\\w*)\\s*\\{\\s*\\}".toRegex()
+private val EMPTY_DSL_BLOCK = "(\\w+\\s*\\{\\s*\\})+".toRegex()
 
+/**
+ * Removes redundant empty braces from the string. The method iteratively replaces patterns of empty
+ * DSL blocks until no such patterns remain and trims the trailing whitespace.
+ *
+ * Example:
+ * ```
+ * val input = "block1 { } block2 { content }"
+ * val result = input.removeEmptyBraces()
+ * println(result) // Output: "block2 { content }"
+ * ```
+ *
+ * @return A new string with all occurrences of empty braces removed.
+ */
 internal fun String.removeEmptyBraces(): String {
   var result = this
   while (EMPTY_DSL_BLOCK.containsMatchIn(result)) {
-    result = EMPTY_DSL_BLOCK.replace(result, "")
+    result = EMPTY_DSL_BLOCK.replace(result, "").trimEnd()
   }
   return result
 }
