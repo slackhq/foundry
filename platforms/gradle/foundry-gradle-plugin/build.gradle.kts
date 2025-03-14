@@ -124,7 +124,6 @@ dependencies {
   compileOnly(libs.gradlePlugins.retry)
   compileOnly(libs.gradlePlugins.spotless)
   compileOnly(libs.gradlePlugins.sqldelight)
-  compileOnly(libs.gradlePlugins.versions)
   compileOnly(libs.gradlePlugins.wire)
   compileOnly(libs.kotlin.reflect)
 

@@ -21,6 +21,7 @@ import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
 import foundry.gradle.properties.getOrCreateExtra
+import foundry.gradle.properties.mapToInt
 import foundry.gradle.properties.sneakyNull
 import java.io.File
 import java.util.Locale
@@ -779,6 +780,14 @@ internal constructor(
         KotlinVersion.fromVersion(it)
       }
 
+  /** Defines .kotlin_version. */
+  public val kotlinVersionFilePath: String?
+    get() = optionalStringProperty("foundry.kotlin.kotlin-version-file-path", blankIsNull = true)
+
+  /** Defines .java_version. */
+  public val javaVersionFilePath: String?
+    get() = optionalStringProperty("foundry.jvm.java-version-file-path", blankIsNull = true)
+
   /** Defines a required vendor for JDK toolchains. */
   public val jvmVendor: Provider<String>
     get() =
@@ -789,6 +798,14 @@ internal constructor(
           it
         }
       }
+
+  /** Defines JVM target to use in Kotlin and Java compilations. */
+  public val jvmTarget: Provider<Int>
+    get() =
+      resolver
+        .optionalStringProvider("foundry.jvm.target")
+        .mapToInt()
+        .orElse(resolver.gradleProviderOf(versions.jvmTarget))
 
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean

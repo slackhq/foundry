@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
@@ -47,7 +48,6 @@ plugins {
   alias(libs.plugins.mavenPublish) apply false
   alias(libs.plugins.dokka)
   alias(libs.plugins.ksp) apply false
-  alias(libs.plugins.versionsPlugin)
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.sortDependencies) apply false
   alias(libs.plugins.intellij) apply false
@@ -224,7 +224,7 @@ subprojects {
           if (isForIntelliJPlugin) {
             KOTLIN_1_9
           } else if (isForGradle) {
-            KOTLIN_1_9
+            KOTLIN_2_0
           } else {
             DEFAULT
           }
@@ -241,7 +241,7 @@ subprojects {
         }
         if (isForGradle) {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
-          freeCompilerArgs.add("-Xsam-conversions=class")
+          freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
         }
         this.jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(

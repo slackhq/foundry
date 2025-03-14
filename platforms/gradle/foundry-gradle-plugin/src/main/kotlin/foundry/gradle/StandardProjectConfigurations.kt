@@ -298,8 +298,7 @@ internal class StandardProjectConfigurations(
 
   /** Adds common configuration for Java projects. */
   private fun Project.configureJavaProject(foundryProperties: FoundryProperties) {
-    val releaseVersion =
-      foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion).asProvider(providers)
+    val releaseVersion = foundryProperties.jvmTarget.map(JavaVersion::toVersion)
     plugins.withType(JavaBasePlugin::class.java).configureEach {
       project.configure<JavaPluginExtension> {
         sourceCompatibility = releaseVersion.get()
@@ -428,7 +427,7 @@ internal class StandardProjectConfigurations(
     foundryExtension: FoundryExtension,
     foundryProperties: FoundryProperties,
   ) {
-    val javaVersion = foundryProperties.versions.jvmTarget.map(JavaVersion::toVersion)
+    val javaVersion = foundryProperties.jvmTarget.map(JavaVersion::toVersion)
     // Contribute these libraries to Fladle if they opt into it
     val androidTestApksPublisher =
       Publisher.interProjectPublisher(project, FoundryArtifact.AndroidTestApkDirs)
@@ -465,9 +464,7 @@ internal class StandardProjectConfigurations(
           if (isApp) {
             beforeVariants { builder ->
               // AGP has confusing declaration mismatches about this deprecation so we cast it
-              if (builder is HasUnitTestBuilder) {
-                (builder as HasUnitTestBuilder).enableUnitTest = false
-              }
+              (builder as HasUnitTestBuilder).enableUnitTest = false
             }
           }
         }

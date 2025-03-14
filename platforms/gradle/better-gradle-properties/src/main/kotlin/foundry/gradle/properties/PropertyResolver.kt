@@ -15,6 +15,7 @@
  */
 package foundry.gradle.properties
 
+import java.util.Optional
 import java.util.concurrent.Callable
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -161,6 +162,10 @@ public class PropertyResolver(
     ERROR,
     NONE,
   }
+
+  /** Returns a Gradle [Provider] around the given [optional]. */
+  public fun <T : Any> gradleProviderOf(optional: Optional<T>): Provider<T> =
+    providers.provider(optional::get)
 
   public companion object {
     /** @property project The project to resolve properties for. */

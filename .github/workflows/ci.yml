@@ -52,7 +52,7 @@ jobs:
       - name: Build and run tests
         id: gradle
         timeout-minutes: 10
-        run: ./gradlew check
+        run: ./gradlew check --quiet
 
       - name: Print build scan url
         if: always()
@@ -106,7 +106,7 @@ jobs:
         - name: Build and run tests
           id: gradle
           timeout-minutes: 10
-          run: ./gradlew verifyRoborazzi
+          run: ./gradlew verifyRoborazzi --quiet
 
         - name: (Fail-only) Upload build reports
           if: failure()
@@ -143,4 +143,4 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/foundry'
-        run: ./gradlew publish -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+        run: ./gradlew publish --quiet -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
