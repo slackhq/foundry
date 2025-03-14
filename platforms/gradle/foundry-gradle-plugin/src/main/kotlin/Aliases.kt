@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import foundry.gradle.AndroidHandler
-import foundry.gradle.FoundryExtension
 import foundry.gradle.FoundryAndroidAppExtension
 import foundry.gradle.FoundryAndroidLibraryExtension
+import foundry.gradle.FoundryExtension
 import foundry.gradle.findByType
 import org.gradle.api.Action
 import org.gradle.api.Project

@@ -29,6 +29,7 @@ import foundry.gradle.properties.synchronousEnvProperty
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.SimpleFilesConsumerTask
 import foundry.gradle.tasks.publish
+import foundry.gradle.util.JavaAgentDependenciesExtension
 import kotlin.math.max
 import kotlin.math.roundToInt
 import org.gradle.api.Project
@@ -85,6 +86,8 @@ internal object UnitTests {
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) {
+    JavaAgentDependenciesExtension.register(project, foundryProperties)
+
     // Projects can opt out of creating the task with this property.
     // android test projects don't support unit tests
     val enabled = foundryProperties.ciUnitTestEnabled && pluginId != "com.android.test"

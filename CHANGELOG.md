@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Add a `dependencies.testJavaAgents { ... }` API for configuring Java agents that need to run in tests, such as Mockito in future versions of Java.
+
 0.25.4
 ------
 
