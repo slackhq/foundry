@@ -52,7 +52,7 @@ constructor(private val project: Project, private val foundryProperties: Foundry
     add("testImplementation", dependency)
     val config =
       project.configurations.detachedConfiguration(dependency).apply { isTransitive = false }
-    project.tasks.withType(Test::class.java) {
+    project.tasks.withType(Test::class.java).configureEach {
       jvmArgumentProviders.add(
         project.objects.newInstance<JavaAgentArgumentProvider>().apply {
           classpath.from(config.incoming.artifactView {}.files)
