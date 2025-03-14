@@ -4,6 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.25.4
+------
+
+_2025-03-14_
+
+- Small project validation fixes.
+- Update Oshi to `6.7.1`.
+- Build against DAGP `2.12.0`.
+
 0.25.3
 ------
 
