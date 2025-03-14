@@ -98,7 +98,14 @@ internal object ModuleTopographyTasks {
           DefaultFeatures.CircuitInject,
           foundryExtension.featuresHandler.circuitHandler.codegen,
         )
-        features.put(DefaultFeatures.Dagger, foundryExtension.featuresHandler.daggerHandler.enabled)
+        features.put(
+          DefaultFeatures.Dagger,
+          foundryExtension.featuresHandler.daggerHandler.enabled.zip(
+            foundryExtension.featuresHandler.daggerHandler.runtimeOnly
+          ) { enabled, runtimeOnly ->
+            enabled && !runtimeOnly
+          },
+        )
         features.put(
           DefaultFeatures.DaggerCompiler,
           foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler,
