@@ -54,7 +54,9 @@ constructor(private val project: Project, private val foundryProperties: Foundry
       project.configurations.detachedConfiguration(dependency).apply { isTransitive = false }
     project.tasks.withType(Test::class.java) {
       jvmArgumentProviders.add(
-        project.objects.newInstance<JavaAgentArgumentProvider>().apply { classpath.from(config) }
+        project.objects.newInstance<JavaAgentArgumentProvider>().apply {
+          classpath.from(project.files(config))
+        }
       )
     }
   }
