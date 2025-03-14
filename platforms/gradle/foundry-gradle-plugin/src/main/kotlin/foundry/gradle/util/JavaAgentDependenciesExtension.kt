@@ -55,7 +55,7 @@ constructor(private val project: Project, private val foundryProperties: Foundry
     project.tasks.withType(Test::class.java) {
       jvmArgumentProviders.add(
         project.objects.newInstance<JavaAgentArgumentProvider>().apply {
-          classpath.from(project.files(config))
+          classpath.from(config.incoming.artifactView {}.files)
         }
       )
     }
