@@ -15,9 +15,6 @@
  */
 package foundry.gradle.topography
 
-import com.github.ajalt.mordant.markdown.Markdown
-import com.github.ajalt.mordant.rendering.AnsiLevel
-import com.github.ajalt.mordant.terminal.Terminal
 import foundry.cli.walkEachFile
 import foundry.common.json.JsonTools
 import foundry.gradle.FoundryExtension
@@ -36,17 +33,24 @@ import foundry.gradle.tasks.dependsOnSourceGeneratingTasks
 import foundry.gradle.tasks.publish
 import foundry.gradle.util.toJson
 import java.nio.file.Path
+import javax.inject.Inject
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.extension
 import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
 import kotlin.io.path.useLines
 import kotlin.io.path.writeText
 import kotlin.jvm.optionals.getOrNull
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.plugins.PluginRegistry
+import org.gradle.api.problems.ProblemGroup
+import org.gradle.api.problems.ProblemId
+import org.gradle.api.problems.Problems
+import org.gradle.api.problems.Severity
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -190,7 +194,8 @@ public abstract class ModuleTopographyTask : DefaultTask() {
 }
 
 @DisableCachingByDefault
-public abstract class ValidateModuleTopographyTask : DefaultTask() {
+public abstract class ValidateModuleTopographyTask @Inject constructor(problems: Problems) :
+  DefaultTask() {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
   @get:Optional
@@ -206,9 +211,12 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
   public abstract val autoFix: Property<Boolean>
 
   @get:Internal public abstract val projectDirProperty: DirectoryProperty
+  @get:Internal public abstract val rootDirProperty: DirectoryProperty
 
   @get:OutputFile public abstract val modifiedBuildFile: RegularFileProperty
   @get:OutputFile public abstract val featuresToRemoveOutputFile: RegularFileProperty
+
+  private val problemReporter = problems.reporter
 
   init {
     group = "foundry"
@@ -290,10 +298,8 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
 
     val allAutoFixed = featuresToRemove.all { it.replacementPatterns.isNotEmpty() }
     if (featuresToRemove.isNotEmpty()) {
-      val message = buildString {
-        appendLine(
-          "**Validation failed! The following features appear to be unused and can be removed.**"
-        )
+      val solution = buildString {
+        appendLine("The following features appear unused and can be removed:")
         appendLine()
         var first = true
         featuresToRemove.forEach {
@@ -301,27 +307,41 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
             first = false
           } else {
             appendLine()
-            appendLine()
           }
-          appendLine("- **${it.name}:** ${it.explanation}")
-          appendLine()
-          appendLine("  - **Advice:** ${it.advice}")
+          appendLine("    ${it.name}:")
+          appendLine("        ${it.explanation}")
+          appendLine("        Advice: ${it.advice}")
         }
         appendLine()
         appendLine("Full list written to ${featuresToRemoveOutputFile.asFile.get().absolutePath}")
       }
-      val t = Terminal(AnsiLevel.TRUECOLOR, interactive = true)
-      val md = Markdown(message)
-      t.println(md, stderr = true)
       if (shouldAutoFix) {
         if (allAutoFixed) {
           logger.lifecycle("All issues auto-fixed")
         } else {
-          throw AssertionError("Not all issues could be fixed automatically")
+          report(
+            buildFile,
+            solution,
+            GradleException("Not all issues could be fixed automatically"),
+          )
         }
       } else {
-        throw AssertionError()
+        report(buildFile, solution)
       }
+    }
+  }
+
+  private fun report(
+    buildFile: Path,
+    solution: String,
+    exception: GradleException = GradleException(),
+  ) {
+    val problemId =
+      ProblemId.create("module-topography-validation", "Module validation failed!", PROBLEM_GROUP)
+    problemReporter.throwing(exception, problemId) {
+      fileLocation(buildFile.relativeTo(rootDirProperty.asFile.get().toPath()).toString())
+      solution(solution)
+      severity(Severity.ERROR)
     }
   }
 
@@ -354,6 +374,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
     private const val NAME = "validateModuleTopography"
     private val CI_NAME = "ci${NAME.capitalizeUS()}"
     internal val GLOBAL_CI_NAME = "global${CI_NAME.capitalizeUS()}"
+    val PROBLEM_GROUP = ProblemGroup.create("sample-group", "Sample Group")
 
     fun register(
       project: Project,
@@ -380,6 +401,7 @@ public abstract class ValidateModuleTopographyTask : DefaultTask() {
           topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
           featuresConfigFile.convention(foundryProperties.topographyFeaturesConfig)
           projectDirProperty.set(project.layout.projectDirectory)
+          rootDirProperty.set(project.rootProject.rootDir)
           autoFix.convention(foundryProperties.topographyAutoFix)
           featuresToRemoveOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
