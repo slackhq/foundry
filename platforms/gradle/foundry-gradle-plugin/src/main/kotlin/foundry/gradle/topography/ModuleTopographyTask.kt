@@ -19,6 +19,7 @@ import foundry.cli.walkEachFile
 import foundry.common.json.JsonTools
 import foundry.gradle.FoundryExtension
 import foundry.gradle.FoundryProperties
+import foundry.gradle.FoundryShared
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
@@ -47,7 +48,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.plugins.PluginRegistry
-import org.gradle.api.problems.ProblemGroup
 import org.gradle.api.problems.ProblemId
 import org.gradle.api.problems.Problems
 import org.gradle.api.problems.Severity
@@ -337,7 +337,11 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
     exception: GradleException = GradleException(),
   ) {
     val problemId =
-      ProblemId.create("module-topography-validation", "Module validation failed!", PROBLEM_GROUP)
+      ProblemId.create(
+        "module-topography-validation",
+        "Module validation failed!",
+        FoundryShared.PROBLEM_GROUP,
+      )
     problemReporter.throwing(exception, problemId) {
       fileLocation(buildFile.relativeTo(rootDirProperty.asFile.get().toPath()).toString())
       solution(solution)
@@ -374,7 +378,6 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
     private const val NAME = "validateModuleTopography"
     private val CI_NAME = "ci${NAME.capitalizeUS()}"
     internal val GLOBAL_CI_NAME = "global${CI_NAME.capitalizeUS()}"
-    val PROBLEM_GROUP = ProblemGroup.create("sample-group", "Sample Group")
 
     fun register(
       project: Project,
