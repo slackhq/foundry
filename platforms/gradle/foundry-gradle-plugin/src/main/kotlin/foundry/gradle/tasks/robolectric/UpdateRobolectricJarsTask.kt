@@ -16,6 +16,7 @@
 package foundry.gradle.tasks.robolectric
 
 import foundry.gradle.FoundryProperties
+import foundry.gradle.FoundryShared
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
 import foundry.gradle.robolectricJars
@@ -61,7 +62,7 @@ internal abstract class UpdateRobolectricJarsTask : DefaultTask(), BootstrapTask
   @get:Internal abstract val outputDir: DirectoryProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
     description = "Downloads the Robolectric android-all jars."
   }
 

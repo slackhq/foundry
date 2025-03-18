@@ -173,7 +173,7 @@ public abstract class ModuleTopographyTask : DefaultTask() {
   @get:OutputFile public abstract val topographyOutputFile: RegularFileProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
   }
 
   @TaskAction
@@ -219,7 +219,7 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
   private val problemReporter = problems.reporter
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
     @Suppress("LeakingThis")
     notCompatibleWithConfigurationCache("This task modified build files in place")
     @Suppress("LeakingThis") doNotTrackState("This task modified build files in place")

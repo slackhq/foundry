@@ -15,6 +15,7 @@
  */
 package foundry.gradle.tasks
 
+import foundry.gradle.FoundryShared
 import foundry.gradle.capitalizeUS
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
@@ -46,7 +47,7 @@ public abstract class PrintFossaDependencies : BaseDependencyCheckTask() {
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
   }
 
   override fun handleDependencies(identifiersToVersions: Map<String, String>) {
