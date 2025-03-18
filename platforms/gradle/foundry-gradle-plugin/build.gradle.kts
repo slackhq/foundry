@@ -86,9 +86,6 @@ dependencies {
   implementation(libs.jgrapht)
   implementation(libs.jna)
   implementation(libs.jna.platform)
-  implementation(libs.mordant)
-  implementation(libs.mordant.coroutines)
-  implementation(libs.mordant.markdown)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
