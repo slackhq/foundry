@@ -15,6 +15,7 @@
  */
 package foundry.gradle.tasks
 
+import foundry.gradle.FoundryShared
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.properties.setDisallowChanges
@@ -51,7 +52,7 @@ public abstract class AndroidTestApksTask : DefaultTask() {
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
   }
 
   @OptIn(ExperimentalPathApi::class)

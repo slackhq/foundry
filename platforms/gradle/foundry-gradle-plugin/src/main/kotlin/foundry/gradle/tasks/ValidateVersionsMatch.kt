@@ -15,12 +15,20 @@
  */
 package foundry.gradle.tasks
 
+import foundry.gradle.FoundryShared
 import foundry.gradle.FoundryVersions
 import foundry.gradle.capitalizeUS
 import foundry.gradle.register
+import javax.inject.Inject
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.readText
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.problems.ProblemId
+import org.gradle.api.problems.Problems
+import org.gradle.api.problems.Severity
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -41,7 +49,8 @@ import org.gradle.api.tasks.TaskAction
  * want a single manifest file.
  */
 @CacheableTask
-public abstract class ValidateVersionsMatch : DefaultTask(), FoundryValidationTask {
+public abstract class ValidateVersionsMatch @Inject constructor(problems: Problems) :
+  DefaultTask(), FoundryValidationTask {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
   public abstract val versionFile: RegularFileProperty
@@ -52,20 +61,39 @@ public abstract class ValidateVersionsMatch : DefaultTask(), FoundryValidationTa
 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
+  private val problemReporter = problems.reporter
+
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
   }
 
   @TaskAction
   internal fun validate() {
-    val fileVersion = versionFile.asFile.get().readText().trim()
+    val versionFilePath = versionFile.asFile.get().toPath()
+    val fileVersion = versionFilePath.readText().trim()
     val requiredVersion = catalogVersion.get()
 
-    check(fileVersion == requiredVersion) {
-      "Version ($fileVersion) in file '${versionFileRelativePath.get()}' does not match the version in ${catalogName.get()}.versions.toml ($requiredVersion). Please ensure these are aligned"
+    val valid = fileVersion == requiredVersion
+    if (!valid) {
+      val problemId =
+        ProblemId.create(
+          "validate-versions-match",
+          "Versions mismatch",
+          FoundryShared.PROBLEM_GROUP,
+        )
+      problemReporter.throwing(
+        GradleException(
+          "Version ($fileVersion) in file '${versionFileRelativePath.get()}' does not match the version in ${catalogName.get()}.versions.toml ($requiredVersion)."
+        ),
+        problemId,
+      ) {
+        fileLocation(versionFilePath.absolutePathString())
+        solution("Ensure these versions are aligned.")
+        severity(Severity.ERROR)
+      }
     }
 
-    outputFile.asFile.get().writeText("valid")
+    outputFile.asFile.get().writeText(valid.toString())
   }
 
   internal companion object {

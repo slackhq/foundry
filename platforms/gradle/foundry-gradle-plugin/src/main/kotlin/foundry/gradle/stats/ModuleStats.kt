@@ -23,6 +23,7 @@ import com.squareup.moshi.JsonClass
 import com.squareup.wire.gradle.WireTask
 import foundry.common.json.JsonTools
 import foundry.gradle.FoundryProperties
+import foundry.gradle.FoundryShared
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
@@ -262,7 +263,7 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
   }
 
   @TaskAction
@@ -365,7 +366,7 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
   }
 
   @TaskAction

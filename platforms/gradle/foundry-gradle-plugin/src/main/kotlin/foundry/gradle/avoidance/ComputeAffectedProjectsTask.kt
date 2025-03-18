@@ -18,6 +18,7 @@ package foundry.gradle.avoidance
 import com.jraska.module.graph.DependencyGraph
 import foundry.common.FoundryLogger
 import foundry.gradle.FoundryProperties
+import foundry.gradle.FoundryShared
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.property
 import foundry.gradle.util.gradle
@@ -105,7 +106,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
   @get:Internal internal abstract val rootDir: DirectoryProperty
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
     description = "Computes affected projects and writes output files to an output directory."
   }
 

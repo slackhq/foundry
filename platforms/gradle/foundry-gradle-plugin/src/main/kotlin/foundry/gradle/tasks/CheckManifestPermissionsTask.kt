@@ -15,13 +15,19 @@
  */
 package foundry.gradle.tasks
 
+import foundry.gradle.FoundryShared
 import java.io.File
+import javax.inject.Inject
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.system.measureTimeMillis
 import okio.buffer
 import okio.source
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.problems.ProblemId
+import org.gradle.api.problems.Problems
+import org.gradle.api.problems.Severity
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -32,9 +38,9 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.w3c.dom.NodeList
 
-@Suppress("UnstableApiUsage")
 @CacheableTask
-internal abstract class CheckManifestPermissionsTask : DefaultTask() {
+internal abstract class CheckManifestPermissionsTask @Inject constructor(problems: Problems) :
+  DefaultTask() {
 
   @get:PathSensitive(PathSensitivity.NONE)
   @get:InputFile
@@ -52,6 +58,8 @@ internal abstract class CheckManifestPermissionsTask : DefaultTask() {
 
   @get:Input abstract val permissionAllowlist: SetProperty<String>
 
+  private val problemReporter = problems.reporter
+
   @TaskAction
   fun check() {
     measureTimeMillis {
@@ -68,24 +76,38 @@ internal abstract class CheckManifestPermissionsTask : DefaultTask() {
         logger.debug("$LOG ${permissions.size} parsed permissions: $permissions")
 
         val added = permissions - allowlist
-        if (added.isNotEmpty()) {
-          throw PermissionAllowlistException(
-            "New permission(s) detected! If this is intentional, " +
-              "please add them to $allowlistFile and update your PR (a code owners group will be " +
-              "added for review). Added permissions: $added"
-          )
-        }
-
         val removed = allowlist - permissions
-        if (removed.isNotEmpty()) {
-          throw PermissionAllowlistException(
-            "Removed permission(s) detected! If this is " +
-              "intentional, please remove them to $allowlistFile and update your PR (a code owners " +
-              "group will be added for review). Removed permissions: $removed"
-          )
+        var exception: PermissionAllowlistException? = null
+        var solution = ""
+        if (added.isNotEmpty()) {
+          exception = PermissionAllowlistException("New permission(s) detected!")
+          solution =
+            "If this is intentional, please add them to $allowlistFile and " +
+              "update your PR (a code owners group will be added for review)." +
+              "Added permissions: $added"
+        } else if (removed.isNotEmpty()) {
+          exception = PermissionAllowlistException("Removed permission(s) detected!")
+          solution =
+            "If this is intentional, please remove them to $allowlistFile and update " +
+              "your PR (a code owners group will be added for review)." +
+              "Removed permissions: $removed"
         }
 
-        manifestFile.copyTo(outputFile.asFile.get(), overwrite = true)
+        if (exception == null) {
+          manifestFile.copyTo(outputFile.asFile.get(), overwrite = true)
+        } else {
+          val problemId =
+            ProblemId.create(
+              "permission-allowlist",
+              "Manifest permission check failure",
+              FoundryShared.PROBLEM_GROUP,
+            )
+          problemReporter.throwing(exception, problemId) {
+            fileLocation(manifestFile.absolutePath)
+            solution(solution)
+            severity(Severity.ERROR)
+          }
+        }
       }
       .let { logger.debug("$LOG Manifest perm checks took $it ms") }
   }
@@ -117,4 +139,4 @@ internal abstract class CheckManifestPermissionsTask : DefaultTask() {
   }
 }
 
-internal class PermissionAllowlistException(message: String) : RuntimeException(message)
+internal class PermissionAllowlistException(message: String) : GradleException(message)
