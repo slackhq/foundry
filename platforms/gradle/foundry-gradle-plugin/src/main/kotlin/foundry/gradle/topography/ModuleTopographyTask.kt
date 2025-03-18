@@ -401,7 +401,7 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
           topographyJson.set(topographyTask.flatMap { it.topographyOutputFile })
           featuresConfigFile.convention(foundryProperties.topographyFeaturesConfig)
           projectDirProperty.set(project.layout.projectDirectory)
-          rootDirProperty.set(project.rootProject.rootDir)
+          rootDirProperty.set(project.rootDir)
           autoFix.convention(foundryProperties.topographyAutoFix)
           featuresToRemoveOutputFile.setDisallowChanges(
             project.layout.buildDirectory.file("foundry/topography/validate/featuresToRemove.json")
