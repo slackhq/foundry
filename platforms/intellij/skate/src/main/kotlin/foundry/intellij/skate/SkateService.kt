@@ -28,7 +28,12 @@ import java.util.function.Supplier
 interface SkateProjectService {
   val traceReporter: SkateTraceReporter
 
-  fun showWhatsNewWindow()
+  /**
+   * Shows the "What's New" panel.
+   *
+   * @param forceShow If true, shows the panel regardless of whether there are new entries.
+   */
+  fun showWhatsNewPanel(forceShow: Boolean = false)
 }
 
 /**
@@ -39,8 +44,7 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
 
   override val traceReporter: SkateTraceReporter by lazy { SkateTraceReporter(project) }
 
-  override fun showWhatsNewWindow() {
-
+  override fun showWhatsNewPanel(forceShow: Boolean) {
     val settings = project.service<SkatePluginSettings>()
     val changelogJournal = project.service<ChangelogJournal>()
 
@@ -51,8 +55,10 @@ class SkateProjectServiceImpl(private val project: Project) : SkateProjectServic
     val changeLogString = VfsUtil.loadText(changeLogFile)
 
     // Don't show the tool window if the parsed changelog is blank
-    // Changelog is parsed
-    val parsedChangelog = ChangelogParser.readFile(changeLogString, changelogJournal.lastReadDate)
+    // If forceShow is true, pass null as lastReadDate to show the first section regardless of
+    // whether the user has seen it before
+    val lastReadDate = if (forceShow) null else changelogJournal.lastReadDate
+    val parsedChangelog = ChangelogParser.readFile(changeLogString, lastReadDate)
     if (parsedChangelog.changeLogString.isNullOrBlank()) return
     // Creating the tool window
     val toolWindowManager = ToolWindowManager.getInstance(project)
