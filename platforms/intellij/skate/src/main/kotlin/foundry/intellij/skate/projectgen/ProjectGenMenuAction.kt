@@ -15,6 +15,7 @@
  */
 package foundry.intellij.skate.projectgen
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
@@ -47,5 +48,9 @@ class ProjectGenMenuAction : AnAction() {
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
       )
+  }
+
+  override fun getActionUpdateThread(): ActionUpdateThread {
+    return ActionUpdateThread.EDT
   }
 }

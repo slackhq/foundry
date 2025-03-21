@@ -22,12 +22,12 @@
                            implementationClass="foundry.intellij.skate.featureflags.FeatureFlagAnnotator"/>
         <projectIndexingActivityHistoryListener implementation="foundry.intellij.skate.idemetrics.IndexingListener"/>
         <postStartupActivity implementation="foundry.intellij.skate.PostStartupActivityExtension"/>
-<!--        <toolWindow factoryClass="foundry.intellij.skate.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"-->
-<!--                    canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>-->
+        <!--        <toolWindow factoryClass="foundry.intellij.skate.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"-->
+        <!--                    canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>-->
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
-        <supportsKotlinPluginMode supportsK2="true" />
+        <supportsKotlinPluginMode supportsK2="true"/>
     </extensions>
 
     <projectListeners>
@@ -43,6 +43,14 @@
                 description="Create a new Slack subproject">
             <add-to-group group-id="NewGroup" anchor="last"/>
             <keyboard-shortcut first-keystroke="control shift P" keymap="$default"/>
+        </action>
+        <action id="foundry.intellij.skate.ui.ShowWhatsNewAction"
+                class="foundry.intellij.skate.ui.ShowWhatsNewAction"
+                text="What's New in Slack!"
+                description="Open the What's New panel"
+                icon="AllIcons.Actions.Help">
+            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>
+            <add-to-group group-id="NavBarToolBar" anchor="last"/>
         </action>
     </actions>
 

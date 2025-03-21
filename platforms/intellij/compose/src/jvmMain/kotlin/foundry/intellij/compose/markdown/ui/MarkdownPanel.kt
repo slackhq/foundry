@@ -19,9 +19,11 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
@@ -60,25 +62,42 @@ import java.awt.Dimension
 import javax.swing.JComponent
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.CircularProgressIndicator
+import org.jetbrains.jewel.ui.component.Icon
+import org.jetbrains.jewel.ui.component.IconButton
 import org.jetbrains.jewel.ui.component.Text
 import org.jetbrains.jewel.ui.component.Typography
 import org.jetbrains.jewel.ui.component.Typography.labelTextSize
 import org.jetbrains.jewel.ui.component.minus
+import org.jetbrains.jewel.ui.icons.AllIconsKeys
 import org.jetbrains.jewel.ui.theme.colorPalette
 
 object MarkdownPanel {
-  fun createPanel(computeMarkdown: suspend () -> String): JComponent {
+  fun createPanel(
+    onOpenInEditorClick: (() -> Unit)? = null,
+    computeMarkdown: suspend () -> String,
+  ): JComponent {
     return ComposePanel().apply {
       // Necessary to avoid an NPE in JPanel
       // This is just a minimum
       preferredSize = Dimension(400, 600)
-      setContent { FoundryDesktopTheme { MarkdownContent(computeMarkdown = computeMarkdown) } }
+      setContent {
+        FoundryDesktopTheme {
+          MarkdownContent(
+            onOpenInEditorClick = onOpenInEditorClick,
+            computeMarkdown = computeMarkdown,
+          )
+        }
+      }
     }
   }
 }
 
 @Composable
-fun MarkdownContent(modifier: Modifier = Modifier, computeMarkdown: suspend () -> String) {
+fun MarkdownContent(
+  modifier: Modifier = Modifier,
+  onOpenInEditorClick: (() -> Unit)? = null,
+  computeMarkdown: suspend () -> String,
+) {
   CompositionLocalProvider(
     LocalMarkdownColors provides jewelMarkdownColor(),
     LocalMarkdownTypography provides jewelMarkdownTypography(),
@@ -114,6 +133,21 @@ fun MarkdownContent(modifier: Modifier = Modifier, computeMarkdown: suspend () -
                 }
               },
           )
+          // Add a button in the top right corner if the callback is provided
+          if (onOpenInEditorClick != null) {
+            Row(
+              modifier = Modifier.align(Alignment.TopEnd).padding(end = 8.dp, top = 8.dp),
+              horizontalArrangement = Arrangement.End,
+            ) {
+              IconButton(onClick = onOpenInEditorClick, modifier = Modifier.size(24.dp)) {
+                Icon(
+                  key = AllIconsKeys.Actions.Edit,
+                  contentDescription = "Open in Editor",
+                  modifier = Modifier.size(16.dp),
+                )
+              }
+            }
+          }
         }
 
         VerticalScrollbar(
