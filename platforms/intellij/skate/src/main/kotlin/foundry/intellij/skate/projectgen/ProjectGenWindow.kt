@@ -23,7 +23,6 @@ import com.intellij.openapi.ui.DialogWrapper
 import foundry.intellij.compose.projectgen.ProjectGenUi
 import java.nio.file.FileSystems
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
@@ -35,14 +34,10 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
     (currentProject.basePath?.let(Paths::get) ?: FileSystems.getDefault().getPath("."))
       .normalize()
       .also { check(Files.isDirectory(it)) { "Must pass a valid directory" } }
-  private val lockFile: Path
 
   init {
     init()
     title = "Project Generator"
-    lockFile = projectPath.resolve(".projectgenlock")
-    deleteProjectLock()
-    Files.createFile(lockFile)
   }
 
   override fun createCenterPanel(): JComponent {
@@ -55,14 +50,10 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
 
   override fun doCancelAction() {
     super.doCancelAction()
-    // Remove projectlock file when exit application
-    deleteProjectLock()
   }
 
   override fun doOKAction() {
     super.doOKAction()
-    // Remove projectlock file when exit application
-    deleteProjectLock()
   }
 
   override fun dismissDialogAndSync() {
@@ -70,9 +61,5 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
     val am: ActionManager = ActionManager.getInstance()
     val sync: AnAction = am.getAction("Android.SyncProject")
     sync.actionPerformed(event)
-  }
-
-  private fun deleteProjectLock() {
-    Files.deleteIfExists(lockFile)
   }
 }
