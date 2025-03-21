@@ -52,6 +52,18 @@
             <add-to-group group-id="ToolbarRunGroup" anchor="last"/>
             <add-to-group group-id="NavBarToolBar" anchor="last"/>
         </action>
+        <action id="foundry.intellij.skate.gradle.CopyGradleProjectPathProvider"
+                class="foundry.intellij.skate.gradle.CopyGradleProjectPathProvider"
+                text="Gradle Project Path"
+                description="Copy the Gradle project path in the format ':path:to:project'">
+            <add-to-group group-id="CopyFileReference" anchor="last"/>
+        </action>
+        <action id="foundry.intellij.skate.gradle.CopyGradleProjectAccessorPathProvider"
+                class="foundry.intellij.skate.gradle.CopyGradleProjectAccessorPathProvider"
+                text="Gradle Project Accessor Path"
+                description="Copy the Gradle project accessor path in the format 'projects.path.to.project'">
+            <add-to-group group-id="CopyFileReference" anchor="last"/>
+        </action>
     </actions>
 
 </idea-plugin>
