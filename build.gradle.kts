@@ -31,12 +31,13 @@ import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDepende
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 plugins {
@@ -175,6 +176,7 @@ dependencies {
 val kotlinVersion = libs.versions.kotlin.get()
 
 val jvmTargetVersion = libs.versions.jvmTarget.map(JvmTarget::fromTarget)
+val jvmTargetIdeaVersion = libs.versions.jvmTargetIdea.map(JvmTarget::fromTarget)
 
 subprojects {
   project.pluginManager.withPlugin("com.github.gmazzo.buildconfig") {
@@ -183,22 +185,11 @@ subprojects {
     }
   }
 
-  pluginManager.withPlugin("java") {
-    configure<JavaPluginExtension> {
-      toolchain {
-        languageVersion.set(
-          JavaLanguageVersion.of(libs.versions.jdk.get().removeSuffix("-ea").toInt())
-        )
-      }
-    }
-
-    tasks.withType<JavaCompile>().configureEach {
-      options.release.set(libs.versions.jvmTarget.map(String::toInt))
-    }
-  }
-
   val isForIntelliJPlugin =
     project.hasProperty("INTELLIJ_PLUGIN") || project.path.startsWith(":platforms:intellij")
+
+  val projectJvmTarget = if (isForIntelliJPlugin) jvmTargetIdeaVersion else jvmTargetVersion
+
   val isForGradle =
     project.hasProperty("GRADLE_PLUGIN") || project.path.startsWith(":platforms:gradle")
   pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
@@ -218,12 +209,27 @@ subprojects {
   }
 
   plugins.withType<KotlinBasePlugin>().configureEach {
-    tasks.withType<KotlinCompile>().configureEach {
+    configure<JavaPluginExtension> {
+      toolchain {
+        languageVersion.set(
+          JavaLanguageVersion.of(libs.versions.jdk.get().removeSuffix("-ea").toInt())
+        )
+      }
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+      options.release.set(projectJvmTarget.map(JvmTarget::target).map(String::toInt))
+    }
+
+    tasks.withType<KotlinCompilationTask<*>>().configureEach {
       compilerOptions {
         val kotlinVersion =
           if (isForIntelliJPlugin) {
+            // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+            // Note this needs to support the latest stable Studio version.
             KOTLIN_1_9
           } else if (isForGradle) {
+            // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
             KOTLIN_2_0
           } else {
             DEFAULT
@@ -243,7 +249,8 @@ subprojects {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
           freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
         }
-        this.jvmTarget.set(jvmTargetVersion)
+        check(this is KotlinJvmCompilerOptions)
+        this.jvmTarget.set(projectJvmTarget)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
           // (@NotNull T => T & Any)
@@ -265,7 +272,7 @@ subprojects {
           "-Xjspecify-annotations=strict",
         )
         // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-        freeCompilerArgs.add(jvmTargetVersion.map { "-Xjdk-release=${it.target}" })
+        freeCompilerArgs.add(projectJvmTarget.map { "-Xjdk-release=${it.target}" })
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
@@ -275,7 +282,7 @@ subprojects {
       }
     }
 
-    tasks.withType<Detekt>().configureEach { this.jvmTarget = jvmTargetVersion.get().target }
+    tasks.withType<Detekt>().configureEach { this.jvmTarget = projectJvmTarget.get().target }
   }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {

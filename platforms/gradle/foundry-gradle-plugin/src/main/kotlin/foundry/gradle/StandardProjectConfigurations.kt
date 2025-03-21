@@ -563,8 +563,7 @@ internal class StandardProjectConfigurations(
                     )
                     .publishWith(skippyAndroidTestProjectPublisher)
                   if (isLibraryVariant) {
-                    val libraryVariant = variant as LibraryVariant
-                    libraryVariant.androidTest?.apply {
+                    variant.androidTest?.apply {
                       // Wire this up to the aggregator. No need for an intermediate task here.
                       androidTestApksPublisher.publishDirs(artifacts.get(SingleArtifact.APK))
                     }
