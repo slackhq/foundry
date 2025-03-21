@@ -16,15 +16,21 @@
 package foundry.intellij.skate.ui
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManagerEvent
 import com.intellij.ui.content.ContentManagerListener
 import foundry.intellij.compose.markdown.ui.MarkdownPanel
 import foundry.intellij.skate.ChangelogJournal
 import foundry.intellij.skate.ChangelogParser
+import foundry.intellij.skate.SkatePluginSettings
+import foundry.intellij.skate.SkateProjectServiceImpl.Companion.WHATS_NEW_PANEL_ID
 import javax.swing.JComponent
 
 /**
@@ -74,9 +80,27 @@ class WhatsNewPanelFactory : DumbAware {
 
       // We can't use JBCefApp because Studio blocks it, so instead we do this in compose.
       // https://issuetracker.google.com/issues/159933628#comment19
-      val panel = MarkdownPanel.createPanel { changeLogContent.changeLogString ?: "" }
+      val markdownPanel =
+        MarkdownPanel.createPanel(
+          onOpenInEditorClick = {
+            // Get the source file and open it in the editor
+            val settings = project.service<SkatePluginSettings>()
+            val projectDir = project.guessProjectDir() ?: return@createPanel
+            val changeLogFile =
+              VfsUtil.findRelativeFile(projectDir, settings.whatsNewFilePath) ?: return@createPanel
 
-      return panel
+            // Open the file in the editor
+            OpenFileDescriptor(project, changeLogFile).navigate(true)
+
+            // Close the whatsnew panel
+            val toolWindow =
+              ToolWindowManager.getInstance(project).getToolWindow(WHATS_NEW_PANEL_ID)
+            toolWindow?.hide()
+          },
+          computeMarkdown = { changeLogContent.changeLogString ?: "" },
+        )
+
+      return markdownPanel
     }
   }
 }

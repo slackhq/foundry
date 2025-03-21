@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Slack Technologies, LLC
+ * Copyright (C) 2025 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 package foundry.gradle.util
 
-/**
- * Merges two maps whose values are also maps. Unlike [Map.plus], the value maps will themselves be
- * merged.
- */
-internal fun <A, B, C> Map<A, Map<B, C>>.deepMerge(map: Map<A, Map<B, C>>): Map<A, Map<B, C>> {
-  return toMutableMap().apply {
-    map.forEach { (key, value) ->
-      this.merge(key, value) { originalValueMap, newValueMap -> originalValueMap + newValueMap }
-    }
-  }
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.tasks.Classpath
+import org.gradle.process.CommandLineArgumentProvider
+
+internal abstract class JavaAgentArgumentProvider : CommandLineArgumentProvider {
+  @get:Classpath abstract val classpath: ConfigurableFileCollection
+
+  override fun asArguments() = listOf("-javaagent:${classpath.singleFile.absolutePath}")
 }

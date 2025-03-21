@@ -168,7 +168,7 @@ internal fun Project.getVersionsCatalog(name: String = "libs"): VersionCatalog {
 internal fun Project.getVersionsCatalogOrNull(name: String = "libs"): VersionCatalog? {
   return try {
     project.extensions.getByType<VersionCatalogsExtension>().named(name)
-  } catch (ignored: Exception) {
+  } catch (_: Exception) {
     null
   }
 }

@@ -111,6 +111,9 @@ internal class FoundryVersions(
   val emulatorWtf: Optional<String>
     get() = getOptionalValue("emulatorWtf")
 
+  val mockito: Optional<String>
+    get() = getOptionalValue("mockito")
+
   fun lookupVersion(key: String) = getOptionalValue(key)
 
   class Bundles(

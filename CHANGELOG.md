@@ -4,6 +4,24 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Add a `dependencies.testJavaAgents { ... }` API for configuring Java agents that need to run in tests, such as Mockito in future versions of Java.
+
+0.25.4
+------
+
+_2025-03-14_
+
+- Small project validation fixes.
+- Update Oshi to `6.7.1`.
+- Build against DAGP `2.12.0`.
+
+0.25.3
+------
+
+_2025-03-12_
+
+- Allow `jvmTarget` to be configurable per-project with the `foundry.jvm.target` property. Default is still the `jvmTarget` defined in `libs.versions.toml`.
+
 0.25.2
 ------
 

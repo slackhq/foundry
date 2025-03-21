@@ -25,6 +25,6 @@ internal class PostStartupActivityExtension : ProjectActivity {
   override suspend fun execute(project: Project) {
     GradleSyncState.subscribe(project, GradleSyncSubscriber())
     val service = project.service<SkateProjectService>()
-    service.showWhatsNewWindow()
+    service.showWhatsNewPanel()
   }
 }

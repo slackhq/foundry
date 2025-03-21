@@ -16,6 +16,7 @@
 package foundry.gradle.tasks
 
 import com.google.common.io.Resources
+import foundry.gradle.FoundryShared
 import foundry.gradle.setProperty
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +47,7 @@ constructor(layout: ProjectLayout, objects: ObjectFactory) : DefaultTask() {
     objects.directoryProperty().convention(layout.projectDirectory.dir("config/git/hooks"))
 
   init {
-    group = "foundry"
+    group = FoundryShared.FOUNDRY_TASK_GROUP
     description = "Installs basic git hook files for formatting to a given output directory."
   }
 
