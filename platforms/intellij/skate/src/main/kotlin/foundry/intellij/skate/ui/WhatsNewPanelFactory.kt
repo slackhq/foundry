@@ -82,7 +82,6 @@ class WhatsNewPanelFactory : DumbAware {
       // https://issuetracker.google.com/issues/159933628#comment19
       val markdownPanel =
         MarkdownPanel.createPanel(
-          computeMarkdown = { changeLogContent.changeLogString ?: "" },
           onOpenInEditorClick = {
             // Get the source file and open it in the editor
             val settings = project.service<SkatePluginSettings>()
@@ -98,6 +97,7 @@ class WhatsNewPanelFactory : DumbAware {
               ToolWindowManager.getInstance(project).getToolWindow(WHATS_NEW_PANEL_ID)
             toolWindow?.hide()
           },
+          computeMarkdown = { changeLogContent.changeLogString ?: "" },
         )
 
       return markdownPanel

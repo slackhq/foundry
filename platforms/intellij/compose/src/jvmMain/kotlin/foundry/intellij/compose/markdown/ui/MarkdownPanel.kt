@@ -73,8 +73,8 @@ import org.jetbrains.jewel.ui.theme.colorPalette
 
 object MarkdownPanel {
   fun createPanel(
-    computeMarkdown: suspend () -> String,
     onOpenInEditorClick: (() -> Unit)? = null,
+    computeMarkdown: suspend () -> String,
   ): JComponent {
     return ComposePanel().apply {
       // Necessary to avoid an NPE in JPanel
@@ -83,8 +83,8 @@ object MarkdownPanel {
       setContent {
         FoundryDesktopTheme {
           MarkdownContent(
-            computeMarkdown = computeMarkdown,
             onOpenInEditorClick = onOpenInEditorClick,
+            computeMarkdown = computeMarkdown,
           )
         }
       }
@@ -95,8 +95,8 @@ object MarkdownPanel {
 @Composable
 fun MarkdownContent(
   modifier: Modifier = Modifier,
-  computeMarkdown: suspend () -> String,
   onOpenInEditorClick: (() -> Unit)? = null,
+  computeMarkdown: suspend () -> String,
 ) {
   CompositionLocalProvider(
     LocalMarkdownColors provides jewelMarkdownColor(),
