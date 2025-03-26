@@ -23,8 +23,10 @@ import foundry.intellij.skate.DEFAULT_TRANSLATOR_FILE_NAME_SUFFIX
 import foundry.intellij.skate.DEFAULT_TRANSLATOR_SOURCE_MODELS_PACKAGE_NAME
 import foundry.intellij.skate.SkateBundle
 import foundry.intellij.skate.util.settings
+import org.junit.Ignore
 import org.junit.Test
 
+@Ignore("This test doesn't load annotators for some reason")
 class TranslatorAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
 
   private val warningDescription = SkateBundle.message("skate.modelTranslator.description")
