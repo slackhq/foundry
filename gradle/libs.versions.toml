@@ -114,7 +114,7 @@ gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-grad
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
-guava = "com.google.guava:guava:33.4.5-jre"
+guava = "com.google.guava:guava:33.4.6-jre"
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-gradlePlugins-bom = { module = "org.jetbrains.kotlin:kotlin-gradle-plugins-bom", version.ref = "kotlin" }
