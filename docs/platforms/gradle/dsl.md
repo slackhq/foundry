@@ -1,13 +1,13 @@
 DSL
 ===
 
-SGP offers a DSL extension for configuring project behavior via the plugin. The idea is that developers don't really
-want to think about specific dependency wirings, and instead want to express what _features_ they want and allow SGP to
+Foundry offers a DSL extension for configuring project behavior via the plugin. The idea is that developers don't really
+want to think about specific dependency wirings, and instead want to express what _features_ they want and allow Foundry to
 automatically wire these up for them.
 
 Some examples of this include Dagger, Moshi code gen, Robolectric, and more.
 
-The primary entry point is the `slack` extension in the build file, which is backed by the `SlackExtension` interface.
+The primary entry point is the `foundry` extension in the build file, which is backed by the `FoundryExtension` interface.
 
 ```kotlin
 foundry {
@@ -19,6 +19,9 @@ foundry {
         features {
             robolectric(...)
         }
+    }
+    testing {
+        burst()
     }
 }
 ```
@@ -71,7 +74,7 @@ behavior.
 
 ### Android Test
 
-By default, SGP disables androidTests in projects. These can be enabled via the `androidTest()` feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.
+By default, Foundry disables androidTests in projects. These can be enabled via the `androidTest()` feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.
 
 This is important for opting in tests to [AndroidTest APK Aggregation](utilities.md#androidtest-apk-aggregation).
 

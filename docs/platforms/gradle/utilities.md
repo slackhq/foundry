@@ -53,7 +53,7 @@ The workflow we use at Slack is like this:
 - This file is owned in GitHub by a specific codeowner rule that adds a permission reviewers group.
 - This file is passed into the `allowListFile` [DSL feature](dsl.md#permission-allowlist) in the application
   project.
-- On each build, SGP automatically checks that the permissions present in the release APK manifest match the ones
+- On each build, Foundry automatically checks that the permissions present in the release APK manifest match the ones
   defined in the allowlist.
 
 This way new permissions are not accidentally or secretly added to the app.

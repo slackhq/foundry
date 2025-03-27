@@ -1,7 +1,7 @@
 Dependency Rake
 ===============
 
-Dependency rake is an tool we develop within foundry (SGP) to automatically clean up Gradle build files.
+Dependency rake is an tool we develop within foundry (Foundry) to automatically clean up Gradle build files.
 
 This tool uses the outputs of
 the [dependency-analysis-gradle-plugin](https://github.com/autonomousapps/dependency-analysis-android-gradle-plugin) (

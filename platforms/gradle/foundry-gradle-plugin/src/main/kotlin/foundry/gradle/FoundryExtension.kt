@@ -68,6 +68,7 @@ constructor(
       project,
       versionCatalog,
     )
+  internal val testingHandler = objects.newInstance<TestingHandler>(project, objects)
 
   /**
    * This is weird! Due to the non-property nature of some AGP DSL features (e.g. buildFeatures and
@@ -82,6 +83,7 @@ constructor(
       field = value
       androidHandler.setAndroidExtension(value)
       featuresHandler.setAndroidExtension(value)
+      testingHandler.setAndroidExtension(value)
     }
 
   internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>) {
@@ -94,6 +96,10 @@ constructor(
 
   public fun features(action: Action<FeaturesHandler>) {
     action.execute(featuresHandler)
+  }
+
+  public fun testing(action: Action<TestingHandler>) {
+    action.execute(testingHandler)
   }
 
   internal fun applyTo(project: Project) {
@@ -1226,5 +1232,27 @@ public abstract class FoundryAndroidAppExtension {
    */
   public fun permissionAllowlist(factory: Action<PermissionAllowlistConfigurer>) {
     allowlistAction = factory
+  }
+}
+
+@FoundryExtensionMarker
+public abstract class TestingHandler
+@Inject
+constructor(private val project: Project, objects: ObjectFactory) {
+
+  /** @see [FoundryExtension.androidExtension] */
+  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+
+  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
+    this.androidExtension = androidExtension
+  }
+
+  /**
+   * Enables the Burst plugin for tests.
+   *
+   * @see <a href="https://github.com/cashapp/burst">Burst on GitHub</a>
+   */
+  public fun burst() {
+    project.pluginManager.apply("app.cash.burst")
   }
 }
