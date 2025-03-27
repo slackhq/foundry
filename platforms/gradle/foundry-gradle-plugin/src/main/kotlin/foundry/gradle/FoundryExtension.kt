@@ -19,7 +19,6 @@ package foundry.gradle
 
 import app.cash.sqldelight.gradle.SqlDelightExtension
 import app.cash.sqldelight.gradle.SqlDelightTask
-import com.android.build.api.AndroidPluginVersion
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
@@ -924,28 +923,6 @@ constructor(
     if (enableCompiler) {
       project.pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
       this.multiplatform.setDisallowChanges(multiplatform)
-      if (!multiplatform) {
-        val extension =
-          checkNotNull(androidExtension) {
-            "ComposeHandler must be configured with an Android extension before it can be enabled. Did you apply the Android gradle plugin?"
-          }
-        extension.apply {
-          // Don't need to set buildFeatures.compose = true as that defaults to true if the compose
-          // compiler gradle plugin is applied
-          if (AndroidPluginVersion.getCurrent() <= AGP_LIVE_LITERALS_MAX_VERSION) {
-            composeOptions {
-              // Disable live literals by default
-              @Suppress("DEPRECATION")
-              useLiveLiterals = foundryProperties.composeEnableLiveLiterals
-            }
-          } else if (foundryProperties.composeEnableLiveLiterals) {
-            project.logger.error(
-              "Live literals are disabled and deprecated in AGP 8.7+. " +
-                "Please remove the `foundry.compose.android.enableLiveLiterals` property."
-            )
-          }
-        }
-      }
     }
   }
 
@@ -974,15 +951,9 @@ constructor(
       // Because the Compose Compiler plugin auto applies common options for us, we need to know
       // about those options and _avoid_ setting them a second time
       val freeOptions = mutableListOf<String>()
-      var includeSourceInformation =
-        foundryProperties.composeIncludeSourceInformationEverywhereByDefault
       for ((k, v) in compilerOptions.get().map { it.split('=') }) {
         project.logger.debug("Processing compose option $k = $v")
         when (k) {
-          OPTION_SOURCE_INFORMATION -> {
-            includeSourceInformation = v.toBoolean()
-          }
-
           "metricsDestination" -> {
             extension.metricsDestination.set(project.file(v))
           }
@@ -1029,14 +1000,6 @@ constructor(
         }
       }
 
-      if (includeSourceInformation) {
-        if (androidExtension == null) {
-          extension.includeSourceInformation.set(true)
-        } else if (foundryProperties.composeUseIncludeInformationWorkaround) {
-          freeOptions += "$OPTION_SOURCE_INFORMATION=true"
-        }
-      }
-
       if (freeOptions.isNotEmpty()) {
         project.tasks.configureKotlinCompilationTask {
           compilerOptions.freeCompilerArgs.addAll(
@@ -1047,12 +1010,6 @@ constructor(
         }
       }
     }
-  }
-
-  private companion object {
-    /** Live literals are disabled and deprecated in AGP 8.7+ */
-    private val AGP_LIVE_LITERALS_MAX_VERSION = AndroidPluginVersion(8, 6, 0)
-    private const val OPTION_SOURCE_INFORMATION = "sourceInformation"
   }
 }
 
