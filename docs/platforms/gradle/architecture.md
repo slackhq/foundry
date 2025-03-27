@@ -43,7 +43,7 @@ Its responsibilities include:
 
 ### `StandardProjectConfigurations`
 
-This class warrants special mention as it is responsible for the bulk of the configuration applied to projects SGP manages.
+This class warrants special mention as it is responsible for the bulk of the configuration applied to projects Foundry manages.
 
 - Creates and exposes the [`foundry` extension DSL](dsl.md).
 - Applies common configurations.
@@ -81,7 +81,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 - Configures AndroidTest APK aggregation with [Skippy](../../tools/skippy.md) support.
 - Applies the [Android cache fix plugin](https://github.com/gradle/android-cache-fix-gradle-plugin), if enabled.
 - Configures common AGP extensions (both legacy extensions and new Component extensions).
-  - Disables unused/irrelevant variants. SGP is single-variant for library projects by default.
+  - Disables unused/irrelevant variants. Foundry is single-variant for library projects by default.
   - Disables android tests on projects unless opted in.
   - Disables unit tests on app projects by default (we use the app project as just a shell project for producing an APK).
   - Configures `compileOptions`, `defaultConfig`, compileSdk/targetSdk/minSdk/ndkVersion, etc.
@@ -104,7 +104,7 @@ Java projects are fairly simple. Note that these are applied on all projects tha
 
 #### Kotlin Configurations
 
-Kotlin projects are configured with KGP and Detekt in mind. SGP supports configuring Android, JVM, Multiplatform, and Compose Multiplatform projects. Multiplatform for targets other than JVM/android is limited at the moment.
+Kotlin projects are configured with KGP and Detekt in mind. Foundry supports configuring Android, JVM, Multiplatform, and Compose Multiplatform projects. Multiplatform for targets other than JVM/android is limited at the moment.
 
 Common configurations include:
 
@@ -147,7 +147,7 @@ This also adds a `generateVersionProperties` task that is more or less only rele
 
 ## AGP Handlers
 
-SGP is designed to work with multiple versions of AGP at a time, albeit only for forward compatibility and testing reasons. Generally SGP will only be tested against the latest stable version of AGP. To support multiple beta/canary versions of upcoming AGP versions, SGP has an API called `AgpHandler`, which is intended to be an AGP-agnostic common interface for configuring AGP projects across breaking API (source or binary) changes. When a new such change is introduced, we create an `AgpHandler{version}` artifact and implementation with that AGP version as its minimum. At runtime, SGP loads the relevant `AgpHandler` instance for the AGP version it is running against and relevant APIs use this instance via `FoundryTools` to interact with them in a version-agnostic way. These aren't always needed so there may be times when there are no implementations needed for the current suite of AGP versions.
+Foundry is designed to work with multiple versions of AGP at a time, albeit only for forward compatibility and testing reasons. Generally Foundry will only be tested against the latest stable version of AGP. To support multiple beta/canary versions of upcoming AGP versions, Foundry has an API called `AgpHandler`, which is intended to be an AGP-agnostic common interface for configuring AGP projects across breaking API (source or binary) changes. When a new such change is introduced, we create an `AgpHandler{version}` artifact and implementation with that AGP version as its minimum. At runtime, Foundry loads the relevant `AgpHandler` instance for the AGP version it is running against and relevant APIs use this instance via `FoundryTools` to interact with them in a version-agnostic way. These aren't always needed so there may be times when there are no implementations needed for the current suite of AGP versions.
 
 An example handler for AGP 8.0 looks like this.
 
