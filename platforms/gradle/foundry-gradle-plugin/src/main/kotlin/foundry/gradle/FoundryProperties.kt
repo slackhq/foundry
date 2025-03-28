@@ -305,11 +305,18 @@ internal constructor(
    * alternative to running gradle with `--info` or `--debug`.
    */
   public val verboseLogging: Boolean
-    get() = resolver.booleanValue("foundry.logging.verbose")
+    get() = booleanProperty("foundry.logging.verbose")
 
   /** Flag to enable verbose logging in unit tests. */
   public val testVerboseLogging: Boolean
     get() = booleanProperty("foundry.test.verboseLogging") || verboseLogging
+
+  /**
+   * Flag to enable dry run mode for tests. Corresponds to the
+   * [Gradle config](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.testing.Test.html#org.gradle.api.tasks.testing.Test:dryRun).
+   */
+  public val testDryRun: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.test.dryRun", defaultValue = false)
 
   /**
    * Flag to enable kapt in tests. By default these are disabled due to this undesirable (but

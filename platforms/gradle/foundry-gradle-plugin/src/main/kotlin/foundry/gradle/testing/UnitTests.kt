@@ -166,6 +166,8 @@ internal object UnitTests {
 
     // Unit test task configuration
     project.tasks.configureEach<Test> {
+      dryRun.set(foundryProperties.testDryRun)
+
       // Run unit tests in parallel if multiple CPUs are available. Use at most half the available
       // CPUs.
       maxParallelForks =
