@@ -18,6 +18,7 @@ package foundry.intellij.skate.projectgen
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import foundry.intellij.compose.projectgen.ProjectGenUi
@@ -35,9 +36,12 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
       .normalize()
       .also { check(Files.isDirectory(it)) { "Must pass a valid directory" } }
 
+  var onOk: (() -> Unit)? = null
+
   init {
     init()
     title = "Project Generator"
+    isModal = false // <- This is crucial
   }
 
   override fun createCenterPanel(): JComponent {
@@ -54,12 +58,10 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
 
   override fun doOKAction() {
     super.doOKAction()
+    onOk?.invoke()
   }
 
   override fun dismissDialogAndSync() {
     doOKAction()
-    val am: ActionManager = ActionManager.getInstance()
-    val sync: AnAction = am.getAction("Android.SyncProject")
-    sync.actionPerformed(event)
   }
 }
