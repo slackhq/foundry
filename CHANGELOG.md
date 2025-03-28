@@ -4,7 +4,23 @@ Changelog
 **Unreleased**
 --------------
 
+0.26.0
+------
+
+_2025-03-27_
+
 - **New**: Add a `dependencies.testJavaAgents { ... }` API for configuring Java agents that need to run in tests, such as Mockito in future versions of Java.
+- **New**: Add `foundry.testing` DSL, starting with a new `burst()` feature.
+- Use the Gradle `Problems` API in more places.
+- Update to Kotlin `2.1.20`. Note this should only be used with `2.1.20` or later.
+- Remove `includeSourceInformation` workarounds for compose as this is enabled by default now in compose-compiler as of Kotlin `2.1.20`.
+- Remove `liveLiterals` compose check as it's long-deprecated and off by default now.
+- Update Guava to `33.4.6`.
+- Update Oshi to `6.8.0`.
+- Update Kaml to `0.73.0`.
+- Build against Roborazzi `1.43.1`.
+- Build against AGP `8.9.1`.
+- Build against DAGP `2.13.1`.
 
 0.25.4
 ------
