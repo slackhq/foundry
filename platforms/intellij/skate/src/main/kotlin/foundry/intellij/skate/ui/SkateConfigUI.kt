@@ -54,10 +54,13 @@ internal class SkateConfigUI(
       }
       row(SkateBundle.message("skate.configuration.choosePath.title")) {
         textFieldWithBrowseButton(
-            SkateBundle.message("skate.configuration.choosePath.dialog.title"),
+            FileChoosing.singleMdFileChooserDescriptor()
+              .withTitle(SkateBundle.message("skate.configuration.choosePath.dialog.title"))
+              .toString(),
             project,
-            FileChoosing.singleMdFileChooserDescriptor(),
-          )
+          ) { chosenFile ->
+            chosenFile.presentableUrl
+          }
           .bindText(
             getter = {
               LocalFileSystem.getInstance().extractPresentableUrl(settings.whatsNewFilePath)

@@ -362,7 +362,7 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.2.1") }
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.3.1") }
       }
 
       if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {
