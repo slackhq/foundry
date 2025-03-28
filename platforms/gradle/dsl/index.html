@@ -980,11 +980,11 @@
 
 
 <h1 id="dsl">DSL<a class="headerlink" href="#dsl" title="Permanent link">&para;</a></h1>
-<p>SGP offers a DSL extension for configuring project behavior via the plugin. The idea is that developers don&rsquo;t really
-want to think about specific dependency wirings, and instead want to express what <em>features</em> they want and allow SGP to
+<p>Foundry offers a DSL extension for configuring project behavior via the plugin. The idea is that developers don&rsquo;t really
+want to think about specific dependency wirings, and instead want to express what <em>features</em> they want and allow Foundry to
 automatically wire these up for them.</p>
 <p>Some examples of this include Dagger, Moshi code gen, Robolectric, and more.</p>
-<p>The primary entry point is the <code>slack</code> extension in the build file, which is backed by the <code>SlackExtension</code> interface.</p>
+<p>The primary entry point is the <code>foundry</code> extension in the build file, which is backed by the <code>FoundryExtension</code> interface.</p>
 <div class="highlight"><pre><span></span><code><span class="n">foundry</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">features</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">dagger</span><span class="p">(...)</span>
@@ -994,6 +994,9 @@ automatically wire these up for them.</p>
 <span class="w">        </span><span class="n">features</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="n">robolectric</span><span class="p">(...)</span>
 <span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">testing</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">burst</span><span class="p">()</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1027,7 +1030,7 @@ downloads (via <code>UpdateRobolectricJarsTask</code>) for test tasks and enabli
 requires). There are a few other controls that <code>StandardProjectConfigurations</code> use to control or patch Robolectric&rsquo;s
 behavior.</p>
 <h3 id="android-test">Android Test<a class="headerlink" href="#android-test" title="Permanent link">&para;</a></h3>
-<p>By default, SGP disables androidTests in projects. These can be enabled via the <code>androidTest()</code> feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.</p>
+<p>By default, Foundry disables androidTests in projects. These can be enabled via the <code>androidTest()</code> feature, which will enable the relevant controls in the Android plugin. This can also accept specified variants to enable/disable.</p>
 <p>This is important for opting in tests to <a href="../utilities/#androidtest-apk-aggregation">AndroidTest APK Aggregation</a>.</p>
 <h3 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h3>
 <p>By default, we disable <em>Android</em> resources (different from <em>Java</em> resources) and libraries have to opt-in to using them.</p>

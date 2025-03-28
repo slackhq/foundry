@@ -958,7 +958,7 @@
 <li>Configuring <a href="../mod-score/">Mod Score</a> tasks.</li>
 </ul>
 <h3 id="standardprojectconfigurations"><code>StandardProjectConfigurations</code><a class="headerlink" href="#standardprojectconfigurations" title="Permanent link">&para;</a></h3>
-<p>This class warrants special mention as it is responsible for the bulk of the configuration applied to projects SGP manages.</p>
+<p>This class warrants special mention as it is responsible for the bulk of the configuration applied to projects Foundry manages.</p>
 <ul>
 <li>Creates and exposes the <a href="../dsl/"><code>foundry</code> extension DSL</a>.</li>
 <li>Applies common configurations.</li>
@@ -993,7 +993,7 @@
 <li>Configures AndroidTest APK aggregation with <a href="../../../tools/skippy/">Skippy</a> support.</li>
 <li>Applies the <a href="https://github.com/gradle/android-cache-fix-gradle-plugin">Android cache fix plugin</a>, if enabled.</li>
 <li>Configures common AGP extensions (both legacy extensions and new Component extensions).</li>
-<li>Disables unused/irrelevant variants. SGP is single-variant for library projects by default.</li>
+<li>Disables unused/irrelevant variants. Foundry is single-variant for library projects by default.</li>
 <li>Disables android tests on projects unless opted in.</li>
 <li>Disables unit tests on app projects by default (we use the app project as just a shell project for producing an APK).</li>
 <li>Configures <code>compileOptions</code>, <code>defaultConfig</code>, compileSdk/targetSdk/minSdk/ndkVersion, etc.<ul>
@@ -1019,7 +1019,7 @@
 <li>are single-variant by default, set to <code>release</code>.</li>
 </ul>
 <h4 id="kotlin-configurations">Kotlin Configurations<a class="headerlink" href="#kotlin-configurations" title="Permanent link">&para;</a></h4>
-<p>Kotlin projects are configured with KGP and Detekt in mind. SGP supports configuring Android, JVM, Multiplatform, and Compose Multiplatform projects. Multiplatform for targets other than JVM/android is limited at the moment.</p>
+<p>Kotlin projects are configured with KGP and Detekt in mind. Foundry supports configuring Android, JVM, Multiplatform, and Compose Multiplatform projects. Multiplatform for targets other than JVM/android is limited at the moment.</p>
 <p>Common configurations include:</p>
 <ul>
 <li>Setting computed kotlin daemon JVM args.</li>
@@ -1054,7 +1054,7 @@
 </code></pre></div>
 <p>This also adds a <code>generateVersionProperties</code> task that is more or less only relevant for Slack&rsquo;s internal CI.</p>
 <h2 id="agp-handlers">AGP Handlers<a class="headerlink" href="#agp-handlers" title="Permanent link">&para;</a></h2>
-<p>SGP is designed to work with multiple versions of AGP at a time, albeit only for forward compatibility and testing reasons. Generally SGP will only be tested against the latest stable version of AGP. To support multiple beta/canary versions of upcoming AGP versions, SGP has an API called <code>AgpHandler</code>, which is intended to be an AGP-agnostic common interface for configuring AGP projects across breaking API (source or binary) changes. When a new such change is introduced, we create an <code>AgpHandler{version}</code> artifact and implementation with that AGP version as its minimum. At runtime, SGP loads the relevant <code>AgpHandler</code> instance for the AGP version it is running against and relevant APIs use this instance via <code>FoundryTools</code> to interact with them in a version-agnostic way. These aren&rsquo;t always needed so there may be times when there are no implementations needed for the current suite of AGP versions.</p>
+<p>Foundry is designed to work with multiple versions of AGP at a time, albeit only for forward compatibility and testing reasons. Generally Foundry will only be tested against the latest stable version of AGP. To support multiple beta/canary versions of upcoming AGP versions, Foundry has an API called <code>AgpHandler</code>, which is intended to be an AGP-agnostic common interface for configuring AGP projects across breaking API (source or binary) changes. When a new such change is introduced, we create an <code>AgpHandler{version}</code> artifact and implementation with that AGP version as its minimum. At runtime, Foundry loads the relevant <code>AgpHandler</code> instance for the AGP version it is running against and relevant APIs use this instance via <code>FoundryTools</code> to interact with them in a version-agnostic way. These aren&rsquo;t always needed so there may be times when there are no implementations needed for the current suite of AGP versions.</p>
 <p>An example handler for AGP 8.0 looks like this.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// AutoService makes it available via ServiceLoader</span>
 <span class="c1">// The factory should always be AGP-api agnostic.</span>

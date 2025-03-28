@@ -603,6 +603,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0260" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.26.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0254" class="md-nav__link">
     <span class="md-ellipsis">
       0.25.4
@@ -2245,6 +2254,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0260" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.26.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0254" class="md-nav__link">
     <span class="md-ellipsis">
       0.25.4
@@ -3803,6 +3821,22 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased"><strong>Unreleased</strong><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0260">0.26.0<a class="headerlink" href="#0260" title="Permanent link">&para;</a></h2>
+<p><em>2025-03-27</em></p>
+<ul>
+<li><strong>New</strong>: Add a <code>dependencies.testJavaAgents { ... }</code> API for configuring Java agents that need to run in tests, such as Mockito in future versions of Java.</li>
+<li><strong>New</strong>: Add <code>foundry.testing</code> DSL, starting with a new <code>burst()</code> feature.</li>
+<li>Use the Gradle <code>Problems</code> API in more places.</li>
+<li>Update to Kotlin <code>2.1.20</code>. Note this should only be used with <code>2.1.20</code> or later.</li>
+<li>Remove <code>includeSourceInformation</code> workarounds for compose as this is enabled by default now in compose-compiler as of Kotlin <code>2.1.20</code>.</li>
+<li>Remove <code>liveLiterals</code> compose check as it&rsquo;s long-deprecated and off by default now.</li>
+<li>Update Guava to <code>33.4.6</code>.</li>
+<li>Update Oshi to <code>6.8.0</code>.</li>
+<li>Update Kaml to <code>0.73.0</code>.</li>
+<li>Build against Roborazzi <code>1.43.1</code>.</li>
+<li>Build against AGP <code>8.9.1</code>.</li>
+<li>Build against DAGP <code>2.13.1</code>.</li>
+</ul>
 <h2 id="0254">0.25.4<a class="headerlink" href="#0254" title="Permanent link">&para;</a></h2>
 <p><em>2025-03-14</em></p>
 <ul>
