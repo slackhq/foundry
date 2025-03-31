@@ -67,8 +67,8 @@ buildscript {
 
 plugins {
   id("com.gradle.develocity") version "3.19.2"
-  id("org.jetbrains.intellij.platform.settings") version "2.4.0"
-  id("org.jetbrains.intellij.platform") version "2.4.0" apply false
+  id("org.jetbrains.intellij.platform.settings") version "2.5.0"
+  id("org.jetbrains.intellij.platform") version "2.5.0" apply false
 }
 
 dependencyResolutionManagement {
