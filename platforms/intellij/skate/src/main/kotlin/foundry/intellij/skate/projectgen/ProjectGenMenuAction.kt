@@ -34,15 +34,16 @@ class ProjectGenMenuAction : AnAction() {
     if (!currentProject.isProjectGenMenuActionEnabled()) return
     val startTimestamp = Instant.now()
 
-    val dialog = ProjectGenWindow(currentProject, e).apply {
-      onOk = {
-        ApplicationManager.getApplication().invokeLater {
-          val am = ActionManager.getInstance()
-          val sync = am.getAction("Android.SyncProject")
-          sync.actionPerformed(e)
+    val dialog =
+      ProjectGenWindow(currentProject, e).apply {
+        onOk = {
+          ApplicationManager.getApplication().invokeLater {
+            val am = ActionManager.getInstance()
+            val sync = am.getAction("Android.SyncProject")
+            sync.actionPerformed(e)
+          }
         }
       }
-    }
 
     dialog.show()
 
