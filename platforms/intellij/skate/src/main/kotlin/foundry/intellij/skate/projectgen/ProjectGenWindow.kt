@@ -35,9 +35,12 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
       .normalize()
       .also { check(Files.isDirectory(it)) { "Must pass a valid directory" } }
 
+  var onOk: (() -> Unit)? = null
+
   init {
     init()
     title = "Project Generator"
+    isModal = false
   }
 
   override fun createCenterPanel(): JComponent {
@@ -54,12 +57,10 @@ class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent
 
   override fun doOKAction() {
     super.doOKAction()
+    onOk?.invoke()
   }
 
   override fun dismissDialogAndSync() {
     doOKAction()
-    val am: ActionManager = ActionManager.getInstance()
-    val sync: AnAction = am.getAction("Android.SyncProject")
-    sync.actionPerformed(event)
   }
 }
