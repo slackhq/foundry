@@ -32,7 +32,29 @@ class ProjectGenWindowTest : LightPlatformCodeInsightFixture4TestCase() {
   }
 
   @Test
+  fun `test onOK callback is invoked on dismissDialogAndSync`() {
+    var wasCalled = false
+    val dialog = ProjectGenWindow(project, null).apply { onOk = { wasCalled = true } }
+
+    dialog.dismissDialogAndSync()
+
+    assertTrue("expect onOk is called when dismissDialogAndSync is invoked", wasCalled)
+  }
+
+  @Test
+  fun `test onOk is not called on cancel`() {
+    var wasCalled = false
+    val dialog = ProjectGenWindow(project, null).apply { onOk = { wasCalled = true } }
+
+    dialog.doCancelAction()
+
+    assertTrue("onOk should not be called when cancel is pressed", !wasCalled)
+  }
+
+  @Test
   fun `test dialog is not modal`() {
+    // dialog must be modeless to avoid deadlocking the EDT when triggering Android.SyncProject.
+    // See: https://jb.gg/ij-platform-threading, nonModal() modality state
     val dialog = ProjectGenWindow(project, null)
     assertTrue("dialog should be modeless to avoid EDT deadlock", !dialog.isModal)
   }
