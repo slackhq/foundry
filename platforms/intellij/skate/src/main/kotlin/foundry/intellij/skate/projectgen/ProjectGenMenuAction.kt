@@ -15,6 +15,7 @@
  */
 package foundry.intellij.skate.projectgen
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -25,7 +26,6 @@ import foundry.intellij.skate.tracing.SkateTracingEvent
 import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isProjectGenMenuActionEnabled
 import foundry.intellij.skate.util.isTracingEnabled
-import com.intellij.openapi.actionSystem.ActionManager
 import java.time.Instant
 
 class ProjectGenMenuAction : AnAction() {

@@ -15,8 +15,6 @@
  */
 package foundry.intellij.skate.projectgen
 
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
@@ -27,7 +25,7 @@ import java.nio.file.Paths
 import javax.swing.Action
 import javax.swing.JComponent
 
-class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent) :
+class ProjectGenWindow(currentProject: Project, private val event: AnActionEvent?) :
   DialogWrapper(currentProject), ProjectGenUi.Events {
 
   private val projectPath =
