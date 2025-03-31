@@ -16,11 +16,24 @@
 package foundry.intellij.skate.projectgen
 
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
+import java.io.File
 import org.junit.Test
 
 class ProjectGenWindowTest : LightPlatformCodeInsightFixture4TestCase() {
+
+  // add this function so each test has an isolated temp dir
+  private fun ensureProjectBasePathExists() {
+    val basePath = project.basePath ?: return
+    val dir = File(basePath)
+    if (!dir.exists()) {
+      dir.mkdirs()
+    }
+  }
+
   @Test
   fun `test onOK callback is invoked on OK`() {
+    ensureProjectBasePathExists()
+
     var wasCalled = false
 
     val dialog = ProjectGenWindow(project, null).apply { onOk = { wasCalled = true } }
@@ -33,6 +46,7 @@ class ProjectGenWindowTest : LightPlatformCodeInsightFixture4TestCase() {
 
   @Test
   fun `test onOK callback is invoked on dismissDialogAndSync`() {
+    ensureProjectBasePathExists()
     var wasCalled = false
     val dialog = ProjectGenWindow(project, null).apply { onOk = { wasCalled = true } }
 
@@ -43,6 +57,7 @@ class ProjectGenWindowTest : LightPlatformCodeInsightFixture4TestCase() {
 
   @Test
   fun `test onOk is not called on cancel`() {
+    ensureProjectBasePathExists()
     var wasCalled = false
     val dialog = ProjectGenWindow(project, null).apply { onOk = { wasCalled = true } }
 
@@ -55,6 +70,8 @@ class ProjectGenWindowTest : LightPlatformCodeInsightFixture4TestCase() {
   fun `test dialog is not modal`() {
     // dialog must be modeless to avoid deadlocking the EDT when triggering Android.SyncProject.
     // See: https://jb.gg/ij-platform-threading, nonModal() modality state
+    ensureProjectBasePathExists()
+
     val dialog = ProjectGenWindow(project, null)
     assertTrue("dialog should be modeless to avoid EDT deadlock", !dialog.isModal)
   }
