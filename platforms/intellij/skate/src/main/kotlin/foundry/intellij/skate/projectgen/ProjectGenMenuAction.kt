@@ -15,9 +15,11 @@
  */
 package foundry.intellij.skate.projectgen
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
@@ -31,7 +33,19 @@ class ProjectGenMenuAction : AnAction() {
     val currentProject = e.project ?: return
     if (!currentProject.isProjectGenMenuActionEnabled()) return
     val startTimestamp = Instant.now()
-    ProjectGenWindow(currentProject, e).show()
+
+    val dialog =
+      ProjectGenWindow(currentProject, e).apply {
+        onOk = {
+          ApplicationManager.getApplication().invokeLater {
+            val am = ActionManager.getInstance()
+            val sync = am.getAction("Android.SyncProject")
+            sync.actionPerformed(e)
+          }
+        }
+      }
+
+    dialog.show()
 
     if (currentProject.isTracingEnabled()) {
       sendUsageTrace(currentProject, startTimestamp)
