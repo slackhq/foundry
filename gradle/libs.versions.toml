@@ -44,7 +44,7 @@ sortDependencies = "0.14"
 spotless = "7.0.2"
 sqldelight = "2.0.2"
 wire = "5.3.1"
-xmlutil = "0.90.3"
+xmlutil = "0.91.0"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
