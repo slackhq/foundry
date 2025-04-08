@@ -117,5 +117,23 @@ class VersionNumberTest {
     assertThat(baseVersion.qualifier).isNull()
   }
 
-  // TODO add comparator tests
+  @Test
+  fun `test comparator for sorting VersionNumbers`() {
+    val versions =
+      listOf(
+        VersionNumber(2, 0, 0, 0, null),
+        VersionNumber(1, 2, 0, 0, null),
+        VersionNumber(1, 1, 1, 0, "alpha"),
+        VersionNumber(1, 1, 1, 0, "beta"),
+      )
+    val sortedVersions = versions.sorted()
+    assertThat(sortedVersions)
+      .containsExactly(
+        VersionNumber(1, 1, 1, 0, "alpha"),
+        VersionNumber(1, 1, 1, 0, "beta"),
+        VersionNumber(1, 2, 0, 0, null),
+        VersionNumber(2, 0, 0, 0, null),
+      )
+      .inOrder()
+  }
 }
