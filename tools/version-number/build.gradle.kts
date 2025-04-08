@@ -19,4 +19,7 @@ plugins {
   alias(libs.plugins.lint)
 }
 
-dependencies { implementation(libs.guava) }
+dependencies {
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
+}
