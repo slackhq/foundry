@@ -146,7 +146,8 @@ dependencies {
       }
   }
 
-  implementation(projects.platforms.gradle.foundryGradlePlugin)
+  implementation(projects.tools.foundryCommon)
+
   implementation(projects.platforms.intellij.compose, exclusions)
   implementation(projects.tools.tracing, exclusions)
 

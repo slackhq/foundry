@@ -19,7 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import com.intellij.mock.MockProject
 import com.intellij.mock.MockVirtualFile
 import com.intellij.openapi.util.Disposer
-import foundry.gradle.convertProjectPathToAccessor
+import foundry.common.gradleProjectAccessorify
 import org.junit.Test
 
 class GradleProjectUtilsTest {
@@ -162,9 +162,9 @@ class GradleProjectUtilsTest {
   }
 
   @Test
-  fun `convertProjectPathToAccessor returns camelCased accessor from Gradle path`() {
+  fun `calling gradleProjectAccessorify is camelCased from hyphenated path`() {
     val testPath = ":libraries:activity-feed"
-    val result = "projects." + convertProjectPathToAccessor(testPath)
+    val result = "projects" + testPath.gradleProjectAccessorify()
     assertThat(result).isEqualTo("projects.libraries.activityFeed")
   }
 }
