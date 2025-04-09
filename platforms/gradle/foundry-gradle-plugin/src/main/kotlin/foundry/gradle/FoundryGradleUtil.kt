@@ -234,7 +234,7 @@ private fun kebabCaseToCamelCase(s: String): String {
  *
  * Example: `:libraries:foundation` -> `libraries.foundation`.
  */
-internal fun convertProjectPathToAccessor(projectPath: String): String {
+public fun convertProjectPathToAccessor(projectPath: String): String {
   return projectPath.removePrefix(":").split(":").joinToString(separator = ".") { segment ->
     kebabCaseToCamelCase(segment)
   }
