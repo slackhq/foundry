@@ -88,6 +88,10 @@ object GradleProjectUtils {
   }
 }
 
+/**
+ * Converts a Gradle project path (e.g. ":module:sub-module") into a camelCased
+ * accessor path (e.g. "module.subModule")
+ */
 fun String.gradleProjectAccessorify(): String {
   return buildString {
     var capNext = false
