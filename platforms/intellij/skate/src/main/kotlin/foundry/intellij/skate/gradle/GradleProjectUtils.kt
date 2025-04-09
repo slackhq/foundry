@@ -84,6 +84,28 @@ object GradleProjectUtils {
     }
 
     // Convert from ":path:to:project" to "projects.path.to.project"
-    return "projects" + gradlePath.replace(':', '.')
+    return "projects" + gradlePath.gradleProjectAccessorify()
+  }
+}
+
+fun String.gradleProjectAccessorify(): String {
+  return buildString {
+    var capNext = false
+    for (c in this@gradleProjectAccessorify) {
+      when (c) {
+        '-' -> {
+          capNext = true
+          continue
+        }
+        ':' -> {
+          append('.')
+          continue
+        }
+        else -> {
+          append(if (capNext) c.uppercaseChar() else c)
+        }
+      }
+      capNext = false
+    }
   }
 }

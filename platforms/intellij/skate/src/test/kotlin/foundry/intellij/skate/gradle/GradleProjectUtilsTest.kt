@@ -139,4 +139,31 @@ class GradleProjectUtilsTest {
 
     assertThat(GradleProjectUtils.getGradleProjectPath(project, externalDirectory)).isNull()
   }
+
+  @Test
+  fun `getGradleProjectAccessorPath returns camelCase accessor for hyphenated module`() {
+    val rootDir = MockVirtualFile(true, "rootDir")
+    val project = MockProject(null, Disposer.newDisposable()).apply { baseDir = rootDir }
+
+    // create a sample mock gradle project: libraries/sample-result/test
+    val librariesDir = MockVirtualFile(true, "libraries")
+    val sampleResultDir = MockVirtualFile(true, "sample-result")
+    val testDir = MockVirtualFile(true, "test")
+
+    testDir.addChild(MockVirtualFile(false, "build.gradle.kts"))
+    sampleResultDir.addChild(testDir)
+    librariesDir.addChild(sampleResultDir)
+    rootDir.addChild(librariesDir)
+
+    val result = GradleProjectUtils.getGradleProjectAccessorPath(project, testDir)
+
+    assertThat(result).isEqualTo("projects.libraries.sampleResult.test")
+  }
+
+  @Test
+  fun `calling gradleProjectAccessorify is camelCased from hyphenated path`() {
+    val testPath = ":libraries:activity-feed"
+    val result = "projects" + testPath.gradleProjectAccessorify()
+    assertThat(result).isEqualTo("projects.libraries.activityFeed")
+  }
 }
