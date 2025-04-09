@@ -19,8 +19,8 @@ import com.google.common.truth.Truth.assertThat
 import com.intellij.mock.MockProject
 import com.intellij.mock.MockVirtualFile
 import com.intellij.openapi.util.Disposer
-import org.junit.Test
 import foundry.gradle.convertProjectPathToAccessor
+import org.junit.Test
 
 class GradleProjectUtilsTest {
 
