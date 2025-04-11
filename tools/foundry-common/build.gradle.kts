@@ -26,4 +26,7 @@ dependencies {
 
   implementation(libs.coroutines.core)
   implementation(libs.guava)
+
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
 }

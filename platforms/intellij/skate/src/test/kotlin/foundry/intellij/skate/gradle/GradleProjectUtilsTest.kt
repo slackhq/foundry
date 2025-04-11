@@ -19,11 +19,9 @@ import com.google.common.truth.Truth.assertThat
 import com.intellij.mock.MockProject
 import com.intellij.mock.MockVirtualFile
 import com.intellij.openapi.util.Disposer
-import foundry.common.gradleProjectAccessorify
 import org.junit.Test
 
 class GradleProjectUtilsTest {
-
   @Test
   fun `findNearestGradleProject returns current directory if it is a Gradle project`() {
     val root = MockVirtualFile(true, "root")
@@ -159,12 +157,5 @@ class GradleProjectUtilsTest {
     val result = GradleProjectUtils.getGradleProjectAccessorPath(project, testDir)
 
     assertThat(result).isEqualTo("projects.libraries.sampleResult.test")
-  }
-
-  @Test
-  fun `calling gradleProjectAccessorify is camelCased from hyphenated path`() {
-    val testPath = ":libraries:activity-feed"
-    val result = "projects" + testPath.gradleProjectAccessorify()
-    assertThat(result).isEqualTo("projects.libraries.activityFeed")
   }
 }

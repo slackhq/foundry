@@ -17,7 +17,12 @@ package foundry.common
 
 import com.google.common.base.CaseFormat
 
-
+/**
+ * Converts a kebab-case string (e.g., `some-module-name`) to lowerCamelCase (e.g.,
+ * `someModuleName`).
+ *
+ * Used to transform Gradle module names into Kotlin DSL-friendly accessors.
+ */
 private fun kebabCaseToCamelCase(s: String): String {
   return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, s)
 }
@@ -32,25 +37,3 @@ public fun convertProjectPathToAccessor(projectPath: String): String {
     kebabCaseToCamelCase(segment)
   }
 }
-
-//public fun String.gradleProjectAccessorify(): String {
-//  return buildString {
-//    var capNext = false
-//    for (c in this@gradleProjectAccessorify) {
-//      when (c) {
-//        '-' -> {
-//          capNext = true
-//          continue
-//        }
-//        ':' -> {
-//          append('.')
-//          continue
-//        }
-//        else -> {
-//          append(if (capNext) c.uppercaseChar() else c)
-//        }
-//      }
-//      capNext = false
-//    }
-//  }
-//}
