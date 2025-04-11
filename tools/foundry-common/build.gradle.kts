@@ -25,4 +25,5 @@ dependencies {
   api(libs.okio)
 
   implementation(libs.coroutines.core)
+  implementation(libs.guava)
 }

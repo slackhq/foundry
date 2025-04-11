@@ -15,24 +15,42 @@
  */
 package foundry.common
 
-public fun String.gradleProjectAccessorify(): String {
-  return buildString {
-    var capNext = false
-    for (c in this@gradleProjectAccessorify) {
-      when (c) {
-        '-' -> {
-          capNext = true
-          continue
-        }
-        ':' -> {
-          append('.')
-          continue
-        }
-        else -> {
-          append(if (capNext) c.uppercaseChar() else c)
-        }
-      }
-      capNext = false
-    }
+import com.google.common.base.CaseFormat
+
+
+private fun kebabCaseToCamelCase(s: String): String {
+  return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, s)
+}
+
+/**
+ * Returns a project accessor representation of the given [projectPath].
+ *
+ * Example: `:libraries:foundation` -> `libraries.foundation`.
+ */
+public fun convertProjectPathToAccessor(projectPath: String): String {
+  return projectPath.removePrefix(":").split(":").joinToString(separator = ".") { segment ->
+    kebabCaseToCamelCase(segment)
   }
 }
+
+//public fun String.gradleProjectAccessorify(): String {
+//  return buildString {
+//    var capNext = false
+//    for (c in this@gradleProjectAccessorify) {
+//      when (c) {
+//        '-' -> {
+//          capNext = true
+//          continue
+//        }
+//        ':' -> {
+//          append('.')
+//          continue
+//        }
+//        else -> {
+//          append(if (capNext) c.uppercaseChar() else c)
+//        }
+//      }
+//      capNext = false
+//    }
+//  }
+//}

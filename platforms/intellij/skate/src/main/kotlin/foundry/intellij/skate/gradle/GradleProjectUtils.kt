@@ -17,7 +17,7 @@ package foundry.intellij.skate.gradle
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import foundry.common.gradleProjectAccessorify
+import foundry.common.convertProjectPathToAccessor
 import java.nio.file.Paths
 
 /** Utility functions for working with Gradle projects. */
@@ -85,6 +85,6 @@ object GradleProjectUtils {
     }
 
     // Convert from ":path:to:project" to "projects.path.to.project"
-    return "projects" + gradlePath.gradleProjectAccessorify()
+    return "projects." + convertProjectPathToAccessor(gradlePath)
   }
 }
