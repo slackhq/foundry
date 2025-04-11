@@ -8,10 +8,10 @@ bugsnagGradle = "8.2.0"
 circuit = "0.27.0"
 compose-jb = "1.7.3"
 compose-jb-stable = "1.7.3"
-coroutines = "1.10.1"
+coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
-coroutines-ij = "1.10.1"
-dependencyAnalysisPlugin = "2.13.3"
+coroutines-ij = "1.8.0"
+dependencyAnalysisPlugin = "2.14.0"
 detekt = "1.23.8"
 dokka = "2.0.0"
 errorproneGradle = "4.1.0"
@@ -23,10 +23,10 @@ jvmTarget = "21"
 jvmTargetIdea = "21"
 jewel = "0.27.0"
 jna = "5.17.0"
-kaml = "0.74.0"
+kaml = "0.76.0"
 kotlin = "2.1.20"
 kotlinx-serialization = "1.8.1"
-ksp = "2.1.20-1.0.32"
+ksp = "2.1.20-2.0.0"
 kotlinPoet = "2.1.0"
 ktfmt = "0.54"
 markdown = "0.31.0"
@@ -41,15 +41,15 @@ retrofit = "2.11.0"
 roborazzi = "1.43.1"
 slack-lint = "0.9.0"
 sortDependencies = "0.14"
-spotless = "7.0.2"
+spotless = "7.0.3"
 sqldelight = "2.0.2"
 wire = "5.3.1"
-xmlutil = "0.90.3"
+xmlutil = "0.91.0"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.1" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.2" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
@@ -115,7 +115,7 @@ gradlePlugins-sortDependencies = { module = "com.squareup:sort-dependencies-grad
 gradlePlugins-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugins-sqldelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 gradlePlugins-wire = { module = "com.squareup.wire:wire-gradle-plugin", version.ref = "wire" }
-guava = "com.google.guava:guava:33.4.6-jre"
+guava = "com.google.guava:guava:33.4.7-jre"
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-gradlePlugins-bom = { module = "org.jetbrains.kotlin:kotlin-gradle-plugins-bom", version.ref = "kotlin" }
