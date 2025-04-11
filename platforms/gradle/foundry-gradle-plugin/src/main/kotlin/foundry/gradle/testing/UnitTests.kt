@@ -15,6 +15,7 @@
  */
 package foundry.gradle.testing
 
+import com.android.build.gradle.BaseExtension
 import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
@@ -22,6 +23,7 @@ import foundry.gradle.artifacts.Resolver
 import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.ciUnitTestAndroidVariant
 import foundry.gradle.configureEach
+import foundry.gradle.getByType
 import foundry.gradle.isActionsCi
 import foundry.gradle.isCi
 import foundry.gradle.properties.setDisallowChanges
@@ -87,6 +89,9 @@ internal object UnitTests {
     onProjectSkipped: (String, String) -> Unit,
   ) {
     JavaAgentDependenciesExtension.register(project, foundryProperties)
+
+    // Configure benchmark plugin if it's applied
+    configureBenchmarkPlugin(project, foundryProperties)
 
     // Projects can opt out of creating the task with this property.
     // android test projects don't support unit tests
@@ -281,6 +286,26 @@ internal object UnitTests {
       description = "Lifecycle task to run unit tests for ${project.path}.",
     ) {
       dependsOn(dependencyTaskName)
+    }
+  }
+
+  /**
+   * Configures the `androidx.benchmark` plugin if it's applied.
+   *
+   * Sets `defaultConfig.testOptions.targetSdk` to the target SDK specified in [FoundryProperties].
+   */
+  private fun configureBenchmarkPlugin(project: Project, foundryProperties: FoundryProperties) {
+    project.pluginManager.withPlugin("androidx.benchmark") {
+      project.logger.debug("$LOG Configuring androidx.benchmark plugin")
+
+      val targetSdk = foundryProperties.requireAndroidSdkProperties().targetSdk
+
+      // Configure the Android extension
+      project.extensions.getByType(BaseExtension::class.java).testOptions.targetSdk = targetSdk
+
+      project.logger.debug(
+        "$LOG Set defaultConfig.testOptions.targetSdk to $targetSdk for androidx.benchmark plugin"
+      )
     }
   }
 }

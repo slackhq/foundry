@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Always set targetSdk in `androidx.benchmark` projects.
+- Remove Guava dependency from version-number artifact.
+
 0.26.0
 ------
 
