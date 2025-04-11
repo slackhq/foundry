@@ -104,15 +104,15 @@ internal object ModuleTopographyTasks {
         )
         features.put(
           DefaultFeatures.Dagger,
-          foundryExtension.featuresHandler.daggerHandler.enabled.zip(
-            foundryExtension.featuresHandler.daggerHandler.runtimeOnly
+          foundryExtension.featuresHandler.diHandler.enabled.zip(
+            foundryExtension.featuresHandler.diHandler.runtimeOnly
           ) { enabled, runtimeOnly ->
             enabled && !runtimeOnly
           },
         )
         features.put(
           DefaultFeatures.DaggerCompiler,
-          foundryExtension.featuresHandler.daggerHandler.useDaggerCompiler,
+          foundryExtension.featuresHandler.diHandler.useDaggerCompiler,
         )
         features.put(
           DefaultFeatures.Compose,
