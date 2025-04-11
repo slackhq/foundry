@@ -83,17 +83,16 @@ public object ModuleStatsTasks {
     val includeGenerated = rootProject.includeGenerated()
     val resolver = Resolver.interProjectResolver(rootProject, FoundryArtifact.ModStatsFiles)
 
-    val projectPathMap =
-      rootProject.provider {
-        rootProject.subprojects.associate { subproject ->
-          val regularPath = subproject.path
-          val projectAccessor = convertProjectPathToAccessor(regularPath)
-          projectAccessor to regularPath
-        }
-      }
-
     rootProject.tasks.register<ModuleStatsAggregatorTask>(AGGREGATOR_NAME) {
-      projectPathsToAccessors.setDisallowChanges(projectPathMap)
+      projectPathsToAccessors.setDisallowChanges(
+        rootProject.provider {
+          rootProject.subprojects.associate { subproject ->
+            val regularPath = subproject.path
+            val projectAccessor = convertProjectPathToAccessor(regularPath)
+            projectAccessor to regularPath
+          }
+        }
+      )
       statsFiles.from(resolver.artifactView())
       outputFile.setDisallowChanges(
         rootProject.layout.buildDirectory.file("reports/foundry/moduleStats.json")
