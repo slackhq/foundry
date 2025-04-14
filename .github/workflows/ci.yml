@@ -49,10 +49,6 @@ jobs:
 
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Clear gradle
-        shell: bash
-        run: rm -rf ~/.gradle || true
-
       - name: Build and run tests
         id: gradle
         timeout-minutes: 10
