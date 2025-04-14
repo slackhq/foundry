@@ -47,8 +47,6 @@ jobs:
           # Don't reuse cache entries from any other Job.
           gradle-home-cache-strict-match: true
 
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
       - name: Build and run tests
         id: gradle
         timeout-minutes: 10
