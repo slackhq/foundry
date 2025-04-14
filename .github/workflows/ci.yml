@@ -25,10 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Clear gradle
-        shell: bash
-        run: rm -rf ~/.gradle || true
-
       - name: Export JDK version
         shell: bash
         run: |
@@ -52,6 +48,10 @@ jobs:
           gradle-home-cache-strict-match: true
 
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Clear gradle
+        shell: bash
+        run: rm -rf ~/.gradle || true
 
       - name: Build and run tests
         id: gradle
