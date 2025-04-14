@@ -25,6 +25,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Clear gradle
+        shell: bash
+        run: rm -rf ~/.gradle || true
+
       - name: Export JDK version
         shell: bash
         run: |
