@@ -53,6 +53,7 @@ jobs:
         shell: bash
         run: |
           ls -al ~/.gradle
+          cat ~/.gradle/init.d
           rm -rf ~/.gradle || true
 
       - name: Build and run tests
