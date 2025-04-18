@@ -102,8 +102,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.anvil)
   // compileOnly because we want to leave versioning to the consumers
   // Add gradle plugins for the slack project itself, separate from plugins. We do this so we can
-  // de-dupe version
-  // management between this plugin and the root build.gradle.kts file.
+  // de-dupe version management between this plugin and the root build.gradle.kts file.
   compileOnly(libs.gradlePlugins.bugsnag)
   compileOnly(libs.gradlePlugins.compose)
   compileOnly(libs.gradlePlugins.composeCompiler)
@@ -115,6 +114,7 @@ dependencies {
   compileOnly(libs.gradlePlugins.errorProne)
   compileOnly(libs.gradlePlugins.kgp)
   compileOnly(libs.gradlePlugins.ksp)
+  compileOnly(libs.gradlePlugins.metro)
   compileOnly(libs.gradlePlugins.moshix)
   compileOnly(libs.gradlePlugins.nullaway)
   compileOnly(libs.gradlePlugins.redacted)

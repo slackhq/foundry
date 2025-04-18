@@ -264,6 +264,18 @@ internal constructor(
   public val anvilUseKspFork: Boolean
     get() = booleanProperty("foundry.anvil.useKspFork", defaultValue = false)
 
+  /** Flag to enable use of Metro for DI. https://github.com/ZacSweers/metro */
+  public val diUseMetro: Boolean
+    get() = booleanProperty("foundry.di.metro", defaultValue = false)
+
+  /** Flag to enable Dagger interop for Metro. */
+  public val metroInteropDagger: Boolean
+    get() = booleanProperty("foundry.di.metro.interop.dagger", defaultValue = false)
+
+  /** Flag to enable Anvil interop for Metro. */
+  public val metroInteropAnvil: Boolean
+    get() = booleanProperty("foundry.di.metro.interop.anvil", defaultValue = false)
+
   /** Log Foundry extension configuration state verbosely. */
   public val foundryExtensionVerbose: Boolean
     get() = booleanProperty("foundry.extension.verbose")
