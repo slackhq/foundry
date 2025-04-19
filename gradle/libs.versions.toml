@@ -83,7 +83,7 @@ autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.2"
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
-commonsText = "org.apache.commons:commons-text:1.13.0"
+commonsText = "org.apache.commons:commons-text:1.13.1"
 composeLints = "com.slack.lint.compose:compose-lint-checks:1.4.2"
 compose-markdown = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown" }
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
