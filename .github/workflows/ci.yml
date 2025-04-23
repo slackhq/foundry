@@ -54,12 +54,18 @@ jobs:
         timeout-minutes: 10
         run: ./gradlew check --quiet
 
+      - name: (Fail-only) Copy gradle dir
+        if: failure()
+        run: |
+          mkdir -p gradle_home
+          cp -r ~/.gradle/* gradle_home/
+
       - name: (Fail-only) Upload broken gradle cache
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: gradle_home
-          path: ~/.gradle
+          path: gradle_home
 
       - name: (Fail-only) Upload build reports
         if: failure()
