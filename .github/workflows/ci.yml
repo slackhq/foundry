@@ -49,21 +49,17 @@ jobs:
 
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Clear gradle
-        shell: bash
-        run: |
-          ls -al ~/.gradle
-          ls -al ~/.gradle/init.d
-          rm -rf ~/.gradle || true
-
       - name: Build and run tests
         id: gradle
         timeout-minutes: 10
         run: ./gradlew check --quiet
 
-      - name: Print build scan url
-        if: always()
-        run: echo ${{ steps.gradle.outputs.build-scan-url }}
+      - name: (Fail-only) Upload broken gradle cache
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle_home
+          path: ~/.gradle
 
       - name: (Fail-only) Upload build reports
         if: failure()
