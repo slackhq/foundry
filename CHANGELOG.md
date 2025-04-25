@@ -6,6 +6,8 @@ Changelog
 
 - Always set targetSdk in `androidx.benchmark` projects.
 - Remove Guava dependency from version-number artifact.
+- Update Okio to `3.11.0`.
+- Build against Gradle `8.14`
 
 0.26.0
 ------
