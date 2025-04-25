@@ -103,7 +103,7 @@ gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-ana
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.0"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
-gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:0.18.1"
+gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:0.19.1"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = { module = "com.jraska.module.graph.assertion:plugin", version.ref = "graph-assert" }
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
