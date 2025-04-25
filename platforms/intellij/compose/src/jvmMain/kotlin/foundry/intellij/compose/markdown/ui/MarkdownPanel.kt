@@ -318,4 +318,5 @@ private fun jewelMarkdownTypography(
     inlineCode = inlineCode,
     link = link,
     textLink = textLink,
+    table = text,
   )
