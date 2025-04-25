@@ -101,7 +101,7 @@ gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
-gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.0"
+gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.0.1"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
 gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:0.19.1"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
