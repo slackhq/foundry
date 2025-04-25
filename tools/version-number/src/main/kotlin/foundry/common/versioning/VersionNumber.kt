@@ -15,7 +15,6 @@
  */
 package foundry.common.versioning
 
-import com.google.common.collect.Ordering
 import java.util.Locale
 import java.util.Objects
 
@@ -65,9 +64,9 @@ private constructor(
     return if (patch != other.patch) {
       patch - other.patch
     } else {
-      Ordering.natural<Comparable<*>>()
-        .nullsLast<Comparable<*>>()
-        .compare(toLowerCase(qualifier), toLowerCase(other.qualifier))
+      compareBy<String?> { it?.lowercase(Locale.US) }
+        .thenComparing(nullsLast())
+        .compare(qualifier, other.qualifier)
     }
   }
 
@@ -88,10 +87,6 @@ private constructor(
     return scheme.format(this)
   }
 
-  private fun toLowerCase(string: String?): String? {
-    return string?.lowercase(Locale.US)
-  }
-
   /** Returns the version number scheme. */
   public interface Scheme {
     public fun parse(value: String?): VersionNumber
@@ -99,7 +94,7 @@ private constructor(
     public fun format(versionNumber: VersionNumber): String
   }
 
-  private abstract class AbstractScheme protected constructor(val depth: Int) : Scheme {
+  private abstract class AbstractScheme(val depth: Int) : Scheme {
     override fun parse(value: String?): VersionNumber {
       if (value.isNullOrEmpty()) {
         return UNKNOWN
