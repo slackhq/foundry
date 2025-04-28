@@ -21,6 +21,7 @@ import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.moshi.JsonClass
 import com.squareup.wire.gradle.WireTask
+import foundry.common.convertProjectPathToAccessor
 import foundry.common.json.JsonTools
 import foundry.gradle.FoundryProperties
 import foundry.gradle.FoundryShared
@@ -29,7 +30,6 @@ import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.capitalizeUS
 import foundry.gradle.configure
-import foundry.gradle.convertProjectPathToAccessor
 import foundry.gradle.dependsOn
 import foundry.gradle.namedLazy
 import foundry.gradle.properties.mapToBoolean
