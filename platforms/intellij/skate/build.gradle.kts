@@ -147,6 +147,7 @@ dependencies {
   }
   implementation(projects.platforms.intellij.compose, exclusions)
   implementation(projects.tools.tracing, exclusions)
+  implementation(projects.tools.foundryCommon, exclusions)
 
   implementation(libs.bugsnag)
   implementation(libs.kaml)
@@ -154,7 +155,6 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.okhttp.loggingInterceptor)
   implementation(libs.okio)
-  implementation(projects.tools.foundryCommon)
 
   compileOnly(libs.coroutines.core.ij)
 
