@@ -38,6 +38,7 @@ internal class SkateConfigUI(
   fun createPanel(): DialogPanel = panel {
     whatsNewPanelSettings()
     enableProjectGenMenuAction()
+    installationLocationSettings()
     featureFlagSettings()
     tracingSettings()
     codeOwnerSettings()
@@ -90,6 +91,45 @@ internal class SkateConfigUI(
             setter = { settings.isProjectGenMenuActionEnabled = it },
           )
       }
+    }
+  }
+
+  private fun Panel.installationLocationSettings() {
+    group(SkateBundle.message("skate.configuration.installationLocation.title")) {
+      lateinit var installationLocationEnabledButton: Cell<JBCheckBox>
+
+      row {
+        installationLocationEnabledButton =
+          checkBox(SkateBundle.message("skate.configuration.installationLocation.enabledDescription"))
+            .bindSelected(
+              getter = { settings.installationLocationPattern != null },
+              setter = { enabled ->
+                if (!enabled) {
+                  settings.installationLocationPattern = null
+                  settings.installationInfoUrl = null
+                } else if (settings.installationLocationPattern == null) {
+                  settings.installationLocationPattern = ""
+                  settings.installationInfoUrl = ""
+                }
+              },
+            )
+      }
+
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.installationLocation.pattern.title",
+        getter = { settings.installationLocationPattern },
+        setter = { settings.installationLocationPattern = it },
+        errorMessageKey = "skate.configuration.installationLocation.pattern.error",
+        enabledCondition = installationLocationEnabledButton.selected,
+      )
+
+      bindAndValidateTextFieldRow(
+        titleMessageKey = "skate.configuration.installationLocation.infoUrl.title",
+        getter = { settings.installationInfoUrl },
+        setter = { settings.installationInfoUrl = it },
+        errorMessageKey = "skate.configuration.installationLocation.infoUrl.error",
+        enabledCondition = installationLocationEnabledButton.selected,
+      )
     }
   }
 
