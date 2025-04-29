@@ -68,6 +68,18 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isProjectGenMenuActionEnabled = value
     }
 
+  var installationLocationPattern: String?
+    get() = state.installationLocationPattern
+    set(value) {
+      state.installationLocationPattern = value
+    }
+
+  var installationInfoUrl: String?
+    get() = state.installationInfoUrl
+    set(value) {
+      state.installationInfoUrl = value
+    }
+
   var isLinkifiedFeatureFlagsEnabled: Boolean
     get() = state.isLinkifiedFeatureFlagsEnabled
     set(value) {
@@ -129,6 +141,8 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var translatorFileNameSuffix by string()
     var translatorEnumIdentifier by string()
     var isProjectGenMenuActionEnabled by property(true)
+    var installationLocationPattern by string()
+    var installationInfoUrl by string()
     var isLinkifiedFeatureFlagsEnabled by property(false)
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()
