@@ -362,7 +362,9 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity(libs.versions.intellij.version) }
+        configure<IntelliJPlatformDependenciesExtension> {
+          intellijIdeaCommunity(libs.versions.intellij.version)
+        }
       }
 
       if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {
