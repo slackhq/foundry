@@ -47,6 +47,9 @@ sqldelight = "2.0.2"
 wire = "5.3.1"
 xmlutil = "0.91.0"
 
+intellij-version = "2024.3.1"
+intellij-sinceBuild = "243"
+
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }

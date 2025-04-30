@@ -345,7 +345,7 @@ subprojects {
           name = property("PLUGIN_NAME").toString(),
           description = property("PLUGIN_DESCRIPTION").toString(),
           version = property("VERSION_NAME").toString(),
-          sinceBuild = property("PLUGIN_SINCE_BUILD").toString(),
+          sinceBuild = libs.versions.intellij.sinceBuild.get(),
           urlSuffix = property("ARTIFACTORY_URL_SUFFIX").toString(),
         )
 
@@ -362,7 +362,7 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.3.1") }
+        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity(libs.versions.intellij.version) }
       }
 
       if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {
