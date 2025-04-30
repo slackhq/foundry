@@ -47,13 +47,15 @@ sqldelight = "2.0.2"
 wire = "5.3.1"
 xmlutil = "0.91.0"
 
-intellij-version = "2024.3.1"
-intellij-sinceBuild = "243"
+# API changes are documented here: https://plugins.jetbrains.com/docs/intellij/api-changes-list.html
+# Bundled API changes (Kotlin, Coroutines, etc) here: https://www.jetbrains.com/legal/third-party-software/?product=IIU
+intellij-version = "2025.1"
+intellij-sinceBuild = "251"
 # https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
 # https://plugins.jetbrains.com/plugin/22989-android/versions/stable
 # https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
 # ^^ This is the list to pull versions from
-intellij-android = "243.22562.218"
+intellij-android = "251.23774.16"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
