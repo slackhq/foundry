@@ -100,7 +100,9 @@ internal class SkateConfigUI(
 
       row {
         installationLocationEnabledButton =
-          checkBox(SkateBundle.message("skate.configuration.installationLocation.enabledDescription"))
+          checkBox(
+              SkateBundle.message("skate.configuration.installationLocation.enabledDescription")
+            )
             .bindSelected(
               getter = { settings.installationLocationPattern != null },
               setter = { enabled ->
