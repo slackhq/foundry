@@ -80,6 +80,18 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.installationInfoUrl = value
     }
 
+  var installationLocationWarningTitle: String?
+    get() = state.installationLocationWarningTitle
+    set(value) {
+      state.installationLocationWarningTitle = value
+    }
+
+  var installationLocationWarningDescription: String?
+    get() = state.installationLocationWarningDescription
+    set(value) {
+      state.installationLocationWarningDescription = value
+    }
+
   var isLinkifiedFeatureFlagsEnabled: Boolean
     get() = state.isLinkifiedFeatureFlagsEnabled
     set(value) {
@@ -143,6 +155,8 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var isProjectGenMenuActionEnabled by property(true)
     var installationLocationPattern by string()
     var installationInfoUrl by string()
+    var installationLocationWarningTitle by string()
+    var installationLocationWarningDescription by string()
     var isLinkifiedFeatureFlagsEnabled by property(false)
     var featureFlagBaseUrl by string()
     var featureFlagAnnotation by string()

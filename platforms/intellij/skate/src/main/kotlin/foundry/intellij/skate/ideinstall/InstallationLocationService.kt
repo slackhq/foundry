@@ -38,6 +38,8 @@ class InstallationLocationService @Inject constructor(private val project: Proje
     val settings = project.service<SkatePluginSettings>()
     val pattern = settings.installationLocationPattern ?: return
     val infoUrl = settings.installationInfoUrl ?: return
+    val warningTitle = settings.installationLocationWarningTitle ?: return
+    val warningDescription = settings.installationLocationWarningDescription ?: return
 
     // print out what the current path is
     println("Running IDE from: ${PathManager.getHomePath()}")
@@ -48,31 +50,33 @@ class InstallationLocationService @Inject constructor(private val project: Proje
     val installationPath = Paths.get(installationDir)
 
     if (!matchesPattern(installationPath, pattern)) {
-      showWarningNotification(infoUrl)
+      showWarningNotification(warningTitle, warningDescription, infoUrl)
     }
   }
 
   @VisibleForTesting
   internal fun matchesPattern(path: Path, pattern: String): Boolean {
-    val expandedPattern = pattern.replace("\${user.home}", System.getProperty("user.home"))
+    val expandedPattern = pattern.replace("~", System.getProperty("user.home"))
     val matcher = FileSystems.getDefault().getPathMatcher("glob:$expandedPattern")
     return matcher.matches(path)
   }
 
-  private fun showWarningNotification(infoUrl: String) {
+  private fun showWarningNotification(
+    warningTitle: String,
+    warningDescription: String,
+    infoUrl: String,
+  ) {
     val installationPath = PathManager.getHomePath()
-
     val notification =
       NotificationGroupManager.getInstance()
         .getNotificationGroup("SkateInstallationLocation")
         .createNotification(
-          "Move Android Studio for better performance",
+          warningTitle,
           """
-        Your IDE isn't installed under the desired path, which means you're missing out on faster Gradle syncs and significantly improved IDE performance.
-
-        Detected path:
-        `$installationPath`
-        """
+            $warningDescription
+            Detected path:
+            `$installationPath`
+          """
             .trimIndent(),
           NotificationType.WARNING,
         )
