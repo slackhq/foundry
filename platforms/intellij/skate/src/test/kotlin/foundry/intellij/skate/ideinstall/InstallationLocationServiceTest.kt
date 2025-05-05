@@ -52,7 +52,7 @@ class InstallationLocationServiceTest : BasePlatformTestCase() {
   fun `user home expands properly`() {
     val userHome = System.getProperty("user.home")
     val path = Paths.get("$userHome/sample")
-    val pattern = "\${user.home}/sample"
+    val pattern = "~/sample"
     val result = service.matchesPattern(path, pattern)
     assertTrue(result)
   }
