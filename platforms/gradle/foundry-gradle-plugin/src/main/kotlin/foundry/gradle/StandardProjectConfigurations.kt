@@ -724,21 +724,9 @@ internal class StandardProjectConfigurations(
           builder.androidTest.enable = variantEnabled
         }
 
-        onVariants(selector().withBuildType("release")) { variant ->
-          // Metadata for coroutines not relevant to release builds
-          variant.packaging.resources.excludes.add("DebugProbesKt.bin")
-        }
-      }
-      configure<BaseAppModuleExtension> {
-        foundryExtension.setAndroidExtension(this)
-        commonBaseExtensionConfig(true)
-        defaultConfig {
-          // TODO this won't work with SDK previews but will fix in a followup
-          targetSdk = sdkVersions.value.targetSdk
-        }
-        packaging {
-          resources.excludes +=
-            setOf(
+        onVariants { variant ->
+          with(variant.packaging) {
+            resources.excludes.addAll(
               "META-INF/LICENSE.txt",
               "META-INF/LICENSE",
               "META-INF/NOTICE.txt",
@@ -755,12 +743,25 @@ internal class StandardProjectConfigurations(
               // https://slack-pde.slack.com/archives/C8EER3C04/p1621353426001500
               "annotated-jdk/**",
             )
-          jniLibs.pickFirsts +=
-            setOf(
-              // Some libs like Flipper bring their own copy of common native libs (like C++) and we
-              // need to de-dupe
+            jniLibs.pickFirsts.addAll(
+              // Some libs like Flipper bring their own copy of common native libs (like C++) and
+              // we need to de-dupe
               "**/*.so"
             )
+            dex.useLegacyPackaging.set(foundryProperties.compressApksWithLegacyPackaging)
+          }
+          if (variant.buildType == "release") {
+            // Metadata for coroutines not relevant to release builds
+            variant.packaging.resources.excludes.add("DebugProbesKt.bin")
+          }
+        }
+      }
+      configure<BaseAppModuleExtension> {
+        foundryExtension.setAndroidExtension(this)
+        commonBaseExtensionConfig(true)
+        defaultConfig {
+          // TODO this won't work with SDK previews but will fix in a followup
+          targetSdk = sdkVersions.value.targetSdk
         }
         buildTypes {
           getByName("debug") {
@@ -888,8 +889,8 @@ internal class StandardProjectConfigurations(
                   .asSequence()
                   .mapNotNull {
                     when (it) {
-                      // Skip dashes and underscores. We could camelcase but it looks weird in a
-                      // package name
+                      // Skip dashes and underscores. We could camelcase but it looks weird in
+                      // a package name
                       '-',
                       '_' -> null
                       // Use the project path as the real dot namespacing
@@ -946,8 +947,8 @@ internal class StandardProjectConfigurations(
                   .asSequence()
                   .mapNotNull {
                     when (it) {
-                      // Skip dashes and underscores. We could camelcase but it looks weird in a
-                      // package name
+                      // Skip dashes and underscores. We could camelcase but it looks weird in
+                      // a package name
                       '-',
                       '_' -> null
                       // Use the project path as the real dot namespacing

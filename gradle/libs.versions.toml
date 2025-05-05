@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.2"
-agpAlpha = "8.10.0-rc03"
+agpAlpha = "8.10.0-rc04"
 anvil = "0.4.1"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.8"
@@ -11,7 +11,7 @@ compose-jb-stable = "1.7.3"
 coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.8.0"
-dependencyAnalysisPlugin = "2.14.0"
+dependencyAnalysisPlugin = "2.17.0"
 detekt = "1.23.8"
 dokka = "2.0.0"
 errorproneGradle = "4.2.0"
@@ -23,10 +23,10 @@ jvmTarget = "21"
 jvmTargetIdea = "21"
 jewel = "0.27.0"
 jna = "5.17.0"
-kaml = "0.77.0"
+kaml = "0.77.1"
 kotlin = "2.1.20"
 kotlinx-serialization = "1.8.1"
-ksp = "2.1.20-2.0.0"
+ksp = "2.1.20-2.0.1"
 kotlinPoet = "2.1.0"
 ktfmt = "0.54"
 markdown = "0.33.0"
@@ -50,7 +50,7 @@ xmlutil = "0.91.0"
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.3" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.4" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

@@ -4,6 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.1
+------
+
+_2025-04-30_
+
+- Add a new `foundry.android.compressWithLegacyPackaging` property to enable legacy compression for all APKs.
+- Fix Jakarta coordinates when applying Dagger runtime deps.
+- Build against DAGP `2.17.0`.
+
 0.27.0
 ------
 

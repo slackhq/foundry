@@ -212,8 +212,6 @@ constructor(
 
         fun addDaggerRuntimeDeps(enableAnvil: Boolean) {
           dependencies.add("implementation", FoundryDependencies.Dagger.dagger)
-          dependencies.add("implementation", FoundryDependencies.javaxInject)
-          dependencies.add("implementation", FoundryDependencies.jakarta)
 
           if (enableAnvil) {
             addAnvilAnnotations()
