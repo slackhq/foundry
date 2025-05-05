@@ -41,9 +41,6 @@ class InstallationLocationService @Inject constructor(private val project: Proje
     val warningTitle = settings.installationLocationWarningTitle ?: return
     val warningDescription = settings.installationLocationWarningDescription ?: return
 
-    // print out what the current path is
-    println("Running IDE from: ${PathManager.getHomePath()}")
-
     if (pattern.isBlank()) return
 
     val installationDir = PathManager.getHomePath()
