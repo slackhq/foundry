@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -227,7 +226,7 @@ subprojects {
           if (isForIntelliJPlugin) {
             // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
             // Note this needs to support the latest stable Studio version.
-            KOTLIN_1_9
+            KOTLIN_2_0
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
             KOTLIN_2_0
@@ -255,9 +254,6 @@ subprojects {
           // Enhance not null annotated type parameter's types to definitely not null types
           // (@NotNull T => T & Any)
           "-Xenhance-type-parameter-types-to-def-not-null",
-          // Support inferring type arguments based on only self upper bounds of the corresponding
-          // type parameters
-          "-Xself-upper-bound-inference",
           "-Xjsr305=strict",
           // Match JVM assertion behavior:
           // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
