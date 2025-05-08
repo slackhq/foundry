@@ -265,7 +265,7 @@ internal fun <T : Any> Optional<T>.asProvider(providers: ProviderFactory) =
  * If we're in an Android project, we need to use the [AndroidComponentsExtension.finalizeDsl]
  * callback to avoid https://github.com/google/ksp/issues/1789#issuecomment-2860100164
  */
-internal fun Project.afterEvaluateCompat(action: Action<Project>) {
+internal fun Project.afterEvaluateSafe(action: Action<Project>) {
   val androidComponents =
     project.extensions.findByName("androidComponents") as? AndroidComponentsExtension<*, *, *>?
 
