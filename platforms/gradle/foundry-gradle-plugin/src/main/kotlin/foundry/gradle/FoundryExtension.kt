@@ -105,7 +105,7 @@ constructor(
   internal fun applyTo(project: Project) {
     val logVerbose = foundryProperties.foundryExtensionVerbose
     // Dirty but necessary since the extension isn't configured yet when we call this
-    project.afterEvaluate {
+    project.afterEvaluateCompat {
       featuresHandler.applyTo(project)
 
       var kaptRequired = false

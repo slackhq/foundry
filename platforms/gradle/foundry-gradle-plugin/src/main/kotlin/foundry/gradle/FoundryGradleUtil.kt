@@ -26,6 +26,7 @@ import java.util.Locale
 import java.util.Optional
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.deleteRecursively
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -256,3 +257,17 @@ internal inline fun <reified T : Task> Project.namedLazy(
 
 internal fun <T : Any> Optional<T>.asProvider(providers: ProviderFactory) =
   providers.provider { get() }
+
+/**
+ * Executes the given action either upon the finalization of [AndroidComponentsExtension] DSL or
+ * after the project evaluation, providing compatibility for both scenarios.
+ *
+ * If we're in an Android project, we need to use the [AndroidComponentsExtension.finalizeDsl]
+ * callback to avoid https://github.com/google/ksp/issues/1789#issuecomment-2860100164
+ */
+internal fun Project.afterEvaluateCompat(action: Action<Project>) {
+  val androidComponents =
+    project.extensions.findByName("androidComponents") as? AndroidComponentsExtension<*, *, *>?
+
+  androidComponents?.finalizeDsl { action.execute(this) } ?: afterEvaluate(action)
+}
