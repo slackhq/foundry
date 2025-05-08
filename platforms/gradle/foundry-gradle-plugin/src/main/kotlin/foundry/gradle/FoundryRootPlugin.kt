@@ -339,6 +339,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
           bundle("dagger") {
             includeGroup("com.google.dagger")
             includeDependency("javax.inject:javax.inject")
+            includeDependency("jakarta.inject:jakarta.inject-api")
           }
           bundle("exoplayer") { includeGroup("com.google.android.exoplayer") }
           bundle("kotlin-stdlib") { includeGroup("org.jetbrains.kotlin") }

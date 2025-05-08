@@ -1,3 +1,4 @@
 {
-    "backend.maxHeapSizeMb": 1487
+    "backend.maxHeapSizeMb": 1487,
+    "gradle.autoImportOnSave": false
 }

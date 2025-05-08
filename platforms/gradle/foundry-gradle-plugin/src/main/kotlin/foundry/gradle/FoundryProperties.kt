@@ -264,6 +264,18 @@ internal constructor(
   public val anvilUseKspFork: Boolean
     get() = booleanProperty("foundry.anvil.useKspFork", defaultValue = false)
 
+  /** Flag to enable use of Metro for DI. https://github.com/ZacSweers/metro */
+  public val diUseMetro: Boolean
+    get() = booleanProperty("foundry.di.metro", defaultValue = false)
+
+  /** Flag to enable Dagger interop for Metro. */
+  public val metroInteropDagger: Boolean
+    get() = booleanProperty("foundry.di.metro.interop.dagger", defaultValue = false)
+
+  /** Flag to enable Anvil interop for Metro. */
+  public val metroInteropAnvil: Boolean
+    get() = booleanProperty("foundry.di.metro.interop.anvil", defaultValue = false)
+
   /** Log Foundry extension configuration state verbosely. */
   public val foundryExtensionVerbose: Boolean
     get() = booleanProperty("foundry.extension.verbose")
@@ -471,6 +483,16 @@ internal constructor(
     get() = booleanProperty("foundry.ci-lint.enable", defaultValue = true)
 
   /**
+   * Flag for compressing APKs with legacy packaging.
+   *
+   * See:
+   * - https://issuetracker.google.com/issues/259832799
+   * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
+   */
+  public val compressApksWithLegacyPackaging: Provider<Boolean>
+    get() = resolver.booleanProvider("foundry.android.compressWithLegacyPackaging", false)
+
+  /**
    * Comma-separated list of CI lint variants to run (Android only). Default when unspecified will
    * lint all variants.
    */
@@ -490,14 +512,17 @@ internal constructor(
       )
 
   /**
-   * Flag for compressing androidTest APks with legacy packaging.
+   * Flag for compressing androidTest APKs with legacy packaging.
    *
    * See:
    * - https://issuetracker.google.com/issues/259832799
    * - https://developer.android.com/reference/tools/gradle-api/7.1/com/android/build/api/dsl/DexPackagingOptions#useLegacyPackaging:kotlin.Boolean
    */
   public val compressAndroidTestApksWithLegacyPackaging: Provider<Boolean>
-    get() = resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
+    get() =
+      compressApksWithLegacyPackaging.orElse(
+        resolver.booleanProvider("foundry.android.test.compressWithLegacyPackaging", false)
+      )
 
   /**
    * Option to specify which architecture to target for androidTest APKs. These are universal by

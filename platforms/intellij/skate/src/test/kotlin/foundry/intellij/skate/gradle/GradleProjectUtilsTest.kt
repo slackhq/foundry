@@ -22,7 +22,6 @@ import com.intellij.openapi.util.Disposer
 import org.junit.Test
 
 class GradleProjectUtilsTest {
-
   @Test
   fun `findNearestGradleProject returns current directory if it is a Gradle project`() {
     val root = MockVirtualFile(true, "root")
@@ -138,5 +137,25 @@ class GradleProjectUtilsTest {
     val externalDirectory = MockVirtualFile(true, "externalDirectory")
 
     assertThat(GradleProjectUtils.getGradleProjectPath(project, externalDirectory)).isNull()
+  }
+
+  @Test
+  fun `getGradleProjectAccessorPath returns camelCase accessor for hyphenated module`() {
+    val rootDir = MockVirtualFile(true, "rootDir")
+    val project = MockProject(null, Disposer.newDisposable()).apply { baseDir = rootDir }
+
+    // create a sample mock gradle project: libraries/sample-result/test
+    val librariesDir = MockVirtualFile(true, "libraries")
+    val sampleResultDir = MockVirtualFile(true, "sample-result")
+    val testDir = MockVirtualFile(true, "test")
+
+    testDir.addChild(MockVirtualFile(false, "build.gradle.kts"))
+    sampleResultDir.addChild(testDir)
+    librariesDir.addChild(sampleResultDir)
+    rootDir.addChild(librariesDir)
+
+    val result = GradleProjectUtils.getGradleProjectAccessorPath(project, testDir)
+
+    assertThat(result).isEqualTo("projects.libraries.sampleResult.test")
   }
 }

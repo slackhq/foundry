@@ -23,9 +23,9 @@ import com.autonomousapps.model.IncludedBuildCoordinates
 import com.autonomousapps.model.ModuleCoordinates
 import com.autonomousapps.model.PluginAdvice
 import com.autonomousapps.model.ProjectCoordinates
+import foundry.common.convertProjectPathToAccessor
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Resolver
-import foundry.gradle.convertProjectPathToAccessor
 import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.property
 import java.io.File

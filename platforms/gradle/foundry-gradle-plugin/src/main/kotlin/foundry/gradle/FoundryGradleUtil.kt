@@ -19,7 +19,6 @@ import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.TestAndroidComponentsExtension
-import com.google.common.base.CaseFormat
 import foundry.gradle.properties.gitExecProvider
 import foundry.gradle.properties.mapToBoolean
 import java.io.File
@@ -222,21 +221,6 @@ internal fun String.snakeToCamel(upper: Boolean = false): String {
         }
       }
     }
-  }
-}
-
-private fun kebabCaseToCamelCase(s: String): String {
-  return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, s)
-}
-
-/**
- * Returns a project accessor representation of the given [projectPath].
- *
- * Example: `:libraries:foundation` -> `libraries.foundation`.
- */
-internal fun convertProjectPathToAccessor(projectPath: String): String {
-  return projectPath.removePrefix(":").split(":").joinToString(separator = ".") { segment ->
-    kebabCaseToCamelCase(segment)
   }
 }
 

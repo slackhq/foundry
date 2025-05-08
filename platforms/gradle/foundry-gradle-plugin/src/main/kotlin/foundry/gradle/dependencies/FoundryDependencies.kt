@@ -78,6 +78,7 @@ import foundry.gradle.dependencies.FoundryDependencies.artifact
 internal object FoundryDependencies : DependencySet() {
 
   internal val javaxInject: Any by artifact("javax.inject", "javax.inject")
+  internal val jakarta: Any by artifact("jakarta.inject", "jakarta.inject-api")
 
   object Auto : DependencySet() {
     val common: Any by artifact("com.google.auto", "auto-common")

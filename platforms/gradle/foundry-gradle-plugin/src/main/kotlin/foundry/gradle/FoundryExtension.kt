@@ -24,6 +24,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
+import dev.zacsweers.metro.gradle.MetroPluginExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import foundry.gradle.agp.PermissionAllowlistConfigurer
 import foundry.gradle.anvil.AnvilMode
@@ -189,25 +190,31 @@ constructor(
       // Dagger is configured first. If Dagger's compilers are present,
       // everything else needs to also use kapt!
       val daggerConfig =
-        featuresHandler.daggerHandler.computeConfig(
+        featuresHandler.diHandler.computeConfig(
           featuresHandler.testFixturesUseDagger.getOrElse(false)
         )
       val useAnyKspAnvilMode = anvilMode.useKspFactoryGen || anvilMode.useKspContributionMerging
       if (daggerConfig != null) {
-        dependencies.add("implementation", FoundryDependencies.Dagger.dagger)
-        dependencies.add("implementation", FoundryDependencies.javaxInject)
-
         val anvilPackage =
           if (foundryProperties.anvilUseKspFork) {
             "dev.zacsweers.anvil"
           } else {
             "com.squareup.anvil"
           }
-        if (daggerConfig.runtimeOnly) {
+
+        val addAnvilAnnotations = {
           val annotations = "$anvilPackage:annotations"
           dependencies.add("compileOnly", annotations)
           if (daggerConfig.testFixturesUseDagger) {
             dependencies.add("testFixturesCompileOnly", annotations)
+          }
+        }
+
+        fun addDaggerRuntimeDeps(enableAnvil: Boolean) {
+          dependencies.add("implementation", FoundryDependencies.Dagger.dagger)
+
+          if (enableAnvil) {
+            addAnvilAnnotations()
           }
         }
 
@@ -222,110 +229,11 @@ constructor(
           )
         }
 
-        if (daggerConfig.enableAnvil) {
-          if (!foundryProperties.disableAnvilForK2Testing) {
-            val anvilId =
-              if (foundryProperties.anvilUseKspFork) {
-                "dev.zacsweers.anvil"
-              } else {
-                "com.squareup.anvil"
-              }
-            pluginManager.apply(anvilId)
-            val anvilExtension = extensions.getByType<AnvilExtension>()
-            anvilExtension.apply {
-              generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
-              generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
-            }
+        if (daggerConfig.runtimeOnly) {
+          addDaggerRuntimeDeps(enableAnvil = true)
+        }
 
-            if (useAnyKspAnvilMode) {
-              // Workaround early application for https://github.com/google/ksp/issues/1789
-              pluginManager.apply("com.google.devtools.ksp")
-              anvilExtension.useKsp(
-                contributesAndFactoryGeneration = true,
-                componentMerging = anvilMode.useKspContributionMerging,
-              )
-
-              if (daggerConfig.testFixturesUseDagger) {
-                dependencies.add(kspConfiguration("testFixtures"), "$anvilPackage:compiler")
-              }
-
-              // Make KSP depend on sqldelight and viewbinding tasks
-              // This is opt-in as it's better for build performance to skip this linking if
-              // possible
-              // TODO KSP is supposed to do this automatically in android projects per
-              //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
-              //  let's make this optional
-              // afterEvaluate is necessary in order to wait for tasks to exist
-              if (
-                foundryProperties.kspConnectSqlDelight || foundryProperties.kspConnectViewBinding
-              ) {
-                afterEvaluate {
-                  if (
-                    foundryProperties.kspConnectSqlDelight &&
-                      pluginManager.hasPlugin("app.cash.sqldelight")
-                  ) {
-                    val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
-                    val sourceSet =
-                      when {
-                        isKotlinMultiplatform -> "CommonMain"
-                        isAndroidLibrary -> "Release"
-                        else -> "Main"
-                      }
-                    val sourceSetKspName =
-                      when {
-                        isKotlinMultiplatform -> "CommonMainMetadata"
-                        isAndroidLibrary -> "Release"
-                        else -> ""
-                      }
-                    for (dbName in dbNames) {
-                      val sqlDelightTask =
-                        tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
-                      val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
-                      project.addKspSource(
-                        "ksp${sourceSetKspName}Kotlin",
-                        sqlDelightTask,
-                        outputProvider,
-                      )
-                    }
-                  }
-
-                  // If using viewbinding, need to wire those up too
-                  if (
-                    foundryProperties.kspConnectViewBinding &&
-                      isAndroidLibrary &&
-                      !foundryProperties.libraryWithVariants &&
-                      androidHandler.isViewBindingEnabled
-                  ) {
-                    val databindingTask =
-                      tasks.named<DataBindingGenBaseClassesTask>("dataBindingGenBaseClassesRelease")
-                    val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
-                    project.addKspSource(
-                      "kspReleaseKotlin",
-                      databindingTask,
-                      databindingOutputProvider,
-                    )
-                  }
-                }
-              }
-            }
-
-            if (anvilMode == AnvilMode.K1_EMBEDDED) {
-              val generatorProjects =
-                buildSet<Any> {
-                  addAll(
-                    foundryProperties.anvilGeneratorProjects
-                      ?.splitToSequence(";")
-                      ?.map(::project)
-                      .orEmpty()
-                  )
-                  addAll(featuresHandler.daggerHandler.anvilGenerators)
-                }
-              for (generator in generatorProjects) {
-                dependencies.add("anvil", generator)
-              }
-            }
-          }
-
+        val addAnvilRuntimeProjects = {
           val runtimeProjects =
             foundryProperties.anvilRuntimeProjects?.splitToSequence(";")?.toSet().orEmpty()
 
@@ -337,15 +245,144 @@ constructor(
           }
         }
 
-        if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-          if (allowDaggerKsp && (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)) {
-            markKspNeeded("Dagger compiler")
-            dependencies.add(kspConfiguration(""), FoundryDependencies.Dagger.compiler)
-            // Currently we don't support dagger-compiler or components in test fixtures, but if we
-            // did it would go here
-          } else {
-            markKaptNeeded("Dagger compiler")
-            dependencies.add(aptConfiguration(), FoundryDependencies.Dagger.compiler)
+        if (daggerConfig.useMetro) {
+          // Use Metro
+          pluginManager.apply("dev.zacsweers.metro")
+          addAnvilRuntimeProjects()
+          val metroExtension = extensions.getByType<MetroPluginExtension>()
+          if (daggerConfig.metroInteropDagger) {
+            addDaggerRuntimeDeps(enableAnvil = daggerConfig.metroInteropAnvil)
+            metroExtension.interop.apply {
+              includeDagger()
+              if (daggerConfig.metroInteropAnvil) {
+                includeAnvil(includeDaggerAnvil = false, includeKotlinInjectAnvil = false)
+              }
+            }
+          }
+        } else {
+          // Using Dagger ± Anvil
+          addDaggerRuntimeDeps(enableAnvil = daggerConfig.enableAnvil)
+
+          if (daggerConfig.enableAnvil) {
+            if (!foundryProperties.disableAnvilForK2Testing) {
+              val anvilId =
+                if (foundryProperties.anvilUseKspFork) {
+                  "dev.zacsweers.anvil"
+                } else {
+                  "com.squareup.anvil"
+                }
+              pluginManager.apply(anvilId)
+              val anvilExtension = extensions.getByType<AnvilExtension>()
+              anvilExtension.apply {
+                generateDaggerFactories.setDisallowChanges(daggerConfig.anvilFactories)
+                generateDaggerFactoriesOnly.setDisallowChanges(daggerConfig.anvilFactoriesOnly)
+              }
+
+              if (useAnyKspAnvilMode) {
+                // Workaround early application for https://github.com/google/ksp/issues/1789
+                pluginManager.apply("com.google.devtools.ksp")
+                anvilExtension.useKsp(
+                  contributesAndFactoryGeneration = true,
+                  componentMerging = anvilMode.useKspContributionMerging,
+                )
+
+                if (daggerConfig.testFixturesUseDagger) {
+                  dependencies.add(kspConfiguration("testFixtures"), "$anvilPackage:compiler")
+                }
+
+                // Make KSP depend on sqldelight and viewbinding tasks
+                // This is opt-in as it's better for build performance to skip this linking if
+                // possible
+                // TODO KSP is supposed to do this automatically in android projects per
+                //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
+                //  let's make this optional
+                // afterEvaluate is necessary in order to wait for tasks to exist
+                if (
+                  foundryProperties.kspConnectSqlDelight || foundryProperties.kspConnectViewBinding
+                ) {
+                  afterEvaluate {
+                    if (
+                      foundryProperties.kspConnectSqlDelight &&
+                        pluginManager.hasPlugin("app.cash.sqldelight")
+                    ) {
+                      val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
+                      val sourceSet =
+                        when {
+                          isKotlinMultiplatform -> "CommonMain"
+                          isAndroidLibrary -> "Release"
+                          else -> "Main"
+                        }
+                      val sourceSetKspName =
+                        when {
+                          isKotlinMultiplatform -> "CommonMainMetadata"
+                          isAndroidLibrary -> "Release"
+                          else -> ""
+                        }
+                      for (dbName in dbNames) {
+                        val sqlDelightTask =
+                          tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
+                        val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
+                        project.addKspSource(
+                          "ksp${sourceSetKspName}Kotlin",
+                          sqlDelightTask,
+                          outputProvider,
+                        )
+                      }
+                    }
+
+                    // If using viewbinding, need to wire those up too
+                    if (
+                      foundryProperties.kspConnectViewBinding &&
+                        isAndroidLibrary &&
+                        !foundryProperties.libraryWithVariants &&
+                        androidHandler.isViewBindingEnabled
+                    ) {
+                      val databindingTask =
+                        tasks.named<DataBindingGenBaseClassesTask>(
+                          "dataBindingGenBaseClassesRelease"
+                        )
+                      val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
+                      project.addKspSource(
+                        "kspReleaseKotlin",
+                        databindingTask,
+                        databindingOutputProvider,
+                      )
+                    }
+                  }
+                }
+              }
+
+              if (anvilMode == AnvilMode.K1_EMBEDDED) {
+                val generatorProjects =
+                  buildSet<Any> {
+                    addAll(
+                      foundryProperties.anvilGeneratorProjects
+                        ?.splitToSequence(";")
+                        ?.map(::project)
+                        .orEmpty()
+                    )
+                    addAll(featuresHandler.diHandler.anvilGenerators)
+                  }
+                for (generator in generatorProjects) {
+                  dependencies.add("anvil", generator)
+                }
+              }
+            }
+
+            addAnvilRuntimeProjects()
+          }
+
+          if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
+            if (allowDaggerKsp /*&& (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)*/) {
+              markKspNeeded("Dagger compiler")
+              dependencies.add(kspConfiguration(""), FoundryDependencies.Dagger.compiler)
+              // Currently we don't support dagger-compiler or components in test fixtures, but if
+              // we
+              // did it would go here
+            } else {
+              markKaptNeeded("Dagger compiler")
+              dependencies.add(aptConfiguration(), FoundryDependencies.Dagger.compiler)
+            }
           }
         }
       }
@@ -430,6 +467,7 @@ constructor(
       if (
         kaptRequired &&
           daggerConfig?.enableAnvil == true &&
+          !daggerConfig.useMetro &&
           !daggerConfig.alwaysEnableAnvilComponentMerging
       ) {
         configure<AnvilExtension> { disableComponentMerging.setDisallowChanges(true) }
@@ -452,7 +490,7 @@ constructor(
   versionCatalog: VersionCatalog,
 ) {
   // Dagger features
-  internal val daggerHandler = objects.newInstance<DaggerHandler>()
+  internal val diHandler = objects.newInstance<DiHandler>(foundryProperties)
 
   // Circuit features
   internal val circuitHandler = objects.newInstance<CircuitHandler>()
@@ -516,9 +554,30 @@ constructor(
    *
    * @param action optional block for extra configuration, such as anvil generators or android.
    */
-  public fun dagger(action: Action<DaggerHandler>? = null) {
-    daggerHandler.enabled.setDisallowChanges(true)
-    action?.execute(daggerHandler)
+  public fun dagger(action: Action<DiHandler>? = null) {
+    diHandler.enabled.setDisallowChanges(true)
+    action?.execute(diHandler)
+  }
+
+  /**
+   * Enables metro for this project.
+   *
+   * @param action optional block for extra configuration.
+   */
+  public fun metro(action: Action<DiHandler>? = null) {
+    diHandler.enabled.setDisallowChanges(true)
+    diHandler.useMetro.setDisallowChanges(true)
+    action?.execute(diHandler)
+  }
+
+  /**
+   * Enables metro for this project.
+   *
+   * @param action optional block for extra configuration.
+   */
+  public fun metroRuntimeOnly(action: Action<DiHandler>? = null) {
+    diHandler.runtimeOnly.set(true)
+    metro(action)
   }
 
   /**
@@ -535,20 +594,20 @@ constructor(
   public fun dagger(
     enableComponents: Boolean = false,
     projectHasJavaInjections: Boolean = false,
-    action: Action<DaggerHandler>? = null,
+    action: Action<DiHandler>? = null,
   ) {
     check(enableComponents || projectHasJavaInjections) {
       "This function should not be called with both enableComponents and projectHasJavaInjections set to false. Either remove these parameters or call a more appropriate non-delicate dagger() overload."
     }
-    daggerHandler.enabled.setDisallowChanges(true)
-    daggerHandler.useDaggerCompiler.setDisallowChanges(true)
-    action?.execute(daggerHandler)
+    diHandler.enabled.setDisallowChanges(true)
+    diHandler.useDaggerCompiler.setDisallowChanges(true)
+    action?.execute(diHandler)
   }
 
   /** Adds dagger's runtime as dependencies to this but runs no code generation. */
   public fun daggerRuntimeOnly() {
-    daggerHandler.enabled.setDisallowChanges(true)
-    daggerHandler.runtimeOnly.setDisallowChanges(true)
+    diHandler.enabled.setDisallowChanges(true)
+    diHandler.runtimeOnly.setDisallowChanges(true)
   }
 
   /**
@@ -638,7 +697,7 @@ constructor(
     composeHandler.applyTo(project)
     circuitHandler.applyTo(project, foundryProperties)
     // Validate we've enabled dagger if we requested test fixtures with dagger code
-    if (testFixturesUseDagger.getOrElse(false) && !daggerHandler.enabled.getOrElse(false)) {
+    if (testFixturesUseDagger.getOrElse(false) && !diHandler.enabled.getOrElse(false)) {
       error(
         "In order to enable test fixtures with dagger, you must also enable " +
           "the `foundry { features { dagger() } }` feature"
@@ -770,7 +829,9 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
 }
 
 @FoundryExtensionMarker
-public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) {
+public abstract class DiHandler
+@Inject
+constructor(objects: ObjectFactory, foundryProperties: FoundryProperties) {
   internal val enabled: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val useDaggerCompiler: Property<Boolean> = objects.property<Boolean>().convention(false)
   internal val disableAnvil: Property<Boolean> = objects.property<Boolean>().convention(false)
@@ -778,6 +839,12 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
   internal val alwaysEnableAnvilComponentMerging: Property<Boolean> =
     objects.property<Boolean>().convention(false)
   internal val anvilGenerators = objects.domainObjectSet<Any>()
+  internal val useMetro: Property<Boolean> =
+    objects.property<Boolean>().convention(foundryProperties.diUseMetro)
+  internal val metroInteropDagger: Property<Boolean> =
+    objects.property<Boolean>().convention(foundryProperties.metroInteropDagger)
+  internal val metroInteropAnvil: Property<Boolean> =
+    objects.property<Boolean>().convention(foundryProperties.metroInteropAnvil)
 
   /**
    * Dependencies for Anvil generators that should be added. These should be in the same form as
@@ -834,13 +901,16 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     }
 
     return DaggerConfig(
-      runtimeOnly,
-      enableAnvil,
-      anvilFactories,
-      anvilFactoriesOnly,
-      useDaggerCompiler,
-      alwaysEnableAnvilComponentMerging,
-      testFixturesUseDagger,
+      runtimeOnly = runtimeOnly,
+      enableAnvil = enableAnvil,
+      anvilFactories = anvilFactories,
+      anvilFactoriesOnly = anvilFactoriesOnly,
+      useDaggerCompiler = useDaggerCompiler,
+      alwaysEnableAnvilComponentMerging = alwaysEnableAnvilComponentMerging,
+      testFixturesUseDagger = testFixturesUseDagger,
+      useMetro = useMetro.getOrElse(false),
+      metroInteropDagger = metroInteropDagger.getOrElse(false),
+      metroInteropAnvil = metroInteropAnvil.getOrElse(false),
     )
   }
 
@@ -852,6 +922,9 @@ public abstract class DaggerHandler @Inject constructor(objects: ObjectFactory) 
     val useDaggerCompiler: Boolean,
     val alwaysEnableAnvilComponentMerging: Boolean,
     val testFixturesUseDagger: Boolean,
+    val useMetro: Boolean,
+    val metroInteropDagger: Boolean,
+    val metroInteropAnvil: Boolean,
   )
 }
 

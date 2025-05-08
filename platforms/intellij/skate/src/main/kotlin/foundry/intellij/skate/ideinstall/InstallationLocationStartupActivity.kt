@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2025 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  alias(libs.plugins.kotlin.jvm)
-  alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.lint)
-}
+package foundry.intellij.skate.ideinstall
 
-dependencies {
-  api(platform(libs.coroutines.bom))
-  api(libs.moshi)
-  api(libs.okio)
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.ProjectActivity
 
-  implementation(libs.coroutines.core)
-  implementation(libs.guava)
-
-  testImplementation(libs.junit)
-  testImplementation(libs.truth)
+class InstallationLocationStartupActivity : ProjectActivity {
+  override suspend fun execute(project: Project) {
+    val service = project.service<InstallationLocationService>()
+    service.checkInstallationLocation()
+  }
 }

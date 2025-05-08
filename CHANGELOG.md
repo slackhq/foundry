@@ -4,6 +4,35 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.1
+------
+
+_2025-04-30_
+
+- Add a new `foundry.android.compressWithLegacyPackaging` property to enable legacy compression for all APKs.
+- Fix Jakarta coordinates when applying Dagger runtime deps.
+- Build against DAGP `2.17.0`.
+
+0.27.0
+------
+
+_2025-04-25_
+
+- Add a `metro()` feature.
+- Always set targetSdk in `androidx.benchmark` projects.
+- Remove Guava dependency from version-number artifact.
+- Update coroutines to `1.10.2`.
+- Update Okio to `3.11.0`.
+- Update Oshi to `6.8.1`.
+- Update Kaml to `0.70.0`.
+- Update Guava to `33.4.8-jre`.
+- Update xmlutil to `0.91.0`.
+- Build against Gradle `8.14`.
+- Build against AGP `8.9.2`.
+- Build against Develocity `4.0.1`.
+- Build against error-prone-gradle `4.2.0`.
+- Build against emulator.wtf Gradle plugin `0.19.1`.
+
 0.26.0
 ------
 
