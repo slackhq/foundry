@@ -119,11 +119,7 @@ configurations
 
 dependencies {
   intellijPlatform {
-    // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
-    // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
-    // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
-    // ^^ This is the list to pull versions from
-    plugin("org.jetbrains.android:243.22562.218")
+    plugin(libs.versions.intellij.android.map { "org.jetbrains.android:${it}" }.get())
     bundledPlugins(
       "com.intellij.java",
       "org.intellij.plugins.markdown",
