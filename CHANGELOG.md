@@ -4,6 +4,16 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.2
+------
+
+_2025-05-09_
+
+- Use `finalizeDsl` when configuring KSP tasks if running in an android project.
+- Update kaml to `0.77.1`.
+- Build against AGP `8.10.0`.
+- Build against KSP `2.1.20-2.0.1`.
+
 0.27.1
 ------
 
