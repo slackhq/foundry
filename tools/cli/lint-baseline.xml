@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.10.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.0)" variant="all" version="8.10.0-alpha08">
+<issues format="6" by="lint 8.11.0-alpha10" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.0)" variant="all" version="8.11.0-alpha10">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -131,72 +131,6 @@
             file="src/main/kotlin/foundry/cli/shellsentry/Issue.kt"
             line="45"
             column="59"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(signal is RetrySignal.RetryDelayed)"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/test/kotlin/foundry/cli/shellsentry/ResultProcessorTest.kt"
-            line="134"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(signal is RetrySignal.RetryImmediately)"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/test/kotlin/foundry/cli/shellsentry/ResultProcessorTest.kt"
-            line="148"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(signal is RetrySignal.Ack)"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/test/kotlin/foundry/cli/shellsentry/ResultProcessorTest.kt"
-            line="162"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(signal is RetrySignal.Ack)"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/test/kotlin/foundry/cli/shellsentry/ResultProcessorTest.kt"
-            line="176"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(signal is RetrySignal.Unknown)"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/test/kotlin/foundry/cli/shellsentry/ResultProcessorTest.kt"
-            line="190"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(signal is RetrySignal.Unknown)"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/test/kotlin/foundry/cli/shellsentry/ResultProcessorTest.kt"
-            line="225"
-            column="5"/>
     </issue>
 
 </issues>
