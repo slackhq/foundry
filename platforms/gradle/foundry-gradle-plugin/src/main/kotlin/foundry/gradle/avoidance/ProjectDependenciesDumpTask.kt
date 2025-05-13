@@ -60,11 +60,9 @@ public abstract class ProjectDependenciesDumpTask : DefaultTask() {
     private val Project.directProjectDependencies: Provider<Set<String>>
       get() {
         return provider {
-          configurations
-            .filter { c -> !c.isCanBeResolved }
-            .flatMapToSet { c ->
-              c.dependencies.filterIsInstance<ProjectDependency>().map { it.path }
-            }
+          configurations.flatMapToSet { c ->
+            c.dependencies.filterIsInstance<ProjectDependency>().map { it.path }
+          }
         }
       }
   }
