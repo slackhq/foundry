@@ -104,15 +104,15 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
           globalConfig.affectedProjects,
         )
       ModuleStatsTasks.configureSubproject(target, foundryProperties, topographyTask)
+
+      // Project deps generation
+      ProjectDependenciesDumpTask.register(target)
     } else {
       // Root-only
       ModuleTopographyTasks.configureRootProject(target)
     }
 
     // Everything in here applies to all projects
-
-    // Project deps generation
-    ProjectDependenciesDumpTask.register(target)
     target.configureClasspath(foundryProperties)
 
     if (!this.buildFeatures.isolatedProjects.requested.getOrElse(false)) {
