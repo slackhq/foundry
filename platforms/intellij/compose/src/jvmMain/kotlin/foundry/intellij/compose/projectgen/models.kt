@@ -49,25 +49,37 @@ internal data class Project(
       feature.renderFiles(projectDir)
     }
 
-    val settingsFile = rootDir.resolve("settings-all.gradle.kts")
-    val includedProjects =
-      settingsFile
-        .readLines()
-        .asSequence()
-        .filter { it.startsWith("  \":") }
-        .map { it.trim().removeSuffix(",").removeSurrounding("\"") }
-        .plus(path)
-        .sorted()
+    val settingsAllFile = rootDir.resolve("settings-all.gradle.kts")
+    val allProjectsFile = rootDir.resolve("gradle/all-projects.txt")
+    if (settingsAllFile.exists()) {
+      val includedProjects =
+        settingsAllFile
+          .readLines()
+          .asSequence()
+          .filter { it.startsWith("  \":") }
+          .map { it.trim().removeSuffix(",").removeSurrounding("\"") }
+          .plus(path)
+          .sorted()
 
-    settingsFile.writeText(
-      includedProjects.joinToString(
-        "\n",
-        prefix = "// Please keep these in alphabetical order!\ninclude(\n",
-        postfix = "\n)\n",
-      ) {
-        "  \"$it\","
-      }
-    )
+      settingsAllFile.writeText(
+        includedProjects.joinToString(
+          "\n",
+          prefix = "// Please keep these in alphabetical order!\ninclude(\n",
+          postfix = "\n)\n",
+        ) {
+          "  \"$it\","
+        }
+      )
+    } else if (allProjectsFile.exists()) {
+      val includedProjects =
+        allProjectsFile.readLines().asSequence().filter { it.startsWith(":") }.plus(path).sorted()
+
+      allProjectsFile.writeText(
+        includedProjects.joinToString("\n", prefix = "# Please keep these in alphabetical order!\n")
+      )
+    } else {
+      error("No settings-all.gradle.kts or all-projects.txt file found!")
+    }
   }
 }
 
