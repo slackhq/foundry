@@ -136,7 +136,7 @@ public abstract class ComputeAffectedProjectsTask : DefaultTask() {
           rootDir = rootDirPath,
           parallelism = parallelism,
           fs = FileSystem.SYSTEM,
-          dependencyGraph = dependencyGraph,
+          dependencyGraph = DependencyGraph.create(dependencyGraph),
           changedFilesPath = rootDirPath.resolve(changedFiles.get()),
           originalConfigMap =
             configs.map(SkippyGradleConfig::asSkippyConfig).associateBy { it.tool },
