@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Add `--dependency-graph-edges` support to Skippy CLI. This allows you to specify a newline-delimited set of edges in a graph rather than a serialized graph.
+
 0.27.2
 ------
 
