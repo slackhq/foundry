@@ -31,7 +31,7 @@ kotlinPoet = "2.1.0"
 ktfmt = "0.54"
 markdown = "0.34.0"
 mavenPublish = "0.32.0"
-metro = "0.3.0"
+metro = "0.3.2"
 mordant = "3.0.2"
 moshi = "1.15.2"
 moshix = "0.30.0"
@@ -45,7 +45,7 @@ sortDependencies = "0.14"
 spotless = "7.0.3"
 sqldelight = "2.0.2"
 wire = "5.3.1"
-xmlutil = "0.91.0"
+xmlutil = "0.91.1"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }

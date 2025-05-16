@@ -220,31 +220,6 @@ internal data class AndroidLibraryFeature(
     }
     resourcesPrefix?.let { builder.addStatement("resources(\"$it\")") }
   }
-
-  override fun renderFiles(projectDir: Path) {
-    if (androidTest) {
-      val androidTestDir = projectDir.resolve("src/androidTest")
-      androidTestDir.createDirectories()
-
-      // Write the manifest file
-      androidTestDir
-        .resolve("AndroidManifest.xml")
-        // language=XML
-        .writeText(
-          """
-        <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-            <!-- Necessary for debugging to work since our libraries are single-variant. -->
-            <application android:debuggable="true" />
-        </manifest>
-        """
-            .trimIndent()
-        )
-
-      // Write the placeholder test file
-      writePlaceholderFileTo(androidTestDir, packageName)
-    }
-  }
 }
 
 internal data class KotlinFeature(val packageName: String, val isAndroid: Boolean) :
