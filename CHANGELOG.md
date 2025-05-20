@@ -4,6 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.4
+------
+
+_2025-05-20_
+
+- Check both `bootstrap` and `:bootstrap` task names when registering bootstrap.
+
 0.27.3
 ------
 
