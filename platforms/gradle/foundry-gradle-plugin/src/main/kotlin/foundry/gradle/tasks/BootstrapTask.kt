@@ -333,7 +333,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
     public const val VERSION: Int = 3
 
     internal fun isBootstrapEnabled(project: Project): Boolean {
-      return project.gradle.startParameter.taskNames.any { it == NAME }
+      return project.gradle.startParameter.taskNames.any { it == ":$NAME" || it == NAME }
     }
 
     public fun register(

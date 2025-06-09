@@ -55,7 +55,7 @@ class SkippyRunnerTest {
         rootDir = rootDirPath,
         outputsDir = rootDirPath / "build" / "skippy" / "outputs",
         androidTestProjects = setOf(":foo"),
-        dependencyGraph = dependencyGraph.serializableGraph(),
+        dependencyGraph = dependencyGraph,
         changedFilesPath = changedFilesPath,
         originalConfigMap = configs.associateBy { it.tool },
         debug = true,

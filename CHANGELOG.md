@@ -4,6 +4,35 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.4
+------
+
+_2025-05-20_
+
+- Check both `bootstrap` and `:bootstrap` task names when registering bootstrap.
+
+0.27.3
+------
+
+_2025-05-16_
+
+- Add `--dependency-graph-edges` support to Skippy CLI. This allows you to specify a newline-delimited set of edges in a graph rather than a serialized graph.
+- Automatically mark `androidTest` APKs as `debuggable`, avoiding the need to manually specify placeholder manifests with a `debuggable` attribute set.
+- Update xmlutil to `0.91.1`.
+- Update kaml to `0.78.0`.
+- Build against Kotlin `2.1.21`.
+- Build against KSP `2.1.21-2.0.1`.
+
+0.27.2
+------
+
+_2025-05-09_
+
+- Use `finalizeDsl` when configuring KSP tasks if running in an android project.
+- Update kaml to `0.77.1`.
+- Build against AGP `8.10.0`.
+- Build against KSP `2.1.20-2.0.1`.
+
 0.27.1
 ------
 

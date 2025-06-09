@@ -863,19 +863,13 @@ internal class StandardProjectConfigurations(
               foundryExtension.androidHandler.featuresHandler.androidTestAllowedVariants.orNull
                 ?.contains(builder.name) != false
           builder.androidTest.enable = variantEnabled
-          if (variantEnabled) {
-            // Ensure there's a manifest file present and has its debuggable flag set correctly
-            if (
-              foundryProperties.strictMode && foundryProperties.strictValidateAndroidTestManifest
-            ) {
-              val manifest = project.file("src/androidTest/AndroidManifest.xml")
-              check(manifest.exists()) {
-                "AndroidManifest.xml is missing from src/androidTest. Ensure it exists and also is set to debuggable!"
-              }
-              check(manifest.readText().contains("android:debuggable=\"true\"")) {
-                "AndroidManifest.xml in src/androidTest is missing the debuggable flag! Ensure it is set to 'android:debuggable=\"true\"'"
-              }
-            }
+
+          // Explicitly mark the test APK as debuggable for debugging purposes
+          // Don't do this for benchmark projects as those must not be debuggable
+          val hasBenchmarkPlugin =
+            plugins.hasPlugin("androidx.baselineprofile") || plugins.hasPlugin("androidx.benchmark")
+          if (!hasBenchmarkPlugin) {
+            builder.androidTest.debuggable = true
           }
         }
 

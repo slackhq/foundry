@@ -18,6 +18,7 @@ package foundry.gradle
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.diffplug.gradle.spotless.SpotlessExtensionPredeclare
 import com.diffplug.spotless.LineEnding
+import foundry.gradle.avoidance.ProjectDependenciesDumpTask
 import foundry.gradle.develocity.NoOpBuildScanAdapter
 import foundry.gradle.develocity.findAdapter
 import foundry.gradle.stats.ModuleStatsTasks
@@ -109,7 +110,11 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
     }
 
     // Everything in here applies to all projects
+
+    // Project deps generation
+    ProjectDependenciesDumpTask.register(target)
     target.configureClasspath(foundryProperties)
+
     if (!this.buildFeatures.isolatedProjects.requested.getOrElse(false)) {
       // TODO https://github.com/diffplug/spotless/issues/1979
       target.configureSpotless(foundryProperties)

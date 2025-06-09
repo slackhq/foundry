@@ -38,7 +38,7 @@ public class SkippyRunner(
   private val outputsDir: Path,
   private val androidTestProjects: Set<String> = emptySet(),
   private val rootDir: Path,
-  private val dependencyGraph: DependencyGraph.SerializableGraph,
+  private val dependencyGraph: DependencyGraph,
   private val changedFilesPath: Path,
   private val originalConfigMap: Map<String, SkippyConfig>,
   private val parallelism: Int = originalConfigMap.size,
@@ -73,9 +73,6 @@ public class SkippyRunner(
 
     val baseOutputDir = outputsDir
     withContext(context) {
-      // Pre-compute dependency graph shape
-      val resolvedDependencyGraph =
-        logTimedValue("diagnostics", "resolving graph") { DependencyGraph.create(dependencyGraph) }
       val diagnostics =
         if (debug) {
           val diagnosticsDir = outputsDir / "diagnostics"
@@ -91,7 +88,7 @@ public class SkippyRunner(
 
       val shallowProjectsToDependencies: Map<String, Set<String>> =
         logTimedValue("diagnostics", "computing shallow dependencies") {
-          resolvedDependencyGraph.nodes().associate { node ->
+          dependencyGraph.nodes().associate { node ->
             val dependencies = mutableSetOf<DependencyGraph.Node>()
             node.visitDependencies(dependencies)
             node.key to dependencies.mapTo(mutableSetOf()) { it.key }

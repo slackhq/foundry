@@ -27,6 +27,7 @@ import foundry.common.json.JsonTools
 import java.io.ObjectInputStream
 import java.nio.file.Path
 import kotlin.coroutines.CoroutineContext
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.inputStream
 import kotlin.io.path.readLines
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -84,9 +85,20 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
       .required()
 
   private val serializedDependencyGraph by
-    option("--dependency-graph", help = "Path to a serialized dependency graph file.")
+    option(
+        "--dependency-graph",
+        help =
+          "Path to a serialized dependency graph file. Only necessary if using the legacy mode.",
+      )
       .path(mustExist = true, canBeDir = false, mustBeReadable = true)
-      .required()
+
+  private val graphEdges by
+    option(
+        "--dependency-graph-edges",
+        help =
+          "Path to a list of dependency graph edges. In the format of newline-delimited :path1,:path2",
+      )
+      .path(mustExist = true, canBeDir = false, mustBeReadable = true)
 
   private val androidTestProjectPaths by
     option(
@@ -98,12 +110,25 @@ public class ComputeAffectedProjectsCli : SuspendingCliktCommand() {
 
   private val logger = FoundryLogger.clikt(this)
 
-  @OptIn(DelicateCoroutinesApi::class)
+  @OptIn(DelicateCoroutinesApi::class, ExperimentalPathApi::class)
   override suspend fun run() {
     val dependencyGraph =
-      ObjectInputStream(serializedDependencyGraph.inputStream()).use {
-        it.readObject() as DependencyGraph.SerializableGraph
+      if (serializedDependencyGraph != null) {
+        echo("--dependency-graph is deprecated. Use --dependency-graph-edges instead.", err = true)
+        ObjectInputStream(serializedDependencyGraph!!.inputStream())
+          .use { it.readObject() as DependencyGraph.SerializableGraph }
+          .let { DependencyGraph.create(it) }
+      } else if (graphEdges != null) {
+        // Compute the DAG directly from edges produced by another tool
+        val allEdges =
+          graphEdges!!.readLines().map { line ->
+            line.split(',').let { (source, dependency) -> source to dependency }
+          }
+        DependencyGraph.create(allEdges)
+      } else {
+        error("One of '--dependency-graph' or '--dependency-graph-edges' must be specified.")
       }
+
     val rootDirPath = rootDir.toOkioPath()
     val configs = JsonTools.fromJson<List<SkippyConfig>>(config).associateBy { it.tool }
     val parallelism =
