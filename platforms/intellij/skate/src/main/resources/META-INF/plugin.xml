@@ -24,8 +24,6 @@
         <postStartupActivity implementation="foundry.intellij.skate.PostStartupActivityExtension"/>
         <postStartupActivity implementation="foundry.intellij.skate.ideinstall.InstallationLocationStartupActivity"/>
         <notificationGroup id="SkateInstallationLocation" displayType="BALLOON" isLogByDefault="true"/>
-        <!--        <toolWindow factoryClass="foundry.intellij.skate.aibot.ChatBotToolWindow" id="DevXPAI" anchor="right"-->
-        <!--                    canCloseContents="true" secondary="false" icon="AllIcons.Actions.Lightning"/>-->
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
