@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.intellij.compose.aibot
+package foundry.intellij.compose.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
