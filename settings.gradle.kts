@@ -61,7 +61,7 @@ pluginManagement {
 buildscript {
   dependencies {
     // Force a newer version of okio, otherwise intellijPlatform and wire conflict
-    classpath("com.squareup.okio:okio:3.11.0")
+    classpath("com.squareup.okio:okio:3.13.0")
   }
 }
 
