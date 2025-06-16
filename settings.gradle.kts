@@ -61,14 +61,14 @@ pluginManagement {
 buildscript {
   dependencies {
     // Force a newer version of okio, otherwise intellijPlatform and wire conflict
-    classpath("com.squareup.okio:okio:3.11.0")
+    classpath("com.squareup.okio:okio:3.13.0")
   }
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.0.1"
-  id("org.jetbrains.intellij.platform.settings") version "2.5.0"
-  id("org.jetbrains.intellij.platform") version "2.5.0" apply false
+  id("com.gradle.develocity") version "4.0.2"
+  id("org.jetbrains.intellij.platform.settings") version "2.6.0"
+  id("org.jetbrains.intellij.platform") version "2.6.0" apply false
 }
 
 dependencyResolutionManagement {
