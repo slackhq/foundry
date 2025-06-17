@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Always defensively patch KSP tasks with sqldelight and viewbinding.
+
 0.27.4
 ------
 

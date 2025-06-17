@@ -409,10 +409,6 @@ internal constructor(
   public val moshixGenerateProguardRules: Boolean
     get() = booleanProperty("moshix.generateProguardRules", defaultValue = true)
 
-  /** Flag to connect SqlDelight sources to KSP. */
-  public val kspConnectSqlDelight: Boolean
-    get() = booleanProperty("foundry.ksp.connect.sqldelight")
-
   /** Flag to connect ViewBinding sources to KSP. */
   public val kspConnectViewBinding: Boolean
     get() = booleanProperty("foundry.ksp.connect.viewbinding")
