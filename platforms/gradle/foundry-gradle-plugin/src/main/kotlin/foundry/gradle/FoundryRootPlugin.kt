@@ -389,7 +389,8 @@ private fun Project.configureMisc(foundryProperties: FoundryProperties) {
     @Suppress("MagicNumber")
     configure<DoctorExtension> {
       // We always use G1 because it's faster
-      warnWhenNotUsingParallelGC.setDisallowChanges(false)
+      // Deprecated but still enabled by default annoyingly
+      @Suppress("DEPRECATION") warnWhenNotUsingParallelGC.setDisallowChanges(false)
 
       /** Throw an exception when multiple Gradle Daemons are running. */
       disallowMultipleDaemons.setDisallowChanges(false)
