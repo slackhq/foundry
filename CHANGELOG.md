@@ -4,7 +4,27 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.5
+------
+
+_2025-06-17_
+
 - Always defensively patch KSP tasks with sqldelight and viewbinding.
+- Update ktfmt to `0.55` and change the download url for the `updateKtfmt` task.
+- Update Retrofit to `3.0.0`.
+- Update Okio to `3.13.0`.
+- Update Circuit to `0.28.1`.
+- Update Wire to `5.3.3`.
+- Update Oshi to `6.8.2`.
+- Build against Compose `1.8.1`.
+- Build against AGP `8.10.1`.
+- Build against Spotless `7.0.4`.
+- Build against Develocity `4.0.2`.
+- Build against DAGP `2.18.0`.
+- Build against Gradle Doctor `0.11.0`.
+- Build against Spotlight `1.0`.
+- Build against KSP `2.1.21-2.0.2`.
+- Build against Gradle `8.14.2`.
 
 0.27.4
 ------
