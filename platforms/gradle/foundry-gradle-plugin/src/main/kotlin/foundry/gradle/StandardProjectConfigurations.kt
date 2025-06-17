@@ -17,6 +17,8 @@
 
 package foundry.gradle
 
+import app.cash.sqldelight.gradle.SqlDelightExtension
+import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
@@ -31,6 +33,7 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
@@ -52,6 +55,7 @@ import foundry.gradle.tasks.robolectric.UpdateRobolectricJarsTask
 import foundry.gradle.testing.EmulatorWtfTests
 import foundry.gradle.testing.RoborazziTests
 import foundry.gradle.testing.UnitTests
+import foundry.gradle.util.addKspSource
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
@@ -71,6 +75,7 @@ import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.jetbrains.kotlin.gradle.utils.named
 import wtf.emulator.EwExtension
 
 private const val LOG = "Foundry:"
@@ -243,6 +248,7 @@ internal class StandardProjectConfigurations(
 
     configureAndroidProjects(foundryExtension, foundryProperties)
     configureJavaProject(foundryProperties)
+    configureKsp(foundryExtension)
     foundryExtension.applyTo(this)
   }
 
@@ -346,6 +352,55 @@ internal class StandardProjectConfigurations(
     }
 
     configureErrorProne(foundryProperties)
+  }
+
+  /** Common KSP configuration. */
+  private fun Project.configureKsp(foundryExtension: FoundryExtension) {
+    pluginManager.withPlugin("com.google.devtools.ksp") {
+      // Make KSP depend on sqldelight and viewbinding tasks
+      // This is opt-in as it's better for build performance to skip this linking if
+      // possible. Required with KSP 2.0.2 now if sqldelight is enabled :|
+      // TODO KSP is supposed to do this automatically in android projects per
+      //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
+      //  let's make this optional
+      // afterEvaluate is necessary in order to wait for tasks to exist
+      afterEvaluate {
+        if (pluginManager.hasPlugin("app.cash.sqldelight")) {
+          val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
+          val sourceSet =
+            when {
+              isKotlinMultiplatform -> "CommonMain"
+              isAndroidLibrary -> "Release"
+              else -> "Main"
+            }
+          val sourceSetKspName =
+            when {
+              isKotlinMultiplatform -> "CommonMainMetadata"
+              isAndroidLibrary -> "Release"
+              else -> ""
+            }
+          for (dbName in dbNames) {
+            val sqlDelightTask =
+              tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
+            val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
+            project.addKspSource("ksp${sourceSetKspName}Kotlin", sqlDelightTask, outputProvider)
+          }
+        }
+
+        // If using viewbinding, need to wire those up too
+        if (
+          foundryProperties.kspConnectViewBinding &&
+            isAndroidLibrary &&
+            !foundryProperties.libraryWithVariants &&
+            foundryExtension.androidHandler.isViewBindingEnabled
+        ) {
+          val databindingTask =
+            tasks.named<DataBindingGenBaseClassesTask>("dataBindingGenBaseClassesRelease")
+          val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
+          project.addKspSource("kspReleaseKotlin", databindingTask, databindingOutputProvider)
+        }
+      }
+    }
   }
 
   /**
