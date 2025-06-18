@@ -137,7 +137,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
           "Studio Giraffe",
           "0.2.0",
         )
-    
+
     val expectedTags =
       mutableListOf(
         KeyValue("service_name", ValueType.STRING, SERVICE_NAME),
