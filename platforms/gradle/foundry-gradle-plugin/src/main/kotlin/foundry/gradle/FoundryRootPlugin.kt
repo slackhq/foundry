@@ -419,11 +419,6 @@ private fun Project.configureMisc(foundryProperties: FoundryProperties) {
        */
       enableTestCaching.setDisallowChanges(true)
       /**
-       * By default, Gradle treats empty directories as inputs to compilation tasks. This can cause
-       * cache misses.
-       */
-      failOnEmptyDirectories.setDisallowChanges(true)
-      /**
        * Do not allow building all apps simultaneously. This is likely not what the user intended.
        */
       allowBuildingAllAndroidAppsSimultaneously.setDisallowChanges(false)
