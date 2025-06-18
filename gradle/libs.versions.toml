@@ -6,7 +6,7 @@ anvil = "0.4.1"
 asm = "9.8"
 bugsnagGradle = "8.2.0"
 circuit = "0.28.1"
-compose-jb = "1.8.1"
+compose-jb = "1.8.2"
 compose-jb-stable = "1.8.1"
 coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
