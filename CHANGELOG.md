@@ -4,6 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.27.6
+------
+
+_2025-06-18_
+
+- Add support for `--all-projects-file` to `gradle-settings-verifier` CLI.
+- Remove deprecated configs from gradle-doctor.
+- Build against Compose `1.8.2`.
+
 0.27.5
 ------
 

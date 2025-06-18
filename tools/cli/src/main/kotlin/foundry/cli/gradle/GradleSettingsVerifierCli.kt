@@ -71,7 +71,7 @@ public class GradleSettingsVerifierCli : CliktCommand() {
       .path(mustExist = true, canBeDir = false)
 
   private val allProjectsFile by
-    option("--all-projects-file", "-s", help = "A Spotlight-style `all-projects.txt` file to use")
+    option("--all-projects-file", help = "A Spotlight-style `all-projects.txt` file to use")
       .path(mustExist = true, canBeDir = false)
 
   private val implicitPaths by
@@ -123,8 +123,12 @@ public class GradleSettingsVerifierCli : CliktCommand() {
 
     val declaredPaths =
       settingsFile?.let(::parseSettingsFile) ?: parseAllProjectsFile(allProjectsFile!!)
+
     val projectPaths =
-      declaredPaths.associateBy { it }.plus(implicitPathsMap.mapValues { "<implicit>" })
+      declaredPaths
+        .filterNot { it.isBlank() }
+        .associateBy { it }
+        .plus(implicitPathsMap.mapValues { "<implicit>" })
 
     val errors = mutableListOf<String>()
     @Suppress("LoopWithTooManyJumpStatements")
