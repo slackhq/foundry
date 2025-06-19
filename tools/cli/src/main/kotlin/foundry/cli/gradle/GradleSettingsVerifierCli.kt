@@ -20,7 +20,6 @@ import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.auto.service.AutoService
 import foundry.cli.CommandFactory
@@ -29,12 +28,15 @@ import foundry.cli.skipBuildAndCacheDirs
 import foundry.cli.walkEachFile
 import java.io.File
 import java.nio.file.Path
+import kotlin.collections.mapValues
+import kotlin.collections.plus
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolute
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
+import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.system.exitProcess
@@ -67,7 +69,10 @@ public class GradleSettingsVerifierCli : CliktCommand() {
             "with vararg project args.",
       )
       .path(mustExist = true, canBeDir = false)
-      .required()
+
+  private val allProjectsFile by
+    option("--all-projects-file", help = "A Spotlight-style `all-projects.txt` file to use")
+      .path(mustExist = true, canBeDir = false)
 
   private val implicitPaths by
     option(
@@ -94,7 +99,11 @@ public class GradleSettingsVerifierCli : CliktCommand() {
   @Suppress("LongMethod")
   @ExperimentalPathApi
   override fun run() {
-    val implicitPaths = implicitPaths.associateWith { resolveProjectFromGradlePath(it) }
+    require((allProjectsFile != null) xor (settingsFile != null)) {
+      "Exactly one of `--all-projects-file` or `--settings-file` should be specified."
+    }
+
+    val implicitPathsMap = implicitPaths.associateWith { resolveProjectFromGradlePath(it) }
     val projectsViaBuildFiles =
       projectDir
         .absolute()
@@ -110,21 +119,16 @@ public class GradleSettingsVerifierCli : CliktCommand() {
           gradlePath
         }
         .filterValues { it.parent != projectDir }
-        .plus(implicitPaths)
+        .plus(implicitPathsMap)
+
+    val declaredPaths =
+      settingsFile?.let(::parseSettingsFile) ?: parseAllProjectsFile(allProjectsFile!!)
 
     val projectPaths =
-      settingsFile
-        .readText()
-        .trim()
-        .lines()
-        // Filter out commented lines
-        .filterNot { it.trimStart().startsWith("//") }
-        .joinToString("\n")
-        .removePrefix("include(")
-        .removeSuffix(")")
-        .splitToSequence(",")
-        .associateBy { line -> line.trim().removeSuffix(",").removeSurrounding("\"") }
-        .plus(implicitPaths.mapValues { "<implicit>" })
+      declaredPaths
+        .filterNot { it.isBlank() }
+        .associateBy { it }
+        .plus(implicitPathsMap.mapValues { "<implicit>" })
 
     val errors = mutableListOf<String>()
     @Suppress("LoopWithTooManyJumpStatements")
@@ -143,18 +147,21 @@ public class GradleSettingsVerifierCli : CliktCommand() {
         gradlePath.endsWith(':') -> {
           reportError("Project paths should not end with ':'", line.lastIndexOf(':') - 1)
         }
+
         !realPath.exists() -> {
           reportError(
             "Project dir '${realPath.relativeTo(projectDir)}' does not exist.",
             line.indexOfFirst { !it.isWhitespace() },
           )
         }
+
         !realPath.resolve("build.gradle.kts").exists() -> {
           reportError(
             "Project build file '${realPath.relativeTo(projectDir).resolve("build.gradle.kts")}' does not exist.",
             line.indexOfFirst { !it.isWhitespace() },
           )
         }
+
         !realPath.isDirectory() -> {
           reportError(
             "Expected '$realPath' to be a directory.",
@@ -182,9 +189,35 @@ public class GradleSettingsVerifierCli : CliktCommand() {
     }
 
     if (errors.isNotEmpty()) {
-      echo("Errors found in '${settingsFile.name}'. Please fix or remove these.", err = true)
+      echo(
+        "Errors found in '${settingsFile?.name ?: allProjectsFile?.name}'. Please fix or remove these.",
+        err = true,
+      )
       echo(errors.joinToString(""), err = true)
       exitProcess(1)
     }
+  }
+
+  private fun parseSettingsFile(file: Path): Sequence<String> {
+    return file
+      .readText()
+      .trim()
+      .lines()
+      // Filter out commented lines
+      .filterNot { it.trimStart().startsWith("//") }
+      .joinToString("\n")
+      .removePrefix("include(")
+      .removeSuffix(")")
+      .splitToSequence(",")
+      .map { it.trim().removeSuffix(",").removeSurrounding("\"") }
+  }
+
+  private fun parseAllProjectsFile(file: Path): Sequence<String> {
+    return file
+      .readLines()
+      .asSequence()
+      .map { it.trim() }
+      // Filter out commented lines
+      .filterNot { it.startsWith("#") }
   }
 }
