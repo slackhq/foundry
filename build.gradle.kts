@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
@@ -230,7 +230,7 @@ subprojects {
             KOTLIN_1_9
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-            KOTLIN_2_0
+            KOTLIN_2_1
           } else {
             DEFAULT
           }
