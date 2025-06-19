@@ -150,16 +150,6 @@ internal fun <T : Any> Project.getOrComputeExt(key: String, valueCalculator: () 
     }
 }
 
-/** Lifts an action into another action, reusing this action instance as an input to [into]. */
-internal fun <T, R : Any> Action<T>.liftIntoAction(into: R.(task: Action<T>) -> Unit): Action<R> {
-  return Action { into(this@liftIntoAction) }
-}
-
-/** Lifts an action into another action, reusing this action instance as an input to [into]. */
-internal fun <T, R> Action<T>.liftIntoFunction(into: R.(task: Action<T>) -> Unit): R.() -> Unit {
-  return { into(this@liftIntoFunction) }
-}
-
 internal inline fun <reified T : Task> TaskContainer.register(
   name: String,
   configuration: Action<in T>,
