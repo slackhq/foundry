@@ -205,10 +205,15 @@ public object Platforms {
       if (isOverridable) {
         providers
           .provider {
-            overridesProvider.get().identifierMap[dependencyDef.identifier]?.available?.newTarget()
+            overridesProvider
+              .get()
+              .identifierMap[dependencyDef.identifier]
+              ?.available
+              ?.newTarget()
+              .orEmpty()
           }
           .zip(defaultProvider) { overridden, default ->
-            if (overridden != null) {
+            if (overridden.isNotBlank()) {
               println("[SlackPlatform] override: ${dependencyDef.identifier}:$overridden")
               overridden
             } else {
@@ -222,7 +227,7 @@ public object Platforms {
 
     return try {
       versionProvider.get()
-    } catch (e: MissingValueException) {
+    } catch (_: MissingValueException) {
       val message =
         "No version found for '${dependencyDef.identifier}' " +
           "(key: '$expectedProperty'). Please add " +

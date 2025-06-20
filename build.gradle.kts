@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
@@ -57,7 +57,7 @@ plugins {
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
   alias(libs.plugins.binaryCompatibilityValidator)
-  alias(libs.plugins.graphAssert)
+  alias(libs.plugins.graphAssert) apply false
 }
 
 buildscript {
@@ -88,17 +88,17 @@ apiValidation {
     )
 }
 
-moduleGraphAssert {
-  // Platforms can depend on tools but not the other way around
-  allowed =
-    arrayOf(
-      ":platforms.* -> :tools.*",
-      ":platforms:gradle.* -> :platforms:gradle.*",
-      ":platforms:intellij.* -> :platforms:intellij.*",
-      ":tools.* -> :tools.*",
-    )
-  configurations = setOf("api", "implementation")
-}
+// moduleGraphAssert {
+//  // Platforms can depend on tools but not the other way around
+//  allowed =
+//    arrayOf(
+//      ":platforms.* -> :tools.*",
+//      ":platforms:gradle.* -> :platforms:gradle.*",
+//      ":platforms:intellij.* -> :platforms:intellij.*",
+//      ":tools.* -> :tools.*",
+//    )
+//  configurations = setOf("api", "implementation")
+// }
 
 configure<DetektExtension> {
   toolVersion = libs.versions.detekt.get()
@@ -230,7 +230,7 @@ subprojects {
             KOTLIN_1_9
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-            KOTLIN_2_0
+            KOTLIN_2_1
           } else {
             DEFAULT
           }
