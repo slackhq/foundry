@@ -4,10 +4,17 @@ Changelog
 **Unreleased**
 --------------
 
+0.28.0
+------
+
+_2025-06-23_
+
 - Add new `foundry.kotlin.jvm.jvmDefaultMode` property to configure the new `-jvm-default` mode in KGP. Unlike KGP, Foundry defaults to `NO_COMPATIBILITY`.
 - Remove deprecated `StrongSkipping` and `IntrinsicRemember` compose flags.
 - Update to Kotlin `2.2.0`.
 - Build against KSP `2.2.0-2.0.2`.
+- Build against gradle-maven-publish-plugin `0.33.0`.
+- Build against spotlight `1.1`.
 
 0.27.6
 ------
