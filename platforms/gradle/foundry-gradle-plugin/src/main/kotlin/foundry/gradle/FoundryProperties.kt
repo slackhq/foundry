@@ -809,6 +809,18 @@ internal constructor(
         .mapToInt()
         .orElse(resolver.gradleProviderOf(versions.jvmTarget))
 
+  /**
+   * Controls the jvm-default behavior. Unlike KGP, we default to `NO_COMPATIBILITY`.
+   *
+   * @see <a
+   *   href="Docs">https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions</a>
+   */
+  public val kotlinJvmDefaultMode: Provider<String>
+    get() =
+      resolver
+        .optionalStringProvider("foundry.kotlin.jvm.jvmDefaultMode")
+        .orElse("no_compatibility")
+
   /** Flag to disable JVM vendor setting locally. */
   public val jvmVendorOptOut: Boolean
     get() = booleanProperty("foundry.jvm.vendor.optOut", defaultValue = false)

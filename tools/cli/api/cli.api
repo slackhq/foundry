@@ -78,7 +78,7 @@ public final class foundry/cli/buildkite/Adjustment {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Adjustment$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Adjustment$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Adjustment$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/Adjustment;
@@ -111,7 +111,7 @@ public final class foundry/cli/buildkite/Agents$AnythingMapValue : foundry/cli/b
 	public final synthetic fun unbox-impl ()Lkotlinx/serialization/json/JsonObject;
 }
 
-public synthetic class foundry/cli/buildkite/Agents$AnythingMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Agents$AnythingMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Agents$AnythingMapValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -147,7 +147,7 @@ public final class foundry/cli/buildkite/Agents$StringArrayValue : foundry/cli/b
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/Agents$StringArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Agents$StringArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Agents$StringArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -188,7 +188,7 @@ public final class foundry/cli/buildkite/Automatic$AutomaticElementArrayValue : 
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/Automatic$AutomaticElementArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Automatic$AutomaticElementArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Automatic$AutomaticElementArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -217,7 +217,7 @@ public final class foundry/cli/buildkite/Automatic$AutomaticElementValue : found
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/AutomaticElement;
 }
 
-public synthetic class foundry/cli/buildkite/Automatic$AutomaticElementValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Automatic$AutomaticElementValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Automatic$AutomaticElementValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -246,7 +246,7 @@ public final class foundry/cli/buildkite/Automatic$BoolValue : foundry/cli/build
 	public final synthetic fun unbox-impl ()Z
 }
 
-public synthetic class foundry/cli/buildkite/Automatic$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Automatic$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Automatic$BoolValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -290,7 +290,7 @@ public final class foundry/cli/buildkite/AutomaticElement {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/AutomaticElement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/AutomaticElement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/AutomaticElement$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/AutomaticElement;
@@ -336,7 +336,7 @@ public final class foundry/cli/buildkite/Block$BlockStepValue : foundry/cli/buil
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/BlockStep;
 }
 
-public synthetic class foundry/cli/buildkite/Block$BlockStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Block$BlockStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Block$BlockStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -369,7 +369,7 @@ public final class foundry/cli/buildkite/Block$StringValue : foundry/cli/buildki
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Block$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Block$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Block$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -423,7 +423,7 @@ public final class foundry/cli/buildkite/BlockStep : foundry/cli/buildkite/Keyab
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/BlockStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/BlockStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/BlockStep$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/BlockStep;
@@ -495,7 +495,7 @@ public final class foundry/cli/buildkite/Build {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Build$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Build$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Build$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/Build;
@@ -631,7 +631,7 @@ public final class foundry/cli/buildkite/CommandStep : foundry/cli/buildkite/Key
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/CommandStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/CommandStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/CommandStep$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/CommandStep;
@@ -767,7 +767,7 @@ public final class foundry/cli/buildkite/Commands$ScriptStepValue : foundry/cli/
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/ScriptStep;
 }
 
-public synthetic class foundry/cli/buildkite/Commands$ScriptStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Commands$ScriptStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Commands$ScriptStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -796,7 +796,7 @@ public final class foundry/cli/buildkite/Commands$StringArrayValue : foundry/cli
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/Commands$StringArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Commands$StringArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Commands$StringArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -825,7 +825,7 @@ public final class foundry/cli/buildkite/Commands$StringValue : foundry/cli/buil
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Commands$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Commands$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Commands$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -895,7 +895,7 @@ public final class foundry/cli/buildkite/DependsOn$StringValue : foundry/cli/bui
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/DependsOn$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/DependsOn$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/DependsOn$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -924,7 +924,7 @@ public final class foundry/cli/buildkite/DependsOn$UnionArrayValue : foundry/cli
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/DependsOn$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/DependsOn$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/DependsOn$UnionArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -954,7 +954,7 @@ public final class foundry/cli/buildkite/DependsOnClass {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/DependsOnClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/DependsOnClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/DependsOnClass$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/DependsOnClass;
@@ -993,7 +993,7 @@ public final class foundry/cli/buildkite/DependsOnElement$DependsOnClassValue : 
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/DependsOnClass;
 }
 
-public synthetic class foundry/cli/buildkite/DependsOnElement$DependsOnClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/DependsOnElement$DependsOnClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/DependsOnElement$DependsOnClassValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1022,7 +1022,7 @@ public final class foundry/cli/buildkite/DependsOnElement$StringValue : foundry/
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/DependsOnElement$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/DependsOnElement$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/DependsOnElement$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1086,7 +1086,7 @@ public final class foundry/cli/buildkite/ExitStatusUnion$EnumValue : foundry/cli
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/ExitStatusEnum;
 }
 
-public synthetic class foundry/cli/buildkite/ExitStatusUnion$EnumValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ExitStatusUnion$EnumValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ExitStatusUnion$EnumValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1115,7 +1115,7 @@ public final class foundry/cli/buildkite/ExitStatusUnion$LongValue : foundry/cli
 	public final synthetic fun unbox-impl ()J
 }
 
-public synthetic class foundry/cli/buildkite/ExitStatusUnion$LongValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ExitStatusUnion$LongValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ExitStatusUnion$LongValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1169,7 +1169,7 @@ public final class foundry/cli/buildkite/ExternalNotification {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/ExternalNotification$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ExternalNotification$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ExternalNotification$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/ExternalNotification;
@@ -1210,7 +1210,7 @@ public final class foundry/cli/buildkite/FieldElement {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/FieldElement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/FieldElement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/FieldElement$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/FieldElement;
@@ -1238,7 +1238,7 @@ public final class foundry/cli/buildkite/GithubCheck {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/GithubCheck$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GithubCheck$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GithubCheck$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/GithubCheck;
@@ -1266,7 +1266,7 @@ public final class foundry/cli/buildkite/GithubCommitStatus {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/GithubCommitStatus$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GithubCommitStatus$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GithubCommitStatus$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/GithubCommitStatus;
@@ -1329,7 +1329,7 @@ public final class foundry/cli/buildkite/GroupStep$AnythingArrayValue : foundry/
 	public final synthetic fun unbox-impl ()Lkotlinx/serialization/json/JsonArray;
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$AnythingArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$AnythingArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$AnythingArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1360,7 +1360,7 @@ public final class foundry/cli/buildkite/GroupStep$BlockStepValue : foundry/cli/
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/BlockStep;
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$BlockStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$BlockStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$BlockStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1391,7 +1391,7 @@ public final class foundry/cli/buildkite/GroupStep$BoolValue : foundry/cli/build
 	public final synthetic fun unbox-impl ()Z
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$BoolValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1422,7 +1422,7 @@ public final class foundry/cli/buildkite/GroupStep$CommandStepValue : foundry/cl
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/CommandStep;
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$CommandStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$CommandStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$CommandStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1466,7 +1466,7 @@ public final class foundry/cli/buildkite/GroupStep$DoubleValue : foundry/cli/bui
 	public final synthetic fun unbox-impl ()D
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$DoubleValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$DoubleValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$DoubleValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1497,7 +1497,7 @@ public final class foundry/cli/buildkite/GroupStep$IntegerValue : foundry/cli/bu
 	public final synthetic fun unbox-impl ()J
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$IntegerValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$IntegerValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$IntegerValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1528,7 +1528,7 @@ public final class foundry/cli/buildkite/GroupStep$NestedBlockStepClassValue : f
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/NestedBlockStepClass;
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$NestedBlockStepClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$NestedBlockStepClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$NestedBlockStepClassValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1568,7 +1568,7 @@ public final class foundry/cli/buildkite/GroupStep$StringValue : foundry/cli/bui
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1599,7 +1599,7 @@ public final class foundry/cli/buildkite/GroupStep$WaitStepValue : foundry/cli/b
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/Wait;
 }
 
-public synthetic class foundry/cli/buildkite/GroupStep$WaitStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/GroupStep$WaitStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/GroupStep$WaitStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1636,7 +1636,7 @@ public final class foundry/cli/buildkite/Input$InputStepValue : foundry/cli/buil
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/InputStep;
 }
 
-public synthetic class foundry/cli/buildkite/Input$InputStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Input$InputStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Input$InputStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1665,7 +1665,7 @@ public final class foundry/cli/buildkite/Input$StringValue : foundry/cli/buildki
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Input$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Input$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Input$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1717,7 +1717,7 @@ public final class foundry/cli/buildkite/InputStep : foundry/cli/buildkite/Keyab
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/InputStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/InputStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/InputStep$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/InputStep;
@@ -1821,7 +1821,7 @@ public final class foundry/cli/buildkite/ManualClass {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/ManualClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ManualClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ManualClass$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/ManualClass;
@@ -1865,7 +1865,7 @@ public final class foundry/cli/buildkite/ManualUnion$BoolValue : foundry/cli/bui
 	public final synthetic fun unbox-impl ()Z
 }
 
-public synthetic class foundry/cli/buildkite/ManualUnion$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ManualUnion$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ManualUnion$BoolValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1898,7 +1898,7 @@ public final class foundry/cli/buildkite/ManualUnion$ManualClassValue : foundry/
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/ManualClass;
 }
 
-public synthetic class foundry/cli/buildkite/ManualUnion$ManualClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ManualUnion$ManualClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ManualUnion$ManualClassValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1927,7 +1927,7 @@ public final class foundry/cli/buildkite/MatrixClass {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/MatrixClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MatrixClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MatrixClass$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/MatrixClass;
@@ -1960,7 +1960,7 @@ public final class foundry/cli/buildkite/MatrixElement$BoolValue : foundry/cli/b
 	public final synthetic fun unbox-impl ()Z
 }
 
-public synthetic class foundry/cli/buildkite/MatrixElement$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MatrixElement$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MatrixElement$BoolValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -1993,7 +1993,7 @@ public final class foundry/cli/buildkite/MatrixElement$IntegerValue : foundry/cl
 	public final synthetic fun unbox-impl ()J
 }
 
-public synthetic class foundry/cli/buildkite/MatrixElement$IntegerValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MatrixElement$IntegerValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MatrixElement$IntegerValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2022,7 +2022,7 @@ public final class foundry/cli/buildkite/MatrixElement$StringValue : foundry/cli
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/MatrixElement$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MatrixElement$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MatrixElement$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2059,7 +2059,7 @@ public final class foundry/cli/buildkite/MatrixUnion$MatrixClassValue : foundry/
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/MatrixClass;
 }
 
-public synthetic class foundry/cli/buildkite/MatrixUnion$MatrixClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MatrixUnion$MatrixClassValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MatrixUnion$MatrixClassValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2088,7 +2088,7 @@ public final class foundry/cli/buildkite/MatrixUnion$UnionArrayValue : foundry/c
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/MatrixUnion$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MatrixUnion$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MatrixUnion$UnionArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2118,7 +2118,7 @@ public final class foundry/cli/buildkite/MultiChannelMessage {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/MultiChannelMessage$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/MultiChannelMessage$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/MultiChannelMessage$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/MultiChannelMessage;
@@ -2230,7 +2230,7 @@ public final class foundry/cli/buildkite/NestedBlockStepClass : foundry/cli/buil
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/NestedBlockStepClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/NestedBlockStepClass$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/NestedBlockStepClass$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/NestedBlockStepClass;
@@ -2290,7 +2290,7 @@ public final class foundry/cli/buildkite/Notification$External : foundry/cli/bui
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/ExternalNotification;
 }
 
-public synthetic class foundry/cli/buildkite/Notification$External$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Notification$External$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Notification$External$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2319,7 +2319,7 @@ public final class foundry/cli/buildkite/Notification$GitHub : foundry/cli/build
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/GithubNotification;
 }
 
-public synthetic class foundry/cli/buildkite/Notification$GitHub$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Notification$GitHub$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Notification$GitHub$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2359,7 +2359,7 @@ public final class foundry/cli/buildkite/Option {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Option$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Option$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Option$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/Option;
@@ -2392,7 +2392,7 @@ public final class foundry/cli/buildkite/Pipeline {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Pipeline$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Pipeline$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Pipeline$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/Pipeline;
@@ -2441,7 +2441,7 @@ public final class foundry/cli/buildkite/Plugin$AnythingMapValue : foundry/cli/b
 	public final synthetic fun unbox-impl ()Lkotlinx/serialization/json/JsonObject;
 }
 
-public synthetic class foundry/cli/buildkite/Plugin$AnythingMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Plugin$AnythingMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Plugin$AnythingMapValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2477,7 +2477,7 @@ public final class foundry/cli/buildkite/Plugin$StringValue : foundry/cli/buildk
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Plugin$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Plugin$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Plugin$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2510,7 +2510,7 @@ public final class foundry/cli/buildkite/Plugins$AnythingMapValue : foundry/cli/
 	public final synthetic fun unbox-impl ()Lkotlinx/serialization/json/JsonObject;
 }
 
-public synthetic class foundry/cli/buildkite/Plugins$AnythingMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Plugins$AnythingMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Plugins$AnythingMapValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2546,7 +2546,7 @@ public final class foundry/cli/buildkite/Plugins$UnionArrayValue : foundry/cli/b
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/Plugins$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Plugins$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Plugins$UnionArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2576,7 +2576,7 @@ public final class foundry/cli/buildkite/Retry {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Retry$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Retry$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Retry$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/Retry;
@@ -2668,7 +2668,7 @@ public final class foundry/cli/buildkite/ScriptStep : foundry/cli/buildkite/Keya
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/ScriptStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/ScriptStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/ScriptStep$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/ScriptStep;
@@ -2720,7 +2720,7 @@ public final class foundry/cli/buildkite/Setup$UnionArrayMapValue : foundry/cli/
 	public final synthetic fun unbox-impl ()Ljava/util/Map;
 }
 
-public synthetic class foundry/cli/buildkite/Setup$UnionArrayMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Setup$UnionArrayMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Setup$UnionArrayMapValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2749,7 +2749,7 @@ public final class foundry/cli/buildkite/Setup$UnionArrayValue : foundry/cli/bui
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/Setup$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Setup$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Setup$UnionArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2799,7 +2799,7 @@ public final class foundry/cli/buildkite/Signature {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Signature$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Signature$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Signature$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/Signature;
@@ -2839,7 +2839,7 @@ public final class foundry/cli/buildkite/SimpleStringValue$ListValue : foundry/c
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/SimpleStringValue$ListValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SimpleStringValue$ListValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SimpleStringValue$ListValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2868,7 +2868,7 @@ public final class foundry/cli/buildkite/SimpleStringValue$SingleValue : foundry
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/SimpleStringValue$SingleValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SimpleStringValue$SingleValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SimpleStringValue$SingleValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2901,7 +2901,7 @@ public final class foundry/cli/buildkite/Skip$BoolValue : foundry/cli/buildkite/
 	public final synthetic fun unbox-impl ()Z
 }
 
-public synthetic class foundry/cli/buildkite/Skip$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Skip$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Skip$BoolValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2934,7 +2934,7 @@ public final class foundry/cli/buildkite/Skip$StringValue : foundry/cli/buildkit
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Skip$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Skip$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Skip$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -2971,7 +2971,7 @@ public final class foundry/cli/buildkite/SlackNotification$Conversation : foundr
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/SlackNotification$Conversation$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SlackNotification$Conversation$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SlackNotification$Conversation$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3000,7 +3000,7 @@ public final class foundry/cli/buildkite/SlackNotification$Multi : foundry/cli/b
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/MultiChannelMessage;
 }
 
-public synthetic class foundry/cli/buildkite/SlackNotification$Multi$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SlackNotification$Multi$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SlackNotification$Multi$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3033,7 +3033,7 @@ public final class foundry/cli/buildkite/SoftFail$BoolValue : foundry/cli/buildk
 	public final synthetic fun unbox-impl ()Z
 }
 
-public synthetic class foundry/cli/buildkite/SoftFail$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SoftFail$BoolValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SoftFail$BoolValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3068,7 +3068,7 @@ public final class foundry/cli/buildkite/SoftFail$Multiple : foundry/cli/buildki
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/SoftFail$Multiple$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SoftFail$Multiple$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SoftFail$Multiple$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3096,7 +3096,7 @@ public final class foundry/cli/buildkite/SoftFailElement {
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/SoftFailElement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/SoftFailElement$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/SoftFailElement$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/SoftFailElement;
@@ -3131,7 +3131,7 @@ public final class foundry/cli/buildkite/Step$CommandStepValue : foundry/cli/bui
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/CommandStep;
 }
 
-public synthetic class foundry/cli/buildkite/Step$CommandStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Step$CommandStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Step$CommandStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3169,7 +3169,7 @@ public final class foundry/cli/buildkite/Step$EnumValue : foundry/cli/buildkite/
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/StringStep;
 }
 
-public synthetic class foundry/cli/buildkite/Step$EnumValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Step$EnumValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Step$EnumValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3200,7 +3200,7 @@ public final class foundry/cli/buildkite/Step$InputStepValue : foundry/cli/build
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/InputStep;
 }
 
-public synthetic class foundry/cli/buildkite/Step$InputStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Step$InputStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Step$InputStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3292,7 +3292,7 @@ public final class foundry/cli/buildkite/Trigger$StringValue : foundry/cli/build
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Trigger$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Trigger$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Trigger$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3323,7 +3323,7 @@ public final class foundry/cli/buildkite/Trigger$TriggerStepValue : foundry/cli/
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/TriggerStep;
 }
 
-public synthetic class foundry/cli/buildkite/Trigger$TriggerStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Trigger$TriggerStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Trigger$TriggerStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3379,7 +3379,7 @@ public final class foundry/cli/buildkite/TriggerStep : foundry/cli/buildkite/Key
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/TriggerStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/TriggerStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/TriggerStep$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/TriggerStep;
@@ -3427,7 +3427,7 @@ public final class foundry/cli/buildkite/Wait$StringValue : foundry/cli/buildkit
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/Wait$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Wait$StringValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Wait$StringValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3458,7 +3458,7 @@ public final class foundry/cli/buildkite/Wait$WaitStepValue : foundry/cli/buildk
 	public final synthetic fun unbox-impl ()Lfoundry/cli/buildkite/WaitStep;
 }
 
-public synthetic class foundry/cli/buildkite/Wait$WaitStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/Wait$WaitStepValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/Wait$WaitStepValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3504,7 +3504,7 @@ public final class foundry/cli/buildkite/WaitStep : foundry/cli/buildkite/Keyabl
 	public fun toString ()Ljava/lang/String;
 }
 
-public synthetic class foundry/cli/buildkite/WaitStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/WaitStep$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/WaitStep$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lfoundry/cli/buildkite/WaitStep;
@@ -3555,7 +3555,7 @@ public final class foundry/cli/buildkite/With$StringMapValue : foundry/cli/build
 	public final synthetic fun unbox-impl ()Ljava/util/Map;
 }
 
-public synthetic class foundry/cli/buildkite/With$StringMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/With$StringMapValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/With$StringMapValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
@@ -3584,7 +3584,7 @@ public final class foundry/cli/buildkite/With$UnionArrayValue : foundry/cli/buil
 	public final synthetic fun unbox-impl ()Ljava/util/List;
 }
 
-public synthetic class foundry/cli/buildkite/With$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+public final synthetic class foundry/cli/buildkite/With$UnionArrayValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
 	public static final field INSTANCE Lfoundry/cli/buildkite/With$UnionArrayValue$$serializer;
 	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
