@@ -39,7 +39,7 @@ nullawayGradle = "2.2.0"
 okhttp = "5.0.0-alpha.14"
 okio = "3.13.0"
 retrofit = "3.0.0"
-roborazzi = "1.44.0"
+roborazzi = "1.45.1"
 slack-lint = "0.9.0"
 sortDependencies = "0.14"
 spotless = "7.0.4"
@@ -83,7 +83,7 @@ asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.2"
-buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.0"
+buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.1"
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.13.1"
@@ -148,7 +148,7 @@ okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", versio
 oshi = "com.github.oshi:oshi-core:6.8.2"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
-robolectric = "org.robolectric:robolectric:4.14.1"
+robolectric = "org.robolectric:robolectric:4.15.1"
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.10"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"
