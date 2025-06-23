@@ -34,8 +34,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
@@ -208,17 +207,17 @@ subprojects {
           if (isForIntelliJPlugin) {
             // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
             // Note this needs to support the latest stable Studio version.
-            KOTLIN_2_0
+            KotlinVersion.KOTLIN_2_0
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-            KOTLIN_2_1
+            KotlinVersion.KOTLIN_2_1
           } else {
-            DEFAULT
+            KotlinVersion.DEFAULT
           }
         languageVersion.set(kotlinVersion)
         apiVersion.set(kotlinVersion)
 
-        if (kotlinVersion != DEFAULT) {
+        if (kotlinVersion != KotlinVersion.DEFAULT) {
           // Gradle/IntelliJ forces a lower version of kotlin, which results in warnings that
           // prevent use of this sometimes.
           // https://github.com/gradle/gradle/issues/16345
