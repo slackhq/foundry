@@ -56,7 +56,6 @@ plugins {
   alias(libs.plugins.buildConfig) apply false
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
-  alias(libs.plugins.binaryCompatibilityValidator)
   alias(libs.plugins.graphAssert)
 }
 
@@ -68,24 +67,6 @@ buildscript {
     classpath(platform(libs.coroutines.bom))
     classpath(platform(libs.kotlin.gradlePlugins.bom))
   }
-}
-
-apiValidation {
-  // only :tools:cli is tracking this right now
-  // Annoyingly this only uses simple names
-  // https://github.com/Kotlin/binary-compatibility-validator/issues/16
-  ignoredProjects +=
-    listOf(
-      "agp-handler-api",
-      "foundry-gradle-plugin",
-      "artifactory-authenticator",
-      "compose",
-      "playground",
-      "skate",
-      "foundry-common",
-      "skippy",
-      "tracing",
-    )
 }
 
 moduleGraphAssert {
