@@ -30,6 +30,7 @@ import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -250,6 +251,7 @@ subprojects {
         }
         check(this is KotlinJvmCompilerOptions)
         this.jvmTarget.set(projectJvmTarget)
+        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
           // (@NotNull T => T & Any)
@@ -260,9 +262,6 @@ subprojects {
           "-Xassertions=jvm",
           // Potentially useful for static analysis tools or annotation processors.
           "-Xemit-jvm-type-annotations",
-          // Enable new jvm-default behavior
-          // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
-          "-Xjvm-default=all",
           "-Xtype-enhancement-improvements-strict-mode",
           // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
           "-Xjspecify-annotations=strict",
