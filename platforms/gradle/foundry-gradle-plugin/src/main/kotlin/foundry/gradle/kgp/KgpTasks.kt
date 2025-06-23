@@ -27,6 +27,7 @@ import foundry.gradle.not
 import foundry.gradle.onFirst
 import foundry.gradle.util.configureKotlinCompilationTask
 import java.io.File
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -35,6 +36,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
@@ -81,10 +83,16 @@ internal object KgpTasks {
         foundryProperties.kotlinExplicitApiMode.orNull?.let(ExplicitApiMode::valueOf)
 
       val jvmConfig: KotlinJvmCompilerOptions.() -> Unit = {
-        jvmTarget.set(jvmTargetProvider)
+        jvmTarget.convention(jvmTargetProvider)
+
+        jvmDefault.convention(
+          foundryProperties.kotlinJvmDefaultMode.map {
+            JvmDefaultMode.valueOf(it.uppercase(Locale.US))
+          }
+        )
 
         // Potentially useful for static analysis or annotation processors
-        javaParameters.set(true)
+        javaParameters.convention(true)
 
         freeCompilerArgs.addAll(foundryProperties.kotlinJvmFreeArgs)
 

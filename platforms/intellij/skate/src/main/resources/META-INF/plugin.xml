@@ -23,6 +23,7 @@
         <projectIndexingActivityHistoryListener implementation="foundry.intellij.skate.idemetrics.IndexingListener"/>
         <postStartupActivity implementation="foundry.intellij.skate.PostStartupActivityExtension"/>
         <postStartupActivity implementation="foundry.intellij.skate.ideinstall.InstallationLocationStartupActivity"/>
+        <postStartupActivity implementation="foundry.intellij.skate.pluginlist.PluginListCollector"/>
         <notificationGroup id="SkateInstallationLocation" displayType="BALLOON" isLogByDefault="true"/>
     </extensions>
 

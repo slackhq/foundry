@@ -969,12 +969,6 @@ constructor(
             extension.reportsDestination.set(project.file(v))
           }
 
-          "intrinsicRemember" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
-            }
-          }
-
           "nonSkippingGroupOptimization" -> {
             if (v.toBoolean()) {
               extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
@@ -983,12 +977,6 @@ constructor(
 
           "suppressKotlinVersionCompatibilityCheck" -> {
             error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
-          }
-
-          "strongSkipping" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
-            }
           }
 
           "stabilityConfigurationPath" -> {

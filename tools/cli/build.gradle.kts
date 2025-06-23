@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.dokka)
@@ -26,6 +28,7 @@ plugins {
 }
 
 kotlin {
+  @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled.set(true) }
   compilerOptions {
     optIn.addAll("kotlin.ExperimentalStdlibApi", "kotlinx.coroutines.ExperimentalCoroutinesApi")
   }
