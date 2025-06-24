@@ -223,7 +223,7 @@ public object ModuleStatsTasks {
 
             // TODO do we need to check the gradle properties too?
             // TODO move to the task action once we have these in ModuleTopography
-            val androidResources = extension.buildFeatures.androidResources == true
+            val androidResources = extension.androidResources.enable
             val viewBinding = extension.buildFeatures.viewBinding == true
             if (viewBinding) {
               addGeneratedSources()
