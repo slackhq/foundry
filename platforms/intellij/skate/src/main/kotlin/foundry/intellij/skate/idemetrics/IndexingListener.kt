@@ -37,7 +37,7 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
         SkateTracingEvent.Indexing.UPDATING_TIME.name,
         history.times.totalUpdatingTime.toMillis(),
       )
-      addTag(SkateTracingEvent.Indexing.WAS_INTERRUPTED.name, history.times.wasInterrupted)
+      addTag(SkateTracingEvent.Indexing.WAS_INTERRUPTED.name, history.times.isCancelled)
       addTag(
         SkateTracingEvent.Indexing.UPDATING_TIME.name,
         history.times.totalUpdatingTime.toMillis(),
@@ -70,7 +70,7 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
         SkateTracingEvent.Indexing.UPDATING_TIME.name,
         history.times.totalUpdatingTime.toMillis(),
       )
-      addTag(SkateTracingEvent.Indexing.WAS_INTERRUPTED.name, history.times.wasInterrupted)
+      addTag(SkateTracingEvent.Indexing.WAS_INTERRUPTED.name, history.times.isCancelled)
       addTag("event", SkateTracingEvent.Indexing.DUMB_INDEXING_COMPLETED.name)
     }
     currentProject

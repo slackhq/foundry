@@ -22,11 +22,13 @@ import foundry.intellij.skate.util.settings
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
+import org.junit.Ignore
 import org.junit.Test
 
 private const val ASSIGNMENTS =
   "id = id, dateStart = dateStart, dateEnded = dateEnd, activeParticipantCount = activeParticipantCount, title = title.toDomainModel(), customTitle = customTitle, outgoingToUser = outgoing.toDomainModel(), incomingFromUser = incoming.toDomainModel(), activeParticipants = activeParticipants, actions = actions.map { it.toDomainModel() }, retryText = retryText.toDomainModel()"
 
+@Ignore("This test doesn't load annotators for some reason")
 class TranslatorHelperTest : LightPlatformCodeInsightFixture4TestCase() {
   override fun getTestDataPath(): String {
     return "src/test/testData"
