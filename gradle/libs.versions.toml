@@ -49,7 +49,7 @@ xmlutil = "0.91.1"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.6" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.7" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
