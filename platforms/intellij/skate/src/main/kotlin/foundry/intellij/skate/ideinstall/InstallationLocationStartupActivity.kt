@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2025 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.intellij.compose.aibot
+package foundry.intellij.skate.ideinstall
 
-import com.slack.circuit.runtime.CircuitUiEvent
-import com.slack.circuit.runtime.CircuitUiState
-import com.slack.circuit.runtime.screen.Screen
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.ProjectActivity
 
-object ChatScreen : Screen {
-  data class State(
-    val messages: List<Message>,
-    val isLoading: Boolean,
-    val eventSink: (Event) -> Unit = {},
-  ) : CircuitUiState
-
-  sealed class Event : CircuitUiEvent {
-    data class SendMessage(val message: String) : Event()
+class InstallationLocationStartupActivity : ProjectActivity {
+  override suspend fun execute(project: Project) {
+    val service = project.service<InstallationLocationService>()
+    service.checkInstallationLocation()
   }
 }

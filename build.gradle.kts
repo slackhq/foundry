@@ -30,11 +30,11 @@ import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 import org.jetbrains.intellij.platform.gradle.tasks.BuildPluginTask
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.Companion.DEFAULT
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -56,7 +56,6 @@ plugins {
   alias(libs.plugins.buildConfig) apply false
   alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
-  alias(libs.plugins.binaryCompatibilityValidator)
   alias(libs.plugins.graphAssert)
 }
 
@@ -68,24 +67,6 @@ buildscript {
     classpath(platform(libs.coroutines.bom))
     classpath(platform(libs.kotlin.gradlePlugins.bom))
   }
-}
-
-apiValidation {
-  // only :tools:cli is tracking this right now
-  // Annoyingly this only uses simple names
-  // https://github.com/Kotlin/binary-compatibility-validator/issues/16
-  ignoredProjects +=
-    listOf(
-      "agp-handler-api",
-      "foundry-gradle-plugin",
-      "artifactory-authenticator",
-      "compose",
-      "playground",
-      "skate",
-      "foundry-common",
-      "skippy",
-      "tracing",
-    )
 }
 
 moduleGraphAssert {
@@ -227,7 +208,7 @@ subprojects {
           if (isForIntelliJPlugin) {
             // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
             // Note this needs to support the latest stable Studio version.
-            KOTLIN_1_9
+            KOTLIN_2_0
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
             KOTLIN_2_0
@@ -251,25 +232,22 @@ subprojects {
         }
         check(this is KotlinJvmCompilerOptions)
         this.jvmTarget.set(projectJvmTarget)
+        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
         freeCompilerArgs.addAll(
           // Enhance not null annotated type parameter's types to definitely not null types
           // (@NotNull T => T & Any)
           "-Xenhance-type-parameter-types-to-def-not-null",
-          // Support inferring type arguments based on only self upper bounds of the corresponding
-          // type parameters
-          "-Xself-upper-bound-inference",
           "-Xjsr305=strict",
           // Match JVM assertion behavior:
           // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
           "-Xassertions=jvm",
           // Potentially useful for static analysis tools or annotation processors.
           "-Xemit-jvm-type-annotations",
-          // Enable new jvm-default behavior
-          // https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/
-          "-Xjvm-default=all",
           "-Xtype-enhancement-improvements-strict-mode",
           // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
           "-Xjspecify-annotations=strict",
+          // https://youtrack.jetbrains.com/issue/KT-73255
+          "-Xannotation-default-target=param-property",
         )
         // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
         freeCompilerArgs.add(projectJvmTarget.map { "-Xjdk-release=${it.target}" })

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.10.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.0)" variant="all" version="8.10.0-alpha08">
+<issues format="6" by="lint 8.11.0-alpha10" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.1)" variant="all" version="8.11.0-alpha10">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -63,7 +63,7 @@
         errorLine2="                    ~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
-            line="1180"
+            line="1146"
             column="21"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="                                             ~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="71"
+            line="72"
             column="46"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                                                                      ~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="133"
+            line="138"
             column="71"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                                      ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="949"
+            line="968"
             column="39"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="451"
+            line="384"
             column="14"/>
     </issue>
 
@@ -272,7 +272,7 @@
         errorLine2="                   ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="342"
+            line="344"
             column="20"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="                            ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/testing/UnitTests.kt"
-            line="224"
+            line="234"
             column="29"/>
     </issue>
 
@@ -345,22 +345,11 @@
     <issue
         id="InternalAgpApiUsage"
         message="Avoid using internal Android Gradle Plugin APIs"
-        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
-            line="25"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalAgpApiUsage"
-        message="Avoid using internal Android Gradle Plugin APIs"
         errorLine1="import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="23"
+            line="24"
             column="1"/>
     </issue>
 
@@ -371,7 +360,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="24"
+            line="25"
             column="1"/>
     </issue>
 
@@ -382,7 +371,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="25"
+            line="26"
             column="1"/>
     </issue>
 
@@ -393,7 +382,18 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="33"
+            line="35"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalAgpApiUsage"
+        message="Avoid using internal Android Gradle Plugin APIs"
+        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
+            line="36"
             column="1"/>
     </issue>
 
@@ -470,7 +470,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/topography/ModuleTopographyTask.kt"
-            line="49"
+            line="50"
             column="1"/>
     </issue>
 
@@ -525,7 +525,7 @@
         errorLine2="        ~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryGradleUtil.kt"
-            line="259"
+            line="244"
             column="9"/>
     </issue>
 
@@ -538,6 +538,17 @@
             file="src/main/kotlin/foundry/gradle/Platforms.kt"
             line="183"
             column="53"/>
+    </issue>
+
+    <issue
+        id="ExceptionMessage"
+        message="Please specify a `lazyMessage` param for check"
+        errorLine1="    check(logs.isNotEmpty())"
+        errorLine2="    ~~~~~">
+        <location
+            file="src/main/kotlin/foundry/gradle/util/ThermalsWatcher.kt"
+            line="216"
+            column="5"/>
     </issue>
 
     <issue

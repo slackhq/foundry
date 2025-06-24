@@ -15,6 +15,7 @@
  */
 package foundry.gradle.lint
 
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.Lint
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
@@ -145,9 +146,10 @@ internal object LintTasks {
     onProjectSkipped: (String, String) -> Unit,
   ) =
     androidExtension.finalizeDsl { extension ->
+      val typedExtension = extension as CommonExtension<*, *, *, *, *, *>
       foundryProperties.lintVersionOverride?.let {
         val lintVersion = foundryProperties.versions.lookupVersion(it)
-        extension.experimentalProperties["android.experimental.lint.version"] = lintVersion
+        typedExtension.experimentalProperties["android.experimental.lint.version"] = lintVersion
       }
 
       log("Applying ciLint to Android project")
@@ -183,7 +185,7 @@ internal object LintTasks {
       }
 
       configureLint(
-        extension.lint,
+        typedExtension.lint,
         ciLintTask,
         foundryProperties,
         affectedProjects,

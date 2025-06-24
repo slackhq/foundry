@@ -1,51 +1,51 @@
 [versions]
-agp = "8.9.2"
-agpAlpha = "8.10.0-rc03"
+agp = "8.10.1"
+agpAlpha = "8.10.1"
 anvil = "0.4.1"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.8"
 bugsnagGradle = "8.2.0"
-circuit = "0.27.1"
-compose-jb = "1.7.3"
-compose-jb-stable = "1.7.3"
+circuit = "0.28.1"
+compose-jb = "1.8.2"
+compose-jb-stable = "1.8.2"
 coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.8.0"
-dependencyAnalysisPlugin = "2.17.0"
+dependencyAnalysisPlugin = "2.18.0"
 detekt = "1.23.8"
 dokka = "2.0.0"
 errorproneGradle = "4.2.0"
 gradle-retry = "1.6.2"
 graph-assert = "2.8.0"
-intellij-platform = "2.5.0"
+intellij-platform = "2.6.0"
 jdk = "23"
 jvmTarget = "21"
 jvmTargetIdea = "21"
 jewel = "0.27.0"
 jna = "5.17.0"
-kaml = "0.77.0"
-kotlin = "2.1.20"
+kaml = "0.82.0"
+kotlin = "2.2.0"
 kotlinx-serialization = "1.8.1"
-ksp = "2.1.20-2.0.0"
-kotlinPoet = "2.1.0"
-ktfmt = "0.54"
-markdown = "0.33.0"
-mavenPublish = "0.31.0"
-metro = "0.2.0"
+ksp = "2.2.0-RC3-2.0.2"
+kotlinPoet = "2.2.0"
+ktfmt = "0.55"
+markdown = "0.35.0"
+mavenPublish = "0.33.0"
+metro = "0.3.8"
 mordant = "3.0.2"
 moshi = "1.15.2"
-moshix = "0.30.0"
+moshix = "0.31.0-alpha01"
 nullawayGradle = "2.2.0"
 okhttp = "5.0.0-alpha.14"
-okio = "3.11.0"
-retrofit = "2.11.0"
-roborazzi = "1.43.1"
+okio = "3.13.0"
+retrofit = "3.0.0"
+roborazzi = "1.45.1"
 slack-lint = "0.9.0"
 sortDependencies = "0.14"
-spotless = "7.0.3"
-sqldelight = "2.0.2"
-wire = "5.3.1"
-xmlutil = "0.91.0"
+spotless = "7.0.4"
+sqldelight = "2.1.0"
+wire = "5.3.3"
+xmlutil = "0.91.1"
 
 # API changes are documented here: https://plugins.jetbrains.com/docs/intellij/api-changes-list.html
 # Bundled API changes (Kotlin, Coroutines, etc) here: https://www.jetbrains.com/legal/third-party-software/?product=IIU
@@ -59,8 +59,7 @@ intellij-android = "251.23774.16"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.17.0" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.3" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.6" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
@@ -93,6 +92,7 @@ asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.2"
+buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.1"
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.13.1"
@@ -111,9 +111,9 @@ gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
-gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.0.1"
-gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.10.0"
-gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:0.19.1"
+gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.0.2"
+gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.11.0"
+gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:0.19.2"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = { module = "com.jraska.module.graph.assertion:plugin", version.ref = "graph-assert" }
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -154,10 +154,10 @@ okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp
 okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
-oshi = "com.github.oshi:oshi-core:6.8.1"
+oshi = "com.github.oshi:oshi-core:6.8.2"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
-robolectric = "org.robolectric:robolectric:4.14.1"
+robolectric = "org.robolectric:robolectric:4.15.1"
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.10"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"

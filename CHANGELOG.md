@@ -4,6 +4,78 @@ Changelog
 **Unreleased**
 --------------
 
+0.28.0
+------
+
+_2025-06-23_
+
+- Add new `foundry.kotlin.jvm.jvmDefaultMode` property to configure the new `-jvm-default` mode in KGP. Unlike KGP, Foundry defaults to `NO_COMPATIBILITY`.
+- Remove deprecated `StrongSkipping` and `IntrinsicRemember` compose flags.
+- Update to Kotlin `2.2.0`.
+- Build against KSP `2.2.0-2.0.2`.
+- Build against gradle-maven-publish-plugin `0.33.0`.
+- Build against spotlight `1.1`.
+
+0.27.6
+------
+
+_2025-06-18_
+
+- Add support for `--all-projects-file` to `gradle-settings-verifier` CLI.
+- Remove deprecated configs from gradle-doctor.
+- Build against Compose `1.8.2`.
+
+0.27.5
+------
+
+_2025-06-17_
+
+- Always defensively patch KSP tasks with sqldelight and viewbinding.
+- Update ktfmt to `0.55` and change the download url for the `updateKtfmt` task.
+- Update Retrofit to `3.0.0`.
+- Update Okio to `3.13.0`.
+- Update Circuit to `0.28.1`.
+- Update Wire to `5.3.3`.
+- Update Oshi to `6.8.2`.
+- Build against Compose `1.8.1`.
+- Build against AGP `8.10.1`.
+- Build against Spotless `7.0.4`.
+- Build against Develocity `4.0.2`.
+- Build against DAGP `2.18.0`.
+- Build against Gradle Doctor `0.11.0`.
+- Build against Spotlight `1.0`.
+- Build against KSP `2.1.21-2.0.2`.
+- Build against Gradle `8.14.2`.
+
+0.27.4
+------
+
+_2025-05-20_
+
+- Check both `bootstrap` and `:bootstrap` task names when registering bootstrap.
+
+0.27.3
+------
+
+_2025-05-16_
+
+- Add `--dependency-graph-edges` support to Skippy CLI. This allows you to specify a newline-delimited set of edges in a graph rather than a serialized graph.
+- Automatically mark `androidTest` APKs as `debuggable`, avoiding the need to manually specify placeholder manifests with a `debuggable` attribute set.
+- Update xmlutil to `0.91.1`.
+- Update kaml to `0.78.0`.
+- Build against Kotlin `2.1.21`.
+- Build against KSP `2.1.21-2.0.1`.
+
+0.27.2
+------
+
+_2025-05-09_
+
+- Use `finalizeDsl` when configuring KSP tasks if running in an android project.
+- Update kaml to `0.77.1`.
+- Build against AGP `8.10.0`.
+- Build against KSP `2.1.20-2.0.1`.
+
 0.27.1
 ------
 

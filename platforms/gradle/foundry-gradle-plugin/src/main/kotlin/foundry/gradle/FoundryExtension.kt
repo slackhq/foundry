@@ -17,11 +17,8 @@
 
 package foundry.gradle
 
-import app.cash.sqldelight.gradle.SqlDelightExtension
-import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.metro.gradle.MetroPluginExtension
@@ -31,7 +28,6 @@ import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import foundry.gradle.dependencies.FoundryDependencies
 import foundry.gradle.properties.setDisallowChanges
-import foundry.gradle.util.addKspSource
 import foundry.gradle.util.configureKotlinCompilationTask
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +42,6 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
-import org.jetbrains.kotlin.gradle.utils.named
 
 @DslMarker public annotation class FoundryExtensionMarker
 
@@ -103,9 +98,9 @@ constructor(
   }
 
   internal fun applyTo(project: Project) {
-    val logVerbose = foundryProperties.foundryExtensionVerbose
     // Dirty but necessary since the extension isn't configured yet when we call this
-    project.afterEvaluate {
+    project.afterEvaluateSafe {
+      val logVerbose = foundryProperties.foundryExtensionVerbose
       featuresHandler.applyTo(project)
 
       var kaptRequired = false
@@ -288,67 +283,6 @@ constructor(
 
                 if (daggerConfig.testFixturesUseDagger) {
                   dependencies.add(kspConfiguration("testFixtures"), "$anvilPackage:compiler")
-                }
-
-                // Make KSP depend on sqldelight and viewbinding tasks
-                // This is opt-in as it's better for build performance to skip this linking if
-                // possible
-                // TODO KSP is supposed to do this automatically in android projects per
-                //  https://github.com/google/ksp/pull/1739, but that doesn't seem to actually work
-                //  let's make this optional
-                // afterEvaluate is necessary in order to wait for tasks to exist
-                if (
-                  foundryProperties.kspConnectSqlDelight || foundryProperties.kspConnectViewBinding
-                ) {
-                  afterEvaluate {
-                    if (
-                      foundryProperties.kspConnectSqlDelight &&
-                        pluginManager.hasPlugin("app.cash.sqldelight")
-                    ) {
-                      val dbNames = extensions.getByType<SqlDelightExtension>().databases.names
-                      val sourceSet =
-                        when {
-                          isKotlinMultiplatform -> "CommonMain"
-                          isAndroidLibrary -> "Release"
-                          else -> "Main"
-                        }
-                      val sourceSetKspName =
-                        when {
-                          isKotlinMultiplatform -> "CommonMainMetadata"
-                          isAndroidLibrary -> "Release"
-                          else -> ""
-                        }
-                      for (dbName in dbNames) {
-                        val sqlDelightTask =
-                          tasks.named<SqlDelightTask>("generate${sourceSet}${dbName}Interface")
-                        val outputProvider = sqlDelightTask.flatMap { it.outputDirectory }
-                        project.addKspSource(
-                          "ksp${sourceSetKspName}Kotlin",
-                          sqlDelightTask,
-                          outputProvider,
-                        )
-                      }
-                    }
-
-                    // If using viewbinding, need to wire those up too
-                    if (
-                      foundryProperties.kspConnectViewBinding &&
-                        isAndroidLibrary &&
-                        !foundryProperties.libraryWithVariants &&
-                        androidHandler.isViewBindingEnabled
-                    ) {
-                      val databindingTask =
-                        tasks.named<DataBindingGenBaseClassesTask>(
-                          "dataBindingGenBaseClassesRelease"
-                        )
-                      val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
-                      project.addKspSource(
-                        "kspReleaseKotlin",
-                        databindingTask,
-                        databindingOutputProvider,
-                      )
-                    }
-                  }
                 }
               }
 
@@ -1035,12 +969,6 @@ constructor(
             extension.reportsDestination.set(project.file(v))
           }
 
-          "intrinsicRemember" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.IntrinsicRemember)
-            }
-          }
-
           "nonSkippingGroupOptimization" -> {
             if (v.toBoolean()) {
               extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
@@ -1049,12 +977,6 @@ constructor(
 
           "suppressKotlinVersionCompatibilityCheck" -> {
             error("'suppressKotlinVersionCompatibilityCheck' option is no longer supported")
-          }
-
-          "strongSkipping" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.StrongSkipping)
-            }
           }
 
           "stabilityConfigurationPath" -> {

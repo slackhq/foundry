@@ -113,4 +113,55 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
         )
     assertThat(listOfSpans).isNull()
   }
+
+  @Test
+  fun testPluginInfoTraceWithCorrectTags() {
+    val traceTags =
+      newTagBuilder().apply {
+        "event" tagTo "PLUGIN_INFO"
+        "plugin_id" tagTo "com.intellij.modules.platform"
+        "plugin_name" tagTo "Platform API"
+        "plugin_version" tagTo "2023.1.3"
+        "plugin_enabled" tagTo "true"
+        "plugin_bundled" tagTo "true"
+      }
+
+    val listOfSpans =
+      SkateTraceReporter(project)
+        .createPluginUsageTraceAndSendTrace(
+          "plugin_info",
+          Instant.now(),
+          traceTags,
+          traceId = ByteString.EMPTY,
+          parentId = ByteString.EMPTY,
+          "Studio Giraffe",
+          "0.2.0",
+        )
+
+    val expectedTags =
+      mutableListOf(
+        KeyValue("service_name", ValueType.STRING, SERVICE_NAME),
+        KeyValue("database", ValueType.STRING, DATABASE_NAME),
+      )
+
+    val expectedSpanTags =
+      newTagBuilder().apply {
+        "skate_version" tagTo "0.2.0"
+        "ide_version" tagTo "Studio Giraffe"
+        "user" tagTo System.getenv("USER")
+        "project_name" tagTo project.name
+        "event" tagTo "PLUGIN_INFO"
+        "plugin_id" tagTo "com.intellij.modules.platform"
+        "plugin_name" tagTo "Platform API"
+        "plugin_version" tagTo "2023.1.3"
+        "plugin_enabled" tagTo "true"
+        "plugin_bundled" tagTo "true"
+      }
+
+    assertThat(listOfSpans).isNotNull()
+    if (listOfSpans != null) {
+      assertThat(listOfSpans.tags).isEqualTo(expectedTags)
+      assertThat(listOfSpans.spans.first().tags).isEqualTo(expectedSpanTags.toList())
+    }
+  }
 }

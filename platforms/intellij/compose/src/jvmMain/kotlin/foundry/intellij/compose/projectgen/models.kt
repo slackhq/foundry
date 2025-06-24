@@ -49,25 +49,37 @@ internal data class Project(
       feature.renderFiles(projectDir)
     }
 
-    val settingsFile = rootDir.resolve("settings-all.gradle.kts")
-    val includedProjects =
-      settingsFile
-        .readLines()
-        .asSequence()
-        .filter { it.startsWith("  \":") }
-        .map { it.trim().removeSuffix(",").removeSurrounding("\"") }
-        .plus(path)
-        .sorted()
+    val settingsAllFile = rootDir.resolve("settings-all.gradle.kts")
+    val allProjectsFile = rootDir.resolve("gradle/all-projects.txt")
+    if (settingsAllFile.exists()) {
+      val includedProjects =
+        settingsAllFile
+          .readLines()
+          .asSequence()
+          .filter { it.startsWith("  \":") }
+          .map { it.trim().removeSuffix(",").removeSurrounding("\"") }
+          .plus(path)
+          .sorted()
 
-    settingsFile.writeText(
-      includedProjects.joinToString(
-        "\n",
-        prefix = "// Please keep these in alphabetical order!\ninclude(\n",
-        postfix = "\n)\n",
-      ) {
-        "  \"$it\","
-      }
-    )
+      settingsAllFile.writeText(
+        includedProjects.joinToString(
+          "\n",
+          prefix = "// Please keep these in alphabetical order!\ninclude(\n",
+          postfix = "\n)\n",
+        ) {
+          "  \"$it\","
+        }
+      )
+    } else if (allProjectsFile.exists()) {
+      val includedProjects =
+        allProjectsFile.readLines().asSequence().filter { it.startsWith(":") }.plus(path).sorted()
+
+      allProjectsFile.writeText(
+        includedProjects.joinToString("\n", prefix = "# Please keep these in alphabetical order!\n")
+      )
+    } else {
+      error("No settings-all.gradle.kts or all-projects.txt file found!")
+    }
   }
 }
 
@@ -219,31 +231,6 @@ internal data class AndroidLibraryFeature(
       builder.addStatement("androidTest()")
     }
     resourcesPrefix?.let { builder.addStatement("resources(\"$it\")") }
-  }
-
-  override fun renderFiles(projectDir: Path) {
-    if (androidTest) {
-      val androidTestDir = projectDir.resolve("src/androidTest")
-      androidTestDir.createDirectories()
-
-      // Write the manifest file
-      androidTestDir
-        .resolve("AndroidManifest.xml")
-        // language=XML
-        .writeText(
-          """
-        <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-            <!-- Necessary for debugging to work since our libraries are single-variant. -->
-            <application android:debuggable="true" />
-        </manifest>
-        """
-            .trimIndent()
-        )
-
-      // Write the placeholder test file
-      writePlaceholderFileTo(androidTestDir, packageName)
-    }
   }
 }
 
