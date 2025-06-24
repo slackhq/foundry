@@ -1155,7 +1155,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
       androidExtension as? LibraryExtension
         ?: error("foundry.android.features.resources() is only applicable in libraries!")
     libraryExtension.resourcePrefix = prefix
-    libraryExtension.buildFeatures { androidResources = true }
+    libraryExtension.androidResources.enable = true
   }
 }
 
