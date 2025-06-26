@@ -4,6 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.28.1
+------
+
+_2025-06-26_
+
+- Update AGP to `8.11.0`.
+- Build against Graph Assert `2.9.0`.
+- Build against KSP `2.2.0-2.0.2`.
+
 0.28.0
 ------
 
