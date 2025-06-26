@@ -21,7 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 
-internal fun <T> Project.addKspSource(
+internal fun <T : Any> Project.addKspSource(
   kspTaskName: String,
   task: TaskProvider<*>,
   provider: Provider<T>,
