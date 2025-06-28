@@ -92,7 +92,7 @@ asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.7.2"
-buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.1"
+buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.2.0"
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.13.1"
