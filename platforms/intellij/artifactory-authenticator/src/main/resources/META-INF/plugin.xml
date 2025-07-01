@@ -1,11 +1,14 @@
 <idea-plugin>
+    <resource-bundle>messages.artifactoryAuthenticator</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <pluginRepositoryAuthProvider
                 implementation="foundry.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
-        <projectConfigurable
-                displayName="Artifactory Auth"
+        <applicationConfigurable
+                bundle="messages.artifactoryAuthenticator"
+                key="artifactoryAuth.displayName"
+                id="foundry.intellij.artifactory.AuthConfig"
                 instance="foundry.intellij.artifactory.AuthConfig"/>
     </extensions>
 </idea-plugin>
