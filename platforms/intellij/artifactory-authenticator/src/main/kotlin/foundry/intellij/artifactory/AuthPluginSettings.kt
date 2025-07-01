@@ -51,8 +51,8 @@ class AuthPluginSettings : SimplePersistentStateComponent<AuthPluginSettings.Sta
         }
       }
     set(value) {
-      val previous = state.url
-      state.url = value
+      val previous = url
+      state.url = value?.encodeBase64()
       notifyChange(previous != value)
     }
 
@@ -75,7 +75,6 @@ class AuthPluginSettings : SimplePersistentStateComponent<AuthPluginSettings.Sta
     set(value) {
       val previous = username
       state.username = value?.encodeBase64()
-      state.version = CURRENT_VERSION
       notifyChange(previous != value)
     }
 
@@ -98,11 +97,11 @@ class AuthPluginSettings : SimplePersistentStateComponent<AuthPluginSettings.Sta
     set(value) {
       val previous = token
       state.token = value?.encodeBase64()
-      state.version = CURRENT_VERSION
       notifyChange(previous != value)
     }
 
   private fun notifyChange(changed: Boolean) {
+    state.version = CURRENT_VERSION
     if (changed) {
       // Any time we change this setting we need to notify the IDE that the auth has changed
       PluginRepositoryAuthListener.notifyAuthChanged()
