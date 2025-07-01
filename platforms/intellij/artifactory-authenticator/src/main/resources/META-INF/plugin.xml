@@ -8,10 +8,4 @@
                 displayName="Artifactory Auth"
                 instance="foundry.intellij.artifactory.AuthConfig"/>
     </extensions>
-
-    <!-- Workaround for https://youtrack.jetbrains.com/issue/IDEA-315487 -->
-    <applicationListeners>
-        <listener class="foundry.intellij.artifactory.RepoAuthHotfix"
-                  topic="com.intellij.ide.AppLifecycleListener"/>
-    </applicationListeners>
 </idea-plugin>
