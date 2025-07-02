@@ -10,5 +10,9 @@
                 key="artifactoryAuth.displayName"
                 id="foundry.intellij.artifactory.AuthConfig"
                 instance="foundry.intellij.artifactory.AuthConfig"/>
+        <postStartupActivity implementation="foundry.intellij.artifactory.OldPluginInstalledWarner"/>
+        <notificationGroup id="Artifactory Authenticator Notifications"
+                           displayType="BALLOON"
+                           key="artifactoryAuth.notifications"/>
     </extensions>
 </idea-plugin>

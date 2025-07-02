@@ -86,7 +86,7 @@ version = property("VERSION_NAME").toString()
 intellijPlatform {
   pluginConfiguration {
     name = "Artifactory Authenticator"
-    id = "com.slack.intellij.artifactory"
+    id = "com.slack.ide.artifactory"
     version = property("VERSION_NAME").toString()
     description = "A plugin for authenticating plugin repositories with Artifactory."
     vendor {
@@ -96,9 +96,4 @@ intellijPlatform {
       email = "oss@slack-corp.com"
     }
   }
-}
-
-dependencies {
-  testImplementation(libs.junit)
-  testImplementation(libs.truth)
 }
