@@ -20,6 +20,7 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import foundry.intellij.skate.SkatePluginSettings
 import java.util.regex.Pattern
 
 internal val PROJECT_CALL_PATTERN = Pattern.compile("""project\s*\(\s*["']([^"']+)["']\s*\)""")
@@ -30,6 +31,12 @@ internal val PROJECT_CALL_PATTERN = Pattern.compile("""project\s*\(\s*["']([^"']
 class GradleProjectAnnotator : Annotator {
 
   override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+    // Check if the ProjectPathService is enabled
+    val settings = element.project.getService(SkatePluginSettings::class.java)
+    if (!settings.isProjectPathServiceEnabled) {
+      return
+    }
+
     // Only process elements in Gradle build files
     val file = element.containingFile
     if (file?.name?.endsWith(".gradle") != true && file?.name?.endsWith(".gradle.kts") != true) {

@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.messages.MessageBusConnection
+import foundry.intellij.skate.SkatePluginSettings
 import foundry.intellij.skate.gradle.GradleProjectUtils.parseProjectPaths
 import java.io.IOException
 
@@ -57,11 +58,12 @@ class ProjectPathService(private val project: Project) : Disposable {
   }
 
   /**
-   * Gets all available project paths. Returns an empty set if all-projects.txt doesn't exist. Uses
-   * simple caching to avoid repeated file reads.
+   * Gets all available project paths. Returns an empty set if the service is disabled,
+   * all-projects.txt doesn't exist, or other conditions are not met. Uses simple caching to avoid
+   * repeated file reads.
    */
   fun getProjectPaths(): Set<String> {
-    if (!hasAllProjectsFile()) {
+    if (!isEnabled() || !hasAllProjectsFile()) {
       return emptySet()
     }
 
@@ -71,6 +73,11 @@ class ProjectPathService(private val project: Project) : Disposable {
   /** Checks if a given project path exists in the available projects. */
   fun isValidProjectPath(path: String): Boolean {
     return getProjectPaths().contains(path)
+  }
+
+  /** Checks if the ProjectPathService is enabled via settings. */
+  private fun isEnabled(): Boolean {
+    return project.getService(SkatePluginSettings::class.java).isProjectPathServiceEnabled
   }
 
   fun invalidateCache() {

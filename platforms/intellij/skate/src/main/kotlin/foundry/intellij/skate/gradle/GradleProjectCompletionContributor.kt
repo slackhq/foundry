@@ -27,6 +27,7 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
+import foundry.intellij.skate.SkatePluginSettings
 
 /** Provides autocomplete functionality for project(...) dependencies in Gradle build files. */
 class GradleProjectCompletionContributor : CompletionContributor() {
@@ -59,6 +60,13 @@ class GradleProjectCompletionContributor : CompletionContributor() {
       result: CompletionResultSet,
     ) {
       val project = parameters.position.project
+      val settings = project.getService(SkatePluginSettings::class.java)
+
+      // Check if the ProjectPathService is enabled
+      if (!settings.isProjectPathServiceEnabled) {
+        return
+      }
+
       val projectPathService = project.getService(ProjectPathService::class.java)
 
       // Simple check: look at file content around the cursor position

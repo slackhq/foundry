@@ -38,6 +38,7 @@ internal class SkateConfigUI(
   fun createPanel(): DialogPanel = panel {
     whatsNewPanelSettings()
     enableProjectGenMenuAction()
+    gradleProjectPathSettings()
     installationLocationSettings()
     featureFlagSettings()
     tracingSettings()
@@ -89,6 +90,18 @@ internal class SkateConfigUI(
           .bindSelected(
             getter = { settings.isProjectGenMenuActionEnabled },
             setter = { settings.isProjectGenMenuActionEnabled = it },
+          )
+      }
+    }
+  }
+
+  private fun Panel.gradleProjectPathSettings() {
+    group(SkateBundle.message("skate.configuration.gradleProjectPath.title")) {
+      row {
+        checkBox(SkateBundle.message("skate.configuration.enableGradleProjectPath.description"))
+          .bindSelected(
+            getter = { settings.isProjectPathServiceEnabled },
+            setter = { settings.isProjectPathServiceEnabled = it },
           )
       }
     }
