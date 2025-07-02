@@ -52,6 +52,7 @@ if (System.getenv("CI") != null) {
 dependencies {
   api(libs.clikt)
 
+  implementation(project(":tools:foundry-common"))
   implementation(libs.autoService.annotations)
   implementation(libs.bugsnag)
   implementation(libs.kotlin.reflect)
@@ -65,7 +66,6 @@ dependencies {
   implementation(libs.slf4jNop)
   implementation(libs.tikxml.htmlEscape)
   implementation(libs.xmlutil.serialization)
-  implementation(projects.tools.foundryCommon)
 
   testImplementation(libs.junit)
   testImplementation(libs.kaml)

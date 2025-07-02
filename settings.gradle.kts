@@ -69,6 +69,8 @@ plugins {
   id("com.gradle.develocity") version "4.0.2"
   id("org.jetbrains.intellij.platform.settings") version "2.6.0"
   id("org.jetbrains.intellij.platform") version "2.6.0" apply false
+  // https://github.com/joshfriend/spotlight
+  id("com.fueledbycaffeine.spotlight") version "1.2.1"
 }
 
 dependencyResolutionManagement {
@@ -145,25 +147,5 @@ develocity {
 
 rootProject.name = "foundry"
 
-// Please keep these in alphabetical order!
-include(
-  ":platforms:gradle:agp-handlers:agp-handler-api",
-  ":platforms:gradle:better-gradle-properties",
-  ":platforms:gradle:foundry-gradle-plugin",
-  ":platforms:intellij:artifactory-authenticator",
-  ":platforms:intellij:compose",
-  ":platforms:intellij:compose:playground",
-  ":platforms:intellij:skate",
-  ":tools:cli",
-  ":tools:foundry-common",
-  ":tools:robolectric-sdk-management",
-  ":tools:skippy",
-  ":tools:tracing",
-  ":tools:version-number",
-)
-
 // https://docs.gradle.org/5.6/userguide/groovy_plugin.html#sec:groovy_compilation_avoidance
 enableFeaturePreview("GROOVY_COMPILATION_AVOIDANCE")
-
-// https://docs.gradle.org/current/userguide/declaring_dependencies.html#sec:type-safe-project-accessors
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
