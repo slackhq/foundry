@@ -62,6 +62,9 @@ buildscript {
   dependencies {
     // Force a newer version of okio, otherwise intellijPlatform and wire conflict
     classpath("com.squareup.okio:okio:3.14.0")
+    // For some reason we need to enforce this on the classpath early
+    // See https://github.com/tinyspeck/slack-android-ng/pull/107076
+    classpath("com.squareup:kotlinpoet:2.2.0")
   }
 }
 
