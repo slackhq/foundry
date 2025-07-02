@@ -77,7 +77,7 @@ class ProjectPathService(private val project: Project) : Disposable {
 
   /** Checks if the ProjectPathService is enabled via settings. */
   private fun isEnabled(): Boolean {
-    return project.getService(SkatePluginSettings::class.java).isProjectPathServiceEnabled
+    return project.getService(SkatePluginSettings::class.java)?.isProjectPathServiceEnabled != false
   }
 
   fun invalidateCache() {
