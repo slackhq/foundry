@@ -135,6 +135,9 @@ class ProjectPathServiceIntegrationTest {
     // Should return empty set rather than throw exception
     val paths = service.getProjectPaths()
     assertThat(paths).isEmpty()
+
+    // Validation should also return false for any path when file doesn't exist
+    assertThat(service.isValidProjectPath(":any:project")).isFalse()
   }
 
   private fun createTestProjectPathService(): ProjectPathService {

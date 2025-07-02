@@ -24,21 +24,20 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.messages.MessageBusConnection
 import foundry.intellij.skate.gradle.GradleProjectUtils.parseProjectPaths
 import java.io.IOException
-import java.util.concurrent.ConcurrentHashMap
+
+private const val ALL_PROJECTS_PATH = "gradle/all-projects.txt"
 
 /**
- * Service that manages available project paths by reading from `gradle/all-projects.txt` file.
- * Provides caching and automatic invalidation when the file changes.
+ * Service that manages available project paths by reading from `gradle/all-projects.txt` file. Only
+ * provides functionality if the all-projects.txt file exists in the project.
  */
 @Service(Service.Level.PROJECT)
 class ProjectPathService(private val project: Project) : Disposable {
 
-  private val projectPathsCache = ConcurrentHashMap<String, Set<String>>()
+  private var cachedProjectPaths: Set<String>? = null
   private var connection: MessageBusConnection?
 
   init {
-    // Listen for file changes to invalidate cache
-    // TODO is there a finer-grained way?
     connection =
       project.messageBus.connect().apply {
         subscribe(
@@ -46,7 +45,8 @@ class ProjectPathService(private val project: Project) : Disposable {
           object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
               events.forEach { event ->
-                if (event.file?.name == "all-projects.txt") {
+                val eventPath = event.file?.path
+                if (eventPath != null && eventPath.endsWith(ALL_PROJECTS_PATH)) {
                   invalidateCache()
                 }
               }
@@ -57,13 +57,15 @@ class ProjectPathService(private val project: Project) : Disposable {
   }
 
   /**
-   * Gets all available project paths. Returns cached results if available, otherwise reads from
-   * `gradle/all-projects.txt` file.
+   * Gets all available project paths. Returns an empty set if all-projects.txt doesn't exist. Uses
+   * simple caching to avoid repeated file reads.
    */
   fun getProjectPaths(): Set<String> {
-    val cacheKey = project.basePath ?: return emptySet()
+    if (!hasAllProjectsFile()) {
+      return emptySet()
+    }
 
-    return projectPathsCache.computeIfAbsent(cacheKey) { loadProjectPathsFromFile() }
+    return cachedProjectPaths ?: loadProjectPathsFromFile().also { cachedProjectPaths = it }
   }
 
   /** Checks if a given project path exists in the available projects. */
@@ -72,13 +74,19 @@ class ProjectPathService(private val project: Project) : Disposable {
   }
 
   fun invalidateCache() {
-    projectPathsCache.clear()
+    cachedProjectPaths = null
+  }
+
+  private fun hasAllProjectsFile(): Boolean {
+    val basePath = project.basePath ?: return false
+    return VirtualFileManager.getInstance().findFileByUrl("file://$basePath/$ALL_PROJECTS_PATH") !=
+      null
   }
 
   private fun loadProjectPathsFromFile(): Set<String> {
     val basePath = project.basePath ?: return emptySet()
     val allProjectsFile =
-      VirtualFileManager.getInstance().findFileByUrl("file://$basePath/gradle/all-projects.txt")
+      VirtualFileManager.getInstance().findFileByUrl("file://$basePath/$ALL_PROJECTS_PATH")
         ?: return emptySet()
 
     return try {
