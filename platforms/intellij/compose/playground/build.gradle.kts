@@ -53,7 +53,7 @@ kotlin {
         implementation(libs.jewel.standalone)
         implementation(libs.kotlin.poet)
         implementation(libs.markdown)
-        implementation(projects.platforms.intellij.compose)
+        implementation(project(":platforms:intellij:compose"))
       }
     }
     jvmTest {

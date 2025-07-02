@@ -144,14 +144,14 @@ dokka {
 }
 
 dependencies {
-  dokka(projects.tools.cli)
-  dokka(projects.tools.foundryCommon)
-  dokka(projects.tools.skippy)
-  dokka(projects.tools.tracing)
-  dokka(projects.tools.versionNumber)
-  dokka(projects.platforms.gradle.betterGradleProperties)
-  dokka(projects.platforms.gradle.foundryGradlePlugin)
-  dokka(projects.platforms.gradle.agpHandlers.agpHandlerApi)
+  dokka(project(":tools:cli"))
+  dokka(project(":tools:foundry-common"))
+  dokka(project(":tools:skippy"))
+  dokka(project(":tools:tracing"))
+  dokka(project(":tools:version-number"))
+  dokka(project(":platforms:gradle:better-gradle-properties"))
+  dokka(project(":platforms:gradle:foundry-gradle-plugin"))
+  dokka(project(":platforms:gradle:agp-handlers:agp-handler-api"))
 }
 
 val kotlinVersion = libs.versions.kotlin.get()

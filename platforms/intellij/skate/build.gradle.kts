@@ -141,9 +141,9 @@ dependencies {
         }
       }
   }
-  implementation(projects.platforms.intellij.compose, exclusions)
-  implementation(projects.tools.tracing, exclusions)
-  implementation(projects.tools.foundryCommon, exclusions)
+  implementation(project(":platforms:intellij:compose"), exclusions)
+  implementation(project(":tools:tracing"), exclusions)
+  implementation(project(":tools:foundry-common"), exclusions)
 
   implementation(libs.bugsnag)
   implementation(libs.kaml)

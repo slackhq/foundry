@@ -23,13 +23,13 @@ plugins {
 dependencies {
   api(platform(libs.coroutines.bom))
 
+  implementation(project(":tools:cli"))
+  implementation(project(":tools:foundry-common"))
   implementation(libs.clikt)
   implementation(libs.coroutines.core)
   implementation(libs.gradlePlugins.graphAssert) { because("To use in Gradle graphing APIs.") }
   implementation(libs.moshi)
   implementation(libs.okio)
-  implementation(projects.tools.cli)
-  implementation(projects.tools.foundryCommon)
 
   testImplementation(platform(libs.coroutines.bom))
   testImplementation(libs.coroutines.test)
