@@ -71,3 +71,23 @@ class GradleProjectAnnotator : Annotator {
     }
   }
 }
+
+/**
+ * Internal function to check if an element should be processed by the annotator. Exposed for
+ * testing.
+ */
+internal fun shouldAnnotatorProcessElement(
+  elementText: String,
+  hasProjectChildren: Boolean,
+): Boolean {
+  if (!elementText.contains("project(")) {
+    return false
+  }
+
+  // Skip if any child element also contains "project(" - let the child handle it
+  if (hasProjectChildren) {
+    return false
+  }
+
+  return true
+}

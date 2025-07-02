@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.messages.MessageBusConnection
+import foundry.intellij.skate.gradle.GradleProjectUtils.parseProjectPaths
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -86,14 +87,6 @@ class ProjectPathService(private val project: Project) : Disposable {
     } catch (_: IOException) {
       emptySet()
     }
-  }
-
-  internal fun parseProjectPaths(content: String): Set<String> {
-    return content
-      .lines()
-      .map { it.trim() }
-      .filter { it.isNotEmpty() && !it.startsWith("#") }
-      .toSet()
   }
 
   override fun dispose() {

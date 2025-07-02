@@ -16,17 +16,13 @@
 package foundry.intellij.skate.gradle
 
 import com.google.common.truth.Truth.assertThat
-import com.intellij.mock.MockProject
-import com.intellij.openapi.util.Disposer
+import foundry.intellij.skate.gradle.GradleProjectUtils.parseProjectPaths
 import org.junit.Test
 
 class ProjectPathServiceTest {
 
   @Test
   fun `parseProjectPaths filters comments and blank lines`() {
-    val project = MockProject(null, Disposer.newDisposable())
-    val service = ProjectPathService(project)
-
     val content =
       """
       # This is a comment
@@ -39,7 +35,7 @@ class ProjectPathServiceTest {
     """
         .trimIndent()
 
-    @Suppress("UNCHECKED_CAST") val result = service.parseProjectPaths(content)
+    @Suppress("UNCHECKED_CAST") val result = parseProjectPaths(content)
 
     assertThat(result)
       .containsExactly(

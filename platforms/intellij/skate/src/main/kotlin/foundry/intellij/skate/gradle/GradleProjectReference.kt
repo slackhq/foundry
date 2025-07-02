@@ -22,7 +22,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
 import com.intellij.util.IncorrectOperationException
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 /**
  * Reference implementation for project paths in project(...) calls. Allows navigation to the
@@ -47,27 +51,19 @@ class GradleProjectReference(
     }
 
     // Convert a project path to a filesystem path
-    val projectBasePath = project.basePath ?: return null
+    val projectBasePath = project.basePath?.let(::Path) ?: return null
     val relativePath = projectPath.removePrefix(":").replace(":", "/")
-    val projectDir = File(projectBasePath, relativePath)
+    val projectDir = projectBasePath.resolve(relativePath)
 
-    if (!projectDir.exists() || !projectDir.isDirectory) {
+    if (!projectDir.exists() || !projectDir.isDirectory()) {
       return null
     }
 
     // Look for build.gradle.kts first, then build.gradle
-    val buildFileKts = File(projectDir, "build.gradle.kts")
-    val buildFile = File(projectDir, "build.gradle")
-
-    val targetFile =
-      when {
-        buildFileKts.exists() -> buildFileKts
-        buildFile.exists() -> buildFile
-        else -> return null
-      }
+    val targetFile = findBuildFile(projectDir) ?: return null
 
     val virtualFile =
-      VirtualFileManager.getInstance().findFileByUrl("file://${targetFile.absolutePath}")
+      VirtualFileManager.getInstance().findFileByUrl("file://${targetFile.absolutePathString()}")
         ?: return null
 
     return PsiManager.getInstance(project).findFile(virtualFile)
@@ -99,5 +95,20 @@ class GradleProjectReference(
         FileEditorManager.getInstance(element.project).openFile(virtualFile, true)
       }
     }
+  }
+}
+
+/**
+ * Internal function to find the build file in a project directory. Prefers build.gradle.kts over
+ * build.gradle. Exposed for testing.
+ */
+internal fun findBuildFile(projectDir: Path): Path? {
+  val buildFileKts = projectDir.resolve("build.gradle.kts")
+  val buildFile = projectDir.resolve("build.gradle")
+
+  return when {
+    buildFileKts.exists() -> buildFileKts
+    buildFile.exists() -> buildFile
+    else -> null
   }
 }

@@ -111,15 +111,7 @@ class GradleProjectReferenceProvider : PsiReferenceProvider() {
         val projectPathService = element.project.getService(ProjectPathService::class.java)
         if (projectPathService.isValidProjectPath(projectPath)) {
           // Calculate range based on element type
-          val range =
-            when {
-              element.text.startsWith("\"") || element.text.startsWith("'") -> {
-                TextRange.create(1, element.text.length - 1) // Exclude quotes
-              }
-              else -> {
-                TextRange.create(0, element.text.length) // Entire element
-              }
-            }
+          val range = calculateReferenceTextRange(element.text)
           return arrayOf(GradleProjectReference(element, range, projectPath))
         }
       }
@@ -141,5 +133,17 @@ class GradleProjectReferenceProvider : PsiReferenceProvider() {
       depth++
     }
     return false
+  }
+}
+
+/** Internal function to calculate text range for references. Exposed for testing. */
+internal fun calculateReferenceTextRange(elementText: String): TextRange {
+  return when {
+    elementText.startsWith("\"") || elementText.startsWith("'") -> {
+      TextRange.create(1, elementText.length - 1) // Exclude quotes
+    }
+    else -> {
+      TextRange.create(0, elementText.length) // Entire element
+    }
   }
 }
