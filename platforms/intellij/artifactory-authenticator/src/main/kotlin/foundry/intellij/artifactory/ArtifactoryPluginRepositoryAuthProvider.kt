@@ -18,15 +18,12 @@ package foundry.intellij.artifactory
 import com.intellij.ide.plugins.auth.PluginRepositoryAuthProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
-import java.util.Base64
 
 class ArtifactoryPluginRepositoryAuthProvider : PluginRepositoryAuthProvider {
 
   private val settings =
     ApplicationManager.getApplication().getService(AuthPluginSettings::class.java)
   private val logger = logger<ArtifactoryPluginRepositoryAuthProvider>()
-
-  private fun String.encodeBase64() = Base64.getEncoder().encodeToString(encodeToByteArray())
 
   override fun getAuthHeaders(url: String): Map<String, String> {
     logger.debug("Getting auth headers for $url")
