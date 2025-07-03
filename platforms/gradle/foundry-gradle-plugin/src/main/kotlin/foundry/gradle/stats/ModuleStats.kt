@@ -448,15 +448,11 @@ internal object StatsUtils {
   fun parseProjectDeps(text: String): Set<String> {
     val deps = mutableSetOf<String>()
     text.lineSequence().forEach { line ->
-      if ("(projects." in line) {
+      if ("project(\"" in line) {
         // testFixtures*( are just for gradle module metadata and not actually a dependency
         if ("testFixturesApi(" in line) return@forEach
         if ("testFixturesImplementation(" in line) return@forEach
-        deps +=
-          line
-            .substringAfter("(projects.")
-            .substringBefore(")")
-            .substringBefore(".dependencyProject")
+        deps += line.substringAfter("project(\"").substringBefore("\")")
       }
     }
     return deps.toSortedSet()
