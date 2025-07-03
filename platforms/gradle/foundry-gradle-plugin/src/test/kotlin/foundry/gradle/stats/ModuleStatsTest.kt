@@ -40,12 +40,12 @@ class ModuleStatsTest {
 
       dependencies {
         compileOnly(SlackDependencies.Androidx.annotation)
-        compileOnly(projects.libraries.foundation.jsr305)
+        compileOnly(project(":libraries:foundation:jsr305"))
         implementation(SlackDependencies.Slack.eithernet)
-        testFixturesApi(projects.libraries.foundation.guinness.testUtils)
+        testFixturesApi(project(":libraries:foundation:guinness:test-utils"))
 
         testImplementation(SlackDependencies.Testing.truth)
-        testImplementation(projects.libraries.foundation.testCommons)
+        testImplementation(project(":libraries:foundation:test-commons"))
       }
 
       """
@@ -53,6 +53,6 @@ class ModuleStatsTest {
 
     val deps = StatsUtils.parseProjectDeps(buildFileText)
     assertThat(deps)
-      .containsExactly("libraries.foundation.jsr305", "libraries.foundation.testCommons")
+      .containsExactly(":libraries:foundation:jsr305", ":libraries:foundation:test-commons")
   }
 }

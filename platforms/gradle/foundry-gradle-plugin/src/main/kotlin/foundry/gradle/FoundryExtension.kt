@@ -788,7 +788,7 @@ constructor(objects: ObjectFactory, foundryProperties: FoundryProperties) {
    * foundry {
    *   features {
    *     dagger(...) {
-   *       anvilGenerators(projects.libraries.foundation.anvil.injection.compiler)
+   *       anvilGenerators(project(":libraries:foundation:anvil:injection:compiler"))
    *     }
    *   }
    * }
