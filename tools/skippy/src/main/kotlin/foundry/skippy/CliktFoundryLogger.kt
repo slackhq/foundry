@@ -23,7 +23,8 @@ internal fun FoundryLogger.Companion.clikt(command: BaseCliktCommand<*>): Foundr
 
 private class CliktFoundryLogger(private val command: BaseCliktCommand<*>) : FoundryLogger {
   override fun debug(message: String) {
-    command.echo(message)
+    // Ignore debug logs as they're very chatty. Most usages branch on a `--debug` flag,
+    // which then redirects logs to lifecycle(...) below
   }
 
   override fun info(message: String) {
