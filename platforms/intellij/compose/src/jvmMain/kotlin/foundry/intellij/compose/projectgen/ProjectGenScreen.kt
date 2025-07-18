@@ -20,7 +20,7 @@ import com.slack.circuit.runtime.CircuitUiEvent
 import com.slack.circuit.runtime.CircuitUiState
 import com.slack.circuit.runtime.screen.Screen
 
-internal object ProjectGenScreen : Screen {
+internal data object ProjectGenScreen : Screen {
   data class State(
     val uiElements: SnapshotStateList<UiElement>,
     // TODO make this a "next page" instead?
