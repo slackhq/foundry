@@ -52,10 +52,10 @@ import okio.Path
  * that are determined to be affected. This is intended to be used as an input to a subsequent
  * Gradle invocation (usually as a file) to inform which projects can be avoided.
  *
- * A secondary output file is [AffectedProjectsResult.focusProjects]. This is a set of Gradle
- * project paths that can be written to a `focus.settings.gradle` file that can be used with the
- * dropbox/focus plugin, and will be a minimal list of projects needed to build the affected
- * projects.
+ * A secondary output is [AffectedProjectsResult.buildProjects]. This is written as 2 files which
+ * both contain a minimal list of projects needed to build the affected projects:
+ * - `focus.settings.gradle`: Can be used with the dropbox/focus plugin.
+ * - `spotlight_projects.txt`: Can be used with joshfriend/spotlight plugin.
  *
  * With both outputs, if any "never-skippable" files [SkippyConfig.neverSkipPatterns] are changed,
  * then no output file is produced and all projects are considered affected. If a file is produced
