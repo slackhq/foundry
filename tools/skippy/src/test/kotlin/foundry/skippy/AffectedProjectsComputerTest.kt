@@ -255,7 +255,7 @@ private fun AffectedProjectsComputer.assertComputed(
 ) {
   val result = compute().checkNotNull()
   assertThat(result.affectedProjects).containsExactlyElementsIn(expectedAffectedProjects)
-  assertThat(result.focusProjects).containsExactlyElementsIn(expectedFocusProjects)
+  assertThat(result.buildProjects).containsExactlyElementsIn(expectedFocusProjects)
   assertThat(result.affectedAndroidTestProjects)
     .containsExactlyElementsIn(expectedAffectedAndroidTestProjects)
 }
@@ -270,5 +270,5 @@ private fun AffectedProjectsResult?.assertNull() {
 private fun AffectedProjectsResult?.assertEmpty() {
   val result = checkNotNull()
   assertThat(result.affectedProjects).isEmpty()
-  assertThat(result.focusProjects).isEmpty()
+  assertThat(result.buildProjects).isEmpty()
 }

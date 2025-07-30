@@ -19,6 +19,10 @@ import java.util.SortedSet
 
 public data class AffectedProjectsResult(
   val affectedProjects: SortedSet<String>,
-  val focusProjects: SortedSet<String>,
+  val buildProjects: SortedSet<String>,
   val affectedAndroidTestProjects: SortedSet<String>,
-)
+) {
+  @Deprecated("Use buildProjects instead", ReplaceWith("buildProjects"))
+  val focusProjects: SortedSet<String>
+    get() = buildProjects
+}
