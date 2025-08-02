@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **Fix**: Don't add anvil runtime projects as dependencies of themselves.
+
 0.28.1
 ------
 

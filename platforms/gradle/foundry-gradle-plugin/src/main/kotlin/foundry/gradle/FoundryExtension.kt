@@ -233,6 +233,7 @@ constructor(
             foundryProperties.anvilRuntimeProjects?.splitToSequence(";")?.toSet().orEmpty()
 
           for (runtimeProject in runtimeProjects) {
+            if (runtimeProject == project.path) continue // No circular deps
             dependencies.add("implementation", project(runtimeProject))
             if (daggerConfig.testFixturesUseDagger) {
               dependencies.add("testFixturesImplementation", project(runtimeProject))
