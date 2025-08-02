@@ -251,7 +251,7 @@ constructor(
             metroExtension.interop.apply {
               includeDagger()
               if (daggerConfig.metroInteropAnvil) {
-                includeAnvil(includeDaggerAnvil = false, includeKotlinInjectAnvil = false)
+                includeAnvil(includeDaggerAnvil = true, includeKotlinInjectAnvil = false)
               }
             }
           }
