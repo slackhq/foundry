@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Update AGP to `8.12.0`.
+
 0.28.1
 ------
 
