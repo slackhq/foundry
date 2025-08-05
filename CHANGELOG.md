@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **Fix**: Propagate `foundry.di.metro.interop.anvil` property correctly to Metro.
+- **Fix**: Don't add anvil runtime projects as dependencies of themselves.
 - Update AGP to `8.12.0`.
 
 0.28.1
