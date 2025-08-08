@@ -4,6 +4,15 @@ Changelog
 **Unreleased**
 --------------
 
+0.30.0
+------
+
+_2025-08-08_
+
+- Support Gradle 9.0.
+- Update Wire to `5.3.7`.
+- Update Spotlight to `1.3.3`.
+
 0.29.0
 ------
 
