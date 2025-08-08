@@ -210,7 +210,7 @@ subprojects {
             KotlinVersion.KOTLIN_2_0
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-            KotlinVersion.KOTLIN_2_1
+            KotlinVersion.KOTLIN_2_2
           } else {
             KotlinVersion.DEFAULT
           }
