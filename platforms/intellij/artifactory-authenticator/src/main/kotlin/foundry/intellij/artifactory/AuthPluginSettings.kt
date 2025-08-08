@@ -35,30 +35,73 @@ class AuthPluginSettings : SimplePersistentStateComponent<AuthPluginSettings.Sta
     }
 
   var url: String?
-    get() = state.url
+    get() =
+      state.url?.let {
+        if (state.version == null) {
+          // Handle legacy non-encoded data when version is absent
+          it
+        } else {
+          try {
+            it.decodeBase64()
+          } catch (_: Exception) {
+            // Can't decode, null out the value
+            state.url = null
+            null
+          }
+        }
+      }
     set(value) {
-      val previous = state.url
-      state.url = value
+      val previous = url
+      state.url = value?.encodeBase64()
       notifyChange(previous != value)
     }
 
   var username: String?
-    get() = state.username
+    get() =
+      state.username?.let {
+        if (state.version == null) {
+          // Handle legacy non-encoded data when version is absent
+          it
+        } else {
+          try {
+            it.decodeBase64()
+          } catch (_: Exception) {
+            // Can't decode, null out the value
+            state.username = null
+            null
+          }
+        }
+      }
     set(value) {
-      val previous = state.username
-      state.username = value
+      val previous = username
+      state.username = value?.encodeBase64()
       notifyChange(previous != value)
     }
 
   var token: String?
-    get() = state.token
+    get() =
+      state.token?.let {
+        if (state.version == null) {
+          // Handle legacy non-encoded data when version is absent
+          it
+        } else {
+          try {
+            it.decodeBase64()
+          } catch (_: Exception) {
+            // Can't decode, null out the value
+            state.token = null
+            null
+          }
+        }
+      }
     set(value) {
-      val previous = state.token
-      state.token = value
+      val previous = token
+      state.token = value?.encodeBase64()
       notifyChange(previous != value)
     }
 
   private fun notifyChange(changed: Boolean) {
+    state.version = CURRENT_VERSION
     if (changed) {
       // Any time we change this setting we need to notify the IDE that the auth has changed
       PluginRepositoryAuthListener.notifyAuthChanged()
@@ -70,5 +113,6 @@ class AuthPluginSettings : SimplePersistentStateComponent<AuthPluginSettings.Sta
     var url by string()
     var username by string()
     var token by string()
+    var version by string()
   }
 }

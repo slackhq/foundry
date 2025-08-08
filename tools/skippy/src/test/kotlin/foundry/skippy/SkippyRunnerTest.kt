@@ -113,7 +113,7 @@ class SkippyRunnerTest {
       assertComputed(
         tool,
         expectedAffectedProjects = listOf(":$projectName"),
-        expectedFocusProjects = listOf(":$projectName"),
+        expectedBuildProjects = listOf(":$projectName"),
         expectedAffectedAndroidTestProjects = listOf(":$projectName"),
       )
     }
@@ -150,7 +150,7 @@ class SkippyRunnerTest {
       assertComputed(
         tool,
         expectedAffectedProjects = listOf(":$barProject"),
-        expectedFocusProjects = listOf(":$barProject"),
+        expectedBuildProjects = listOf(":$barProject"),
         // Lint xml file doesn't affect android tests
         expectedAffectedAndroidTestProjects = emptyList(),
       )
@@ -158,7 +158,7 @@ class SkippyRunnerTest {
     assertComputed(
       "unitTest",
       expectedAffectedProjects = emptyList(),
-      expectedFocusProjects = emptyList(),
+      expectedBuildProjects = emptyList(),
       expectedAffectedAndroidTestProjects = emptyList(),
     )
   }
@@ -169,14 +169,16 @@ class SkippyRunnerTest {
   private fun assertComputed(
     tool: String,
     expectedAffectedProjects: List<String>,
-    expectedFocusProjects: List<String>,
+    expectedBuildProjects: List<String>,
     expectedAffectedAndroidTestProjects: List<String>,
   ) {
-    val includedProjects = expectedFocusProjects.map { "include(\"$it\")" }
+    val includedProjects = expectedBuildProjects.map { "include(\"$it\")" }
     assertThat(skippyOutput(tool, SkippyOutput.AFFECTED_PROJECTS_FILE_NAME).readLines(fs))
       .containsExactlyElementsIn(expectedAffectedProjects)
     assertThat(skippyOutput(tool, SkippyOutput.FOCUS_SETTINGS_FILE_NAME).readLines(fs))
       .containsExactlyElementsIn(includedProjects)
+    assertThat(skippyOutput(tool, SkippyOutput.SPOTLIGHT_FILE_NAME).readLines(fs))
+      .containsExactlyElementsIn(expectedBuildProjects)
     assertThat(
         skippyOutput(tool, SkippyOutput.AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME).readLines(fs)
       )

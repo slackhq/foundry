@@ -25,6 +25,20 @@
         <postStartupActivity implementation="foundry.intellij.skate.ideinstall.InstallationLocationStartupActivity"/>
         <postStartupActivity implementation="foundry.intellij.skate.pluginlist.PluginListCollector"/>
         <notificationGroup id="SkateInstallationLocation" displayType="BALLOON" isLogByDefault="true"/>
+        
+        <!-- Gradle project path support -->
+        <completion.contributor language="Groovy" implementationClass="foundry.intellij.skate.gradle.GradleProjectCompletionContributor"/>
+        <completion.contributor language="kotlin" implementationClass="foundry.intellij.skate.gradle.GradleProjectCompletionContributor"/>
+        <annotator language="Groovy" implementationClass="foundry.intellij.skate.gradle.GradleProjectAnnotator"/>
+        <annotator language="kotlin" implementationClass="foundry.intellij.skate.gradle.GradleProjectAnnotator"/>
+        <psi.referenceContributor language="Groovy"
+                implementation="foundry.intellij.skate.gradle.GradleProjectReferenceContributor"/>
+        <psi.referenceContributor language="kotlin"
+                implementation="foundry.intellij.skate.gradle.GradleProjectReferenceContributor"/>
+        <intentionAction>
+            <className>foundry.intellij.skate.gradle.RefreshProjectPathsIntentionAction</className>
+            <category>Gradle</category>
+        </intentionAction>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">

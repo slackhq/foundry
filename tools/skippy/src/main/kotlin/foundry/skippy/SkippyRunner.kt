@@ -28,7 +28,6 @@ import foundry.skippy.SkippyConfig.Companion.GLOBAL_TOOL
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
@@ -159,12 +158,17 @@ public class SkippyRunner(
           val mergedFocusProjects = async {
             outputs.flatMapToSet { it.outputFocusFile.readLines(fs) }.toSortedSet()
           }
-          val (affectedProjects, affectedAndroidTestProjects, focusProjects) =
-            listOf(mergedAffectedProjects, mergedAffectedAndroidTestProjects, mergedFocusProjects)
-              .awaitAll()
-          mergedOutput.affectedProjectsFile.writeLines(affectedProjects, fs)
-          mergedOutput.affectedAndroidTestProjectsFile.writeLines(affectedAndroidTestProjects, fs)
-          mergedOutput.outputFocusFile.writeLines(focusProjects, fs)
+          val mergedSpotlightProjects = async {
+            outputs.flatMapToSet { it.outputSpotlightFile.readLines(fs) }.toSortedSet()
+          }
+
+          mergedOutput.affectedProjectsFile.writeLines(mergedAffectedProjects.await(), fs)
+          mergedOutput.affectedAndroidTestProjectsFile.writeLines(
+            mergedAffectedAndroidTestProjects.await(),
+            fs,
+          )
+          mergedOutput.outputFocusFile.writeLines(mergedFocusProjects.await(), fs)
+          mergedOutput.outputSpotlightFile.writeLines(mergedSpotlightProjects.await(), fs)
         }
       }
     }
@@ -233,6 +237,10 @@ public class SkippyRunner(
         focusProjects.joinToString("\n") { "include(\"$it\")" },
         fs,
       )
+
+      // Generate Spotlight projects file
+      log(tool, "writing spotlight projects file to: ${skippyOutputs.outputSpotlightFile}")
+      skippyOutputs.outputSpotlightFile.writeText(focusProjects.joinToString("\n"), fs)
 
       skippyOutputs.delegate
     }

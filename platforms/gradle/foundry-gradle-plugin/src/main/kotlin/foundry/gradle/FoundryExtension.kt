@@ -233,6 +233,7 @@ constructor(
             foundryProperties.anvilRuntimeProjects?.splitToSequence(";")?.toSet().orEmpty()
 
           for (runtimeProject in runtimeProjects) {
+            if (runtimeProject == project.path) continue // No circular deps
             dependencies.add("implementation", project(runtimeProject))
             if (daggerConfig.testFixturesUseDagger) {
               dependencies.add("testFixturesImplementation", project(runtimeProject))
@@ -250,7 +251,7 @@ constructor(
             metroExtension.interop.apply {
               includeDagger()
               if (daggerConfig.metroInteropAnvil) {
-                includeAnvil(includeDaggerAnvil = false, includeKotlinInjectAnvil = false)
+                includeAnvil(includeDaggerAnvil = true, includeKotlinInjectAnvil = false)
               }
             }
           }
@@ -788,7 +789,7 @@ constructor(objects: ObjectFactory, foundryProperties: FoundryProperties) {
    * foundry {
    *   features {
    *     dagger(...) {
-   *       anvilGenerators(projects.libraries.foundation.anvil.injection.compiler)
+   *       anvilGenerators(project(":libraries:foundation:anvil:injection:compiler"))
    *     }
    *   }
    * }
@@ -1155,7 +1156,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
       androidExtension as? LibraryExtension
         ?: error("foundry.android.features.resources() is only applicable in libraries!")
     libraryExtension.resourcePrefix = prefix
-    libraryExtension.buildFeatures { androidResources = true }
+    libraryExtension.androidResources.enable = true
   }
 }
 

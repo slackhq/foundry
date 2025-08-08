@@ -70,13 +70,18 @@ dependencies.constraints {
 
 dependencies {
   api(platform(libs.okhttp.bom))
+  api(project(":platforms:gradle:agp-handlers:agp-handler-api"))
+  api(project(":tools:version-number"))
   api(libs.okhttp)
   // Better I/O
   api(libs.okio)
-  api(projects.platforms.gradle.agpHandlers.agpHandlerApi)
-  api(projects.tools.versionNumber)
 
   implementation(platform(libs.coroutines.bom))
+  implementation(project(":platforms:gradle:better-gradle-properties"))
+  implementation(project(":tools:cli"))
+  implementation(project(":tools:foundry-common"))
+  implementation(project(":tools:robolectric-sdk-management"))
+  implementation(project(":tools:skippy"))
   implementation(libs.commonsText) { because("For access to its StringEscapeUtils") }
   implementation(libs.coroutines.core)
   implementation(libs.develocity.agent.adapters)
@@ -89,11 +94,6 @@ dependencies {
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
-  implementation(projects.platforms.gradle.betterGradleProperties)
-  implementation(projects.tools.cli)
-  implementation(projects.tools.foundryCommon)
-  implementation(projects.tools.robolectricSdkManagement)
-  implementation(projects.tools.skippy)
 
   compileOnly(platform(libs.kotlin.bom))
   compileOnly(gradleApi())

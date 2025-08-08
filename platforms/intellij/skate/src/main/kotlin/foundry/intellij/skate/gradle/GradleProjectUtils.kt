@@ -70,7 +70,15 @@ object GradleProjectUtils {
     }
 
     // Convert the path to Gradle format
-    return ":" + relativePath.toString().replace('/', ':')
+    return convertRelativePathToGradlePath(relativePath.toString())
+  }
+
+  /** Converts a relative filesystem path to a Gradle project path format. */
+  internal fun convertRelativePathToGradlePath(relativePath: String): String {
+    if (relativePath.isEmpty()) {
+      return ":"
+    }
+    return ":" + relativePath.replace('/', ':')
   }
 
   /**
@@ -86,5 +94,13 @@ object GradleProjectUtils {
 
     // Convert from ":path:to:project" to "projects.path.to.project"
     return "projects." + convertProjectPathToAccessor(gradlePath)
+  }
+
+  fun parseProjectPaths(content: String): Set<String> {
+    return content
+      .lines()
+      .map { it.trim() }
+      .filter { it.isNotEmpty() && !it.startsWith("#") }
+      .toSet()
   }
 }

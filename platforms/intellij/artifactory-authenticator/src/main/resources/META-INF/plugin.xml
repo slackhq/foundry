@@ -1,17 +1,18 @@
 <idea-plugin>
+    <resource-bundle>messages.artifactoryAuthenticator</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <pluginRepositoryAuthProvider
                 implementation="foundry.intellij.artifactory.ArtifactoryPluginRepositoryAuthProvider"/>
-        <projectConfigurable
-                displayName="Artifactory Auth"
+        <applicationConfigurable
+                bundle="messages.artifactoryAuthenticator"
+                key="artifactoryAuth.displayName"
+                id="foundry.intellij.artifactory.AuthConfig"
                 instance="foundry.intellij.artifactory.AuthConfig"/>
+        <postStartupActivity implementation="foundry.intellij.artifactory.OldPluginInstalledWarner"/>
+        <notificationGroup id="Artifactory Authenticator Notifications"
+                           displayType="BALLOON"
+                           key="artifactoryAuth.notifications"/>
     </extensions>
-
-    <!-- Workaround for https://youtrack.jetbrains.com/issue/IDEA-315487 -->
-    <applicationListeners>
-        <listener class="foundry.intellij.artifactory.RepoAuthHotfix"
-                  topic="com.intellij.ide.AppLifecycleListener"/>
-    </applicationListeners>
 </idea-plugin>

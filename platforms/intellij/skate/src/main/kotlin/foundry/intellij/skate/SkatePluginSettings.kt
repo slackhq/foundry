@@ -146,6 +146,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.codeOwnerFilePath = value
     }
 
+  var isProjectPathServiceEnabled: Boolean
+    get() = state.isProjectPathServiceEnabled
+    set(value) {
+      state.isProjectPathServiceEnabled = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -165,5 +171,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var tracingEndpoint by string()
     var codeOwnerFilePath by string()
     var isCodeOwnerEnabled by property(true)
+    var isProjectPathServiceEnabled by property(true)
   }
 }

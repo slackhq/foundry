@@ -35,7 +35,7 @@ fi
 # Export the new version for Gradle's version name
 export ORG_GRADLE_PROJECT_VERSION_NAME=$version
 
-# Update change-notes.xml
+# Update change-notes.html
 # Use inline editing with compatibility for both macOS and Linux
 awk -v version="$version" '
     /<h2>Unreleased<\/h2>/ {
@@ -50,6 +50,8 @@ awk -v version="$version" '
 ' $changeNotes > tmpfile && mv tmpfile $changeNotes
 
 ./gradlew :platforms:intellij:skate:uploadPluginToArtifactory --no-configuration-cache --stacktrace
+
+git reset $changeNotes
 
 # Prepare release
 git config user.name "OSS-Bot"

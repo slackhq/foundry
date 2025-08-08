@@ -20,7 +20,7 @@ plugins {
 }
 
 dependencies {
-  implementation(projects.tools.versionNumber)
+  implementation(project(":tools:version-number"))
 
   compileOnly(gradleApi())
   compileOnly(libs.agp)

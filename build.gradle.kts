@@ -143,14 +143,14 @@ dokka {
 }
 
 dependencies {
-  dokka(projects.tools.cli)
-  dokka(projects.tools.foundryCommon)
-  dokka(projects.tools.skippy)
-  dokka(projects.tools.tracing)
-  dokka(projects.tools.versionNumber)
-  dokka(projects.platforms.gradle.betterGradleProperties)
-  dokka(projects.platforms.gradle.foundryGradlePlugin)
-  dokka(projects.platforms.gradle.agpHandlers.agpHandlerApi)
+  dokka(project(":tools:cli"))
+  dokka(project(":tools:foundry-common"))
+  dokka(project(":tools:skippy"))
+  dokka(project(":tools:tracing"))
+  dokka(project(":tools:version-number"))
+  dokka(project(":platforms:gradle:better-gradle-properties"))
+  dokka(project(":platforms:gradle:foundry-gradle-plugin"))
+  dokka(project(":platforms:gradle:agp-handlers:agp-handler-api"))
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
@@ -322,7 +322,7 @@ subprojects {
           name = property("PLUGIN_NAME").toString(),
           description = property("PLUGIN_DESCRIPTION").toString(),
           version = property("VERSION_NAME").toString(),
-          sinceBuild = property("PLUGIN_SINCE_BUILD").toString(),
+          sinceBuild = libs.versions.intellij.sinceBuild.get(),
           urlSuffix = property("ARTIFACTORY_URL_SUFFIX").toString(),
         )
 
@@ -339,7 +339,9 @@ subprojects {
         }
       }
       project.dependencies {
-        configure<IntelliJPlatformDependenciesExtension> { intellijIdeaCommunity("2024.3.1") }
+        configure<IntelliJPlatformDependenciesExtension> {
+          intellijIdeaCommunity(libs.versions.intellij.version)
+        }
       }
 
       if (hasProperty("FoundryIntellijArtifactoryBaseUrl")) {

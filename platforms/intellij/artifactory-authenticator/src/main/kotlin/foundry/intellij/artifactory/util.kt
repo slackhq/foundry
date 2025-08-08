@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2025 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.skippy
+package foundry.intellij.artifactory
 
-import java.util.SortedSet
+import java.util.Base64
 
-public data class AffectedProjectsResult(
-  val affectedProjects: SortedSet<String>,
-  val buildProjects: SortedSet<String>,
-  val affectedAndroidTestProjects: SortedSet<String>,
-) {
-  @Deprecated("Use buildProjects instead", ReplaceWith("buildProjects"))
-  val focusProjects: SortedSet<String>
-    get() = buildProjects
-}
+internal fun String.encodeBase64() = Base64.getEncoder().encodeToString(encodeToByteArray())
+
+internal fun String.decodeBase64(): String =
+  Base64.getDecoder().decode(this).toString(Charsets.UTF_8)

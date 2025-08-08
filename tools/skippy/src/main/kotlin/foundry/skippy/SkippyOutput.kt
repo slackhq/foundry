@@ -19,6 +19,7 @@ import foundry.common.prepareForGradleOutput
 import foundry.skippy.SkippyOutput.Companion.AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME
 import foundry.skippy.SkippyOutput.Companion.AFFECTED_PROJECTS_FILE_NAME
 import foundry.skippy.SkippyOutput.Companion.FOCUS_SETTINGS_FILE_NAME
+import foundry.skippy.SkippyOutput.Companion.SPOTLIGHT_FILE_NAME
 import okio.FileSystem
 import okio.Path
 
@@ -35,11 +36,15 @@ public interface SkippyOutput {
   /** An output .focus file that could be used with the Focus plugin. */
   public val outputFocusFile: Path
 
+  /** An output spotlight file that could be used with the Spotlight plugin. */
+  public val outputSpotlightFile: Path
+
   public companion object {
     internal const val AFFECTED_PROJECTS_FILE_NAME: String = "affected_projects.txt"
     internal const val AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME: String =
       "affected_android_test_projects.txt"
     internal const val FOCUS_SETTINGS_FILE_NAME: String = "focus.settings.gradle"
+    internal const val SPOTLIGHT_FILE_NAME: String = "spotlight_projects.txt"
   }
 }
 
@@ -48,6 +53,7 @@ public class SimpleSkippyOutput(public override val subDir: Path) : SkippyOutput
   public override val affectedAndroidTestProjectsFile: Path =
     subDir.resolve(AFFECTED_ANDROID_TEST_PROJECTS_FILE_NAME)
   public override val outputFocusFile: Path = subDir.resolve(FOCUS_SETTINGS_FILE_NAME)
+  public override val outputSpotlightFile: Path = subDir.resolve(SPOTLIGHT_FILE_NAME)
 }
 
 public class WritableSkippyOutput(tool: String, outputDir: Path, fs: FileSystem) : SkippyOutput {
@@ -71,5 +77,9 @@ public class WritableSkippyOutput(tool: String, outputDir: Path, fs: FileSystem)
 
   public override val outputFocusFile: Path by lazy {
     delegate.outputFocusFile.prepareForGradleOutput(fs)
+  }
+
+  override val outputSpotlightFile: Path by lazy {
+    delegate.outputSpotlightFile.prepareForGradleOutput(fs)
   }
 }

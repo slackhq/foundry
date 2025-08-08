@@ -4,6 +4,47 @@ Changelog
 **Unreleased**
 --------------
 
+0.29.0
+------
+
+_2025-08-05_
+
+- **New**: Add Spotlight output to Skippy.
+- **Enhancement**: Stop echo-ing debug logs in `CliktFoundryLogger`.
+- **Fix**: Propagate `foundry.di.metro.interop.anvil` property correctly to Metro.
+- **Fix**: Don't add anvil runtime projects as dependencies of themselves.
+- Update Okio to `3.16.0`.
+- Update Circuit to `0.30.0`.
+- Update xmlutil to `0.91.2`.
+- Update kaml to `0.85.0`.
+- Update bugsnag to `3.8.0`.
+- Update wire to `5.3.5`.
+- Update okhttp to `5.1.0`.
+- Update rxjava to `3.1.11`.
+- Update kotlinx-serialization to `1.9.0`.
+- Update moshix `0.31.0`.
+- Build against redacted-compiler-plugin `1.14.1`.
+- Build against gradle-errorprone-plugin `4.3.0`.
+- Build against roborazzi `1.46.1`.
+- Build against emulator.wtf `0.19.3`.
+- Build against maven-publish `0.34.0`.
+- Build against Metro `0.5.5`.
+- Build against AGP `8.12.0`.
+- Build against Spotlight `1.3.2`.
+- Build against Spotless `7.2.1`.
+- Build against Develocity `4.1`.
+
+Special thanks to [@ChrisBanes](https://github.com/chrisbanes) for contributing to this release!
+
+0.28.1
+------
+
+_2025-06-26_
+
+- Update AGP to `8.11.0`.
+- Build against Graph Assert `2.9.0`.
+- Build against KSP `2.2.0-2.0.2`.
+
 0.28.0
 ------
 
