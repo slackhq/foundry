@@ -846,9 +846,10 @@ internal class StandardProjectConfigurations(
 
         pluginManager.withPlugin("com.bugsnag.android.gradle") {
           val branchMatchesPatternProvider =
-            foundryProperties.bugsnagEnabledBranchPattern.zip(gitBranchProvider()) { pattern, branch
-              ->
-              if (pattern == null || branch == null) {
+            foundryProperties.bugsnagEnabledBranchPattern.orElse("").zip(gitBranchProvider()) {
+              pattern,
+              branch ->
+              if (pattern.isBlank() || branch.isBlank()) {
                 return@zip false
               }
               pattern.toRegex().matches(branch)
