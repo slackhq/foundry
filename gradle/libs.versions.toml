@@ -44,7 +44,7 @@ slack-lint = "0.11.0"
 sortDependencies = "0.14"
 spotless = "7.2.1"
 sqldelight = "2.1.0"
-wire = "5.3.7"
+wire = "5.3.8"
 xmlutil = "0.91.2"
 
 # API changes are documented here: https://plugins.jetbrains.com/docs/intellij/api-changes-list.html
