@@ -4,6 +4,26 @@ Changelog
 **Unreleased**
 --------------
 
+0.31.0
+------
+
+_2025-08-28_
+
+- Update Wire to `5.3.8`.
+- Update IntelliJ Platform to `2.7.2`.
+- Update Oshi to `6.8.3`
+- Update to Kotlin `2.2.10`.
+- Update kaml to `0.93.0`.
+- Build against roborazzi `1.47.0`.
+- Build against KSP `2.2.10-2.0.2`.
+- Build against AGP `8.12.1`.
+- Build against Develocity `4.1.1`.
+- Build against Gradle Doctor `0.12.0`.
+- Build against Metro `0.6.3`.
+- Build against nullaway gradle plugin `2.3.0`.
+- Build against robolectric `4.16`.
+- Build against roborazzi `1.50.0`.
+
 0.30.0
 ------
 
