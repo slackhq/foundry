@@ -125,69 +125,69 @@ class ThermlogParserTest {
 
 private val THROTTLED_EXAMPLE =
   """
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 90
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 92
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 90
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 92
 
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-"""
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  """
     .trimIndent()
 
 /** Weird but actual phenomenon we've seen. */
 private val GARBAGE_DATA =
   """
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 90
-2021-07-07 12:32:50 -0400 al;dkfjaskljdfhaklsjdhfklAJSDFLJAKSCPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 92
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 90
+  2021-07-07 12:32:50 -0400 al;dkfjaskljdfhaklsjdhfklAJSDFLJAKSCPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 92
 
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-"""
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  """
     .trimIndent()
 
 private val UNTHROTTLED_EXAMPLE =
   """
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-"""
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  """
     .trimIndent()
 
 private val INCOMPLETE_EXAMPLE =
   """
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Speed_Limit 	= 100
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Scheduler_Limit 	= 100
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-2021-07-07 12:32:50 -0400 CPU Power notify
-	CPU_Available_CPUs 	= 8
-	CPU_Speed_Limit 	= 100
-"""
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Speed_Limit 	= 100
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Scheduler_Limit 	= 100
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  2021-07-07 12:32:50 -0400 CPU Power notify
+  	CPU_Available_CPUs 	= 8
+  	CPU_Speed_Limit 	= 100
+  """
     .trimIndent()
