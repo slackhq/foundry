@@ -143,14 +143,23 @@ dokka {
 }
 
 dependencies {
-  dokka(project(":tools:cli"))
-  dokka(project(":tools:foundry-common"))
-  dokka(project(":tools:skippy"))
-  dokka(project(":tools:tracing"))
-  dokka(project(":tools:version-number"))
-  dokka(project(":platforms:gradle:better-gradle-properties"))
-  dokka(project(":platforms:gradle:foundry-gradle-plugin"))
-  dokka(project(":platforms:gradle:agp-handlers:agp-handler-api"))
+  // Only add dokka dependencies for projects that exist
+  val dokkaDependencies = listOf(
+    ":tools:cli",
+    ":tools:foundry-common", 
+    ":tools:skippy",
+    ":tools:tracing",
+    ":tools:version-number",
+    ":platforms:gradle:better-gradle-properties",
+    ":platforms:gradle:foundry-gradle-plugin",
+    ":platforms:gradle:agp-handlers:agp-handler-api"
+  )
+  
+  dokkaDependencies.forEach { projectPath ->
+    if (findProject(projectPath) != null) {
+      dokka(project(projectPath))
+    }
+  }
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
