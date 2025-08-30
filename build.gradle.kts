@@ -144,17 +144,18 @@ dokka {
 
 dependencies {
   // Only add dokka dependencies for projects that exist
-  val dokkaDependencies = listOf(
-    ":tools:cli",
-    ":tools:foundry-common", 
-    ":tools:skippy",
-    ":tools:tracing",
-    ":tools:version-number",
-    ":platforms:gradle:better-gradle-properties",
-    ":platforms:gradle:foundry-gradle-plugin",
-    ":platforms:gradle:agp-handlers:agp-handler-api"
-  )
-  
+  val dokkaDependencies =
+    listOf(
+      ":tools:cli",
+      ":tools:foundry-common",
+      ":tools:skippy",
+      ":tools:tracing",
+      ":tools:version-number",
+      ":platforms:gradle:better-gradle-properties",
+      ":platforms:gradle:foundry-gradle-plugin",
+      ":platforms:gradle:agp-handlers:agp-handler-api",
+    )
+
   dokkaDependencies.forEach { projectPath ->
     if (findProject(projectPath) != null) {
       dokka(project(projectPath))
