@@ -32,3 +32,6 @@ docs/changelog.md
 docs/api/
 site/
 temp-clone/
+
+# Files generated for Spotlight: https://github.com/joshfriend/spotlight
+gradle/ide-projects.txt
