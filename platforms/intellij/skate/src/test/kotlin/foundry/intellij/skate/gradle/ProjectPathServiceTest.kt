@@ -25,14 +25,14 @@ class ProjectPathServiceTest {
   fun `parseProjectPaths filters comments and blank lines`() {
     val content =
       """
-      # This is a comment
-      :platforms:gradle:foundry-gradle-plugin
-      :platforms:intellij:skate
+        # This is a comment
+        :platforms:gradle:foundry-gradle-plugin
+        :platforms:intellij:skate
 
-      # Another comment
-      :tools:cli
-      :tools:foundry-common
-    """
+        # Another comment
+        :tools:cli
+        :tools:foundry-common
+      """
         .trimIndent()
 
     @Suppress("UNCHECKED_CAST") val result = parseProjectPaths(content)

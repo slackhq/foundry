@@ -32,10 +32,11 @@ class OldPluginInstalledWarner : ProjectActivity, DumbAware {
       PluginManager.getPlugins().any { it.pluginId.idString == "org.jetbrains.kotlin.test.helper" }
     ) {
       val message =
-        """"
-            |The old "Artifactory Authenticator" is still installed.
-            |Please uninstall the old one (ID is 'com.slack.intellij.artifactory', version is <1.0.0).
-            |"""
+        """
+        |"
+        |The old "Artifactory Authenticator" is still installed.
+        |Please uninstall the old one (ID is 'com.slack.intellij.artifactory', version is <1.0.0).
+        |"""
           .trimMargin()
 
       NotificationGroupManager.getInstance()

@@ -31,10 +31,10 @@ class ModuleTopographyTest {
   fun `removeEmptyBraces should remove nested empty braces block`() {
     val input =
       """
-            outer {
-                inner { }
-            }
-        """
+          outer {
+              inner { }
+          }
+      """
         .trimIndent()
     val actual = input.removeEmptyBraces()
     assertThat(actual).isEmpty()
@@ -44,9 +44,9 @@ class ModuleTopographyTest {
   fun `removeEmptyBraces should handle multiple empty braces blocks`() {
     val input =
       """
-            block1 { }
-            block2 { }
-        """
+          block1 { }
+          block2 { }
+      """
         .trimIndent()
     val actual = input.removeEmptyBraces()
     assertThat(actual).isEmpty()
@@ -56,17 +56,17 @@ class ModuleTopographyTest {
   fun `removeEmptyBraces should not affect blocks with content`() {
     val input =
       """
-            block {
-                content
-            }
-        """
+          block {
+              content
+          }
+      """
         .trimIndent()
     val expected =
       """
-            block {
-                content
-            }
-        """
+          block {
+              content
+          }
+      """
         .trimIndent()
     val actual = input.removeEmptyBraces()
     assertThat(actual).isEqualTo(expected)
@@ -76,18 +76,18 @@ class ModuleTopographyTest {
   fun `removeEmptyBraces should handle mixed empty and non-empty braces blocks`() {
     val input =
       """
-            block1 {
-                content
-            }
-            block2 { }
-        """
+          block1 {
+              content
+          }
+          block2 { }
+      """
         .trimIndent()
     val expected =
       """
-            block1 {
-                content
-            }
-        """
+          block1 {
+              content
+          }
+      """
         .trimIndent()
     val actual = input.removeEmptyBraces()
     assertThat(actual).isEqualTo(expected)
