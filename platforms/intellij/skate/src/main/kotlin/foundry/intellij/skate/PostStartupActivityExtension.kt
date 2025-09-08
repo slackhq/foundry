@@ -13,18 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// PostStartupActivityExtension.kt (Android Studio only)
 package foundry.intellij.skate
 
+import com.android.tools.idea.gradle.project.sync.GradleSyncListener
 import com.android.tools.idea.gradle.project.sync.GradleSyncState
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import foundry.intellij.skate.idemetrics.GradleSyncSubscriber
 
 internal class PostStartupActivityExtension : ProjectActivity {
+
   override suspend fun execute(project: Project) {
-    GradleSyncState.subscribe(project, GradleSyncSubscriber())
-    val service = project.service<SkateProjectService>()
-    service.showWhatsNewPanel()
+    val dumb = DumbService.getInstance(project)
+
+    // 1) Show once after startup, when indices are ready (deterministic)
+    dumb.runWhenSmart {
+      if (!project.isDisposed) {
+        project.service<SkateProjectService>().showWhatsNewPanel()
+      }
+    }
+
+    // 2) Also show after a successful Gradle sync (Android Studio only)
+    GradleSyncState.subscribe(
+      project,
+      object : GradleSyncListener {
+        override fun syncStarted(project: Project) = Unit
+
+        override fun syncSucceeded(project: Project) {
+          // Schedule on smart mode to avoid races with indexing / EDT modality
+          DumbService.getInstance(project).smartInvokeLater {
+            if (!project.isDisposed) {
+              project.service<SkateProjectService>().showWhatsNewPanel()
+            }
+          }
+        }
+
+        override fun syncSkipped(project: Project) = Unit
+        override fun syncFailed(project: Project, errorMessage: String) {}
+      },
+      /* disposable = */ project
+    )
   }
 }
