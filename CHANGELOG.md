@@ -4,6 +4,19 @@ Changelog
 **Unreleased**
 --------------
 
+0.31.1
+------
+_2025-08-28_
+
+- Build against AGP `8.13.0`.
+- Update IntelliJ Platform to `2.9.0`.
+- Build against sort dependencies plugin `0.15`.
+- Update Wire to `5.4.0`.
+- Update kaml to `0.94.0`.
+- Build against Metro `0.6.4`.
+- Build against Gradle Doctor `0.1210`.
+- Build against DAGP `3.0.1`.
+
 0.31.0
 ------
 
