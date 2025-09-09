@@ -6,7 +6,8 @@ Changelog
 
 0.31.1
 ------
-_2025-08-28_
+
+_2025-09-08_
 
 - Build against AGP `8.13.0`.
 - Update IntelliJ Platform to `2.9.0`.
