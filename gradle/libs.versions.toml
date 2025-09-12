@@ -167,6 +167,6 @@ slf4jNop = "org.slf4j:slf4j-nop:2.0.17"
 testing-roborazzi-core = { module = "io.github.takahirom.roborazzi:roborazzi-core", version.ref = "roborazzi" }
 testing-roborazzi-desktop = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 tikxml-htmlEscape = { module = "com.tickaroo.tikxml:converter-htmlescape", version = "0.8.15" }
-truth = "com.google.truth:truth:1.4.4"
+truth = "com.google.truth:truth:1.4.5"
 xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "xmlutil" }
 xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }
