@@ -108,7 +108,8 @@ internal abstract class BaseDownloadTask(
  */
 // language=bash
 private val EXEC_PREFIX =
-  """#!/bin/sh
+  """
+  #!/bin/sh
 
     if [ -n "${'$'}JAVA_HOME" ] ; then
         if [ -x "${'$'}JAVA_HOME/jre/sh/java" ] ; then

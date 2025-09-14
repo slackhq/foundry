@@ -25,13 +25,13 @@ class GradleProjectAnnotatorIntegrationTest {
   fun `PROJECT_CALL_PATTERN correctly extracts project paths`() {
     val gradleContent =
       """
-      dependencies {
-        implementation(project(":platforms:intellij:skate"))
-        testImplementation(project(':tools:cli'))
-        api(project( ":tools:foundry-common" ))
-        runtimeOnly project(':platforms:gradle:foundry-gradle-plugin')
-      }
-    """
+        dependencies {
+          implementation(project(":platforms:intellij:skate"))
+          testImplementation(project(':tools:cli'))
+          api(project( ":tools:foundry-common" ))
+          runtimeOnly project(':platforms:gradle:foundry-gradle-plugin')
+        }
+      """
         .trimIndent()
 
     val matcher = PROJECT_CALL_PATTERN.matcher(gradleContent)
@@ -96,14 +96,14 @@ class GradleProjectAnnotatorIntegrationTest {
     // Needs to skip blank lines and comments
     val testContent =
       """
-      # This is a comment
-      :platforms:intellij:skate
+        # This is a comment
+        :platforms:intellij:skate
 
-      :tools:cli
-      # Another comment
-      :tools:foundry-common
+        :tools:cli
+        # Another comment
+        :tools:foundry-common
 
-    """
+      """
         .trimIndent()
 
     val parsedPaths = parseProjectPaths(testContent)

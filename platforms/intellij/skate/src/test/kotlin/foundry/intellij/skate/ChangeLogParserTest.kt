@@ -184,18 +184,18 @@ class ChangeLogParserTest {
         .trimIndent()
     val expected =
       """
-      Changelog
-      =========
+        Changelog
+        =========
 
-      2023-07-16
-      ----------
+        2023-07-16
+        ----------
 
-      - Don't register `RakeDependencies` task on platform projects.
-      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
-      - Add Dependency Rake usage to its doc.
-      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
-        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
-    """
+        - Don't register `RakeDependencies` task on platform projects.
+        - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+        - Add Dependency Rake usage to its doc.
+        - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+          - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+      """
         .trimIndent()
     val expectedDate = LocalDate.of(2023, 7, 16)
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 7, 15))
@@ -207,58 +207,58 @@ class ChangeLogParserTest {
   fun `multiple entries, previous entry matches but not the latest`() {
     val input =
       """
-        Changelog
-        =========
+      Changelog
+      =========
 
-        2023-07-07
-        ----------
+      2023-07-07
+      ----------
 
-        - Don't register `RakeDependencies` task on platform projects.
-        - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
-        - Add Dependency Rake usage to its doc.
-        - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
-          - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
 
-        2023-06-30
-        ----------
+      2023-06-30
+      ----------
 
-        - Enable lint on test sources by default.
-        - Account for all version catalogs in `DependencyRake`.
-        - Update Guava to `32.1.0-jre`.
+      - Enable lint on test sources by default.
+      - Account for all version catalogs in `DependencyRake`.
+      - Update Guava to `32.1.0-jre`.
 
-        2023-06-29
-        ----------
+      2023-06-29
+      ----------
 
-        - Switch Robolectric jar downloads to use detached configurations.
-          - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
-        - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
-        - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
-        - Update `kotlin-cli-util` to 1.2.2.
-        """
+      - Switch Robolectric jar downloads to use detached configurations.
+        - This lets Gradle do the heavy lifting of caching the downloaded jars and also allows downloading them from a configured repository setup. This also simplifies the up-to-date checks.
+      - Docs are now published on https://slackhq.github.io/foundry. This is a work in progress.
+      - API kdocs are published at https://slackhq.github.io/foundry/api/0.x/.
+      - Update `kotlin-cli-util` to 1.2.2.
+      """
         .trimIndent()
 
     val expectedDate = LocalDate.of(2023, 7, 7)
     val expectedString =
       """
-        Changelog
-        =========
+      Changelog
+      =========
 
-        2023-07-07
-        ----------
+      2023-07-07
+      ----------
 
-        - Don't register `RakeDependencies` task on platform projects.
-        - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
-        - Add Dependency Rake usage to its doc.
-        - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
-          - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
 
-        2023-06-30
-        ----------
+      2023-06-30
+      ----------
 
-        - Enable lint on test sources by default.
-        - Account for all version catalogs in `DependencyRake`.
-        - Update Guava to `32.1.0-jre`.
-        """
+      - Enable lint on test sources by default.
+      - Account for all version catalogs in `DependencyRake`.
+      - Update Guava to `32.1.0-jre`.
+      """
         .trimIndent()
 
     val (changeLogString, latestEntry) = ChangelogParser.readFile(input, LocalDate.of(2023, 6, 29))
