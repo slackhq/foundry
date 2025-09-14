@@ -23,7 +23,7 @@ if ! [[ ${local} || ${ci} ]]; then
   # Move working directory into temp folder
   cd ${DIR}
   # Generate the API docs
-  ./gradlew :dokkaGenerate
+  ./gradlew :dokkaGenerate -Dspotlight.enabled=false
 fi
 
 # Copy in special files that GitHub wants in the project root.

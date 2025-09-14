@@ -44,6 +44,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.compose.LocalMarkdownColors
@@ -162,21 +163,15 @@ fun MarkdownContent(
 @Composable
 private fun jewelMarkdownColor(
   text: Color = JewelTheme.defaultTextStyle.color.takeOrElse { JewelTheme.contentColor },
-  linkText: Color = JewelTheme.linkColor,
   dividerColor: Color = JewelTheme.globalColors.borders.normal,
 ): MarkdownColors {
-  val (codeText, codeBackground, inlineCodeText, inlineCodeBackground) =
-    rememberCodeBackground(JewelTheme.globalColors.panelBackground, text)
+  val codeColors = rememberCodeBackground(JewelTheme.globalColors.panelBackground, text)
   return DefaultMarkdownColors(
     text = text,
-    codeText = codeText,
-    inlineCodeText = inlineCodeText,
-    linkText = linkText,
-    codeBackground = codeBackground,
-    inlineCodeBackground = inlineCodeBackground,
+    codeBackground = codeColors.codeBackground,
+    inlineCodeBackground = codeColors.inlineCodeBackground,
     dividerColor = dividerColor,
-    tableText = codeText,
-    tableBackground = codeBackground,
+    tableBackground = codeColors.codeBackground,
   )
 }
 
@@ -298,8 +293,13 @@ private fun jewelMarkdownTypography(
   bullet: TextStyle = text,
   list: TextStyle = text,
   inlineCode: TextStyle = code,
-  link: TextStyle = text,
-  textLink: TextLinkStyles = TextLinkStyles(style = text.toSpanStyle()),
+  textLink: TextLinkStyles =
+    TextLinkStyles(
+      style =
+        text
+          .toSpanStyle()
+          .copy(color = JewelTheme.linkColor, textDecoration = TextDecoration.Underline)
+    ),
 ): MarkdownTypography =
   DefaultMarkdownTypography(
     h1 = h1,
@@ -316,7 +316,6 @@ private fun jewelMarkdownTypography(
     bullet = bullet,
     list = list,
     inlineCode = inlineCode,
-    link = link,
     textLink = textLink,
     table = text,
   )

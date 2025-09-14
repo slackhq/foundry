@@ -135,22 +135,27 @@ allprojects {
   }
 }
 
-dokka {
-  dokkaPublications.html {
-    outputDirectory.set(rootDir.resolve("docs/api/0.x"))
-    includes.from(project.layout.projectDirectory.file("README.md"))
-  }
-}
+val spotlightEnabled =
+  providers.gradleProperty("spotlight.enabled").map { it.toBoolean() }.getOrElse(true)
 
-dependencies {
-  dokka(project(":tools:cli"))
-  dokka(project(":tools:foundry-common"))
-  dokka(project(":tools:skippy"))
-  dokka(project(":tools:tracing"))
-  dokka(project(":tools:version-number"))
-  dokka(project(":platforms:gradle:better-gradle-properties"))
-  dokka(project(":platforms:gradle:foundry-gradle-plugin"))
-  dokka(project(":platforms:gradle:agp-handlers:agp-handler-api"))
+if (!spotlightEnabled) {
+  dokka {
+    dokkaPublications.html {
+      outputDirectory.set(rootDir.resolve("docs/api/0.x"))
+      includes.from(project.layout.projectDirectory.file("README.md"))
+    }
+  }
+
+  dependencies {
+    dokka(project(":tools:cli"))
+    dokka(project(":tools:foundry-common"))
+    dokka(project(":tools:skippy"))
+    dokka(project(":tools:tracing"))
+    dokka(project(":tools:version-number"))
+    dokka(project(":platforms:gradle:better-gradle-properties"))
+    dokka(project(":platforms:gradle:foundry-gradle-plugin"))
+    dokka(project(":platforms:gradle:agp-handlers:agp-handler-api"))
+  }
 }
 
 val kotlinVersion = libs.versions.kotlin.get()
