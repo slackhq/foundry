@@ -162,21 +162,16 @@ fun MarkdownContent(
 @Composable
 private fun jewelMarkdownColor(
   text: Color = JewelTheme.defaultTextStyle.color.takeOrElse { JewelTheme.contentColor },
-  linkText: Color = JewelTheme.linkColor,
   dividerColor: Color = JewelTheme.globalColors.borders.normal,
 ): MarkdownColors {
-  val (codeText, codeBackground, inlineCodeText, inlineCodeBackground) =
+  val codeColors =
     rememberCodeBackground(JewelTheme.globalColors.panelBackground, text)
   return DefaultMarkdownColors(
     text = text,
-    codeText = codeText,
-    inlineCodeText = inlineCodeText,
-    linkText = linkText,
-    codeBackground = codeBackground,
-    inlineCodeBackground = inlineCodeBackground,
+    codeBackground = codeColors.codeBackground,
+    inlineCodeBackground = codeColors.inlineCodeBackground,
     dividerColor = dividerColor,
-    tableText = codeText,
-    tableBackground = codeBackground,
+    tableBackground = codeColors.codeBackground,
   )
 }
 
@@ -298,7 +293,6 @@ private fun jewelMarkdownTypography(
   bullet: TextStyle = text,
   list: TextStyle = text,
   inlineCode: TextStyle = code,
-  link: TextStyle = text,
   textLink: TextLinkStyles = TextLinkStyles(style = text.toSpanStyle()),
 ): MarkdownTypography =
   DefaultMarkdownTypography(
@@ -316,7 +310,6 @@ private fun jewelMarkdownTypography(
     bullet = bullet,
     list = list,
     inlineCode = inlineCode,
-    link = link,
     textLink = textLink,
     table = text,
   )
