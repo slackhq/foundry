@@ -164,8 +164,7 @@ private fun jewelMarkdownColor(
   text: Color = JewelTheme.defaultTextStyle.color.takeOrElse { JewelTheme.contentColor },
   dividerColor: Color = JewelTheme.globalColors.borders.normal,
 ): MarkdownColors {
-  val codeColors =
-    rememberCodeBackground(JewelTheme.globalColors.panelBackground, text)
+  val codeColors = rememberCodeBackground(JewelTheme.globalColors.panelBackground, text)
   return DefaultMarkdownColors(
     text = text,
     codeBackground = codeColors.codeBackground,
