@@ -44,6 +44,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.compose.LocalMarkdownColors
@@ -292,7 +293,9 @@ private fun jewelMarkdownTypography(
   bullet: TextStyle = text,
   list: TextStyle = text,
   inlineCode: TextStyle = code,
-  textLink: TextLinkStyles = TextLinkStyles(style = text.toSpanStyle()),
+  textLink: TextLinkStyles = TextLinkStyles(
+    style = text.toSpanStyle().copy(color = JewelTheme.linkColor, textDecoration = TextDecoration.Underline)
+  ),
 ): MarkdownTypography =
   DefaultMarkdownTypography(
     h1 = h1,
