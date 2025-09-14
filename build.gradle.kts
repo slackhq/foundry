@@ -135,9 +135,8 @@ allprojects {
   }
 }
 
-val spotlightEnabled = providers.gradleProperty("spotlight.enabled")
-  .map { it.toBoolean() }
-  .getOrElse(true)
+val spotlightEnabled =
+  providers.gradleProperty("spotlight.enabled").map { it.toBoolean() }.getOrElse(true)
 
 if (!spotlightEnabled) {
   dokka {

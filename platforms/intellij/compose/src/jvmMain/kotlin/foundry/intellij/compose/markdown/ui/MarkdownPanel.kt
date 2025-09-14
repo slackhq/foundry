@@ -293,9 +293,13 @@ private fun jewelMarkdownTypography(
   bullet: TextStyle = text,
   list: TextStyle = text,
   inlineCode: TextStyle = code,
-  textLink: TextLinkStyles = TextLinkStyles(
-    style = text.toSpanStyle().copy(color = JewelTheme.linkColor, textDecoration = TextDecoration.Underline)
-  ),
+  textLink: TextLinkStyles =
+    TextLinkStyles(
+      style =
+        text
+          .toSpanStyle()
+          .copy(color = JewelTheme.linkColor, textDecoration = TextDecoration.Underline)
+    ),
 ): MarkdownTypography =
   DefaultMarkdownTypography(
     h1 = h1,
