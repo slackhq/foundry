@@ -27,20 +27,20 @@ class ProjectPathServiceIntegrationTest {
   fun `service correctly parses all-projects txt file`() {
     val projectFileContent =
       """
-      :platforms:gradle:agp-handlers:agp-handler-api
-      :platforms:gradle:better-gradle-properties
-      :platforms:gradle:foundry-gradle-plugin
-      :platforms:intellij:artifactory-authenticator
-      :platforms:intellij:compose
-      :platforms:intellij:compose:playground
-      :platforms:intellij:skate
-      :tools:cli
-      :tools:foundry-common
-      :tools:robolectric-sdk-management
-      :tools:skippy
-      :tools:tracing
-      :tools:version-number
-    """
+        :platforms:gradle:agp-handlers:agp-handler-api
+        :platforms:gradle:better-gradle-properties
+        :platforms:gradle:foundry-gradle-plugin
+        :platforms:intellij:artifactory-authenticator
+        :platforms:intellij:compose
+        :platforms:intellij:compose:playground
+        :platforms:intellij:skate
+        :tools:cli
+        :tools:foundry-common
+        :tools:robolectric-sdk-management
+        :tools:skippy
+        :tools:tracing
+        :tools:version-number
+      """
         .trimIndent()
 
     val parsedPaths = parseProjectPaths(projectFileContent)
@@ -55,15 +55,15 @@ class ProjectPathServiceIntegrationTest {
   fun `service handles empty lines and comments`() {
     val projectFileContent =
       """
-      # This is a comment
-      :platforms:intellij:skate
+        # This is a comment
+        :platforms:intellij:skate
 
-      # Another comment
-      :tools:cli
+        # Another comment
+        :tools:cli
 
-      :tools:foundry-common
-      # End comment
-    """
+        :tools:foundry-common
+        # End comment
+      """
         .trimIndent()
 
     val parsedPaths = parseProjectPaths(projectFileContent)

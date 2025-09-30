@@ -62,9 +62,9 @@ class ResultProcessorTest(private val useExtensions: Boolean) {
 
     val expectedOutput =
       """
-      test.txt
-      tmp
-    """
+        test.txt
+        tmp
+      """
         .trimIndent()
 
     assertThat(outputFile.readText().trim()).isEqualTo(expectedOutput)
@@ -78,10 +78,10 @@ class ResultProcessorTest(private val useExtensions: Boolean) {
   fun testExecuteCommandWithStderr() {
     val script =
       """
-      #!/bin/bash
+        #!/bin/bash
 
-      >&2 echo "Error text"
-    """
+        >&2 echo "Error text"
+      """
         .trimIndent()
     val scriptFile =
       tmpFolder.newFile("script.sh").apply {
@@ -96,8 +96,8 @@ class ResultProcessorTest(private val useExtensions: Boolean) {
 
     val expectedOutput =
       """
-      Error text
-    """
+        Error text
+      """
         .trimIndent()
 
     assertThat(outputFile.readText().trim()).isEqualTo(expectedOutput)
