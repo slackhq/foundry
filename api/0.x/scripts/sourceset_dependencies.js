@@ -1,1 +1,0 @@
-sourceset_dependencies = '{":tools:cli/main":[],":tools:tracing/main":[],":platforms:gradle:agp-handlers:agp-handler-api/main":[],":platforms:gradle:foundry-gradle-plugin/main":[],":tools:skippy/main":[],":platforms:gradle:better-gradle-properties/main":[],":tools:version-number/main":[],":tools:foundry-common/main":[]}'
