@@ -4,6 +4,23 @@ Changelog
 **Unreleased**
 --------------
 
+0.31.2
+------
+_2025-09-30_
+
+- Build against DAGP `3.0.3`.
+- Update Google Truth to `1.4.5`.
+- Build against KSP `2.2.20-2.0.3`.
+- Build against Metro `0.6.8`.
+- Build against redacted-compiler-plugin `1.15.0`.
+- Update kaml to `0.97.0`.
+- Update to Kotlin to `2.2.20`.
+- Build against compose gradle plugin `1.9.0`.
+- Build against Develocity `4.2`.
+- Update oshi-core to `6.9.0`.
+- Update Guava to `33.5.0`.
+- Build against Spotless `8.0.0`.
+
 0.31.1
 ------
 
