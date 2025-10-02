@@ -68,7 +68,6 @@ buildscript {
   }
 }
 
-
 moduleGraphAssert {
   // Platforms can depend on tools but not the other way around
   allowed =
