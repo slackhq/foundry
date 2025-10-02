@@ -57,7 +57,8 @@ internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Uni
         when (id) {
           "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
           "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
-          "org.jetbrains.kotlin.android" -> KotlinProjectType.ANDROID
+          "org.jetbrains.kotlin.android",
+          "com.android.experimental.built-in-kotlin" -> KotlinProjectType.ANDROID
           else -> {
             // Do nothing
             return@onFirst
