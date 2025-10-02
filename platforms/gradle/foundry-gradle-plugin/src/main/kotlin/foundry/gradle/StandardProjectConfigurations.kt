@@ -112,7 +112,7 @@ internal class StandardProjectConfigurations(
     }
     project.applyCommonConfigurations(foundryProperties)
     project.applyJvmConfigurations(foundryProperties, foundryExtension)
-    KgpTasks.configure(project, foundryTools, foundryProperties)
+    KgpTasks.configureOnMatchingPlugin(project, foundryTools, foundryProperties)
   }
 
   /**

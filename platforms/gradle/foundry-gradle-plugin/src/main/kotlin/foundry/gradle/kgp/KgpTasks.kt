@@ -38,21 +38,56 @@ import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin
+
+/**
+ * With the introduction of AGP's built-in kotlin compilation handling, we have to check multiple places :(
+ */
+internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Unit) {
+  val once = project.pluginManager.onFirst(KgpTasks.KGP_PLUGINS) { id ->
+    val type = when (id) {
+      "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
+      "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
+      "org.jetbrains.kotlin.android" -> KotlinProjectType.ANDROID
+      else -> {
+        // Do nothing
+        return@onFirst
+      }
+    }
+    action(project, type)
+  }
+  pluginManager.withPlugin("com.android.base") {
+    if (plugins.hasPlugin(KotlinBaseApiPlugin::class.java)) {
+      once.onFirst { action(project, KotlinProjectType.ANDROID) }
+    }
+  }
+}
+
+internal enum class KotlinProjectType {
+  ANDROID,
+  JVM,
+  MULTIPLATFORM,
+}
 
 /** Common configuration for Kotlin projects. */
 internal object KgpTasks {
-  private val KGP_PLUGINS =
+  val KGP_PLUGINS =
     listOf(
       "org.jetbrains.kotlin.multiplatform",
       "org.jetbrains.kotlin.jvm",
       "org.jetbrains.kotlin.android",
+      "com.android.experimental.built-in-kotlin",
+    )
+  val KAPT_PLUGINS =
+    listOf(
+      "org.jetbrains.kotlin.kapt",
+      "com.android.legacy-kapt"
     )
 
   @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -62,7 +97,7 @@ internal object KgpTasks {
     foundryTools: FoundryTools,
     foundryProperties: FoundryProperties,
   ) {
-    project.pluginManager.onFirst(KGP_PLUGINS) {
+    project.onKotlinProject { project, kotlinProjectType ->
       val kotlinExtension = project.extensions.getByType<KotlinBaseExtension>()
       kotlinExtension.apply {
         foundryTools.globalConfig.kotlinDaemonArgs?.let { kotlinDaemonJvmArgs = it }
@@ -74,7 +109,22 @@ internal object KgpTasks {
         }
       }
 
-      val isKotlinAndroid = kotlinExtension is KotlinAndroidProjectExtension
+      val isKotlinAndroid = kotlinProjectType == KotlinProjectType.ANDROID
+
+      if (isKotlinAndroid) {
+        // Configure kotlin sources in Android projects
+        project.configure<BaseExtension> {
+          this.sourceSets.configureEach {
+            val nestedSourceDir = "src/${this.name}/kotlin"
+            val dir = File(project.projectDir, nestedSourceDir)
+            if (dir.exists()) {
+              // Standard source set
+              // Only added if it exists to avoid potentially adding empty source dirs
+              this.java.srcDirs(project.layout.projectDirectory.dir(nestedSourceDir))
+            }
+          }
+        }
+      }
 
       val jvmTargetProvider =
         foundryProperties.jvmTarget.map { JvmTarget.fromTarget(it.toString()) }
@@ -161,21 +211,6 @@ internal object KgpTasks {
       foundryTools.globalConfig.affectedProjects,
     )
 
-    project.pluginManager.withPlugin("org.jetbrains.kotlin.android") {
-      // Configure kotlin sources in Android projects
-      project.configure<BaseExtension> {
-        this.sourceSets.configureEach {
-          val nestedSourceDir = "src/${this.name}/kotlin"
-          val dir = File(project.projectDir, nestedSourceDir)
-          if (dir.exists()) {
-            // Standard source set
-            // Only added if it exists to avoid potentially adding empty source dirs
-            this.java.srcDirs(project.layout.projectDirectory.dir(nestedSourceDir))
-          }
-        }
-      }
-    }
-
     project.pluginManager.withPlugin("org.jetbrains.kotlin.android.extensions") {
       throw GradleException(
         "Don't use the deprecated 'android.extensions' plugin, switch to " +
@@ -183,7 +218,7 @@ internal object KgpTasks {
       )
     }
 
-    project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
+    project.pluginManager.onFirst(KAPT_PLUGINS) {
       project.configure<KaptExtension> {
         // By default, Kapt replaces unknown types with `NonExistentClass`. This flag asks kapt
         // to infer the type, which is useful for processors that reference to-be-generated

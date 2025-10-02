@@ -31,6 +31,7 @@ import foundry.gradle.artifacts.Resolver
 import foundry.gradle.capitalizeUS
 import foundry.gradle.configure
 import foundry.gradle.dependsOn
+import foundry.gradle.kgp.KgpTasks
 import foundry.gradle.namedLazy
 import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.properties.setDisallowChanges
@@ -386,11 +387,12 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
       when (plugin) {
         "org.jetbrains.kotlin.jvm",
         "org.jetbrains.kotlin.android",
+        "com.android.experimental.built-in-kotlin",
         "org.jetbrains.kotlin.multiplatform" -> {
           finalTags.add(TAG_KOTLIN)
         }
 
-        "org.jetbrains.kotlin.kapt" -> {
+        in KgpTasks.KAPT_PLUGINS -> {
           finalTags.add(TAG_KAPT)
         }
 
