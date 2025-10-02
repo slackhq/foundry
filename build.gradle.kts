@@ -68,6 +68,8 @@ buildscript {
   }
 }
 
+args
+
 moduleGraphAssert {
   // Platforms can depend on tools but not the other way around
   allowed =
@@ -345,7 +347,7 @@ subprojects {
       }
       project.dependencies {
         configure<IntelliJPlatformDependenciesExtension> {
-          intellijIdeaCommunity(libs.versions.intellij.version)
+          intellijIdea(libs.versions.intellij.version)
         }
       }
 
