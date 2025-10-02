@@ -345,7 +345,10 @@ subprojects {
       }
       project.dependencies {
         configure<IntelliJPlatformDependenciesExtension> {
-          intellijIdea(libs.versions.intellij.version)
+          // Suppressed deprecation as we can't actually move to intellijIdea() until 2025.3
+          // Bad use of the deprecated annotation
+          @Suppress("DEPRECATION")
+          intellijIdeaCommunity(libs.versions.intellij.version)
         }
       }
 
