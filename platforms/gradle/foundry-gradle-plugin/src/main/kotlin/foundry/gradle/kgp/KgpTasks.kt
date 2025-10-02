@@ -47,21 +47,24 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin
 
 /**
- * With the introduction of AGP's built-in kotlin compilation handling, we have to check multiple places :(
+ * With the introduction of AGP's built-in kotlin compilation handling, we have to check multiple
+ * places :(
  */
 internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Unit) {
-  val once = project.pluginManager.onFirst(KgpTasks.KGP_PLUGINS) { id ->
-    val type = when (id) {
-      "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
-      "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
-      "org.jetbrains.kotlin.android" -> KotlinProjectType.ANDROID
-      else -> {
-        // Do nothing
-        return@onFirst
-      }
+  val once =
+    project.pluginManager.onFirst(KgpTasks.KGP_PLUGINS) { id ->
+      val type =
+        when (id) {
+          "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
+          "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
+          "org.jetbrains.kotlin.android" -> KotlinProjectType.ANDROID
+          else -> {
+            // Do nothing
+            return@onFirst
+          }
+        }
+      action(project, type)
     }
-    action(project, type)
-  }
   pluginManager.withPlugin("com.android.base") {
     if (plugins.hasPlugin(KotlinBaseApiPlugin::class.java)) {
       once.onFirst { action(project, KotlinProjectType.ANDROID) }
@@ -84,11 +87,7 @@ internal object KgpTasks {
       "org.jetbrains.kotlin.android",
       "com.android.experimental.built-in-kotlin",
     )
-  val KAPT_PLUGINS =
-    listOf(
-      "org.jetbrains.kotlin.kapt",
-      "com.android.legacy-kapt"
-    )
+  val KAPT_PLUGINS = listOf("org.jetbrains.kotlin.kapt", "com.android.legacy-kapt")
 
   @OptIn(ExperimentalKotlinGradlePluginApi::class)
   @Suppress("LongMethod")
