@@ -907,9 +907,6 @@ internal constructor(
   public val compileSdkVersion: String?
     get() = optionalStringProperty("foundry.android.compileSdkVersion")
 
-  public fun latestCompileSdkWithSources(defaultValue: Int): Int =
-    intProperty("foundry.android.latestCompileSdkWithSources", defaultValue = defaultValue)
-
   private val minSdkVersion: String?
     get() = optionalStringProperty("foundry.android.minSdkVersion")
 
