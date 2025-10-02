@@ -87,6 +87,7 @@ wire = { id = "com.squareup.wire", version.ref = "wire" }
 
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+agp-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
 agpAlpha = { module = "com.android.tools.build:gradle", version.ref = "agpAlpha" }
 asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
