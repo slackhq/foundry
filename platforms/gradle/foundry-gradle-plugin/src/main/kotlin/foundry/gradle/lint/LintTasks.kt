@@ -34,11 +34,13 @@ import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.capitalizeUS
 import foundry.gradle.getByType
 import foundry.gradle.multiplatformExtension
+import foundry.gradle.register
 import foundry.gradle.tasks.SimpleFileProducerTask
 import foundry.gradle.tasks.SimpleFilesConsumerTask
 import foundry.gradle.tasks.publish
 import java.lang.reflect.Field
 import org.gradle.api.Action
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -146,7 +148,7 @@ internal object LintTasks {
     onProjectSkipped: (String, String) -> Unit,
   ) =
     androidExtension.finalizeDsl { extension ->
-      val typedExtension = extension as CommonExtension<*, *, *, *, *, *>
+      val typedExtension = extension as CommonExtension
       foundryProperties.lintVersionOverride?.let {
         val lintVersion = foundryProperties.versions.lookupVersion(it)
         typedExtension.experimentalProperties["android.experimental.lint.version"] = lintVersion
@@ -213,11 +215,11 @@ internal object LintTasks {
     // Create task aliases matching those creates by AGP for Android projects, since those are what
     // developers expect to invoke. Redirect them to the "real" lint task.
     val lintTask = tasks.named("lint")
-    tasks.register("lintDebug") {
+    tasks.register<DefaultTask>("lintDebug") {
       dependsOn(lintTask)
       enabled = false
     }
-    tasks.register("lintRelease") {
+    tasks.register<DefaultTask>("lintRelease") {
       dependsOn(lintTask)
       enabled = false
     }
@@ -464,10 +466,10 @@ internal object LintTasks {
   }
 
   private fun Any.findDeclaredFieldOnClass(name: String): Field? {
-    try {
-      return this::class.java.getDeclaredField(name)
-    } catch (e: NoSuchFieldException) {
-      return null
+    return try {
+      this::class.java.getDeclaredField(name)
+    } catch (_: NoSuchFieldException) {
+      null
     }
   }
 
