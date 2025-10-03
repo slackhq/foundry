@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Remove Android SDK sources patching as this is no longer necessary with modern android releases.
+  - Also removes the `foundry.android.latestCompileSdkWithSources` property.
+
 0.31.2
 ------
 _2025-09-30_
