@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.11.0-alpha10" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.1)" variant="all" version="8.11.0-alpha10">
+<issues format="6" by="lint 9.0.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (9.0.0-alpha08)" variant="all" version="9.0.0-alpha08">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -63,7 +63,7 @@
         errorLine2="                    ~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
-            line="1146"
+            line="1135"
             column="21"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                                                                      ~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="138"
+            line="137"
             column="71"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                                      ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="968"
+            line="980"
             column="39"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="       ~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="240"
+            line="230"
             column="8"/>
     </issue>
 
@@ -250,7 +250,7 @@
         errorLine2="        ~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="241"
+            line="231"
             column="9"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="          ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="245"
+            line="235"
             column="11"/>
     </issue>
 
@@ -272,7 +272,7 @@
         errorLine2="                   ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="344"
+            line="346"
             column="20"/>
     </issue>
 
@@ -382,7 +382,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="35"
+            line="33"
             column="1"/>
     </issue>
 
@@ -393,7 +393,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="36"
+            line="34"
             column="1"/>
     </issue>
 
@@ -538,17 +538,6 @@
             file="src/main/kotlin/foundry/gradle/Platforms.kt"
             line="183"
             column="53"/>
-    </issue>
-
-    <issue
-        id="ExceptionMessage"
-        message="Please specify a `lazyMessage` param for check"
-        errorLine1="    check(logs.isNotEmpty())"
-        errorLine2="    ~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/util/ThermalsWatcher.kt"
-            line="216"
-            column="5"/>
     </issue>
 
     <issue

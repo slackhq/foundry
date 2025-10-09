@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("UnstableApiUsage")
-
 package foundry.gradle
 
 import app.cash.sqldelight.gradle.SqlDelightExtension
@@ -62,6 +60,7 @@ import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -113,7 +112,7 @@ internal class StandardProjectConfigurations(
     }
     project.applyCommonConfigurations(foundryProperties)
     project.applyJvmConfigurations(foundryProperties, foundryExtension)
-    KgpTasks.configure(project, foundryTools, foundryProperties)
+    KgpTasks.configureOnMatchingPlugin(project, foundryTools, foundryProperties)
   }
 
   /**
