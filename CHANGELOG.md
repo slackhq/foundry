@@ -4,8 +4,21 @@ Changelog
 **Unreleased**
 --------------
 
+0.31.3
+------
+_2025-10-14_
+- Update to JNA `5.18.1`.
+- Build against Develocity `4.2.1`.
+- Build against Develocity Gradle Plugin `4.2.2`.
+- Build against DAGP `3.1.0`.
 - Remove Android SDK sources patching as this is no longer necessary with modern android releases.
-  - Also removes the `foundry.android.latestCompileSdkWithSources` property.
+    - Also removes the `foundry.android.latestCompileSdkWithSources` property.
+- Build against KSP `2.2.20-2.0.4`.
+- Build against Metro `0.6.10`.
+- Update Okio to `3.16.1`.
+- Build against gradle retry `1.6.4`.
+- Build against Compose `1.9.1`.
+- Update kaml to `0.98.0`.
 
 0.31.2
 ------
