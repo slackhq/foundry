@@ -24,10 +24,10 @@ class TomlTest {
     // language=toml
     val toml =
       """
-        [versions]
-        kotlin = "1.6.10" # Trailing comment is skipped
-        # Skipped
-        jvmTarget = "1.8"
+      [versions]
+      kotlin = "1.6.10" # Trailing comment is skipped
+      # Skipped
+      jvmTarget = "1.8"
       """
         .trimIndent()
     val versions = Toml.parseVersion(toml.lineSequence())
@@ -39,13 +39,13 @@ class TomlTest {
     // language=toml
     val toml =
       """
-        [versions]
-        kotlin = "1.6.10"
-        jvmTarget = "1.8"
+      [versions]
+      kotlin = "1.6.10"
+      jvmTarget = "1.8"
 
-        [libraries]
-        # Skipped
-        jvmTarget = "17"
+      [libraries]
+      # Skipped
+      jvmTarget = "17"
       """
         .trimIndent()
     val versions = Toml.parseVersion(toml.lineSequence())

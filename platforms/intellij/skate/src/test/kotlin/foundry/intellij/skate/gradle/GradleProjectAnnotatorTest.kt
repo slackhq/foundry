@@ -62,12 +62,12 @@ class GradleProjectAnnotatorTest {
   fun `project call pattern extracts paths from complex gradle content`() {
     val gradleContent =
       """
-        dependencies {
-          implementation(project(":platforms:intellij:skate"))
-          implementation(project(':tools:cli'))
-          testImplementation(project( ":tools:foundry-common" ))
-          api project(':platforms:gradle:foundry-gradle-plugin')
-        }
+      dependencies {
+        implementation(project(":platforms:intellij:skate"))
+        implementation(project(':tools:cli'))
+        testImplementation(project( ":tools:foundry-common" ))
+        api project(':platforms:gradle:foundry-gradle-plugin')
+      }
       """
         .trimIndent()
 
