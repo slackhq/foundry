@@ -16,7 +16,6 @@
 package foundry.gradle.util
 
 import com.google.devtools.ksp.gradle.KspAATask
-import com.google.devtools.ksp.gradle.KspTaskJvm
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
@@ -30,10 +29,6 @@ internal fun <T : Any> Project.addKspSource(
     .named { it == kspTaskName }
     .configureEach {
       when (this) {
-        is KspTaskJvm -> {
-          source(provider)
-          dependsOn(task)
-        }
         is KspAATask -> {
           kspConfig.javaSourceRoots.from(provider)
           dependsOn(task)

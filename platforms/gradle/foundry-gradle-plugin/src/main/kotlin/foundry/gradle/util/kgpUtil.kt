@@ -15,7 +15,6 @@
  */
 package foundry.gradle.util
 
-import com.google.devtools.ksp.gradle.KspTask
 import org.gradle.api.tasks.TaskContainer
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
@@ -31,7 +30,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  */
 internal fun TaskContainer.configureKotlinCompilationTask(
   includeKaptGenerateStubsTask: Boolean = false,
-  includeKspTask: Boolean = false,
   action: KotlinCompilationTask<*>.() -> Unit,
 ) {
   withType(KotlinCompilationTask::class.java).configureEach {
@@ -39,9 +37,7 @@ internal fun TaskContainer.configureKotlinCompilationTask(
     // standard kotlin compilation, which can lead to duplicates. SOOOO we skip configuration of
     // it here. Callers to this _can_ opt in to including it, but they must be explicit.
     if (includeKaptGenerateStubsTask || this !is KaptGenerateStubsTask) {
-      if (includeKspTask || this !is KspTask) {
-        action()
-      }
+      action()
     }
   }
 }
