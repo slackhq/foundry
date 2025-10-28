@@ -18,7 +18,7 @@ package foundry.gradle.stats
 import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.google.devtools.ksp.gradle.KspTask
+import com.google.devtools.ksp.gradle.KspAATask
 import com.squareup.moshi.JsonClass
 import com.squareup.wire.gradle.WireTask
 import foundry.common.convertProjectPathToAccessor
@@ -187,7 +187,7 @@ public object ModuleStatsTasks {
       }
       withPlugin("com.google.devtools.ksp") {
         addGeneratedSources()
-        linkToLocTask { it.mustRunAfter(project.tasks.withType(KspTask::class.java)) }
+        linkToLocTask { it.mustRunAfter(project.tasks.withType(KspAATask::class.java)) }
       }
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
