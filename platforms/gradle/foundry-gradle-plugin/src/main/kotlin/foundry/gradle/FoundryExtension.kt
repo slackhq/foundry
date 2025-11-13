@@ -165,9 +165,6 @@ constructor(
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
         }
-        if (foundryProperties.moshixGenerateProguardRules) {
-          markKspNeeded("Moshi IR code gen")
-        }
       }
 
       fun aptConfiguration(variant: String = ""): String {
@@ -381,8 +378,7 @@ constructor(
               markKspNeeded("Moshi sealed codegen")
               dependencies.add("ksp", FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
             } else {
-              markKaptNeeded("Moshi sealed codegen")
-              dependencies.add(aptConfiguration(), FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
+              error("There is no KAPT support for moshi-sealed and KSP/moshi-ir are disabled")
             }
           }
           if (featuresHandler.moshiHandler.sealedReflect.getOrElse(false)) {
