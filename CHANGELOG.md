@@ -4,7 +4,7 @@ Changelog
 **Unreleased**
 --------------
 
-0.32.0
+0.33.0
 ------
 
 _2025-11-18_
@@ -26,6 +26,13 @@ _2025-11-18_
 - Build against Develocity `4.2.2`.
 - Build against emulator.wtf `0.19.4`.
 - Build against Dokka `2.1.0`.
+
+0.32.0
+------
+
+_2025-11-18_
+
+Don't use this build. Things got goofed during GitHub's outage!
 
 0.31.3
 ------
