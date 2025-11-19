@@ -82,11 +82,6 @@ fun readGitRepoCommit(): String? {
 buildConfig {
   packageName("foundry.intellij.skate")
   buildConfigField("String", "VERSION", "\"${project.property("VERSION_NAME")}\"")
-  buildConfigField(
-    "String",
-    "BUGSNAG_KEY",
-    "\"${project.findProperty("FoundryIntellijBugsnagKey")?.toString().orEmpty()}\"",
-  )
   buildConfigField("String", "GIT_SHA", provider { "\"${readGitRepoCommit().orEmpty()}\"" })
   useKotlinOutput {
     topLevelConstants = true
@@ -145,7 +140,6 @@ dependencies {
   implementation(project(":tools:tracing"), exclusions)
   implementation(project(":tools:foundry-common"), exclusions)
 
-  implementation(libs.bugsnag)
   implementation(libs.kaml)
   implementation(libs.kotlinx.serialization.core)
   implementation(libs.okhttp)

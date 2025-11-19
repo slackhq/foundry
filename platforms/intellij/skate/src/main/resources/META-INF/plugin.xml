@@ -16,7 +16,6 @@
                 serviceInterface="foundry.intellij.skate.SkateProjectService"
                 serviceImplementation="foundry.intellij.skate.SkateProjectServiceImpl"/>
         <projectConfigurable instance="foundry.intellij.skate.SkateConfig" displayName="Skate Configuration"/>
-        <errorHandler implementation="foundry.intellij.skate.SkateErrorHandler"/>
         <annotator language="kotlin" implementationClass="foundry.intellij.skate.modeltranslator.TranslatorAnnotator"/>
         <externalAnnotator language="kotlin"
                            implementationClass="foundry.intellij.skate.featureflags.FeatureFlagAnnotator"/>

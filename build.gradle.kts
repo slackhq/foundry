@@ -96,7 +96,7 @@ tasks.withType<Detekt>().configureEach {
 val ktfmtVersion = libs.versions.ktfmt.get()
 
 val externalFiles =
-  listOf("SkateErrorHandler", "MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
+  listOf("MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
 
 allprojects {
   apply(plugin = "com.diffplug.spotless")
