@@ -405,10 +405,6 @@ internal constructor(
   public val enableMoshiIr: Boolean
     get() = booleanProperty("foundry.moshi.ir.enable")
 
-  /** Flag to enable/disable moshi proguard rule gen. */
-  public val moshixGenerateProguardRules: Boolean
-    get() = booleanProperty("moshix.generateProguardRules", defaultValue = true)
-
   /** Flag to connect ViewBinding sources to KSP. */
   public val kspConnectViewBinding: Boolean
     get() = booleanProperty("foundry.ksp.connect.viewbinding")
