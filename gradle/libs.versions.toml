@@ -11,13 +11,13 @@ compose-jb-stable = "1.9.3"
 coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.8.0"
-dependencyAnalysisPlugin = "3.5.0"
+dependencyAnalysisPlugin = "3.5.1"
 detekt = "1.23.8"
 dokka = "2.1.0"
 errorproneGradle = "4.3.0"
 gradle-retry = "1.6.4"
 graph-assert = "2.9.0"
-intellij-platform = "2.10.4"
+intellij-platform = "2.10.5"
 jdk = "23"
 jvmTarget = "21"
 jvmTargetIdea = "21"
@@ -39,7 +39,7 @@ nullawayGradle = "2.3.0"
 okhttp = "5.3.2"
 okio = "3.16.4"
 retrofit = "3.0.0"
-roborazzi = "1.51.0"
+roborazzi = "1.52.0"
 slack-lint = "0.11.1"
 sortDependencies = "0.15"
 spotless = "8.1.0"
@@ -59,7 +59,7 @@ intellij-android = "251.26094.121"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
-buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.7.1" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version = "6.0.6" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
