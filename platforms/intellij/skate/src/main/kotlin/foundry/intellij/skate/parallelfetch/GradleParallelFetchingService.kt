@@ -77,8 +77,6 @@ class GradleParallelFetchingService @Inject constructor(private val project: Pro
             Parallel Gradle model fetching can significantly improve sync times in Android Studio.
 
             This feature is available in Gradle 7.4+ and is recommended for faster syncs.
-            
-            See: https://engineering.block.xyz/blog/shrinking-elephants.
           """
             .trimIndent(),
           NotificationType.WARNING,
@@ -90,7 +88,6 @@ class GradleParallelFetchingService @Inject constructor(private val project: Pro
               gradleSettings.isParallelModelFetch = true
               ShowSettingsUtil.getInstance()
                 .showSettingsDialog(project, "Gradle")
-              // notification.expire()
             }
           }
         )
@@ -99,7 +96,15 @@ class GradleParallelFetchingService @Inject constructor(private val project: Pro
             override fun actionPerformed(e: AnActionEvent, notification: Notification) {
               ShowSettingsUtil.getInstance()
                 .showSettingsDialog(project, "Gradle")
-              // notification.expire()
+            }
+          }
+        )
+        .addAction(
+          object : NotificationAction("Don't Show Again") {
+            override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+              val settings = project.service<SkatePluginSettings>()
+              settings.isParallelFetchingReminderEnabled = false
+              notification.expire()
             }
           }
         )
