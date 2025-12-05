@@ -7,6 +7,7 @@
     <depends>org.jetbrains.kotlin</depends>
     <depends>org.jetbrains.android</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -23,8 +24,10 @@
         <projectIndexingActivityHistoryListener implementation="foundry.intellij.skate.idemetrics.IndexingListener"/>
         <postStartupActivity implementation="foundry.intellij.skate.PostStartupActivityExtension"/>
         <postStartupActivity implementation="foundry.intellij.skate.ideinstall.InstallationLocationStartupActivity"/>
+        <postStartupActivity implementation="foundry.intellij.skate.parallelfetch.GradleParallelFetchingStartupActivity"/>
         <postStartupActivity implementation="foundry.intellij.skate.pluginlist.PluginListCollector"/>
         <notificationGroup id="SkateInstallationLocation" displayType="BALLOON" isLogByDefault="true"/>
+        <notificationGroup id="SkateGradleParallelFetching" displayType="BALLOON" isLogByDefault="true"/>
         
         <!-- Gradle project path support -->
         <completion.contributor language="Groovy" implementationClass="foundry.intellij.skate.gradle.GradleProjectCompletionContributor"/>

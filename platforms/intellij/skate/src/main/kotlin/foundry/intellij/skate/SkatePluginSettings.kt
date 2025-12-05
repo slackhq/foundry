@@ -152,6 +152,12 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
       state.isProjectPathServiceEnabled = value
     }
 
+  var isParallelFetchingReminderEnabled: Boolean
+    get() = state.isParallelFetchingReminderEnabled
+    set(value) {
+      state.isParallelFetchingReminderEnabled = value
+    }
+
   class State : BaseState() {
     var whatsNewFilePath by string()
     var isWhatsNewEnabled by property(true)
@@ -172,5 +178,6 @@ class SkatePluginSettings : SimplePersistentStateComponent<SkatePluginSettings.S
     var codeOwnerFilePath by string()
     var isCodeOwnerEnabled by property(true)
     var isProjectPathServiceEnabled by property(true)
+    var isParallelFetchingReminderEnabled by property(true)
   }
 }
