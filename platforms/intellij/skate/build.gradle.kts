@@ -125,6 +125,7 @@ dependencies {
       "org.intellij.plugins.markdown",
       "org.jetbrains.plugins.terminal",
       "org.jetbrains.kotlin",
+      "org.jetbrains.plugins.gradle",
     )
 
     pluginVerifier()
