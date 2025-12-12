@@ -329,7 +329,8 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
     const val TAG_KAPT = "kapt"
     const val TAG_KSP = "ksp"
     const val TAG_KOTLIN = "kotlin"
-    const val TAG_DAGGER_COMPILER = "dagger-compiler"
+    const val TAG_DAGGER_COMPILER_KAPT = "dagger-compiler-kapt"
+    const val TAG_DAGGER_COMPILER_KSP = "dagger-compiler-ksp"
     const val TAG_VIEW_BINDING = "viewbinding"
     const val TAG_ANDROID = "android"
     const val TAG_WIRE = "wire"
@@ -426,8 +427,8 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
     for (feature in topography.features) {
       when (feature) {
-        DefaultFeatures.DaggerCompilerKapt.name,
-        DefaultFeatures.DaggerCompilerKsp.name -> finalTags.add(TAG_DAGGER_COMPILER)
+        DefaultFeatures.DaggerCompilerKapt.name -> finalTags.add(TAG_DAGGER_COMPILER_KAPT)
+        DefaultFeatures.DaggerCompilerKsp.name -> finalTags.add(TAG_DAGGER_COMPILER_KSP)
       }
     }
 
@@ -543,7 +544,9 @@ public data class Weights(
     val resourcesEnabled = ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED in tags
     val resourcesHavePublicXml = true // TODO
     val androidVariants = ModuleStatsCollectorTask.TAG_VARIANTS in tags
-    val daggerCompiler = ModuleStatsCollectorTask.TAG_DAGGER_COMPILER in tags
+    val daggerCompiler =
+      ModuleStatsCollectorTask.TAG_DAGGER_COMPILER_KAPT in tags ||
+        ModuleStatsCollectorTask.TAG_DAGGER_COMPILER_KSP in tags
 
     // Kapt slows down projects. We want KSP/Anvil longer term, for now we just add a fixed hit.
     if (kapt) {

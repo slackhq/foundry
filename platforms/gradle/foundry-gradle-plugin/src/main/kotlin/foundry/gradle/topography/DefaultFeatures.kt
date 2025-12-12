@@ -65,7 +65,7 @@ internal object DefaultFeatures {
 
   internal val DaggerCompilerKapt =
     ModuleFeature(
-      name = "dagger-compiler",
+      name = "dagger-compiler-kapt",
       explanation =
         "The 'mergeComponents()' feature (and thus dagger-compiler/KAPT) was requested but no corresponding Merge*/*Component annotations were found in sources",
       advice = "Remove 'foundry.features.dagger.mergeComponents' from your build file",
