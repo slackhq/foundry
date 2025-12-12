@@ -63,7 +63,7 @@ internal object DefaultFeatures {
       matchingTextFileExtensions = setOf("kt"),
     )
 
-  internal val DaggerCompiler =
+  internal val DaggerCompilerKapt =
     ModuleFeature(
       name = "dagger-compiler",
       explanation =
@@ -85,6 +85,28 @@ internal object DefaultFeatures {
       generatedSourcesExtensions = setOf("java"),
     )
 
+  internal val DaggerCompilerKsp =
+    ModuleFeature(
+      name = "dagger-compiler",
+      explanation =
+        "The 'mergeComponents()' feature (and thus dagger-compiler/KSP) was requested but no corresponding Merge*/*Component annotations were found in sources",
+      advice = "Remove 'foundry.features.dagger.mergeComponents' from your build file",
+      replacementPatterns = buildRegexMap { remove("\\bmergeComponents\\(\\)") },
+      matchingText =
+        setOf(
+          "@Component",
+          "@Subcomponent",
+          "@MergeComponent",
+          "@MergeSubcomponent",
+          "@MergeModules",
+          "@MergeInterfaces",
+          "@ContributesSubcomponent",
+        ),
+      matchingTextFileExtensions = setOf("kt", "java"),
+      generatedSourcesDir = "build/generated/ksp",
+      generatedSourcesExtensions = setOf("java", "kt"),
+    )
+
   internal val Dagger =
     ModuleFeature(
       name = "dagger",
@@ -94,7 +116,7 @@ internal object DefaultFeatures {
       replacementPatterns = buildRegexMap { remove("\\bdagger\\(\\)") },
       matchingText =
         buildSet {
-          addAll(DaggerCompiler.matchingText)
+          addAll(DaggerCompilerKapt.matchingText)
           addAll(
             setOf(
               "@Inject",

@@ -110,8 +110,11 @@ internal object ModuleTopographyTasks {
             enabled && !runtimeOnly
           },
         )
+        // Conditionally select DaggerCompilerKsp or DaggerCompilerKapt based on AnvilMode
         features.put(
-          DefaultFeatures.DaggerCompiler,
+          (foundryProperties.anvilMode.useDaggerKsp.let {
+            if (it) DefaultFeatures.DaggerCompilerKsp else DefaultFeatures.DaggerCompilerKapt
+          }),
           foundryExtension.featuresHandler.diHandler.useDaggerCompiler,
         )
         features.put(

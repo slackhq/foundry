@@ -426,7 +426,8 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
     for (feature in topography.features) {
       when (feature) {
-        DefaultFeatures.DaggerCompiler.name -> finalTags.add(TAG_DAGGER_COMPILER)
+        DefaultFeatures.DaggerCompilerKapt.name,
+        DefaultFeatures.DaggerCompilerKsp.name -> finalTags.add(TAG_DAGGER_COMPILER)
       }
     }
 
