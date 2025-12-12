@@ -87,7 +87,7 @@ internal object DefaultFeatures {
 
   internal val DaggerCompilerKsp =
     ModuleFeature(
-      name = "dagger-compiler",
+      name = "dagger-compiler-ksp",
       explanation =
         "The 'mergeComponents()' feature (and thus dagger-compiler/KSP) was requested but no corresponding Merge*/*Component annotations were found in sources",
       advice = "Remove 'foundry.features.dagger.mergeComponents' from your build file",
