@@ -4,6 +4,24 @@ Changelog
 **Unreleased**
 --------------
 
+0.33.1
+------
+
+_2025-12-15_
+
+- **Skate**: Enable parallel gradle model fetching warning for Skate plugin
+- **Fix**: Add `DaggerCompilerKsp` for Module Topography Validation Task
+- Update OkHttp to `5.3.2`.
+- Build against Metro `0.8.2`.
+- Update Kaml to `0.104.0`.
+- Build against redacted-compiler-plugin `1.15.1`.
+- Build against DAGP `3.5.1`.
+- Build against KSP `2.3.3`.
+- Build against Anvil `0.5.1`.
+- Build against Spotless `8.1.0`.
+- Update MoshiX to `0.34.1`.
+- Build against AGP `8.13.2`.
+
 0.33.0
 ------
 
