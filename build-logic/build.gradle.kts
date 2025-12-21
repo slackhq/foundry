@@ -24,4 +24,7 @@ dependencies {
   // SAM with receiver plugin for Gradle plugin projects
   implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:${libs.versions.kotlin.get()}")
   // Note: Dokka and MavenPublish are applied via plugins block, not as dependencies
+
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
 }
