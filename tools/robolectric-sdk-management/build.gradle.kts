@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import io.gitlab.arturbosch.detekt.Detekt
-
 plugins {
   id("foundry.spotless")
   id("foundry.kotlin-jvm")
@@ -23,8 +21,5 @@ plugins {
   alias(libs.plugins.lint)
   alias(libs.plugins.mavenPublish)
 }
-
-// Configure detekt jvmTarget (detekt doesn't support JDK 23 yet)
-tasks.withType<Detekt>().configureEach { jvmTarget = "21" }
 
 dependencies { implementation(libs.robolectric) }

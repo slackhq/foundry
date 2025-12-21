@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 // KSP doesn't support isolated projects yet
@@ -39,9 +38,6 @@ plugins {
 if (!isolatedProjectsEnabled) {
   apply(plugin = "com.google.devtools.ksp")
 }
-
-// Configure detekt jvmTarget (detekt doesn't support JDK 23 yet)
-tasks.withType<Detekt>().configureEach { jvmTarget = "21" }
 
 kotlin {
   @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled.set(true) }
