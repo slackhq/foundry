@@ -17,8 +17,12 @@ Code formatting is checked via [Spotless](https://github.com/diffplug/spotless).
 use the `spotlessApply` command.
 
 ```bash
-./gradlew spotlessApply
+./gradlew spotlessApply -Dorg.gradle.unsafe.isolated-projects=false
 ```
+
+> **Note**: The `-Dorg.gradle.unsafe.isolated-projects=false` flag is required because this project
+> uses Gradle's isolated projects feature, which Spotless does not yet support.
+> See [diffplug/spotless#1979](https://github.com/diffplug/spotless/issues/1979) for details.
 
 Optionally, there are commit hooks in the repo you can enable by running the below
 ```bash
