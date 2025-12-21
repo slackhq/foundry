@@ -15,12 +15,13 @@
  */
 package foundry.gradle
 
-import java.util.Locale
+import java.io.File
+import java.util.concurrent.TimeUnit
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
 
-/** A [ValueSource] that reads the current git commit hash from the .git directory. */
+/** A [ValueSource] that executes `git rev-parse HEAD` to get the current commit hash. */
 public abstract class GitCommitValueSource : ValueSource<String, GitCommitValueSource.Params> {
 
   public interface Params : ValueSourceParameters {
@@ -28,34 +29,28 @@ public abstract class GitCommitValueSource : ValueSource<String, GitCommitValueS
   }
 
   override fun obtain(): String? {
-    return try {
-      val gitDir = parameters.rootDir.get().asFile.resolve(".git")
-      val headFile = gitDir.resolve("HEAD")
-      if (!headFile.exists()) return null
-
-      val headContents = headFile.readText(Charsets.UTF_8).lowercase(Locale.US).trim()
-
-      if (isGitHash(headContents)) {
-        return headContents
-      }
-
-      if (!headContents.startsWith("ref:")) {
-        return null
-      }
-
-      val headRef = headContents.removePrefix("ref:").trim()
-      val refFile = gitDir.resolve(headRef)
-      if (!refFile.exists()) {
-        return null
-      }
-
-      refFile.readText(Charsets.UTF_8).trim().takeIf { isGitHash(it) }
-    } catch (_: Exception) {
-      null
-    }
+    return getGitCommitHash(parameters.rootDir.get().asFile)
   }
 
-  private fun isGitHash(hash: String): Boolean {
-    return hash.length == 40 && hash.all { it in '0'..'9' || it in 'a'..'f' }
+  public companion object {
+    /** Executes `git rev-parse HEAD` in the given [directory] and returns the commit hash. */
+    public fun getGitCommitHash(directory: File): String? {
+      return try {
+        val process =
+          ProcessBuilder("git", "rev-parse", "HEAD")
+            .directory(directory)
+            .redirectErrorStream(true)
+            .start()
+
+        val completed = process.waitFor(10, TimeUnit.SECONDS)
+        if (!completed || process.exitValue() != 0) {
+          return null
+        }
+
+        process.inputStream.bufferedReader().readText().trim().takeIf { it.isNotEmpty() }
+      } catch (_: Exception) {
+        null
+      }
+    }
   }
 }
