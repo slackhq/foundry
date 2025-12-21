@@ -39,7 +39,8 @@ if (isolatedProjectsEnabled) {
 } else {
   plugins { id("com.diffplug.spotless") }
 
-  val ktfmtVersion = "0.59"
+  val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+  val ktfmtVersion = catalog.findVersion("ktfmt").get().toString()
 
   val externalFiles =
     listOf("SkateErrorHandler", "MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
