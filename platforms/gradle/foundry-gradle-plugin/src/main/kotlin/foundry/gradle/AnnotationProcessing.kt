@@ -140,9 +140,8 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
         project.logger.debug(
           "${baseConfig.name}: Adding javac apt options to android project ${project.path}"
         )
-        project.tasks.withType(
-          JavaCompile::class.java,
-          baseConfig.javaCompileAptAction(foundryProperties),
+        project.tasks.withType(JavaCompile::class.java).configureEach(
+          baseConfig.javaCompileAptAction(foundryProperties)
         )
       }
 

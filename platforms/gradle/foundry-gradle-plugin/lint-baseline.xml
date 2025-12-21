@@ -135,39 +135,6 @@
 
     <issue
         id="GradleProjectIsolation"
-        message="Use providers.gradleProperty instead of findProperty"
-        errorLine1="      (findProperty(AndroidProject.PROPERTY_BUILD_MODEL_ONLY) == &quot;true&quot; ||"
-        errorLine2="       ~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="230"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Use providers.gradleProperty instead of findProperty"
-        errorLine1="        findProperty(AndroidProject.PROPERTY_GENERATE_SOURCES_ONLY) == &quot;true&quot;)"
-        errorLine2="        ~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="231"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Use providers.gradleProperty instead of hasProperty"
-        errorLine1="  get() = hasProperty(&quot;android.injected.invoked.from.ide&quot;)"
-        errorLine2="          ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="235"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
         message="Avoid using method getRootProject"
         errorLine1="      lintConfig = rootProject.layout.projectDirectory.file(&quot;config/lint/lint.xml&quot;).asFile"
         errorLine2="                   ~~~~~~~~~~~">
@@ -373,39 +340,6 @@
             file="src/main/kotlin/foundry/gradle/tasks/ProgressResponseBody.kt"
             line="26"
             column="1"/>
-    </issue>
-
-    <issue
-        id="WithTypeWithoutConfigureEach"
-        message="Avoid passing a closure to withType, use withType().configureEach instead"
-        errorLine1="        project.tasks.withType("
-        errorLine2="                      ~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/AnnotationProcessing.kt"
-            line="143"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WithTypeWithoutConfigureEach"
-        message="Avoid passing a closure to withType, use withType().configureEach instead"
-        errorLine1="    project.plugins.withType(AppPlugin::class.java) {"
-        errorLine2="                    ~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/ApkVersioningPlugin.kt"
-            line="50"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="WithTypeWithoutConfigureEach"
-        message="Avoid passing a closure to withType, use withType().configureEach instead"
-        errorLine1="  tasks.withType(T::class.java) {"
-        errorLine2="        ~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryGradleUtil.kt"
-            line="244"
-            column="9"/>
     </issue>
 
 </issues>
