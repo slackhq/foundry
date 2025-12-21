@@ -16,7 +16,7 @@ git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION"
 
 # Publish
 # Disable isolated projects because CLI module requires KSP for service loader generation
-./gradlew publish --no-configuration-cache -Porg.gradle.unsafe.isolated-projects=false -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300 -Dspotlight.enabled=false
+./gradlew publish --no-configuration-cache -Dorg.gradle.unsafe.isolated-projects=false -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300 -Dspotlight.enabled=false
 
 # Prepare next snapshot
 echo "Restoring snapshot version $SNAPSHOT_VERSION"
