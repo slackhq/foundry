@@ -20,8 +20,8 @@ The core set of formatters are:
 If the project has Gradle's isolated projects feature enabled (`org.gradle.unsafe.isolated-projects=true`), you must disable it when running Spotless tasks:
 
 ```bash
-./gradlew spotlessApply -Dorg.gradle.unsafe.isolated-projects=false
-./gradlew spotlessCheck -Dorg.gradle.unsafe.isolated-projects=false
+./gradlew spotlessApply -Porg.gradle.unsafe.isolated-projects=false
+./gradlew spotlessCheck -Porg.gradle.unsafe.isolated-projects=false
 ```
 
 This is required because Spotless does not yet support isolated projects. See [diffplug/spotless#1979](https://github.com/diffplug/spotless/issues/1979) for tracking.
