@@ -145,4 +145,4 @@ jobs:
         if: github.repository == 'slackhq/foundry'
         # Disable isolated projects for publishing because the CLI module requires KSP
         # to generate service loader files, and KSP doesn't support isolated projects yet
-        run: ./gradlew publish --quiet -Porg.gradle.unsafe.isolated-projects=false -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+        run: ./gradlew publish --quiet -Dorg.gradle.unsafe.isolated-projects=false -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
