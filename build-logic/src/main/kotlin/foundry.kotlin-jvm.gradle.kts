@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -24,8 +25,9 @@ plugins {
   id("com.squareup.sort-dependencies")
 }
 
-val jvmTargetVersion = JvmTarget.JVM_21
-val jdkVersion = 23
+val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val jvmTargetVersion = catalog.findVersion("jvmTarget").get().toString().let { JvmTarget.fromTarget(it) }
+val jdkVersion = catalog.findVersion("jdk").get().toString().toInt()
 
 extensions.configure<KotlinJvmProjectExtension> { explicitApi() }
 
@@ -63,4 +65,9 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
       "kotlin.time.ExperimentalTime",
     )
   }
+}
+
+// Configure Detekt jvmTarget when Detekt plugin is applied
+pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
+  tasks.withType<Detekt>().configureEach { jvmTarget = jvmTargetVersion.target }
 }
