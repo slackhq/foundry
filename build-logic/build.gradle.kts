@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2022 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  id("foundry.spotless")
-  id("foundry.kotlin-jvm-gradle")
-  alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.lint)
-}
+plugins { `kotlin-dsl` }
 
 dependencies {
-  implementation(libs.okio)
-
-  compileOnly(gradleApi())
+  // Plugin dependencies - these become available in convention plugins
+  implementation(libs.gradlePlugins.spotless)
+  implementation(libs.gradlePlugins.kgp)
+  implementation(libs.gradlePlugins.detekt)
+  implementation(libs.gradlePlugins.sortDependencies)
+  // SAM with receiver plugin for Gradle plugin projects
+  implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:${libs.versions.kotlin.get()}")
+  // Note: Dokka and MavenPublish are applied via plugins block, not as dependencies
 }
