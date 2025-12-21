@@ -15,6 +15,17 @@ The core set of formatters are:
 - gradle-dependency-sorter (Gradle build file dependencies)
 - Spotless (general purpose Gradle plugin that runs most of the above)
 
+### Running Spotless with Isolated Projects
+
+If the project has Gradle's isolated projects feature enabled (`org.gradle.unsafe.isolated-projects=true`), you must disable it when running Spotless tasks:
+
+```bash
+./gradlew spotlessApply -Dorg.gradle.unsafe.isolated-projects=false
+./gradlew spotlessCheck -Dorg.gradle.unsafe.isolated-projects=false
+```
+
+This is required because Spotless does not yet support isolated projects. See [diffplug/spotless#1979](https://github.com/diffplug/spotless/issues/1979) for tracking.
+
 ## Static Analysis
 
 The core set of analysis tools supported in Foundry are:
