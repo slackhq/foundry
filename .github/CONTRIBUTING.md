@@ -17,10 +17,10 @@ Code formatting is checked via [Spotless](https://github.com/diffplug/spotless).
 use the `spotlessApply` command.
 
 ```bash
-./gradlew spotlessApply -Porg.gradle.unsafe.isolated-projects=false
+./gradlew spotlessApply -Dorg.gradle.unsafe.isolated-projects=false
 ```
 
-> **Note**: The `-Porg.gradle.unsafe.isolated-projects=false` flag is required because this project
+> **Note**: The `-Dorg.gradle.unsafe.isolated-projects=false` flag is required because this project
 > uses Gradle's isolated projects feature, which Spotless does not yet support.
 > See [diffplug/spotless#1979](https://github.com/diffplug/spotless/issues/1979) for details.
 
@@ -30,7 +30,7 @@ The CLI module uses KSP for `@AutoService` annotations. Since KSP does not yet s
 projects, you must disable it when building the CLI:
 
 ```bash
-./gradlew :tools:cli:build -Porg.gradle.unsafe.isolated-projects=false
+./gradlew :tools:cli:build -Dorg.gradle.unsafe.isolated-projects=false
 ```
 
 Without this flag, the CLI JAR will not contain the service loader files and CLI commands will not
