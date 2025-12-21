@@ -16,6 +16,7 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
+  id("foundry.spotless")
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.compose)
@@ -24,7 +25,7 @@ plugins {
 }
 
 kotlin {
-  jvm()
+  jvm { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21) } }
 
   sourceSets {
     jvmMain {
