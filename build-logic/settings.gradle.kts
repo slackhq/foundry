@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2022 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import io.gitlab.arturbosch.detekt.Detekt
+rootProject.name = "build-logic"
 
-plugins {
-  id("foundry.spotless")
-  id("foundry.kotlin-jvm")
-  alias(libs.plugins.dokka)
-  alias(libs.plugins.lint)
-  alias(libs.plugins.mavenPublish)
+dependencyResolutionManagement {
+  versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
+  repositories {
+    mavenCentral()
+    google()
+    gradlePluginPortal()
+  }
 }
-
-// Configure detekt jvmTarget (detekt doesn't support JDK 23 yet)
-tasks.withType<Detekt>().configureEach { jvmTarget = "21" }
-
-dependencies { implementation(libs.robolectric) }
