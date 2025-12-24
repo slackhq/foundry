@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 plugins {
-  alias(libs.plugins.kotlin.jvm)
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm")
   alias(libs.plugins.dokka)
   alias(libs.plugins.detekt)
   alias(libs.plugins.lint)

@@ -15,7 +15,8 @@ git commit -am "Prepare for release $NEW_VERSION."
 git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION"
 
 # Publish
-./gradlew publish --no-configuration-cache -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300 -Dspotlight.enabled=false
+# Disable isolated projects because CLI module requires KSP for service loader generation
+./gradlew publish --no-configuration-cache -Dorg.gradle.unsafe.isolated-projects=false -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300 -Dspotlight.enabled=false
 
 # Prepare next snapshot
 echo "Restoring snapshot version $SNAPSHOT_VERSION"
