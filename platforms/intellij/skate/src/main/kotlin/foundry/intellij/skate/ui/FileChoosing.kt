@@ -29,8 +29,10 @@ object FileChoosing {
 
   private fun createSingleFileChooserDescriptor(fileFilter: (VirtualFile) -> Boolean) =
     object : FileChooserDescriptor(true, false, false, false, false, false) {
+      @Deprecated("Deprecated in Java")
       override fun isFileSelectable(file: VirtualFile?) = file?.let { fileFilter(it) } ?: false
 
+      @Deprecated("Deprecated in Java")
       override fun isFileVisible(file: VirtualFile?, showHiddenFiles: Boolean) =
         if (file == null || file.isDirectory) true else fileFilter(file)
     }

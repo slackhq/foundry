@@ -18,7 +18,7 @@ package foundry.gradle.stats
 import app.cash.sqldelight.gradle.GenerateSchemaTask
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.google.devtools.ksp.gradle.KspTask
+import com.google.devtools.ksp.gradle.KspAATask
 import com.squareup.moshi.JsonClass
 import com.squareup.wire.gradle.WireTask
 import foundry.common.convertProjectPathToAccessor
@@ -188,7 +188,7 @@ public object ModuleStatsTasks {
       }
       withPlugin("com.google.devtools.ksp") {
         addGeneratedSources()
-        linkToLocTask { it.mustRunAfter(project.tasks.withType(KspTask::class.java)) }
+        linkToLocTask { it.mustRunAfter(project.tasks.withType(KspAATask::class.java)) }
       }
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
@@ -330,7 +330,8 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
     const val TAG_KAPT = "kapt"
     const val TAG_KSP = "ksp"
     const val TAG_KOTLIN = "kotlin"
-    const val TAG_DAGGER_COMPILER = "dagger-compiler"
+    const val TAG_DAGGER_COMPILER_KAPT = "dagger-compiler-kapt"
+    const val TAG_DAGGER_COMPILER_KSP = "dagger-compiler-ksp"
     const val TAG_VIEW_BINDING = "viewbinding"
     const val TAG_ANDROID = "android"
     const val TAG_WIRE = "wire"
@@ -428,7 +429,8 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
 
     for (feature in topography.features) {
       when (feature) {
-        DefaultFeatures.DaggerCompiler.name -> finalTags.add(TAG_DAGGER_COMPILER)
+        DefaultFeatures.DaggerCompilerKapt.name -> finalTags.add(TAG_DAGGER_COMPILER_KAPT)
+        DefaultFeatures.DaggerCompilerKsp.name -> finalTags.add(TAG_DAGGER_COMPILER_KSP)
       }
     }
 
@@ -544,7 +546,9 @@ public data class Weights(
     val resourcesEnabled = ModuleStatsCollectorTask.TAG_RESOURCES_ENABLED in tags
     val resourcesHavePublicXml = true // TODO
     val androidVariants = ModuleStatsCollectorTask.TAG_VARIANTS in tags
-    val daggerCompiler = ModuleStatsCollectorTask.TAG_DAGGER_COMPILER in tags
+    val daggerCompiler =
+      ModuleStatsCollectorTask.TAG_DAGGER_COMPILER_KAPT in tags ||
+        ModuleStatsCollectorTask.TAG_DAGGER_COMPILER_KSP in tags
 
     // Kapt slows down projects. We want KSP/Anvil longer term, for now we just add a fixed hit.
     if (kapt) {

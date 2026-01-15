@@ -158,13 +158,6 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
       }
     }
 
-    if (!project.isCi) {
-      foundryProperties.compileSdkVersion?.substringAfter("-")?.toInt()?.let { compileSdk ->
-        val latestCompileSdkWithSources = foundryProperties.latestCompileSdkWithSources(compileSdk)
-        AndroidSourcesConfigurer.patchSdkSources(compileSdk, project, latestCompileSdkWithSources)
-      }
-    }
-
     FoundryValidationTask.registerLifecycleTask(project)
 
     foundryProperties.javaVersionFilePath?.let { javaVersionFilePath ->

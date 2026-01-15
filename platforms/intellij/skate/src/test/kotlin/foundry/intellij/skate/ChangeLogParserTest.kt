@@ -184,17 +184,17 @@ class ChangeLogParserTest {
         .trimIndent()
     val expected =
       """
-        Changelog
-        =========
+      Changelog
+      =========
 
-        2023-07-16
-        ----------
+      2023-07-16
+      ----------
 
-        - Don't register `RakeDependencies` task on platform projects.
-        - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
-        - Add Dependency Rake usage to its doc.
-        - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
-          - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
+      - Don't register `RakeDependencies` task on platform projects.
+      - Fix configuration cache for Dependency Rake. Note that DAGP doesn't yet support it.
+      - Add Dependency Rake usage to its doc.
+      - Add missing identifiers aggregation for Dependency Rake. This makes it easier to find and add missing identifiers to version catalogs that dependency rake expects.
+        - `./gradlew aggregateMissingIdentifiers -Pslack.gradle.config.enableAnalysisPlugin=true --no-configuration-cache`
       """
         .trimIndent()
     val expectedDate = LocalDate.of(2023, 7, 16)

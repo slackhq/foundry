@@ -61,7 +61,7 @@ pluginManagement {
 buildscript {
   dependencies {
     // Force a newer version of okio, otherwise intellijPlatform and wire conflict
-    classpath("com.squareup.okio:okio:3.16.0")
+    classpath("com.squareup.okio:okio:3.16.4")
     // For some reason we need to enforce this on the classpath early
     // See https://github.com/tinyspeck/slack-android-ng/pull/107076
     classpath("com.squareup:kotlinpoet:2.2.0")
@@ -69,11 +69,11 @@ buildscript {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.2.1"
-  id("org.jetbrains.intellij.platform.settings") version "2.9.0"
-  id("org.jetbrains.intellij.platform") version "2.9.0" apply false
+  id("com.gradle.develocity") version "4.3"
+  id("org.jetbrains.intellij.platform.settings") version "2.10.5"
+  id("org.jetbrains.intellij.platform") version "2.10.5" apply false
   // https://github.com/joshfriend/spotlight
-  id("com.fueledbycaffeine.spotlight") version "1.3.3"
+  id("com.fueledbycaffeine.spotlight") version "1.4.1"
 }
 
 dependencyResolutionManagement {

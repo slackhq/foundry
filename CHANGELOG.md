@@ -4,8 +4,75 @@ Changelog
 **Unreleased**
 --------------
 
+0.33.1
+------
+
+_2025-12-15_
+
+- **Skate**: Enable parallel gradle model fetching warning for Skate plugin
+- **Fix**: Add `DaggerCompilerKsp` for Module Topography Validation Task
+- Update OkHttp to `5.3.2`.
+- Build against Metro `0.8.2`.
+- Update Kaml to `0.104.0`.
+- Build against redacted-compiler-plugin `1.15.1`.
+- Build against DAGP `3.5.1`.
+- Build against KSP `2.3.3`.
+- Build against Anvil `0.5.1`.
+- Build against Spotless `8.1.0`.
+- Update MoshiX to `0.34.1`.
+- Build against AGP `8.13.2`.
+
+0.33.0
+------
+
+_2025-11-18_
+
+- **Behavior change**: Drop support for KSP1. It may still work but is untested now. Only KSP2 is supported.
+- Update MoshiX to `0.33.0`. This also removes all the moshix proguard rule handling properties since that functionality is no longer necessary. This also includes no longer applying KSP if moshi-ir is enabled.
+- Update OkHttp to `5.3.1`.
+- Update Okio to `3.16.4`.
+- Update Spotlight to `1.3.4`.
+- Update Kaml to `0.102.0`.
+- Build against Metro `0.7.6`.
+- Build against KSP `2.3.2`.
+- Build against AGP `8.13.1`.
+- Build against SqlDelight `2.2.1`.
+- Build against Gradle `9.2.1`.
+- Build against Roborazzi `1.51.0`.
+- Build against DAGP `3.4.1`.
+- Build against CMP `1.9.3`.
+- Build against Develocity `4.2.2`.
+- Build against emulator.wtf `0.19.4`.
+- Build against Dokka `2.1.0`.
+
+0.32.0
+------
+
+_2025-11-18_
+
+Don't use this build. Things got goofed during GitHub's outage!
+
+0.31.3
+------
+
+_2025-10-14_
+
+- Update to JNA `5.18.1`.
+- Build against Develocity `4.2.1`.
+- Build against Develocity Gradle Plugin `4.2.2`.
+- Build against DAGP `3.1.0`.
+- Remove Android SDK sources patching as this is no longer necessary with modern android releases.
+    - Also removes the `foundry.android.latestCompileSdkWithSources` property.
+- Build against KSP `2.2.20-2.0.4`.
+- Build against Metro `0.6.10`.
+- Update Okio to `3.16.1`.
+- Build against gradle retry `1.6.4`.
+- Build against Compose `1.9.1`.
+- Update kaml to `0.98.0`.
+
 0.31.2
 ------
+
 _2025-09-30_
 
 - Build against DAGP `3.0.3`.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2025 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package foundry.gradle.util
+package foundry.intellij.skate.parallelfetch
 
-import com.google.devtools.ksp.gradle.KspAATask
-import org.gradle.api.Project
-import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.TaskProvider
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.ProjectActivity
 
-internal fun <T : Any> Project.addKspSource(
-  kspTaskName: String,
-  task: TaskProvider<*>,
-  provider: Provider<T>,
-) {
-  tasks
-    .named { it == kspTaskName }
-    .configureEach {
-      when (this) {
-        is KspAATask -> {
-          kspConfig.javaSourceRoots.from(provider)
-          dependsOn(task)
-        }
-      }
-    }
+class GradleParallelFetchingStartupActivity : ProjectActivity {
+  override suspend fun execute(project: Project) {
+    val service = project.service<GradleParallelFetchingService>()
+    service.checkParallelFetching()
+  }
 }

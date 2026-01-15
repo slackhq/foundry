@@ -305,7 +305,7 @@ subprojects {
     }
 
     configure<MavenPublishBaseExtension> {
-      publishToMavenCentral(automaticRelease = true)
+      publishToMavenCentral(automaticRelease = true, validateDeployment = false)
       signAllPublications()
     }
   }
@@ -345,7 +345,9 @@ subprojects {
       }
       project.dependencies {
         configure<IntelliJPlatformDependenciesExtension> {
-          intellijIdeaCommunity(libs.versions.intellij.version)
+          // Suppressed deprecation as we can't actually move to intellijIdea() until 2025.3
+          // Bad use of the deprecated annotation
+          @Suppress("DEPRECATION") intellijIdeaCommunity(libs.versions.intellij.version)
         }
       }
 

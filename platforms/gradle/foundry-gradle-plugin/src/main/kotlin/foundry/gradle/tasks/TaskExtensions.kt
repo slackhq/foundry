@@ -18,7 +18,6 @@ package foundry.gradle.tasks
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspAATask
-import com.google.devtools.ksp.gradle.KspTask
 import com.squareup.wire.gradle.WireTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -47,10 +46,7 @@ internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
 
   // KSP
   project.pluginManager.withPlugin("com.google.devtools.ksp") {
-    configure {
-      dependsOn(project.tasks.withType(KspTask::class.java))
-      dependsOn(project.tasks.withType(KspAATask::class.java))
-    }
+    configure { dependsOn(project.tasks.withType(KspAATask::class.java)) }
   }
 
   // ViewBinding
