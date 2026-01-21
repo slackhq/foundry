@@ -31,11 +31,11 @@ kotlinPoet = "2.2.0"
 ktfmt = "0.61"
 markdown = "0.39.1"
 mavenPublish = "0.35.0"
-metro = "0.9.4"
+metro = "0.10.0"
 mordant = "3.0.2"
 moshi = "1.15.2"
 moshix = "0.34.2"
-nullawayGradle = "2.3.0"
+nullawayGradle = "2.4.0"
 okhttp = "5.3.2"
 okio = "3.16.4"
 retrofit = "3.0.0"
@@ -92,8 +92,8 @@ asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"
 autoService-ksp = "dev.zacsweers.autoservice:auto-service-ksp:1.2.0"
 bugsnag = "com.bugsnag:bugsnag:3.8.0"
-buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.5.5"
-clikt = "com.github.ajalt.clikt:clikt:5.0.3"
+buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.5.6"
+clikt = "com.github.ajalt.clikt:clikt:5.1.0"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.15.0"
 composeLints = "com.slack.lint.compose:compose-lint-checks:1.4.2"
@@ -111,9 +111,9 @@ gradlePlugins-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 gradlePlugins-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin" }
 gradlePlugins-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
-gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.3"
+gradlePlugins-develocity = "com.gradle:develocity-gradle-plugin:4.3.1"
 gradlePlugins-doctor = "com.osacky.doctor:doctor-plugin:0.12.1"
-gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:1.0.3"
+gradlePlugins-emulatorWtf = "wtf.emulator:gradle-plugin-api:1.2.0"
 gradlePlugins-errorProne = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorproneGradle" }
 gradlePlugins-graphAssert = { module = "com.jraska.module.graph.assertion:plugin", version.ref = "graph-assert" }
 gradlePlugins-kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -157,7 +157,7 @@ okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", versio
 oshi = "com.github.oshi:oshi-core:6.9.2"
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "retrofit" }
-robolectric = "org.robolectric:robolectric:4.16"
+robolectric = "org.robolectric:robolectric:4.16.1"
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.12"
 sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"
