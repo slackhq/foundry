@@ -35,3 +35,6 @@ temp-clone/
 
 # Files generated for Spotlight: https://github.com/joshfriend/spotlight
 gradle/ide-projects.txt
+
+# AI
+settings.local.json

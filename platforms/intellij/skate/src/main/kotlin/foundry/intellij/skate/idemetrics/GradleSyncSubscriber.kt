@@ -60,7 +60,7 @@ class GradleSyncSubscriber : GradleSyncListener {
     sendTrace(
       project,
       Instant.now(),
-      SkateTracingEvent.GradleSync.GRADLE_SYNC_SUCCEDDED,
+      SkateTracingEvent.GradleSync.GRADLE_SYNC_FINISHED,
       spanId = makeId(),
       parentId = parentId,
     )
