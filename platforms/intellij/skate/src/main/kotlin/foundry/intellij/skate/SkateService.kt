@@ -15,12 +15,14 @@
  */
 package foundry.intellij.skate
 
+import com.android.tools.idea.gradle.project.sync.GradleSyncState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
+import foundry.intellij.skate.idemetrics.GradleSyncSubscriber
 import foundry.intellij.skate.tracing.SkateTraceReporter
 import foundry.intellij.skate.ui.WhatsNewPanelFactory
 import java.util.function.Supplier
@@ -34,6 +36,12 @@ interface SkateProjectService {
    * @param forceShow If true, shows the panel regardless of whether there are new entries.
    */
   fun showWhatsNewPanel(forceShow: Boolean = false)
+
+  /**
+   * Registers the Gradle sync subscriber to track Gradle sync events.
+   * This should be called during project initialization.
+   */
+  fun registerGradleSyncSubscriber()
 }
 
 /**
@@ -43,6 +51,12 @@ interface SkateProjectService {
 class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
 
   override val traceReporter: SkateTraceReporter by lazy { SkateTraceReporter(project) }
+
+  private val gradleSyncSubscriber: GradleSyncSubscriber = GradleSyncSubscriber()
+
+  override fun registerGradleSyncSubscriber() {
+    GradleSyncState.subscribe(project, gradleSyncSubscriber)
+  }
 
   override fun showWhatsNewPanel(forceShow: Boolean) {
     val settings = project.service<SkatePluginSettings>()

@@ -15,16 +15,14 @@
  */
 package foundry.intellij.skate
 
-import com.android.tools.idea.gradle.project.sync.GradleSyncState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import foundry.intellij.skate.idemetrics.GradleSyncSubscriber
 
 internal class PostStartupActivityExtension : ProjectActivity {
   override suspend fun execute(project: Project) {
-    GradleSyncState.subscribe(project, GradleSyncSubscriber())
     val service = project.service<SkateProjectService>()
+    service.registerGradleSyncSubscriber()
     service.showWhatsNewPanel()
   }
 }
