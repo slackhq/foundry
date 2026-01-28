@@ -227,12 +227,12 @@ internal value class OnceCheck(val once: AtomicBoolean = AtomicBoolean(false)) {
 public val Project.isSyncing: Boolean
   get() =
     invokedFromIde &&
-      (findProperty(AndroidProject.PROPERTY_BUILD_MODEL_ONLY) == "true" ||
-        findProperty(AndroidProject.PROPERTY_GENERATE_SOURCES_ONLY) == "true")
+      (providers.gradleProperty(AndroidProject.PROPERTY_BUILD_MODEL_ONLY).orNull == "true" ||
+        providers.gradleProperty(AndroidProject.PROPERTY_GENERATE_SOURCES_ONLY).orNull == "true")
 
 // Note that we don't reference the AndroidProject property because this constant moved in AGP 7.2
 public val Project.invokedFromIde: Boolean
-  get() = hasProperty("android.injected.invoked.from.ide")
+  get() = providers.gradleProperty("android.injected.invoked.from.ide").isPresent
 
 internal inline fun <reified T : Any> ObjectFactory.newInstance(vararg parameters: Any): T {
   return newInstance(T::class.java, *parameters)
