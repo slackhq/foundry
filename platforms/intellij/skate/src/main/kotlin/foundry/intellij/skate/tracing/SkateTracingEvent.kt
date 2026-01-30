@@ -50,5 +50,6 @@ sealed interface SkateTracingEvent {
     GRADLE_SYNC_STARTED,
     GRADLE_SYNC_SUCCEDDED,
     GRADLE_SYNC_SKIPPED,
+    GRADLE_SYNC_FAILED,
   }
 }

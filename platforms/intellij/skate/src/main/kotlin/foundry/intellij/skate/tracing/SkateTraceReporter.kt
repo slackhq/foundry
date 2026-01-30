@@ -60,10 +60,23 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
 
   override suspend fun sendTrace(spans: ListOfSpans) {
     try {
+      // Debug logging for gradle_sync metrics
+      LOG.info("=== SKATE TRACE DEBUG ===")
+      LOG.info("Sending trace with ${spans.spans.size} span(s)")
+      LOG.info("Full trace data: $spans")
+      LOG.info("========================")
+
+      // Also print to stdout for easy viewing
+      println("=== SKATE TRACE DEBUG ===")
+      println("Sending trace with ${spans.spans.size} span(s)")
+      println("Full trace data: $spans")
+      println("========================")
+
       delegate.sendTrace(spans)
-      LOG.info(spans.toString())
+      LOG.info("Trace sent successfully")
     } catch (httpException: HttpException) {
       LOG.error("Uploading Skate plugin trace failed.", httpException)
+      println("ERROR sending trace: ${httpException.message}")
     }
   }
 
@@ -89,12 +102,9 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
       buildSpan(
         name = spanName,
         startTimestampMicros =
-          startTimestamp.toEpochMilli().toDuration(DurationUnit.MILLISECONDS).inWholeMicroseconds,
+          startTimestamp.toEpochMilli() * 1000, // Convert milliseconds to microseconds
         durationMicros =
-          Duration.between(startTimestamp, Instant.now())
-            .toMillis()
-            .toDuration(DurationUnit.MILLISECONDS)
-            .inWholeMicroseconds,
+          Duration.between(startTimestamp, Instant.now()).toMillis() * 1000, // Convert milliseconds to microseconds
         traceId = traceId,
         parentId = parentId,
       ) {
@@ -111,7 +121,7 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
 
   companion object {
     const val SERVICE_NAME: String = "skate_plugin"
-    const val DATABASE_NAME: String = "itools"
+    const val DATABASE_NAME: String = "traces_prod"
     private val LOG: Logger = Logger.getInstance(SkateTraceReporter::class.java)
   }
 }
