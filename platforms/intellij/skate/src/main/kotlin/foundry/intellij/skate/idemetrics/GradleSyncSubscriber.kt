@@ -16,6 +16,7 @@
 package foundry.intellij.skate.idemetrics
 
 import com.android.tools.idea.gradle.project.sync.GradleSyncListener
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
@@ -27,14 +28,22 @@ import okio.ByteString
 
 class GradleSyncSubscriber : GradleSyncListener {
 
+  private val logger = Logger.getInstance(GradleSyncSubscriber::class.java)
   private var parentId: ByteString = ByteString.EMPTY
   private var syncStartTime: Instant? = null
 
   override fun syncStarted(project: Project) {
     super.syncStarted(project)
-    if (!project.isTracingEnabled()) return
+    logger.info("Skate: syncStarted() called for project: ${project.name}")
+    val tracingEnabled = project.isTracingEnabled()
+    logger.info("Skate: Tracing enabled: $tracingEnabled")
+    if (!tracingEnabled) {
+      logger.info("Skate: Skipping GRADLE_SYNC_STARTED trace - tracing disabled")
+      return
+    }
     syncStartTime = Instant.now()
     parentId = makeId()
+    logger.info("Skate: Sending GRADLE_SYNC_STARTED trace with parentId: $parentId")
     val spanBuilder = SkateSpanBuilder().apply {
       addTag("event", SkateTracingEvent.GradleSync.GRADLE_SYNC_STARTED)
     }
@@ -45,15 +54,23 @@ class GradleSyncSubscriber : GradleSyncListener {
       spanId = parentId,
       parentId = ByteString.EMPTY,
     )
+    logger.info("Skate: GRADLE_SYNC_STARTED trace sent successfully")
   }
 
   override fun syncSkipped(project: Project) {
     super.syncSkipped(project)
-    if (!project.isTracingEnabled()) return
+    logger.info("Skate: syncSkipped() called for project: ${project.name}")
+    val tracingEnabled = project.isTracingEnabled()
+    logger.info("Skate: Tracing enabled: $tracingEnabled")
+    if (!tracingEnabled) {
+      logger.info("Skate: Skipping GRADLE_SYNC_SKIPPED trace - tracing disabled")
+      return
+    }
     val startTime = syncStartTime ?: Instant.now()
     val endTime = Instant.now()
     val durationMs = java.time.Duration.between(startTime, endTime).toMillis()
 
+    logger.info("Skate: Sending GRADLE_SYNC_SKIPPED trace (duration: ${durationMs}ms)")
     val spanBuilder = SkateSpanBuilder().apply {
       addTag("event", SkateTracingEvent.GradleSync.GRADLE_SYNC_SKIPPED)
       addTag("duration_ms", durationMs)
@@ -66,16 +83,24 @@ class GradleSyncSubscriber : GradleSyncListener {
       spanId = makeId(),
       parentId = parentId,
     )
+    logger.info("Skate: GRADLE_SYNC_SKIPPED trace sent successfully")
     resetState()
   }
 
   override fun syncSucceeded(project: Project) {
     super.syncSucceeded(project)
-    if (!project.isTracingEnabled()) return
+    logger.info("Skate: syncSucceeded() called for project: ${project.name}")
+    val tracingEnabled = project.isTracingEnabled()
+    logger.info("Skate: Tracing enabled: $tracingEnabled")
+    if (!tracingEnabled) {
+      logger.info("Skate: Skipping GRADLE_SYNC_SUCCEEDED trace - tracing disabled")
+      return
+    }
     val startTime = syncStartTime ?: Instant.now()
     val endTime = Instant.now()
     val durationMs = java.time.Duration.between(startTime, endTime).toMillis()
 
+    logger.info("Skate: Sending GRADLE_SYNC_SUCCEEDED trace (duration: ${durationMs}ms)")
     val spanBuilder = SkateSpanBuilder().apply {
       addTag("event", SkateTracingEvent.GradleSync.GRADLE_SYNC_SUCCEDDED)
       addTag("duration_ms", durationMs)
@@ -88,16 +113,24 @@ class GradleSyncSubscriber : GradleSyncListener {
       spanId = makeId(),
       parentId = parentId,
     )
+    logger.info("Skate: GRADLE_SYNC_SUCCEEDED trace sent successfully")
     resetState()
   }
 
   override fun syncFailed(project: Project, errorMessage: String) {
     super.syncFailed(project, errorMessage)
-    if (!project.isTracingEnabled()) return
+    logger.info("Skate: syncFailed() called for project: ${project.name}")
+    val tracingEnabled = project.isTracingEnabled()
+    logger.info("Skate: Tracing enabled: $tracingEnabled")
+    if (!tracingEnabled) {
+      logger.info("Skate: Skipping GRADLE_SYNC_FAILED trace - tracing disabled")
+      return
+    }
     val startTime = syncStartTime ?: Instant.now()
     val endTime = Instant.now()
     val durationMs = java.time.Duration.between(startTime, endTime).toMillis()
 
+    logger.info("Skate: Sending GRADLE_SYNC_FAILED trace (duration: ${durationMs}ms, error: $errorMessage)")
     val spanBuilder = SkateSpanBuilder().apply {
       addTag("event", SkateTracingEvent.GradleSync.GRADLE_SYNC_FAILED)
       addTag("duration_ms", durationMs)
@@ -111,6 +144,7 @@ class GradleSyncSubscriber : GradleSyncListener {
       spanId = makeId(),
       parentId = parentId,
     )
+    logger.info("Skate: GRADLE_SYNC_FAILED trace sent successfully")
     resetState()
   }
 

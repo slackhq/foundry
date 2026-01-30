@@ -17,13 +17,18 @@ package foundry.intellij.skate
 
 import com.android.tools.idea.gradle.project.sync.GradleSyncState
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import foundry.intellij.skate.idemetrics.GradleSyncSubscriber
 
 internal class PostStartupActivityExtension : ProjectActivity {
+  private val logger = Logger.getInstance(PostStartupActivityExtension::class.java)
+
   override suspend fun execute(project: Project) {
+    logger.info("Skate: Registering GradleSyncSubscriber for project: ${project.name}")
     GradleSyncState.subscribe(project, GradleSyncSubscriber())
+    logger.info("Skate: GradleSyncSubscriber registered successfully")
     val service = project.service<SkateProjectService>()
     service.showWhatsNewPanel()
   }

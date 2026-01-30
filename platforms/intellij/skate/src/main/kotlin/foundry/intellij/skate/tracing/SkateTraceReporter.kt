@@ -31,11 +31,11 @@ import foundry.tracing.reporter.TraceReporter
 import foundry.tracing.reporter.TraceReporter.NoOpTraceReporter
 import java.time.Duration
 import java.time.Instant
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.Response
+import okio.Buffer
 import okio.ByteString
 import org.apache.http.HttpException
 
@@ -43,15 +43,59 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
 
   private val delegate by lazy {
     val okHttpClient = lazy { OkHttpClient.Builder().build() }
-    val loggingInterceptor =
-      HttpLoggingInterceptor(
-        object : HttpLoggingInterceptor.Logger {
-          override fun log(message: String) {
-            LOG.info("[TRACES API] $message")
-            println("[TRACES API] $message")
-          }
-        }
-      ).apply { level = HttpLoggingInterceptor.Level.BODY }
+    val loggingInterceptor = Interceptor { chain ->
+      val request = chain.request()
+
+      // Log request
+      LOG.info("[TRACES API] --> ${request.method} ${request.url}")
+      println("[TRACES API] --> ${request.method} ${request.url}")
+
+      // Log request headers
+      request.headers.forEach { (name, value) ->
+        LOG.info("[TRACES API] $name: $value")
+        println("[TRACES API] $name: $value")
+      }
+
+      // Log request body if present
+      request.body?.let { body ->
+        val buffer = Buffer()
+        body.writeTo(buffer)
+        val bodyString = buffer.readUtf8()
+        LOG.info("[TRACES API] Request Body: $bodyString")
+        println("[TRACES API] Request Body: $bodyString")
+      }
+
+      LOG.info("[TRACES API] --> END ${request.method}")
+      println("[TRACES API] --> END ${request.method}")
+
+      // Execute request
+      val response = chain.proceed(request)
+
+      // Log response
+      LOG.info("[TRACES API] <-- ${response.code} ${response.message} ${response.request.url}")
+      println("[TRACES API] <-- ${response.code} ${response.message} ${response.request.url}")
+
+      // Log response headers
+      response.headers.forEach { (name, value) ->
+        LOG.info("[TRACES API] $name: $value")
+        println("[TRACES API] $name: $value")
+      }
+
+      // Log response body if present
+      response.body?.let { responseBody ->
+        val source = responseBody.source()
+        source.request(Long.MAX_VALUE)
+        val buffer = source.buffer.clone()
+        val bodyString = buffer.readUtf8()
+        LOG.info("[TRACES API] Response Body: $bodyString")
+        println("[TRACES API] Response Body: $bodyString")
+      }
+
+      LOG.info("[TRACES API] <-- END HTTP")
+      println("[TRACES API] <-- END HTTP")
+
+      response
+    }
 
     val loggingClient = lazy {
       okHttpClient.value.newBuilder().addInterceptor(loggingInterceptor).build()
