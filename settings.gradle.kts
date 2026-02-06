@@ -15,6 +15,39 @@
  */
 import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
 
+// Automatically detect spotless tasks and provide guidance for isolated projects
+// This is necessary because Spotless doesn't support isolated projects
+// See: https://github.com/diffplug/spotless/issues/1979
+val requestedTasks = gradle.startParameter.taskNames
+val isSpotlessTask = requestedTasks.any { task -> task.contains("spotless", ignoreCase = true) }
+
+// Check if isolated projects is enabled (system property from -D flag takes precedence)
+val isolatedProjectsFromGradleProperty =
+  providers
+    .gradleProperty("org.gradle.unsafe.isolated-projects")
+    .map { it.toBoolean() }
+    .getOrElse(false)
+val isolatedProjectsFromSystemProperty =
+  providers.systemProperty("org.gradle.unsafe.isolated-projects").map { it.toBoolean() }.orNull
+val isolatedProjectsEnabled =
+  isolatedProjectsFromSystemProperty ?: isolatedProjectsFromGradleProperty
+
+if (isSpotlessTask && isolatedProjectsEnabled) {
+  // Fail fast with a helpful error message
+  throw GradleException(
+    """
+    |
+    |Spotless tasks cannot run with isolated projects enabled.
+    |Spotless does not support isolated projects: https://github.com/diffplug/spotless/issues/1979
+    |
+    |To run spotless, use one of these options:
+    |  ./gradlew spotlessApply -Dorg.gradle.unsafe.isolated-projects=false
+    |  ./gradlew spotlessCheck -Dorg.gradle.unsafe.isolated-projects=false
+    |"""
+      .trimMargin()
+  )
+}
+
 pluginManagement {
   // Non-delegate APIs are annoyingly not public so we have to use withGroovyBuilder
   fun hasProperty(key: String): Boolean {
@@ -75,6 +108,8 @@ plugins {
   // https://github.com/joshfriend/spotlight
   id("com.fueledbycaffeine.spotlight") version "1.6.6"
 }
+
+includeBuild("build-logic")
 
 dependencyResolutionManagement {
   versionCatalogs {

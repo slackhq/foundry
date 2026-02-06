@@ -16,7 +16,8 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
-  kotlin("jvm")
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm-gradle")
   `java-gradle-plugin`
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.bestPracticesPlugin)
@@ -47,13 +48,15 @@ buildConfig {
 
 // Copy our hooks into resources for InstallCommitHooks
 tasks.named<ProcessResources>("processResources") {
-  from(rootProject.layout.projectDirectory.dir("config/git/hooks")) {
+  from(rootDir.resolve("config/git/hooks")) {
     // Give it a common prefix for us to look for
     rename { name -> "githook-$name" }
   }
 }
 
 moshi { enableSealed.set(true) }
+
+lint { baseline = file("lint-baseline.xml") }
 
 tasks.named<ValidatePlugins>("validatePlugins") { enableStricterValidation.set(true) }
 

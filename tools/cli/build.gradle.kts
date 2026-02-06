@@ -15,16 +15,28 @@
  */
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
+// KSP doesn't support isolated projects yet
+// See: https://github.com/google/ksp/issues/XXXX (TODO: file upstream issue)
+val isolatedProjectsEnabled =
+  providers
+    .gradleProperty("org.gradle.unsafe.isolated-projects")
+    .map { it.toBoolean() }
+    .getOrElse(false)
+
 plugins {
-  alias(libs.plugins.kotlin.jvm)
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm")
   alias(libs.plugins.dokka)
   alias(libs.plugins.detekt)
   alias(libs.plugins.lint)
   alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.spotless)
   alias(libs.plugins.moshix)
   alias(libs.plugins.kotlin.plugin.serialization)
-  alias(libs.plugins.ksp)
+  alias(libs.plugins.ksp) apply false
+}
+
+if (!isolatedProjectsEnabled) {
+  apply(plugin = "com.google.devtools.ksp")
 }
 
 kotlin {
@@ -39,7 +51,9 @@ lint { baseline = file("lint-baseline.xml") }
 moshi { enableSealed.set(true) }
 
 // We have a couple flaky tests on CI right now
-if (System.getenv("CI") != null) {
+val isCI = providers.environmentVariable("CI").isPresent
+
+if (isCI) {
   tasks.test {
     develocity.testRetry {
       maxRetries.set(2)
@@ -71,5 +85,7 @@ dependencies {
   testImplementation(libs.kaml)
   testImplementation(libs.truth)
 
-  ksp(libs.autoService.ksp)
+  if (!isolatedProjectsEnabled) {
+    "ksp"(libs.autoService.ksp)
+  }
 }
