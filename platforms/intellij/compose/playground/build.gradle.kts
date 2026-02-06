@@ -37,17 +37,17 @@ kotlin {
   sourceSets {
     jvmMain {
       dependencies {
-        implementation(compose.animation)
-        implementation(compose.desktop.common)
-        implementation(compose.desktop.linux_arm64)
-        implementation(compose.desktop.linux_x64)
-        implementation(compose.desktop.macos_arm64)
-        implementation(compose.desktop.macos_x64)
-        implementation(compose.desktop.windows_x64)
-        implementation(compose.foundation)
-        implementation(compose.material)
-        implementation(compose.material3)
-        implementation(compose.ui)
+        implementation(libs.compose.jb.animation)
+        implementation(libs.compose.jb.desktop)
+        implementation(libs.compose.jb.desktop.linux.arm64)
+        implementation(libs.compose.jb.desktop.linux.x64)
+        implementation(libs.compose.jb.desktop.macos.arm64)
+        implementation(libs.compose.jb.desktop.macos.x64)
+        implementation(libs.compose.jb.desktop.windows.x64)
+        implementation(libs.compose.jb.foundation)
+        implementation(libs.compose.jb.material)
+        implementation(libs.compose.jb.material3)
+        implementation(libs.compose.jb.ui)
         implementation(libs.circuit.foundation)
         implementation(libs.compose.markdown)
         implementation(libs.jewel.standalone)
@@ -58,8 +58,8 @@ kotlin {
     }
     jvmTest {
       dependencies {
-        implementation(compose.desktop.common)
-        implementation(compose.desktop.uiTestJUnit4)
+        implementation(libs.compose.jb.desktop)
+        implementation(libs.compose.jb.ui.test.junit4)
         implementation(libs.kotlin.test)
         implementation(libs.roborazzi)
         implementation(libs.testing.roborazzi.core)
