@@ -238,9 +238,6 @@ subprojects {
         this.jvmTarget.set(projectJvmTarget)
         jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
         freeCompilerArgs.addAll(
-          // Enhance not null annotated type parameter's types to definitely not null types
-          // (@NotNull T => T & Any)
-          "-Xenhance-type-parameter-types-to-def-not-null",
           "-Xjsr305=strict",
           // Match JVM assertion behavior:
           // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
