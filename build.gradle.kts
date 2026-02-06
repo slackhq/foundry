@@ -247,7 +247,6 @@ subprojects {
           "-Xassertions=jvm",
           // Potentially useful for static analysis tools or annotation processors.
           "-Xemit-jvm-type-annotations",
-          "-Xtype-enhancement-improvements-strict-mode",
           // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
           "-Xjspecify-annotations=strict",
           // https://youtrack.jetbrains.com/issue/KT-73255
