@@ -62,7 +62,6 @@ bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", 
 buildConfig = { id = "com.github.gmazzo.buildconfig", version = "6.0.7" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose-jb" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 graphAssert = { id = "com.jraska.module.graph.assertion", version.ref = "graph-assert" }
 intellij = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
