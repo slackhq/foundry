@@ -17,6 +17,7 @@ import com.android.build.api.dsl.Lint
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import com.github.gmazzo.buildconfig.BuildConfigExtension
+import com.vanniktech.maven.publish.DeploymentValidation
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import dev.bmac.gradle.intellij.GenerateBlockMapTask
 import dev.bmac.gradle.intellij.PluginUploader
@@ -305,7 +306,7 @@ subprojects {
     }
 
     configure<MavenPublishBaseExtension> {
-      publishToMavenCentral(automaticRelease = true, validateDeployment = false)
+      publishToMavenCentral(automaticRelease = true, validateDeployment = DeploymentValidation.NONE)
       signAllPublications()
     }
   }
