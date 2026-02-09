@@ -16,7 +16,7 @@
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 // KSP doesn't support isolated projects yet
-// See: https://github.com/google/ksp/issues/XXXX (TODO: file upstream issue)
+// See: https://github.com/google/ksp/issues/1943
 val isolatedProjectsEnabled =
   providers
     .gradleProperty("org.gradle.unsafe.isolated-projects")
