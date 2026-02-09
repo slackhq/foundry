@@ -5,8 +5,9 @@ anvil = "0.5.2"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.9.1"
 bugsnagGradle = "8.2.0"
-circuit = "0.31.0"
-compose-jb = "1.9.3"
+circuit = "0.32.0"
+compose-jb = "1.10.0"
+compose-jb-material3 = "1.9.0"
 compose-jb-stable = "1.10.0"
 coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
@@ -14,7 +15,7 @@ coroutines-ij = "1.8.0"
 dependencyAnalysisPlugin = "3.5.1"
 detekt = "1.23.8"
 dokka = "2.1.0"
-errorproneGradle = "4.4.0"
+errorproneGradle = "5.0.0"
 gradle-retry = "1.6.4"
 graph-assert = "2.9.0"
 intellij-platform = "2.11.0"
@@ -24,18 +25,18 @@ jvmTargetIdea = "21"
 jewel = "0.27.0"
 jna = "5.18.1"
 kaml = "0.104.0"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 kotlinx-serialization = "1.10.0"
 ksp = "2.3.5"
 kotlinPoet = "2.2.0"
 ktfmt = "0.61"
 markdown = "0.39.2"
-mavenPublish = "0.35.0"
+mavenPublish = "0.36.0"
 metro = "0.10.2"
 mordant = "3.0.2"
 moshi = "1.15.2"
 moshix = "0.34.4"
-nullawayGradle = "2.4.1"
+nullawayGradle = "3.0.0"
 okhttp = "5.3.2"
 okio = "3.16.4"
 retrofit = "3.0.0"
@@ -96,6 +97,19 @@ buildscriptUtil = "com.fueledbycaffeine.spotlight:buildscript-utils:1.6.6"
 clikt = "com.github.ajalt.clikt:clikt:5.1.0"
 circuit-foundation = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit" }
 commonsText = "org.apache.commons:commons-text:1.15.0"
+compose-jb-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "compose-jb" }
+compose-jb-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-jb" }
+compose-jb-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose-jb" }
+compose-jb-desktop-linux-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-arm64", version.ref = "compose-jb" }
+compose-jb-desktop-linux-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-x64", version.ref = "compose-jb" }
+compose-jb-desktop-macos-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-arm64", version.ref = "compose-jb" }
+compose-jb-desktop-macos-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-x64", version.ref = "compose-jb" }
+compose-jb-desktop-windows-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-windows-x64", version.ref = "compose-jb" }
+compose-jb-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-jb" }
+compose-jb-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-jb" }
+compose-jb-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-jb-material3" }
+compose-jb-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-jb" }
+compose-jb-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "compose-jb" }
 composeLints = "com.slack.lint.compose:compose-lint-checks:1.4.2"
 compose-markdown = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown" }
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
