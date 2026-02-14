@@ -73,7 +73,7 @@ constructor(
    * this instance. Ideally we could eventually remove this if/when AGP finally makes these
    * properties lazy.
    */
-  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+  private var androidExtension: CommonExtension? = null
     set(value) {
       field = value
       androidHandler.setAndroidExtension(value)
@@ -81,7 +81,7 @@ constructor(
       testingHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension) {
     this.androidExtension = androidExtension
   }
 
@@ -444,13 +444,13 @@ constructor(
     objects.newInstance<ComposeHandler>(globalFoundryProperties, foundryProperties, versionCatalog)
 
   /** @see [FoundryExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+  private var androidExtension: CommonExtension? = null
     set(value) {
       field = value
       composeHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
     this.androidExtension = androidExtension
   }
 
@@ -902,9 +902,9 @@ constructor(
   }
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+  private var androidExtension: CommonExtension? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
     this.androidExtension = androidExtension
   }
 
@@ -1016,7 +1016,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [FoundryExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+  private var androidExtension: CommonExtension? = null
     set(value) {
       field = value
       featuresHandler.setAndroidExtension(value)
@@ -1025,7 +1025,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
   internal val isViewBindingEnabled: Boolean
     get() = androidExtension?.buildFeatures?.viewBinding == true
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
     this.androidExtension = androidExtension
   }
 
@@ -1100,9 +1100,9 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val snapshotTests: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+  private var androidExtension: CommonExtension? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
     this.androidExtension = androidExtension
   }
 
@@ -1190,9 +1190,9 @@ public abstract class TestingHandler
 constructor(private val project: Project, objects: ObjectFactory) {
 
   /** @see [FoundryExtension.androidExtension] */
-  private var androidExtension: CommonExtension<*, *, *, *, *, *>? = null
+  private var androidExtension: CommonExtension? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension<*, *, *, *, *, *>?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
     this.androidExtension = androidExtension
   }
 
