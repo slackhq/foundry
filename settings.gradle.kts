@@ -73,7 +73,7 @@ plugins {
   id("org.jetbrains.intellij.platform.settings") version "2.11.0"
   id("org.jetbrains.intellij.platform") version "2.11.0" apply false
   // https://github.com/joshfriend/spotlight
-  id("com.fueledbycaffeine.spotlight") version "1.6.6"
+  id("com.fueledbycaffeine.spotlight") version "1.6.7"
 }
 
 dependencyResolutionManagement {
