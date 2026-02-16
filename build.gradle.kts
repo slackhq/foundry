@@ -69,6 +69,24 @@ buildscript {
   }
 }
 
+// Auto-configure git to use project-specific config (hooks + LFS)
+if (file(".git").exists()) {
+  val expectedIncludePath = "../config/git/.gitconfig"
+  val includePath =
+    providers
+      .exec { commandLine("git", "config", "--local", "--default", "", "--get", "include.path") }
+      .standardOutput
+      .asText
+      .map { it.trim() }
+      .getOrElse("")
+  if (includePath != expectedIncludePath) {
+    providers
+      .exec { commandLine("git", "config", "--local", "include.path", expectedIncludePath) }
+      .result
+      .get()
+  }
+}
+
 moduleGraphAssert {
   // Platforms can depend on tools but not the other way around
   allowed =
