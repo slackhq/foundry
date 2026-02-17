@@ -18,6 +18,10 @@ package foundry.gradle
 import app.cash.sqldelight.gradle.SqlDelightExtension
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.dsl.TestExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
@@ -27,10 +31,6 @@ import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.LibraryVariant
 import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.android.build.api.variant.TestVariant
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.TestExtension
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
@@ -643,17 +643,17 @@ internal class StandardProjectConfigurations(
 
     val sdkVersions = lazy { foundryProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = foundryProperties.enableAndroidCacheFix
-    val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
+    val commonBaseExtensionConfig: CommonExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {
           pluginManager.apply("org.gradle.android.cache-fix")
         }
 
-        compileSdkVersion(sdkVersions.value.compileSdk)
+        compileSdk { release(sdkVersions.value.compileSdk.toInt()) }
         foundryProperties.ndkVersion?.let { ndkVersion = it }
         foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
         val useOrchestrator = foundryProperties.useOrchestrator.getOrElse(false)
-        defaultConfig {
+        defaultConfig.apply {
           minSdk = sdkVersions.value.minSdk
           vectorDrawables.useSupportLibrary = true
 
@@ -669,7 +669,7 @@ internal class StandardProjectConfigurations(
           }
         }
 
-        compileOptions {
+        compileOptions.apply {
           sourceCompatibility = javaVersion.get()
           targetCompatibility = javaVersion.get()
           isCoreLibraryDesugaringEnabled = true
@@ -681,7 +681,7 @@ internal class StandardProjectConfigurations(
         )
 
         if (applyTestOptions) {
-          testOptions {
+          testOptions.apply {
             animationsDisabled = true
 
             if (useOrchestrator) {
@@ -810,7 +810,7 @@ internal class StandardProjectConfigurations(
           }
         }
       }
-      configure<BaseAppModuleExtension> {
+      configure<ApplicationExtension> {
         foundryExtension.setAndroidExtension(this)
         commonBaseExtensionConfig(true)
         defaultConfig {

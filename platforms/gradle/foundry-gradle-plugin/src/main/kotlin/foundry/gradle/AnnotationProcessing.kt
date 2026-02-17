@@ -15,10 +15,10 @@
  */
 package foundry.gradle
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.internal.dsl.BuildType
+import com.android.build.api.dsl.BuildType
+import com.android.build.api.dsl.CommonExtension
 import foundry.gradle.AptOptionsConfig.AptOptionsConfigurer
+import foundry.gradle.AptOptionsConfigs.invoke
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
@@ -162,13 +162,13 @@ internal abstract class BasicAptOptionsConfig : AptOptionsConfig {
             logger.debug(
               "${baseConfig.name}: Adding javac apt options to android application project $path"
             )
-            configure<AppExtension> { buildTypes.configureEach(baseBuildTypeAction) }
+            configure<CommonExtension> { buildTypes.configureEach(baseBuildTypeAction) }
           }
           project.pluginManager.withPlugin("com.android.library") {
             logger.debug(
               "${baseConfig.name}: Adding javac apt options to android library project $path"
             )
-            configure<LibraryExtension> { buildTypes.configureEach(baseBuildTypeAction) }
+            configure<CommonExtension> { buildTypes.configureEach(baseBuildTypeAction) }
           }
           project.pluginManager.withPlugin("java", javaLibraryAction(foundryProperties))
           project.pluginManager.withPlugin("java-library", javaLibraryAction(foundryProperties))

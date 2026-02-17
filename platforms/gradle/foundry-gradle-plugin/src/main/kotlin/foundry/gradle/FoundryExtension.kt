@@ -18,7 +18,7 @@
 package foundry.gradle
 
 import com.android.build.api.dsl.CommonExtension
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.metro.gradle.MetroPluginExtension
