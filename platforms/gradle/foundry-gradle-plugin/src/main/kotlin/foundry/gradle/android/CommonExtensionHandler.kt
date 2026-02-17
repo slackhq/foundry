@@ -24,6 +24,10 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.TestExtension
 import com.android.build.api.dsl.TestOptions
 
+/**
+ * Abstraction API over [CommonExtension] due to AGP 9 having an annoying disparate API between it
+ * and the [KotlinMultiplatformAndroidLibraryExtension].
+ */
 public sealed interface CommonExtensionHandler {
   public val buildFeatures: BuildFeatures?
   public val testOptions: TestOptions?
@@ -42,7 +46,7 @@ public sealed interface CommonExtensionHandler {
   public interface KmpLibrary : CommonExtensionHandler, LibraryAndroidResourcesHolder
 
   public companion object {
-    internal class DefaultImpl(private val delegate: CommonExtension) : Default {
+    private class DefaultImpl(private val delegate: CommonExtension) : Default {
       override val buildFeatures: BuildFeatures
         get() = delegate.buildFeatures
 
@@ -50,7 +54,7 @@ public sealed interface CommonExtensionHandler {
         get() = delegate.testOptions
     }
 
-    internal class LibraryImpl(private val delegate: LibraryExtension) :
+    private class LibraryImpl(private val delegate: LibraryExtension) :
       Library, CommonExtensionHandler by DefaultImpl(delegate) {
       override var resourcePrefix: String?
         get() = delegate.resourcePrefix
@@ -62,9 +66,8 @@ public sealed interface CommonExtensionHandler {
         get() = delegate.androidResources
     }
 
-    internal class KmpLibraryImpl(
-      private val delegate: KotlinMultiplatformAndroidLibraryExtension
-    ) : KmpLibrary {
+    private class KmpLibraryImpl(private val delegate: KotlinMultiplatformAndroidLibraryExtension) :
+      KmpLibrary {
       override val androidResources: LibraryAndroidResources
         get() = delegate.androidResources
 
