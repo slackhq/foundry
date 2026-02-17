@@ -235,27 +235,28 @@ subprojects {
           // TODO required due to https://github.com/gradle/gradle/issues/24871
           freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
         }
-        check(this is KotlinJvmCompilerOptions)
-        this.jvmTarget.set(projectJvmTarget)
-        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
-        freeCompilerArgs.addAll(
-          // Enhance not null annotated type parameter's types to definitely not null types
-          // (@NotNull T => T & Any)
-          "-Xenhance-type-parameter-types-to-def-not-null",
-          "-Xjsr305=strict",
-          // Match JVM assertion behavior:
-          // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
-          "-Xassertions=jvm",
-          // Potentially useful for static analysis tools or annotation processors.
-          "-Xemit-jvm-type-annotations",
-          "-Xtype-enhancement-improvements-strict-mode",
-          // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
-          "-Xjspecify-annotations=strict",
-          // https://youtrack.jetbrains.com/issue/KT-73255
-          "-Xannotation-default-target=param-property",
-        )
-        // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
-        freeCompilerArgs.add(projectJvmTarget.map { "-Xjdk-release=${it.target}" })
+        if (this is KotlinJvmCompilerOptions) {
+          jvmTarget.set(projectJvmTarget)
+          jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
+          freeCompilerArgs.addAll(
+            // Enhance not null annotated type parameter's types to definitely not null types
+            // (@NotNull T => T & Any)
+            "-Xenhance-type-parameter-types-to-def-not-null",
+            "-Xjsr305=strict",
+            // Match JVM assertion behavior:
+            // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
+            "-Xassertions=jvm",
+            // Potentially useful for static analysis tools or annotation processors.
+            "-Xemit-jvm-type-annotations",
+            "-Xtype-enhancement-improvements-strict-mode",
+            // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
+            "-Xjspecify-annotations=strict",
+            // https://youtrack.jetbrains.com/issue/KT-73255
+            "-Xannotation-default-target=param-property",
+          )
+          // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+          freeCompilerArgs.add(projectJvmTarget.map { "-Xjdk-release=${it.target}" })
+        }
         optIn.addAll(
           "kotlin.contracts.ExperimentalContracts",
           "kotlin.experimental.ExperimentalTypeInference",
