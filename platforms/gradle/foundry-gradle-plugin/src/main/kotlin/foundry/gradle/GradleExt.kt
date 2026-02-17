@@ -137,6 +137,39 @@ internal val Project.isAndroid: Boolean
     return getOrComputeExt(IS_ANDROID) { isAndroidApplication || isAndroidLibrary || isAndroidTest }
   }
 
+/** Returns the appropriate "implementation" configuration for common/shared code. */
+internal val Project.commonImplementation: String
+  get() = if (isKotlinMultiplatform) "commonMainImplementation" else "implementation"
+
+/** Returns the appropriate "compileOnly" configuration for common/shared code. */
+internal val Project.commonCompileOnly: String
+  get() = if (isKotlinMultiplatform) "commonMainCompileOnly" else "compileOnly"
+
+/** Returns the appropriate "testImplementation" configuration for common/shared test code. */
+internal val Project.commonTestImplementation: String
+  get() = if (isKotlinMultiplatform) "commonTestImplementation" else "testImplementation"
+
+/** Returns the appropriate "implementation" configuration for JVM-specific code. */
+internal val Project.jvmImplementation: String
+  get() = if (isKotlinMultiplatform) "jvmMainImplementation" else "implementation"
+
+/** Returns the appropriate "compileOnly" configuration for JVM-specific code. */
+internal val Project.jvmCompileOnly: String
+  get() = if (isKotlinMultiplatform) "jvmMainCompileOnly" else "compileOnly"
+
+/** Returns the appropriate "testImplementation" configuration for JVM-specific test code. */
+internal val Project.jvmTestImplementation: String
+  get() = if (isKotlinMultiplatform) "jvmTestImplementation" else "testImplementation"
+
+/** Returns the appropriate KSP configuration for the project's primary target. */
+internal val Project.ksp: String
+  get() =
+    when {
+      !isKotlinMultiplatform -> "ksp"
+      isAndroidLibrary -> "kspAndroid"
+      else -> "kspJvm"
+    }
+
 internal fun <T : Any> Project.getOrComputeExt(key: String, valueCalculator: () -> T): T {
   @Suppress("UNCHECKED_CAST")
   return (extensions.findByName(key) as? T)

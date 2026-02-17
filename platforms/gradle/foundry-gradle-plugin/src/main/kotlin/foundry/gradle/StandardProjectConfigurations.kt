@@ -39,6 +39,7 @@ import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import foundry.gradle.Configurations.isPlatformConfigurationName
 import foundry.gradle.android.AndroidArchitecture
+import foundry.gradle.android.CommonExtensionHandler
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.dependencies.FoundryDependencies
@@ -836,7 +837,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<ApplicationExtension> {
-        foundryExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
@@ -963,7 +964,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
-        foundryExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         if (isLibraryWithVariants) {
           buildTypes {
@@ -1007,7 +1008,7 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<TestExtension> {
-        foundryExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
         buildTypes {
@@ -1028,6 +1029,7 @@ internal class StandardProjectConfigurations(
         kmpExtension.targets
           .withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
           .configureEach {
+            foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
             compileSdk = sdkVersions.value.compileSdk
             minSdk = sdkVersions.value.minSdk
           }

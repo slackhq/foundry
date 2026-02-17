@@ -17,13 +17,13 @@
 
 package foundry.gradle
 
-import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
 import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.metro.gradle.MetroPluginExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import foundry.gradle.agp.PermissionAllowlistConfigurer
+import foundry.gradle.android.CommonExtensionHandler
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.compose.COMPOSE_COMPILER_OPTION_PREFIX
 import foundry.gradle.dependencies.FoundryDependencies
@@ -65,15 +65,7 @@ constructor(
     )
   internal val testingHandler = objects.newInstance<TestingHandler>(project, objects)
 
-  /**
-   * This is weird! Due to the non-property nature of some AGP DSL features (e.g. buildFeatures and
-   * composeOptions DSLs), we can't lazily chain their values to our own extension's properties.
-   * Because of this, we lazily set this instance from [StandardProjectConfigurations] during
-   * Android extension evaluation and then make calls to enable them _directly_ set the values on
-   * this instance. Ideally we could eventually remove this if/when AGP finally makes these
-   * properties lazy.
-   */
-  private var androidExtension: CommonExtension? = null
+  private var androidExtension: CommonExtensionHandler? = null
     set(value) {
       field = value
       androidHandler.setAndroidExtension(value)
@@ -81,7 +73,7 @@ constructor(
       testingHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension) {
+  internal fun setAndroidExtension(androidExtension: CommonExtensionHandler) {
     this.androidExtension = androidExtension
   }
 
@@ -176,7 +168,10 @@ constructor(
       }
 
       fun kspConfiguration(variant: String = ""): String {
-        return "ksp${variant.capitalizeUS()}"
+        if (variant.isNotEmpty()) {
+          return "ksp${variant.capitalizeUS()}"
+        }
+        return ksp
       }
 
       // Dagger is configured first. If Dagger's compilers are present,
@@ -196,14 +191,14 @@ constructor(
 
         val addAnvilAnnotations = {
           val annotations = "$anvilPackage:annotations"
-          dependencies.add("compileOnly", annotations)
+          dependencies.add(jvmCompileOnly, annotations)
           if (daggerConfig.testFixturesUseDagger) {
             dependencies.add("testFixturesCompileOnly", annotations)
           }
         }
 
         fun addDaggerRuntimeDeps(enableAnvil: Boolean) {
-          dependencies.add("implementation", FoundryDependencies.Dagger.dagger)
+          dependencies.add(jvmImplementation, FoundryDependencies.Dagger.dagger)
 
           if (enableAnvil) {
             addAnvilAnnotations()
@@ -231,7 +226,7 @@ constructor(
 
           for (runtimeProject in runtimeProjects) {
             if (runtimeProject == project.path) continue // No circular deps
-            dependencies.add("implementation", project(runtimeProject))
+            dependencies.add(jvmImplementation, project(runtimeProject))
             if (daggerConfig.testFixturesUseDagger) {
               dependencies.add("testFixturesImplementation", project(runtimeProject))
             }
@@ -321,18 +316,18 @@ constructor(
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
         markKspNeeded("Circuit")
-        dependencies.add("ksp", "com.slack.circuit:circuit-codegen")
-        dependencies.add("compileOnly", "com.slack.circuit:circuit-codegen-annotations")
+        dependencies.add(ksp, "com.slack.circuit:circuit-codegen")
+        dependencies.add(commonCompileOnly, "com.slack.circuit:circuit-codegen-annotations")
       }
 
       if (featuresHandler.autoService.getOrElse(false)) {
         if (allowKsp) {
           markKspNeeded("AutoService")
-          dependencies.add("implementation", FoundryDependencies.Auto.Service.annotations)
-          dependencies.add("ksp", FoundryDependencies.Auto.Service.ksp)
+          dependencies.add(jvmImplementation, FoundryDependencies.Auto.Service.annotations)
+          dependencies.add(ksp, FoundryDependencies.Auto.Service.ksp)
         } else {
           markKaptNeeded("AutoService")
-          dependencies.add("compileOnly", FoundryDependencies.Auto.Service.annotations)
+          dependencies.add(jvmCompileOnly, FoundryDependencies.Auto.Service.annotations)
           dependencies.add(aptConfiguration(), FoundryDependencies.Auto.Service.autoservice)
         }
       }
@@ -342,51 +337,51 @@ constructor(
       }
 
       if (featuresHandler.moshiHandler.moshi.getOrElse(false)) {
-        dependencies.add("implementation", FoundryDependencies.Moshi.moshi)
+        dependencies.add(jvmImplementation, FoundryDependencies.Moshi.moshi)
         if (moshiCodegenEnabled) {
           if (allowMoshiIr) {
             markMoshiGradleNeeded("Moshi code gen", false)
           } else if (allowKsp) {
             markKspNeeded("Moshi code gen")
-            dependencies.add("ksp", FoundryDependencies.Moshi.codeGen)
+            dependencies.add(ksp, FoundryDependencies.Moshi.codeGen)
           } else {
             markKaptNeeded("Moshi code gen")
             dependencies.add(aptConfiguration(), FoundryDependencies.Moshi.codeGen)
           }
         }
         if (featuresHandler.moshiHandler.moshiAdapters.getOrElse(false)) {
-          dependencies.add("implementation", FoundryDependencies.Moshi.adapters)
+          dependencies.add(jvmImplementation, FoundryDependencies.Moshi.adapters)
         }
         if (featuresHandler.moshiHandler.moshiKotlinReflect.getOrElse(false)) {
-          dependencies.add("implementation", FoundryDependencies.Moshi.kotlinReflect)
+          dependencies.add(jvmImplementation, FoundryDependencies.Moshi.kotlinReflect)
         }
         if (featuresHandler.moshiHandler.moshixAdapters.getOrElse(false)) {
-          dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.adapters)
+          dependencies.add(jvmImplementation, FoundryDependencies.Moshi.MoshiX.adapters)
         }
         if (featuresHandler.moshiHandler.moshixMetadataReflect.getOrElse(false)) {
-          dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.metadataReflect)
+          dependencies.add(jvmImplementation, FoundryDependencies.Moshi.MoshiX.metadataReflect)
         }
         if (featuresHandler.moshiHandler.lazyAdapters.getOrElse(false)) {
-          dependencies.add("implementation", FoundryDependencies.Moshi.lazyAdapters)
+          dependencies.add(jvmImplementation, FoundryDependencies.Moshi.lazyAdapters)
         }
         if (featuresHandler.moshiHandler.sealed.getOrElse(false)) {
-          dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.Sealed.runtime)
+          dependencies.add(jvmImplementation, FoundryDependencies.Moshi.MoshiX.Sealed.runtime)
           if (moshiSealedCodegenEnabled) {
             if (allowMoshiIr) {
               markMoshiGradleNeeded("Moshi sealed codegen", enableSealed = true)
             } else if (allowKsp) {
               markKspNeeded("Moshi sealed codegen")
-              dependencies.add("ksp", FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
+              dependencies.add(ksp, FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
             } else {
               error("There is no KAPT support for moshi-sealed and KSP/moshi-ir are disabled")
             }
           }
           if (featuresHandler.moshiHandler.sealedReflect.getOrElse(false)) {
-            dependencies.add("implementation", FoundryDependencies.Moshi.MoshiX.Sealed.reflect)
+            dependencies.add(jvmImplementation, FoundryDependencies.Moshi.MoshiX.Sealed.reflect)
           }
           if (featuresHandler.moshiHandler.sealedMetadataReflect.getOrElse(false)) {
             dependencies.add(
-              "implementation",
+              jvmImplementation,
               FoundryDependencies.Moshi.MoshiX.Sealed.metadataReflect,
             )
           }
@@ -444,13 +439,13 @@ constructor(
     objects.newInstance<ComposeHandler>(globalFoundryProperties, foundryProperties, versionCatalog)
 
   /** @see [FoundryExtension.androidExtension] */
-  private var androidExtension: CommonExtension? = null
+  private var androidExtension: CommonExtensionHandler? = null
     set(value) {
       field = value
       composeHandler.setAndroidExtension(value)
     }
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtensionHandler?) {
     this.androidExtension = androidExtension
   }
 
@@ -717,17 +712,20 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
 
   internal fun applyTo(project: Project, foundryProperties: FoundryProperties) {
     if (runtime.getOrElse(false)) {
-      project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime")
-      project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime-presenter")
-      project.dependencies.add("implementation", "com.slack.circuit:circuit-runtime-ui")
-      project.dependencies.add("testImplementation", "com.slack.circuit:circuit-test")
+      project.dependencies.add(project.commonImplementation, "com.slack.circuit:circuit-runtime")
+      project.dependencies.add(
+        project.commonImplementation,
+        "com.slack.circuit:circuit-runtime-presenter",
+      )
+      project.dependencies.add(project.commonImplementation, "com.slack.circuit:circuit-runtime-ui")
+      project.dependencies.add(project.commonTestImplementation, "com.slack.circuit:circuit-test")
     }
     if (foundation.getOrElse(false)) {
-      project.dependencies.add("implementation", "com.slack.circuit:circuit-foundation")
+      project.dependencies.add(project.commonImplementation, "com.slack.circuit:circuit-foundation")
     }
     if (commonBundle.getOrElse(false)) {
       foundryProperties.versions.bundles.commonCircuit.ifPresent {
-        project.dependencies.add("implementation", it)
+        project.dependencies.add(project.commonImplementation, it)
       }
     }
 
@@ -747,13 +745,19 @@ public abstract class CircuitHandler @Inject constructor(objects: ObjectFactory)
 
     internal fun applyTo(project: Project) {
       if (android.getOrElse(false)) {
-        project.dependencies.add("implementation", "com.slack.circuit:circuitx-android")
+        project.dependencies.add(project.commonImplementation, "com.slack.circuit:circuitx-android")
       }
       if (gestureNav.getOrElse(false)) {
-        project.dependencies.add("implementation", "com.slack.circuit:circuitx-gesture-navigation")
+        project.dependencies.add(
+          project.commonImplementation,
+          "com.slack.circuit:circuitx-gesture-navigation",
+        )
       }
       if (overlays.getOrElse(false)) {
-        project.dependencies.add("implementation", "com.slack.circuit:circuitx-overlays")
+        project.dependencies.add(
+          project.commonImplementation,
+          "com.slack.circuit:circuitx-overlays",
+        )
       }
     }
   }
@@ -902,9 +906,9 @@ constructor(
   }
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension? = null
+  private var androidExtension: CommonExtensionHandler? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtensionHandler?) {
     this.androidExtension = androidExtension
   }
 
@@ -1016,16 +1020,17 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
   internal val featuresHandler = objects.newInstance<AndroidFeaturesHandler>()
 
   /** @see [FoundryExtension.androidExtension] */
-  private var androidExtension: CommonExtension? = null
+  private var androidExtension: CommonExtensionHandler? = null
     set(value) {
       field = value
       featuresHandler.setAndroidExtension(value)
     }
 
   internal val isViewBindingEnabled: Boolean
-    get() = androidExtension?.buildFeatures?.viewBinding == true
+    get() =
+      (androidExtension as? CommonExtensionHandler.Default)?.buildFeatures?.viewBinding == true
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtensionHandler?) {
     this.androidExtension = androidExtension
   }
 
@@ -1052,9 +1057,11 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
           // For projects using robolectric, we want to make sure they include robolectric-core to
           // ensure robolectric uses our custom dependency resolver and config (which just need
           // to be on the classpath).
-          add("testImplementation", FoundryDependencies.Testing.Robolectric.annotations)
-          add("testImplementation", FoundryDependencies.Testing.Robolectric.robolectric)
-          foundryProperties.robolectricCoreProject?.let { add("testImplementation", project(it)) }
+          add(project.jvmTestImplementation, FoundryDependencies.Testing.Robolectric.annotations)
+          add(project.jvmTestImplementation, FoundryDependencies.Testing.Robolectric.robolectric)
+          foundryProperties.robolectricCoreProject?.let {
+            add(project.jvmTestImplementation, project(it))
+          }
         }
         project.tasks.withType(Test::class.java).configureEach {
           // Enable Robolectric's new NATIVE graphics mode.
@@ -1067,7 +1074,9 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
           "Roborazzi support requested in ${project.path} but no version was specified in the version catalog."
         }
         project.dependencies.apply {
-          foundryProperties.roborazziCoreProject?.let { add("testImplementation", project(it)) }
+          foundryProperties.roborazziCoreProject?.let {
+            add(project.jvmTestImplementation, project(it))
+          }
         }
         project.tasks.withType(Test::class.java).configureEach {
           // Enable hardware rendering mode for Roborazzi snapshot testing.
@@ -1100,9 +1109,9 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   internal abstract val snapshotTests: Property<Boolean>
 
   /** @see [AndroidHandler.androidExtension] */
-  private var androidExtension: CommonExtension? = null
+  private var androidExtension: CommonExtensionHandler? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtensionHandler?) {
     this.androidExtension = androidExtension
   }
 
@@ -1128,7 +1137,10 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   // In the future, we may want to add an enum for picking which shadows/artifacts
   public fun robolectric() {
     // Required for Robolectric to work.
-    androidExtension!!.testOptions.unitTests.isIncludeAndroidResources = true
+    (androidExtension as? CommonExtensionHandler.Default)!!
+      .testOptions
+      ?.unitTests
+      ?.isIncludeAndroidResources = true
     robolectric.set(true)
   }
 
@@ -1148,11 +1160,10 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
    * resources.
    */
   public fun resources(prefix: String) {
-    val libraryExtension =
-      androidExtension as? LibraryExtension
-        ?: error("foundry.android.features.resources() is only applicable in libraries!")
-    libraryExtension.resourcePrefix = prefix
-    libraryExtension.androidResources.enable = true
+    (androidExtension as? CommonExtensionHandler.Library)?.resourcePrefix = prefix
+    (androidExtension as? CommonExtensionHandler.LibraryAndroidResourcesHolder)
+      ?.androidResources
+      ?.enable = true
   }
 }
 
@@ -1190,9 +1201,9 @@ public abstract class TestingHandler
 constructor(private val project: Project, objects: ObjectFactory) {
 
   /** @see [FoundryExtension.androidExtension] */
-  private var androidExtension: CommonExtension? = null
+  private var androidExtension: CommonExtensionHandler? = null
 
-  internal fun setAndroidExtension(androidExtension: CommonExtension?) {
+  internal fun setAndroidExtension(androidExtension: CommonExtensionHandler?) {
     this.androidExtension = androidExtension
   }
 
