@@ -95,7 +95,8 @@ internal val Project.isKotlinJvm: Boolean
 internal val Project.isKotlinMultiplatform: Boolean
   get() {
     return getOrComputeExt(IS_KOTLIN_MULTIPLATFORM) {
-      project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
+      project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform") ||
+        project.pluginManager.hasPlugin("com.android.kotlin.multiplatform.library")
     }
   }
 
@@ -120,7 +121,10 @@ internal val Project.isAndroidApplication: Boolean
 
 internal val Project.isAndroidLibrary: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin("com.android.library") }
+    return getOrComputeExt(IS_ANDROID_LIBRARY) {
+      plugins.hasPlugin("com.android.library") ||
+        plugins.hasPlugin("com.android.kotlin.multiplatform.library")
+    }
   }
 
 internal val Project.isAndroidTest: Boolean
