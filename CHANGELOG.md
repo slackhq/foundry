@@ -4,7 +4,6 @@ Changelog
 **Unreleased**
 --------------
 
-- **Breaking change**: The `foundry.android.compileSdkVersion` property must now be an int like `36`.
 - Build against and require AGP 9.0.0+.
 - Update Skate plugin to target Kotlin 2.2/Studio Panda/IJ 2025.3.
 

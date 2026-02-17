@@ -901,7 +901,10 @@ internal constructor(
   )
 
   public val compileSdkVersion: Int?
-    get() = optionalStringProperty("foundry.android.compileSdkVersion")?.toInt()
+    get() =
+      optionalStringProperty("foundry.android.compileSdkVersion")
+        ?.removePrefix("android-") // Gracefully handle legacy prefixing
+        ?.toInt()
 
   private val minSdkVersion: String?
     get() = optionalStringProperty("foundry.android.minSdkVersion")
