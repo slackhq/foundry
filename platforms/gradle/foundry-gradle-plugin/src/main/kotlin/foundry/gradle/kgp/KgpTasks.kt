@@ -53,8 +53,7 @@ internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Uni
     project.pluginManager.onFirst(KgpTasks.KGP_PLUGINS) { id ->
       val type =
         when (id) {
-          "org.jetbrains.kotlin.multiplatform",
-          "com.android.kotlin.multiplatform.library" -> KotlinProjectType.MULTIPLATFORM
+          "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
 
           "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
           "org.jetbrains.kotlin.android",

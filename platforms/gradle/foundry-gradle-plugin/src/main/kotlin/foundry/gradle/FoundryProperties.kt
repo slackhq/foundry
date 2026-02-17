@@ -895,13 +895,13 @@ internal constructor(
   }
 
   internal data class AndroidSdkProperties(
-    val compileSdk: String,
+    val compileSdk: Int,
     val minSdk: Int,
     val targetSdk: Int,
   )
 
-  public val compileSdkVersion: String?
-    get() = optionalStringProperty("foundry.android.compileSdkVersion")
+  public val compileSdkVersion: Int?
+    get() = optionalStringProperty("foundry.android.compileSdkVersion")?.toInt()
 
   private val minSdkVersion: String?
     get() = optionalStringProperty("foundry.android.minSdkVersion")

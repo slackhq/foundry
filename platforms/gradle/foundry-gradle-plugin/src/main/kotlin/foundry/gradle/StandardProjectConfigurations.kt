@@ -674,7 +674,7 @@ internal class StandardProjectConfigurations(
           pluginManager.apply("org.gradle.android.cache-fix")
         }
 
-        compileSdk { release(sdkVersions.value.compileSdk.toInt()) }
+        compileSdk = sdkVersions.value.compileSdk
         foundryProperties.ndkVersion?.let { ndkVersion = it }
         foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
         val useOrchestrator = foundryProperties.useOrchestrator.getOrElse(false)
@@ -1023,25 +1023,27 @@ internal class StandardProjectConfigurations(
 
     // AGP 9 KMP Android library plugin uses a different DSL than com.android.library
     pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
-      val kmpExtension = extensions.getByType<KotlinMultiplatformExtension>()
-      kmpExtension.targets
-        .withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
-        .configureEach {
-          compileSdk = sdkVersions.value.compileSdk.toInt()
-          minSdk = sdkVersions.value.minSdk
-        }
+      pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+        val kmpExtension = extensions.getByType<KotlinMultiplatformExtension>()
+        kmpExtension.targets
+          .withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+          .configureEach {
+            compileSdk = sdkVersions.value.compileSdk
+            minSdk = sdkVersions.value.minSdk
+          }
 
-      // Default namespace if not set by the build script
-      configure<KotlinMultiplatformAndroidComponentsExtension> {
-        finalizeDsl { target ->
-          if (target.namespace == null) {
-            target.namespace =
-              defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
+        // Default namespace if not set by the build script
+        configure<KotlinMultiplatformAndroidComponentsExtension> {
+          finalizeDsl { target ->
+            if (target.namespace == null) {
+              target.namespace =
+                defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
+            }
           }
         }
-      }
 
-      foundryExtension.androidHandler.applyTo(project)
+        foundryExtension.androidHandler.applyTo(project)
+      }
     }
 
     foundryProperties.versions.roborazzi.ifPresent {
