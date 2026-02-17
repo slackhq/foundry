@@ -15,7 +15,6 @@
  */
 package foundry.gradle.kgp
 
-import com.android.build.gradle.BaseExtension
 import foundry.gradle.Configurations
 import foundry.gradle.Configurations.isKnownConfiguration
 import foundry.gradle.FoundryProperties
@@ -26,7 +25,6 @@ import foundry.gradle.lint.DetektTasks
 import foundry.gradle.not
 import foundry.gradle.onFirst
 import foundry.gradle.util.configureKotlinCompilationTask
-import java.io.File
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gradle.api.GradleException
@@ -110,21 +108,6 @@ internal object KgpTasks {
       }
 
       val isKotlinAndroid = kotlinProjectType == KotlinProjectType.ANDROID
-
-      if (isKotlinAndroid) {
-        // Configure kotlin sources in Android projects
-        project.configure<BaseExtension> {
-          this.sourceSets.configureEach {
-            val nestedSourceDir = "src/${this.name}/kotlin"
-            val dir = File(project.projectDir, nestedSourceDir)
-            if (dir.exists()) {
-              // Standard source set
-              // Only added if it exists to avoid potentially adding empty source dirs
-              this.java.srcDirs(project.layout.projectDirectory.dir(nestedSourceDir))
-            }
-          }
-        }
-      }
 
       val jvmTargetProvider =
         foundryProperties.jvmTarget.map { JvmTarget.fromTarget(it.toString()) }
