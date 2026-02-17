@@ -53,10 +53,13 @@ internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Uni
     project.pluginManager.onFirst(KgpTasks.KGP_PLUGINS) { id ->
       val type =
         when (id) {
-          "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
+          "org.jetbrains.kotlin.multiplatform",
+          "com.android.kotlin.multiplatform.library" -> KotlinProjectType.MULTIPLATFORM
+
           "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
           "org.jetbrains.kotlin.android",
           "com.android.experimental.built-in-kotlin" -> KotlinProjectType.ANDROID
+
           else -> {
             // Do nothing
             return@onFirst
@@ -65,7 +68,12 @@ internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Uni
       action(project, type)
     }
   pluginManager.withPlugin("com.android.base") {
-    if (plugins.hasPlugin(KotlinBaseApiPlugin::class.java)) {
+    // Exclude com.android.kotlin.multiplatform.library projects from this fallback.
+    // They should be detected as MULTIPLATFORM via KGP_PLUGINS, not ANDROID via this path.
+    if (
+      plugins.hasPlugin(KotlinBaseApiPlugin::class.java) &&
+        !plugins.hasPlugin("com.android.kotlin.multiplatform.library")
+    ) {
       once.onFirst { action(project, KotlinProjectType.ANDROID) }
     }
   }
@@ -85,6 +93,7 @@ internal object KgpTasks {
       "org.jetbrains.kotlin.jvm",
       "org.jetbrains.kotlin.android",
       "com.android.experimental.built-in-kotlin",
+      "com.android.kotlin.multiplatform.library",
     )
   val KAPT_PLUGINS = listOf("org.jetbrains.kotlin.kapt", "com.android.legacy-kapt")
 

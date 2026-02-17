@@ -20,6 +20,7 @@ import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.TestExtension
 import com.android.build.api.variant.AndroidComponentsExtension
@@ -27,6 +28,7 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.HasAndroidTestBuilder
 import com.android.build.api.variant.HasUnitTestBuilder
+import com.android.build.api.variant.KotlinMultiplatformAndroidComponentsExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.LibraryVariant
 import com.android.build.api.variant.TestAndroidComponentsExtension
@@ -74,6 +76,7 @@ import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.utils.named
 import wtf.emulator.EwExtension
 
@@ -82,6 +85,27 @@ private const val FIVE_MINUTES_MS = 300_000L
 
 private fun Logger.logWithTag(message: String) {
   debug("$LOG $message")
+}
+
+/**
+ * Computes a default namespace from a [projectPath] like `:libraries:foundation` ->
+ * `.libraries.foundation`.
+ */
+private fun defaultNamespace(prefix: String, projectPath: String): String {
+  return prefix +
+    projectPath
+      .asSequence()
+      .mapNotNull {
+        when (it) {
+          // Skip dashes and underscores. We could camelcase but it looks weird in a package name
+          '-',
+          '_' -> null
+          // Use the project path as the real dot namespacing
+          ':' -> '.'
+          else -> it
+        }
+      }
+      .joinToString("")
 }
 
 /**
@@ -546,6 +570,7 @@ internal class StandardProjectConfigurations(
                 is ApplicationAndroidComponentsExtension -> {
                   dependencies.add("androidTestImplementation", "wtf.emulator:test-runtime-android")
                 }
+
                 is TestAndroidComponentsExtension -> {
                   dependencies.add("implementation", "wtf.emulator:test-runtime-android")
                 }
@@ -933,21 +958,7 @@ internal class StandardProjectConfigurations(
         finalizeDsl { libraryExtension ->
           if (libraryExtension.namespace == null) {
             libraryExtension.namespace =
-              foundryProperties.defaultNamespacePrefix +
-                projectPath
-                  .asSequence()
-                  .mapNotNull {
-                    when (it) {
-                      // Skip dashes and underscores. We could camelcase but it looks weird in
-                      // a package name
-                      '-',
-                      '_' -> null
-                      // Use the project path as the real dot namespacing
-                      ':' -> '.'
-                      else -> it
-                    }
-                  }
-                  .joinToString("")
+              defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
           }
         }
       }
@@ -991,21 +1002,7 @@ internal class StandardProjectConfigurations(
         finalizeDsl { testExtension ->
           if (testExtension.namespace == null) {
             testExtension.namespace =
-              foundryProperties.defaultNamespacePrefix +
-                projectPath
-                  .asSequence()
-                  .mapNotNull {
-                    when (it) {
-                      // Skip dashes and underscores. We could camelcase but it looks weird in
-                      // a package name
-                      '-',
-                      '_' -> null
-                      // Use the project path as the real dot namespacing
-                      ':' -> '.'
-                      else -> it
-                    }
-                  }
-                  .joinToString("")
+              defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
           }
         }
       }
@@ -1017,6 +1014,29 @@ internal class StandardProjectConfigurations(
           getByName("debug") {
             // For upstream android libraries that just have a single release variant, use that.
             matchingFallbacks += "release"
+          }
+        }
+      }
+
+      foundryExtension.androidHandler.applyTo(project)
+    }
+
+    // AGP 9 KMP Android library plugin uses a different DSL than com.android.library
+    pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
+      val kmpExtension = extensions.getByType<KotlinMultiplatformExtension>()
+      kmpExtension.targets
+        .withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+          compileSdk = sdkVersions.value.compileSdk.toInt()
+          minSdk = sdkVersions.value.minSdk
+        }
+
+      // Default namespace if not set by the build script
+      configure<KotlinMultiplatformAndroidComponentsExtension> {
+        finalizeDsl { target ->
+          if (target.namespace == null) {
+            target.namespace =
+              defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
           }
         }
       }
@@ -1063,6 +1083,7 @@ internal class StandardProjectConfigurations(
         "com.android.library",
         "com.android.application",
         "com.android.test",
+        "com.android.kotlin.multiplatform.library",
       )
   }
 }
