@@ -236,7 +236,7 @@ subprojects {
           freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
         }
         if (this is KotlinJvmCompilerOptions) {
-          this.jvmTarget.set(projectJvmTarget)
+          jvmTarget.set(projectJvmTarget)
           jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
           freeCompilerArgs.addAll(
             // Enhance not null annotated type parameter's types to definitely not null types
