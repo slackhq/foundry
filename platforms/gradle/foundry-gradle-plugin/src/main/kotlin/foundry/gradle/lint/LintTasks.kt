@@ -21,9 +21,6 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestPlugin
-import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
-import com.android.build.gradle.internal.lint.LintModelWriterTask
-import com.android.build.gradle.internal.lint.VariantInputs
 import foundry.gradle.FoundryProperties
 import foundry.gradle.androidExtension
 import foundry.gradle.androidExtensionNullable
@@ -41,17 +38,13 @@ import foundry.gradle.tasks.publish
 import java.lang.reflect.Field
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.tooling.core.withClosure
 
 /**
  * Common configuration for Android lint in projects.
@@ -101,6 +94,7 @@ internal object LintTasks {
               affectedProjects,
               onProjectSkipped,
             )
+
           is TestPlugin -> {
             if (foundryProperties.enableLintInAndroidTestProjects) {
               project.configureAndroidProjectForLint(
@@ -202,12 +196,6 @@ internal object LintTasks {
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
   ) = afterEvaluate {
-    // The lint plugin expects certain configurations and source sets which are only added by
-    // the Java and Android plugins. If this is a multiplatform project targeting JVM, we'll
-    // need to manually create these configurations and source sets based on their multiplatform
-    // JVM equivalents.
-    addSourceSetsForMultiplatformAfterEvaluate()
-
     // For Android projects, the Android Gradle Plugin is responsible for applying the lint plugin;
     // however, we need to apply it ourselves for non-Android projects.
     pluginManager.apply("com.android.lint")
@@ -264,8 +252,6 @@ internal object LintTasks {
       val publisher = Publisher.interProjectPublisher(project, FoundryArtifact.SkippyLint)
       publisher.publish(ciLint)
     }
-
-    afterEvaluate { addSourceSetsForAndroidMultiplatformAfterEvaluate() }
 
     // Lint is configured entirely in finalizeDsl so that individual projects cannot easily
     // disable individual checks in the DSL for any reason.
@@ -350,89 +336,6 @@ internal object LintTasks {
           project.layout.projectDirectory.file(it).asFile
         }
     }
-  }
-
-  /**
-   * If the project is using multiplatform, adds configurations and source sets expected by the lint
-   * plugin, which allows it to configure itself when running against a non-Android multiplatform
-   *
-   * The version of lint that we're using does not directly support Kotlin multiplatform, but we can
-   * synthesize the necessary configurations and source sets from existing `jvm` configurations and
-   * `kotlinSourceSets`, respectively.
-   *
-   * This method *must* run after evaluation.
-   */
-  private fun Project.addSourceSetsForMultiplatformAfterEvaluate() {
-    val kmpTargets = multiplatformExtension?.targets ?: return
-
-    // Synthesize target configurations based on multiplatform configurations.
-    val kmpApiElements = kmpTargets.map { it.apiElementsConfigurationName }
-    val kmpRuntimeElements = kmpTargets.map { it.runtimeElementsConfigurationName }
-    listOf(kmpRuntimeElements to "runtimeElements", kmpApiElements to "apiElements").forEach {
-      (kmpConfigNames, targetConfigName) ->
-      configurations.maybeCreate(targetConfigName).apply {
-        kmpConfigNames
-          .mapNotNull { configName -> configurations.findByName(configName) }
-          .forEach { config -> extendsFrom(config) }
-      }
-    }
-
-    // Synthesize source sets based on multiplatform source sets.
-    val javaExtension = project.extensions.getByType<JavaPluginExtension>()
-    listOf("main" to "main", "test" to "test").forEach { (kmpCompilationName, targetSourceSetName)
-      ->
-      javaExtension.sourceSets.maybeCreate(targetSourceSetName).apply {
-        kmpTargets
-          .mapNotNull { target -> target.compilations.findByName(kmpCompilationName) }
-          .flatMap { compilation -> compilation.kotlinSourceSets }
-          .flatMap { sourceSet -> sourceSet.kotlin.srcDirs }
-          .forEach { srcDirs -> java.srcDirs += srcDirs }
-      }
-    }
-  }
-
-  /**
-   * If the project is using multiplatform targeted to Android, adds source sets directly to lint
-   * tasks, which allows it to run against Android multiplatform projects.
-   *
-   * Lint is not aware of MPP, and MPP doesn't configure Lint. There is no built-in API to adjust
-   * the default Lint task's sources, so we use this hack to manually add sources for MPP source
-   * sets. In the future, with the new Kotlin Project Model
-   * (https://youtrack.jetbrains.com/issue/KT-42572) and an AGP / MPP integration plugin, this will
-   * no longer be needed. See also b/195329463.
-   */
-  private fun Project.addSourceSetsForAndroidMultiplatformAfterEvaluate() {
-    val multiplatformExtension = multiplatformExtension ?: return
-    multiplatformExtension.targets.findByName("android") ?: return
-
-    val androidMain =
-      multiplatformExtension.sourceSets.findByName("androidMain")
-        ?: throw GradleException("Failed to find source set with name 'androidMain'")
-
-    // Get all the source sets androidMain transitively / directly depends on.
-    val dependencySourceSets = androidMain.withClosure(KotlinSourceSet::dependsOn)
-
-    /** Helper function to add the missing sourcesets to this [VariantInputs] */
-    fun VariantInputs.addSourceSets() {
-      // Each variant has a source provider for the variant (such as debug) and the 'main'
-      // variant. The actual files that Lint will run on is both of these providers
-      // combined - so we can just add the dependencies to the first we see.
-      val sourceProvider = sourceProviders.get().firstOrNull() ?: return
-      dependencySourceSets.forEach { sourceSet ->
-        sourceProvider.javaDirectories.withChangesAllowed {
-          from(sourceSet.kotlin.sourceDirectories)
-        }
-      }
-    }
-
-    // Add the new sources to the lint analysis tasks.
-    tasks.withType(AndroidLintAnalysisTask::class.java).configureEach {
-      variantInputs.addSourceSets()
-    }
-
-    // Also configure the model writing task, so that we don't run into mismatches between
-    // analyzed sources in one module and a downstream module
-    tasks.withType(LintModelWriterTask::class.java).configureEach { variantInputs.addSourceSets() }
   }
 
   /**
