@@ -894,11 +894,7 @@ internal constructor(
     return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
   }
 
-  internal data class AndroidSdkProperties(
-    val compileSdk: Int,
-    val minSdk: Int,
-    val targetSdk: Int,
-  )
+  internal data class AndroidSdkProperties(val compileSdk: Int, val minSdk: Int, val targetSdk: Int)
 
   public val compileSdkVersion: Int?
     get() =
