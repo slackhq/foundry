@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Build against and require AGP 9.0.0+.
+- Update Skate plugin to target Kotlin 2.2/Studio Panda/IJ 2025.3.
+
 0.33.1
 ------
 

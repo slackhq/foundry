@@ -23,7 +23,7 @@ dependencies {
   implementation(project(":tools:version-number"))
 
   compileOnly(gradleApi())
-  compileOnly(libs.agp)
+  compileOnly(libs.agp.api)
 
   testImplementation(gradleApi())
   testImplementation(libs.agp)
