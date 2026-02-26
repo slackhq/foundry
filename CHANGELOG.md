@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Remove redundant `-Xenhance-type-parameter-types-to-def-not-null` arg for Kotlin 2.3.20+ (enabled by default).
+
 0.33.1
 ------
 
