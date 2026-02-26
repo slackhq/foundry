@@ -22,8 +22,6 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import dev.bmac.gradle.intellij.GenerateBlockMapTask
 import dev.bmac.gradle.intellij.PluginUploader
 import dev.bmac.gradle.intellij.UploadPluginTask
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import okio.ByteString.Companion.encode
 import org.gradle.util.internal.VersionNumber
 import org.jetbrains.dokka.gradle.DokkaExtension
@@ -44,7 +42,6 @@ plugins {
   alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.plugin.sam)
-  alias(libs.plugins.detekt)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.mavenPublish) apply false
   alias(libs.plugins.dokka)
@@ -79,19 +76,6 @@ moduleGraphAssert {
       ":tools.* -> :tools.*",
     )
   configurations = setOf("api", "implementation")
-}
-
-configure<DetektExtension> {
-  toolVersion = libs.versions.detekt.get()
-  allRules = true
-}
-
-tasks.withType<Detekt>().configureEach {
-  reports {
-    html.required.set(true)
-    xml.required.set(true)
-    txt.required.set(true)
-  }
 }
 
 val ktfmtVersion = libs.versions.ktfmt.get()
@@ -239,16 +223,12 @@ subprojects {
           jvmTarget.set(projectJvmTarget)
           jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
           freeCompilerArgs.addAll(
-            // Enhance not null annotated type parameter's types to definitely not null types
-            // (@NotNull T => T & Any)
-            "-Xenhance-type-parameter-types-to-def-not-null",
             "-Xjsr305=strict",
             // Match JVM assertion behavior:
             // https://publicobject.com/2019/11/18/kotlins-assert-is-not-like-javas-assert/
             "-Xassertions=jvm",
             // Potentially useful for static analysis tools or annotation processors.
             "-Xemit-jvm-type-annotations",
-            "-Xtype-enhancement-improvements-strict-mode",
             // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
             "-Xjspecify-annotations=strict",
             // https://youtrack.jetbrains.com/issue/KT-73255
@@ -265,8 +245,6 @@ subprojects {
         )
       }
     }
-
-    tasks.withType<Detekt>().configureEach { this.jvmTarget = projectJvmTarget.get().target }
   }
 
   pluginManager.withPlugin("com.vanniktech.maven.publish") {
