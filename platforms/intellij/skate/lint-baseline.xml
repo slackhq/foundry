@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.11.0-alpha10" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.0)" variant="all" version="8.11.0-alpha10">
+<issues format="6" by="lint 9.0.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (9.0.0-alpha08)" variant="all" version="9.0.0-alpha08">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -30,7 +30,7 @@
         errorLine2="                   ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="44"
+            line="46"
             column="20"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                   ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="67"
+            line="69"
             column="20"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                   ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="90"
+            line="92"
             column="20"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="                   ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="113"
+            line="115"
             column="20"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="                   ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="131"
+            line="133"
             column="20"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                   ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="149"
+            line="151"
             column="20"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="                                                                                         ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="160"
+            line="162"
             column="90"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="                                                                                           ~~">
         <location
             file="src/test/kotlin/foundry/intellij/skate/modeltranslator/TranslatorHelperTest.kt"
-            line="163"
+            line="165"
             column="92"/>
     </issue>
 

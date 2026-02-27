@@ -894,14 +894,13 @@ internal constructor(
     return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
   }
 
-  internal data class AndroidSdkProperties(
-    val compileSdk: String,
-    val minSdk: Int,
-    val targetSdk: Int,
-  )
+  internal data class AndroidSdkProperties(val compileSdk: Int, val minSdk: Int, val targetSdk: Int)
 
-  public val compileSdkVersion: String?
-    get() = optionalStringProperty("foundry.android.compileSdkVersion")
+  public val compileSdkVersion: Int?
+    get() =
+      optionalStringProperty("foundry.android.compileSdkVersion")
+        ?.removePrefix("android-") // Gracefully handle legacy prefixing
+        ?.toInt()
 
   private val minSdkVersion: String?
     get() = optionalStringProperty("foundry.android.minSdkVersion")

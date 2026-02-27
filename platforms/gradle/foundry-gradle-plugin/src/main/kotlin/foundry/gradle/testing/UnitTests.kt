@@ -15,7 +15,7 @@
  */
 package foundry.gradle.testing
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.CommonExtension
 import foundry.gradle.FoundryProperties
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
@@ -23,7 +23,6 @@ import foundry.gradle.artifacts.Resolver
 import foundry.gradle.avoidance.SkippyArtifacts
 import foundry.gradle.ciUnitTestAndroidVariant
 import foundry.gradle.configureEach
-import foundry.gradle.getByType
 import foundry.gradle.isActionsCi
 import foundry.gradle.isCi
 import foundry.gradle.properties.setDisallowChanges
@@ -301,7 +300,7 @@ internal object UnitTests {
       val targetSdk = foundryProperties.requireAndroidSdkProperties().targetSdk
 
       // Configure the Android extension
-      project.extensions.getByType(BaseExtension::class.java).testOptions.targetSdk = targetSdk
+      project.extensions.getByType(CommonExtension::class.java).testOptions.targetSdk = targetSdk
 
       project.logger.debug(
         "$LOG Set defaultConfig.testOptions.targetSdk to $targetSdk for androidx.benchmark plugin"

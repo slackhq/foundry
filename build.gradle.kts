@@ -231,7 +231,7 @@ subprojects {
           if (isForIntelliJPlugin) {
             // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
             // Note this needs to support the latest stable Studio version.
-            KotlinVersion.KOTLIN_2_0
+            KotlinVersion.KOTLIN_2_2
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
             KotlinVersion.KOTLIN_2_2
