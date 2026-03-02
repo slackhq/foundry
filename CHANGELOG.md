@@ -4,13 +4,23 @@ Changelog
 **Unreleased**
 --------------
 
+0.34.1
+------
+
+_2026-03-02_
+
+- **NOTE** Release 0.34.0 should not be used as it did not include the latest changes
+- Build against DAGP `3.6.0`.
+- Build against errorprone plugin `5.1.0`.
+- Build against AGP `9.0.1`.
+
 0.34.0
 ------
 
 _2026-03-02_
 
+- **Do not use this release.** It was accidentally cut from the wrong branch and may not include all intended changes.
 - **Fix**: Fix configuration of KMP projects breaking IDE sync.
-- Build against AGP `9.0.1`.
 - Remove deprecated KGP properties.
 - Update infra around formatters (hooks/lfs/formatting helpers).
 - Update to Kotlin `2.3.10`.
