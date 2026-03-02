@@ -775,9 +775,7 @@ conventional to check out.</p>
 use the <code>spotlessApply</code> command.</p>
 <div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>spotlessApply
 </code></pre></div>
-<p>Optionally, there are commit hooks in the repo you can enable by running the below
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>core.hooksPath<span class="w"> </span>config/git/hooks
-</code></pre></div></p>
+<p>Git hooks and LFS are automatically configured on the first Gradle invocation via <code>config/git/.gitconfig</code>.</p>
 
 
 
