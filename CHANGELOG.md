@@ -4,6 +4,43 @@ Changelog
 **Unreleased**
 --------------
 
+0.34.0
+------
+
+_2026-03-02_
+
+- **Fix**: Fix configuration of KMP projects breaking IDE sync.
+- Build against AGP `9.0.1`.
+- Remove deprecated KGP properties.
+- Update infra around formatters (hooks/lfs/formatting helpers).
+- Update to Kotlin `2.3.10`.
+- Update Wire to `5.5.0`.
+- Update Circuit to `0.33.1`.
+- Update MoshiX to `0.34.4`.
+- Update oshi-core to `6.10.0`.
+- Update Spotlight to `1.6.7`.
+- Update IntelliJ Platform to `2.11.0`.
+- Update kotlinx-serialization to `1.10.0`.
+- Update Clikt to `5.1.0`.
+- Update ktfmt to `0.61`.
+- Update ASM to `9.9.1`.
+- Update multiplatform-markdown-renderer to `0.39.2`.
+- Update maven publish to `0.36.0`.
+- Build against Metro `0.11.2`.
+- Build against KSP `2.3.6`.
+- Build against Gradle `9.3.1`.
+- Build against Anvil `0.5.3`.
+- Build against Roborazzi `1.59.0`.
+- Build against Spotless `8.2.1`.
+- Build against DAGP `3.6.0`.
+- Build against Develocity `4.3.2`.
+- Build against CMP `1.10.1`.
+- Build against emulator.wtf `1.5.0`.
+- Build against robolectric `4.16.1`.
+- Build against nullaway gradle plugin `3`.
+- Build against errorprone plugin `5`.
+- Build against buildConfig plugin `6.0.7`.
+
 0.33.1
 ------
 
