@@ -1,6 +1,6 @@
 [versions]
-agp = "8.13.2"
-agpAlpha = "8.13.2"
+agp = "9.0.1"
+agpAlpha = "9.0.1"
 anvil = "0.5.3"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.9.1"
@@ -12,10 +12,10 @@ compose-jb-stable = "1.10.1"
 coroutines = "1.10.2"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.8.0"
-dependencyAnalysisPlugin = "3.6.0"
+dependencyAnalysisPlugin = "3.6.1"
 detekt = "1.23.8"
 dokka = "2.1.0"
-errorproneGradle = "5.0.0"
+errorproneGradle = "5.1.0"
 gradle-retry = "1.6.4"
 graph-assert = "2.9.0"
 intellij-platform = "2.11.0"
@@ -32,7 +32,7 @@ kotlinPoet = "2.2.0"
 ktfmt = "0.61"
 markdown = "0.39.2"
 mavenPublish = "0.36.0"
-metro = "0.11.1"
+metro = "0.11.2"
 mordant = "3.0.2"
 moshi = "1.15.2"
 moshix = "0.34.4"
@@ -88,6 +88,7 @@ wire = { id = "com.squareup.wire", version.ref = "wire" }
 
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+agp-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
 agpAlpha = { module = "com.android.tools.build:gradle", version.ref = "agpAlpha" }
 asm-bom = { module = "org.ow2.asm:asm-bom", version.ref = "asm" }
 autoService-annotations = "com.google.auto.service:auto-service-annotations:1.1.1"

@@ -13,32 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("UnstableApiUsage")
-
 package foundry.gradle
 
 import app.cash.sqldelight.gradle.SqlDelightExtension
 import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.dsl.TestExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.HasAndroidTestBuilder
 import com.android.build.api.variant.HasUnitTestBuilder
+import com.android.build.api.variant.KotlinMultiplatformAndroidComponentsExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.LibraryVariant
 import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.android.build.api.variant.TestVariant
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.TestExtension
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
 import foundry.gradle.Configurations.isPlatformConfigurationName
 import foundry.gradle.android.AndroidArchitecture
+import foundry.gradle.android.CommonExtensionHandler
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.dependencies.FoundryDependencies
@@ -62,6 +63,7 @@ import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -75,6 +77,7 @@ import org.gradle.jvm.toolchain.JavaCompiler
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.utils.named
 import wtf.emulator.EwExtension
 
@@ -83,6 +86,27 @@ private const val FIVE_MINUTES_MS = 300_000L
 
 private fun Logger.logWithTag(message: String) {
   debug("$LOG $message")
+}
+
+/**
+ * Computes a default namespace from a [projectPath] like `:libraries:foundation` ->
+ * `.libraries.foundation`.
+ */
+private fun defaultNamespace(prefix: String, projectPath: String): String {
+  return prefix +
+    projectPath
+      .asSequence()
+      .mapNotNull {
+        when (it) {
+          // Skip dashes and underscores. We could camelcase but it looks weird in a package name
+          '-',
+          '_' -> null
+          // Use the project path as the real dot namespacing
+          ':' -> '.'
+          else -> it
+        }
+      }
+      .joinToString("")
 }
 
 /**
@@ -547,6 +571,7 @@ internal class StandardProjectConfigurations(
                 is ApplicationAndroidComponentsExtension -> {
                   dependencies.add("androidTestImplementation", "wtf.emulator:test-runtime-android")
                 }
+
                 is TestAndroidComponentsExtension -> {
                   dependencies.add("implementation", "wtf.emulator:test-runtime-android")
                 }
@@ -644,17 +669,17 @@ internal class StandardProjectConfigurations(
 
     val sdkVersions = lazy { foundryProperties.requireAndroidSdkProperties() }
     val shouldApplyCacheFixPlugin = foundryProperties.enableAndroidCacheFix
-    val commonBaseExtensionConfig: BaseExtension.(applyTestOptions: Boolean) -> Unit =
+    val commonBaseExtensionConfig: CommonExtension.(applyTestOptions: Boolean) -> Unit =
       { applyTestOptions ->
         if (shouldApplyCacheFixPlugin) {
           pluginManager.apply("org.gradle.android.cache-fix")
         }
 
-        compileSdkVersion(sdkVersions.value.compileSdk)
+        compileSdk = sdkVersions.value.compileSdk
         foundryProperties.ndkVersion?.let { ndkVersion = it }
         foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
         val useOrchestrator = foundryProperties.useOrchestrator.getOrElse(false)
-        defaultConfig {
+        defaultConfig.apply {
           minSdk = sdkVersions.value.minSdk
           vectorDrawables.useSupportLibrary = true
 
@@ -670,7 +695,7 @@ internal class StandardProjectConfigurations(
           }
         }
 
-        compileOptions {
+        compileOptions.apply {
           sourceCompatibility = javaVersion.get()
           targetCompatibility = javaVersion.get()
           isCoreLibraryDesugaringEnabled = true
@@ -682,7 +707,7 @@ internal class StandardProjectConfigurations(
         )
 
         if (applyTestOptions) {
-          testOptions {
+          testOptions.apply {
             animationsDisabled = true
 
             if (useOrchestrator) {
@@ -811,8 +836,8 @@ internal class StandardProjectConfigurations(
           }
         }
       }
-      configure<BaseAppModuleExtension> {
-        foundryExtension.setAndroidExtension(this)
+      configure<ApplicationExtension> {
+        foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         defaultConfig {
           // TODO this won't work with SDK previews but will fix in a followup
@@ -934,26 +959,12 @@ internal class StandardProjectConfigurations(
         finalizeDsl { libraryExtension ->
           if (libraryExtension.namespace == null) {
             libraryExtension.namespace =
-              foundryProperties.defaultNamespacePrefix +
-                projectPath
-                  .asSequence()
-                  .mapNotNull {
-                    when (it) {
-                      // Skip dashes and underscores. We could camelcase but it looks weird in
-                      // a package name
-                      '-',
-                      '_' -> null
-                      // Use the project path as the real dot namespacing
-                      ':' -> '.'
-                      else -> it
-                    }
-                  }
-                  .joinToString("")
+              defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
           }
         }
       }
       configure<LibraryExtension> {
-        foundryExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         if (isLibraryWithVariants) {
           buildTypes {
@@ -992,26 +1003,12 @@ internal class StandardProjectConfigurations(
         finalizeDsl { testExtension ->
           if (testExtension.namespace == null) {
             testExtension.namespace =
-              foundryProperties.defaultNamespacePrefix +
-                projectPath
-                  .asSequence()
-                  .mapNotNull {
-                    when (it) {
-                      // Skip dashes and underscores. We could camelcase but it looks weird in
-                      // a package name
-                      '-',
-                      '_' -> null
-                      // Use the project path as the real dot namespacing
-                      ':' -> '.'
-                      else -> it
-                    }
-                  }
-                  .joinToString("")
+              defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
           }
         }
       }
       configure<TestExtension> {
-        foundryExtension.setAndroidExtension(this)
+        foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
         buildTypes {
@@ -1023,6 +1020,32 @@ internal class StandardProjectConfigurations(
       }
 
       foundryExtension.androidHandler.applyTo(project)
+    }
+
+    // AGP 9 KMP Android library plugin uses a different DSL than com.android.library
+    pluginManager.withPlugin("com.android.kotlin.multiplatform.library") {
+      pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+        val kmpExtension = extensions.getByType<KotlinMultiplatformExtension>()
+        kmpExtension.targets
+          .withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+          .configureEach {
+            foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
+            compileSdk = sdkVersions.value.compileSdk
+            minSdk = sdkVersions.value.minSdk
+          }
+
+        // Default namespace if not set by the build script
+        configure<KotlinMultiplatformAndroidComponentsExtension> {
+          finalizeDsl { target ->
+            if (target.namespace == null) {
+              target.namespace =
+                defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
+            }
+          }
+        }
+
+        foundryExtension.androidHandler.applyTo(project)
+      }
     }
 
     foundryProperties.versions.roborazzi.ifPresent {
@@ -1064,6 +1087,7 @@ internal class StandardProjectConfigurations(
         "com.android.library",
         "com.android.application",
         "com.android.test",
+        "com.android.kotlin.multiplatform.library",
       )
   }
 }
