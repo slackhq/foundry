@@ -66,6 +66,24 @@ buildscript {
   }
 }
 
+// Auto-configure git to use project-specific config (hooks + LFS)
+if (file(".git").exists()) {
+  val expectedIncludePath = "../config/git/.gitconfig"
+  val includePath =
+    providers
+      .exec { commandLine("git", "config", "--local", "--default", "", "--get", "include.path") }
+      .standardOutput
+      .asText
+      .map { it.trim() }
+      .getOrElse("")
+  if (includePath != expectedIncludePath) {
+    providers
+      .exec { commandLine("git", "config", "--local", "include.path", expectedIncludePath) }
+      .result
+      .get()
+  }
+}
+
 moduleGraphAssert {
   // Platforms can depend on tools but not the other way around
   allowed =
@@ -197,7 +215,7 @@ subprojects {
           if (isForIntelliJPlugin) {
             // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
             // Note this needs to support the latest stable Studio version.
-            KotlinVersion.KOTLIN_2_0
+            KotlinVersion.KOTLIN_2_2
           } else if (isForGradle) {
             // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
             KotlinVersion.KOTLIN_2_2

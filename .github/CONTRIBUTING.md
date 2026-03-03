@@ -20,7 +20,4 @@ use the `spotlessApply` command.
 ./gradlew spotlessApply
 ```
 
-Optionally, there are commit hooks in the repo you can enable by running the below
-```bash
-git config core.hooksPath config/git/hooks
-```
+Git hooks and LFS are automatically configured on the first Gradle invocation via `config/git/.gitconfig`.

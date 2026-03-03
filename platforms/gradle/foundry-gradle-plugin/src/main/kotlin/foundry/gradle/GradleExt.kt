@@ -50,7 +50,6 @@ private const val IS_ANDROID = "foundry.project.ext.isAndroid"
 private const val IS_ANDROID_APPLICATION = "foundry.project.ext.isAndroidApplication"
 private const val IS_ANDROID_LIBRARY = "foundry.project.ext.isAndroidLibrary"
 private const val IS_ANDROID_TEST = "foundry.project.ext.isAndroidTest"
-private const val IS_USING_KAPT = "foundry.project.ext.isUsingKapt"
 private const val IS_USING_KSP = "foundry.project.ext.isUsingKsp"
 private const val IS_USING_MOSHI_IR = "foundry.project.ext.isUsingMoshiIr"
 private const val IS_KOTLIN = "foundry.project.ext.isKotlin"
@@ -81,7 +80,8 @@ internal val Project.isKotlin: Boolean
 internal val Project.isKotlinAndroid: Boolean
   get() {
     return getOrComputeExt(IS_KOTLIN_ANDROID) {
-      project.pluginManager.hasPlugin("org.jetbrains.kotlin.android")
+      project.pluginManager.hasPlugin("org.jetbrains.kotlin.android") ||
+        project.pluginManager.hasPlugin("com.android.experimental.built-in-kotlin")
     }
   }
 
@@ -95,14 +95,8 @@ internal val Project.isKotlinJvm: Boolean
 internal val Project.isKotlinMultiplatform: Boolean
   get() {
     return getOrComputeExt(IS_KOTLIN_MULTIPLATFORM) {
-      project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
-    }
-  }
-
-internal val Project.isUsingKapt: Boolean
-  get() {
-    return getOrComputeExt(IS_USING_KAPT) {
-      project.pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")
+      project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform") ||
+        project.pluginManager.hasPlugin("com.android.kotlin.multiplatform.library")
     }
   }
 
@@ -127,7 +121,10 @@ internal val Project.isAndroidApplication: Boolean
 
 internal val Project.isAndroidLibrary: Boolean
   get() {
-    return getOrComputeExt(IS_ANDROID_LIBRARY) { plugins.hasPlugin("com.android.library") }
+    return getOrComputeExt(IS_ANDROID_LIBRARY) {
+      plugins.hasPlugin("com.android.library") ||
+        plugins.hasPlugin("com.android.kotlin.multiplatform.library")
+    }
   }
 
 internal val Project.isAndroidTest: Boolean
@@ -139,6 +136,39 @@ internal val Project.isAndroid: Boolean
   get() {
     return getOrComputeExt(IS_ANDROID) { isAndroidApplication || isAndroidLibrary || isAndroidTest }
   }
+
+/** Returns the appropriate "implementation" configuration for common/shared code. */
+internal val Project.commonImplementation: String
+  get() = if (isKotlinMultiplatform) "commonMainImplementation" else "implementation"
+
+/** Returns the appropriate "compileOnly" configuration for common/shared code. */
+internal val Project.commonCompileOnly: String
+  get() = if (isKotlinMultiplatform) "commonMainCompileOnly" else "compileOnly"
+
+/** Returns the appropriate "testImplementation" configuration for common/shared test code. */
+internal val Project.commonTestImplementation: String
+  get() = if (isKotlinMultiplatform) "commonTestImplementation" else "testImplementation"
+
+/** Returns the appropriate "implementation" configuration for JVM-specific code. */
+internal val Project.jvmImplementation: String
+  get() = if (isKotlinMultiplatform) "jvmMainImplementation" else "implementation"
+
+/** Returns the appropriate "compileOnly" configuration for JVM-specific code. */
+internal val Project.jvmCompileOnly: String
+  get() = if (isKotlinMultiplatform) "jvmMainCompileOnly" else "compileOnly"
+
+/** Returns the appropriate "testImplementation" configuration for JVM-specific test code. */
+internal val Project.jvmTestImplementation: String
+  get() = if (isKotlinMultiplatform) "jvmTestImplementation" else "testImplementation"
+
+/** Returns the appropriate KSP configuration for the project's primary target. */
+internal val Project.ksp: String
+  get() =
+    when {
+      !isKotlinMultiplatform -> "ksp"
+      isAndroidLibrary -> "kspAndroid"
+      else -> "kspJvm"
+    }
 
 internal fun <T : Any> Project.getOrComputeExt(key: String, valueCalculator: () -> T): T {
   @Suppress("UNCHECKED_CAST")
@@ -193,17 +223,17 @@ internal operator fun ExtensionContainer.set(key: String, value: Any) {
 internal fun PluginManager.onFirst(
   pluginIds: Iterable<String>,
   body: AppliedPlugin.(id: String) -> Unit,
-) {
-  once {
+): OnceCheck {
+  return once {
     for (id in pluginIds) {
       withPlugin(id) { onFirst { body(id) } }
     }
   }
 }
 
-internal inline fun once(body: OnceCheck.() -> Unit) {
+internal inline fun once(body: OnceCheck.() -> Unit): OnceCheck {
   contract { callsInPlace(body, InvocationKind.EXACTLY_ONCE) }
-  OnceCheck().body()
+  return OnceCheck().apply(body)
 }
 
 @JvmInline

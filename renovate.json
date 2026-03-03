@@ -59,6 +59,37 @@
       "extends": [
         "schedule:monthly"
       ]
+    },
+    {
+      "description": "Update ktfmt binary when version changes",
+      "matchDepNames": [
+        "com.facebook:ktfmt"
+      ],
+      "postUpgradeTasks": {
+        "commands": [
+          "tools/scripts/update-binaries.sh ktfmt"
+        ],
+        "fileFilters": [
+          "config/bin/ktfmt"
+        ],
+        "executionMode": "branch"
+      }
+    },
+    {
+      "description": "Update sort-dependencies binary when version changes",
+      "matchDepNames": [
+        "com.squareup.sort-dependencies",
+        "com.squareup:sort-dependencies-gradle-plugin"
+      ],
+      "postUpgradeTasks": {
+        "commands": [
+          "tools/scripts/update-binaries.sh sort-dependencies"
+        ],
+        "fileFilters": [
+          "config/bin/sort-dependencies"
+        ],
+        "executionMode": "branch"
+      }
     }
   ]
 }

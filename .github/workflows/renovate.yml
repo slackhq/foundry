@@ -17,3 +17,5 @@ jobs:
         with:
           configurationFile: renovate.json
           token: ${{ secrets.SLACKHQ_MBR_GITHUB_TOKEN }}
+        env:
+          RENOVATE_ALLOWED_POST_UPGRADE_COMMANDS: '["tools/scripts/update-binaries\\.sh"]'
