@@ -248,6 +248,10 @@ constructor(
                 }
               }
             }
+          } else if (logVerbose) {
+            logger.lifecycle(
+              "[Dagger Config] Skipping Metro plugin for $path because runtimeOnly=true"
+            )
           }
         } else {
           // Using Dagger ± Anvil
@@ -504,7 +508,7 @@ constructor(
    * @param action optional block for extra configuration.
    */
   public fun metroRuntimeOnly(action: Action<DiHandler>? = null) {
-    diHandler.runtimeOnly.set(true)
+    diHandler.runtimeOnly.setDisallowChanges(true)
     metro(action)
   }
 
