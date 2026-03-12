@@ -234,24 +234,22 @@ constructor(
         }
 
         if (daggerConfig.useMetro) {
-          if (!daggerConfig.runtimeOnly) {
-            // Use Metro
-            pluginManager.apply("dev.zacsweers.metro")
-            addAnvilRuntimeProjects()
-            val metroExtension = extensions.getByType<MetroPluginExtension>()
-            if (daggerConfig.metroInteropDagger) {
-              addDaggerRuntimeDeps(enableAnvil = daggerConfig.metroInteropAnvil)
-              metroExtension.interop.apply {
-                includeDagger()
-                if (daggerConfig.metroInteropAnvil) {
-                  includeAnvilForDagger()
-                }
+          // Use Metro
+          pluginManager.apply("dev.zacsweers.metro")
+          addAnvilRuntimeProjects()
+          val metroExtension = extensions.getByType<MetroPluginExtension>()
+          if (daggerConfig.runtimeOnly) {
+            // Disable the compiler plugin but keep the runtime deps + interop handling
+            metroExtension.enabled.setDisallowChanges(false)
+          }
+          if (daggerConfig.metroInteropDagger) {
+            addDaggerRuntimeDeps(enableAnvil = daggerConfig.metroInteropAnvil)
+            metroExtension.interop.apply {
+              includeDagger()
+              if (daggerConfig.metroInteropAnvil) {
+                includeAnvilForDagger()
               }
             }
-          } else if (logVerbose) {
-            logger.lifecycle(
-              "[Dagger Config] Skipping Metro plugin for $path because runtimeOnly=true"
-            )
           }
         } else {
           // Using Dagger ± Anvil
