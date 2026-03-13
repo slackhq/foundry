@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **Fix**: Broaden test configuration regex to better capture other variants like `commonTest`.
+
 0.34.1
 ------
 
