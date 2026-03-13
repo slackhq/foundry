@@ -1027,8 +1027,7 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
     }
 
   internal val isViewBindingEnabled: Boolean
-    get() =
-      (androidExtension as? CommonExtensionHandler.Default)?.buildFeatures?.viewBinding == true
+    get() = androidExtension?.buildFeatures?.viewBinding == true
 
   internal fun setAndroidExtension(androidExtension: CommonExtensionHandler?) {
     this.androidExtension = androidExtension
@@ -1137,10 +1136,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   // In the future, we may want to add an enum for picking which shadows/artifacts
   public fun robolectric() {
     // Required for Robolectric to work.
-    (androidExtension as? CommonExtensionHandler.Default)!!
-      .testOptions
-      ?.unitTests
-      ?.isIncludeAndroidResources = true
+    androidExtension?.testOptions?.unitTests?.isIncludeAndroidResources = true
     robolectric.set(true)
   }
 
