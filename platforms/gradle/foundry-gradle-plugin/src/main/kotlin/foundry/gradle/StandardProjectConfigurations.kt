@@ -207,7 +207,7 @@ internal class StandardProjectConfigurations(
     checkAndroidXDependencies(foundryProperties)
     AnnotationProcessing.configureFor(project)
 
-    pluginManager.onFirst(JVM_PLUGINS) { pluginId ->
+    pluginManager.onFirst(CORE_PLUGINS) { pluginId ->
       foundryProperties.versions.bundles.commonAnnotations.ifPresent {
         dependencies.add("implementation", it)
       }
@@ -1077,13 +1077,14 @@ internal class StandardProjectConfigurations(
         isAccessible = true
       }
 
-    /** Top-level JVM plugin IDs. Usually only one of these is applied. */
-    private val JVM_PLUGINS =
+    /** Top-level core plugin IDs. Usually only one of these is applied. */
+    private val CORE_PLUGINS =
       setOf(
         "application",
         "java",
         "java-library",
         "org.jetbrains.kotlin.jvm",
+        "org.jetbrains.kotlin.multiplatform",
         "com.android.library",
         "com.android.application",
         "com.android.test",

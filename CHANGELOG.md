@@ -5,6 +5,7 @@ Changelog
 --------------
 
 - **Fix**: Broaden test configuration regex to better capture other variants like `commonTest`.
+- **Fix**: Support KMP projects in `ciUnitTest`.
 
 0.34.1
 ------
