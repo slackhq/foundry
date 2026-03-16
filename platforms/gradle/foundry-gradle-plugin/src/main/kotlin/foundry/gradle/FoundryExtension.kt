@@ -1141,10 +1141,7 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
   // In the future, we may want to add an enum for picking which shadows/artifacts
   public fun robolectric() {
     // Required for Robolectric to work.
-    (androidExtension as? CommonExtensionHandler.Default)!!
-      .testOptions
-      ?.unitTests
-      ?.isIncludeAndroidResources = true
+    androidExtension?.withAndroidUnitTest { includeAndroidResources = true }
     robolectric.set(true)
   }
 

@@ -134,8 +134,17 @@ internal object UnitTests {
       }
       else -> {
         // Standard JVM projects like kotlin-jvm, java-library, etc
-        project.logger.debug("$LOG Creating CI unit test tasks")
-        val ciUnitTest = registerCiUnitTest(project, "test")
+        project.logger.debug("$LOG Creating CI unit test tasks for plugin $pluginId")
+        val isKmp =
+          pluginId == "org.jetbrains.kotlin.multiplatform" ||
+            pluginId == "com.android.kotlin.multiplatform.library"
+        val baseTestTask =
+          if (isKmp) {
+            "allTests"
+          } else {
+            "test"
+          }
+        val ciUnitTest = registerCiUnitTest(project, baseTestTask)
         unitTestsPublisher?.publish(ciUnitTest)
         project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
           group = LifecycleBasePlugin.VERIFICATION_GROUP
