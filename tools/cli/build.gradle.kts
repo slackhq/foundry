@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.dokka)
-  alias(libs.plugins.detekt)
   alias(libs.plugins.lint)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.spotless)
