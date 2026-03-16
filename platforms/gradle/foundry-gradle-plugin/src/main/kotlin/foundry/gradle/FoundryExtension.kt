@@ -238,6 +238,10 @@ constructor(
           pluginManager.apply("dev.zacsweers.metro")
           addAnvilRuntimeProjects()
           val metroExtension = extensions.getByType<MetroPluginExtension>()
+          if (daggerConfig.runtimeOnly) {
+            // Disable the compiler plugin but keep the runtime deps + interop handling
+            metroExtension.enabled.setDisallowChanges(false)
+          }
           if (daggerConfig.metroInteropDagger) {
             addDaggerRuntimeDeps(enableAnvil = daggerConfig.metroInteropAnvil)
             metroExtension.interop.apply {
@@ -502,7 +506,7 @@ constructor(
    * @param action optional block for extra configuration.
    */
   public fun metroRuntimeOnly(action: Action<DiHandler>? = null) {
-    diHandler.runtimeOnly.set(true)
+    diHandler.runtimeOnly.setDisallowChanges(true)
     metro(action)
   }
 

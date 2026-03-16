@@ -209,7 +209,14 @@ internal object UnitTests {
         "--add-opens=java.base/java.util=ALL-UNNAMED",
         // endregion
 
-        "-Xss1m", // Stack size
+        // Suppress native access warnings and ReservedStackAccess warnings in forked JVMs
+        // on JDK 24+
+        "--enable-native-access=ALL-UNNAMED",
+        "--sun-misc-unsafe-memory-access=allow",
+        "-XX:StackReservedPages=0",
+
+        // Stack size
+        "-Xss1m",
       )
 
       if (foundryProperties.testVerboseLogging) {

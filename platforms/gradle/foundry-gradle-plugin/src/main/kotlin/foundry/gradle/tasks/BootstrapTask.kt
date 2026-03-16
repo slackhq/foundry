@@ -402,7 +402,7 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
 }
 
 internal object BootstrapUtils {
-  private val jdkOpensAndExports =
+  private val commonJdkFlags =
     listOf(
         // For GJF, error-prone, and compile-testing
         // https://github.com/diffplug/spotless/issues/834
@@ -415,6 +415,10 @@ internal object BootstrapUtils {
         "--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
         "--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        // Suppress native access warnings and ReservedStackAccess warnings in forked JVMs
+        // on JDK 24+
+        "--enable-native-access=ALL-UNNAMED",
+        "--sun-misc-unsafe-memory-access=allow",
       )
       .toSortedSet()
 
@@ -527,7 +531,7 @@ internal object BootstrapUtils {
       }
     }
 
-    kotlinDaemonGcArgs += jdkOpensAndExports
+    kotlinDaemonGcArgs += commonJdkFlags
 
     fun buildJvmArgs(xmsG: Int, xmxG: Int, gcArgs: List<String>): List<String> =
       buildList {
@@ -539,7 +543,7 @@ internal object BootstrapUtils {
           add("-XX:ReservedCodeCacheSize=320m")
           addAll(gcArgs)
           addAll(extraJvmArgs.get())
-          addAll(jdkOpensAndExports)
+          addAll(commonJdkFlags)
         }
         .sorted()
 
