@@ -5,6 +5,8 @@ Changelog
 --------------
 
 - Remove redundant `-Xenhance-type-parameter-types-to-def-not-null` arg for Kotlin 2.3.20+ (enabled by default).
+- **Fix**: Broaden test configuration regex to better capture other variants like `commonTest`.
+- **Fix**: Support KMP projects in `ciUnitTest`.
 
 0.34.1
 ------

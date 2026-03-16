@@ -18,11 +18,13 @@ package foundry.gradle.android
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.BuildFeatures
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.KotlinMultiplatformAndroidHostTest
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import com.android.build.api.dsl.LibraryAndroidResources
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.TestExtension
 import com.android.build.api.dsl.TestOptions
+import org.gradle.api.Action
 
 /**
  * Abstraction API over [CommonExtension] due to AGP 9 having an annoying disparate API between it
@@ -30,7 +32,34 @@ import com.android.build.api.dsl.TestOptions
  */
 public sealed interface CommonExtensionHandler {
   public val buildFeatures: BuildFeatures?
-  public val testOptions: TestOptions?
+
+  public fun withAndroidUnitTest(action: Action<AndroidUnitTestOptions>)
+
+  /**
+   * Simple abstraction over unit/host test options, because Android KMP uses different naming/APIs
+   * for this :(.
+   */
+  public sealed interface AndroidUnitTestOptions {
+
+    public var includeAndroidResources: Boolean
+
+    public class Default(private val delegate: TestOptions) : AndroidUnitTestOptions {
+      override var includeAndroidResources: Boolean
+        get() = delegate.unitTests.isIncludeAndroidResources
+        set(value) {
+          delegate.unitTests.isIncludeAndroidResources = value
+        }
+    }
+
+    public class Kmp(private val delegate: KotlinMultiplatformAndroidHostTest) :
+      AndroidUnitTestOptions {
+      override var includeAndroidResources: Boolean
+        get() = delegate.isIncludeAndroidResources
+        set(value) {
+          delegate.isIncludeAndroidResources = value
+        }
+    }
+  }
 
   public interface Default : CommonExtensionHandler
 
@@ -50,8 +79,9 @@ public sealed interface CommonExtensionHandler {
       override val buildFeatures: BuildFeatures
         get() = delegate.buildFeatures
 
-      override val testOptions: TestOptions
-        get() = delegate.testOptions
+      override fun withAndroidUnitTest(action: Action<AndroidUnitTestOptions>) {
+        action.execute(AndroidUnitTestOptions.Default(delegate.testOptions))
+      }
     }
 
     private class LibraryImpl(private val delegate: LibraryExtension) :
@@ -72,7 +102,10 @@ public sealed interface CommonExtensionHandler {
         get() = delegate.androidResources
 
       override val buildFeatures: BuildFeatures? = null
-      override val testOptions: TestOptions? = null
+
+      override fun withAndroidUnitTest(action: Action<AndroidUnitTestOptions>) {
+        delegate.withHostTest { action.execute(AndroidUnitTestOptions.Kmp(this)) }
+      }
     }
 
     internal operator fun invoke(extension: ApplicationExtension): CommonExtensionHandler {

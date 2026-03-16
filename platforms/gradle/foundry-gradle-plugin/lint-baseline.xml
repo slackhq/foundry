@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 9.0.1" type="baseline" client="gradle" dependencies="false" name="AGP (9.0.1)" variant="all" version="9.0.1">
+<issues format="6" by="lint 9.1.0" type="baseline" client="gradle" dependencies="false" name="AGP (9.1.0)" variant="all" version="9.1.0">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -54,17 +54,6 @@
             file="src/main/kotlin/foundry/gradle/dependencyrake/DependencyRake.kt"
             line="305"
             column="60"/>
-    </issue>
-
-    <issue
-        id="AvoidUsingNotNullOperator"
-        message="Avoid using the `!!` operator"
-        errorLine1="    (androidExtension as? CommonExtensionHandler.Default)!!"
-        errorLine2="                                                         ~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryExtension.kt"
-            line="1140"
-            column="58"/>
     </issue>
 
     <issue
@@ -283,7 +272,7 @@
         errorLine2="                            ~~~~~~~~~~~">
         <location
             file="src/main/kotlin/foundry/gradle/testing/UnitTests.kt"
-            line="233"
+            line="249"
             column="29"/>
     </issue>
 
