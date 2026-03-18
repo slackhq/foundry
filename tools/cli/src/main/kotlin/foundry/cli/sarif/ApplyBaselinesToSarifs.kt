@@ -142,24 +142,23 @@ public class ApplyBaselinesToSarifs : CliktCommand() {
         //            match here would be if the severity changes
         // Absent -> Nothing to report, means this issue was fixed presumably. Not sure how this
         //           would show up in a baseline state tbh
-        val baselinedResults =
-          results.map { result ->
-            val baselineResult = baselineResultsByHash[result.identityHash]
-            when {
-              baselineResult == null -> {
-                // No baseline result, so it's new!
-                result.copy(baselineState = BaselineState.New)
-              }
-              baselineResult.shallowHash == result.shallowHash -> {
-                // They're they same, so it's unchanged
-                result.copy(baselineState = BaselineState.Unchanged, suppressions = suppressions)
-              }
-              else -> {
-                // They're different, so it's updated
-                result.copy(baselineState = BaselineState.Updated, suppressions = suppressions)
-              }
+        val baselinedResults = results.map { result ->
+          val baselineResult = baselineResultsByHash[result.identityHash]
+          when {
+            baselineResult == null -> {
+              // No baseline result, so it's new!
+              result.copy(baselineState = BaselineState.New)
+            }
+            baselineResult.shallowHash == result.shallowHash -> {
+              // They're they same, so it's unchanged
+              result.copy(baselineState = BaselineState.Unchanged, suppressions = suppressions)
+            }
+            else -> {
+              // They're different, so it's updated
+              result.copy(baselineState = BaselineState.Updated, suppressions = suppressions)
             }
           }
+        }
         val absentResults =
           if (includeAbsent) {
             // Create a copy of the baseline results that are absent with a suppression

@@ -346,13 +346,12 @@ constructor(objects: ObjectFactory, providers: ProviderFactory) : DefaultTask() 
       val bootstrap =
         project.tasks.register<CoreBootstrapTask>(NAME) {
           val service = project.serviceOf<JavaToolchainService>()
-          val defaultLauncher =
-            service.launcherFor {
-              languageVersion.setDisallowChanges(jdkVersion.map(JavaLanguageVersion::of))
-              if (jvmVendor != null) {
-                vendor.setDisallowChanges(jvmVendor)
-              }
+          val defaultLauncher = service.launcherFor {
+            languageVersion.setDisallowChanges(jdkVersion.map(JavaLanguageVersion::of))
+            if (jvmVendor != null) {
+              vendor.setDisallowChanges(jvmVendor)
             }
+          }
           this.launcher.convention(defaultLauncher)
           this.jdkVersion.setDisallowChanges(jdkVersion)
           this.jdkDocsLink.setDisallowChanges(jdkDocsLink)

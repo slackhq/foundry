@@ -228,10 +228,9 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
       }
     }
 
-    val allPathsToMigrate =
-      migratableProjects.associate {
-        it.testFixtureProject.gradleAccessorPath to it.hostProject.gradleAccessorPath
-      }
+    val allPathsToMigrate = migratableProjects.associate {
+      it.testFixtureProject.gradleAccessorPath to it.hostProject.gradleAccessorPath
+    }
 
     var updatedDependencyDeclarations = 0
     for (project in projectByPath.values) {
@@ -346,8 +345,9 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
         return
       }
       // Find the `features {` block if any
-      val featuresBlock =
-        lines.indexOfFirst { it.contains("features {") && !it.contains("android {") }
+      val featuresBlock = lines.indexOfFirst {
+        it.contains("features {") && !it.contains("android {")
+      }
       if (featuresBlock == -1) {
         // No features block. Check for `foundry {`
         val foundryBlock = lines.indexOfFirst { it.contains("foundry {") }
@@ -563,18 +563,17 @@ public class GradleTestFixturesMigratorCli : CliktCommand() {
   }
 
   private val Project.type
-    get() =
-      buildFile.useLines { lines ->
-        lines.firstNotNullOfOrNull { line ->
-          if ("libs.plugins.android." in line || "id(\"com.android.library\")" in line) {
-            ProjectType.ANDROID
-          } else if ("libs.plugins.kotlin.jvm" in line) {
-            ProjectType.JVM
-          } else {
-            null
-          }
-        } ?: error("Could not resolve project type of '$gradlePath'")
-      }
+    get() = buildFile.useLines { lines ->
+      lines.firstNotNullOfOrNull { line ->
+        if ("libs.plugins.android." in line || "id(\"com.android.library\")" in line) {
+          ProjectType.ANDROID
+        } else if ("libs.plugins.kotlin.jvm" in line) {
+          ProjectType.JVM
+        } else {
+          null
+        }
+      } ?: error("Could not resolve project type of '$gradlePath'")
+    }
 
   private enum class ProjectType {
     ANDROID,

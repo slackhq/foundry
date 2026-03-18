@@ -104,10 +104,9 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
       }
     }
     if (canLogThermals) {
-      thermalsExecutor =
-        Executors.newSingleThreadExecutor { r ->
-          Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
-        }
+      thermalsExecutor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "SlackToolsThermalsHeartbeat").apply { isDaemon = true }
+      }
       thermalsWatcher = ThermalsWatcher(logger, ::thermalsFile)
       thermalsWatcher.start(thermalsExecutor)
     } else {

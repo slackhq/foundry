@@ -75,8 +75,9 @@ internal class ApkVersioningPlugin : Plugin<Project> {
               .orElse(project.providers.environmentVariable("USER")),
         )
 
-      val debugVersionCodeProvider: Provider<Int> =
-        project.provider { foundryProperties.debugVersionCode }
+      val debugVersionCodeProvider: Provider<Int> = project.provider {
+        foundryProperties.debugVersionCode
+      }
 
       val ciVersionFileProvider =
         project.rootProject.layout.projectDirectory.file("ci/release.version")

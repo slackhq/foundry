@@ -235,8 +235,9 @@ internal class StandardProjectConfigurations(
               val catalogNames =
                 extensions.findByType<VersionCatalogsExtension>()?.catalogNames ?: return@withId
 
-              val catalogs =
-                catalogNames.map { catalogName -> project.getVersionsCatalog(catalogName) }
+              val catalogs = catalogNames.map { catalogName ->
+                project.getVersionsCatalog(catalogName)
+              }
 
               val rakeDependencies =
                 tasks.register<RakeDependencies>("rakeDependencies") {

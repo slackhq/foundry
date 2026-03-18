@@ -274,10 +274,9 @@ public abstract class ModuleStatsAggregatorTask : DefaultTask() {
     val globalStats = allStats.map { it.totalSource }.reduce(Map<String, LanguageStats>::mergeWith)
 
     val projectAccessorsMapping = projectPathsToAccessors.get()
-    val shallowProjectDeps =
-      allStats.associate { stats ->
-        stats.modulePath to stats.deps.map { projectAccessorsMapping.getValue(it) }
-      }
+    val shallowProjectDeps = allStats.associate { stats ->
+      stats.modulePath to stats.deps.map { projectAccessorsMapping.getValue(it) }
+    }
 
     val graph = DirectedAcyclicGraph<String, DefaultEdge>(DefaultEdge::class.java)
     for ((subproject, dependencies) in shallowProjectDeps) {
