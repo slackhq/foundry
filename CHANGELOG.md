@@ -4,9 +4,27 @@ Changelog
 **Unreleased**
 --------------
 
-- Remove redundant `-Xenhance-type-parameter-types-to-def-not-null` arg for Kotlin 2.3.20+ (enabled by default).
+0.35.0
+------
+
+_2026-03-18_
+
+- **New**: Disable some noisy JVM warnings in JDK 24+ in generated bootstrap daemon args.
+- **Enhancement**: Remove redundant `-Xenhance-type-parameter-types-to-def-not-null` arg for Kotlin 2.3.20+ (enabled by default).
+- **Enhancement**: Apply the metro plugin but disable the plugin when using `runtimeOnly` DI support.
 - **Fix**: Broaden test configuration regex to better capture other variants like `commonTest`.
 - **Fix**: Support KMP projects in `ciUnitTest`.
+- **Fix**: Generally fix AGP 9 support.
+- Update okio `3.17.0`.
+- Update moshix `0.35.0`.
+- Build against Kotlin `2.3.20`.
+- Build against sqldelight `2.3.2`.
+- Build against spotlight `1.6.8`.
+- Build against emulator.wtf `1.5.1`.
+- Build against spotless `8.3.0`.
+- Build against agp `9.1.0`.
+- Build against redacted gradle plugin `1.16.0`.
+- Build against compose multiplatform `1.10.2`.
 
 0.34.1
 ------
