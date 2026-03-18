@@ -140,55 +140,54 @@ internal object LintTasks {
     foundryProperties: FoundryProperties,
     affectedProjects: Set<String>?,
     onProjectSkipped: (String, String) -> Unit,
-  ) =
-    androidExtension.finalizeDsl { extension ->
-      val typedExtension = extension as CommonExtension
-      foundryProperties.lintVersionOverride?.let {
-        val lintVersion = foundryProperties.versions.lookupVersion(it)
-        typedExtension.experimentalProperties["android.experimental.lint.version"] = lintVersion
-      }
-
-      log("Applying ciLint to Android project")
-
-      log(
-        "Configuring android lint tasks. isApp=${extension is ApplicationAndroidComponentsExtension}"
-      )
-
-      log("Creating ciLint task")
-      val ciLintTask = createCiLintTask(project)
-
-      val ciLintVariants = foundryProperties.ciLintVariants
-      if (ciLintVariants != null) {
-        ciLintTask.configure {
-          // Even if the task isn't created yet, we can do this by name alone and it will resolve at
-          // task configuration time.
-          ciLintVariants.splitToSequence(',').forEach { variant ->
-            logger.debug("Using variant $variant for ciLint task")
-            val lintTaskName = "lint${variant.capitalizeUS()}"
-            dependsOn(lintTaskName)
-          }
-        }
-      } else {
-        androidExtension.onVariants { variant ->
-          val lintTaskName = "lint${variant.name.capitalizeUS()}"
-          log("Adding $lintTaskName to ciLint task")
-          ciLintTask.configure {
-            // Even if the task isn't created yet, we can do this by name alone and it will resolve
-            // at task configuration time.
-            dependsOn(lintTaskName)
-          }
-        }
-      }
-
-      configureLint(
-        typedExtension.lint,
-        ciLintTask,
-        foundryProperties,
-        affectedProjects,
-        onProjectSkipped,
-        foundryProperties.requireAndroidSdkProperties(),
-      )
+  ) = androidExtension.finalizeDsl { extension ->
+    val typedExtension = extension as CommonExtension
+    foundryProperties.lintVersionOverride?.let {
+      val lintVersion = foundryProperties.versions.lookupVersion(it)
+      typedExtension.experimentalProperties["android.experimental.lint.version"] = lintVersion
     }
+
+    log("Applying ciLint to Android project")
+
+    log(
+      "Configuring android lint tasks. isApp=${extension is ApplicationAndroidComponentsExtension}"
+    )
+
+    log("Creating ciLint task")
+    val ciLintTask = createCiLintTask(project)
+
+    val ciLintVariants = foundryProperties.ciLintVariants
+    if (ciLintVariants != null) {
+      ciLintTask.configure {
+        // Even if the task isn't created yet, we can do this by name alone and it will resolve at
+        // task configuration time.
+        ciLintVariants.splitToSequence(',').forEach { variant ->
+          logger.debug("Using variant $variant for ciLint task")
+          val lintTaskName = "lint${variant.capitalizeUS()}"
+          dependsOn(lintTaskName)
+        }
+      }
+    } else {
+      androidExtension.onVariants { variant ->
+        val lintTaskName = "lint${variant.name.capitalizeUS()}"
+        log("Adding $lintTaskName to ciLint task")
+        ciLintTask.configure {
+          // Even if the task isn't created yet, we can do this by name alone and it will resolve
+          // at task configuration time.
+          dependsOn(lintTaskName)
+        }
+      }
+    }
+
+    configureLint(
+      typedExtension.lint,
+      ciLintTask,
+      foundryProperties,
+      affectedProjects,
+      onProjectSkipped,
+      foundryProperties.requireAndroidSdkProperties(),
+    )
+  }
 
   /** Android Lint configuration entry point for non-Android projects. */
   private fun Project.configureNonAndroidProjectForLint(

@@ -136,20 +136,19 @@ public class GradleProjectFlattenerCli : CliktCommand() {
     if (verbose) {
       echo("Finished flattening projects. Updating settings file")
     }
-    val newPaths =
-      projectPaths.mapNotNull { path ->
-        // Point at their new paths
-        // Example:
-        //   project(":libraries:compose-extensions:pull-refresh").projectDir =
-        //     file("libraries--compose-extensions--pull-refresh")
-        val newPath = newPathMapping[path] ?: return@mapNotNull null
-        "project(\"$path\").projectDir = file(\"$newPath\")"
-          .also {
-            if (verbose) {
-              echo("+  $it")
-            }
+    val newPaths = projectPaths.mapNotNull { path ->
+      // Point at their new paths
+      // Example:
+      //   project(":libraries:compose-extensions:pull-refresh").projectDir =
+      //     file("libraries--compose-extensions--pull-refresh")
+      val newPath = newPathMapping[path] ?: return@mapNotNull null
+      "project(\"$path\").projectDir = file(\"$newPath\")"
+        .also {
+          if (verbose) {
+            echo("+  $it")
           }
-      }
+        }
+    }
 
     if (!dryRun) {
       settingsFile.appendText("\n\n")

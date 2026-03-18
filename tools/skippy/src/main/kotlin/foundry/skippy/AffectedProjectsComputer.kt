@@ -309,18 +309,24 @@ public class AffectedProjectsComputer(
   internal companion object {
     /** Returns a filtered list of [filePaths] that match the given [includePatterns]. */
     fun filterIncludes(filePaths: List<Path>, includePatterns: Collection<String>) =
-      filePaths.filter { includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
+      filePaths.filter {
+        includePatterns.any { pattern -> pattern.toPathMatcher().matches(it) }
+      }
 
     /**
      * Returns a filtered list of [filePaths] that do _not_ match the given
      * [SkippyConfig.includePatterns].
      */
     fun filterExcludes(filePaths: List<Path>, excludePatterns: Collection<String>) =
-      filePaths.filterNot { excludePatterns.any { pattern -> pattern.toPathMatcher().matches(it) } }
+      filePaths.filterNot {
+        excludePatterns.any { pattern -> pattern.toPathMatcher().matches(it) }
+      }
 
     /** Returns whether any [filePaths] match any [SkippyConfig.neverSkipPatterns]. */
     fun anyNeverSkip(filePaths: List<Path>, neverSkipPathMatchers: List<PathMatcher>) =
-      filePaths.any { path -> neverSkipPathMatchers.any { it.matches(path) } }
+      filePaths.any { path ->
+        neverSkipPathMatchers.any { it.matches(path) }
+      }
 
     /**
      * A slower, debug-only alternative to [anyNeverSkip] that returns a map of paths to matched
@@ -329,8 +335,9 @@ public class AffectedProjectsComputer(
     fun anyNeverSkipDebug(
       filePaths: List<Path>,
       neverSkipPathMatchers: List<PathMatcher>,
-    ): Map<Path, PathMatcher?> =
-      filePaths.associateWith { path -> neverSkipPathMatchers.find { it.matches(path) } }
+    ): Map<Path, PathMatcher?> = filePaths.associateWith { path ->
+      neverSkipPathMatchers.find { it.matches(path) }
+    }
   }
 }
 
@@ -351,11 +358,10 @@ private data class ChangedProject(
   val gradlePath: String,
   val changedPaths: Set<Path>,
 ) {
-  val testPaths =
-    changedPaths.filterToSet {
-      // Have to check both because test fixtures do affect downstream dependents
-      testPathMatcher.matches(it) && !testFixturePathMatcher.matches(it)
-    }
+  val testPaths = changedPaths.filterToSet {
+    // Have to check both because test fixtures do affect downstream dependents
+    testPathMatcher.matches(it) && !testFixturePathMatcher.matches(it)
+  }
 
   /**
    * Returns true if all changed files are in a test directory and therefore do not carry-over to

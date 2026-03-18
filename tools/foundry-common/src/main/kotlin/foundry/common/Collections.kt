@@ -33,7 +33,6 @@ public fun <T> Collection<T>.filterToSet(predicate: (T) -> Boolean): Set<T> {
  * this to find all affected projects given a seed of changed projects.
  *
  * Example:
- *
  *  ```
  *  Given a map
  *  {a:[b, c], b:[d], c:[d], d:[]}
