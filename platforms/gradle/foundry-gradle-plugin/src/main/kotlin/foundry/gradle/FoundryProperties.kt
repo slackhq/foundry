@@ -231,6 +231,14 @@ internal constructor(
         .map { it.toInt() }
         .toList()
 
+  /**
+   * The Robolectric graphics mode to use for tests. Defaults to "NATIVE".
+   *
+   * Valid values are "NATIVE", "LEGACY", and "PAUSED".
+   */
+  public val robolectricGraphicsMode: String
+    get() = stringProperty("foundry.android.robolectric.graphicsMode", defaultValue = "NATIVE")
+
   /** Opt out for -Werror. */
   public val allowWarnings: Provider<Boolean>
     get() = resolver.booleanProvider("foundry.kotlin.allowWarnings", defaultValue = false)

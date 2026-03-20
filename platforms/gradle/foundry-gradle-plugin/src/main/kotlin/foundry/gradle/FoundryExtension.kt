@@ -1064,9 +1064,9 @@ constructor(objects: ObjectFactory, private val foundryProperties: FoundryProper
           }
         }
         project.tasks.withType(Test::class.java).configureEach {
-          // Enable Robolectric's new NATIVE graphics mode.
+          // Configure Robolectric's graphics mode. Defaults to NATIVE.
           // https://github.com/robolectric/robolectric/releases/tag/robolectric-4.10-alpha-1
-          systemProperty("robolectric.graphicsMode", "NATIVE")
+          systemProperty("robolectric.graphicsMode", foundryProperties.robolectricGraphicsMode)
         }
       }
       if (featuresHandler.snapshotTests.getOrElse(false)) {
