@@ -23,6 +23,7 @@ import foundry.gradle.properties.PropertyResolver
 import foundry.gradle.properties.getOrCreateExtra
 import foundry.gradle.properties.mapToInt
 import foundry.gradle.properties.sneakyNull
+import foundry.gradle.robolectric.RobolectricGraphicsMode
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
@@ -230,6 +231,19 @@ internal constructor(
         .splitToSequence(",")
         .map { it.toInt() }
         .toList()
+
+  /**
+   * Defines the [RobolectricGraphicsMode] to use for tests. Defaults to
+   * [RobolectricGraphicsMode.NATIVE].
+   */
+  public val robolectricGraphicsMode: RobolectricGraphicsMode
+    get() =
+      resolver
+        .stringValue(
+          "foundry.android.robolectric.graphicsMode",
+          defaultValue = RobolectricGraphicsMode.NATIVE.name,
+        )
+        .let { RobolectricGraphicsMode.valueOf(it.uppercase(Locale.US)) }
 
   /** Opt out for -Werror. */
   public val allowWarnings: Provider<Boolean>
