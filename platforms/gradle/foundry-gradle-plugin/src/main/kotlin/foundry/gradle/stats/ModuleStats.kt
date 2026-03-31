@@ -182,9 +182,11 @@ public object ModuleStatsTasks {
     }
 
     project.pluginManager.apply {
-      withPlugin("org.jetbrains.kotlin.kapt") {
-        addGeneratedSources()
-        linkToLocTask { it.mustRunAfter(project.tasks.withType(KaptTask::class.java)) }
+      for (kaptId in KgpTasks.KAPT_PLUGINS) {
+        withPlugin(kaptId) {
+          addGeneratedSources()
+          linkToLocTask { it.mustRunAfter(project.tasks.withType(KaptTask::class.java)) }
+        }
       }
       withPlugin("com.google.devtools.ksp") {
         addGeneratedSources()
@@ -386,7 +388,6 @@ internal abstract class ModuleStatsCollectorTask @Inject constructor(objects: Ob
     for (plugin in topography.plugins) {
       when (plugin) {
         "org.jetbrains.kotlin.jvm",
-        "org.jetbrains.kotlin.android",
         "com.android.experimental.built-in-kotlin",
         "org.jetbrains.kotlin.multiplatform" -> {
           finalTags.add(TAG_KOTLIN)

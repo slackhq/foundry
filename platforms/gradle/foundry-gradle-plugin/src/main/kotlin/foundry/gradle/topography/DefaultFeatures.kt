@@ -16,6 +16,7 @@
 package foundry.gradle.topography
 
 import foundry.common.buildRegexMap
+import foundry.gradle.kgp.KgpTasks
 import kotlin.reflect.full.declaredMemberProperties
 
 internal object DefaultFeatures {
@@ -205,7 +206,7 @@ internal object DefaultFeatures {
           remove("\\bkapt\\([a-zA-Z.-]*\\)")
         },
       generatedSourcesDir = "build/generated/source/kapt",
-      matchingPlugin = "org.jetbrains.kotlin.kapt",
+      matchingPlugins = KgpTasks.KAPT_PLUGINS.toSet(),
       // Don't specify file extensions because KSP can generate anything into resources
     )
 

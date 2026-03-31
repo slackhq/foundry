@@ -19,6 +19,7 @@ import app.cash.sqldelight.gradle.SqlDelightTask
 import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspAATask
 import com.squareup.wire.gradle.WireTask
+import foundry.gradle.kgp.KgpTasks
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
@@ -37,10 +38,12 @@ internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
   includeCompilerTasks: Boolean,
 ) {
   // Kapt
-  project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
-    configure {
-      dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
-      dependsOn(project.tasks.withType(KaptTask::class.java))
+  for (kaptId in KgpTasks.KAPT_PLUGINS) {
+    project.pluginManager.withPlugin(kaptId) {
+      configure {
+        dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
+        dependsOn(project.tasks.withType(KaptTask::class.java))
+      }
     }
   }
 

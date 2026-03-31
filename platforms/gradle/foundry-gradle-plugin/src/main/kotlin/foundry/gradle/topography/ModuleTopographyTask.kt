@@ -239,7 +239,14 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
     val features = buildSet {
       addAll(topography.features.map { featureKey -> loadedFeatures.getValue(featureKey) })
       // Include plugin-specific features to the check here
-      addAll(loadedFeatures.filterValues { it.matchingPlugin in topography.plugins }.values)
+      addAll(
+        loadedFeatures
+          .filterValues {
+            it.matchingPlugin in topography.plugins ||
+              it.matchingPlugins.any { p -> p in topography.plugins }
+          }
+          .values
+      )
     }
     val featuresToRemove = mutableSetOf<ModuleFeature>()
 

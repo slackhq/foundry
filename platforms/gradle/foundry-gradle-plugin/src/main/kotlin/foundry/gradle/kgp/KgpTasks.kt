@@ -56,7 +56,6 @@ internal fun Project.onKotlinProject(action: (Project, KotlinProjectType) -> Uni
           "org.jetbrains.kotlin.multiplatform" -> KotlinProjectType.MULTIPLATFORM
 
           "org.jetbrains.kotlin.jvm" -> KotlinProjectType.JVM
-          "org.jetbrains.kotlin.android",
           "com.android.experimental.built-in-kotlin" -> KotlinProjectType.ANDROID
 
           else -> {
@@ -90,7 +89,6 @@ internal object KgpTasks {
     listOf(
       "org.jetbrains.kotlin.multiplatform",
       "org.jetbrains.kotlin.jvm",
-      "org.jetbrains.kotlin.android",
       "com.android.experimental.built-in-kotlin",
       "com.android.kotlin.multiplatform.library",
     )

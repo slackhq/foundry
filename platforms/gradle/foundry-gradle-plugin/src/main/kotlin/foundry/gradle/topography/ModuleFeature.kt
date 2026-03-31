@@ -37,4 +37,5 @@ public data class ModuleFeature(
    */
   val matchingSourcesDir: String? = null,
   val matchingPlugin: String? = null,
+  val matchingPlugins: Set<String> = emptySet(),
 )

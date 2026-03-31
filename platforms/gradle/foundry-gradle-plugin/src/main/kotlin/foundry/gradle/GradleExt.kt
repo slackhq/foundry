@@ -80,8 +80,7 @@ internal val Project.isKotlin: Boolean
 internal val Project.isKotlinAndroid: Boolean
   get() {
     return getOrComputeExt(IS_KOTLIN_ANDROID) {
-      project.pluginManager.hasPlugin("org.jetbrains.kotlin.android") ||
-        project.pluginManager.hasPlugin("com.android.experimental.built-in-kotlin")
+      project.pluginManager.hasPlugin("com.android.experimental.built-in-kotlin")
     }
   }
 

@@ -18,7 +18,6 @@
 package foundry.gradle
 
 import com.android.build.api.dsl.LibraryExtension
-import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
 import dev.zacsweers.metro.gradle.MetroPluginExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
@@ -95,30 +94,10 @@ constructor(
       val logVerbose = foundryProperties.foundryExtensionVerbose
       featuresHandler.applyTo(project)
 
-      var kaptRequired = false
       val moshiCodegenEnabled = featuresHandler.moshiHandler.moshiCodegen.getOrElse(false)
       val moshiSealedCodegenEnabled = featuresHandler.moshiHandler.sealedCodegen.getOrElse(false)
-      val allowKsp = foundryProperties.enableKsp
       val allowMoshiIr = foundryProperties.enableMoshiIr
       val anvilMode = foundryProperties.anvilMode
-      val allowDaggerKsp = anvilMode.useKspContributionMerging && anvilMode.useDaggerKsp
-
-      /** Marks this project as needing kapt code gen. */
-      fun markKaptNeeded(source: String) {
-        kaptRequired = true
-        // Apply kapt for them
-        pluginManager.apply("org.jetbrains.kotlin.kapt")
-        if (logVerbose) {
-          logger.lifecycle(
-            """
-            [kapt Config]
-            project = $path
-            source = $source
-            """
-              .trimIndent()
-          )
-        }
-      }
 
       /** Marks this project as needing KSP code gen. */
       fun markKspNeeded(source: String) {
@@ -156,14 +135,6 @@ constructor(
         }
         if (enableSealed) {
           configure<MoshiPluginExtension> { this.enableSealed.setDisallowChanges(true) }
-        }
-      }
-
-      fun aptConfiguration(variant: String = ""): String {
-        return if (isKotlin) {
-          "kapt${variant.capitalizeUS()}"
-        } else {
-          "annotationProcessor${variant.capitalizeUS()}"
         }
       }
 
@@ -304,16 +275,11 @@ constructor(
           }
 
           if (!daggerConfig.runtimeOnly && daggerConfig.useDaggerCompiler) {
-            if (allowDaggerKsp /*&& (!daggerConfig.enableAnvil || anvilMode.useDaggerKsp)*/) {
-              markKspNeeded("Dagger compiler")
-              dependencies.add(kspConfiguration(""), FoundryDependencies.Dagger.compiler)
-              // Currently we don't support dagger-compiler or components in test fixtures, but if
-              // we
-              // did it would go here
-            } else {
-              markKaptNeeded("Dagger compiler")
-              dependencies.add(aptConfiguration(), FoundryDependencies.Dagger.compiler)
-            }
+            markKspNeeded("Dagger compiler")
+            dependencies.add(kspConfiguration(""), FoundryDependencies.Dagger.compiler)
+            // Currently we don't support dagger-compiler or components in test fixtures, but if
+            // we
+            // did it would go here
           }
         }
       }
@@ -325,15 +291,9 @@ constructor(
       }
 
       if (featuresHandler.autoService.getOrElse(false)) {
-        if (allowKsp) {
-          markKspNeeded("AutoService")
-          dependencies.add(jvmImplementation, FoundryDependencies.Auto.Service.annotations)
-          dependencies.add(ksp, FoundryDependencies.Auto.Service.ksp)
-        } else {
-          markKaptNeeded("AutoService")
-          dependencies.add(jvmCompileOnly, FoundryDependencies.Auto.Service.annotations)
-          dependencies.add(aptConfiguration(), FoundryDependencies.Auto.Service.autoservice)
-        }
+        markKspNeeded("AutoService")
+        dependencies.add(jvmImplementation, FoundryDependencies.Auto.Service.annotations)
+        dependencies.add(ksp, FoundryDependencies.Auto.Service.ksp)
       }
 
       if (featuresHandler.redacted.getOrElse(false)) {
@@ -345,12 +305,9 @@ constructor(
         if (moshiCodegenEnabled) {
           if (allowMoshiIr) {
             markMoshiGradleNeeded("Moshi code gen", false)
-          } else if (allowKsp) {
+          } else {
             markKspNeeded("Moshi code gen")
             dependencies.add(ksp, FoundryDependencies.Moshi.codeGen)
-          } else {
-            markKaptNeeded("Moshi code gen")
-            dependencies.add(aptConfiguration(), FoundryDependencies.Moshi.codeGen)
           }
         }
         if (featuresHandler.moshiHandler.moshiAdapters.getOrElse(false)) {
@@ -373,11 +330,9 @@ constructor(
           if (moshiSealedCodegenEnabled) {
             if (allowMoshiIr) {
               markMoshiGradleNeeded("Moshi sealed codegen", enableSealed = true)
-            } else if (allowKsp) {
+            } else {
               markKspNeeded("Moshi sealed codegen")
               dependencies.add(ksp, FoundryDependencies.Moshi.MoshiX.Sealed.codegen)
-            } else {
-              error("There is no KAPT support for moshi-sealed and KSP/moshi-ir are disabled")
             }
           }
           if (featuresHandler.moshiHandler.sealedReflect.getOrElse(false)) {
@@ -389,20 +344,6 @@ constructor(
               FoundryDependencies.Moshi.MoshiX.Sealed.metadataReflect,
             )
           }
-        }
-      }
-
-      // At the very end we check if kapt is enabled and disable anvil component merging if needed
-      // https://github.com/square/anvil#incremental-kotlin-compilation-breaks-compiler-plugins
-      if (
-        kaptRequired &&
-          daggerConfig?.enableAnvil == true &&
-          !daggerConfig.useMetro &&
-          !daggerConfig.alwaysEnableAnvilComponentMerging
-      ) {
-        configure<AnvilExtension> { disableComponentMerging.setDisallowChanges(true) }
-        if (useAnyKspAnvilMode) {
-          configure<KspExtension> { arg("disable-component-merging", "true") }
         }
       }
     }
