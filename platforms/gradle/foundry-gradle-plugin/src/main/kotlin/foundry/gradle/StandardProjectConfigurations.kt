@@ -965,6 +965,12 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<LibraryExtension> {
+        // Set a default namespace eagerly so that other plugins (e.g. SqlDelight) that read
+        // it during finalizeDsl can see it. The finalizeDsl block above serves as a final
+        // fallback, and the build script can still override this value.
+        if (namespace == null) {
+          namespace = defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
+        }
         foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         if (isLibraryWithVariants) {
@@ -1009,6 +1015,9 @@ internal class StandardProjectConfigurations(
         }
       }
       configure<TestExtension> {
+        if (namespace == null) {
+          namespace = defaultNamespace(foundryProperties.defaultNamespacePrefix, projectPath)
+        }
         foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
         commonBaseExtensionConfig(true)
         defaultConfig { targetSdk = sdkVersions.value.targetSdk }
