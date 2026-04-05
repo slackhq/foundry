@@ -20,6 +20,7 @@ package foundry.gradle
 import com.android.build.api.dsl.LibraryExtension
 import com.google.devtools.ksp.gradle.KspExtension
 import com.squareup.anvil.plugin.AnvilExtension
+import dev.zacsweers.metro.gradle.ExperimentalMetroGradleApi
 import dev.zacsweers.metro.gradle.MetroPluginExtension
 import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import foundry.gradle.agp.PermissionAllowlistConfigurer
@@ -251,6 +252,13 @@ constructor(
               }
             }
           }
+          if (
+            foundryProperties.metroCircuitCodeGen &&
+              featuresHandler.circuitHandler.codegen.getOrElse(true)
+          ) {
+            @OptIn(ExperimentalMetroGradleApi::class)
+            metroExtension.enableCircuitCodegen.setDisallowChanges(true)
+          }
         } else {
           // Using Dagger ± Anvil
           addDaggerRuntimeDeps(enableAnvil = daggerConfig.enableAnvil)
@@ -308,8 +316,7 @@ constructor(
               markKspNeeded("Dagger compiler")
               dependencies.add(kspConfiguration(""), FoundryDependencies.Dagger.compiler)
               // Currently we don't support dagger-compiler or components in test fixtures, but if
-              // we
-              // did it would go here
+              // we did it would go here
             } else {
               markKaptNeeded("Dagger compiler")
               dependencies.add(aptConfiguration(), FoundryDependencies.Dagger.compiler)
@@ -319,9 +326,11 @@ constructor(
       }
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
-        markKspNeeded("Circuit")
-        dependencies.add(ksp, "com.slack.circuit:circuit-codegen")
-        dependencies.add(commonCompileOnly, "com.slack.circuit:circuit-codegen-annotations")
+        if (daggerConfig?.useMetro != true) {
+          markKspNeeded("Circuit")
+          dependencies.add(ksp, "com.slack.circuit:circuit-codegen")
+          dependencies.add(commonCompileOnly, "com.slack.circuit:circuit-codegen-annotations")
+        }
       }
 
       if (featuresHandler.autoService.getOrElse(false)) {

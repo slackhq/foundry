@@ -290,6 +290,10 @@ internal constructor(
   public val metroInteropAnvil: Boolean
     get() = booleanProperty("foundry.di.metro.interop.anvil", defaultValue = false)
 
+  /** Flag to enable using Metro's native Circuit code gen (if circuit code gen is enabled). */
+  public val metroCircuitCodeGen: Boolean
+    get() = booleanProperty("foundry.di.metro.circuit", defaultValue = true)
+
   /** Log Foundry extension configuration state verbosely. */
   public val foundryExtensionVerbose: Boolean
     get() = booleanProperty("foundry.extension.verbose")
