@@ -4,7 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.35.1
+------
+
+_2026-04-06_
+
 - Add support for Metro's native circuit code gen if Metro is enabled for DI.
+- Build against Metro `0.13.1`'s Gradle Plugin.
 
 0.35.0
 ------
