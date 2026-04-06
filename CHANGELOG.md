@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Add support for Metro's native circuit code gen if Metro is enabled for DI.
+
 0.35.0
 ------
 
