@@ -11,6 +11,12 @@ _2026-04-06_
 
 - Add support for Metro's native circuit code gen if Metro is enabled for DI.
 - Build against Metro `0.13.1`'s Gradle Plugin.
+- Add a `foundry.android.robolectric.graphicsMode` property for configuring Robolectric graphics mode.
+- Update KotlinPoet to `2.3.0`.
+- Update oshi to `6.11.0`.
+- Build against compose-jb `1.10.3`.
+- Build against Spotlight `1.6.9`.
+- Build against Develocity `4.4.0`.
 
 0.35.0
 ------
