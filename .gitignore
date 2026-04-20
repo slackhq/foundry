@@ -35,3 +35,7 @@ temp-clone/
 
 # Files generated for Spotlight: https://github.com/joshfriend/spotlight
 gradle/ide-projects.txt
+
+# Claude Code
+.claude/worktrees/
+.claude/settings.local.json
