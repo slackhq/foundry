@@ -27,6 +27,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SealedSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
@@ -44,7 +45,6 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonDecoder
-import kotlinx.serialization.json.JsonDecodingException
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonLiteral
@@ -134,10 +134,8 @@ internal object JsonPrimitiveSerializer : KSerializer<JsonPrimitive> {
   override fun deserialize(decoder: Decoder): JsonPrimitive {
     val result = decoder.asJsonDecoder().decodeJsonElement()
     if (result !is JsonPrimitive) {
-      throw JsonDecodingException(
-        -1,
-        "Unexpected JSON element, expected JsonPrimitive, had ${result::class}",
-        result.toString(),
+      throw SerializationException(
+        "Unexpected JSON element, expected JsonPrimitive, had ${result::class}"
       )
     }
     return result
@@ -160,7 +158,7 @@ internal object JsonNullSerializer : KSerializer<JsonNull> {
 
   override fun deserialize(decoder: Decoder): JsonNull {
     if (decoder.decodeNotNullMark()) {
-      throw JsonDecodingException("Expected 'null' literal")
+      throw SerializationException("Expected 'null' literal")
     }
     decoder.decodeNull()
     return JsonNull
@@ -207,10 +205,8 @@ private object JsonLiteralSerializer : KSerializer<JsonLiteral> {
   override fun deserialize(decoder: Decoder): JsonLiteral {
     val result = decoder.asJsonDecoder().decodeJsonElement()
     if (result !is JsonLiteral) {
-      throw JsonDecodingException(
-        -1,
-        "Unexpected JSON element, expected JsonLiteral, had ${result::class}",
-        result.toString(),
+      throw SerializationException(
+        "Unexpected JSON element, expected JsonLiteral, had ${result::class}"
       )
     }
     return result
