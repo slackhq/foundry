@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("invisible_reference", "invisible_member")
 @file:OptIn(
   InternalSerializationApi::class,
   ExperimentalSerializationApi::class,
@@ -27,6 +26,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SealedSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
@@ -50,7 +50,6 @@ import kotlinx.serialization.json.JsonLiteral
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.internal.JsonDecodingException
 
 internal object JsonObjectAsMapSerializer : KSerializer<JsonObject> {
   @OptIn(ExperimentalSerializationApi::class)
@@ -134,10 +133,8 @@ internal object JsonPrimitiveSerializer : KSerializer<JsonPrimitive> {
   override fun deserialize(decoder: Decoder): JsonPrimitive {
     val result = decoder.asJsonDecoder().decodeJsonElement()
     if (result !is JsonPrimitive) {
-      throw JsonDecodingException(
-        -1,
-        "Unexpected JSON element, expected JsonPrimitive, had ${result::class}",
-        result.toString(),
+      throw SerializationException(
+        "Unexpected JSON element, expected JsonPrimitive, had ${result::class}"
       )
     }
     return result
@@ -160,7 +157,7 @@ internal object JsonNullSerializer : KSerializer<JsonNull> {
 
   override fun deserialize(decoder: Decoder): JsonNull {
     if (decoder.decodeNotNullMark()) {
-      throw JsonDecodingException("Expected 'null' literal")
+      throw SerializationException("Expected 'null' literal")
     }
     decoder.decodeNull()
     return JsonNull
@@ -207,10 +204,8 @@ private object JsonLiteralSerializer : KSerializer<JsonLiteral> {
   override fun deserialize(decoder: Decoder): JsonLiteral {
     val result = decoder.asJsonDecoder().decodeJsonElement()
     if (result !is JsonLiteral) {
-      throw JsonDecodingException(
-        -1,
-        "Unexpected JSON element, expected JsonLiteral, had ${result::class}",
-        result.toString(),
+      throw SerializationException(
+        "Unexpected JSON element, expected JsonLiteral, had ${result::class}"
       )
     }
     return result
