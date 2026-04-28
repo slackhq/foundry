@@ -174,7 +174,7 @@ retrofit-converters-wire = { module = "com.squareup.retrofit2:converter-wire", v
 robolectric = "org.robolectric:robolectric:4.16.1"
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
 rxjava = "io.reactivex.rxjava3:rxjava:3.1.12"
-sarif4k = "io.github.detekt.sarif4k:sarif4k:0.6.0"
+sarif4k = "io.github.detekt.sarif4k:sarif4k:0.7.0"
 slackLints-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slack-lint" }
 slackLints-annotations = { module = "com.slack.lint:slack-lint-annotations", version.ref = "slack-lint" }
 slf4jNop = "org.slf4j:slf4j-nop:2.0.17"
