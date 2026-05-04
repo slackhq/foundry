@@ -1,7 +1,7 @@
 [versions]
 agp = "9.1.0"
 agpAlpha = "9.2.0"
-anvil = "0.5.3"
+anvil = "0.5.4"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.9.1"
 bugsnagGradle = "8.2.0"
