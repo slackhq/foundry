@@ -958,7 +958,7 @@ constructor(
 
       // composeRuntimeOnly() skips applying kotlin.plugin.compose, so the compiler extension
       // below won't exist — short-circuit before reading it.
-      if (!enableCompiler.get()) return
+      if (!enableCompiler.getOrElse(false)) return
 
       val extension = project.extensions.getByType<ComposeCompilerGradlePluginExtension>()
       if (foundryProperties.composeGlobalStabilityConfigurationPath.isPresent) {
