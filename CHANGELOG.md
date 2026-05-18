@@ -4,6 +4,37 @@ Changelog
 **Unreleased**
 --------------
 
+0.35.2
+------
+
+_2026-05-18_
+
+- **Fix**: Fix `composeRuntimeOnly()` crashing project configuration.
+- Update Wire to `6.2.0`.
+- Update Okio to `3.17.0`.
+- Update coroutines to `1.10.2`.
+- Update oshi to `6.12.0`.
+- Update Guava to `33.6.0-jre`.
+- Update jgrapht to `1.5.3`.
+- Update multiplatform-markdown-renderer to `0.40.2`.
+- Update slf4j-nop to `2.0.18`.
+- Update IntelliJ Platform to `2.14.0`.
+- Update Dokka to `2.2.0`.
+- Build against Kotlin `2.3.21`.
+- Build against KSP `2.3.8`.
+- Build against Metro `1.0.0`.
+- Build against AGP `9.2.1`.
+- Build against Gradle `9.4.1`.
+- Build against DAGP `3.9.0`.
+- Build against Roborazzi `1.60.0`.
+- Build against Anvil `0.5.4`.
+- Build against Spotless `8.4.0`.
+- Build against Spotlight `1.6.10`.
+- Build against Develocity `4.4.1`.
+- Build against emulator.wtf `1.5.4`.
+- Build against Graph Assert `2.9.1`.
+- Build against compose-lint-checks `1.4.3`.
+
 0.35.1
 ------
 
