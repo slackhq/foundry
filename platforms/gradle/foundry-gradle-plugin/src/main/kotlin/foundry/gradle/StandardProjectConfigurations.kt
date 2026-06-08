@@ -201,7 +201,7 @@ internal class StandardProjectConfigurations(
         )
       }
     } else if (!foundryProperties.noPlatform && path != platformProjectPath) {
-      applyPlatforms(foundryProperties.versions.boms, platformProjectPath)
+      applyPlatforms(foundryProperties.versions.boms, platformProjectPath, foundryExtension)
     }
 
     checkAndroidXDependencies(foundryProperties)
@@ -284,6 +284,7 @@ internal class StandardProjectConfigurations(
   private fun Project.applyPlatforms(
     boms: Set<Provider<MinimalExternalModuleDependency>>,
     platformProject: String,
+    foundryExtension: FoundryExtension,
   ) {
     configurations.configureEach {
       if (Configurations.isTest(name) && Configurations.isApi(name)) {
@@ -291,6 +292,17 @@ internal class StandardProjectConfigurations(
         // https://youtrack.jetbrains.com/issue/KT-61653
         project.logger.debug("Ignoring boms on ${project.path}:$name")
         return@configureEach
+      }
+      if (Configurations.isAndroidTest(name)) {
+        // Only platform androidTest* configurations when the androidTest variant is enabled.
+        // Otherwise AGP ignores the dependencies and warns, since libraries don't opt into
+        // androidTest by default.
+        val androidTestEnabled =
+          foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+        if (!androidTestEnabled) {
+          project.logger.debug("Ignoring boms on ${project.path}:$name (androidTest disabled)")
+          return@configureEach
+        }
       }
       if (isPlatformConfigurationName(name)) {
         project.logger.debug("Adding boms to ${project.path}:$name")
