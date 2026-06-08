@@ -28,6 +28,13 @@ internal object Configurations {
 
   fun isTest(name: String): Boolean = testConfigurationRegex.matches(name)
 
+  /**
+   * Whether [name] is an android instrumentation test ("androidTest") configuration, such as
+   * `androidTestImplementation` or `androidTestUtil`. Note this intentionally does not match unit
+   * test configurations like `testImplementation`.
+   */
+  fun isAndroidTest(name: String): Boolean = name.contains("androidTest", ignoreCase = true)
+
   fun isApi(name: String): Boolean = name.endsWith("api", ignoreCase = true)
 
   object ErrorProne {
