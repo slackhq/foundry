@@ -47,7 +47,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.services.BuildServiceRegistration
-import org.gradle.internal.os.OperatingSystem
+import oshi.util.PlatformEnum
 
 /** Misc tools for Foundry Gradle projects, usable in tasks as a [BuildService] too. */
 public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
@@ -290,9 +290,7 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
             project.gradle.startParameter.taskNames.any { it.equals("clean", ignoreCase = true) }
           )
           parameters.logThermals.setDisallowChanges(
-            project.provider {
-              logThermals && !parameters.cleanRequested.get() && OperatingSystem.current().isMacOsX
-            }
+            project.provider { logThermals && !parameters.cleanRequested.get() && isMacOs() }
           )
           parameters.configurationCacheEnabled.setDisallowChanges(isConfigurationCacheRequested)
           parameters.enableSkippyDiagnostics.setDisallowChanges(enableSkippyDiagnostics)
@@ -326,6 +324,8 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
     public val startParameterProperties: MapProperty<String, String>
   }
 }
+
+private fun isMacOs(): Boolean = PlatformEnum.getCurrentPlatform() == PlatformEnum.MACOS
 
 public interface ThermalsReporter {
   public fun reportThermals(thermals: Thermals)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 9.1.0" type="baseline" client="gradle" dependencies="false" name="AGP (9.1.0)" variant="all" version="9.1.0">
+<issues format="6" by="lint 9.2.1" type="baseline" client="gradle" dependencies="false" name="AGP (9.2.1)" variant="all" version="9.2.1">
 
     <issue
         id="AvoidUsingNotNullOperator"
@@ -63,7 +63,7 @@
         errorLine2="                                             ~~">
         <location
             file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="72"
+            line="73"
             column="46"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="                                                                      ~~">
         <location
             file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="162"
+            line="164"
             column="71"/>
     </issue>
 
@@ -87,138 +87,6 @@
             file="src/main/kotlin/foundry/gradle/topography/ModuleFeature.kt"
             line="26"
             column="28"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="        project.rootProject.layout.projectDirectory.file(&quot;ci/release.version&quot;)"
-        errorLine2="                ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/ApkVersioningPlugin.kt"
-            line="82"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="        project.rootProject.file(&quot;config/detekt/detekt.yml&quot;)"
-        errorLine2="                ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/lint/DetektTasks.kt"
-            line="83"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="            config.from(project.rootProject.file(configFile))"
-        errorLine2="                                ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/lint/DetektTasks.kt"
-            line="86"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="  if (project.rootProject.extensions.findByName(&quot;develocity&quot;) != null) {"
-        errorLine2="              ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
-            line="33"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="    return DevelocityConfigurationAdapter(project.rootProject.extensions.getByName(&quot;develocity&quot;))"
-        errorLine2="                                                  ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
-            line="34"
-            column="51"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="  } else if (project.rootProject.extensions.findByName(&quot;gradleEnterprise&quot;) != null) {"
-        errorLine2="                     ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
-            line="36"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="        project.rootProject.extensions.getByName(&quot;gradleEnterprise&quot;)"
-        errorLine2="                ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/develocity/DevelocityFinderApi.kt"
-            line="38"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="        rootDirFileProvider = project.rootProject.layout.projectDirectory::file,"
-        errorLine2="                                      ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryProperties.kt"
-            line="972"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="    require(project == project.rootProject) {"
-        errorLine2="                               ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="69"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="      delete(rootProject.layout.buildDirectory)"
-        errorLine2="             ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryRootPlugin.kt"
-            line="377"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="      check(project == project.rootProject) { &quot;Project is not root project!&quot; }"
-        errorLine2="                               ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GlobalConfig.kt"
-            line="33"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="  get() = rootProject === this"
-        errorLine2="          ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="63"
-            column="11"/>
     </issue>
 
     <issue
@@ -255,138 +123,6 @@
     </issue>
 
     <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="      lintConfig = rootProject.layout.projectDirectory.file(&quot;config/lint/lint.xml&quot;).asFile"
-        errorLine2="                   ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/lint/LintTasks.kt"
-            line="332"
-            column="20"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getRootProject"
-        errorLine1="            else -> project.rootProject.projectDir.absolutePath"
-        errorLine2="                            ~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/testing/UnitTests.kt"
-            line="249"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="InternalAgpApiUsage"
-        message="Avoid using internal Android Gradle Plugin APIs"
-        errorLine1="import com.android.build.gradle.internal.publishing.AndroidArtifacts"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/tasks/BaseDependencyCheckTask.kt"
-            line="18"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalAgpApiUsage"
-        message="Avoid using internal Android Gradle Plugin APIs"
-        errorLine1="import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/tasks/BaseDependencyCheckTask.kt"
-            line="19"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalAgpApiUsage"
-        message="Avoid using internal Android Gradle Plugin APIs"
-        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/StandardProjectConfigurations.kt"
-            line="36"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalAgpApiUsage"
-        message="Avoid using internal Android Gradle Plugin APIs"
-        errorLine1="import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/tasks/TaskExtensions.kt"
-            line="19"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/tasks/BaseDependencyCheckTask.kt"
-            line="26"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.internal.logging.progress.ProgressLoggerFactory"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/tasks/BaseDownloadTask.kt"
-            line="31"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.internal.os.OperatingSystem"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/FoundryTools.kt"
-            line="50"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.project.ProjectInternal"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="30"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.internal.service.ServiceRegistry"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/GradleExt.kt"
-            line="43"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.plugins.PluginRegistry"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/topography/ModuleTopographyTask.kt"
-            line="50"
-            column="1"/>
-    </issue>
-
-    <issue
         id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
         errorLine1="import org.gradle.api.internal.provider.MissingValueException"
@@ -394,17 +130,6 @@
         <location
             file="src/main/kotlin/foundry/gradle/Platforms.kt"
             line="29"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.internal.logging.progress.ProgressLogger"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/foundry/gradle/tasks/ProgressResponseBody.kt"
-            line="26"
             column="1"/>
     </issue>
 

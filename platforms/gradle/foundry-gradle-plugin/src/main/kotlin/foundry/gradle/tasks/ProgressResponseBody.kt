@@ -23,7 +23,6 @@ import okio.BufferedSource
 import okio.ForwardingSource
 import okio.Source
 import okio.buffer
-import org.gradle.internal.logging.progress.ProgressLogger
 
 private const val ONE_MEGABYTE_IN_BYTES: Double = (1L * 1024L * 1024L).toDouble()
 
@@ -77,10 +76,14 @@ internal class ProgressReportingInterceptor(private val progressListener: Progre
 /** A [ProgressListener] that logs progress to a [ProgressLogger]. */
 internal class ProgressLoggerProgressListener(
   private val name: String,
-  private val progressLogger: ProgressLogger,
+  // This adapts the internal progress logger created by BaseDownloadTask.
+  @Suppress("InternalGradleApiUsage")
+  private val progressLogger: org.gradle.internal.logging.progress.ProgressLogger,
 ) : ProgressListener {
   private var firstUpdate = true
 
+  // ProgressLogger has no public equivalent for incremental download updates.
+  @Suppress("InternalGradleApiUsage")
   override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
     if (done) {
       progressLogger.progress("Download completed")
