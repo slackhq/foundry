@@ -15,9 +15,10 @@ jobs:
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@v46.1.17
         with:
-          configurationFile: .github/renovate-config.json
+          configurationFile: renovate.json
           renovate-image: renovate/renovate
           renovate-version: full
           token: ${{ secrets.SLACKHQ_MBR_GITHUB_TOKEN }}
         env:
           RENOVATE_ALLOWED_POST_UPGRADE_COMMANDS: '["tools/scripts/update-binaries\\.sh"]'
+          RENOVATE_REPOSITORIES: '["slackhq/foundry"]'
