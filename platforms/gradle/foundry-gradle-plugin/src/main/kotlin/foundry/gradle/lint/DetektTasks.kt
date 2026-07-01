@@ -80,10 +80,11 @@ internal object DetektTasks {
         buildUponDefaultConfig = true
         toolVersion =
           foundryProperties.versions.detekt ?: error("missing 'detekt' version in version catalog")
-        project.rootProject.file("config/detekt/detekt.yml")
+        val rootProjectDirectory = project.isolated.rootProject.projectDirectory
+        rootProjectDirectory.file("config/detekt/detekt.yml")
         foundryProperties.detektConfigs?.let { configs ->
           for (configFile in configs) {
-            config.from(project.rootProject.file(configFile))
+            config.from(rootProjectDirectory.file(configFile))
           }
         }
 

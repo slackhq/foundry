@@ -27,7 +27,6 @@ import org.gradle.api.Action
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.api.plugins.ExtensionContainer
@@ -40,7 +39,6 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.reflect.TypeOf
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.internal.service.ServiceRegistry
 
 /*
  * A set of utility functions that check and cache project information stored in extensions.
@@ -60,7 +58,7 @@ private const val IS_JAVA_LIBRARY = "foundry.project.ext.isJavaLibrary"
 private const val IS_JAVA = "foundry.project.ext.isJava"
 
 internal val Project.isRootProject: Boolean
-  get() = rootProject === this
+  get() = isolated == isolated.rootProject
 
 internal val Project.isJava: Boolean
   get() {
@@ -289,10 +287,15 @@ internal inline fun <reified E : Any> ObjectFactory.domainObjectSet(): DomainObj
   return domainObjectSet(E::class.java)
 }
 
+// Gradle exposes project-scoped services only through ProjectInternal.
+@Suppress("InternalGradleApiUsage")
 internal inline fun <reified T : Any> Project.serviceOf(): T =
-  (this as ProjectInternal).services.get()
+  (this as org.gradle.api.internal.project.ProjectInternal).services.get()
 
-internal inline fun <reified T : Any> ServiceRegistry.get(): T = this[T::class.java]
+// Keep the internal ServiceRegistry access localized to service lookup.
+@Suppress("InternalGradleApiUsage")
+internal inline fun <reified T : Any> org.gradle.internal.service.ServiceRegistry.get(): T =
+  this[T::class.java]
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified T : Task> TaskContainer.registerOrConfigure(

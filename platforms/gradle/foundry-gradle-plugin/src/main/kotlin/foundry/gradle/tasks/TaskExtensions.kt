@@ -16,13 +16,11 @@
 package foundry.gradle.tasks
 
 import app.cash.sqldelight.gradle.SqlDelightTask
-import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.google.devtools.ksp.gradle.KspAATask
 import com.squareup.wire.gradle.WireTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
-import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -40,7 +38,9 @@ internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
   project.pluginManager.withPlugin("org.jetbrains.kotlin.kapt") {
     configure {
       dependsOn(project.tasks.withType(KaptGenerateStubs::class.java))
-      dependsOn(project.tasks.withType(KaptTask::class.java))
+      // KaptTask is the task that writes kapt generated sources.
+      @Suppress("InternalKgpApiUsage")
+      dependsOn(project.tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptTask::class.java))
     }
   }
 
@@ -51,7 +51,16 @@ internal fun TaskProvider<*>.dependsOnSourceGeneratingTasks(
 
   // ViewBinding
   project.pluginManager.withPlugin("com.android.base") {
-    configure { dependsOn(project.tasks.withType(DataBindingGenBaseClassesTask::class.java)) }
+    configure {
+      // AGP exposes this generated source task only as an internal type.
+      @Suppress("InternalAgpApiUsage")
+      dependsOn(
+        project.tasks.withType(
+          com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask::class
+            .java
+        )
+      )
+    }
   }
 
   // SqlDelight

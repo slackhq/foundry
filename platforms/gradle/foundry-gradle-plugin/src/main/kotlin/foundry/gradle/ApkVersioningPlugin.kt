@@ -80,7 +80,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
       }
 
       val ciVersionFileProvider =
-        project.rootProject.layout.projectDirectory.file("ci/release.version")
+        project.isolated.rootProject.projectDirectory.file("ci/release.version")
       val ciContent = project.providers.fileContents(ciVersionFileProvider)
       val defaultVersionCodeProvider: Provider<Int> =
         project.ciBuildNumber

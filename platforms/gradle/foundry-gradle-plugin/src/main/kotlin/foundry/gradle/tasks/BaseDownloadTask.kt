@@ -28,7 +28,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.logging.progress.ProgressLoggerFactory
 import org.gradle.work.DisableCachingByDefault
 
 /**
@@ -45,13 +44,17 @@ internal abstract class BaseDownloadTask(
   private val addExecPrefix: Boolean = false,
   private val urlTemplate: (version: String) -> String,
 ) : DefaultTask(), BootstrapTask {
-  @get:Inject abstract val progressLoggerFactory: ProgressLoggerFactory
+  // Gradle's public logging API has no streaming progress logger service.
+  @get:Inject
+  @Suppress("InternalGradleApiUsage")
+  abstract val progressLoggerFactory: org.gradle.internal.logging.progress.ProgressLoggerFactory
 
   @get:Input abstract val version: Property<String>
 
   @get:OutputFile abstract val outputFile: RegularFileProperty
 
-  @Suppress("NestedBlockDepth")
+  // Gradle's public logging API has no streaming progress logger equivalent.
+  @Suppress("InternalGradleApiUsage", "NestedBlockDepth")
   @TaskAction
   fun download() {
     val version = version.get()

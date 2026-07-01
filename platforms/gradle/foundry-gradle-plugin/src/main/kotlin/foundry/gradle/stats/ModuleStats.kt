@@ -64,7 +64,6 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.internal.KaptTask
 import org.jgrapht.alg.scoring.BetweennessCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
@@ -140,6 +139,12 @@ public object ModuleStatsTasks {
       locTask?.configure { body(this) }
     }
 
+    // Loc should run after optional generators without making them task dependencies.
+    @Suppress("GradlePerformance")
+    fun Task.mustRunAfterOptionalGenerators(vararg paths: Any) {
+      mustRunAfter(*paths)
+    }
+
     val moduleStatsCollector: Lazy<TaskProvider<ModuleStatsCollectorTask>> = lazy {
       val task =
         project.tasks.register<ModuleStatsCollectorTask>("moduleStats") {
@@ -184,20 +189,30 @@ public object ModuleStatsTasks {
     project.pluginManager.apply {
       withPlugin("org.jetbrains.kotlin.kapt") {
         addGeneratedSources()
-        linkToLocTask { it.mustRunAfter(project.tasks.withType(KaptTask::class.java)) }
+        // KaptTask is the generated-source task marker for kapt.
+        @Suppress("InternalKgpApiUsage")
+        linkToLocTask {
+          it.mustRunAfterOptionalGenerators(
+            project.tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptTask::class.java)
+          )
+        }
       }
       withPlugin("com.google.devtools.ksp") {
         addGeneratedSources()
-        linkToLocTask { it.mustRunAfter(project.tasks.withType(KspAATask::class.java)) }
+        linkToLocTask {
+          it.mustRunAfterOptionalGenerators(project.tasks.withType(KspAATask::class.java))
+        }
       }
       withPlugin("com.squareup.wire") {
         addGeneratedSources()
-        linkToLocTask { it.mustRunAfter(project.tasks.withType(WireTask::class.java)) }
+        linkToLocTask {
+          it.mustRunAfterOptionalGenerators(project.tasks.withType(WireTask::class.java))
+        }
       }
       withPlugin("app.cash.sqldelight") {
         addGeneratedSources()
         linkToLocTask {
-          it.mustRunAfter(
+          it.mustRunAfterOptionalGenerators(
             project.tasks.withType(GenerateSchemaTask::class.java),
             project.tasks.withType(SqlDelightTask::class.java),
           )

@@ -987,7 +987,7 @@ internal constructor(
         projectName = project.name,
         resolver = resolver,
         regularFileProvider = project.layout.projectDirectory::file,
-        rootDirFileProvider = project.rootProject.layout.projectDirectory::file,
+        rootDirFileProvider = project.isolated.rootProject.projectDirectory::file,
         versions = versions,
       )
     }
