@@ -134,13 +134,12 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.Bundled)
 
-    val runLocalIde by
-      intellijPlatformTesting.runIde.registering {
-        // https://plugins.jetbrains.com/docs/intellij/android-studio.html#configuring-the-plugin-gradle-build-script
-        providers.gradleProperty("intellijPlatformTesting.idePath").orNull?.let {
-          localPath.set(file(it))
-        }
+    intellijPlatformTesting.runIde.register("runLocalIde") {
+      // https://plugins.jetbrains.com/docs/intellij/android-studio.html#configuring-the-plugin-gradle-build-script
+      providers.gradleProperty("intellijPlatformTesting.idePath").orNull?.let {
+        localPath.set(file(it))
       }
+    }
   }
   implementation(project(":platforms:intellij:compose"), exclusions)
   implementation(project(":tools:tracing"), exclusions)
