@@ -3599,7 +3599,6 @@ public final class foundry/cli/buildkite/With$UnionArrayValue$Companion {
 }
 
 public final class foundry/cli/gradle/GradleProjectFlattenerCli : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field DESCRIPTION Ljava/lang/String;
 	public fun <init> ()V
 	public fun help (Lcom/github/ajalt/clikt/core/Context;)Ljava/lang/String;
 	public fun run ()V
@@ -3613,7 +3612,6 @@ public final class foundry/cli/gradle/GradleProjectFlattenerCli$Factory : foundr
 }
 
 public final class foundry/cli/gradle/GradleSettingsVerifierCli : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field DESCRIPTION Ljava/lang/String;
 	public fun <init> ()V
 	public fun help (Lcom/github/ajalt/clikt/core/Context;)Ljava/lang/String;
 	public fun run ()V
@@ -3627,9 +3625,6 @@ public final class foundry/cli/gradle/GradleSettingsVerifierCli$Factory : foundr
 }
 
 public final class foundry/cli/gradle/GradleTestFixturesMigratorCli : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field ANDROID_TEST_FIXTURES_BLOCK Ljava/lang/String;
-	public static final field DESCRIPTION Ljava/lang/String;
-	public static final field JAVA_FIXTURES_BLOCK Ljava/lang/String;
 	public fun <init> ()V
 	public fun help (Lcom/github/ajalt/clikt/core/Context;)Ljava/lang/String;
 	public fun run ()V
@@ -3643,7 +3638,6 @@ public final class foundry/cli/gradle/GradleTestFixturesMigratorCli$Factory : fo
 }
 
 public final class foundry/cli/lint/LintBaselineMergerCli : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field DESCRIPTION Ljava/lang/String;
 	public fun <init> ()V
 	public fun run ()V
 }
@@ -3656,7 +3650,6 @@ public final class foundry/cli/lint/LintBaselineMergerCli$Factory : foundry/cli/
 }
 
 public final class foundry/cli/sarif/ApplyBaselinesToSarifs : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field DESCRIPTION Ljava/lang/String;
 	public fun <init> ()V
 	public fun help (Lcom/github/ajalt/clikt/core/Context;)Ljava/lang/String;
 	public fun run ()V
@@ -3670,7 +3663,6 @@ public final class foundry/cli/sarif/ApplyBaselinesToSarifs$Factory : foundry/cl
 }
 
 public final class foundry/cli/sarif/MergeSarifReports : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field DESCRIPTION Ljava/lang/String;
 	public fun <init> ()V
 	public fun help (Lcom/github/ajalt/clikt/core/Context;)Ljava/lang/String;
 	public fun run ()V
@@ -3807,7 +3799,6 @@ public final class foundry/cli/shellsentry/ShellSentry$Companion {
 }
 
 public final class foundry/cli/shellsentry/ShellSentryCli : com/github/ajalt/clikt/core/CliktCommand {
-	public static final field DESCRIPTION Ljava/lang/String;
 	public fun <init> ()V
 	public fun run ()V
 }
