@@ -16,7 +16,7 @@
 package foundry.cli.shellsentry
 
 import com.bugsnag.Bugsnag
-import com.bugsnag.Report
+import com.bugsnag.BugsnagEvent
 import com.bugsnag.Severity
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -67,10 +67,11 @@ internal class ResultProcessor(
           it.notify(KnownIssue(issue), Severity.ERROR) { report ->
             // Group by the throwable message
             report.setGroupingHash(issue.groupingHash)
-            report.addToTab("Run Info", "After-Retry", isAfterRetry)
+            report.addMetadata("Run Info", "After-Retry", isAfterRetry)
             config.gradleEnterpriseServer?.let(logLinesReversed::parseBuildScan)?.let { scanLink ->
-              report.addToTab("Run Info", "Build-Scan", scanLink)
+              report.addMetadata("Run Info", "Build-Scan", scanLink)
             }
+            true
           }
         } ?: run { verboseEcho("Skipping bugsnag reporting: $retrySignal") }
 
@@ -110,12 +111,13 @@ internal class ResultProcessor(
           bugsnag?.let {
             verboseEcho("Reporting to bugsnag: ${result.retrySignal}")
             it.notify(result.throwableMaker(result.message), Severity.ERROR) { report ->
-              report.addToTab("Run Info", "After-Retry", isAfterRetry)
+              report.addMetadata("Run Info", "After-Retry", isAfterRetry)
               config.gradleEnterpriseServer?.let(logLinesReversed::parseBuildScan)?.let { scanLink
                 ->
-                report.addToTab("Run Info", "Build-Scan", scanLink)
+                report.addMetadata("Run Info", "Build-Scan", scanLink)
               }
-              report.addToTab("Extensions", "Explanation", result.explanation)
+              report.addMetadata("Extensions", "Explanation", result.explanation)
+              true
             }
           } ?: run { verboseEcho("Skipping bugsnag reporting.") }
 
@@ -147,7 +149,7 @@ internal class ResultProcessor(
 
       // Report synchronously. This is a CLI so we don't care about blocking.
       // Use our own OkHttp based delivery for better reliability and proxy support.
-      delivery = OkHttpSyncHttpDelivery
+      setDelivery(OkHttpSyncHttpDelivery)
 
       // Set the app type to the step key. Useful for grouping these by different steps they
       // occur in.
@@ -167,29 +169,30 @@ internal class ResultProcessor(
       }
 
       // Add metadata to reports
-      addCallback { report ->
+      addOnError { report ->
         verboseEcho("Adding metadata to report")
 
         // Tabs with misc build info.
         report.populateDeviceTab()
         report.populateBuildKiteTab()
+        true
       }
     }
   }
 }
 
-private fun Report.populateDeviceTab() {
-  addToTab("Device", "OS-version", System.getProperty("os.version"))
-  addToTab("Device", "JRE", System.getProperty("java.version"))
-  addToTab("Device", "Kotlin", KotlinVersion.CURRENT.toString())
+private fun BugsnagEvent.populateDeviceTab() {
+  addMetadata("Device", "OS-version", System.getProperty("os.version"))
+  addMetadata("Device", "JRE", System.getProperty("java.version"))
+  addMetadata("Device", "Kotlin", KotlinVersion.CURRENT.toString())
 }
 
-private fun Report.populateBuildKiteTab() {
-  envOrNull("BUILDKITE_JOB_ID")?.let { jobId -> addToTab("BuildKite", "Job-ID", jobId) }
-  envOrNull("BUILDKITE_BUILD_ID")?.let { addToTab("BuildKite", "ID", it) }
-  envOrNull("BUILDKITE_BUILD_URL")?.let { addToTab("BuildKite", "URL", it) }
-  envOrNull("BUILDKITE_STEP_KEY")?.let { addToTab("BuildKite", "Step-Key", it) }
-  envOrNull("BUILDKITE_COMMAND")?.let { addToTab("BuildKite", "CI-Command", it) }
+private fun BugsnagEvent.populateBuildKiteTab() {
+  envOrNull("BUILDKITE_JOB_ID")?.let { jobId -> addMetadata("BuildKite", "Job-ID", jobId) }
+  envOrNull("BUILDKITE_BUILD_ID")?.let { addMetadata("BuildKite", "ID", it) }
+  envOrNull("BUILDKITE_BUILD_URL")?.let { addMetadata("BuildKite", "URL", it) }
+  envOrNull("BUILDKITE_STEP_KEY")?.let { addMetadata("BuildKite", "Step-Key", it) }
+  envOrNull("BUILDKITE_COMMAND")?.let { addMetadata("BuildKite", "CI-Command", it) }
 }
 
 private fun envOrNull(envKey: String) = System.getenv(envKey)?.takeUnless { it.isBlank() }
