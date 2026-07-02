@@ -188,16 +188,15 @@ public class AffectedProjectsComputer(
         }
     }
 
-    val allAffectedProjects =
-      buildSet {
-          for ((path, change) in changedProjects) {
-            add(path)
-            if (change.affectsDependents) {
-              addAll(dependencyMetadata.projectsToDependents[path] ?: emptySet())
-            }
-          }
+    val allAffectedProjects = buildSet {
+      for ((path, change) in changedProjects) {
+        add(path)
+        if (change.affectsDependents) {
+          addAll(dependencyMetadata.projectsToDependents[path] ?: emptySet())
         }
-        .toSortedSet()
+      }
+    }
+      .toSortedSet()
 
     logger.lifecycle("Found ${allAffectedProjects.size} affected projects.")
 
