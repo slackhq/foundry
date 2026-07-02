@@ -62,51 +62,51 @@ internal abstract class CheckManifestPermissionsTask @Inject constructor(problem
   @TaskAction
   fun check() {
     measureTimeMillis {
-        val manifestFile = inputFile.asFile.get()
-        logger.debug("$LOG Using manifest at $manifestFile")
+      val manifestFile = inputFile.asFile.get()
+      logger.debug("$LOG Using manifest at $manifestFile")
 
-        val allowlistFile = permissionAllowlistFile.asFile.get()
-        logger.debug("$LOG Using allowlist permissions at $manifestFile")
+      val allowlistFile = permissionAllowlistFile.asFile.get()
+      logger.debug("$LOG Using allowlist permissions at $manifestFile")
 
-        val allowlist = permissionAllowlist.get()
-        logger.debug("$LOG ${allowlist.size} allowlisted permissions: $allowlist")
+      val allowlist = permissionAllowlist.get()
+      logger.debug("$LOG ${allowlist.size} allowlisted permissions: $allowlist")
 
-        val permissions = parseXmlPermissions(manifestFile)
-        logger.debug("$LOG ${permissions.size} parsed permissions: $permissions")
+      val permissions = parseXmlPermissions(manifestFile)
+      logger.debug("$LOG ${permissions.size} parsed permissions: $permissions")
 
-        val added = permissions - allowlist
-        val removed = allowlist - permissions
-        var exception: PermissionAllowlistException? = null
-        var solution = ""
-        if (added.isNotEmpty()) {
-          exception = PermissionAllowlistException("New permission(s) detected!")
-          solution =
-            "If this is intentional, please add them to $allowlistFile and " +
-              "update your PR (a code owners group will be added for review)." +
-              "Added permissions: $added"
-        } else if (removed.isNotEmpty()) {
-          exception = PermissionAllowlistException("Removed permission(s) detected!")
-          solution =
-            "If this is intentional, please remove them to $allowlistFile and update " +
-              "your PR (a code owners group will be added for review)." +
-              "Removed permissions: $removed"
-        }
+      val added = permissions - allowlist
+      val removed = allowlist - permissions
+      var exception: PermissionAllowlistException? = null
+      var solution = ""
+      if (added.isNotEmpty()) {
+        exception = PermissionAllowlistException("New permission(s) detected!")
+        solution =
+          "If this is intentional, please add them to $allowlistFile and " +
+            "update your PR (a code owners group will be added for review)." +
+            "Added permissions: $added"
+      } else if (removed.isNotEmpty()) {
+        exception = PermissionAllowlistException("Removed permission(s) detected!")
+        solution =
+          "If this is intentional, please remove them to $allowlistFile and update " +
+            "your PR (a code owners group will be added for review)." +
+            "Removed permissions: $removed"
+      }
 
-        if (exception == null) {
-          manifestFile.copyTo(outputFile.asFile.get(), overwrite = true)
-        } else {
-          val problemId =
-            ProblemId.create(
-              "permission-allowlist",
-              "Manifest permission check failure",
-              FoundryShared.PROBLEM_GROUP,
-            )
-          problemReporter.throwing(exception, problemId) {
-            fileLocation(manifestFile.absolutePath)
-            solution(solution)
-          }
+      if (exception == null) {
+        manifestFile.copyTo(outputFile.asFile.get(), overwrite = true)
+      } else {
+        val problemId =
+          ProblemId.create(
+            "permission-allowlist",
+            "Manifest permission check failure",
+            FoundryShared.PROBLEM_GROUP,
+          )
+        problemReporter.throwing(exception, problemId) {
+          fileLocation(manifestFile.absolutePath)
+          solution(solution)
         }
       }
+    }
       .let { logger.debug("$LOG Manifest perm checks took $it ms") }
   }
 
