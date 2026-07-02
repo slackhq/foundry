@@ -24,9 +24,13 @@ import com.intellij.openapi.wm.ToolWindowManager
 import foundry.intellij.skate.tracing.SkateTraceReporter
 import foundry.intellij.skate.ui.WhatsNewPanelFactory
 import java.util.function.Supplier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface SkateProjectService {
   val traceReporter: SkateTraceReporter
+
+  fun launchTrace(block: suspend SkateTraceReporter.() -> Unit)
 
   /**
    * Shows the "What's New" panel.
@@ -40,9 +44,16 @@ interface SkateProjectService {
  * This file's intended purpose is to pass in the changelog file from the file path into the What's
  * New UI of the Skate Plugin
  */
-class SkateProjectServiceImpl(private val project: Project) : SkateProjectService {
+class SkateProjectServiceImpl(
+  private val project: Project,
+  private val coroutineScope: CoroutineScope,
+) : SkateProjectService {
 
   override val traceReporter: SkateTraceReporter by lazy { SkateTraceReporter(project) }
+
+  override fun launchTrace(block: suspend SkateTraceReporter.() -> Unit) {
+    coroutineScope.launch { traceReporter.block() }
+  }
 
   override fun showWhatsNewPanel(forceShow: Boolean) {
     val settings = project.service<SkatePluginSettings>()

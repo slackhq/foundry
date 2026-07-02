@@ -26,9 +26,9 @@ import com.intellij.psi.PsiFile
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
 import foundry.intellij.skate.util.featureFlagFilePattern
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isLinkifiedFeatureFlagsEnabled
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 import java.net.URI
 import java.time.Instant
 import org.jetbrains.kotlin.psi.KtFile
@@ -96,12 +96,12 @@ class UrlIntentionAction(private val message: String, private val url: String) :
 
   fun sendUsageTrace(project: Project) {
     if (!project.isTracingEnabled()) return
-    project
-      .getTraceReporter()
-      .createPluginUsageTraceAndSendTrace(
+    project.launchTrace {
+      createPluginUsageTraceAndSendTrace(
         "feature_flag_annotator",
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
       )
+    }
   }
 }
