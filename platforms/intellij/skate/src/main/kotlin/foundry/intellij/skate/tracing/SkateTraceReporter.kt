@@ -33,7 +33,6 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okio.ByteString
@@ -67,7 +66,7 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
     }
   }
 
-  fun createPluginUsageTraceAndSendTrace(
+  suspend fun createPluginUsageTraceAndSendTrace(
     spanName: String,
     startTimestamp: Instant,
     spanDataMap: List<KeyValue>,
@@ -105,7 +104,7 @@ class SkateTraceReporter(val project: Project) : TraceReporter {
         this.addAll(spanDataMap)
       }
     val spans = ListOfSpans(spans = listOf(span), tags = traceTags)
-    runBlocking { sendTrace(spans) }
+    sendTrace(spans)
     return spans
   }
 

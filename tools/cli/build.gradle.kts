@@ -27,7 +27,7 @@ plugins {
 }
 
 kotlin {
-  @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled.set(true) }
+  @OptIn(ExperimentalAbiValidation::class) abiValidation {}
   compilerOptions {
     optIn.addAll("kotlin.ExperimentalStdlibApi", "kotlinx.coroutines.ExperimentalCoroutinesApi")
   }

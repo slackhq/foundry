@@ -26,8 +26,8 @@ import foundry.intellij.skate.SkateProjectService
 import foundry.intellij.skate.SkateProjectServiceImpl
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 import java.time.Instant
 
 /** Action to open the "What's New" panel on demand. */
@@ -43,13 +43,13 @@ class ShowWhatsNewAction : AnAction(), DumbAware {
     if (project.isTracingEnabled()) {
       val skateSpanBuilder = SkateSpanBuilder()
       skateSpanBuilder.addTag("event", SkateTracingEvent.WhatsNew.PANEL_OPENED)
-      project
-        .getTraceReporter()
-        .createPluginUsageTraceAndSendTrace(
+      project.launchTrace {
+        createPluginUsageTraceAndSendTrace(
           "whats_new_button_clicked",
           startTimestamp,
           skateSpanBuilder.getKeyValueList(),
         )
+      }
     }
   }
 

@@ -23,9 +23,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isProjectGenMenuActionEnabled
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 import java.time.Instant
 
 class ProjectGenMenuAction : AnAction() {
@@ -55,13 +55,13 @@ class ProjectGenMenuAction : AnAction() {
   fun sendUsageTrace(project: Project, startTimestamp: Instant) {
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.addTag("event", SkateTracingEvent.ProjectGen.DIALOG_OPENED)
-    project
-      .getTraceReporter()
-      .createPluginUsageTraceAndSendTrace(
+    project.launchTrace {
+      createPluginUsageTraceAndSendTrace(
         "project_generator",
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
       )
+    }
   }
 
   override fun getActionUpdateThread(): ActionUpdateThread {
