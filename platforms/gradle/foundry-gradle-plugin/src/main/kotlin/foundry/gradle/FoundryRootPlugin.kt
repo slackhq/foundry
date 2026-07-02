@@ -66,9 +66,7 @@ internal class FoundryRootPlugin @Inject constructor(private val buildFeatures: 
   Plugin<Project> {
 
   override fun apply(project: Project) {
-    require(project == project.rootProject) {
-      "Slack plugin should only be applied on the root project!"
-    }
+    require(project.isRootProject) { "Slack plugin should only be applied on the root project!" }
     val startParameters = project.gradle.startParameter.projectProperties
     val startParameterProperties =
       project.providers.of(StartParameterProperties::class.java) {
@@ -374,7 +372,7 @@ private fun Project.configureMisc(foundryProperties: FoundryProperties) {
     .named { it == "clean" }
     .configureEach {
       group = "build"
-      delete(rootProject.layout.buildDirectory)
+      delete(layout.buildDirectory)
     }
 
   // Configure gradle doctor
