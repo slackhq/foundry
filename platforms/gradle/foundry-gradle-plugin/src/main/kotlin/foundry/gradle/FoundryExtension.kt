@@ -42,7 +42,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 
 @DslMarker public annotation class FoundryExtensionMarker
 
@@ -985,12 +984,6 @@ constructor(
 
           "reportsDestination" -> {
             extension.reportsDestination.set(project.file(v))
-          }
-
-          "nonSkippingGroupOptimization" -> {
-            if (v.toBoolean()) {
-              extension.featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
-            }
           }
 
           "suppressKotlinVersionCompatibilityCheck" -> {
