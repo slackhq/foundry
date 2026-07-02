@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Update to Kotlin `2.4.0`.
+- Update to MoshiX `0.36.0`.
+
 0.35.2
 ------
 
