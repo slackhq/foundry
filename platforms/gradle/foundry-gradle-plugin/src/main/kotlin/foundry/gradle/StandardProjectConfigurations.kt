@@ -33,7 +33,6 @@ import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.LibraryVariant
 import com.android.build.api.variant.TestAndroidComponentsExtension
 import com.android.build.api.variant.TestVariant
-import com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
 import com.android.build.gradle.tasks.JavaPreCompileTask
 import com.autonomousapps.DependencyAnalysisSubExtension
 import com.bugsnag.android.gradle.BugsnagPluginExtension
@@ -431,8 +430,16 @@ internal class StandardProjectConfigurations(
             !foundryProperties.libraryWithVariants &&
             foundryExtension.androidHandler.isViewBindingEnabled
         ) {
+          // AGP exposes this ViewBinding output folder only on its internal task type.
+          @Suppress("InternalAgpApiUsage")
           val databindingTask =
-            tasks.named<DataBindingGenBaseClassesTask>("dataBindingGenBaseClassesRelease")
+            tasks.named<
+              com.android.build.gradle.internal.tasks.databinding.DataBindingGenBaseClassesTask
+            >(
+              "dataBindingGenBaseClassesRelease"
+            )
+          // The same internal task owns the generated source directory provider.
+          @Suppress("InternalAgpApiUsage")
           val databindingOutputProvider = databindingTask.flatMap { it.sourceOutFolder }
           project.addKspSource("kspReleaseKotlin", databindingTask, databindingOutputProvider)
         }

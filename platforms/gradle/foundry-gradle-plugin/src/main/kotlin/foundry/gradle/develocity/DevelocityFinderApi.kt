@@ -30,14 +30,12 @@ import org.gradle.api.Project
  */
 
 internal fun findAdapter(project: Project): BuildScanAdapter {
-  if (project.rootProject.extensions.findByName("develocity") != null) {
-    return DevelocityConfigurationAdapter(project.rootProject.extensions.getByName("develocity"))
-      .buildScan
-  } else if (project.rootProject.extensions.findByName("gradleEnterprise") != null) {
-    return GradleEnterpriseExtensionAdapter(
-        project.rootProject.extensions.getByName("gradleEnterprise")
-      )
-      .buildScan
+  // Build scan extensions are registered on the real root project extension container.
+  @Suppress("GradleProjectIsolation") val rootExtensions = project.rootProject.extensions
+  if (rootExtensions.findByName("develocity") != null) {
+    return DevelocityConfigurationAdapter(rootExtensions.getByName("develocity")).buildScan
+  } else if (rootExtensions.findByName("gradleEnterprise") != null) {
+    return GradleEnterpriseExtensionAdapter(rootExtensions.getByName("gradleEnterprise")).buildScan
   }
   return NoOpBuildScanAdapter()
 }

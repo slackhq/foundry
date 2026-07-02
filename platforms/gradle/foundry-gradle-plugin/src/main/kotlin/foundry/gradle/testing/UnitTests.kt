@@ -246,7 +246,7 @@ internal object UnitTests {
         val workspaceDir =
           when {
             project.isActionsCi -> project.synchronousEnvProperty("GITHUB_WORKSPACE")
-            else -> project.rootProject.projectDir.absolutePath
+            else -> project.isolated.rootProject.projectDirectory.asFile.absolutePath
           }
         jvmArgs(
           "-XX:+HeapDumpOnOutOfMemoryError", // Produce a heap dump when an OOM occurs

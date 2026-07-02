@@ -21,4 +21,5 @@ jobs:
           token: ${{ secrets.SLACKHQ_MBR_GITHUB_TOKEN }}
         env:
           RENOVATE_ALLOWED_POST_UPGRADE_COMMANDS: '["tools/scripts/update-binaries\\.sh"]'
+          RENOVATE_ALLOWED_UNSAFE_EXECUTIONS: '["gradleWrapper"]'
           RENOVATE_REPOSITORIES: '["slackhq/foundry"]'

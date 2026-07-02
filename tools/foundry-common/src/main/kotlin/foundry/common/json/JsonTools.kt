@@ -181,3 +181,19 @@ private class RegexMapJsonAdapter(private val stringAdapter: JsonAdapter<String>
     writer.endObject()
   }
 }
+
+// Adapted from kotlinx-serialization
+public fun CharSequence.minify(offset: Int = -1): CharSequence {
+  if (length < 200) return this
+  if (offset == -1) {
+    val start = this.length - 60
+    if (start <= 0) return this
+    return "....." + substring(start)
+  }
+
+  val start = offset - 30
+  val end = offset + 30
+  val prefix = if (start <= 0) "" else "....."
+  val suffix = if (end >= length) "" else "....."
+  return prefix + substring(start.coerceAtLeast(0), end.coerceAtMost(length)) + suffix
+}
