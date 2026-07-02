@@ -28,7 +28,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.problems.ProblemId
 import org.gradle.api.problems.Problems
-import org.gradle.api.problems.Severity
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -89,7 +88,6 @@ public abstract class ValidateVersionsMatch @Inject constructor(problems: Proble
       ) {
         fileLocation(versionFilePath.absolutePathString())
         solution("Ensure these versions are aligned.")
-        severity(Severity.ERROR)
       }
     }
 

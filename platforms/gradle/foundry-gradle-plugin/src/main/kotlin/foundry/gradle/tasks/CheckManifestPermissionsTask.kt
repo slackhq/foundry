@@ -27,7 +27,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.problems.ProblemId
 import org.gradle.api.problems.Problems
-import org.gradle.api.problems.Severity
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -105,7 +104,6 @@ internal abstract class CheckManifestPermissionsTask @Inject constructor(problem
           problemReporter.throwing(exception, problemId) {
             fileLocation(manifestFile.absolutePath)
             solution(solution)
-            severity(Severity.ERROR)
           }
         }
       }
