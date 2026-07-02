@@ -21,8 +21,8 @@ import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import foundry.intellij.skate.SkateProjectServiceImpl.Companion.WHATS_NEW_PANEL_ID
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 import java.time.Instant
 
 /** Custom listener for WhatsNew Tool Window. */
@@ -46,13 +46,13 @@ class WhatsNewToolWindowListener(private val project: Project) : ToolWindowManag
       } else {
         skateSpanBuilder.addTag("event", SkateTracingEvent.WhatsNew.PANEL_CLOSED)
       }
-      project
-        .getTraceReporter()
-        .createPluginUsageTraceAndSendTrace(
+      project.launchTrace {
+        createPluginUsageTraceAndSendTrace(
           WHATS_NEW_PANEL_ID.replace('-', '_'),
           startTimestamp,
           skateSpanBuilder.getKeyValueList(),
         )
+      }
     }
   }
 

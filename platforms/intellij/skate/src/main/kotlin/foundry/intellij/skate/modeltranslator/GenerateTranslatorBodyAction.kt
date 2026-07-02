@@ -25,8 +25,8 @@ import foundry.intellij.skate.modeltranslator.helper.TranslatorHelper
 import foundry.intellij.skate.modeltranslator.model.TranslatorBundle
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 import java.time.Instant
 
 class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : IntentionAction {
@@ -56,13 +56,13 @@ class GenerateTranslatorBodyAction(private val bundle: TranslatorBundle) : Inten
       SkateSpanBuilder().apply {
         addTag("event", SkateTracingEvent.ModelTranslator.MODEL_TRANSLATOR_GENERATED)
       }
-    project
-      .getTraceReporter()
-      .createPluginUsageTraceAndSendTrace(
+    project.launchTrace {
+      createPluginUsageTraceAndSendTrace(
         "model_translator",
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
       )
+    }
   }
 
   companion object {

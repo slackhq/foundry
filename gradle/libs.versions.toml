@@ -9,7 +9,7 @@ circuit = "0.34.0"
 compose-jb = "1.11.1"
 compose-jb-material3 = "1.9.0"
 compose-jb-stable = "1.11.1"
-coroutines = "1.10.2"
+coroutines = "1.11.0"
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
 coroutines-ij = "1.10.2"
 dependencyAnalysisPlugin = "3.16.0"
@@ -50,13 +50,13 @@ xmlutil = "0.91.3"
 
 # API changes are documented here: https://plugins.jetbrains.com/docs/intellij/api-changes-list.html
 # Bundled API changes (Kotlin, Coroutines, etc) here: https://www.jetbrains.com/legal/third-party-software/?product=IIU
-intellij-version = "2025.1"
-intellij-sinceBuild = "251"
+intellij-version = "2026.1"
+intellij-sinceBuild = "261"
 # https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
 # https://plugins.jetbrains.com/plugin/22989-android/versions/stable
 # https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
 # ^^ This is the list to pull versions from
-intellij-android = "251.26094.121"
+intellij-android = "261.23567.138"
 
 [plugins]
 bestPracticesPlugin = { id = "com.autonomousapps.plugin-best-practices-plugin", version = "0.10" }
@@ -115,7 +115,7 @@ compose-markdown = { module = "com.mikepenz:multiplatform-markdown-renderer", ve
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-core-ij = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines-ij" }
-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-ij" }
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
 develocity-agent-adapters = "com.gradle:develocity-gradle-plugin-adapters:1.2.1"
 gradleLints = "androidx.lint:lint-gradle:1.0.0"
