@@ -101,7 +101,7 @@ public class LintBaselineMergerCli : CliktCommand(DESCRIPTION) {
 
   private val verbose by option("--verbose", "-v").flag()
 
-  private val xml = XML { defaultPolicy { ignoreUnknownChildren() } }
+  private val xml = XML.recommended_1_0 { policy { ignoreUnknownChildren() } }
 
   override fun run() {
     val issues = parseIssues()
