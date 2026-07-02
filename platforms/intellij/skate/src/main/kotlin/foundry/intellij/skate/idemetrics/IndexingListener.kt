@@ -21,8 +21,8 @@ import com.intellij.util.indexing.diagnostic.ProjectScanningHistory
 import com.intellij.util.indexing.diagnostic.dto.toMillis
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 
 @Suppress("UnstableApiUsage")
 class IndexingListener : ProjectIndexingActivityHistoryListener {
@@ -52,13 +52,13 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
       )
       addTag("event", SkateTracingEvent.Indexing.INDEXING_COMPLETED.name)
     }
-    history.project
-      .getTraceReporter()
-      .createPluginUsageTraceAndSendTrace(
+    history.project.launchTrace {
+      createPluginUsageTraceAndSendTrace(
         "indexing",
         history.times.updatingStart.toInstant(),
         skateSpanBuilder.getKeyValueList(),
       )
+    }
   }
 
   override fun onFinishedDumbIndexing(history: ProjectDumbIndexingHistory) {
@@ -73,12 +73,12 @@ class IndexingListener : ProjectIndexingActivityHistoryListener {
       addTag(SkateTracingEvent.Indexing.WAS_INTERRUPTED.name, history.times.isCancelled)
       addTag("event", SkateTracingEvent.Indexing.DUMB_INDEXING_COMPLETED.name)
     }
-    currentProject
-      .getTraceReporter()
-      .createPluginUsageTraceAndSendTrace(
+    currentProject.launchTrace {
+      createPluginUsageTraceAndSendTrace(
         "indexing",
         history.times.updatingStart.toInstant(),
         skateSpanBuilder.getKeyValueList(),
       )
+    }
   }
 }

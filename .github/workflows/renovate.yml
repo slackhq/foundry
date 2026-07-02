@@ -10,12 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v41.0.22
+        uses: renovatebot/github-action@v46.1.17
         with:
           configurationFile: renovate.json
+          renovate-image: renovate/renovate
+          renovate-version: full
           token: ${{ secrets.SLACKHQ_MBR_GITHUB_TOKEN }}
         env:
           RENOVATE_ALLOWED_POST_UPGRADE_COMMANDS: '["tools/scripts/update-binaries\\.sh"]'
+          RENOVATE_ALLOWED_UNSAFE_EXECUTIONS: '["gradleWrapper"]'
+          RENOVATE_REPOSITORIES: '["slackhq/foundry"]'

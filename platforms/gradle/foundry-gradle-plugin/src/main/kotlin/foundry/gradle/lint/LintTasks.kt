@@ -328,7 +328,7 @@ internal object LintTasks {
         }
       }
 
-      lintConfig = rootProject.layout.projectDirectory.file("config/lint/lint.xml").asFile
+      lintConfig = isolated.rootProject.projectDirectory.file("config/lint/lint.xml").asFile
 
       baseline =
         foundryProperties.lintBaselineFileName?.let {

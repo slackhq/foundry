@@ -15,7 +15,6 @@
  */
 package foundry.intellij.skate.ideinstall
 
-import androidx.annotation.VisibleForTesting
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
@@ -31,6 +30,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.inject.Inject
+import org.jetbrains.annotations.TestOnly
 
 @Service(Service.Level.PROJECT)
 class InstallationLocationService @Inject constructor(private val project: Project) {
@@ -51,7 +51,7 @@ class InstallationLocationService @Inject constructor(private val project: Proje
     }
   }
 
-  @VisibleForTesting
+  @TestOnly
   internal fun matchesPattern(path: Path, pattern: String): Boolean {
     val expandedPattern = pattern.replace("~", System.getProperty("user.home"))
     val matcher = FileSystems.getDefault().getPathMatcher("glob:$expandedPattern")

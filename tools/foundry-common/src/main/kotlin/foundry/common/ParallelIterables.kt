@@ -32,15 +32,15 @@ public suspend inline fun <A, B> Iterable<A>.parallelMap(
 ): List<B> = coroutineScope {
   val semaphore = Semaphore(parallelism)
   map {
-      semaphore.acquire()
-      async(start = start) {
-        try {
-          mapper(it)
-        } finally {
-          semaphore.release()
-        }
+    semaphore.acquire()
+    async(start = start) {
+      try {
+        mapper(it)
+      } finally {
+        semaphore.release()
       }
     }
+  }
     .awaitAll()
 }
 
@@ -55,15 +55,15 @@ public suspend inline fun <A, B> Iterable<A>.parallelMapNotNull(
 ): List<B> = coroutineScope {
   val semaphore = Semaphore(parallelism)
   map {
-      semaphore.acquire()
-      async(start = start) {
-        try {
-          mapper(it)
-        } finally {
-          semaphore.release()
-        }
+    semaphore.acquire()
+    async(start = start) {
+      try {
+        mapper(it)
+      } finally {
+        semaphore.release()
       }
     }
+  }
     .awaitAll()
     .filterNotNull()
 }

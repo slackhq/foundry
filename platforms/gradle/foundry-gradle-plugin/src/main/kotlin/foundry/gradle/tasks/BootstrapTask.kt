@@ -532,19 +532,18 @@ internal object BootstrapUtils {
 
     kotlinDaemonGcArgs += commonJdkFlags
 
-    fun buildJvmArgs(xmsG: Int, xmxG: Int, gcArgs: List<String>): List<String> =
-      buildList {
-          add("-Xms${xmsG}g")
-          add("-Xmx${xmxG}g")
-          // https://www.jasonpearson.dev/softreflrupolicymspermb-in-jvm-builds/
-          add("-XX:SoftRefLRUPolicyMSPerMB=1")
-          // https://www.jasonpearson.dev/codecache-in-jvm-builds/
-          add("-XX:ReservedCodeCacheSize=320m")
-          addAll(gcArgs)
-          addAll(extraJvmArgs.get())
-          addAll(commonJdkFlags)
-        }
-        .sorted()
+    fun buildJvmArgs(xmsG: Int, xmxG: Int, gcArgs: List<String>): List<String> = buildList {
+      add("-Xms${xmsG}g")
+      add("-Xmx${xmxG}g")
+      // https://www.jasonpearson.dev/softreflrupolicymspermb-in-jvm-builds/
+      add("-XX:SoftRefLRUPolicyMSPerMB=1")
+      // https://www.jasonpearson.dev/codecache-in-jvm-builds/
+      add("-XX:ReservedCodeCacheSize=320m")
+      addAll(gcArgs)
+      addAll(extraJvmArgs.get())
+      addAll(commonJdkFlags)
+    }
+      .sorted()
 
     val gradleDaemonArgs =
       GradleDaemonArgs(buildJvmArgs(gradleXms, gradleXmx, gradleDaemonGcArgs), maxWorkers)
