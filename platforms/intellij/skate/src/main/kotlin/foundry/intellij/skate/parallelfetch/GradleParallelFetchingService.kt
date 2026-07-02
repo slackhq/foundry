@@ -15,7 +15,6 @@
  */
 package foundry.intellij.skate.parallelfetch
 
-import androidx.annotation.VisibleForTesting
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
@@ -28,6 +27,7 @@ import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import foundry.intellij.skate.SkatePluginSettings
 import javax.inject.Inject
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 
 @Service(Service.Level.PROJECT)
@@ -61,7 +61,7 @@ class GradleParallelFetchingService @Inject constructor(private val project: Pro
     }
   }
 
-  @VisibleForTesting
+  @TestOnly
   internal fun isAndroidStudio(): Boolean {
     val appInfo = ApplicationInfo.getInstance()
     return appInfo.fullApplicationName.contains("Android Studio", ignoreCase = true)

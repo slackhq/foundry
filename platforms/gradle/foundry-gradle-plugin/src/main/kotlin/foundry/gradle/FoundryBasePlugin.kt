@@ -187,20 +187,17 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
           }
         }
       }
+      if (isRootProject) {
+        configure<SpotlessExtensionPredeclare> { spotlessFormatters() }
+      }
       // Pre-declare in root project for better performance and also to work around
       // https://github.com/diffplug/spotless/issues/1213
       configure<SpotlessExtension> {
         spotlessFormatters()
-        if (isRootProject) {
-          predeclareDeps()
-        }
         // Use platform native endings and don't try to inspect gitattrs
         // https://github.com/diffplug/spotless/issues/1527
         // https://github.com/diffplug/spotless/issues/1644
         lineEndings = LineEnding.PLATFORM_NATIVE
-      }
-      if (isRootProject) {
-        configure<SpotlessExtensionPredeclare> { spotlessFormatters() }
       }
     }
   }

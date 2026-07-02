@@ -117,11 +117,17 @@ configurations
   .named { it.endsWith("ForLint") }
   .configureEach { attributes { attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm) } }
 
+configurations.named("testRuntimeClasspath") {
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+  exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+}
+
 dependencies {
   intellijPlatform {
     plugin(libs.versions.intellij.android.map { "org.jetbrains.android:${it}" }.get())
     bundledPlugins(
       "com.intellij.java",
+      "com.intellij.gradle",
       "org.intellij.plugins.markdown",
       "org.jetbrains.plugins.terminal",
       "org.jetbrains.kotlin",
@@ -154,6 +160,10 @@ dependencies {
 
   compileOnly(libs.coroutines.core.ij)
 
+  testImplementation(libs.coroutines.test) {
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+  }
   testImplementation(libs.junit)
   testImplementation(libs.truth)
 
