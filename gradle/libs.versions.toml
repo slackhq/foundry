@@ -3,7 +3,7 @@ agp = "9.2.1"
 agpAlpha = "9.2.1"
 anvil = "0.5.4"
 # Release notes: https://asm.ow2.io/versions.html
-asm = "9.9.1"
+asm = "9.10.1"
 bugsnagGradle = "8.2.0"
 circuit = "0.33.1"
 compose-jb = "1.11.1"
