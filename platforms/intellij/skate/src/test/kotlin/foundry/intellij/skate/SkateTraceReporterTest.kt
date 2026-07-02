@@ -25,6 +25,7 @@ import foundry.tracing.KeyValue
 import foundry.tracing.ValueType
 import foundry.tracing.model.newTagBuilder
 import java.time.Instant
+import kotlinx.coroutines.test.runTest
 import okio.ByteString
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +41,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
   }
 
   @Test
-  fun testSpanCreatedWithCorrectTags() {
+  fun testSpanCreatedWithCorrectTags() = runTest {
     val traceTags =
       newTagBuilder().apply {
         "test_string" tagTo "test_value"
@@ -83,7 +84,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
   }
 
   @Test
-  fun testSpanNotCreatedWhenSpanDataIsEmpty() {
+  fun testSpanNotCreatedWhenSpanDataIsEmpty() = runTest {
     val listOfSpans =
       SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(
@@ -99,7 +100,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
   }
 
   @Test
-  fun testSpanNotCreatedWhenIdeVersionEmpty() {
+  fun testSpanNotCreatedWhenIdeVersionEmpty() = runTest {
     val listOfSpans =
       SkateTraceReporter(project)
         .createPluginUsageTraceAndSendTrace(
@@ -115,7 +116,7 @@ class SkateTraceReporterTest : BasePlatformTestCase() {
   }
 
   @Test
-  fun testPluginInfoTraceWithCorrectTags() {
+  fun testPluginInfoTraceWithCorrectTags() = runTest {
     val traceTags =
       newTagBuilder().apply {
         "event" tagTo "PLUGIN_INFO"

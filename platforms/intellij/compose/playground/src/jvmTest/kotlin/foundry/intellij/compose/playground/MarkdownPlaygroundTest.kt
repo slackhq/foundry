@@ -27,6 +27,7 @@ import io.github.takahirom.roborazzi.captureRoboImage
 import kotlin.test.Test
 
 class MarkdownPlaygroundTest {
+  // TODO can't migrate the deprecated runDesktopComposeUiTest until roborazzi supports
   @OptIn(ExperimentalTestApi::class, ExperimentalRoborazziApi::class)
   @Test
   fun snapshot() = runDesktopComposeUiTest {

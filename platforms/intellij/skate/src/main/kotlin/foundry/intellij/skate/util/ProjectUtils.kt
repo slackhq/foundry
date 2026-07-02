@@ -34,3 +34,7 @@ fun Project.isProjectGenMenuActionEnabled(): Boolean = settings().isProjectGenMe
 fun Project.tracingEndpoint(): String? = settings().tracingEndpoint
 
 fun Project.getTraceReporter(): SkateTraceReporter = service<SkateProjectService>().traceReporter
+
+fun Project.launchTrace(block: suspend SkateTraceReporter.() -> Unit) {
+  service<SkateProjectService>().launchTrace(block)
+}
