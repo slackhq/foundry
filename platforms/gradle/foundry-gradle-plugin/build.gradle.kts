@@ -25,6 +25,9 @@ plugins {
   alias(libs.plugins.lint)
 }
 
+// Can remove this when we move to language version 2.4+
+kotlin { compilerOptions { freeCompilerArgs.add("-Xannotation-default-target=param-property") } }
+
 gradlePlugin {
   plugins.create("foundry-root") {
     id = "com.slack.foundry.root"

@@ -249,8 +249,6 @@ subprojects {
             "-Xemit-jvm-type-annotations",
             // https://kotlinlang.org/docs/whatsnew1520.html#support-for-jspecify-nullness-annotations
             "-Xjspecify-annotations=strict",
-            // https://youtrack.jetbrains.com/issue/KT-73255
-            "-Xannotation-default-target=param-property",
           )
           // https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
           freeCompilerArgs.add(projectJvmTarget.map { "-Xjdk-release=${it.target}" })
@@ -343,9 +341,7 @@ subprojects {
       }
       project.dependencies {
         configure<IntelliJPlatformDependenciesExtension> {
-          // Suppressed deprecation as we can't actually move to intellijIdea() until 2025.3
-          // Bad use of the deprecated annotation
-          @Suppress("DEPRECATION") intellijIdeaCommunity(libs.versions.intellij.version)
+          intellijIdea(libs.versions.intellij.version)
         }
       }
 
