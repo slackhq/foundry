@@ -40,15 +40,16 @@ class SkateErrorHandler : ErrorReportSubmitter() {
     bugsnag.startSession()
     bugsnag.setAppVersion(VERSION)
     bugsnag.setProjectPackages("com.slack.sgp.intellij")
-    bugsnag.addCallback {
-      it.addToTab("Device", "osVersion", System.getProperty("os.version"))
-      it.addToTab("Device", "JRE", System.getProperty("java.version"))
-      it.addToTab("Device", "IDE Version", ApplicationInfo.getInstance().fullVersion)
-      it.addToTab("Device", "IDE Build #", ApplicationInfo.getInstance().build)
-      it.addToTab("Device", "Plugin SHA", GIT_SHA)
+    bugsnag.addOnError {
+      it.addMetadata("Device", "osVersion", System.getProperty("os.version"))
+      it.addMetadata("Device", "JRE", System.getProperty("java.version"))
+      it.addMetadata("Device", "IDE Version", ApplicationInfo.getInstance().fullVersion)
+      it.addMetadata("Device", "IDE Build #", ApplicationInfo.getInstance().build)
+      it.addMetadata("Device", "Plugin SHA", GIT_SHA)
       PluginManagerCore.plugins.forEach { plugin ->
-        it.addToTab("Plugins", plugin.name, "${plugin.pluginId} : ${plugin.version}")
+        it.addMetadata("Plugins", plugin.name, "${plugin.pluginId} : ${plugin.version}")
       }
+      true
     }
   }
 
@@ -64,9 +65,10 @@ class SkateErrorHandler : ErrorReportSubmitter() {
       if (BUGSNAG_KEY.isNotBlank()) {
         val throwable = (event.data as? AbstractMessage)?.throwable ?: event.throwable
         bugsnag.notify(throwable, Severity.ERROR) {
-          it.addToTab("Data", "message", event.message)
-          it.addToTab("Data", "additional info", additionalInfo)
-          it.addToTab("Data", "stacktrace", event.throwableText)
+          it.addMetadata("Data", "message", event.message)
+          it.addMetadata("Data", "additional info", additionalInfo)
+          it.addMetadata("Data", "stacktrace", event.throwableText)
+          true
         }
       }
     }
