@@ -15,15 +15,13 @@
  */
 package foundry.gradle.tasks
 
-import com.android.build.gradle.internal.publishing.AndroidArtifacts
-import com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.attributes.AttributeContainer
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.component.external.model.ModuleComponentArtifactIdentifier
 import org.gradle.work.DisableCachingByDefault
 
 @DisableCachingByDefault
@@ -36,7 +34,7 @@ public abstract class BaseDependencyCheckTask : DefaultTask() {
     identifiersToVersions.putAll(
       configuration.incoming
         .artifactView {
-          attributes { attribute(AndroidArtifacts.ARTIFACT_TYPE, ArtifactType.AAR_OR_JAR.type) }
+          attributes { requestAarOrJarArtifactType() }
           lenient(true)
           // Only resolve external dependencies! Without this, all project dependencies will get
           // _compiled_.
@@ -50,9 +48,9 @@ public abstract class BaseDependencyCheckTask : DefaultTask() {
           result
             .asSequence()
             .map { it.id }
-            .filterIsInstance<ModuleComponentArtifactIdentifier>()
-            .associate { component ->
-              val componentId = component.componentIdentifier
+            .map { it.componentIdentifier }
+            .filterIsInstance<ModuleComponentIdentifier>()
+            .associate { componentId ->
               val identifier = "${componentId.group}:${componentId.module}"
               identifier to componentId.version
             }
@@ -64,4 +62,13 @@ public abstract class BaseDependencyCheckTask : DefaultTask() {
   internal fun check() {
     handleDependencies(identifiersToVersions.get())
   }
+}
+
+private fun AttributeContainer.requestAarOrJarArtifactType() {
+  // AGP has no public constant for this AAR-or-JAR artifact view filter.
+  @Suppress("InternalAgpApiUsage")
+  attribute(
+    com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE,
+    com.android.build.gradle.internal.publishing.AndroidArtifacts.ArtifactType.AAR_OR_JAR.type,
+  )
 }

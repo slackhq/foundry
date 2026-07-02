@@ -47,10 +47,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.internal.plugins.PluginRegistry
 import org.gradle.api.problems.ProblemId
 import org.gradle.api.problems.Problems
-import org.gradle.api.problems.Severity
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -143,10 +141,10 @@ internal object ModuleTopographyTasks {
     task.dependsOnSourceGeneratingTasks(project, includeCompilerTasks = false)
 
     // No easy way to query all plugin IDs, so we use an internal Gradle API
-    val pluginRegistry = project.serviceOf<PluginRegistry>()
+    val pluginRegistry = project.pluginRegistry()
     project.plugins.configureEach {
       val pluginType = this::class.java
-      val id = pluginRegistry.findPluginForClass(pluginType).getOrNull()?.id
+      val id = pluginRegistry.pluginIdFor(pluginType)
       if (id == null) {
         project.logger.debug("Could not read plugin ID for type '$pluginType'")
         return@configureEach
@@ -159,6 +157,16 @@ internal object ModuleTopographyTasks {
     return task
   }
 }
+
+// Gradle has no public service for mapping plugin classes back to plugin IDs.
+@Suppress("InternalGradleApiUsage")
+private fun Project.pluginRegistry(): org.gradle.api.internal.plugins.PluginRegistry = serviceOf()
+
+// PluginRegistry is the only API that resolves applied plugin implementation classes to IDs.
+@Suppress("InternalGradleApiUsage")
+private fun org.gradle.api.internal.plugins.PluginRegistry.pluginIdFor(
+  pluginType: Class<*>
+): String? = findPluginForClass(pluginType).getOrNull()?.id
 
 @CacheableTask
 public abstract class ModuleTopographyTask : DefaultTask() {
@@ -347,7 +355,6 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
     problemReporter.throwing(exception, problemId) {
       fileLocation(buildFile.relativeTo(rootDirProperty.asFile.get().toPath()).toString())
       solution(solution)
-      severity(Severity.ERROR)
     }
   }
 
