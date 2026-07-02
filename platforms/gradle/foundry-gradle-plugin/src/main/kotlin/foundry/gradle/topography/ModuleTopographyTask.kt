@@ -49,7 +49,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.problems.ProblemId
 import org.gradle.api.problems.Problems
-import org.gradle.api.problems.Severity
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -356,7 +355,6 @@ public abstract class ValidateModuleTopographyTask @Inject constructor(problems:
     problemReporter.throwing(exception, problemId) {
       fileLocation(buildFile.relativeTo(rootDirProperty.asFile.get().toPath()).toString())
       solution(solution)
-      severity(Severity.ERROR)
     }
   }
 
