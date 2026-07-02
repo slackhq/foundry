@@ -19,8 +19,8 @@ import com.android.tools.idea.gradle.project.sync.GradleSyncListener
 import com.intellij.openapi.project.Project
 import foundry.intellij.skate.tracing.SkateSpanBuilder
 import foundry.intellij.skate.tracing.SkateTracingEvent
-import foundry.intellij.skate.util.getTraceReporter
 import foundry.intellij.skate.util.isTracingEnabled
+import foundry.intellij.skate.util.launchTrace
 import foundry.tracing.model.makeId
 import java.time.Instant
 import okio.ByteString
@@ -75,14 +75,14 @@ class GradleSyncSubscriber : GradleSyncListener {
   ) {
     val skateSpanBuilder = SkateSpanBuilder()
     skateSpanBuilder.addTag("event", event)
-    project
-      .getTraceReporter()
-      .createPluginUsageTraceAndSendTrace(
+    project.launchTrace {
+      createPluginUsageTraceAndSendTrace(
         "gradle_sync",
         startTimestamp,
         skateSpanBuilder.getKeyValueList(),
         spanId,
         parentId,
       )
+    }
   }
 }
