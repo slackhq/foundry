@@ -110,7 +110,7 @@ compose-jb-material = { module = "org.jetbrains.compose.material:material", vers
 compose-jb-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-jb-material3" }
 compose-jb-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-jb" }
 compose-jb-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "compose-jb" }
-composeLints = "com.slack.lint.compose:compose-lint-checks:1.5.2"
+composeLints = "com.slack.lint.compose:compose-lint-checks:1.5.3"
 compose-markdown = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown" }
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
