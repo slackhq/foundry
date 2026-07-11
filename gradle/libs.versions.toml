@@ -46,7 +46,7 @@ sortDependencies = "0.19.0"
 spotless = "8.8.0"
 sqldelight = "2.3.2"
 wire = "6.4.5"
-xmlutil = "1.0.0"
+xmlutil = "1.0.1"
 
 # API changes are documented here: https://plugins.jetbrains.com/docs/intellij/api-changes-list.html
 # Bundled API changes (Kotlin, Coroutines, etc) here: https://www.jetbrains.com/legal/third-party-software/?product=IIU
