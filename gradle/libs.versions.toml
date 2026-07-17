@@ -1,6 +1,6 @@
 [versions]
 agp = "9.3.0"
-agpAlpha = "9.2.1"
+agpAlpha = "9.3.0"
 anvil = "0.5.4"
 # Release notes: https://asm.ow2.io/versions.html
 asm = "9.10.1"
