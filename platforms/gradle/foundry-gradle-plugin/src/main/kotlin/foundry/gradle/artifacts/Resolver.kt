@@ -59,6 +59,9 @@ internal class Resolver<T : Serializable>(
 ) {
 
   internal companion object {
+    /** Name of the resolvable configuration for [declarableName], mirroring [internalName]. */
+    fun resolvableConfigurationName(declarableName: String): String = "${declarableName}Classpath"
+
     /**
      * Convenience function for creating a [Resolver] for inter-project resolving of
      * [FoundryArtifact].
@@ -97,7 +100,7 @@ internal class Resolver<T : Serializable>(
 
   // Following the naming pattern established by the Java Library plugin. See
   // https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-  private val internalName = "${declarableName}Classpath"
+  private val internalName = resolvableConfigurationName(declarableName)
 
   /** Dependencies are declared on this configuration */
   val declarable: Configuration = project.configurations.dependencyScope(declarableName).get()

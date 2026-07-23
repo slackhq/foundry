@@ -19,6 +19,8 @@ import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.TestAndroidComponentsExtension
+import foundry.gradle.artifacts.FoundryArtifact
+import foundry.gradle.artifacts.Resolver
 import foundry.gradle.properties.gitExecProvider
 import foundry.gradle.properties.mapToBoolean
 import java.io.File
@@ -33,6 +35,7 @@ import org.gradle.api.Task
 import org.gradle.api.UnknownTaskException
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
@@ -127,6 +130,33 @@ public fun Project.fullGitShaProvider(): Provider<String> {
 
 public fun Project.gitShaProvider(): Provider<String> {
   return providers.gitExecProvider("git", "rev-parse", "--short", "HEAD")
+}
+
+/**
+ * Returns the distinct paths of projects that produce androidTest APKs. Resolves eagerly from
+ * published metadata, reading only each artifact's owning project (not its files), so it is safe to
+ * call at configuration time and does not trigger the producer tasks. Must be called on the root
+ * project after Foundry's root plugin is applied.
+ */
+public fun Project.androidTestProjectPaths(): List<String> {
+  val configurationName =
+    Resolver.resolvableConfigurationName(FoundryArtifact.SkippyAndroidTestProject.declarableName)
+  val configuration =
+    configurations.findByName(configurationName)
+      ?: error(
+        "Configuration '$configurationName' not found. androidTestProjectPaths() must be called on " +
+          "the root project after Foundry's root plugin is applied, which registers the resolver " +
+          "this reads from."
+      )
+  // Only projects that publish the androidTest artifact match the view's attributes, so this is
+  // exactly the producer set.
+  return configuration.incoming
+    .artifactView { lenient(true) }
+    .artifacts
+    .resolvedArtifacts
+    .get()
+    .mapNotNull { (it.id.componentIdentifier as? ProjectComponentIdentifier)?.projectPath }
+    .distinct()
 }
 
 public val Project.ciBuildNumber: Provider<String>
