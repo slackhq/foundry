@@ -45,7 +45,7 @@ class PluginListCollector : ProjectActivity {
           id = it.pluginId.idString,
           name = it.name,
           version = it.version,
-          enabled = it.isEnabled,
+          enabled = PluginManagerCore.isLoaded(it.pluginId),
           bundled = it.isBundled,
         )
       }

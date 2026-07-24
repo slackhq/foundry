@@ -33,7 +33,6 @@ class TranslatorAnnotator : Annotator {
           SkateBundle.message("skate.modelTranslator.description"),
         )
         .range(bundle.functionHeaderRange)
-        .needsUpdateOnTyping(true)
         .withFix(GenerateTranslatorBodyAction(bundle))
         .create()
   }
