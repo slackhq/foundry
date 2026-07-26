@@ -58,7 +58,6 @@ class FeatureFlagAnnotator : ExternalAnnotator<List<FeatureFlagSymbol>, List<Fea
       holder
         .newAnnotation(HighlightSeverity.INFORMATION, "Open for more details.")
         .range(symbol.range)
-        .needsUpdateOnTyping(true)
         .withFix(UrlIntentionAction(message, symbol.url))
         .create()
     }
