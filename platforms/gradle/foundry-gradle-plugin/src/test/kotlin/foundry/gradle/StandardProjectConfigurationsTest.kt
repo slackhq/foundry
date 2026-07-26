@@ -15,10 +15,31 @@
  */
 package foundry.gradle
 
+import com.google.common.truth.Truth.assertThat
 import foundry.gradle.Configurations.isPlatformConfigurationName
+import foundry.gradle.Configurations.shouldDetachAndroidTestDependencies
 import org.junit.Test
 
 class StandardProjectConfigurationsTest {
+
+  @Test
+  fun detachAndroidTestDependenciesWhenDisabled() {
+    // androidTest configs are detached only when the feature is not opted in, so AGP has no
+    // inherited dependencies to warn about on the disabled variant.
+    for (name in listOf("androidTestImplementation", "androidTestApi", "androidTestUtil")) {
+      assertThat(shouldDetachAndroidTestDependencies(name, androidTestEnabled = false)).isTrue()
+      assertThat(shouldDetachAndroidTestDependencies(name, androidTestEnabled = true)).isFalse()
+    }
+  }
+
+  @Test
+  fun neverDetachNonAndroidTestDependencies() {
+    // Unit test and main configs keep their inheritance regardless of the androidTest flag.
+    for (name in listOf("implementation", "api", "testImplementation", "testApi")) {
+      assertThat(shouldDetachAndroidTestDependencies(name, androidTestEnabled = false)).isFalse()
+      assertThat(shouldDetachAndroidTestDependencies(name, androidTestEnabled = true)).isFalse()
+    }
+  }
 
   @Test
   fun platformConfigurations() {

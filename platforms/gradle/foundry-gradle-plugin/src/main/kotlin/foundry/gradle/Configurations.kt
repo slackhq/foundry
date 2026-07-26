@@ -37,6 +37,19 @@ internal object Configurations {
 
   fun isApi(name: String): Boolean = name.endsWith("api", ignoreCase = true)
 
+  /**
+   * Whether the androidTest configuration named [name] should be detached from its parent
+   * configurations (i.e. have its `extendsFrom` cleared).
+   *
+   * When a module hasn't opted into androidTest ([androidTestEnabled] is false), AGP disables the
+   * androidTest variant and builds nothing from its configurations. Those configurations still
+   * extend `implementation`/`api` though, so AGP reports every inherited dependency as ignored
+   * ("androidTestImplementation dependencies are ignored because androidTest is disabled").
+   * Detaching them leaves nothing to ignore. Opted-in modules keep the normal inheritance.
+   */
+  fun shouldDetachAndroidTestDependencies(name: String, androidTestEnabled: Boolean): Boolean =
+    isAndroidTest(name) && !androidTestEnabled
+
   object ErrorProne {
     const val ERROR_PRONE = "errorprone"
     const val ERROR_PRONE_JAVAC = "errorproneJavac"

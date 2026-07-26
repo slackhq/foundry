@@ -784,6 +784,14 @@ internal class StandardProjectConfigurations(
             // compatible with Android SDK <26
             resolutionStrategy.force("org.objenesis:objenesis:$it")
           }
+
+          // Avoid AGP's "androidTest dependencies are ignored" warning when the variant is
+          // disabled. See Configurations.shouldDetachAndroidTestDependencies.
+          val androidTestEnabled =
+            foundryExtension.androidHandler.featuresHandler.androidTest.getOrElse(false)
+          if (Configurations.shouldDetachAndroidTestDependencies(name, androidTestEnabled)) {
+            setExtendsFrom(emptySet())
+          }
         }
       }
     }
