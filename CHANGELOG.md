@@ -4,8 +4,50 @@ Changelog
 **Unreleased**
 --------------
 
-- Update to Kotlin `2.4.0`.
-- Update to MoshiX `0.36.0`.
+0.36.0
+------
+
+_2026-07-28_
+
+- **Fix**: Avoid `androidTestImplementation dependencies are ignored` warning in Android library modules.
+- **Skate**: Fix some deprecations in the IntelliJ `2026.1` update.
+- Update to Kotlin `2.4.10`.
+- Update to MoshiX `0.37.0`.
+- Update Circuit to `0.35.1`.
+- Update coroutines to `1.11.0`.
+- Update kotlinx-serialization to `1.11.0`.
+- Update OkHttp to `5.4.0`.
+- Update Okio to `3.18.0`.
+- Update Wire to `6.4.5`.
+- Update oshi to `7.4.2`.
+- Update JNA to `5.19.1`.
+- Update ktfmt to `0.64`.
+- Update ASM to `9.10.1`.
+- Update Bugsnag to `4.0.1`.
+- Update multiplatform-markdown-renderer to `0.43.0`.
+- Update Jetbrains Markdown to `0.7.7`.
+- Update IntelliJ Platform to `2.18.1`.
+- Update sarif4k to `0.7.0`.
+- Update androidx lint-gradle to `1.0.0`.
+- Build against Kotlin `2.4.10`.
+- Build against KSP `2.3.10`.
+- Build against AGP `9.3.1`.
+- Build against Gradle `9.6.1`.
+- Build against Metro `1.3.2`.
+- Build against DAGP `3.17.0`.
+- Build against Roborazzi `1.68.0`.
+- Build against Spotless `8.8.0`.
+- Build against compose multiplatform `1.11.1`.
+- Build against Develocity `4.5.0`.
+- Build against emulator.wtf `1.7.0`.
+- Build against redacted-compiler-plugin `1.18.0`.
+- Build against nullaway gradle plugin `3.1.0`.
+- Build against maven-publish `0.37.0`.
+- Build against buildConfig plugin `6.0.10`.
+- Build against sort dependencies plugin `0.19.0`.
+- Build against Spotlight `1.6.12`.
+- Build against compose-lint-checks `1.5.3`.
+- Build against gradle retry `1.6.5`.
 
 0.35.2
 ------
