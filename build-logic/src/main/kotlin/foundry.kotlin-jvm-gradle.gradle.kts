@@ -28,7 +28,8 @@ plugins {
 }
 
 val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-val jvmTargetVersion = catalog.findVersion("jvmTarget").get().toString().let { JvmTarget.fromTarget(it) }
+val jvmTargetVersion =
+  catalog.findVersion("jvmTarget").get().toString().let { JvmTarget.fromTarget(it) }
 val jdkVersion = catalog.findVersion("jdk").get().toString().toInt()
 
 extensions.configure<KotlinJvmProjectExtension> { explicitApi() }
@@ -59,13 +60,10 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
       // Required due to https://github.com/gradle/gradle/issues/24871
       "-Xsam-conversions=class",
       "-Xlambdas=class",
-      "-Xenhance-type-parameter-types-to-def-not-null",
       "-Xjsr305=strict",
       "-Xassertions=jvm",
       "-Xemit-jvm-type-annotations",
-      "-Xtype-enhancement-improvements-strict-mode",
       "-Xjspecify-annotations=strict",
-      "-Xannotation-default-target=param-property",
       "-Xjdk-release=${jvmTargetVersion.target}",
     )
     optIn.addAll(
