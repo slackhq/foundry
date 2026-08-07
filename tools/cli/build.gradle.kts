@@ -19,7 +19,8 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 // See: https://github.com/google/ksp/issues/1943
 val isolatedProjectsEnabled =
   providers
-    .gradleProperty("org.gradle.unsafe.isolated-projects")
+    .systemProperty("org.gradle.unsafe.isolated-projects")
+    .orElse(providers.gradleProperty("org.gradle.unsafe.isolated-projects"))
     .map { it.toBoolean() }
     .getOrElse(false)
 
