@@ -66,7 +66,8 @@ if (file(".git").exists()) {
 // Several plugins don't support isolated projects and need to be conditionally applied
 val isolatedProjectsEnabled =
   providers
-    .gradleProperty("org.gradle.unsafe.isolated-projects")
+    .systemProperty("org.gradle.unsafe.isolated-projects")
+    .orElse(providers.gradleProperty("org.gradle.unsafe.isolated-projects"))
     .map { it.toBoolean() }
     .getOrElse(false)
 
