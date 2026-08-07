@@ -66,7 +66,7 @@ intellijPlatform {
 
 dependencies {
   intellijPlatform {
-    intellijIdeaCommunity(libs.versions.intellij.version)
+    intellijIdea(libs.versions.intellij.version)
     pluginVerifier()
     zipSigner()
   }
