@@ -96,7 +96,7 @@ configurations.named("testRuntimeClasspath") {
 
 dependencies {
   intellijPlatform {
-    intellijIdeaCommunity(libs.versions.intellij.version)
+    intellijIdea(libs.versions.intellij.version)
     plugin(libs.versions.intellij.android.map { "org.jetbrains.android:${it}" }.get())
     bundledPlugins(
       "com.intellij.java",
