@@ -25,7 +25,8 @@ plugins {
 }
 
 val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-val jvmTargetVersion = catalog.findVersion("jvmTargetIdea").get().toString().let { JvmTarget.fromTarget(it) }
+val jvmTargetVersion =
+  catalog.findVersion("jvmTargetIdea").get().toString().let { JvmTarget.fromTarget(it) }
 val jdkVersion = catalog.findVersion("jdk").get().toString().toInt()
 
 // Note: No explicit API for IntelliJ plugins
@@ -50,13 +51,10 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
     this.jvmTarget.set(jvmTargetVersion)
     jvmDefault.set(org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode.NO_COMPATIBILITY)
     freeCompilerArgs.addAll(
-      "-Xenhance-type-parameter-types-to-def-not-null",
       "-Xjsr305=strict",
       "-Xassertions=jvm",
       "-Xemit-jvm-type-annotations",
-      "-Xtype-enhancement-improvements-strict-mode",
       "-Xjspecify-annotations=strict",
-      "-Xannotation-default-target=param-property",
       "-Xjdk-release=${jvmTargetVersion.target}",
     )
     optIn.addAll(
