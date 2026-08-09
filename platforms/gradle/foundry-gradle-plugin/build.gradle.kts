@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -63,6 +64,13 @@ lint { baseline = file("lint-baseline.xml") }
 
 tasks.named<ValidatePlugins>("validatePlugins") { enableStricterValidation.set(true) }
 
+val pluginUnderTestRuntimeClasspath = configurations.create("pluginUnderTestRuntimeClasspath")
+
+// Foundry's published plugins keep AGP compile-only, but TestKit fixtures need its runtime APIs.
+tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {
+  pluginClasspath.from(pluginUnderTestRuntimeClasspath)
+}
+
 // This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
 // apply disambiguation rules
 dependencies.constraints {
@@ -75,6 +83,8 @@ dependencies.constraints {
 }
 
 dependencies {
+  add(pluginUnderTestRuntimeClasspath.name, libs.agp)
+
   api(platform(libs.okhttp.bom))
   api(project(":platforms:gradle:agp-handlers:agp-handler-api"))
   api(project(":tools:version-number"))
@@ -133,6 +143,7 @@ dependencies {
   testImplementation(platform(libs.coroutines.bom))
   testImplementation(libs.agp)
   testImplementation(libs.coroutines.test)
+  testImplementation(gradleTestKit())
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)

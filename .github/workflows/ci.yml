@@ -49,10 +49,25 @@ jobs:
 
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Build and run tests
+      - name: Build and run tests under isolated projects
         id: gradle
         timeout-minutes: 10
-        run: ./gradlew check --quiet
+        shell: bash
+        run: |
+          set -euo pipefail
+          cache_dir="$RUNNER_TEMP/foundry-project-cache"
+          args=(
+            check
+            --configuration-cache
+            --configuration-cache-problems=fail
+            -Dorg.gradle.unsafe.isolated-projects=true
+            -Dorg.gradle.projectcachedir="$cache_dir"
+            --console=plain
+          )
+
+          ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-first.log"
+          ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-second.log"
+          grep -F "Reusing configuration cache." "$RUNNER_TEMP/foundry-second.log"
 
       - name: Print build scan url
         if: always()
