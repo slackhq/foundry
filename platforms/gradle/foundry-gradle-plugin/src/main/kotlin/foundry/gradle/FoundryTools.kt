@@ -37,6 +37,7 @@ import java.util.concurrent.Executors
 import kotlin.streams.asSequence
 import okhttp3.OkHttpClient
 import org.gradle.StartParameter
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
@@ -347,6 +348,22 @@ public interface FoundryToolsExtension : AutoCloseable {
 
 public fun Project.foundryTools(): FoundryTools {
   return foundryToolsProvider().get()
+}
+
+/**
+ * Registers [configurer] to run from [FoundryBasePlugin] while each non-root project configures.
+ *
+ * This is the project-isolation-compatible alternative to root `subprojects {}` configuration.
+ */
+public fun Project.configureFoundryProjects(configurer: Project.() -> Unit) {
+  check(isRootProject) { "Foundry project configuration must be registered from the root project." }
+  val action =
+    object : Action<Project> {
+      override fun execute(project: Project) {
+        configurer(project)
+      }
+    }
+  foundryTools().globalConfig.configureProjects(action)
 }
 
 @Suppress("UNCHECKED_CAST")
