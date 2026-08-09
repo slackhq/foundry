@@ -69,6 +69,24 @@ jobs:
           ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-second.log"
           grep -F "Reusing configuration cache." "$RUNNER_TEMP/foundry-second.log"
 
+      - name: Verify CLI service loader with isolated projects disabled
+        shell: bash
+        run: |
+          set -euo pipefail
+          service_file="META-INF/services/foundry.cli.CommandFactory"
+
+          ./gradlew :tools:cli:jar \
+            --configuration-cache-problems=fail \
+            -Dorg.gradle.unsafe.isolated-projects=false \
+            -Dorg.gradle.projectcachedir="$RUNNER_TEMP/foundry-cli-project-cache" \
+            --console=plain
+
+          cli_jar="tools/cli/build/libs/cli.jar"
+          test -f "$cli_jar"
+          unzip -p "$cli_jar" "$service_file" | tee "$RUNNER_TEMP/foundry-cli-command-factories"
+          grep -Fqx 'foundry.cli.gradle.GradleProjectFlattenerCli$Factory' \
+            "$RUNNER_TEMP/foundry-cli-command-factories"
+
       - name: Print build scan url
         if: always()
         run: echo ${{ steps.gradle.outputs.build-scan-url }}
