@@ -351,7 +351,9 @@ public fun Project.foundryTools(): FoundryTools {
 
 @Suppress("UNCHECKED_CAST")
 public fun Project.foundryToolsProvider(): Provider<FoundryTools> {
-  return (project.gradle.sharedServices.registrations.getByName(SERVICE_NAME)
-      as BuildServiceRegistration<FoundryTools, Parameters>)
-    .service
+  val registration =
+    requireNotNull(project.gradle.sharedServices.registrations.findByName(SERVICE_NAME)) {
+      "$SERVICE_NAME must be registered before it is requested."
+    }
+  return (registration as BuildServiceRegistration<FoundryTools, Parameters>).service
 }
