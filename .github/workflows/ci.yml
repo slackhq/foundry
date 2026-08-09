@@ -75,6 +75,8 @@ jobs:
           set -euo pipefail
           service_file="META-INF/services/foundry.cli.CommandFactory"
 
+          # runCommand() discovers commands through Java ServiceLoader; KSP generates this descriptor.
+          # KSP requires isolated projects to be disabled for the CLI packaging check.
           ./gradlew :tools:cli:jar \
             --configuration-cache-problems=fail \
             -Dorg.gradle.unsafe.isolated-projects=false \
