@@ -66,7 +66,8 @@ tasks.named<ValidatePlugins>("validatePlugins") { enableStricterValidation.set(t
 
 val pluginUnderTestRuntimeClasspath = configurations.create("pluginUnderTestRuntimeClasspath")
 
-// Foundry's published plugins keep AGP compile-only, but TestKit fixtures need its runtime APIs.
+// Foundry's published plugins keep third-party plugins compile-only, but TestKit fixtures need
+// the runtime APIs for plugins they activate.
 tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {
   pluginClasspath.from(pluginUnderTestRuntimeClasspath)
 }
@@ -84,6 +85,7 @@ dependencies.constraints {
 
 dependencies {
   add(pluginUnderTestRuntimeClasspath.name, libs.agp)
+  add(pluginUnderTestRuntimeClasspath.name, libs.gradlePlugins.retry)
 
   api(platform(libs.okhttp.bom))
   api(project(":platforms:gradle:agp-handlers:agp-handler-api"))

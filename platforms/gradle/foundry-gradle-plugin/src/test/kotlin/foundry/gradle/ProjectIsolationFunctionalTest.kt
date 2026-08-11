@@ -52,7 +52,7 @@ class ProjectIsolationFunctionalTest {
     assertThat(second.output).contains("Reusing configuration cache.")
   }
 
-  // The plugin-under-test metadata includes AGP through pluginUnderTestRuntimeClasspath.
+  // The plugin-under-test metadata includes the fixture's compile-only plugin dependencies.
   @Suppress("WithPluginClasspathUsage")
   private fun File.runner(arguments: List<String>): GradleRunner {
     return GradleRunner.create().withProjectDir(this).withPluginClasspath().withArguments(arguments)
