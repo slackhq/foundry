@@ -141,9 +141,9 @@ dependencies {
   compileOnly(libs.kotlin.reflect)
 
   testImplementation(platform(libs.coroutines.bom))
+  testImplementation(gradleTestKit())
   testImplementation(libs.agp)
   testImplementation(libs.coroutines.test)
-  testImplementation(gradleTestKit())
   testImplementation(libs.junit)
   testImplementation(libs.okio.fakefilesystem)
   testImplementation(libs.truth)
