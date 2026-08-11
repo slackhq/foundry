@@ -79,8 +79,8 @@ jobs:
           with:
             lfs: 'true'
 
-        - name: Check LFS files
-          uses: actionsdesk/lfs-warning@v3.3
+        - name: Verify LFS files
+          run: git lfs fsck
 
         - name: Export JDK version
           shell: bash
