@@ -15,9 +15,7 @@
  */
 import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
 
-// Automatically detect spotless tasks and provide guidance for isolated projects
-// This is necessary because Spotless doesn't support isolated projects
-// See: https://github.com/diffplug/spotless/issues/1979
+// Spotless does not support isolated projects: https://github.com/diffplug/spotless/issues/1213
 val requestedTasks = gradle.startParameter.taskNames
 val isSpotlessTask = requestedTasks.any { task -> task.contains("spotless", ignoreCase = true) }
 
@@ -38,7 +36,7 @@ if (isSpotlessTask && isolatedProjectsEnabled) {
     """
     |
     |Spotless tasks cannot run with isolated projects enabled.
-    |Spotless does not support isolated projects: https://github.com/diffplug/spotless/issues/1979
+    |Spotless does not support isolated projects: https://github.com/diffplug/spotless/issues/1213
     |
     |To run spotless, use one of these options:
     |  ./gradlew spotlessApply -Dorg.gradle.unsafe.isolated-projects=false

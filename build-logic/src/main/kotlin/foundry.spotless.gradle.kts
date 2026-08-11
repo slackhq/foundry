@@ -16,8 +16,7 @@
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 
-// Spotless doesn't support isolated projects
-// See: https://github.com/diffplug/spotless/issues/1979
+// Spotless doesn't support isolated projects: https://github.com/diffplug/spotless/issues/1213
 // Check both gradle property and system property (-D flag takes precedence)
 val isolatedProjectsFromGradleProperty =
   providers
