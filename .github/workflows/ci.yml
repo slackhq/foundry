@@ -52,45 +52,10 @@ jobs:
       - name: Build and run tests under isolated projects
         id: gradle
         timeout-minutes: 10
-        shell: bash
-        run: |
-          set -euo pipefail
-          cache_dir="$RUNNER_TEMP/foundry-project-cache"
-          args=(
-            check
-            --configuration-cache
-            --configuration-cache-problems=fail
-            -Dorg.gradle.unsafe.isolated-projects=true
-            -Dorg.gradle.projectcachedir="$cache_dir"
-            --console=plain
-          )
-
-          # IntelliJ Platform creates its layout index during the first check, after Gradle has
-          # captured configuration inputs. Bootstrap that state before checking cache reuse.
-          ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-bootstrap.log"
-          ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-first.log"
-          ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-second.log"
-          grep -F "Reusing configuration cache." "$RUNNER_TEMP/foundry-second.log"
+        run: tools/scripts/verify-isolated-projects.sh
 
       - name: Verify CLI service loader with isolated projects disabled
-        shell: bash
-        run: |
-          set -euo pipefail
-          service_file="META-INF/services/foundry.cli.CommandFactory"
-
-          # runCommand() discovers commands through Java ServiceLoader; KSP generates this descriptor.
-          # KSP requires isolated projects to be disabled for the CLI packaging check.
-          ./gradlew :tools:cli:jar \
-            --configuration-cache-problems=fail \
-            -Dorg.gradle.unsafe.isolated-projects=false \
-            -Dorg.gradle.projectcachedir="$RUNNER_TEMP/foundry-cli-project-cache" \
-            --console=plain
-
-          cli_jar="tools/cli/build/libs/cli.jar"
-          test -f "$cli_jar"
-          unzip -p "$cli_jar" "$service_file" | tee "$RUNNER_TEMP/foundry-cli-command-factories"
-          grep -Fqx 'foundry.cli.gradle.GradleProjectFlattenerCli$Factory' \
-            "$RUNNER_TEMP/foundry-cli-command-factories"
+        run: tools/scripts/verify-cli-service-loader.sh
 
       - name: Print build scan url
         if: always()
