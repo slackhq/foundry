@@ -65,6 +65,9 @@ jobs:
             --console=plain
           )
 
+          # IntelliJ Platform creates its layout index during the first check, after Gradle has
+          # captured configuration inputs. Bootstrap that state before checking cache reuse.
+          ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-bootstrap.log"
           ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-first.log"
           ./gradlew "${args[@]}" |& tee "$RUNNER_TEMP/foundry-second.log"
           grep -F "Reusing configuration cache." "$RUNNER_TEMP/foundry-second.log"
