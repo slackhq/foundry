@@ -36,7 +36,7 @@ class ProjectIsolationFunctionalTest {
         ":two:verifyProjectIsolationConvention",
         "--configuration-cache",
         "--configuration-cache-problems=fail",
-        "-Dorg.gradle.unsafe.isolated-projects=true",
+        "--isolated-projects",
         "--console=plain",
         "--stacktrace",
       )
@@ -90,8 +90,19 @@ class ProjectIsolationFunctionalTest {
         id("com.slack.foundry.root")
       }
 
+      val rootConventionName = "root convention"
+
       configureFoundryProjects {
-        tasks.register("verifyProjectIsolationConvention")
+        tasks.register("verifyProjectIsolationConvention") {
+          group = rootConventionName
+          inputs.property("rootConventionName", rootConventionName)
+        }
+      }
+      configureFoundryProjects {
+        tasks.named("verifyProjectIsolationConvention") {
+          check(group == rootConventionName)
+          description = "Configured after root registration."
+        }
       }
       """,
     )

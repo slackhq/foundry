@@ -21,6 +21,7 @@ plugins {
   id("foundry.kotlin-jvm-gradle")
   `java-gradle-plugin`
   alias(libs.plugins.mavenPublish)
+  id("foundry.maven-publish")
   alias(libs.plugins.bestPracticesPlugin)
   alias(libs.plugins.moshix)
   alias(libs.plugins.buildConfig)

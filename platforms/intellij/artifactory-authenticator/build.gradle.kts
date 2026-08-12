@@ -18,6 +18,7 @@ import foundry.gradle.GitCommitValueSource
 plugins {
   id("foundry.spotless")
   id("foundry.kotlin-jvm-intellij")
+  id("foundry.intellij-platform")
   java
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader) apply false
@@ -51,10 +52,6 @@ version = versionName.get()
 
 intellijPlatform {
   pluginConfiguration {
-    name = "Artifactory Authenticator"
-    id = "com.slack.ide.artifactory"
-    version = versionName.get()
-    description = "A plugin for authenticating plugin repositories with Artifactory."
     vendor {
       name = "Slack"
       url =

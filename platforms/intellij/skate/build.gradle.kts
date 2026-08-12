@@ -20,9 +20,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 plugins {
   id("foundry.spotless")
   id("foundry.kotlin-jvm-intellij")
+  id("foundry.intellij-platform")
   alias(libs.plugins.kotlin.plugin.serialization)
   alias(libs.plugins.intellij)
-  alias(libs.plugins.pluginUploader)
+  alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.lint)
 }
