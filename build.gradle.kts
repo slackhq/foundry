@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import foundry.buildlogic.BuildFeaturesExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 
 plugins {
+  id("foundry.build-features")
   id("foundry.spotless")
   alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.kotlin.multiplatform) apply false
@@ -63,13 +65,9 @@ if (file(".git").exists()) {
   }
 }
 
-// Several plugins don't support isolated projects and need to be conditionally applied
+// Several plugins don't support isolated projects and need to be conditionally applied.
 val isolatedProjectsEnabled =
-  providers
-    .systemProperty("org.gradle.unsafe.isolated-projects")
-    .orElse(providers.gradleProperty("org.gradle.unsafe.isolated-projects"))
-    .map { it.toBoolean() }
-    .getOrElse(false)
+  extensions.getByType<BuildFeaturesExtension>().isolatedProjects.getOrElse(false)
 
 // GraphAssert doesn't support isolated projects as it needs to traverse subproject configurations
 // See: https://github.com/jraska/modules-graph-assert/issues/XXX (TODO: file upstream issue)

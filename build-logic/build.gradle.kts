@@ -15,15 +15,27 @@
  */
 plugins { `kotlin-dsl` }
 
+gradlePlugin {
+  plugins {
+    register("buildFeatures") {
+      id = "foundry.build-features"
+      implementationClass = "foundry.buildlogic.BuildFeaturesPlugin"
+    }
+  }
+}
+
 dependencies {
   // Plugin dependencies - these become available in convention plugins
   implementation(libs.gradlePlugins.spotless)
   implementation(libs.gradlePlugins.kgp)
   implementation(libs.gradlePlugins.detekt)
+  implementation(libs.gradlePlugins.dokka)
+  implementation(libs.gradlePlugins.intellij)
+  implementation(libs.gradlePlugins.mavenPublish)
+  implementation(libs.gradlePlugins.pluginUploader)
   implementation(libs.gradlePlugins.sortDependencies)
   // SAM with receiver plugin for Gradle plugin projects
   implementation("org.jetbrains.kotlin:kotlin-sam-with-receiver:${libs.versions.kotlin.get()}")
-  // Note: Dokka and MavenPublish are applied via plugins block, not as dependencies
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)

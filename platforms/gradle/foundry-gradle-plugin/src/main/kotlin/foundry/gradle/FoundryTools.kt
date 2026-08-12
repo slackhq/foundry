@@ -353,7 +353,10 @@ public fun Project.foundryTools(): FoundryTools {
 /**
  * Registers [configurer] to run from [FoundryBasePlugin] while each non-root project configures.
  *
- * This is the project-isolation-compatible alternative to root `subprojects {}` configuration.
+ * This is the project-isolation-compatible alternative to root `subprojects {}` configuration. The
+ * action is retained and invoked later from each child project, so it must capture only immutable,
+ * configuration-safe values. Do not capture a root [Project], mutable build-model objects, or
+ * values whose computation accesses another project.
  */
 public fun Project.configureFoundryProjects(configurer: Project.() -> Unit) {
   check(isRootProject) { "Foundry project configuration must be registered from the root project." }

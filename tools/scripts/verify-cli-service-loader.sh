@@ -12,7 +12,7 @@ service_file="META-INF/services/foundry.cli.CommandFactory"
 # KSP requires isolated projects to be disabled for the CLI packaging check.
 ./gradlew :tools:cli:jar \
   --configuration-cache-problems=fail \
-  -Dorg.gradle.unsafe.isolated-projects=false \
+  -Dorg.gradle.isolated-projects=false \
   -Dorg.gradle.projectcachedir="$cache_dir" \
   --console=plain
 

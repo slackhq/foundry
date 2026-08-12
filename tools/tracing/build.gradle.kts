@@ -18,6 +18,7 @@ plugins {
   id("foundry.kotlin-jvm")
   alias(libs.plugins.wire)
   alias(libs.plugins.mavenPublish)
+  id("foundry.maven-publish")
   alias(libs.plugins.lint)
 }
 
