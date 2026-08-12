@@ -42,8 +42,8 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<KotlinCompilationTask<*>>().configureEach {
   compilerOptions {
     // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-    languageVersion.set(KotlinVersion.KOTLIN_2_0)
-    apiVersion.set(KotlinVersion.KOTLIN_2_0)
+    languageVersion.set(KotlinVersion.KOTLIN_2_2)
+    apiVersion.set(KotlinVersion.KOTLIN_2_2)
     // IntelliJ forces older Kotlin, which results in warnings
     allWarningsAsErrors.set(false)
 

@@ -16,65 +16,46 @@
 import com.diffplug.gradle.spotless.KotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 
-// Spotless doesn't support isolated projects: https://github.com/diffplug/spotless/issues/1213
-// Check both gradle property and system property (-D flag takes precedence)
-val isolatedProjectsFromGradleProperty =
-  providers
-    .gradleProperty("org.gradle.unsafe.isolated-projects")
-    .map { it.toBoolean() }
-    .getOrElse(false)
-val isolatedProjectsFromSystemProperty =
-  providers.systemProperty("org.gradle.unsafe.isolated-projects").map { it.toBoolean() }.orNull
-val isolatedProjectsEnabled =
-  isolatedProjectsFromSystemProperty ?: isolatedProjectsFromGradleProperty
+// Regression coverage runs Spotless under isolated projects. See
+// https://github.com/diffplug/spotless/issues/1213 for the original issue.
+plugins { id("com.diffplug.spotless") }
 
-if (isolatedProjectsEnabled) {
-  // Skip spotless configuration when isolated projects is enabled.
-  // Running spotless tasks with isolated projects enabled will fail fast in settings.gradle.kts
-  // with a helpful error message directing users to use the -D flag.
-  logger.info(
-    "Spotless is disabled when isolated projects is enabled. Run spotlessApply directly to format."
-  )
-} else {
-  plugins { id("com.diffplug.spotless") }
+val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val ktfmtVersion = catalog.findVersion("ktfmt").get().toString()
 
-  val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-  val ktfmtVersion = catalog.findVersion("ktfmt").get().toString()
+val externalFiles =
+  listOf("SkateErrorHandler", "MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
 
-  val externalFiles =
-    listOf("SkateErrorHandler", "MemoizedSequence", "Publisher", "Resolver").map { "src/**/$it.kt" }
-
-  configure<SpotlessExtension> {
-    format("misc") {
-      target("*.md", ".gitignore")
-      trimTrailingWhitespace()
-      endWithNewline()
-    }
-    kotlin {
-      target("src/**/*.kt")
-      targetExclude(externalFiles)
-      ktfmt(ktfmtVersion).googleStyle()
-      trimTrailingWhitespace()
-      endWithNewline()
-      licenseHeaderFile(rootDir.resolve("spotless/spotless.kt"))
-      targetExclude("**/spotless.kt", "**/Aliases.kt", *externalFiles.toTypedArray())
-    }
-    format("kotlinExternal", KotlinExtension::class.java) {
-      target(externalFiles)
-      ktfmt(ktfmtVersion).googleStyle()
-      trimTrailingWhitespace()
-      endWithNewline()
-      targetExclude("**/spotless.kt", "**/Aliases.kt")
-    }
-    kotlinGradle {
-      target("*.kts", "src/**/*.kts")
-      ktfmt(ktfmtVersion).googleStyle()
-      trimTrailingWhitespace()
-      endWithNewline()
-      licenseHeaderFile(
-        rootDir.resolve("spotless/spotless.kt"),
-        "(import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)",
-      )
-    }
+configure<SpotlessExtension> {
+  format("misc") {
+    target("*.md", ".gitignore")
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+  kotlin {
+    target("src/**/*.kt")
+    targetExclude(externalFiles)
+    ktfmt(ktfmtVersion).googleStyle()
+    trimTrailingWhitespace()
+    endWithNewline()
+    licenseHeaderFile(rootDir.resolve("spotless/spotless.kt"))
+    targetExclude("**/spotless.kt", "**/Aliases.kt", *externalFiles.toTypedArray())
+  }
+  format("kotlinExternal", KotlinExtension::class.java) {
+    target(externalFiles)
+    ktfmt(ktfmtVersion).googleStyle()
+    trimTrailingWhitespace()
+    endWithNewline()
+    targetExclude("**/spotless.kt", "**/Aliases.kt")
+  }
+  kotlinGradle {
+    target("*.kts", "src/**/*.kts")
+    ktfmt(ktfmtVersion).googleStyle()
+    trimTrailingWhitespace()
+    endWithNewline()
+    licenseHeaderFile(
+      rootDir.resolve("spotless/spotless.kt"),
+      "(import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)",
+    )
   }
 }
