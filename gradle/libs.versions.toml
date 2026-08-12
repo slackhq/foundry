@@ -51,7 +51,8 @@ xmlutil = "1.0.2"
 
 # API changes are documented here: https://plugins.jetbrains.com/docs/intellij/api-changes-list.html
 # Bundled API changes (Kotlin, Coroutines, etc) here: https://www.jetbrains.com/legal/third-party-software/?product=IIU
-intellij-version = "2026.1"
+# Keep this aligned with the minimum build required by intellij-android below.
+intellij-version = "2026.1.1"
 intellij-sinceBuild = "261"
 # https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
 # https://plugins.jetbrains.com/plugin/22989-android/versions/stable
