@@ -35,7 +35,8 @@ private constructor(
    * Registers [configurer] to run from Foundry's project-local base plugin application.
    *
    * This lets a root build supply conventions without configuring subprojects directly, which is
-   * required when Gradle isolated projects is enabled.
+   * required when Gradle isolated projects is enabled. The action runs later while a child project
+   * configures, so callers must capture only immutable, configuration-safe values.
    */
   public fun configureProjects(configurer: Action<Project>) {
     projectConfigurers.add(configurer)

@@ -19,6 +19,7 @@ plugins {
   alias(libs.plugins.dokka)
   alias(libs.plugins.lint)
   alias(libs.plugins.mavenPublish)
+  id("foundry.maven-publish")
 }
 
 dependencies { implementation(libs.robolectric) }
