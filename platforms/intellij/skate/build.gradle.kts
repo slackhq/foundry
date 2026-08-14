@@ -18,6 +18,7 @@ import java.nio.file.Paths
 import java.util.Locale
 import kotlin.io.path.readText
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
@@ -39,6 +40,11 @@ intellijPlatform {
       email = "oss@slack-corp.com"
     }
   }
+}
+
+tasks.named<PrepareSandboxTask>("prepareTestSandbox") {
+  // Vue assumes a different Android Studio plugin layout and crashes during Linux test teardown.
+  disabledPlugins.add("org.jetbrains.plugins.vue")
 }
 
 fun isGitHash(hash: String): Boolean {
