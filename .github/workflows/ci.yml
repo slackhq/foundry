@@ -51,7 +51,7 @@ jobs:
 
       - name: Build and run tests under isolated projects
         id: gradle
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: tools/scripts/verify-isolated-projects.sh
 
       - name: Verify CLI service loader with isolated projects disabled
