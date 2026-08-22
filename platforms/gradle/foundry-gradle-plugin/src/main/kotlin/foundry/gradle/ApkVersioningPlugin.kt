@@ -47,7 +47,7 @@ internal class ApkVersioningPlugin : Plugin<Project> {
 
   @Suppress("LongMethod")
   override fun apply(project: Project) {
-    project.plugins.withType(AppPlugin::class.java) {
+    project.plugins.withType(AppPlugin::class.java).configureEach {
       val versionMajor = project.localGradleProperty("versionMajor")
       val versionMinor = project.localGradleProperty("versionMinor")
       val versionPatch = project.localGradleProperty("versionPatch")

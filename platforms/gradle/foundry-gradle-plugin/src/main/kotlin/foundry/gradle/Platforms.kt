@@ -26,7 +26,6 @@ import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
-import org.gradle.api.internal.provider.MissingValueException
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -225,15 +224,12 @@ public object Platforms {
         defaultProvider
       }
 
-    return try {
-      versionProvider.get()
-    } catch (_: MissingValueException) {
-      val message =
+    return versionProvider.orNull
+      ?: throw GradleException(
         "No version found for '${dependencyDef.identifier}' " +
           "(key: '$expectedProperty'). Please add " +
           "'${expectedProperty.replace(":", "\\:")}' in gradle.properties"
-      throw GradleException(message)
-    }
+      )
   }
 }
 

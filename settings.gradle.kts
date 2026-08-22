@@ -76,6 +76,8 @@ plugins {
   id("com.fueledbycaffeine.spotlight") version "1.6.12"
 }
 
+includeBuild("build-logic")
+
 dependencyResolutionManagement {
   versionCatalogs {
     if (System.getenv("DEP_OVERRIDES") == "true") {

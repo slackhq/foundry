@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 plugins {
-  alias(libs.plugins.kotlin.jvm)
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm")
   alias(libs.plugins.wire)
   alias(libs.plugins.mavenPublish)
+  id("foundry.maven-publish")
   alias(libs.plugins.lint)
 }
 
