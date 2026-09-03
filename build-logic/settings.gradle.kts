@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Slack Technologies, LLC
+ * Copyright (C) 2026 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  id("foundry.spotless")
-  id("foundry.kotlin-jvm")
-  alias(libs.plugins.dokka)
-  alias(libs.plugins.lint)
-  alias(libs.plugins.mavenPublish)
-  id("foundry.maven-publish")
-}
+rootProject.name = "build-logic"
 
-dependencies { implementation(libs.robolectric) }
+dependencyResolutionManagement {
+  versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
+  repositories {
+    mavenCentral()
+    google()
+    gradlePluginPortal()
+  }
+}

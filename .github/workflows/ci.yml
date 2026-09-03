@@ -49,10 +49,13 @@ jobs:
 
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Build and run tests
+      - name: Build and run tests under isolated projects
         id: gradle
-        timeout-minutes: 10
-        run: ./gradlew check --quiet
+        timeout-minutes: 15
+        run: tools/scripts/verify-isolated-projects.sh
+
+      - name: Verify CLI service loader with isolated projects disabled
+        run: tools/scripts/verify-cli-service-loader.sh
 
       - name: Print build scan url
         if: always()
@@ -76,8 +79,8 @@ jobs:
           with:
             lfs: 'true'
 
-        - name: Check LFS files
-          uses: actionsdesk/lfs-warning@v3.3
+        - name: Verify LFS files
+          run: git lfs fsck
 
         - name: Export JDK version
           shell: bash
@@ -143,4 +146,6 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/foundry'
-        run: ./gradlew publish --quiet -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+        # Disable isolated projects for publishing because the CLI module requires KSP
+        # to generate service loader files, and KSP doesn't support isolated projects yet
+        run: ./gradlew publish --quiet -Dorg.gradle.isolated-projects=false -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
