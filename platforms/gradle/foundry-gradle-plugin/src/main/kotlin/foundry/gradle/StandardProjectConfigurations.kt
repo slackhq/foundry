@@ -638,30 +638,20 @@ internal class StandardProjectConfigurations(
               }
 
               if (isAffectedProject) {
-                // Aggregate test apks. In Fladle we aggregate test APKs, in emulator.wtf we
-                // aggregate
-                // to their root project dep
-                if (foundryProperties.enableEmulatorWtfForAndroidTest) {
-                  // Aggregate to emulator.wtf's configuration instead
-                  // TODO this doesn't work yet, toe-hold for the future
-                  // @Suppress("GradleProjectIsolation")
-                  // project.rootProject.dependencies.add(
-                  //   "emulatorwtf",
-                  //   project.rootProject.project(project.path),
-                  // )
-                } else {
-                  // Note this intentionally just uses the same task each time as they always
-                  // produce
-                  // the same output
-                  SimpleFileProducerTask.registerOrConfigure(
-                      project,
-                      name = "androidTestProjectMetadata",
-                      description =
-                        "Produces a metadata artifact indicating this project path produces an androidTest APK.",
-                      input = projectPath,
-                      group = "skippy",
-                    )
-                    .publishWith(skippyAndroidTestProjectPublisher)
+                // Publish this project's androidTest metadata so downstream consumers can enumerate
+                // it.
+                SimpleFileProducerTask.registerOrConfigure(
+                    project,
+                    name = "androidTestProjectMetadata",
+                    description =
+                      "Produces a metadata artifact indicating this project path produces an androidTest APK.",
+                    input = projectPath,
+                    group = "skippy",
+                  )
+                  .publishWith(skippyAndroidTestProjectPublisher)
+
+                // Fladle aggregates test APKs directly; emulator.wtf doesn't.
+                if (!foundryProperties.enableEmulatorWtfForAndroidTest) {
                   if (isLibraryVariant) {
                     variant.androidTest?.apply {
                       // Wire this up to the aggregator. No need for an intermediate task here.
