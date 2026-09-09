@@ -115,7 +115,11 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
     ProjectDependenciesDumpTask.register(target)
     target.configureClasspath(foundryProperties)
 
-    if (!this.buildFeatures.isolatedProjects.requested.getOrElse(false)) {
+    if (!target.isRootProject) {
+      globalConfig.configureProject(target)
+    }
+
+    if (!this.buildFeatures.isolatedProjects.active.getOrElse(false)) {
       // TODO https://github.com/diffplug/spotless/issues/1979
       target.configureSpotless(foundryProperties)
       // TODO not clear how to access the build scan API from a non-root project
@@ -187,11 +191,11 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
           }
         }
       }
-      if (isRootProject) {
+      if (isRootProject && !buildFeatures.configurationCache.requested.getOrElse(false)) {
         configure<SpotlessExtensionPredeclare> { spotlessFormatters() }
       }
-      // Pre-declare in root project for better performance and also to work around
-      // https://github.com/diffplug/spotless/issues/1213
+      // Root predeclaration breaks configuration-cache serialization when root and child Spotless
+      // tasks are both requested, so only enable it when configuration cache is disabled.
       configure<SpotlessExtension> {
         spotlessFormatters()
         // Use platform native endings and don't try to inspect gitattrs

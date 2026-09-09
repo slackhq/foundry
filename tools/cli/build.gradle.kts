@@ -13,17 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import foundry.buildlogic.BuildFeaturesExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
+// KSP doesn't support isolated projects yet
+// See: https://github.com/google/ksp/issues/1943
+val isolatedProjectsEnabled =
+  extensions.getByType<BuildFeaturesExtension>().isolatedProjects.getOrElse(false)
+
 plugins {
-  alias(libs.plugins.kotlin.jvm)
+  id("foundry.build-features")
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm")
   alias(libs.plugins.dokka)
   alias(libs.plugins.lint)
   alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.spotless)
+  id("foundry.maven-publish")
   alias(libs.plugins.moshix)
   alias(libs.plugins.kotlin.plugin.serialization)
-  alias(libs.plugins.ksp)
+  alias(libs.plugins.ksp) apply false
+}
+
+if (!isolatedProjectsEnabled) {
+  apply(plugin = "com.google.devtools.ksp")
 }
 
 kotlin {
@@ -38,7 +50,9 @@ lint { baseline = file("lint-baseline.xml") }
 moshi { enableSealed.set(true) }
 
 // We have a couple flaky tests on CI right now
-if (System.getenv("CI") != null) {
+val isCI = providers.environmentVariable("CI").isPresent
+
+if (isCI) {
   tasks.test {
     develocity.testRetry {
       maxRetries.set(2)
@@ -70,5 +84,7 @@ dependencies {
   testImplementation(libs.kaml)
   testImplementation(libs.truth)
 
-  ksp(libs.autoService.ksp)
+  if (!isolatedProjectsEnabled) {
+    "ksp"(libs.autoService.ksp)
+  }
 }
