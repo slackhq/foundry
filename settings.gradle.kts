@@ -69,7 +69,7 @@ buildscript {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.5.0"
+  id("com.gradle.develocity") version "4.5.1"
   id("org.jetbrains.intellij.platform.settings") version "2.18.1"
   id("org.jetbrains.intellij.platform") version "2.18.1" apply false
   // https://github.com/joshfriend/spotlight
