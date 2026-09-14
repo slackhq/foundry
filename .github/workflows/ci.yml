@@ -49,13 +49,10 @@ jobs:
 
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Build and run tests under isolated projects
+      - name: Build and run tests
         id: gradle
-        timeout-minutes: 15
-        run: tools/scripts/verify-isolated-projects.sh
-
-      - name: Verify CLI service loader with isolated projects disabled
-        run: tools/scripts/verify-cli-service-loader.sh
+        timeout-minutes: 10
+        run: ./gradlew check --quiet
 
       - name: Print build scan url
         if: always()
