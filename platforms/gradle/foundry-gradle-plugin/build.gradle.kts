@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
-  kotlin("jvm")
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm-gradle")
   `java-gradle-plugin`
   alias(libs.plugins.mavenPublish)
+  id("foundry.maven-publish")
   alias(libs.plugins.bestPracticesPlugin)
   alias(libs.plugins.moshix)
   alias(libs.plugins.buildConfig)
@@ -50,7 +53,7 @@ buildConfig {
 
 // Copy our hooks into resources for InstallCommitHooks
 tasks.named<ProcessResources>("processResources") {
-  from(rootProject.layout.projectDirectory.dir("config/git/hooks")) {
+  from(rootDir.resolve("config/git/hooks")) {
     // Give it a common prefix for us to look for
     rename { name -> "githook-$name" }
   }
@@ -58,7 +61,17 @@ tasks.named<ProcessResources>("processResources") {
 
 moshi { enableSealed.set(true) }
 
+lint { baseline = file("lint-baseline.xml") }
+
 tasks.named<ValidatePlugins>("validatePlugins") { enableStricterValidation.set(true) }
+
+val pluginUnderTestRuntimeClasspath = configurations.create("pluginUnderTestRuntimeClasspath")
+
+// Foundry's published plugins keep third-party plugins compile-only, but TestKit fixtures need
+// the runtime APIs for plugins they activate.
+tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {
+  pluginClasspath.from(pluginUnderTestRuntimeClasspath)
+}
 
 // This is necessary for included builds, as the KGP plugin isn't applied in them and thus doesn't
 // apply disambiguation rules
@@ -72,6 +85,9 @@ dependencies.constraints {
 }
 
 dependencies {
+  add(pluginUnderTestRuntimeClasspath.name, libs.agp)
+  add(pluginUnderTestRuntimeClasspath.name, libs.gradlePlugins.retry)
+
   api(platform(libs.okhttp.bom))
   api(project(":platforms:gradle:agp-handlers:agp-handler-api"))
   api(project(":tools:version-number"))
@@ -128,6 +144,7 @@ dependencies {
   compileOnly(libs.kotlin.reflect)
 
   testImplementation(platform(libs.coroutines.bom))
+  testImplementation(gradleTestKit())
   testImplementation(libs.agp)
   testImplementation(libs.coroutines.test)
   testImplementation(libs.junit)

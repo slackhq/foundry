@@ -76,8 +76,8 @@ jobs:
           with:
             lfs: 'true'
 
-        - name: Check LFS files
-          uses: actionsdesk/lfs-warning@v3.3
+        - name: Verify LFS files
+          run: git lfs fsck
 
         - name: Export JDK version
           shell: bash
@@ -143,4 +143,6 @@ jobs:
 
       - name: Publish snapshot
         if: github.repository == 'slackhq/foundry'
-        run: ./gradlew publish --quiet -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
+        # Disable isolated projects for publishing because the CLI module requires KSP
+        # to generate service loader files, and KSP doesn't support isolated projects yet
+        run: ./gradlew publish --quiet -Dorg.gradle.isolated-projects=false -PmavenCentralUsername=${{ secrets.SONATYPEUSERNAME }} -PmavenCentralPassword=${{ secrets.SONATYPEPASSWORD }}
