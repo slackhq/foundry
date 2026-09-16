@@ -179,6 +179,8 @@ public object Platforms {
           if (snapshotsEnabled && version.endsWith("-SNAPSHOT")) {
             add("api", def.coordinates) { version { strictly(version) } }
           } else {
+            // This is Gradle's MutableVersionConstraint.require(String), not Kotlin's precondition.
+            @Suppress("ExceptionMessage")
             add("api", def.coordinates) { version { require(version) } }
           }
         }

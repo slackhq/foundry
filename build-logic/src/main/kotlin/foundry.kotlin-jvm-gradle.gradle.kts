@@ -36,7 +36,7 @@ extensions.configure<SamWithReceiverExtension> {
 configureKotlinJvmConvention(
   jvmTargetVersion = jvmTargetVersion,
   jdkVersion = jdkVersion,
-  languageVersion = KotlinVersion.KOTLIN_2_2,
+  kotlinLanguageVersion = KotlinVersion.KOTLIN_2_2,
   // Gradle forces older Kotlin, which results in warnings.
   allWarningsAsErrors = false,
   useExplicitApi = true,

@@ -34,7 +34,7 @@ internal fun parseJdkVersion(version: String): Int = version.removeSuffix("-ea")
 internal fun Project.configureKotlinJvmConvention(
   jvmTargetVersion: JvmTarget,
   jdkVersion: Int,
-  languageVersion: KotlinVersion,
+  kotlinLanguageVersion: KotlinVersion,
   allWarningsAsErrors: Boolean,
   useExplicitApi: Boolean,
   gradleCompatibility: Boolean = false,
@@ -53,8 +53,8 @@ internal fun Project.configureKotlinJvmConvention(
 
   tasks.withType<KotlinCompilationTask<*>>().configureEach {
     compilerOptions {
-      this.languageVersion.set(languageVersion)
-      apiVersion.set(languageVersion)
+      languageVersion.set(kotlinLanguageVersion)
+      apiVersion.set(kotlinLanguageVersion)
       this.allWarningsAsErrors.set(allWarningsAsErrors)
 
       check(this is KotlinJvmCompilerOptions)

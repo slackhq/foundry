@@ -34,5 +34,9 @@ pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
 }
 
 pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
-  dependencies.add("jvmMainCompileOnly", catalog.findLibrary("slackLints-annotations").get())
+  configurations
+    .matching { it.name == "jvmMainCompileOnly" }
+    .configureEach {
+      project.dependencies.add(name, catalog.findLibrary("slackLints-annotations").get())
+    }
 }

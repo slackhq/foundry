@@ -30,26 +30,32 @@ class ProjectIsolationFunctionalTest {
   fun `applies root conventions to base plugin projects with isolated projects`() {
     val projectDir = temporaryFolder.root
     projectDir.writeFixture()
+    val projectCacheDir = temporaryFolder.newFolder("project-cache")
     val arguments =
       listOf(
         ":one:verifyProjectIsolationConvention",
+        ":one:spotlessCheck",
         ":two:verifyProjectIsolationConvention",
         "--configuration-cache",
         "--configuration-cache-problems=fail",
         "--isolated-projects",
+        "-Dorg.gradle.projectcachedir=${projectCacheDir.absolutePath}",
         "--console=plain",
         "--stacktrace",
       )
 
     val first = projectDir.runner(arguments).build()
     assertThat(first.task(":one:verifyProjectIsolationConvention")).isNotNull()
+    assertThat(first.task(":one:spotlessCheck")).isNotNull()
     assertThat(first.task(":two:verifyProjectIsolationConvention")).isNotNull()
     assertThat(first.output).contains("Configuration cache entry stored.")
 
     val second = projectDir.runner(arguments).build()
     assertThat(second.task(":one:verifyProjectIsolationConvention")).isNotNull()
+    assertThat(second.task(":one:spotlessCheck")).isNotNull()
     assertThat(second.task(":two:verifyProjectIsolationConvention")).isNotNull()
     assertThat(second.output).contains("Reusing configuration cache.")
+    assertThat(second.output).contains("Configuration cache entry reused.")
   }
 
   // The plugin-under-test metadata includes the fixture's compile-only plugin dependencies.

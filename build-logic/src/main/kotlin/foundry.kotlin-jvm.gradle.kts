@@ -30,7 +30,7 @@ val jdkVersion = parseJdkVersion(catalog.findVersion("jdk").get().requiredVersio
 configureKotlinJvmConvention(
   jvmTargetVersion = jvmTargetVersion,
   jdkVersion = jdkVersion,
-  languageVersion = KotlinVersion.DEFAULT,
+  kotlinLanguageVersion = KotlinVersion.DEFAULT,
   allWarningsAsErrors = true,
   useExplicitApi = true,
 )

@@ -19,10 +19,22 @@ plugins { base }
 
 val verifyConventionPlugins =
   tasks.register<VerifyConventionPluginsTask>("verifyConventionPlugins") {
-    buildFiles.from(
-      isolated.rootProject.projectDirectory.asFileTree.matching {
-        include("platforms/**/build.gradle.kts")
-        include("tools/**/build.gradle.kts")
+    val rootDirectory = isolated.rootProject.projectDirectory
+    buildFileContents.set(
+      providers.provider {
+        sequenceOf("platforms", "tools")
+          .flatMap { sourceRoot ->
+            rootDirectory
+              .dir(sourceRoot)
+              .asFile
+              .walkTopDown()
+              .onEnter { directory -> directory.name !in setOf("build", ".gradle") }
+              .filter { file -> file.isFile && file.name == "build.gradle.kts" }
+          }
+          .associate { buildFile ->
+            val relativePath = buildFile.relativeTo(rootDirectory.asFile).invariantSeparatorsPath
+            relativePath to buildFile.readText()
+          }
       }
     )
     // This module historically did not apply the standalone Android lint plugin.
