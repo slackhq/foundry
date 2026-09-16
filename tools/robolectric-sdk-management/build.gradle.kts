@@ -17,7 +17,7 @@ plugins {
   id("foundry.spotless")
   id("foundry.kotlin-jvm")
   alias(libs.plugins.dokka)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
   alias(libs.plugins.mavenPublish)
   id("foundry.maven-publish")
 }

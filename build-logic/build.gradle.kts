@@ -26,6 +26,7 @@ gradlePlugin {
 
 dependencies {
   // Plugin dependencies - these become available in convention plugins
+  implementation(libs.agp)
   implementation(libs.gradlePlugins.spotless)
   implementation(libs.gradlePlugins.kgp)
   implementation(libs.gradlePlugins.detekt)

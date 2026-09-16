@@ -21,7 +21,7 @@ plugins {
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.compose)
   alias(libs.plugins.kotlin.plugin.compose)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
 }
 
 kotlin {

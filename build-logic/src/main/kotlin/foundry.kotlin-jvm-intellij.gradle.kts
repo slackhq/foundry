@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import io.gitlab.arturbosch.detekt.Detekt
+import foundry.buildlogic.configureKotlinJvmConvention
+import foundry.buildlogic.parseJdkVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
   id("org.jetbrains.kotlin.jvm")
@@ -26,47 +25,16 @@ plugins {
 
 val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
 val jvmTargetVersion =
-  catalog.findVersion("jvmTargetIdea").get().toString().let { JvmTarget.fromTarget(it) }
-val jdkVersion = catalog.findVersion("jdk").get().toString().toInt()
+  JvmTarget.fromTarget(catalog.findVersion("jvmTargetIdea").get().requiredVersion)
+val jdkVersion = parseJdkVersion(catalog.findVersion("jdk").get().requiredVersion)
 
-// Note: No explicit API for IntelliJ plugins
-
-extensions.configure<JavaPluginExtension> {
-  toolchain { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
-}
-
-tasks.withType<JavaCompile>().configureEach {
-  options.release.set(jvmTargetVersion.target.toInt())
-}
-
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-  compilerOptions {
-    // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-    languageVersion.set(KotlinVersion.KOTLIN_2_2)
-    apiVersion.set(KotlinVersion.KOTLIN_2_2)
-    // IntelliJ forces older Kotlin, which results in warnings
-    allWarningsAsErrors.set(false)
-
-    check(this is KotlinJvmCompilerOptions)
-    this.jvmTarget.set(jvmTargetVersion)
-    jvmDefault.set(org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode.NO_COMPATIBILITY)
-    freeCompilerArgs.addAll(
-      "-Xjsr305=strict",
-      "-Xassertions=jvm",
-      "-Xemit-jvm-type-annotations",
-      "-Xjspecify-annotations=strict",
-      "-Xjdk-release=${jvmTargetVersion.target}",
-    )
-    optIn.addAll(
-      "kotlin.contracts.ExperimentalContracts",
-      "kotlin.experimental.ExperimentalTypeInference",
-      "kotlin.ExperimentalStdlibApi",
-      "kotlin.time.ExperimentalTime",
-    )
-  }
-}
-
-// Configure Detekt jvmTarget when Detekt plugin is applied
-pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-  tasks.withType<Detekt>().configureEach { jvmTarget = jvmTargetVersion.target }
-}
+configureKotlinJvmConvention(
+  jvmTargetVersion = jvmTargetVersion,
+  jdkVersion = jdkVersion,
+  // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+  languageVersion = KotlinVersion.KOTLIN_2_2,
+  // IntelliJ forces older Kotlin, which results in warnings.
+  allWarningsAsErrors = false,
+  // IntelliJ plugins intentionally do not use explicit API mode.
+  useExplicitApi = false,
+)

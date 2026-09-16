@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Slack Technologies, LLC
+ * Copyright (C) 2026 Slack Technologies, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  id("foundry.spotless")
-  id("foundry.kotlin-jvm")
-  alias(libs.plugins.wire)
-  alias(libs.plugins.mavenPublish)
-  id("foundry.maven-publish")
-  id("foundry.lint")
-}
+package foundry.buildlogic
 
-wire {
-  kotlin {}
-  sourcePath {
-    srcDir(layout.projectDirectory.dir("src/main/proto"))
-    include("trace.proto")
+import com.google.common.truth.Truth.assertThat
+import org.junit.Test
+
+class KotlinJvmConventionTest {
+
+  @Test
+  fun `parses stable JDK versions`() {
+    assertThat(parseJdkVersion("23")).isEqualTo(23)
   }
-}
 
-dependencies {
-  implementation(libs.coroutines.core)
-  implementation(libs.okhttp)
-  implementation(libs.okio)
-  implementation(libs.retrofit)
-  implementation(libs.retrofit.converters.wire)
+  @Test
+  fun `parses early access JDK versions`() {
+    assertThat(parseJdkVersion("23-ea")).isEqualTo(23)
+  }
 }

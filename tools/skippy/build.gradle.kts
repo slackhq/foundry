@@ -19,7 +19,7 @@ plugins {
   alias(libs.plugins.moshix)
   alias(libs.plugins.mavenPublish)
   id("foundry.maven-publish")
-  alias(libs.plugins.lint)
+  id("foundry.lint")
 }
 
 dependencies {

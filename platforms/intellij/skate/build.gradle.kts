@@ -26,7 +26,7 @@ plugins {
   alias(libs.plugins.intellij)
   alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
 }
 
 group = "com.slack.intellij"

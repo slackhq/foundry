@@ -25,7 +25,7 @@ plugins {
   alias(libs.plugins.bestPracticesPlugin)
   alias(libs.plugins.moshix)
   alias(libs.plugins.buildConfig)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
 }
 
 // Can remove this when we move to language version 2.4+
@@ -61,8 +61,6 @@ tasks.named<ProcessResources>("processResources") {
 
 moshi { enableSealed.set(true) }
 
-lint { baseline = file("lint-baseline.xml") }
-
 tasks.named<ValidatePlugins>("validatePlugins") { enableStricterValidation.set(true) }
 
 val pluginUnderTestRuntimeClasspath = configurations.create("pluginUnderTestRuntimeClasspath")
@@ -87,6 +85,7 @@ dependencies.constraints {
 dependencies {
   add(pluginUnderTestRuntimeClasspath.name, libs.agp)
   add(pluginUnderTestRuntimeClasspath.name, libs.gradlePlugins.retry)
+  add(pluginUnderTestRuntimeClasspath.name, libs.gradlePlugins.spotless)
 
   api(platform(libs.okhttp.bom))
   api(project(":platforms:gradle:agp-handlers:agp-handler-api"))
