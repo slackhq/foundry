@@ -15,21 +15,15 @@
  */
 package foundry.buildlogic
 
-import java.io.File
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 public abstract class VerifyConventionPluginsTask : DefaultTask() {
 
-  @get:InputFiles
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  public abstract val buildFiles: ConfigurableFileCollection
+  @get:Input public abstract val buildFileContents: MapProperty<String, String>
 
   @get:Input public abstract val lintExemptBuildFiles: ListProperty<String>
 
@@ -38,10 +32,7 @@ public abstract class VerifyConventionPluginsTask : DefaultTask() {
     val failures = mutableListOf<String>()
     val lintExemptions = lintExemptBuildFiles.get().toSet()
 
-    for (buildFile in buildFiles.files.sortedBy { it.path }) {
-      val relativePath = buildFile.sourceProjectRelativePath()
-      val contents = buildFile.readText()
-
+    for ((relativePath, contents) in buildFileContents.get().toSortedMap()) {
       if ("id(\"foundry.spotless\")" !in contents) {
         failures += "$relativePath must apply id(\"foundry.spotless\")"
       }
@@ -69,21 +60,7 @@ public abstract class VerifyConventionPluginsTask : DefaultTask() {
     }
   }
 
-  private fun File.sourceProjectRelativePath(): String {
-    val normalizedPath = invariantSeparatorsPath
-    return SOURCE_ROOTS.firstNotNullOfOrNull { root ->
-      val marker = "/$root/"
-      normalizedPath
-        .indexOf(marker)
-        .takeIf { it >= 0 }
-        ?.let { index ->
-          normalizedPath.substring(index + 1)
-        }
-    } ?: normalizedPath
-  }
-
   private companion object {
-    val SOURCE_ROOTS = listOf("platforms", "tools")
     val KOTLIN_CONVENTIONS =
       listOf(
         "id(\"foundry.kotlin-jvm\")",

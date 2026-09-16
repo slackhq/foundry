@@ -32,7 +32,7 @@ configureKotlinJvmConvention(
   jvmTargetVersion = jvmTargetVersion,
   jdkVersion = jdkVersion,
   // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-  languageVersion = KotlinVersion.KOTLIN_2_2,
+  kotlinLanguageVersion = KotlinVersion.KOTLIN_2_2,
   // IntelliJ forces older Kotlin, which results in warnings.
   allWarningsAsErrors = false,
   // IntelliJ plugins intentionally do not use explicit API mode.
