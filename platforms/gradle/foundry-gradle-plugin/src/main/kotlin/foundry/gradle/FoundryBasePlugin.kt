@@ -119,9 +119,9 @@ internal class FoundryBasePlugin @Inject constructor(private val buildFeatures: 
       globalConfig.configureProject(target)
     }
 
+    target.configureSpotless(foundryProperties)
+
     if (!this.buildFeatures.isolatedProjects.active.getOrElse(false)) {
-      // TODO https://github.com/diffplug/spotless/issues/1979
-      target.configureSpotless(foundryProperties)
       // TODO not clear how to access the build scan API from a non-root project
       val scanApi = findAdapter(target)
       if (scanApi !is NoOpBuildScanAdapter) {

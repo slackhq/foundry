@@ -18,7 +18,7 @@ plugins {
   id("foundry.kotlin-jvm-gradle")
   alias(libs.plugins.mavenPublish)
   id("foundry.maven-publish")
-  alias(libs.plugins.lint)
+  id("foundry.lint")
 }
 
 dependencies {

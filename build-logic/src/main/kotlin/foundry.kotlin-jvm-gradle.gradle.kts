@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import io.gitlab.arturbosch.detekt.Detekt
+import foundry.buildlogic.configureKotlinJvmConvention
+import foundry.buildlogic.parseJdkVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.samWithReceiver.gradle.SamWithReceiverExtension
 
 plugins {
@@ -28,54 +26,19 @@ plugins {
 }
 
 val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-val jvmTargetVersion =
-  catalog.findVersion("jvmTarget").get().toString().let { JvmTarget.fromTarget(it) }
-val jdkVersion = catalog.findVersion("jdk").get().toString().toInt()
-
-extensions.configure<KotlinJvmProjectExtension> { explicitApi() }
+val jvmTargetVersion = JvmTarget.fromTarget(catalog.findVersion("jvmTarget").get().requiredVersion)
+val jdkVersion = parseJdkVersion(catalog.findVersion("jdk").get().requiredVersion)
 
 extensions.configure<SamWithReceiverExtension> {
   annotation("org.gradle.api.HasImplicitReceiver")
 }
 
-extensions.configure<JavaPluginExtension> {
-  toolchain { languageVersion.set(JavaLanguageVersion.of(jdkVersion)) }
-}
-
-tasks.withType<JavaCompile>().configureEach {
-  options.release.set(jvmTargetVersion.target.toInt())
-}
-
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-  compilerOptions {
-    languageVersion.set(KotlinVersion.KOTLIN_2_2)
-    apiVersion.set(KotlinVersion.KOTLIN_2_2)
-    // Gradle forces older Kotlin, which results in warnings
-    allWarningsAsErrors.set(false)
-
-    check(this is KotlinJvmCompilerOptions)
-    this.jvmTarget.set(jvmTargetVersion)
-    jvmDefault.set(org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode.NO_COMPATIBILITY)
-    freeCompilerArgs.addAll(
-      // Required due to https://github.com/gradle/gradle/issues/24871
-      "-Xsam-conversions=class",
-      "-Xlambdas=class",
-      "-Xjsr305=strict",
-      "-Xassertions=jvm",
-      "-Xemit-jvm-type-annotations",
-      "-Xjspecify-annotations=strict",
-      "-Xjdk-release=${jvmTargetVersion.target}",
-    )
-    optIn.addAll(
-      "kotlin.contracts.ExperimentalContracts",
-      "kotlin.experimental.ExperimentalTypeInference",
-      "kotlin.ExperimentalStdlibApi",
-      "kotlin.time.ExperimentalTime",
-    )
-  }
-}
-
-// Configure Detekt jvmTarget when Detekt plugin is applied
-pluginManager.withPlugin("io.gitlab.arturbosch.detekt") {
-  tasks.withType<Detekt>().configureEach { jvmTarget = jvmTargetVersion.target }
-}
+configureKotlinJvmConvention(
+  jvmTargetVersion = jvmTargetVersion,
+  jdkVersion = jdkVersion,
+  languageVersion = KotlinVersion.KOTLIN_2_2,
+  // Gradle forces older Kotlin, which results in warnings.
+  allWarningsAsErrors = false,
+  useExplicitApi = true,
+  gradleCompatibility = true,
+)

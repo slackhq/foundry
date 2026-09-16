@@ -19,6 +19,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 
 plugins {
   id("foundry.build-features")
+  id("foundry.convention-coverage")
   id("foundry.spotless")
   alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.kotlin.multiplatform) apply false
@@ -32,7 +33,6 @@ plugins {
   alias(libs.plugins.intellij) apply false
   alias(libs.plugins.pluginUploader) apply false
   alias(libs.plugins.buildConfig) apply false
-  alias(libs.plugins.lint) apply false
   alias(libs.plugins.wire) apply false
   alias(libs.plugins.graphAssert) apply false
 }
@@ -65,12 +65,12 @@ if (file(".git").exists()) {
   }
 }
 
-// Several plugins don't support isolated projects and need to be conditionally applied.
+// GraphAssert doesn't support isolated projects and needs to be conditionally applied.
 val isolatedProjectsEnabled =
   extensions.getByType<BuildFeaturesExtension>().isolatedProjects.getOrElse(false)
 
 // GraphAssert doesn't support isolated projects as it needs to traverse subproject configurations
-// See: https://github.com/jraska/modules-graph-assert/issues/XXX (TODO: file upstream issue)
+// See: https://github.com/jraska/modules-graph-assert/issues/322
 if (!isolatedProjectsEnabled) {
   apply(plugin = "com.jraska.module.graph.assertion")
 

@@ -13,29 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import foundry.buildlogic.BuildFeaturesExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
-// KSP doesn't support isolated projects yet
-// See: https://github.com/google/ksp/issues/1943
-val isolatedProjectsEnabled =
-  extensions.getByType<BuildFeaturesExtension>().isolatedProjects.getOrElse(false)
-
 plugins {
-  id("foundry.build-features")
   id("foundry.spotless")
   id("foundry.kotlin-jvm")
   alias(libs.plugins.dokka)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
   alias(libs.plugins.mavenPublish)
   id("foundry.maven-publish")
   alias(libs.plugins.moshix)
   alias(libs.plugins.kotlin.plugin.serialization)
-  alias(libs.plugins.ksp) apply false
-}
-
-if (!isolatedProjectsEnabled) {
-  apply(plugin = "com.google.devtools.ksp")
+  alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -44,8 +33,6 @@ kotlin {
     optIn.addAll("kotlin.ExperimentalStdlibApi", "kotlinx.coroutines.ExperimentalCoroutinesApi")
   }
 }
-
-lint { baseline = file("lint-baseline.xml") }
 
 moshi { enableSealed.set(true) }
 
@@ -84,7 +71,5 @@ dependencies {
   testImplementation(libs.kaml)
   testImplementation(libs.truth)
 
-  if (!isolatedProjectsEnabled) {
-    "ksp"(libs.autoService.ksp)
-  }
+  ksp(libs.autoService.ksp)
 }
