@@ -37,6 +37,7 @@ import java.util.concurrent.Executors
 import kotlin.streams.asSequence
 import okhttp3.OkHttpClient
 import org.gradle.StartParameter
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
@@ -349,9 +350,30 @@ public fun Project.foundryTools(): FoundryTools {
   return foundryToolsProvider().get()
 }
 
+/**
+ * Registers [configurer] to run from [FoundryBasePlugin] while each non-root project configures.
+ *
+ * This is the project-isolation-compatible alternative to root `subprojects {}` configuration. The
+ * action is retained and invoked later from each child project, so it must capture only immutable,
+ * configuration-safe values. Do not capture a root [Project], mutable build-model objects, or
+ * values whose computation accesses another project.
+ */
+public fun Project.configureFoundryProjects(configurer: Project.() -> Unit) {
+  check(isRootProject) { "Foundry project configuration must be registered from the root project." }
+  val action =
+    object : Action<Project> {
+      override fun execute(project: Project) {
+        configurer(project)
+      }
+    }
+  foundryTools().globalConfig.configureProjects(action)
+}
+
 @Suppress("UNCHECKED_CAST")
 public fun Project.foundryToolsProvider(): Provider<FoundryTools> {
-  return (project.gradle.sharedServices.registrations.getByName(SERVICE_NAME)
-      as BuildServiceRegistration<FoundryTools, Parameters>)
-    .service
+  val registration =
+    requireNotNull(project.gradle.sharedServices.registrations.findByName(SERVICE_NAME)) {
+      "$SERVICE_NAME must be registered before it is requested."
+    }
+  return (registration as BuildServiceRegistration<FoundryTools, Parameters>).service
 }

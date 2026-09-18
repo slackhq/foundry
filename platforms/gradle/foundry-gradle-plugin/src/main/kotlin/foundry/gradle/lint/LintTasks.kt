@@ -261,11 +261,6 @@ internal object LintTasks {
       ignoreTestSources = foundryProperties.lintIgnoreTestSources
       checkTestSources = foundryProperties.lintCheckTestSources
 
-      textReport = true
-      xmlReport = false
-      htmlReport = true
-      sarifReport = true
-
       // Format text output for convenience.
       explainIssues = true
       noLines = false

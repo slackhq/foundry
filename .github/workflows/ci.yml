@@ -9,7 +9,7 @@ on:
       - '**/*.md'
   # Always run on PRs
   pull_request:
-    branches: [ main ]
+    branches: [main]
   merge_group:
 
 concurrency:
@@ -54,6 +54,11 @@ jobs:
         timeout-minutes: 10
         run: ./gradlew check --quiet
 
+      - name: Verify module dependency graph
+        timeout-minutes: 5
+        # GraphAssert requires cross-project access and does not support isolated projects.
+        run: ./gradlew assertModuleGraph --quiet -Dorg.gradle.isolated-projects=false
+
       - name: Print build scan url
         if: always()
         run: echo ${{ steps.gradle.outputs.build-scan-url }}
@@ -71,51 +76,55 @@ jobs:
     env:
       GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
     steps:
-        - name: Checkout
-          uses: actions/checkout@v7
-          with:
-            lfs: 'true'
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          lfs: 'true'
 
-        - name: Check LFS files
-          uses: actionsdesk/lfs-warning@v3.3
+      - name: Check for large files outside LFS
+        if: github.event_name == 'pull_request'
+        uses: actionsdesk/lfs-warning@4b98a8a5e6c429c23c34eee02d71553bca216425  # v3.3
 
-        - name: Export JDK version
-          shell: bash
-          run: |
-            JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
-            echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
+      - name: Verify LFS objects and pointers
+        run: git lfs fsck
 
-        - name: Install JDK ${{ env.JDK_VERSION }}
-          uses: actions/setup-java@v5
-          with:
-            distribution: 'zulu'
-            java-version: '${{ env.JDK_VERSION }}'
+      - name: Export JDK version
+        shell: bash
+        run: |
+          JDK_VERSION=$(grep "jdk =" gradle/libs.versions.toml | head -n 1 | cut -d'=' -f2 | tr -d '"' | xargs)
+          echo "JDK_VERSION=${JDK_VERSION}" >> $GITHUB_ENV
 
-        - name: Setup Gradle
-          uses: gradle/actions/setup-gradle@v6
-          with:
-            # Only save Gradle User Home state for builds on the 'main' branch.
-            # Builds on other branches will only read existing entries from the cache.
-            cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - name: Install JDK ${{ env.JDK_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '${{ env.JDK_VERSION }}'
 
-            # Don't reuse cache entries from any other Job.
-            gradle-home-cache-strict-match: true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          # Only save Gradle User Home state for builds on the 'main' branch.
+          # Builds on other branches will only read existing entries from the cache.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-            cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          # Don't reuse cache entries from any other Job.
+          gradle-home-cache-strict-match: true
 
-        - name: Build and run tests
-          id: gradle
-          timeout-minutes: 10
-          run: ./gradlew verifyRoborazzi --quiet
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-        - name: (Fail-only) Upload build reports
-          if: failure()
-          uses: actions/upload-artifact@v7
-          with:
-            name: snapshot-reports
-            path: |
-              **/build/reports/**
-              **/build/outputs/roborazzi/*.png
+      - name: Build and run tests
+        id: gradle
+        timeout-minutes: 10
+        run: ./gradlew verifyRoborazzi --quiet
+
+      - name: (Fail-only) Upload build reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: snapshot-reports
+          path: |
+            **/build/reports/**
+            **/build/outputs/roborazzi/*.png
 
   publish-snapshot:
     name: 'Publish snapshot (main only)'

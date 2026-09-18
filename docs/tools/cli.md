@@ -15,6 +15,22 @@ dependencies {
 @file:DependsOn("com.slack.foundry:cli:{version}")
 ```
 
+## Building
+
+This project uses Gradle's isolated projects feature by default. The CLI module uses KSP
+(Kotlin Symbol Processing) for `@AutoService` annotations to generate service loader files for
+command discovery:
+
+```bash
+./gradlew :tools:cli:build
+```
+
+To explicitly verify that the packaged CLI contains every expected service-loader entry, run:
+
+```bash
+tools/scripts/verify-cli-service-loader.sh
+```
+
 ## Local testing
 
 If consuming these utilities from a kotlin script file, you can test changes like so:
