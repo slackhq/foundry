@@ -15,7 +15,8 @@ git commit -am "Prepare for release $NEW_VERSION."
 git tag -a "$NEW_VERSION" -m "Version $NEW_VERSION"
 
 # Publish
-./gradlew publish --no-configuration-cache -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300 -Dspotlight.enabled=false
+# Gradle rejects --no-configuration-cache while isolated projects is enabled, so disable both.
+./gradlew publish --no-configuration-cache -Dorg.gradle.isolated-projects=false -PSONATYPE_CONNECT_TIMEOUT_SECONDS=300 -Dspotlight.enabled=false
 
 # Prepare next snapshot
 echo "Restoring snapshot version $SNAPSHOT_VERSION"
