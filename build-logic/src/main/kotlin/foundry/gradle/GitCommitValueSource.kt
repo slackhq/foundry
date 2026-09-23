@@ -16,8 +16,10 @@
 package foundry.gradle
 
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.logging.Logging
 import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
 
@@ -33,7 +35,12 @@ public abstract class GitCommitValueSource : ValueSource<String, GitCommitValueS
   }
 
   public companion object {
-    /** Executes `git rev-parse HEAD` in the given [directory] and returns the commit hash. */
+    private val logger = Logging.getLogger(GitCommitValueSource::class.java)
+
+    /**
+     * Executes `git rev-parse HEAD` in the given [directory] and returns the commit hash, or null
+     * (with a warning) if it cannot be determined.
+     */
     public fun getGitCommitHash(directory: File): String? {
       return try {
         val process =
@@ -43,14 +50,26 @@ public abstract class GitCommitValueSource : ValueSource<String, GitCommitValueS
             .start()
 
         val completed = process.waitFor(10, TimeUnit.SECONDS)
-        if (!completed || process.exitValue() != 0) {
-          return null
+        if (!completed) {
+          return warn(directory, "git rev-parse HEAD timed out")
+        }
+        val output = process.inputStream.bufferedReader().readText().trim()
+        if (process.exitValue() != 0) {
+          return warn(directory, "git rev-parse HEAD exited with ${process.exitValue()}: $output")
         }
 
-        process.inputStream.bufferedReader().readText().trim().takeIf { it.isNotEmpty() }
-      } catch (_: Exception) {
-        null
+        output.ifEmpty { warn(directory, "git rev-parse HEAD returned no output") }
+      } catch (e: IOException) {
+        warn(directory, "git could not be run: ${e.message}")
+      } catch (_: InterruptedException) {
+        Thread.currentThread().interrupt()
+        warn(directory, "interrupted while waiting for git")
       }
+    }
+
+    private fun warn(directory: File, reason: String): String? {
+      logger.warn("Could not determine the git commit for '$directory' ($reason).")
+      return null
     }
   }
 }
