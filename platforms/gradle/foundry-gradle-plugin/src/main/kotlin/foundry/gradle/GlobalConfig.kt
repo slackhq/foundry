@@ -42,7 +42,7 @@ private constructor(
    * Registration must happen before any child project configures, since earlier children would
    * otherwise silently miss [configurer].
    */
-  public fun configureProjects(configurer: Action<Project>) {
+  internal fun configureProjects(configurer: Action<Project>) {
     check(!projectConfigurationStarted) {
       "Foundry project configuration must be registered before any subproject is configured."
     }
