@@ -57,19 +57,21 @@ internal fun Project.configureKotlinJvmConvention(
       apiVersion.set(kotlinLanguageVersion)
       this.allWarningsAsErrors.set(allWarningsAsErrors)
 
-      check(this is KotlinJvmCompilerOptions)
-      jvmTarget.set(jvmTargetVersion)
-      jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
       if (gradleCompatibility) {
         freeCompilerArgs.addAll("-Xsam-conversions=class", "-Xlambdas=class")
       }
-      freeCompilerArgs.addAll(
-        "-Xjsr305=strict",
-        "-Xassertions=jvm",
-        "-Xemit-jvm-type-annotations",
-        "-Xjspecify-annotations=strict",
-        "-Xjdk-release=${jvmTargetVersion.target}",
-      )
+      // Multiplatform projects also register non-JVM (metadata) compilations.
+      if (this is KotlinJvmCompilerOptions) {
+        jvmTarget.set(jvmTargetVersion)
+        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
+        freeCompilerArgs.addAll(
+          "-Xjsr305=strict",
+          "-Xassertions=jvm",
+          "-Xemit-jvm-type-annotations",
+          "-Xjspecify-annotations=strict",
+          "-Xjdk-release=${jvmTargetVersion.target}",
+        )
+      }
       optIn.addAll(
         "kotlin.contracts.ExperimentalContracts",
         "kotlin.experimental.ExperimentalTypeInference",

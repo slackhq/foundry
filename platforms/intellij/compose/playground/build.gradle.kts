@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 plugins {
   id("foundry.spotless")
   alias(libs.plugins.kotlin.multiplatform)
+  id("foundry.kotlin-multiplatform-intellij")
   alias(libs.plugins.compose)
   alias(libs.plugins.kotlin.plugin.compose)
   id("foundry.lint")
@@ -33,7 +34,7 @@ roborazzi {
 }
 
 kotlin {
-  jvm { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21) } }
+  jvm()
 
   sourceSets {
     jvmMain {

@@ -37,9 +37,7 @@ public abstract class VerifyConventionPluginsTask : DefaultTask() {
         failures += "$relativePath must apply id(\"foundry.spotless\")"
       }
 
-      val hasKotlinConvention =
-        KOTLIN_CONVENTIONS.any { convention -> convention in contents } ||
-          "alias(libs.plugins.kotlin.multiplatform)" in contents
+      val hasKotlinConvention = KOTLIN_CONVENTIONS.any { convention -> convention in contents }
       if (!hasKotlinConvention) {
         failures += "$relativePath must apply a Foundry Kotlin convention"
       }
@@ -66,6 +64,7 @@ public abstract class VerifyConventionPluginsTask : DefaultTask() {
         "id(\"foundry.kotlin-jvm\")",
         "id(\"foundry.kotlin-jvm-gradle\")",
         "id(\"foundry.kotlin-jvm-intellij\")",
+        "id(\"foundry.kotlin-multiplatform-intellij\")",
       )
   }
 }
