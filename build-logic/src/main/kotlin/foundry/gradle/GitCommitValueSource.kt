@@ -51,6 +51,7 @@ public abstract class GitCommitValueSource : ValueSource<String, GitCommitValueS
 
         val completed = process.waitFor(10, TimeUnit.SECONDS)
         if (!completed) {
+          process.destroyForcibly()
           return warn(directory, "git rev-parse HEAD timed out")
         }
         val output = process.inputStream.bufferedReader().readText().trim()
