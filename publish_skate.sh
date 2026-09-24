@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -exo pipefail
+
 source tools/scripts/scriptUtil.sh
 
 changeNotes=platforms/intellij/skate/change-notes.html
