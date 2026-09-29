@@ -16,10 +16,12 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
+  id("foundry.spotless")
   alias(libs.plugins.kotlin.multiplatform)
+  id("foundry.kotlin-multiplatform-intellij")
   alias(libs.plugins.compose)
   alias(libs.plugins.kotlin.plugin.compose)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
   alias(libs.plugins.roborazzi)
 }
 

@@ -16,11 +16,12 @@
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
-  alias(libs.plugins.kotlin.jvm)
+  id("foundry.spotless")
+  id("foundry.kotlin-jvm")
   alias(libs.plugins.dokka)
-  alias(libs.plugins.lint)
+  id("foundry.lint")
   alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.spotless)
+  id("foundry.maven-publish")
   alias(libs.plugins.moshix)
   alias(libs.plugins.kotlin.plugin.serialization)
   alias(libs.plugins.ksp)
@@ -33,12 +34,12 @@ kotlin {
   }
 }
 
-lint { baseline = file("lint-baseline.xml") }
-
 moshi { enableSealed.set(true) }
 
 // We have a couple flaky tests on CI right now
-if (System.getenv("CI") != null) {
+val isCI = providers.environmentVariable("CI").isPresent
+
+if (isCI) {
   tasks.test {
     develocity.testRetry {
       maxRetries.set(2)

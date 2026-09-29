@@ -32,7 +32,6 @@ import foundry.gradle.capitalizeUS
 import foundry.gradle.configure
 import foundry.gradle.dependsOn
 import foundry.gradle.kgp.KgpTasks
-import foundry.gradle.namedLazy
 import foundry.gradle.properties.mapToBoolean
 import foundry.gradle.properties.setDisallowChanges
 import foundry.gradle.register
@@ -232,8 +231,8 @@ public object ModuleStatsTasks {
               }
 
             if (includeGenerated && locTask != null) {
-              project.namedLazy<Task>("compile${targetVariant.capitalizeUS()}Sources") {
-                locTask.dependsOn(it)
+              locTask.configure {
+                dependsOn("compile${targetVariant.capitalizeUS()}Sources")
               }
             }
 

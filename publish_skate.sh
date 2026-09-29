@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -exo pipefail
+
 source tools/scripts/scriptUtil.sh
 
 changeNotes=platforms/intellij/skate/change-notes.html
@@ -49,7 +51,8 @@ awk -v version="$version" '
     { print }
 ' $changeNotes > tmpfile && mv tmpfile $changeNotes
 
-./gradlew :platforms:intellij:skate:uploadPluginToArtifactory --no-configuration-cache --stacktrace
+# Gradle rejects --no-configuration-cache while isolated projects is enabled, so disable both.
+./gradlew :platforms:intellij:skate:uploadPluginToArtifactory --no-configuration-cache -Dorg.gradle.isolated-projects=false --stacktrace
 
 git reset $changeNotes
 

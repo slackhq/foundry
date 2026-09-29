@@ -15,6 +15,8 @@
  */
 package foundry.gradle
 
+import java.util.concurrent.CopyOnWriteArrayList
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.jvm.toolchain.JvmVendorSpec
 
@@ -27,6 +29,30 @@ private constructor(
   internal val affectedProjects: Set<String>?,
   internal val jvmVendor: JvmVendorSpec?,
 ) {
+  private val projectConfigurers = CopyOnWriteArrayList<Action<Project>>()
+  @Volatile private var projectConfigurationStarted = false
+
+  /**
+   * Registers [configurer] to run from Foundry's project-local base plugin application.
+   *
+   * This lets a root build supply conventions without configuring subprojects directly, which is
+   * required when Gradle isolated projects is enabled. The action runs later while a child project
+   * configures, so callers must capture only immutable, configuration-safe values.
+   *
+   * Registration must happen before any child project configures, since earlier children would
+   * otherwise silently miss [configurer].
+   */
+  internal fun configureProjects(configurer: Action<Project>) {
+    check(!projectConfigurationStarted) {
+      "Foundry project configuration must be registered before any subproject is configured."
+    }
+    projectConfigurers.add(configurer)
+  }
+
+  internal fun configureProject(project: Project) {
+    projectConfigurationStarted = true
+    projectConfigurers.forEach { it.execute(project) }
+  }
 
   internal companion object {
     operator fun invoke(project: Project): GlobalConfig {

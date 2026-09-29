@@ -213,7 +213,7 @@ public sealed class Thermals {
 public data class ThermalsData(public val logs: List<ThermLog>) : Thermals() {
 
   init {
-    check(logs.isNotEmpty())
+    check(logs.isNotEmpty()) { "ThermalsData requires at least one thermal log." }
   }
 
   override val wasThrottled: Boolean by lazy { logs.any { it.isThrottled } }
