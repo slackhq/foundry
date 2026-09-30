@@ -4,6 +4,34 @@ Changelog
 **Unreleased**
 --------------
 
+0.37.0
+------
+
+_2026-09-30_
+
+- Enable Gradle project isolation support and migrate root build configuration into project-local convention plugins.
+- Update Circuit to `0.36.1`.
+- Update Okio to `3.18.2`.
+- Update Wire to `6.4.7`.
+- Update oshi to `7.4.4`.
+- Update xmlutil to `1.0.2`.
+- Update Jetbrains Markdown to `0.7.14`.
+- Update slf4j-nop to `2.0.20`.
+- Build against Kotlin `2.4.20`.
+- Build against KSP `2.3.12`.
+- Build against AGP `9.3.2`.
+- Build against Gradle `9.7.0`.
+- Build against IntelliJ `2026.1.1`.
+- Build against DAGP `3.18.0`.
+- Build against Roborazzi `1.70.0`.
+- Build against Spotless `8.10.3`.
+- Build against SqlDelight `2.4.0`.
+- Build against Develocity `4.5.1`.
+- Build against emulator.wtf `1.7.3`.
+- Build against errorprone plugin `5.1.1`.
+- Build against compose-lint-checks `1.5.5`.
+- Build against gradle retry `1.6.6`.
+
 0.36.0
 ------
 
