@@ -585,6 +585,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    <span class="md-ellipsis">
+      Building
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#local-testing" class="md-nav__link">
     <span class="md-ellipsis">
       Local testing
@@ -755,6 +764,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    <span class="md-ellipsis">
+      Building
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#local-testing" class="md-nav__link">
     <span class="md-ellipsis">
       Local testing
@@ -794,6 +812,15 @@
 <span class="c1">// In kotlin script</span>
 <span class="nd">@file</span><span class="p">:</span><span class="n">DependsOn</span><span class="p">(</span><span class="s">&quot;com.slack.foundry:cli:{version}&quot;</span><span class="p">)</span>
 </code></pre></div></p>
+<h2 id="building">Building<a class="headerlink" href="#building" title="Permanent link">&para;</a></h2>
+<p>This project uses Gradle&rsquo;s isolated projects feature by default. The CLI module uses KSP
+(Kotlin Symbol Processing) for <code>@AutoService</code> annotations to generate service loader files for
+command discovery:</p>
+<div class="highlight"><pre><span></span><code>./gradlew<span class="w"> </span>:tools:cli:build
+</code></pre></div>
+<p>To explicitly verify that the packaged CLI contains every expected service-loader entry, run:</p>
+<div class="highlight"><pre><span></span><code>tools/scripts/verify-cli-service-loader.sh
+</code></pre></div>
 <h2 id="local-testing">Local testing<a class="headerlink" href="#local-testing" title="Permanent link">&para;</a></h2>
 <p>If consuming these utilities from a kotlin script file, you can test changes like so:</p>
 <ol>
