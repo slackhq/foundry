@@ -174,11 +174,12 @@ public abstract class FoundryTools : BuildService<Parameters>, AutoCloseable {
   }
 
   private fun thermalsFile(): File {
+    // This is called during configuration, so avoid exists() checks here as they would be tracked
+    // as configuration cache inputs and invalidate the next build once the file is created.
+    // Truncating also ensures this file only contains thermals from the current build.
     return parameters.thermalsOutputFile.asFile.get().apply {
-      if (!exists()) {
-        parentFile.mkdirs()
-        createNewFile()
-      }
+      parentFile.mkdirs()
+      writeText("")
     }
   }
 
