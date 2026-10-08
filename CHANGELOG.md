@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- Support minor compileSdk versions. `foundry.android.compileSdkVersion` now accepts a value like `37.2`.
+
 0.37.0
 ------
 

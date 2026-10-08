@@ -695,7 +695,12 @@ internal class StandardProjectConfigurations(
           pluginManager.apply("org.gradle.android.cache-fix")
         }
 
-        compileSdk = sdkVersions.value.compileSdk
+        compileSdk {
+          version =
+            release(sdkVersions.value.compileSdk) {
+              minorApiLevel = sdkVersions.value.compileSdkMinor
+            }
+        }
         foundryProperties.ndkVersion?.let { ndkVersion = it }
         foundryProperties.buildToolsVersionOverride?.let { buildToolsVersion = it }
         val useOrchestrator = foundryProperties.useOrchestrator.getOrElse(false)
@@ -1050,7 +1055,12 @@ internal class StandardProjectConfigurations(
           .withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
           .configureEach {
             foundryExtension.setAndroidExtension(CommonExtensionHandler(this))
-            compileSdk = sdkVersions.value.compileSdk
+            compileSdk {
+              version =
+                release(sdkVersions.value.compileSdk) {
+                  minorApiLevel = sdkVersions.value.compileSdkMinor
+                }
+            }
             minSdk = sdkVersions.value.minSdk
           }
 

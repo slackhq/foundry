@@ -17,6 +17,7 @@ package foundry.gradle
 
 import foundry.common.FoundryKeys
 import foundry.gradle.android.AndroidArchitecture
+import foundry.gradle.android.AndroidCompileSdk
 import foundry.gradle.anvil.AnvilMode
 import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.properties.PropertyResolver
@@ -906,19 +907,30 @@ internal constructor(
     get() = fileProvider("foundry.topography.features.config", useRoot = true)
 
   internal fun requireAndroidSdkProperties(): AndroidSdkProperties {
-    val compileSdk = compileSdkVersion ?: error("foundry.android.compileSdkVersion not set")
+    val compileSdk = compileSdk ?: error("foundry.android.compileSdkVersion not set")
     val minSdk = minSdkVersion?.toInt() ?: error("foundry.android.minSdkVersion not set")
     val targetSdk = targetSdkVersion?.toInt() ?: error("foundry.android.targetSdkVersion not set")
-    return AndroidSdkProperties(compileSdk, minSdk, targetSdk)
+    return AndroidSdkProperties(compileSdk.major, compileSdk.minor, minSdk, targetSdk)
   }
 
-  internal data class AndroidSdkProperties(val compileSdk: Int, val minSdk: Int, val targetSdk: Int)
+  internal data class AndroidSdkProperties(
+    val compileSdk: Int,
+    val compileSdkMinor: Int?,
+    val minSdk: Int,
+    val targetSdk: Int,
+  )
 
+  /** The major API level of `foundry.android.compileSdkVersion`. */
   public val compileSdkVersion: Int?
+    get() = compileSdk?.major
+
+  /** The minor API level of `foundry.android.compileSdkVersion`, such as `2` for `37.2`. */
+  public val compileSdkMinorVersion: Int?
+    get() = compileSdk?.minor
+
+  private val compileSdk: AndroidCompileSdk?
     get() =
-      optionalStringProperty("foundry.android.compileSdkVersion")
-        ?.removePrefix("android-") // Gracefully handle legacy prefixing
-        ?.toInt()
+      optionalStringProperty("foundry.android.compileSdkVersion")?.let(AndroidCompileSdk::parse)
 
   private val minSdkVersion: String?
     get() = optionalStringProperty("foundry.android.minSdkVersion")
