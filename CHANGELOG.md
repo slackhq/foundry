@@ -4,7 +4,16 @@ Changelog
 **Unreleased**
 --------------
 
+0.37.1
+------
+
+_2026-10-09_
+
 - Support minor compileSdk versions. `foundry.android.compileSdkVersion` now accepts a value like `37.2`.
+- **Fix**: Avoid configuration cache invalidation from the `last-build-thermals.log` file.
+- Update Jetbrains Markdown to `0.7.16`.
+- Build against Kotlin `2.4.21`.
+- Build against SqlDelight `2.4.1`.
 
 0.37.0
 ------
