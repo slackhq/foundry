@@ -325,7 +325,11 @@ constructor(
       }
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
-        if (daggerConfig?.useMetro != true) {
+        // Metro projects use Metro's native Circuit codegen unless it's disabled, in which case
+        // they fall back to Circuit's KSP processor like non-Metro projects.
+        val metroGeneratesCircuit =
+          daggerConfig?.useMetro == true && foundryProperties.metroCircuitCodeGen
+        if (!metroGeneratesCircuit) {
           markKspNeeded("Circuit")
           dependencies.add(ksp, "com.slack.circuit:circuit-codegen")
           dependencies.add(commonCompileOnly, "com.slack.circuit:circuit-codegen-annotations")

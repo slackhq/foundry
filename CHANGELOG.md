@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **Fix**: Metro projects with `foundry.di.metro.circuit=false` now use Circuit's KSP processor. Previously this disabled Metro's native Circuit codegen without enabling KSP, so no Circuit factories were generated.
+
 0.37.1
 ------
 

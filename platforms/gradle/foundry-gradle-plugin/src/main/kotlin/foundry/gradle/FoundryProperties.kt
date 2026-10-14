@@ -291,7 +291,10 @@ internal constructor(
   public val metroInteropAnvil: Boolean
     get() = booleanProperty("foundry.di.metro.interop.anvil", defaultValue = false)
 
-  /** Flag to enable using Metro's native Circuit code gen (if circuit code gen is enabled). */
+  /**
+   * Flag to enable using Metro's native Circuit code gen (if circuit code gen is enabled). When
+   * disabled, Metro projects use Circuit's KSP processor instead.
+   */
   public val metroCircuitCodeGen: Boolean
     get() = booleanProperty("foundry.di.metro.circuit", defaultValue = true)
 
