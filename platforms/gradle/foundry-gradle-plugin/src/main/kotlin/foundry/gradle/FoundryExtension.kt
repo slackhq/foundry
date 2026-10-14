@@ -325,16 +325,12 @@ constructor(
       }
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
-        // Metro projects use Metro's native Circuit codegen unless it's disabled, in which case
-        // they fall back to Circuit's KSP processor like non-Metro projects.
         val useMetro = daggerConfig?.useMetro == true
         if (!useMetro || !foundryProperties.metroCircuitCodeGen) {
           markKspNeeded("Circuit")
           dependencies.add(ksp, "com.slack.circuit:circuit-codegen")
           dependencies.add(commonCompileOnly, "com.slack.circuit:circuit-codegen-annotations")
           if (useMetro) {
-            // With Anvil interop, `anvil` mode keeps javax/Dagger annotations working through
-            // Metro's interop; `metro` mode requires Metro's own @Inject/@AssistedInject.
             val mode = if (daggerConfig?.metroInteropAnvil == true) "anvil" else "metro"
             pluginManager.withPlugin("com.google.devtools.ksp") {
               configure<KspExtension> { arg("circuit.codegen.mode", mode) }
