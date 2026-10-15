@@ -325,10 +325,17 @@ constructor(
       }
 
       if (featuresHandler.circuitHandler.codegen.getOrElse(false)) {
-        if (daggerConfig?.useMetro != true) {
+        val useMetro = daggerConfig?.useMetro == true
+        if (!useMetro || !foundryProperties.metroCircuitCodeGen) {
           markKspNeeded("Circuit")
           dependencies.add(ksp, "com.slack.circuit:circuit-codegen")
           dependencies.add(commonCompileOnly, "com.slack.circuit:circuit-codegen-annotations")
+          if (useMetro) {
+            val mode = if (daggerConfig?.metroInteropAnvil == true) "anvil" else "metro"
+            pluginManager.withPlugin("com.google.devtools.ksp") {
+              configure<KspExtension> { arg("circuit.codegen.mode", mode) }
+            }
+          }
         }
       }
 
