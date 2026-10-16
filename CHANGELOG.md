@@ -4,7 +4,14 @@ Changelog
 **Unreleased**
 --------------
 
+0.37.2
+------
+
+_2026-10-16_
+
 - **Fix**: Metro projects with `foundry.di.metro.circuit=false` now use Circuit's KSP processor. Previously this disabled Metro's native Circuit codegen without enabling KSP, so no Circuit factories were generated. Foundry sets `circuit.codegen.mode` to `anvil` when Metro's Anvil interop is enabled, and to `metro` otherwise.
+- Update Jetbrains Markdown to `0.7.17`.
+- Build against Spotless `8.10.4`.
 
 0.37.1
 ------
