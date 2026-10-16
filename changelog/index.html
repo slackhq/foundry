@@ -635,6 +635,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0372" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.37.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0371" class="md-nav__link">
     <span class="md-ellipsis">
       0.37.1
@@ -2526,6 +2535,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0372" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.37.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0371" class="md-nav__link">
     <span class="md-ellipsis">
       0.37.1
@@ -4328,6 +4346,13 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased"><strong>Unreleased</strong><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0372">0.37.2<a class="headerlink" href="#0372" title="Permanent link">&para;</a></h2>
+<p><em>2026-10-16</em></p>
+<ul>
+<li><strong>Fix</strong>: Metro projects with <code>foundry.di.metro.circuit=false</code> now use Circuit&rsquo;s KSP processor. Previously this disabled Metro&rsquo;s native Circuit codegen without enabling KSP, so no Circuit factories were generated. Foundry sets <code>circuit.codegen.mode</code> to <code>anvil</code> when Metro&rsquo;s Anvil interop is enabled, and to <code>metro</code> otherwise.</li>
+<li>Update Jetbrains Markdown to <code>0.7.17</code>.</li>
+<li>Build against Spotless <code>8.10.4</code>.</li>
+</ul>
 <h2 id="0371">0.37.1<a class="headerlink" href="#0371" title="Permanent link">&para;</a></h2>
 <p><em>2026-10-09</em></p>
 <ul>
