@@ -4,7 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.37.3
+------
+
+_2026-10-21_
+
 - **Fix**: `merge-sarif-reports` and `apply-baselines-to-sarifs` now match results by their full rule, location, and message instead of a 32-bit hash. Before, two unrelated results with the same hash were treated as one, so one was dropped depending on input order.
+- Update Jetbrains Markdown to `0.7.18`.
 
 0.37.2
 ------
