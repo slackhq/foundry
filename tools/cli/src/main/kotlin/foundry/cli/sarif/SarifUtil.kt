@@ -24,7 +24,6 @@ import io.github.detekt.sarif4k.Result
 import io.github.detekt.sarif4k.SarifSchema210
 import io.github.detekt.sarif4k.Suppression
 import io.github.detekt.sarif4k.SuppressionKind
-import java.util.Objects
 
 internal val BASELINE_SUPPRESSION: Suppression =
   Suppression(
@@ -58,37 +57,45 @@ internal val RESULT_SORT_COMPARATOR =
   )
 
 /**
- * Returns the identity hash code for the [Result] object. This seeks to create a hash code for
- * results that point to the same issue+location, but not necessarily the same
- * [Result.level]/[Result.message].
+ * Identifies a [Result] by its rule and first location. Compared by value rather than by hash code
+ * so two unrelated results can never be treated as the same result.
  */
-internal val Result.identityHash: Int
-  get() =
-    Objects.hash(
-      ruleID,
-      locations?.firstOrNull()?.physicalLocation?.artifactLocation?.uri,
-      locations?.firstOrNull()?.physicalLocation?.region?.startLine,
-      locations?.firstOrNull()?.physicalLocation?.region?.startColumn,
-      locations?.firstOrNull()?.physicalLocation?.region?.endLine,
-      locations?.firstOrNull()?.physicalLocation?.region?.endColumn,
-    )
+internal data class ResultIdentityKey(
+  val ruleID: String?,
+  val uri: String?,
+  val startLine: Long?,
+  val startColumn: Long?,
+  val endLine: Long?,
+  val endColumn: Long?,
+)
+
+/** Identifies a [Result] by its [ResultIdentityKey] plus its message text. */
+internal data class ResultShallowKey(val identity: ResultIdentityKey, val messageText: String?)
 
 /**
- * Returns the shallow hash code for the [Result] object. This seeks to create a hash code for
- * results that include the [identityHash] but also differentiate if the
- * [Result.level]/[Result.message] are different.
+ * Returns the identity key for the [Result] object. This matches results that point to the same
+ * issue+location, but not necessarily the same [Result.level]/[Result.message].
  */
-internal val Result.shallowHash: Int
-  get() =
-    Objects.hash(
-      ruleID,
-      message.text,
-      locations?.firstOrNull()?.physicalLocation?.artifactLocation?.uri,
-      locations?.firstOrNull()?.physicalLocation?.region?.startLine,
-      locations?.firstOrNull()?.physicalLocation?.region?.startColumn,
-      locations?.firstOrNull()?.physicalLocation?.region?.endLine,
-      locations?.firstOrNull()?.physicalLocation?.region?.endColumn,
+internal val Result.identityKey: ResultIdentityKey
+  get() {
+    val physicalLocation = locations?.firstOrNull()?.physicalLocation
+    val region = physicalLocation?.region
+    return ResultIdentityKey(
+      ruleID = ruleID,
+      uri = physicalLocation?.artifactLocation?.uri,
+      startLine = region?.startLine,
+      startColumn = region?.startColumn,
+      endLine = region?.endLine,
+      endColumn = region?.endColumn,
     )
+  }
+
+/**
+ * Returns the shallow key for the [Result] object. This includes the [identityKey] but also
+ * differentiates results whose [Result.message] is different.
+ */
+internal val Result.shallowKey: ResultShallowKey
+  get() = ResultShallowKey(identityKey, message.text)
 
 private val LEVEL_NAMES =
   Level.entries.joinToString(separator = ", ", prefix = "[", postfix = "]", transform = Level::name)
@@ -125,7 +132,7 @@ internal fun List<SarifSchema210>.merge(
     // Some projects produce multiple reports for different variants, so we need to
     // de-dupe.
     // Using the default distinct() function leaves duplicates, so using a custom selector
-    .distinctBy { it.shallowHash }
+    .distinctBy { it.shallowKey }
     .also { log("Merged ${it.size} results") }
 
   if (mergedResults.isEmpty()) {

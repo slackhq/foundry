@@ -133,8 +133,8 @@ public class ApplyBaselinesToSarifs : CliktCommand() {
           .merge(removeUriPrefixes = removeUriPrefixes, log = ::echo)
       }
       Mode.UPDATE -> {
-        val baselineResultsByHash = baselineResults.associateBy { it.identityHash }
-        val resultsByHash = results.associateBy { it.identityHash }
+        val baselineResultsByKey = baselineResults.associateBy { it.identityKey }
+        val resultsByKey = results.associateBy { it.identityKey }
         // New -> No match in the baseline
         // Unchanged -> Exact match in the baseline.
         // Updated -> Partial match is found. Not sure if we could realistically detect this well
@@ -143,13 +143,13 @@ public class ApplyBaselinesToSarifs : CliktCommand() {
         // Absent -> Nothing to report, means this issue was fixed presumably. Not sure how this
         //           would show up in a baseline state tbh
         val baselinedResults = results.map { result ->
-          val baselineResult = baselineResultsByHash[result.identityHash]
+          val baselineResult = baselineResultsByKey[result.identityKey]
           when {
             baselineResult == null -> {
               // No baseline result, so it's new!
               result.copy(baselineState = BaselineState.New)
             }
-            baselineResult.shallowHash == result.shallowHash -> {
+            baselineResult.shallowKey == result.shallowKey -> {
               // They're they same, so it's unchanged
               result.copy(baselineState = BaselineState.Unchanged, suppressions = suppressions)
             }
@@ -163,7 +163,7 @@ public class ApplyBaselinesToSarifs : CliktCommand() {
           if (includeAbsent) {
             // Create a copy of the baseline results that are absent with a suppression
             baselineResults
-              .filter { result -> result.identityHash !in resultsByHash }
+              .filter { result -> result.identityKey !in resultsByKey }
               .map { it.copy(baselineState = BaselineState.Absent, suppressions = suppressions) }
           } else {
             emptyList()
