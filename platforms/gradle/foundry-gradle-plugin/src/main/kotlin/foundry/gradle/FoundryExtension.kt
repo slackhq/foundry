@@ -1138,7 +1138,8 @@ public abstract class AndroidFeaturesHandler @Inject constructor() {
    * Enables android instrumentation tests for this project.
    *
    * @param excludeFromAggregation If true, the test will be excluded from Flank/Fladle/emulator.wtf
-   *   test aggregation.
+   *   test aggregation. Its sources still compile as part of `ciUnitTest` unless
+   *   `foundry.android.test.compileExcluded` is false.
    * @param allowedVariants If set, the allowed variants to enable android tests for.
    */
   public fun androidTest(

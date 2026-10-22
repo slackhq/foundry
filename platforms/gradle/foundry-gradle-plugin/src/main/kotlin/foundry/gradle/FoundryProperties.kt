@@ -551,6 +551,15 @@ internal constructor(
     get() = resolver.booleanProvider("foundry.android.test.minifyEnabled", false)
 
   /**
+   * If enabled, `ciUnitTest` also compiles androidTest sources that
+   * `androidTest(excludeFromAggregation = true)` keeps out of test aggregation. Aggregation is
+   * otherwise the only CI build of androidTest sources, so excluded ones silently stop compiling
+   * when their dependencies change.
+   */
+  public val compileExcludedAndroidTests: Boolean
+    get() = booleanProperty("foundry.android.test.compileExcluded", defaultValue = true)
+
+  /**
    * Location for robolectric-core to be referenced by app. Temporary till we have a better solution
    * for "always add these" type of deps.
    *

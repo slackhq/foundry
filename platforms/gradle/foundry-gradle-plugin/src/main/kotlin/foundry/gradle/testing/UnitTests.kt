@@ -21,6 +21,7 @@ import foundry.gradle.artifacts.FoundryArtifact
 import foundry.gradle.artifacts.Publisher
 import foundry.gradle.artifacts.Resolver
 import foundry.gradle.avoidance.SkippyArtifacts
+import foundry.gradle.capitalizeUS
 import foundry.gradle.ciUnitTestAndroidVariant
 import foundry.gradle.configureEach
 import foundry.gradle.isActionsCi
@@ -302,6 +303,17 @@ internal object UnitTests {
     ) {
       dependsOn(dependencyTaskName)
     }
+  }
+
+  /**
+   * Makes `ciUnitTest` compile the androidTest sources of [androidTestComponentName] (for example
+   * `debugAndroidTest`) without building or running the test APK.
+   */
+  fun compileAndroidTestInCiUnitTest(project: Project, androidTestComponentName: String) {
+    val compileTaskName = "compile${androidTestComponentName.capitalizeUS()}Sources"
+    project.tasks
+      .named { it == CI_UNIT_TEST_TASK_NAME }
+      .configureEach { dependsOn(compileTaskName) }
   }
 
   /**
