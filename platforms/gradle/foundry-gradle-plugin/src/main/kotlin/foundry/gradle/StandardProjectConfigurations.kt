@@ -672,6 +672,13 @@ internal class StandardProjectConfigurations(
               }
             }
 
+            if (excluded && foundryProperties.compileExcludedAndroidTests) {
+              // Nothing else in CI builds excluded androidTest sources.
+              (variant as? LibraryVariant)?.androidTest?.let {
+                UnitTests.compileAndroidTestInCiUnitTest(project, it.name)
+              }
+            }
+
             if (excluded || !isAffectedProject) {
               val reason = if (excluded) "excluded" else "not affected"
               val taskPath = "${projectPath}:androidTest"
