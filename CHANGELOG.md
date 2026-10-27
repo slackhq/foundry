@@ -4,7 +4,13 @@ Changelog
 **Unreleased**
 --------------
 
+0.38.0
+------
+
+_2026-10-27_
+
 - **Behavior change**: `ciUnitTest` and `compileCiUnitTest` now compile androidTest sources that `androidTest(excludeFromAggregation = true)` keeps out of test aggregation. Aggregation was the only CI build of androidTest sources, so excluded ones (benchmarks, typically) silently stopped compiling when their dependencies changed. This is on by default, so excluded sources that already fail to compile now fail these tasks. Set `foundry.android.test.compileExcluded=false` to opt out.
+- Build against JDK 27.
 
 0.37.3
 ------
