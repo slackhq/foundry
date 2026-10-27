@@ -635,6 +635,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0380" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.38.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0373" class="md-nav__link">
     <span class="md-ellipsis">
       0.37.3
@@ -2544,6 +2553,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#0380" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.38.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0373" class="md-nav__link">
     <span class="md-ellipsis">
       0.37.3
@@ -4364,6 +4382,12 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased"><strong>Unreleased</strong><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0380">0.38.0<a class="headerlink" href="#0380" title="Permanent link">&para;</a></h2>
+<p><em>2026-10-27</em></p>
+<ul>
+<li><strong>Behavior change</strong>: <code>ciUnitTest</code> and <code>compileCiUnitTest</code> now compile androidTest sources that <code>androidTest(excludeFromAggregation = true)</code> keeps out of test aggregation. Aggregation was the only CI build of androidTest sources, so excluded ones (benchmarks, typically) silently stopped compiling when their dependencies changed. This is on by default, so excluded sources that already fail to compile now fail these tasks. Set <code>foundry.android.test.compileExcluded=false</code> to opt out.</li>
+<li>Build against JDK 27.</li>
+</ul>
 <h2 id="0373">0.37.3<a class="headerlink" href="#0373" title="Permanent link">&para;</a></h2>
 <p><em>2026-10-21</em></p>
 <ul>
