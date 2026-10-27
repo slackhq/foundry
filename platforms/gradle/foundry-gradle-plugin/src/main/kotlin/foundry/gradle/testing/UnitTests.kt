@@ -306,13 +306,14 @@ internal object UnitTests {
   }
 
   /**
-   * Makes `ciUnitTest` compile the androidTest sources of [androidTestComponentName] (for example
-   * `debugAndroidTest`) without building or running the test APK.
+   * Makes `ciUnitTest` and `compileCiUnitTest` compile the androidTest sources of
+   * [androidTestComponentName] (for example `debugAndroidTest`) without building or running the
+   * test APK.
    */
   fun compileAndroidTestInCiUnitTest(project: Project, androidTestComponentName: String) {
     val compileTaskName = "compile${androidTestComponentName.capitalizeUS()}Sources"
     project.tasks
-      .named { it == CI_UNIT_TEST_TASK_NAME }
+      .named { it == CI_UNIT_TEST_TASK_NAME || it == COMPILE_CI_UNIT_TEST_NAME }
       .configureEach { dependsOn(compileTaskName) }
   }
 
