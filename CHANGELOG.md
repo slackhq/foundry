@@ -4,6 +4,9 @@ Changelog
 **Unreleased**
 --------------
 
+- Raise JVM target across all targets to `25`.
+- Apple Silicon thermals logging now reads the thermal state through FFM rather than JNA+embedded dylib.
+
 0.38.0
 ------
 

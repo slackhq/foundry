@@ -16,8 +16,6 @@
 package foundry.gradle.util
 
 import com.squareup.moshi.JsonClass
-import com.sun.jna.Library
-import com.sun.jna.Native
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import foundry.cli.AppleSiliconCompat.Arch
 import foundry.cli.AppleSiliconCompat.Arch.ARM64
@@ -268,9 +266,15 @@ public data class ThermLog(
   val isThrottled: Boolean = speedLimit != -1 && speedLimit < 100
 }
 
+/**
+ * Polls the macOS thermal state every 5 seconds. [readThermalState] returns the raw
+ * `NSProcessInfoThermalState` value and defaults to [ProcessInfoThermalState.read]. Tests can pass
+ * a fake.
+ */
 internal class AppleSiliconThermals(
   private val logger: Logger,
   private val thermalsFileProvider: () -> File,
+  private val readThermalState: () -> Int = ProcessInfoThermalState::read,
 ) : ThermalsWatcher {
 
   private var emissions: BehaviorSubject<Thermals> = BehaviorSubject.create()
@@ -345,20 +349,15 @@ internal class AppleSiliconThermals(
   private fun getThermalState(): ThermalState? {
     val rawValue =
       try {
-        JnaThermalState.INSTANCE.thermal_state()
+        readThermalState()
       } catch (t: Throwable) {
-        // If Gradle is misconfigured, this will fail to load and result in a massive cascading
-        // stacktrace to RxJava that's more or less incomprehensible to read. Instead, we'll
-        // just swallow the exception and log an error.
+        // A missing library or symbol, or blocked native access, fails here and would result in a
+        // massive cascading stacktrace to RxJava that's more or less incomprehensible to read.
+        // Instead, we'll just swallow the exception and log an error.
         logger.error("Could not read thermals state: ${t.message}")
         return null
       }
-    // Raw value in this case is 0-4, which we use as the ordinal of our enums for convenience
-    return if (rawValue in 0..ThermalState.entries.size) {
-      ThermalState.entries[rawValue]
-    } else {
-      null
-    }
+    return ThermalState.fromRawValue(rawValue)
   }
 
   /** From `Foundation.NSProcessInfo.ThermalState`. */
@@ -385,17 +384,14 @@ internal class AppleSiliconThermals(
      * to respond to user actions. Consider stopping use of camera and other peripherals if your
      * application is using them.
      */
-    CRITICAL(3),
-  }
-}
+    CRITICAL(3);
 
-/** JNA wrapper interface for the `thermal_state` dylib */
-internal interface JnaThermalState : Library {
-  // Corresponds to the thermal_state function in thermal_state.swift
-  @Suppress("FunctionName") fun thermal_state(): Int
-
-  companion object {
-    val INSTANCE: JnaThermalState =
-      Native.load("thermal_state", JnaThermalState::class.java) as JnaThermalState
+    companion object {
+      /**
+       * Returns the state for a raw `NSProcessInfoThermalState` value, or null if it is unknown.
+       * Raw values are 0-3 and match the ordinals of these entries.
+       */
+      fun fromRawValue(rawValue: Int): ThermalState? = entries.getOrNull(rawValue)
+    }
   }
 }
