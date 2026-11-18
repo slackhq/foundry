@@ -107,8 +107,6 @@ dependencies {
   implementation(libs.guava)
   // Graphing library with Betweenness Centrality algo for modularization score
   implementation(libs.jgrapht)
-  implementation(libs.jna)
-  implementation(libs.jna.platform)
   implementation(libs.moshi)
   implementation(libs.oshi) { because("To read hardware information") }
   implementation(libs.rxjava)
