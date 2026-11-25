@@ -40,6 +40,8 @@ pluginManagement {
 
     google()
 
+    gradlePluginPortal()
+
     // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only
     // tested on CI shadow jobs
     // https://kotlinlang.slack.com/archives/C0KLZSCHF/p1616514468003200?thread_ts=1616509748.001400&cid=C0KLZSCHF
@@ -47,14 +49,14 @@ pluginManagement {
       name = "Kotlin-Bootstrap"
       content {
         // this repository *only* contains Kotlin artifacts (don't try others here)
-        includeGroupByRegex("org\\.jetbrains.*")
+        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
       }
     }
 
     maven("https://packages.jetbrains.team/maven/p/kpm/public/")
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-
-    gradlePluginPortal()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") {
+      content { includeGroupByRegex("org\\.jetbrains\\.compose.*") }
+    }
   }
 }
 
@@ -125,12 +127,14 @@ dependencyResolutionManagement {
       name = "Kotlin-Bootstrap"
       content {
         // this repository *only* contains Kotlin artifacts (don't try others here)
-        includeGroupByRegex("org\\.jetbrains.*")
+        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
       }
     }
 
     maven("https://packages.jetbrains.team/maven/p/kpm/public/")
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") {
+      content { includeGroupByRegex("org\\.jetbrains\\.compose.*") }
+    }
 
     intellijPlatform { defaultRepositories() }
 
