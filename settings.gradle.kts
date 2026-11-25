@@ -43,7 +43,7 @@ pluginManagement {
     // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only
     // tested on CI shadow jobs
     // https://kotlinlang.slack.com/archives/C0KLZSCHF/p1616514468003200?thread_ts=1616509748.001400&cid=C0KLZSCHF
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap") {
+    maven("https://packages.jetbrains.team/maven/p/kt/bootstrap") {
       name = "Kotlin-Bootstrap"
       content {
         // this repository *only* contains Kotlin artifacts (don't try others here)
@@ -52,7 +52,7 @@ pluginManagement {
     }
 
     maven("https://packages.jetbrains.team/maven/p/kpm/public/")
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
 
     gradlePluginPortal()
   }
@@ -121,7 +121,7 @@ dependencyResolutionManagement {
     // Kotlin bootstrap repository, useful for testing against Kotlin dev builds. Usually only
     // tested on CI shadow jobs
     // https://kotlinlang.slack.com/archives/C0KLZSCHF/p1616514468003200?thread_ts=1616509748.001400&cid=C0KLZSCHF
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap") {
+    maven("https://packages.jetbrains.team/maven/p/kt/bootstrap") {
       name = "Kotlin-Bootstrap"
       content {
         // this repository *only* contains Kotlin artifacts (don't try others here)
@@ -130,7 +130,7 @@ dependencyResolutionManagement {
     }
 
     maven("https://packages.jetbrains.team/maven/p/kpm/public/")
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
 
     intellijPlatform { defaultRepositories() }
 
